@@ -14,25 +14,25 @@ class Qws(Experiment):
         env_vars = {}
         variables = {}
 
-        variables['experiment_setup'] = ''
-        variables['lx'] = '32'
-        variables['ly'] = '6'
-        variables['lz'] = '4'
-        variables['lt'] = '3'
-        variables['px'] = '1'
-        variables['py'] = '1'
-        variables['pz'] = '1'
-        variables['pt'] = '1'
-        variables['tol_outer'] = '-1'
-        variables['tol_inner'] = '-1'
-        variables['maxiter_plus1_outer'] = '6'
-        variables['maxiter_inner'] = '50'
+        variables["experiment_setup"] = ""
+        variables["lx"] = "32"
+        variables["ly"] = "6"
+        variables["lz"] = "4"
+        variables["lt"] = "3"
+        variables["px"] = "1"
+        variables["py"] = "1"
+        variables["pz"] = "1"
+        variables["pt"] = "1"
+        variables["tol_outer"] = "-1"
+        variables["tol_inner"] = "-1"
+        variables["maxiter_plus1_outer"] = "6"
+        variables["maxiter_inner"] = "50"
 
         if self.spec.satisfies("programming_model=openmp"):
-            env_vars["OMP_NUM_THREADS"] = '{omp_num_threads}'
+            env_vars["OMP_NUM_THREADS"] = "{omp_num_threads}"
 
             variables["n_nodes"] = ["1"]
-            variables["n_ranks"] = '{processes_per_node} * {n_nodes}'
+            variables["n_ranks"] = "{processes_per_node} * {n_nodes}"
             variables["omp_num_threads"] = ["48"]
             variables["arch"] = "OpenMP"
 
