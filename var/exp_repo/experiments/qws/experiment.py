@@ -5,8 +5,8 @@ from benchpark.experiment import Experiment
 class Qws(Experiment):
     variant(
         "programming_model",
-        default="openmp",
-        values=("openmp"),
+        default="mpi",
+        values=("mpi", "openmp"),
         description="on-node parallelism model",
     )
 
@@ -42,7 +42,7 @@ class Qws(Experiment):
                     f"problem-{str(self.spec)}": {
                         "env_vars": env_vars,
                         "experiments": {
-                            "qws_omp_{n_nodes}_{omp_num_threads}_{lx}_{ly}_{lz}_{lt}_{px}_{py}_{pz}_{pt}_{tol_outer}_{tol_inner}_{maxiter_plus1_outer}_{maxiter_inner}": {
+                            "qws_mpi_{n_nodes}_{omp_num_threads}_{lx}_{ly}_{lz}_{lt}_{px}_{py}_{pz}_{pt}_{tol_outer}_{tol_inner}_{maxiter_plus1_outer}_{maxiter_inner}": {
                                 "variants": {
                                     "package_manager": "spack",
                                 },
@@ -58,10 +58,11 @@ class Qws(Experiment):
         # TODO: express that we need certain variables from system
         # Does not need to happen before merge, separate task
         spack_spec = "qws@master +mpi{modifier_spack_variant}"
+        packages = [self.spec.name, "{modifier_package_name}"]
+
         if self.spec.satisfies("programming_model=openmp"):
             spack_spec += "+openmp"
-
-        packages = ["default-mpi", self.spec.name, "{modifier_package_name}"]
+            packages.append("openmp")
 
         return {
             "software": {
