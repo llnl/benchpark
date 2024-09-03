@@ -30,7 +30,6 @@ class Qws(Experiment):
 
         if self.spec.satisfies("programming_model=openmp"):
             # env_vars["OMP_NUM_THREADS"] = "{omp_num_threads}"
-            
             variables["processes_per_node"] = ["1"]
             variables["n_nodes"] = ["1"]
             variables["n_ranks"] = "{processes_per_node} * {n_nodes}"
