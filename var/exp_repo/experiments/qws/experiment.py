@@ -5,7 +5,7 @@ from benchpark.experiment import Experiment
 class Qws(Experiment):
     variant(
         "programming_model",
-        default="mpi",
+        default="openmp",
         values=("mpi", "openmp"),
         description="on-node parallelism model",
     )
