@@ -29,8 +29,9 @@ class Qws(Experiment):
         variables["maxiter_inner"] = "50"
 
         if self.spec.satisfies("programming_model=openmp"):
-            env_vars["OMP_NUM_THREADS"] = "{omp_num_threads}"
-
+            # env_vars["OMP_NUM_THREADS"] = "{omp_num_threads}"
+            
+            variables["processes_per_node"] = ["1"]
             variables["n_nodes"] = ["1"]
             variables["n_ranks"] = "{processes_per_node} * {n_nodes}"
             variables["omp_num_threads"] = ["48"]
@@ -39,8 +40,8 @@ class Qws(Experiment):
         return {
             "qws": {
                 "workloads": {
-                    f"problem-{str(self.spec)}": {
-                        "env_vars": env_vars,
+                    "qws": {
+                        #"env_vars": env_vars,
                         "experiments": {
                             "qws_mpi_{n_nodes}_{omp_num_threads}_{lx}_{ly}_{lz}_{lt}_{px}_{py}_{pz}_{pt}_{tol_outer}_{tol_inner}_{maxiter_plus1_outer}_{maxiter_inner}": {
                                 "variants": {
@@ -57,21 +58,20 @@ class Qws(Experiment):
     def compute_spack_section(self):
         # TODO: express that we need certain variables from system
         # Does not need to happen before merge, separate task
-        spack_spec = "qws@master +mpi{modifier_spack_variant}"
-        packages = [self.spec.name, "{modifier_package_name}"]
+        #spack_spec = "qws@master +mpi{modifier_spack_variant}"
+        spack_spec = "qws@master +mpi"
+        packages = [self.spec.name, "default-mpi"]
 
         if self.spec.satisfies("programming_model=openmp"):
             spack_spec += "+openmp"
-            packages.append("openmp")
+            # packages.append("openmp")
 
         return {
-            "software": {
-                "packages": {
-                    self.spec.name: {
-                        "spack_spec": spack_spec,
-                        "compiler": "default_compiler",  # TODO: this should probably move?
-                    }
-                },
-                "environments": {"qws": {"packages": packages}},
-            }
+            "packages": {
+                self.spec.name: {
+                    "pkg_spec": spack_spec,
+                    "compiler": "default_compiler",  # TODO: this should probably move?
+                }
+            },
+            "environments": {"qws": {"packages": packages}},
         }
