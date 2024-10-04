@@ -65,11 +65,9 @@ ramble:
 
   software:
     packages:
-      default-compiler:
-        pkg_spec: fj@4.10.0
       salmon-tddft:
         pkg_spec: salmon-tddft@2.0.2
-        compiler: compiler-fj
+        compiler: default-compiler
       cmake:
         pkg_spec: cmake
         compiler: compiler-gcc
