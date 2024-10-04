@@ -40,7 +40,7 @@ class Qws(Experiment):
             "qws": {
                 "workloads": {
                     "qws": {
-                        #"env_vars": env_vars,
+                        # "env_vars": env_vars,
                         "experiments": {
                             "qws_mpi_{n_nodes}_{omp_num_threads}_{lx}_{ly}_{lz}_{lt}_{px}_{py}_{pz}_{pt}_{tol_outer}_{tol_inner}_{maxiter_plus1_outer}_{maxiter_inner}": {
                             "qws_omp_{n_nodes}_{omp_num_threads}_{lx}_{ly}_{lz}_{lt}_{px}_{py}_{pz}_{pt}_{tol_outer}_{tol_inner}_{maxiter_plus1_outer}_{maxiter_inner}": {
@@ -59,7 +59,7 @@ class Qws(Experiment):
     def compute_spack_section(self):
         # TODO: express that we need certain variables from system
         # Does not need to happen before merge, separate task
-        #spack_spec = "qws@master +mpi{modifier_spack_variant}"
+        # spack_spec = "qws@master +mpi{modifier_spack_variant}"
         spack_spec = "qws@master +mpi"
         packages = [self.spec.name, "default-mpi"]
 
