@@ -24,266 +24,266 @@ jobs:
           spack mirror add ci-buildcache oci://ghcr.io/llnl/benchpark-binary-cache
           spack config add "packages:all:target:[x86_64_v3]"
 
-                  env | grep SPACK >> "$GITHUB_ENV"
-                  env | grep RAMBLE >> "$GITHUB_ENV"
-                  echo "PATH=$PATH" >> "$GITHUB_ENV"
+          env | grep SPACK >> "$GITHUB_ENV"
+          env | grep RAMBLE >> "$GITHUB_ENV"
+          echo "PATH=$PATH" >> "$GITHUB_ENV"
 
-              - name: Setup Saxpy Workspace
-                working-directory: ./workspace/saxpy/openmp/nosite-x86_64/workspace/
-                run: |
-                  ramble \
-                    --workspace-dir . \
-                    --disable-progress-bar \
-                    --disable-logger \
-                    -c config:spack_flags:install:'--no-check-signature' \
-                    workspace setup
+      - name: Setup Saxpy Workspace
+        working-directory: ./workspace/saxpy/openmp/nosite-x86_64/workspace/
+        run: |
+          ramble \
+            --workspace-dir . \
+            --disable-progress-bar \
+            --disable-logger \
+            -c config:spack_flags:install:'--no-check-signature' \
+            workspace setup
 
-              - name: Run Saxpy Experiments
-                working-directory: ./workspace/saxpy/openmp/nosite-x86_64/workspace/
-                run: |
-                  ramble \
-                    --workspace-dir . \
-                    --disable-progress-bar \
-                    --disable-logger \
-                    on \
-                    --executor '{execute_experiment}' \
-                    --where '{n_nodes} == 1'
+      - name: Run Saxpy Experiments
+        working-directory: ./workspace/saxpy/openmp/nosite-x86_64/workspace/
+        run: |
+          ramble \
+            --workspace-dir . \
+            --disable-progress-bar \
+            --disable-logger \
+            on \
+            --executor '{execute_experiment}' \
+            --where '{n_nodes} == 1'
 
-              - name: Analyze Saxpy Results
-                working-directory: ./workspace/saxpy/openmp/nosite-x86_64/workspace/
-                run: |
-                  ramble \
-                    --workspace-dir . \
-                    --disable-progress-bar \
-                    --disable-logger \
-                    workspace analyze
+      - name: Analyze Saxpy Results
+        working-directory: ./workspace/saxpy/openmp/nosite-x86_64/workspace/
+        run: |
+          ramble \
+            --workspace-dir . \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace analyze
 
-              - name: Archive Experiment Workspace
-                working-directory: ./workspace/saxpy/openmp/nosite-x86_64/workspace/
-                if: always()
-                run: |
-                  ramble \
-                    --workspace-dir . \
-                    --disable-progress-bar \
-                    --disable-logger \
-                    workspace archive
+      - name: Archive Experiment Workspace
+        working-directory: ./workspace/saxpy/openmp/nosite-x86_64/workspace/
+        if: always()
+        run: |
+          ramble \
+            --workspace-dir . \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace archive
 
-              - name: Upload Workspace Archive as CI Artifact
-                if: always()
-                uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874
-                with:
-                  name: workspace-archive
-                  path: './workspace/saxpy/openmp/nosite-x86_64/workspace/archive/**'
+      - name: Upload Workspace Archive as CI Artifact
+        if: always()
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874
+        with:
+          name: workspace-archive
+          path: './workspace/saxpy/openmp/nosite-x86_64/workspace/archive/**'
 
-              - name: Upload Binaries to CI Cache
-                if: github.ref == 'refs/heads/develop'
-                run: |
-                  spack mirror set \
-                    --push \
-                    --oci-username ${{ github.actor }} \
-                    --oci-password "${{ secrets.GITHUB_TOKEN }}" \
-                    ci-buildcache
+      - name: Upload Binaries to CI Cache
+        if: github.ref == 'refs/heads/develop'
+        run: |
+          spack mirror set \
+            --push \
+            --oci-username ${{ github.actor }} \
+            --oci-password "${{ secrets.GITHUB_TOKEN }}" \
+            ci-buildcache
 
-                  spack buildcache push \
-                    -j $(($(nproc) + 1)) \
-                    --base-image ubuntu:22.04 \
-                    --unsigned \
-                    --update-index ci-buildcache \
-                    $(spack find --format '/{hash}')
-          dryrunexperiments:
-            runs-on: ubuntu-latest
-            steps:
-              - name: Checkout Benchpark
-                uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938
+          spack buildcache push \
+            -j $(($(nproc) + 1)) \
+            --base-image ubuntu:22.04 \
+            --unsigned \
+            --update-index ci-buildcache \
+            $(spack find --format '/{hash}')
+  dryrunexperiments:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Benchpark
+        uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938
 
-              - name: Add needed Python libs
-                run: |
-                  pip install -r ./requirements.txt
+      - name: Add needed Python libs
+        run: |
+          pip install -r ./requirements.txt
 
-              - name: Dry run amg2023/openmp on Dane with allocation modifier
-                run: |
-                  ./bin/benchpark setup amg2023/openmp LLNL-Dane-DELL-sapphirerapids-OmniPath workspace/
-                  . workspace/setup.sh
-                  ramble \
-                    --workspace-dir workspace/amg2023/openmp/LLNL-Dane-DELL-sapphirerapids-OmniPath/workspace \
-                    --disable-progress-bar \
-                    --disable-logger \
-                    workspace setup --dry-run
+      - name: Dry run amg2023/openmp on Dane with allocation modifier
+        run: |
+          ./bin/benchpark setup amg2023/openmp LLNL-Dane-DELL-sapphirerapids-OmniPath workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/amg2023/openmp/LLNL-Dane-DELL-sapphirerapids-OmniPath/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
 
-              - name: Dry run amg2023/cuda on Sierra with allocation modifier
-                run: |
-                  ./bin/benchpark setup amg2023/cuda LLNL-Sierra-IBM-power9-V100-Infiniband workspace/
-                  . workspace/setup.sh
-                  ramble \
-                    --workspace-dir workspace/amg2023/cuda/LLNL-Sierra-IBM-power9-V100-Infiniband/workspace \
-                    --disable-progress-bar \
-                    --disable-logger \
-                    workspace setup --dry-run
+      - name: Dry run amg2023/cuda on Sierra with allocation modifier
+        run: |
+          ./bin/benchpark setup amg2023/cuda LLNL-Sierra-IBM-power9-V100-Infiniband workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/amg2023/cuda/LLNL-Sierra-IBM-power9-V100-Infiniband/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
 
-              - name: Dry run amg2023/cuda on Pascal with allocation modifier
-                run: |
-                  ./bin/benchpark setup amg2023/cuda LLNL-Pascal-Penguin-broadwell-P100-OmniPath workspace/
-                  . workspace/setup.sh
-                  ramble \
-                    --workspace-dir workspace/amg2023/cuda/LLNL-Pascal-Penguin-broadwell-P100-OmniPath/workspace \
-                    --disable-progress-bar \
-                    --disable-logger \
-                    workspace setup --dry-run
+      - name: Dry run amg2023/cuda on Pascal with allocation modifier
+        run: |
+          ./bin/benchpark setup amg2023/cuda LLNL-Pascal-Penguin-broadwell-P100-OmniPath workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/amg2023/cuda/LLNL-Pascal-Penguin-broadwell-P100-OmniPath/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
 
-              - name: Dry run dynamic kripke-openmp on nosite-x86_64 with allocation modifier
-                run: |
-                  ./bin/benchpark experiment init --dest=kripke-openmp kripke programming_model=openmp
-                  ./bin/benchpark setup ./kripke-openmp nosite-x86_64 workspace/
-                  . workspace/setup.sh
-                  ramble \
-                    --workspace-dir workspace/kripke-openmp/nosite-x86_64/workspace \
-                    --disable-progress-bar \
-                    --disable-logger \
-                    workspace setup --dry-run
+      - name: Dry run dynamic kripke-openmp on nosite-x86_64 with allocation modifier
+        run: |
+          ./bin/benchpark experiment init --dest=kripke-openmp kripke programming_model=openmp
+          ./bin/benchpark setup ./kripke-openmp nosite-x86_64 workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/kripke-openmp/nosite-x86_64/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
 
-              - name: Dry run dynamic kripke-rocm on LLNL-Tioga-HPECray-zen3-MI250X-Slingshot with allocation modifier
-                run: |
-                  ./bin/benchpark experiment init --dest=kripke-rocm kripke programming_model=rocm
-                  ./bin/benchpark setup ./kripke-openmp LLNL-Tioga-HPECray-zen3-MI250X-Slingshot workspace/
-                  . workspace/setup.sh
-                  ramble \
-                    --workspace-dir workspace/kripke-openmp/LLNL-Tioga-HPECray-zen3-MI250X-Slingshot/workspace \
-                    --disable-progress-bar \
-                    --disable-logger \
-                    workspace setup --dry-run
-                    
-              - name: Dry run kripke/cuda on Sierra with allocation modifier
-                run: |
-                  ./bin/benchpark setup kripke/cuda LLNL-Sierra-IBM-power9-V100-Infiniband workspace/
-                  . workspace/setup.sh
-                  ramble \
-                    --workspace-dir workspace/kripke/cuda/LLNL-Sierra-IBM-power9-V100-Infiniband/workspace \
-                    --disable-progress-bar \
-                    --disable-logger \
-                    workspace setup --dry-run
+      - name: Dry run dynamic kripke-rocm on LLNL-Tioga-HPECray-zen3-MI250X-Slingshot with allocation modifier
+        run: |
+          ./bin/benchpark experiment init --dest=kripke-rocm kripke programming_model=rocm
+          ./bin/benchpark setup ./kripke-openmp LLNL-Tioga-HPECray-zen3-MI250X-Slingshot workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/kripke-openmp/LLNL-Tioga-HPECray-zen3-MI250X-Slingshot/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+            
+      - name: Dry run kripke/cuda on Sierra with allocation modifier
+        run: |
+          ./bin/benchpark setup kripke/cuda LLNL-Sierra-IBM-power9-V100-Infiniband workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/kripke/cuda/LLNL-Sierra-IBM-power9-V100-Infiniband/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
 
-              - name: Dry run kripke/rocm on dynamic Tioga with allocation modifier
-                run: |
-                  ./bin/benchpark system init --dest=tioga-system tioga rocm=551 compiler=cce ~gtl
-                  ./bin/benchpark setup kripke/rocm ./tioga-system workspace/
-                  . workspace/setup.sh
-                  ramble \
-                    --workspace-dir workspace/kripke/rocm/Tioga-d34a754/workspace \
-                    --disable-progress-bar \
-                    --disable-logger \
-                    workspace setup --dry-run
+      - name: Dry run kripke/rocm on dynamic Tioga with allocation modifier
+        run: |
+          ./bin/benchpark system init --dest=tioga-system tioga rocm=551 compiler=cce ~gtl
+          ./bin/benchpark setup kripke/rocm ./tioga-system workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/kripke/rocm/Tioga-d34a754/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
 
-              - name: Dry run dynamic saxpy/rocm with static Tioga
-                run: |
-                  ./bin/benchpark experiment init --dest=saxpy-rocm saxpy programming_model=rocm
-                  ./bin/benchpark setup ./saxpy-rocm LLNL-Tioga-HPECray-zen3-MI250X-Slingshot workspace/
-                  . workspace/setup.sh
-                  ramble \
-                    --workspace-dir workspace/saxpy-rocm/LLNL-Tioga-HPECray-zen3-MI250X-Slingshot/workspace \
-                    --disable-progress-bar \
-                    --disable-logger \
-                    workspace setup --dry-run
+      - name: Dry run dynamic saxpy/rocm with static Tioga
+        run: |
+          ./bin/benchpark experiment init --dest=saxpy-rocm saxpy programming_model=rocm
+          ./bin/benchpark setup ./saxpy-rocm LLNL-Tioga-HPECray-zen3-MI250X-Slingshot workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/saxpy-rocm/LLNL-Tioga-HPECray-zen3-MI250X-Slingshot/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
 
-              - name: Dry run dynamic saxpy/rocm with dynamic Tioga
-                run: |
-                  ./bin/benchpark system init --dest=tioga-system2 tioga rocm=551 compiler=cce ~gtl
-                  ./bin/benchpark experiment init --dest=saxpy-rocm2 saxpy programming_model=rocm
-                  ./bin/benchpark setup ./saxpy-rocm2 ./tioga-system2 workspace/
-                  . workspace/setup.sh
-                  ramble \
-                    --workspace-dir workspace/saxpy-rocm2/Tioga-d34a754/workspace \
-                    --disable-progress-bar \
-                    --disable-logger \
-                    workspace setup --dry-run
+      - name: Dry run dynamic saxpy/rocm with dynamic Tioga
+        run: |
+          ./bin/benchpark system init --dest=tioga-system2 tioga rocm=551 compiler=cce ~gtl
+          ./bin/benchpark experiment init --dest=saxpy-rocm2 saxpy programming_model=rocm
+          ./bin/benchpark setup ./saxpy-rocm2 ./tioga-system2 workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/saxpy-rocm2/Tioga-d34a754/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
 
-              - name: Dry run laghos/mpi-only on LLNL-Magma-Penguin-icelake-OmniPath with allocation modifier
-                run: |
-                  ./bin/benchpark setup laghos/mpi-only LLNL-Magma-Penguin-icelake-OmniPath workspace/
-                  . workspace/setup.sh
-                  ramble \
-                    --workspace-dir workspace/laghos/mpi-only/LLNL-Magma-Penguin-icelake-OmniPath/workspace \
-                    --disable-progress-bar \
-                    --disable-logger \
-                    workspace setup --dry-run
+      - name: Dry run laghos/mpi-only on LLNL-Magma-Penguin-icelake-OmniPath with allocation modifier
+        run: |
+          ./bin/benchpark setup laghos/mpi-only LLNL-Magma-Penguin-icelake-OmniPath workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/laghos/mpi-only/LLNL-Magma-Penguin-icelake-OmniPath/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
 
-              - name: Dry run laghos/mpi-only on LLNL-Ruby-icelake-OmniPath with allocation modifier
-                run: |
-                  ./bin/benchpark setup laghos/mpi-only LLNL-Ruby-icelake-OmniPath workspace/
-                  . workspace/setup.sh
-                  ramble \
-                    --workspace-dir workspace/laghos/mpi-only/LLNL-Ruby-icelake-OmniPath/workspace \
-                    --disable-progress-bar \
-                    --disable-logger \
-                    workspace setup --dry-run
+      - name: Dry run laghos/mpi-only on LLNL-Ruby-icelake-OmniPath with allocation modifier
+        run: |
+          ./bin/benchpark setup laghos/mpi-only LLNL-Ruby-icelake-OmniPath workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/laghos/mpi-only/LLNL-Ruby-icelake-OmniPath/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
 
-              - name: Dry run lammps/rocm on Tioga with allocation modifier
-                run: |
-                  ./bin/benchpark setup lammps/rocm LLNL-Tioga-HPECray-zen3-MI250X-Slingshot workspace/
-                  . workspace/setup.sh
-                  ramble \
-                    --workspace-dir workspace/lammps/rocm/LLNL-Tioga-HPECray-zen3-MI250X-Slingshot/workspace \
-                    --disable-progress-bar \
-                    --disable-logger \
-                    workspace setup --dry-run
+      - name: Dry run lammps/rocm on Tioga with allocation modifier
+        run: |
+          ./bin/benchpark setup lammps/rocm LLNL-Tioga-HPECray-zen3-MI250X-Slingshot workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/lammps/rocm/LLNL-Tioga-HPECray-zen3-MI250X-Slingshot/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
 
-              - name: Dry run hpl/openmp with Caliper-topdown modifier on Magma
-                run: |
-                  ./bin/benchpark setup hpl/openmp --modifier=caliper-topdown LLNL-Magma-Penguin-icelake-OmniPath workspace/
-                  . workspace/setup.sh
-                  ramble \
-                    --workspace-dir workspace/hpl/openmp/LLNL-Magma-Penguin-icelake-OmniPath/workspace \
-                    --disable-progress-bar \
-                    --disable-logger \
-                    workspace setup --dry-run
+      - name: Dry run hpl/openmp with Caliper-topdown modifier on Magma
+        run: |
+          ./bin/benchpark setup hpl/openmp --modifier=caliper-topdown LLNL-Magma-Penguin-icelake-OmniPath workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/hpl/openmp/LLNL-Magma-Penguin-icelake-OmniPath/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
 
-              - name: Dry run dynamic quicksilver-openmp on nosite-x86_64 with allocation modifier
-                run: |
-                  ./bin/benchpark experiment init --dest=quicksilver-openmp quicksilver experiment=weak
-                  ./bin/benchpark setup ./quicksilver-openmp nosite-x86_64 workspace/
-                  . workspace/setup.sh
-                  ramble \
-                    --workspace-dir workspace/quicksilver-openmp/nosite-x86_64/workspace \
-                    --disable-progress-bar \
-                    --disable-logger \
-                    workspace setup --dry-run
+      - name: Dry run dynamic quicksilver-openmp on nosite-x86_64 with allocation modifier
+        run: |
+          ./bin/benchpark experiment init --dest=quicksilver-openmp quicksilver experiment=weak
+          ./bin/benchpark setup ./quicksilver-openmp nosite-x86_64 workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/quicksilver-openmp/nosite-x86_64/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
 
-              - name: Dry run phloem/mpi-only on nosite-x86_64 with allocation modifier
-                run: |
-                  ./bin/benchpark setup phloem/mpi-only nosite-x86_64 workspace/
-                  . workspace/setup.sh
-                  ramble \
-                    --workspace-dir workspace/phloem/mpi-only/nosite-x86_64/workspace \
-                    --disable-progress-bar \
-                    --disable-logger \
-                    workspace setup --dry-run
+      - name: Dry run phloem/mpi-only on nosite-x86_64 with allocation modifier
+        run: |
+          ./bin/benchpark setup phloem/mpi-only nosite-x86_64 workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/phloem/mpi-only/nosite-x86_64/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
 
-              - name: Dry run genesis/openmp with allocation modifier on Fugaku
-                run: |
-                  ./bin/benchpark setup genesis/openmp RCCS-Fugaku-Fujitsu-A64FX-TofuD workspace/
-                  . workspace/setup.sh
-                  ramble \
-                    --workspace-dir workspace/genesis/openmp/RCCS-Fugaku-Fujitsu-A64FX-TofuD/workspace \
-                    --disable-progress-bar \
-                    --disable-logger \
-                    workspace setup --dry-run
+      - name: Dry run genesis/openmp with allocation modifier on Fugaku
+        run: |
+          ./bin/benchpark setup genesis/openmp RCCS-Fugaku-Fujitsu-A64FX-TofuD workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/genesis/openmp/RCCS-Fugaku-Fujitsu-A64FX-TofuD/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
 
-              - name: Dry run salmon/openmp with allocation modifier on Fugaku
-                run: |
-                  ./bin/benchpark setup salmon/openmp RCCS-Fugaku-Fujitsu-A64FX-TofuD workspace/
-                  . workspace/setup.sh
-                  ramble \
-                    --workspace-dir workspace/salmon/openmp/RCCS-Fugaku-Fujitsu-A64FX-TofuD/workspace \
-                    --disable-progress-bar \
-                    --disable-logger \
-                    workspace setup --dry-run
-                    
-              - name: Dry run dynamic qws/openmp with allocation modifier on Fugaku
-                run:
-                  ./bin/benchpark experiment init --dest=qws-openmp qws programming_model=openmp
-                  ./bin/benchpark setup qws-openmp RCCS-Fugaku-Fujitsu-A64FX-TofuD workspace/
-                  . workspace/setup.sh
-                  ramble \
-                    --workspace-dir workspace/qws-openmp/RCCS-Fugaku-Fujitsu-A64FX-TofuD/workspace \
-                    --disable-progress-bar \
-                    --disable-logger \
-                    workspace setup --dry-run
+      - name: Dry run salmon/openmp with allocation modifier on Fugaku
+        run: |
+          ./bin/benchpark setup salmon/openmp RCCS-Fugaku-Fujitsu-A64FX-TofuD workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/salmon/openmp/RCCS-Fugaku-Fujitsu-A64FX-TofuD/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+            
+      - name: Dry run dynamic qws/openmp with allocation modifier on Fugaku
+        run:
+          ./bin/benchpark experiment init --dest=qws-openmp qws programming_model=openmp
+          ./bin/benchpark setup qws-openmp RCCS-Fugaku-Fujitsu-A64FX-TofuD workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/qws-openmp/RCCS-Fugaku-Fujitsu-A64FX-TofuD/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
