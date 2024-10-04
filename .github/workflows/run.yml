@@ -280,7 +280,7 @@ jobs:
       - name: Dry run dynamic qws/openmp with allocation modifier on Fugaku
         run:
           ./bin/benchpark experiment init --dest=qws-openmp qws programming_model=openmp
-          ./bin/benchpark setup qws-openmp RCCS-Fugaku-Fujitsu-A64FX-TofuD workspace/
+          ./bin/benchpark setup ./qws-openmp RCCS-Fugaku-Fujitsu-A64FX-TofuD workspace/
           . workspace/setup.sh
           ramble \
             --workspace-dir workspace/qws-openmp/RCCS-Fugaku-Fujitsu-A64FX-TofuD/workspace \
