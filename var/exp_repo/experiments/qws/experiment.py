@@ -11,7 +11,7 @@ class Qws(Experiment):
     )
 
     def compute_applications_section(self):
-        env_vars = {}
+        # env_vars = {}
         variables = {}
 
         variables["experiment_setup"] = ""
