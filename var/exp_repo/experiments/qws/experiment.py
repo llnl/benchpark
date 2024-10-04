@@ -71,7 +71,7 @@ class Qws(Experiment):
             "packages": {
                 self.spec.name: {
                     "pkg_spec": spack_spec,
-                    "compiler": "default_compiler",  # TODO: this should probably move?
+                    "compiler": "default-compiler",  # TODO: this should probably move?
                 }
             },
             "environments": {"qws": {"packages": packages}},
