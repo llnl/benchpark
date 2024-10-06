@@ -70,7 +70,7 @@ ramble:
         compiler: default-compiler
       cmake:
         pkg_spec: cmake
-        compiler: compiler-gcc
+        compiler: default-compiler
     environments:
       salmon-tddft:
         packages:

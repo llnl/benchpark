@@ -259,6 +259,15 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
+      - name: Dry run salmon/openmp with allocation modifier on x86
+        run: |
+          ./bin/benchpark setup salmon/openmp nosite-x86_64 workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/salmon/openmp/nosite-x86_64/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
   dynamicdryrunexperiments:
     runs-on: ubuntu-22.04
     steps:
