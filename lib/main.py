@@ -17,6 +17,7 @@ import yaml
 import benchpark.cmd.audit
 import benchpark.cmd.system
 import benchpark.cmd.experiment
+import benchpark.cmd.init
 import benchpark.cmd.setup
 import benchpark.cmd.unit_test
 import benchpark.paths
@@ -198,6 +199,11 @@ def init_commands(subparsers, actions_dict):
     system_parser = subparsers.add_parser("system", help="Initialize a system config")
     benchpark.cmd.system.setup_parser(system_parser)
 
+    init_parser = subparsers.add_parser(
+        "init", help="Initialize a set of experiments with a compatible system"
+    )
+    benchpark.cmd.init.setup_parser(init_parser)
+
     experiment_parser = subparsers.add_parser(
         "experiment", help="Interact with experiments"
     )
@@ -218,6 +224,7 @@ def init_commands(subparsers, actions_dict):
     )
     benchpark.cmd.audit.setup_parser(audit_parser)
 
+    actions_dict["init"] = benchpark.cmd.init.command
     actions_dict["system"] = benchpark.cmd.system.command
     actions_dict["experiment"] = benchpark.cmd.experiment.command
     actions_dict["setup"] = benchpark.cmd.setup.command
