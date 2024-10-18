@@ -6,6 +6,52 @@
       - HOST: dane
         ARCHCONFIG: LLNL-Dane-DELL-sapphirerapids-OmniPath
 
+.on_machine:
+  tags:
+    - shell
+    - $HOST
+  <<: *test_clusters
+  rules:
+    # Only report failure if the pipeline failed.
+    - if: '$CI_JOB_NAME =~ /status_failure/'
+      when: on_failure
+    # A true statement is expected to allow jobs to run. Here is the default.
+    - when: on_success
+
+.status_report: &status_report
+    - export context=$HOST
+    - |
+      curl --url "https://api.github.com/repos/llnl/${CI_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+           --header 'Content-Type: application/json' \
+           --header "authorization: Bearer ${GITHUB_TOKEN}" \
+           --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${context} pipeline\", \"context\": \"ci/gitlab/${context}\" }"
+
+status_pending:
+  extends: [.on_machine]
+  stage: status_initiate
+  id_tokens:
+    CI_JOB_JWT:
+      aud: https://lc.llnl.gov/gitlab
+  script:
+    - export pipeline_status="pending"
+    - *status_report
+
+status_success:
+  extends: [.on_machine]
+  stage: status_update
+  script:
+    - export pipeline_status="success"
+    - *status_report
+  when: on_success
+
+status_failure:
+  extends: [.on_machine]
+  stage: status_update
+  script:
+    - export pipeline_status="failure"
+    - *status_report
+  when: on_failure
+
 test_run:
   stage: test
   tags:
