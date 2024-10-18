@@ -3,8 +3,20 @@
     matrix:
       - HOST: tioga
         ARCHCONFIG: LLNL-Tioga-HPECray-zen3-MI250X-Slingshot
+        SYSTEMHASH: Tioga-975af3c
       - HOST: dane
         ARCHCONFIG: LLNL-Dane-DELL-sapphirerapids-OmniPath
+        SYSTEMHASH: Cts-2c51a80
+      - HOST: ruby
+        ARCHCONFIG: LLNL-Ruby-icelake-OmniPath
+        SYSTEMHASH: Cts-6d48f81
+
+.test_benchmarks: &test_benchmarks
+  parallel:
+    matrix:
+      - BENCHMARK:
+          - kripke
+          - saxpy
 
 .on_machine:
   tags:
@@ -52,7 +64,7 @@ status_failure:
     - *status_report
   when: on_failure
 
-test_run:
+legacy_test_run:
   resource_group: $HOST
   stage: test
   tags:
@@ -86,3 +98,123 @@ test_run:
     # Run Saxpy Experiments
     - ramble --workspace-dir . --disable-progress-bar --disable-logger
       on --executor '{execute_experiment}' --where '{n_nodes} == 1'
+    # Analyze Experiments
+    - ramble --workspace-dir . --disable-progress-bar workspace analyze
+
+test_run_tioga_rocm:
+  resource_group: $HOST
+  stage: test
+  tags:
+    - tioga
+    - batch
+  rules:
+    - changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/*
+        - experiments/**
+        - systems/**
+        - repo/**
+        - modifiers/**
+        - var/**
+        - lib/**
+  script:
+    - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
+    # Initialize system & experiment
+    - ./bin/benchpark system init --dest=tioga-system tioga ~gtl
+    - ./bin/benchpark experiment init --dest=${BENCHMARK}-benchmark ${BENCHMARK} rocm=oui
+    # Build Workspace
+    - ./bin/benchpark setup ${BENCHMARK}-benchmark tioga-system workspace/
+    # Setup Ramble & Spack
+    - . workspace/setup.sh
+    # Setup Workspace
+    - cd ./workspace/${BENCHMARK}-benchmark/Tioga-975af3c/workspace/
+    - ramble --workspace-dir . --disable-progress-bar --disable-logger workspace setup
+    # Run Experiments
+    - ramble --workspace-dir . --disable-progress-bar --disable-logger
+      on --executor '{execute_experiment}' --where '{n_nodes} == 1'
+  <<: *test_benchmarks
+
+test_run_kripke_openmp:
+  resource_group: $HOST
+  stage: test
+  tags:
+    - $HOST
+    - batch
+  <<: *test_clusters
+  variables:
+    SCHEDULER_PARAMETERS: -N 1 -t 1h
+  rules:
+    - changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/*
+        - experiments/**
+        - systems/**
+        - repo/**
+        - modifiers/**
+        - var/**
+        - lib/**
+  script:
+    - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
+    # Initialize system & experiment
+    - |
+        if [ "$HOST" == "tioga" ]; then
+            ./bin/benchpark system init --dest=tioga-system tioga ~gtl
+        else
+            ./bin/benchpark system init --dest=$HOST-system cts cluster=$HOST
+        fi
+    - ./bin/benchpark experiment init --dest=kripke-benchmark kripke openmp=oui
+    # Build Workspace
+    - ./bin/benchpark setup kripke-benchmark $HOST-system workspace/
+    # Setup Ramble & Spack
+    - . workspace/setup.sh
+    # Setup Workspace
+    - cd ./workspace/kripke-benchmark/$SYSTEMHASH/workspace/
+    - ramble --workspace-dir . --disable-progress-bar --disable-logger workspace setup
+    # Run Experiments
+    - ramble --workspace-dir . --disable-progress-bar --disable-logger
+      on --executor '{execute_experiment}' --where '{n_nodes} == 1'
+    # Analyze Experiments
+    - ramble --workspace-dir . --disable-progress-bar workspace analyze
+
+test_run_saxpy_openmp:
+  resource_group: $HOST
+  stage: test
+  tags:
+    - $HOST
+    - batch
+  <<: *test_clusters
+  variables:
+    SCHEDULER_PARAMETERS: -N 1 -t 1h
+  rules:
+    - changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/*
+        - experiments/**
+        - systems/**
+        - repo/**
+        - modifiers/**
+        - var/**
+        - lib/**
+  script:
+    - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
+    # Initialize system & experiment
+    - |
+        if [ "$HOST" == "tioga" ]; then
+            ./bin/benchpark system init --dest=tioga-system tioga ~gtl
+        else
+            ./bin/benchpark system init --dest=$HOST-system cts cluster=$HOST
+        fi
+    - ./bin/benchpark experiment init --dest=saxpy-benchmark saxpy openmp=oui
+    # Build Workspace
+    - ./bin/benchpark setup saxpy-benchmark $HOST-system workspace/
+    # Setup Ramble & Spack
+    - . workspace/setup.sh
+    # Setup Workspace
+    - cd ./workspace/saxpy-benchmark/$SYSTEMHASH/workspace/
+    - ramble --workspace-dir . --disable-progress-bar --disable-logger workspace setup
+    # Run Experiments
+    - ramble --workspace-dir . --disable-progress-bar --disable-logger
+      on --executor '{execute_experiment}' --where '{n_nodes} == 1'
+    # Analyze Experiments
+    - ramble --workspace-dir . --disable-progress-bar workspace analyze
+>>>>>>> 87e5a1b (add more jobs)
