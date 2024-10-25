@@ -56,10 +56,10 @@ For example, to run the AMG2023 strong scaling experiment for problem 1, using C
 
 Initializing an experiment generates the following yaml files:
 
-- ``ramble.yaml`` defines the `Ramble specs <https://googlecloudplatform.github.io/ramble/workspace_config.html#workspace-config>`_ for building, running, analyzing and archiving experiments.
+- ``ramble.yaml`` defines the `Ramble specs <https://ramble.readthedocs.io/en/latest/workspace_config.html#>`_ for building, running, analyzing and archiving experiments.
 - ``execution_template.tpl`` serves as a template for the final experiment script that will be concretized and executed.
 
-A detailed description of Ramble configuration files is available at `Ramble workspace_config <https://googlecloudplatform.github.io/ramble/workspace_config.html>`_.
+A detailed description of Ramble configuration files is available at `Ramble workspace_config <https://ramble.readthedocs.io/en/latest/workspace_config.html#>`_.
 
 For more advanced usage, such as customizing hardware allocation or performance profiling see :doc:`modifiers`.
 

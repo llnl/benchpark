@@ -7,7 +7,7 @@
 Benchpark Modifiers
 =====================
 In Benchpark, a ``modifier`` follows the `Ramble Modifier
-<https://googlecloudplatform.github.io/ramble/tutorials/10_using_modifiers.html#modifiers>`_
+<https://ramble.readthedocs.io/en/latest/tutorials/10_using_modifiers.html>`_
 and is an abstract object that can be applied to a large set of reproducible
 specifications. Modifiers are intended to encapsulate reusable patterns that
 perform a specific configuration of an experiment. This may include injecting

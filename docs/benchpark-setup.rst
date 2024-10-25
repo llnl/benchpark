@@ -45,7 +45,7 @@ with the following directory structure::
 
 The ``setup.sh`` script calls the Spack and Ramble setup scripts.  It optionally accepts
 parameters to ``ramble workspace setup`` as `documented in Ramble
-<https://googlecloudplatform.github.io/ramble/workspace.html#setting-up-a-workspace>`_,
+<https://ramble.readthedocs.io/en/latest/getting_started.html#setting-up-a-workspace>`_,
 including ``--dry-run`` and ``--phases make_experiments``.
 
 Now you are ready to compile your experiments as described in :doc:`build-experiment`.

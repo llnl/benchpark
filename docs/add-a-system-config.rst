@@ -242,7 +242,7 @@ The following yaml files are examples of what is generated for the modified_x86 
 manager (Spack) should use to build the benchmarks on this system.
 ``software.yaml`` becomes the spack section in the `Ramble configuration
 file
-<https://googlecloudplatform.github.io/ramble/configuration_files.html#spack-config>`_.
+<https://ramble.readthedocs.io/en/latest/configuration_files.html#external-spack-environment-support>`_.
 
 .. code-block:: yaml
 
