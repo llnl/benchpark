@@ -3,69 +3,18 @@
 
    SPDX-License-Identifier: Apache-2.0
 
-=================================
-Editing the experiment (optional)
-=================================
-
-Benchpark configuration files are organized as follows::
-
-  $benchpark
-  ├── configs
-  │  ├── ${SYSTEM1}
-  │  │  ├── auxiliary_software_files
-  │  │  │  ├── compilers.yaml
-  │  │  │  └── packages.yaml
-  │  │  ├── software.yaml
-  │  │  └── variables.yaml
-  ├── experiments
-  │  ├── ${BENCHMARK1}
-  │  │  ├── ${ProgrammingModel1}
-  │  │  │  ├── execute_experiment.tpl
-  │  │  │  └── ramble.yaml
-  │  │  ├── ${ProgrammingModel1}
-  │  │  │  ├── execute_experiment.tpl
-  │  │  │  └── ramble.yaml
-  └── repo
-     ├── ${BENCHMARK1}
-     │  ├── application.py
-     │  └── package.py
-     └── repo.yaml
-
-You can edit these configuration files to change the behavior of your experiments.
-
-System Specification
---------------------
-Files under ``benchpark/configs/${SYSTEM}`` provide the specification
-of the software stack on your system
-(see :doc:`add-a-system-config` for details).
-
-Benchmark Specification
------------------------
-If you would like to modify a specification of your benchmark,
-you can do so by upstreaming changes to Spack and/or Ramble,
-or working on your benchmark specification in ``benchpark/repo/${BENCHMARK}``
-(see :doc:`add-a-benchmark` for details).
-
-Experiment Specification
-------------------------
-Files under ``benchpark/experiments/${BENCHMARK}/${ProgrammingModel}``
-provide the specifications for the experiments.
-If you would like to make changes to your experiments,  such as enabling
-specific tools to measure the performance of your experiments,
-you can manually edit the specifications in ``ramble.yaml``
-(see :doc:`add-an-experiment` for details).
-
+=====================
 Benchpark Modifiers
--------------------
+=====================
 In Benchpark, a ``modifier`` follows the `Ramble Modifier
 <https://googlecloudplatform.github.io/ramble/tutorials/10_using_modifiers.html#modifiers>`_
 and is an abstract object that can be applied to a large set of reproducible
-specifications. Modifiers are intended to encasulate reusable patterns that
+specifications. Modifiers are intended to encapsulate reusable patterns that
 perform a specific configuration of an experiment. This may include injecting
 performance analysis or setting up system resources.
 
-Requesting resources with Allocation Modifier
----------------------------------------------
+Requesting Resources with the Allocation Modifier
+---------------------------------------------------
 Given:
 
   - an experiment that requests resources (nodes, cpus, gpus, etc.), and
@@ -118,24 +67,25 @@ The modifier checks the resources requested by the experiment,
 computes the values for the unspecified variables, and
 checks that the request does not exceed the resources available on the system.
 
-To use the resource allocation modifier with your experiment,
-add the following in your ramble.yaml::
+The resource allocation modifier is used by default in your experiment. However, 
+it will only calculate values if you have not specified them yourself. 
 
-  ramble:
-    include:
-      - ...
-      - ./configs/modifier.yaml
-    config:
-      ...
-    modifiers:
-    - name: allocation
-    applications:
-      ...
-    software:
-      ...
-    environments:
-      - ...
-      - '{modifier_package_name}'
+If you do not specify values, it will assign the default values as listed below.
+
+.. list-table:: Default Values For the Allocation Modifier
+   :widths: 20 80
+   :header-rows: 1
+
+   * - Variable
+     - Default Value
+   * - n_nodes
+     - (n_ranks / sys_cores_per_node) OR (n_gpus / sys_gpus_per_node) whichever is greater
+   * - n_ranks
+     - (n_nodes * n_ranks_per_node) OR (n_gpus)
+   * - n_gpus
+     - 0 
+   * - n_threads_per_proc
+     - 1 
 
 
 Profiling with Caliper Modifier
@@ -147,7 +97,7 @@ benchmarks in Benchpark. More documentation on Caliper can be found `here
 To turn on profiling with Caliper, add ``--modifier=<caliper_modifier>`` to the Benchpark
 setup step::
 
-    ./benchpark setup <Benchmark/ProgrammingModel> <System> --modifier=<caliper_modifier> <workspace-dir>
+    ./benchpark setup </output/path/to/experiments_root> </output/path/to/system_root> --modifier=<caliper_modifier> </output/path/to/workspace> 
 
 Valid values for ``<caliper_modifier>`` are found in the **Caliper Modifier**
 column of the table below.  Benchpark will link the experiment to Caliper,
@@ -179,3 +129,4 @@ is created which contains the collected performance metrics.
    * - caliper-cuda
      - NVIDIA GPUs
      - | - CUDA API functions (e.g., time.gpu)
+

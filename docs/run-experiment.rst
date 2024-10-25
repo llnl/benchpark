@@ -42,3 +42,5 @@ Further, if the benchmark has restart capability, existing output may alter the 
 benchpark would run in the second run.  Generally, we would advise the user to remove the
 ``$workspace/experiments`` directory before re-running the experiments using
 ``ramble --disable-progress-bar --workspace-dir . on``.
+
+Once you have run your experiment you can try :doc:`analyze-experiment`.

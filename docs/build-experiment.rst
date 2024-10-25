@@ -3,9 +3,9 @@
 
    SPDX-License-Identifier: Apache-2.0
 
-=======================
-Building the experiment
-=======================
+=====================================
+Defining the Experiments in Benchpark
+=====================================
 
 ``benchpark setup`` has set up the directory structure for your experiment.
 The next step is setting up the Ramble workspace and building the code::
@@ -31,5 +31,7 @@ Ramble will build the source code and set up the following workspace directory s
                               <Benchmark>_<ProgrammingModel>_<Problem>
                                     execute_experiment
 
-If you edit any of the files, see :doc:`FAQ-what-to-rerun` to determine
+If you edit any of the files, see :doc:`FAQ` to determine
 whether you need to re-do any of the previous steps.
+
+Once that is complete, you are ready for :doc:`run-experiment`. 

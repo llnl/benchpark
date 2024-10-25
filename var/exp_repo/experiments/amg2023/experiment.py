@@ -16,9 +16,9 @@ class Amg2023(OpenMPExperiment, CudaExperiment, ROCmExperiment, Caliper, Experim
 
     variant(
         "experiment",
-        default="example",
-        values=("strong", "weak", "example"),
-        description="type of experiment",
+        default="single-node",
+        values=("strong", "weak", "example", "single-node", "throughput"),
+        description="strong scaling, weak scaling, single-node, throughput study or an example",
     )
 
     variant(
@@ -87,14 +87,71 @@ class Amg2023(OpenMPExperiment, CudaExperiment, ROCmExperiment, Caliper, Experim
 
     def compute_applications_section(self):
         if self.spec.satisfies("experiment=example"):
-            self.make_experiment_example()
-        elif self.spec.satisfies("experiment=strong"):
-            self.make_experiment_strong()
-        elif self.spec.satisfies("experiment=weak"):
-            self.make_experiment_weak()
-        else:
-            raise NotImplementedError(
-                "Unsupported experiment. Only strong, weak and example experiments are supported"
+            return self.make_experiment_example()
+
+        px = "px"
+        py = "py"
+        pz = "pz"
+        nx = "nx"
+        ny = "ny"
+        nz = "nz"
+        num_procs = "{px} * {py} * {pz}"
+
+        variables = {}
+        variables["n_ranks"] = num_procs
+
+        if self.spec.satisfies("programming_model=openmp"):
+            variables["n_ranks"] = num_procs
+            variables["n_threads_per_proc"] = 1
+            n_resources = "{n_ranks}_{n_threads_per_proc}"
+        elif self.spec.satisfies("programming_model=cuda"):
+            variables["n_gpus"] = num_procs
+            n_resources = "{n_gpus}"
+        elif self.spec.satisfies("programming_model=rocm"):
+            variables["n_gpus"] = num_procs
+            n_resources = "{n_gpus}"
+
+        experiment_name = f"amg2023_{self.spec.variants['programming_model'][0]}_{self.spec.variants['experiment'][0]}_{self.workload}_{{n_nodes}}_{n_resources}_{{{px}}}_{{{py}}}_{{{pz}}}_{{{nx}}}_{{{ny}}}_{{{nz}}}"
+
+        experiment_setup = {}
+        experiment_setup["variants"] = {"package_manager": "spack"}
+
+        # Number of processes in each dimension
+        initial_p = [2, 2, 2]
+
+        # Per-process size (in zones) in each dimension
+        initial_n = [80, 80, 80]
+
+        if self.spec.satisfies("experiment=single-node"):
+            variables[px] = initial_p[0]
+            variables[py] = initial_p[1]
+            variables[pz] = initial_p[2]
+            variables[nx] = initial_n[0]
+            variables[ny] = initial_n[1]
+            variables[nz] = initial_n[2]
+        else:  # A scaling study
+            input_params = {}
+            if self.spec.satisfies("experiment=throughput"):
+                variables[px] = initial_p[0]
+                variables[py] = initial_p[1]
+                variables[pz] = initial_p[2]
+                scaling_variable = (nx, ny, nz)
+                input_params[scaling_variable] = initial_n
+            elif self.spec.satisfies("experiment=strong"):
+                scaling_variable = (px, py, pz)
+                input_params[scaling_variable] = initial_p
+                variables[nx] = initial_n[0]
+                variables[ny] = initial_n[1]
+                variables[nz] = initial_n[2]
+            elif self.spec.satisfies("experiment=weak"):
+                scaling_variable = (px, py, pz)
+                input_params[scaling_variable] = initial_p
+                input_params[(nx, ny, nz)] = initial_n
+            variables |= self.scale_experiment_variables(
+                input_params,
+                int(self.spec.variants["scaling-factor"][0]),
+                int(self.spec.variants["scaling-iterations"][0]),
+                scaling_variable,
             )
 
     def compute_spack_section(self):

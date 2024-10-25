@@ -365,3 +365,15 @@ jobs:
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
+
+      - name: Dry run dynamic saxpy/openmp with dynamic generic x86
+        run: |
+          ./bin/benchpark system init --dest=x86-system genericx86
+          ./bin/benchpark experiment init --dest=saxpy-omp-generic saxpy programming_model=openmp
+          ./bin/benchpark setup ./saxpy-omp-generic ./x86-system workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/saxpy-omp-generic/Genericx86-040898b/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
