@@ -5,11 +5,11 @@
 
 import os
 
-from benchpark.paths import source_location
+import benchpark.paths
 
 
 def benchpark_experiments():
-    source_dir = source_location()
+    source_dir = benchpark.paths.benchpark_root
     experiments = []
     experiments_dir = source_dir / "experiments"
     for x in os.listdir(experiments_dir):
@@ -19,7 +19,7 @@ def benchpark_experiments():
 
 
 def benchpark_modifiers():
-    source_dir = source_location()
+    source_dir = benchpark.paths.benchpark_root
     modifiers = []
     for x in os.listdir(source_dir / "modifiers"):
         modifiers.append(x)
@@ -27,7 +27,7 @@ def benchpark_modifiers():
 
 
 def benchpark_systems():
-    source_dir = source_location()
+    source_dir = benchpark.paths.benchpark_root
     systems = []
     for x in os.listdir(source_dir / "configs"):
         if not (

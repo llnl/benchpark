@@ -12,9 +12,9 @@ import sys
 
 
 def main():
-    basedir = pathlib.Path(os.path.abspath(__file__)).parent.parent
-    main = basedir / "lib" / "main.py"
-    subprocess.run([sys.executable, main] + sys.argv[1:], check=True)
+    basedir = pathlib.Path(__file__).resolve().parents[1]
+    main_py = basedir / "lib" / "main.py"
+    subprocess.run([sys.executable, main_py] + sys.argv[1:], check=True)
 
 
 if __name__ == "__main__":

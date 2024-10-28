@@ -6,11 +6,16 @@
 import os
 import pathlib
 
+
+def _source_location() -> pathlib.Path:
+    """Return the location of the project source files directory."""
+    path_to_this_file = __file__
+    return pathlib.Path(path_to_this_file).resolve().parents[2]
+
+
+benchpark_root = _source_location()
+lib_path = benchpark_root / "lib" / "benchpark"
+test_path = lib_path / "test"
 benchpark_home = pathlib.Path(os.path.expanduser("~/.benchpark"))
 global_ramble_path = benchpark_home / "ramble"
 global_spack_path = benchpark_home / "spack"
-
-
-def source_location():
-    the_directory_with_this_file = os.path.dirname(os.path.abspath(__file__))
-    return pathlib.Path(the_directory_with_this_file).parent.parent

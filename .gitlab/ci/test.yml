@@ -1,0 +1,35 @@
+.test_clusters: &test_clusters
+  parallel:
+    matrix:
+      - HOST: tioga
+        ARCHCONFIG: LLNL-Tioga-HPECray-zen3-MI250X-Slingshot
+      - HOST: dane
+        ARCHCONFIG: LLNL-Dane-DELL-sapphirerapids-OmniPath
+
+test_run:
+  stage: test
+  tags:
+    - $HOST
+    - shell
+  <<: *test_clusters
+  rules:
+    - changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/*
+        - experiments/**
+        - systems/**
+        - repo/**
+        - modifiers/**
+        - var/**
+        - lib/**
+  script:
+    - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
+    # Build Saxpy Workspace
+    - ./bin/benchpark setup saxpy/openmp $ARCHCONFIG workspace/
+    # Setup Ramble & Spack
+    - . workspace/setup.sh
+    # Setup Saxpy Workspace
+    - cd ./workspace/saxpy/openmp/$ARCHCONFIG/workspace/
+    - ramble --workspace-dir . --disable-progress-bar --disable-logger workspace setup
+    # Run Saxpy Experiments
+    - ramble --workspace-dir . --disable-progress-bar --disable-logger on

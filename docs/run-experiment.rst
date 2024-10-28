@@ -9,7 +9,7 @@ Running an Experiment in Benchpark
 
 To run all of the experiments in the workspace::
 
-   ramble -P -D . on
+   ramble --disable-progress-bar --workspace-dir . on
 
 An output file is generated for each experiment in its unique directory::
 
@@ -41,4 +41,6 @@ Note that re-running the experiment may overwrite any existing output files in t
 Further, if the benchmark has restart capability, existing output may alter the experiments
 benchpark would run in the second run.  Generally, we would advise the user to remove the
 ``$workspace/experiments`` directory before re-running the experiments using
-``ramble -P -D . on``.
+``ramble --disable-progress-bar --workspace-dir . on``.
+
+Once you have run your experiment you can try :doc:`analyze-experiment`.

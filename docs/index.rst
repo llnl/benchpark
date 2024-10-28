@@ -7,24 +7,12 @@
 
 .. toctree::
    :maxdepth: 1
-   :numbered:
-   :caption: Getting Started
+   :caption: Basics
 
-   1-getting-started
-   2-benchpark-list
-   3-opt-edit-experiment
-   4-benchpark-setup
-   5-build-experiment
-   6-run-experiment
-   7-analyze-experiment
-
-.. toctree::
-   :maxdepth: 1
-   :caption: FAQ
-
-   FAQ-what-to-rerun
-   FAQ-spack-ramble-dependence
-   FAQ-benchpark-repo
+   getting-started
+   basic-usage
+   benchpark-workflow
+   FAQ
 
 .. toctree::
    :maxdepth: 1
@@ -32,19 +20,36 @@
 
    system-list
    benchmark-list
-   benchpark-help
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Tutorials
+
+   example-workflow
+   llnl-tutorial
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Running Benchpark
+
+   benchpark-setup
+   build-experiment
+   run-experiment
+   analyze-experiment
+   modifiers
+   set-of-experiments
 
 .. toctree::
    :maxdepth: 1
    :caption: Contributing
 
    add-a-system-config
-   add-a-site-specific-system-config
    add-a-benchmark
    add-an-experiment
+   add-a-dryrun
 
 .. toctree::
    :maxdepth: 1
-   :caption: Benchmark Suites
+   :caption: Legacy Workflow
 
-   set-of-experiments
+   legacy-getting-started

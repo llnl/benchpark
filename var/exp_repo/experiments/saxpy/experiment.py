@@ -41,13 +41,20 @@ class Saxpy(Experiment):
         }
         the_experiment.update(matrix_cfg)
 
+        if self.spec.satisfies("programming_model=openmp"):
+            experiment_id = "saxpy_{n}_{n_nodes}_{omp_num_threads}"
+        elif self.spec.satisfies("programming_model=cuda") or self.spec.satisfies(
+            "programming_model=rocm"
+        ):
+            experiment_id = "saxpy_{n}"
+
         return {
             "saxpy": {  # ramble Application name
                 "workloads": {
                     # TODO replace with a hash once we have one?
                     "problem": {
                         "experiments": {
-                            "saxpy_{n}_{n_nodes}_{omp_num_threads}": the_experiment,
+                            experiment_id: the_experiment,
                         }
                     }
                 }

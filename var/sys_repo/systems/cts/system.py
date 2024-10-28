@@ -15,6 +15,9 @@ id_to_resources = {
     "magma": {
         "sys_cores_per_node": 96,
     },
+    "dane": {
+        "sys_cores_per_node": 112,
+    },
 }
 
 
@@ -23,7 +26,7 @@ class Cts(System):
     variant(
         "cluster",
         default="ruby",
-        values=("ruby", "magma"),
+        values=("ruby", "magma", "dane"),
         description="Which cluster to run on",
     )
 
