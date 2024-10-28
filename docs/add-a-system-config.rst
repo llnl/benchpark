@@ -210,7 +210,7 @@ this will generate the software configurations for spack (``software.yaml``). Th
     """
 
 Once the modified system subclass is written, run: 
-``./bin/benchpark system init --dest=modifiedx86-system modifiedx86``
+``benchpark system init --dest=modifiedx86-system modifiedx86``
 
 This will generate the required yaml configurations for your system and you can validate it works with a static experiment test.
 
@@ -220,9 +220,9 @@ Validating the System
 
 To manually validate your new system, you should initialize it and run an existing experiment such as saxpy. For example::
 
-  ./bin/benchpark system init --dest=modifiedx86-system modifiedx86
-  ./bin/benchpark experiment init --dest=saxpy saxpy
-  ./bin/benchpark setup ./saxpy ./modifiedx86-system workspace/
+  benchpark system init --dest=modifiedx86-system modifiedx86
+  benchpark experiment init --dest=saxpy saxpy
+  benchpark setup ./saxpy ./modifiedx86-system workspace/
 
 Then you can run the commands provided by the output, the experiments should be built and run successfully without any errors. 
 

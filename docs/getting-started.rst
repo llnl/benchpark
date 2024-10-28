@@ -14,11 +14,16 @@ Installation
 Git is needed to clone Benchpark, and Python 3.8+ is needed to run Benchpark::
 
     git clone https://github.com/LLNL/benchpark.git
+
+To add the executable to your path, source the setup script::
+
     cd benchpark
+    . setup-env.sh
+    
 
-The executable is in ``/bin``, to check the version you can run:: 
+Now, to check the version you can run:: 
 
-    ./bin/benchpark --version
+    benchpark --version
 
 --------------------
 System Prerequisites

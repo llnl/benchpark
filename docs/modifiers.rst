@@ -94,39 +94,53 @@ We have implemented a Caliper modifier to enable profiling of Caliper-instrument
 benchmarks in Benchpark. More documentation on Caliper can be found `here
 <https://software.llnl.gov/Caliper>`_.
 
-To turn on profiling with Caliper, add ``--modifier=<caliper_modifier>`` to the Benchpark
+To turn on profiling with Caliper, add ``caliper=<caliper_variant>`` to the experiment init
 setup step::
 
-    ./benchpark setup </output/path/to/experiments_root> </output/path/to/system_root> --modifier=<caliper_modifier> </output/path/to/workspace> 
+    benchpark experiment init --dest=</path/to/experiment_root> caliper=<caliper_modifier> </output/path/to/workspace> 
 
-Valid values for ``<caliper_modifier>`` are found in the **Caliper Modifier**
+Valid values for ``<caliper>`` are found in the **Caliper Variant**
 column of the table below.  Benchpark will link the experiment to Caliper,
 and inject appropriate Caliper configuration at runtime.  After the experiments
 in the workspace have completed running, a ``.cali`` file
 is created which contains the collected performance metrics.
 
-.. list-table:: Available caliper modifiers
+.. list-table:: Available caliper variants
    :widths: 20 20 50
    :header-rows: 1
 
-   * - Caliper Modifier
+   * - Caliper Variant
      - Where Applicable
      - Metrics Collected
-   * - caliper
+   * - time
      - Platform-independent
      - | - Min/Max/Avg time/rank: Minimum/Maximum/Average time (in seconds) across all ranks
        | - Total time: Aggregated time (in seconds) for all ranks
-   * - caliper-mpi
+   * - mpi
      - Platform-independent
      - | - Same as basic caliper modifier above
        | - Profiles MPI functions
-   * - caliper-topdown
-     - x86 Intel CPUs
-     - | - Retiring
-       | - Bad speculation
-       | - Front end bound
-       | - Back end bound
-   * - caliper-cuda
+   * - cuda
      - NVIDIA GPUs
      - | - CUDA API functions (e.g., time.gpu)
+   * - topdown-counters-all
+     - x86 Intel CPUs
+     - | - Raw counter values for Intel top-down analysis (all levels)
+   * - topdown-counters-toplevel
+     - x86 Intel CPUs
+     - | - Raw counter values for Intel top-down analysis (top level)
+   * - topdown-all
+     - x86 Intel CPUs
+     - | - Top-down analysis for Intel CPUs (all levels)
+   * - topdown-toplevel
+     - x86 Intel CPUs
+     - | - Top-down analysis for Intel CPUs (top level)
+   
+
+An experiment must inherit from the Caliper experiment class to make use of 
+the Caliper functionality. Most existing experiments should already do this, but if 
+adding to a new experiment, it is as simple as adding it to the class definition signature.
+For example::
+  
+  class Amg2023(Experiment, Caliper):
 

@@ -11,8 +11,8 @@ To setup an experiment workspace you must first initialize both an experiment an
 Any system or experiment variants are specified at the end of the command as shown below.
 The order of the two init commands does not matter, but they both need to be run before the setup command.::
 
-./bin/benchpark system init --dest=</output/path/to/system_root> <SystemName> compiler=<Compiler>
-./bin/benchpark experiment init --dest=</output/path/to/experiments_root> <Benchmark> experiment=<Experiment> programming_model=<ProgrammingModel>
+benchpark system init --dest=</output/path/to/system_root> <SystemName> compiler=<Compiler>
+benchpark experiment init --dest=</output/path/to/experiments_root> <Benchmark> experiment=<Experiment> programming_model=<ProgrammingModel>
 
 
 Once you have a benchmark experiment to run, along with the programming model to use, and a system to run them on.
