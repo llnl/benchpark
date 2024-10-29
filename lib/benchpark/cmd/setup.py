@@ -88,7 +88,9 @@ def benchpark_check_experiment(arg_str):
         )
         raise ValueError(out_str)
 
-    experiment_src_dir = benchpark.paths.benchpark_root / "legacy" / "experiments" / str(arg_str)
+    experiment_src_dir = (
+        benchpark.paths.benchpark_root / "legacy" / "experiments" / str(arg_str)
+    )
     return arg_str, experiment_src_dir
 
 
@@ -116,7 +118,9 @@ def benchpark_check_system(arg_str):
         )
         raise ValueError(out_str)
 
-    configs_src_dir = benchpark.paths.benchpark_root / "legacy" / "systems" / str(arg_str)
+    configs_src_dir = (
+        benchpark.paths.benchpark_root / "legacy" / "systems" / str(arg_str)
+    )
     return arg_str, configs_src_dir
 
 
