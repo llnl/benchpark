@@ -57,7 +57,7 @@ def list_files(root):
 SPDX_MISMATCH, GENERAL_MISMATCH, COPYRIGHT_YEAR_MISMATCH = range(1, 4)
 
 #: Latest year that copyright applies. UPDATE THIS when bumping copyright.
-latest_year = 202[34]
+latest_year = "202[34]"
 strict_date = r"Copyright %s" % latest_year
 
 #: regexes for valid license lines at tops of files
