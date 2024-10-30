@@ -1,24 +1,29 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+from benchpark.error import BenchparkError
 from benchpark.directives import variant
 from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
+from benchpark.scaling import StrongScaling
+from benchpark.scaling import WeakScaling
+from benchpark.scaling import ThroughputScaling
 from benchpark.expr.builtin.caliper import Caliper
 
 
-class Amg2023(OpenMPExperiment, CudaExperiment, ROCmExperiment, Caliper, Experiment):
+class Amg2023(Experiment,
+              OpenMPExperiment, CudaExperiment, ROCmExperiment,
+              StrongScaling, WeakScaling, ThroughputScaling,
+              Caliper):
     variant(
         "workload",
         default="problem1",
         values=("problem1", "problem2"),
         description="problem1 or problem2",
-    )
-
-    variant(
-        "experiment",
-        default="single-node",
-        values=("strong", "weak", "example", "single-node", "throughput"),
-        description="strong scaling, weak scaling, single-node, throughput study or an example",
     )
 
     variant(
@@ -41,118 +46,74 @@ class Amg2023(OpenMPExperiment, CudaExperiment, ROCmExperiment, Caliper, Experim
     #     description="value of n",
     # )
 
-    def make_experiment_example(self):
-        self.add_experiment_name_prefix("example")
-
-        if self.spec.satisfies("openmp=oui"):
-            # TODO: Support variants
-            n = ["55", "110"]
-            self.add_experiment_variable("n_nodes", ["1", "2"], True)
-            self.add_experiment_variable("n_ranks", "8", True)
-            self.add_experiment_variable("n_threads_per_proc", ["4", "6", "12"], True)
-        elif self.spec.satisfies("cuda=oui"):
-            # TODO: Support variants
-            n = ["10", "20"]
-            self.add_experiment_variable("n_gpus", "8", True)
-        elif self.spec.satisfies("rocm=oui"):
-            # TODO: Support variants
-            n = ["110", "220"]
-            self.add_experiment_variable("n_gpus", "8", True)
-        else:
-            raise NotImplementedError(
-                "Unsupported programming_model. Only openmp, cuda and rocm are supported"
-            )
-
-        # TODO: Support variant
-        p = "2"
-        self.add_experiment_variable("px", p, True)
-        self.add_experiment_variable("py", p, True)
-        self.add_experiment_variable("pz", p, True)
-
-        self.add_experiment_variable("nx", n, True)
-        self.add_experiment_variable("ny", n, True)
-        self.add_experiment_variable("nz", n, True)
-
-        self.zip_experiment_variables("size", ["nx", "ny", "nz"])
-
-        if self.spec.satisfies("openmp=oui"):
-            self.matrix_experiment_variables(["size", "n_nodes", "n_threads_per_proc"])
-        if self.spec.satisfies("cuda=oui") or self.spec.satisfies("rocm=oui"):
-            self.matrix_experiment_variables("size")
-
-        if self.spec.satisfies("openmp=oui"):
-            self.add_experiment_exclude(
-                "{n_threads_per_proc} * {n_ranks} > {n_nodes} * {sys_cores_per_node}"
-            )
-
     def compute_applications_section(self):
-        if self.spec.satisfies("experiment=example"):
-            return self.make_experiment_example()
+        # TODO: Replace with conflicts clause
+        scaling_modes = {
+            "strong": self.spec.satisfies("strong=oui"),
+            "weak": self.spec.satisfies("weak=oui"),
+            "throughput": self.spec.satisfies("throughput=oui"),
+            "single_node": self.spec.satisfies("single_node=oui"),
+        }
 
-        px = "px"
-        py = "py"
-        pz = "pz"
-        nx = "nx"
-        ny = "ny"
-        nz = "nz"
-        num_procs = "{px} * {py} * {pz}"
-
-        variables = {}
-        variables["n_ranks"] = num_procs
-
-        if self.spec.satisfies("programming_model=openmp"):
-            variables["n_ranks"] = num_procs
-            variables["n_threads_per_proc"] = 1
-            n_resources = "{n_ranks}_{n_threads_per_proc}"
-        elif self.spec.satisfies("programming_model=cuda"):
-            variables["n_gpus"] = num_procs
-            n_resources = "{n_gpus}"
-        elif self.spec.satisfies("programming_model=rocm"):
-            variables["n_gpus"] = num_procs
-            n_resources = "{n_gpus}"
-
-        experiment_name = f"amg2023_{self.spec.variants['programming_model'][0]}_{self.spec.variants['experiment'][0]}_{self.workload}_{{n_nodes}}_{n_resources}_{{{px}}}_{{{py}}}_{{{pz}}}_{{{nx}}}_{{{ny}}}_{{{nz}}}"
-
-        experiment_setup = {}
-        experiment_setup["variants"] = {"package_manager": "spack"}
+        scaling_mode_enabled = [key for key, value in scaling_modes.items() if value]
+        if len(scaling_mode_enabled) != 1:
+            raise BenchparkError(
+                f"Only one type of scaling per experiment is allowed for application package {self.name}"
+            )
 
         # Number of processes in each dimension
-        initial_p = [2, 2, 2]
+        num_procs = {"px": 2, "py": 2, "pz": 2}
 
         # Per-process size (in zones) in each dimension
-        initial_n = [80, 80, 80]
+        problem_sizes = {"nx": 80, "ny": 80, "nz": 80}
 
-        if self.spec.satisfies("experiment=single-node"):
-            variables[px] = initial_p[0]
-            variables[py] = initial_p[1]
-            variables[pz] = initial_p[2]
-            variables[nx] = initial_n[0]
-            variables[ny] = initial_n[1]
-            variables[nz] = initial_n[2]
-        else:  # A scaling study
-            input_params = {}
-            if self.spec.satisfies("experiment=throughput"):
-                variables[px] = initial_p[0]
-                variables[py] = initial_p[1]
-                variables[pz] = initial_p[2]
-                scaling_variable = (nx, ny, nz)
-                input_params[scaling_variable] = initial_n
-            elif self.spec.satisfies("experiment=strong"):
-                scaling_variable = (px, py, pz)
-                input_params[scaling_variable] = initial_p
-                variables[nx] = initial_n[0]
-                variables[ny] = initial_n[1]
-                variables[nz] = initial_n[2]
-            elif self.spec.satisfies("experiment=weak"):
-                scaling_variable = (px, py, pz)
-                input_params[scaling_variable] = initial_p
-                input_params[(nx, ny, nz)] = initial_n
-            variables |= self.scale_experiment_variables(
-                input_params,
+        if self.spec.satisfies("single_node=oui"):
+            n_resources = 1
+            #TODO: Check if n_ranks / n_resources_per_node <= 1 
+            for pk, pv in num_procs.items():
+                self.add_experiment_variable(pk, pv, True) 
+                n_resources *= pv
+            for nk, nv in problem_sizes.items():
+                self.add_experiment_variable(nk, nv, True) 
+        elif self.spec.satisfies("throughput=oui"):
+            n_resources = 1
+            for pk, pv in num_procs.items():
+                self.add_experiment_variable(pk, pv, True) 
+                n_resources *= pv
+            scaled_variables = self.generate_throughput_scaling_params(
+                {tuple(problem_sizes.keys()): list(problem_sizes.values())},
                 int(self.spec.variants["scaling-factor"][0]),
                 int(self.spec.variants["scaling-iterations"][0]),
-                scaling_variable,
             )
+            for nk, nv in scaled_variables.items():
+                self.add_experiment_variable(nk, nv, True) 
+        elif self.spec.satisfies("strong=oui"):
+            scaled_variables = self.generate_strong_scaling_params(
+                {tuple(num_procs.keys()): list(num_procs.values())},
+                int(self.spec.variants["scaling-factor"][0]),
+                int(self.spec.variants["scaling-iterations"][0]),
+            )
+            for pk, pv in scaled_variables.items():
+                self.add_experiment_variable(pk, pv, True) 
+            n_resources = [x * y * z for x, y, z in zip(*(scaled_variables[p] for p in num_procs if p in scaled_variables))]
+            for nk, nv in problem_sizes.items():
+                self.add_experiment_variable(nk, nv, True) 
+        elif self.spec.satisfies("weak=oui"):
+            scaled_variables = self.generate_weak_scaling_params(
+                {tuple(num_procs.keys()): list(num_procs.values())},
+                {tuple(problem_sizes.keys()): list(problem_sizes.values())},
+                int(self.spec.variants["scaling-factor"][0]),
+                int(self.spec.variants["scaling-iterations"][0]),
+            )
+            n_resources = [px * py * pz for px, py, pz in zip(*(scaled_variables[p] for p in num_procs if p in scaled_variables))]
+            for k, v in scaled_variables.items():
+                self.add_experiment_variable(k, v, True) 
+
+        if self.spec.satisfies("openmp=oui"):
+            self.add_experiment_variable("n_ranks", n_resources, True)
+            self.add_experiment_variable("n_threads_per_proc", 1, True)
+        elif self.spec.satisfies("cuda=oui") or self.spec.satisfies("rocm=oui"):
+            self.add_experiment_variable("n_gpus", n_resources, True)
 
     def compute_spack_section(self):
         # get package version
