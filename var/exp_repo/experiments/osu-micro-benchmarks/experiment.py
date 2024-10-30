@@ -100,7 +100,7 @@ class OsuMicroBenchmarks(Experiment):
                     workload_string: {
                         "experiments": {
                             "scaling_{n_nodes}nodes_medium": {
-				"variants": {
+			        "variants": {
                                     "package_manager": "spack",
                                 },
                                 "variables": variables,
