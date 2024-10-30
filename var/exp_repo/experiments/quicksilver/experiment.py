@@ -8,7 +8,7 @@ from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 
 
-class Quicksilver(OpenMPExperiment, Experiment):
+class Quicksilver(Experiment, OpenMPExperiment):
     variant(
         "workload",
         default="quicksilver",

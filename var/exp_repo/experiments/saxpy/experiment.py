@@ -6,7 +6,7 @@ from benchpark.rocm import ROCmExperiment
 from benchpark.expr.builtin.caliper import Caliper
 
 
-class Saxpy(OpenMPExperiment, CudaExperiment, ROCmExperiment, Caliper, Experiment):
+class Saxpy(Experiment, OpenMPExperiment, CudaExperiment, ROCmExperiment, Caliper):
     variant(
         "workload",
         default="problem",
