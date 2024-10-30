@@ -118,12 +118,12 @@ class OsuMicroBenchmarks(Experiment):
         packages = ["default-mpi", self.spec.name]
 
         return {
-                "packages": {
-                    "osu-micro-benchmarks": {
-                        "pkg_spec": osu_microbenchmarks_spack_spec,
-                        "compiler": "default-compiler",
-                    }
-                },
-                "environments": {"osu-micro-benchmarks": {"packages": packages}},
+            "packages": {
+                "osu-micro-benchmarks": {
+                    "pkg_spec": osu_microbenchmarks_spack_spec,
+                    "compiler": "default-compiler",
+                }
+            },
+            "environments": {"osu-micro-benchmarks": {"packages": packages}},
             
         }
