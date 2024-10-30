@@ -8,7 +8,7 @@ import yaml
 
 def main():
     sysconfig_yaml_files = glob.glob(
-        "../configs/**/system_definition.yaml", recursive=True
+        "../legacy/systems/**/system_definition.yaml", recursive=True
     )
 
     df_list = []
