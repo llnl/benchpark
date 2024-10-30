@@ -50,7 +50,7 @@ with command line arguments.
 Using System API to Generate a System Description
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-System classes are defined in ``var/sys_repo``; once the class has been
+System classes are defined in ``systems/``; once the class has been
 defined, you can invoke ``benchpark system init`` to generate a system
 configuration directory that can then be passed to ``benchpark setup``::
 
@@ -60,15 +60,13 @@ where "tioga rocm=551 compiler=cce ~gtl" describes a config for Tioga that
 uses ROCm 5.5.1 components, a CCE compiler, and MPI without GTL support.
 
 If you want to add support for a new system you can add a class definition
-for that system in a separate directory in ``var/sys_repo/systems/``. For
+for that system in a separate directory in ``/systems/``. For
 example the Tioga system is defined in::
 
   $benchpark
-  ├── var
-     ├── sys_repo
-        ├── systems
-           ├── tioga
-              ├── system.py
+  ├── systems
+     ├── tioga
+        ├── system.py
 
 Static System Configurations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
