@@ -100,6 +100,9 @@ class OsuMicroBenchmarks(Experiment):
                     workload_string: {
                         "experiments": {
                             "scaling_{n_nodes}nodes_medium": {
+				"variants": {
+                                    "package_manager": "spack",
+                                },
                                 "variables": variables,
                             }
                         }
@@ -111,17 +114,16 @@ class OsuMicroBenchmarks(Experiment):
     def compute_spack_section(self):
         # TODO: express that we need certain variables from system
         # Does not need to happen before merge, separate task
-        osu_microbenchmarks_spack_spec = "osu-micro-benchmarks{modifier_spack_variant}"
-        packages = ["default-mpi", self.spec.name, "{modifier_package_name}"]
+        osu_microbenchmarks_spack_spec = "osu-micro-benchmarks"
+        packages = ["default-mpi", self.spec.name]
 
         return {
-            "spack": {
                 "packages": {
                     "osu-micro-benchmarks": {
-                        "spack_spec": osu_microbenchmarks_spack_spec,
-                        "compiler": "default_compiler",
+                        "pkg_spec": osu_microbenchmarks_spack_spec,
+                        "compiler": "default-compiler",
                     }
                 },
                 "environments": {"osu-micro-benchmarks": {"packages": packages}},
-            }
+            
         }
