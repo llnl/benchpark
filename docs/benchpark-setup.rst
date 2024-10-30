@@ -11,8 +11,8 @@ To setup an experiment workspace you must first initialize both an experiment an
 Any system or experiment variants are specified at the end of the command as shown below.
 The order of the two init commands does not matter, but they both need to be run before the setup command.::
 
-./bin/benchpark system init --dest=</output/path/to/system_root> <SystemName> compiler=<Compiler>
-./bin/benchpark experiment init --dest=</output/path/to/experiments_root> <Benchmark> experiment=<Experiment> programming_model=<ProgrammingModel>
+benchpark system init --dest=</output/path/to/system_root> <SystemName> compiler=<Compiler>
+benchpark experiment init --dest=</output/path/to/experiments_root> <Benchmark> experiment=<Experiment> programming_model=<ProgrammingModel>
 
 
 Once you have a benchmark experiment to run, along with the programming model to use, and a system to run them on.
@@ -45,7 +45,7 @@ with the following directory structure::
 
 The ``setup.sh`` script calls the Spack and Ramble setup scripts.  It optionally accepts
 parameters to ``ramble workspace setup`` as `documented in Ramble
-<https://googlecloudplatform.github.io/ramble/workspace.html#setting-up-a-workspace>`_,
+<https://ramble.readthedocs.io/en/latest/getting_started.html#setting-up-a-workspace>`_,
 including ``--dry-run`` and ``--phases make_experiments``.
 
 Now you are ready to compile your experiments as described in :doc:`build-experiment`.

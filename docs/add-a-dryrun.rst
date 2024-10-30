@@ -24,9 +24,9 @@ For example, if you are contributing a system called foo you would test it with 
 
   - name: Dry run dynamic saxpy on dynamic foo
     run: |
-      ./bin/benchpark system init --dest=foo-system foo
-      ./bin/benchpark experiment init --dest=saxpy-openmp saxpy
-      ./bin/benchpark setup ./saxpy ./foo-system workspace/
+      benchpark system init --dest=foo-system foo
+      benchpark experiment init --dest=saxpy-openmp saxpy
+      benchpark setup ./saxpy ./foo-system workspace/
       . workspace/setup.sh
       ramble \
         --workspace-dir workspace/saxpy/foo-{hashID}/workspace \
@@ -43,9 +43,9 @@ For example, if you are contributing a new benchmark called bar:
 
   - name: Dry run dynamic bar on dynamic genericx86
     run: |
-      ./bin/benchpark system init --dest=x86-system genericx86 
-      ./bin/benchpark experiment init --dest=bar-benchmark bar
-      ./bin/benchpark setup ./bar-benchmark ./x86-system workspace/
+      benchpark system init --dest=x86-system genericx86 
+      benchpark experiment init --dest=bar-benchmark bar
+      benchpark setup ./bar-benchmark ./x86-system workspace/
       . workspace/setup.sh
       ramble \
         --workspace-dir workspace/new-benchmark/genericx86-{hashID}/workspace \
