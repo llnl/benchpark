@@ -152,6 +152,7 @@ class Scaling:
                 output_variables[k] = v[0] if len(v[0]) > 1 else v[0][0]
         return output_variables
 
+
 class StrongScaling(Scaling):
     variant(
         "strong",
@@ -160,12 +161,17 @@ class StrongScaling(Scaling):
         description="Strong scaling",
     )
 
-    def generate_strong_scaling_params(self, resource_variable, scaling_factor, num_exprs):
-        return self.scale_experiment_variables(resource_variable, scaling_factor, num_exprs) 
+    def generate_strong_scaling_params(
+        self, resource_variable, scaling_factor, num_exprs
+    ):
+        return self.scale_experiment_variables(
+            resource_variable, scaling_factor, num_exprs
+        )
 
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):
             return "strong_scaling" if self.spec.satisfies("strong=oui") else ""
+
 
 class WeakScaling(Scaling):
     variant(
@@ -175,13 +181,21 @@ class WeakScaling(Scaling):
         description="Weak scaling",
     )
 
-    def generate_weak_scaling_params(self, resource_variable, problem_size_variables, scaling_factor, num_exprs):
+    def generate_weak_scaling_params(
+        self, resource_variable, problem_size_variables, scaling_factor, num_exprs
+    ):
         scaling_variable = next(iter(resource_variable))
-        return self.scale_experiment_variables(resource_variable|problem_size_variables, scaling_factor, num_exprs, scaling_variable) 
+        return self.scale_experiment_variables(
+            resource_variable | problem_size_variables,
+            scaling_factor,
+            num_exprs,
+            scaling_variable,
+        )
 
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):
             return "weak_scaling" if self.spec.satisfies("weak=oui") else ""
+
 
 class ThroughputScaling(Scaling):
     variant(
@@ -191,8 +205,12 @@ class ThroughputScaling(Scaling):
         description="Throughput scaling",
     )
 
-    def generate_throughput_scaling_params(self, problem_size_variables, scaling_factor, num_exprs):
-        return self.scale_experiment_variables(problem_size_variables, scaling_factor, num_exprs) 
+    def generate_throughput_scaling_params(
+        self, problem_size_variables, scaling_factor, num_exprs
+    ):
+        return self.scale_experiment_variables(
+            problem_size_variables, scaling_factor, num_exprs
+        )
 
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):

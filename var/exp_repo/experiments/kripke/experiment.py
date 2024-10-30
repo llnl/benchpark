@@ -14,9 +14,15 @@ from benchpark.scaling import WeakScaling
 from benchpark.scaling import ThroughputScaling
 
 
-class Kripke(Experiment,
-             OpenMPExperiment, CudaExperiment, ROCmExperiment,
-             StrongScaling, WeakScaling, ThroughputScaling):
+class Kripke(
+    Experiment,
+    OpenMPExperiment,
+    CudaExperiment,
+    ROCmExperiment,
+    StrongScaling,
+    WeakScaling,
+    ThroughputScaling,
+):
     variant(
         "workload",
         default="kripke",
@@ -63,16 +69,16 @@ class Kripke(Experiment,
 
         if self.spec.satisfies("single_node=oui"):
             n_resources = 1
-            #TODO: Check if n_ranks / n_resources_per_node <= 1 
+            # TODO: Check if n_ranks / n_resources_per_node <= 1
             for pk, pv in num_procs.items():
-                self.add_experiment_variable(pk, pv, True) 
+                self.add_experiment_variable(pk, pv, True)
                 n_resources *= pv
             for nk, nv in problem_sizes.items():
-                self.add_experiment_variable(nk, nv, True) 
+                self.add_experiment_variable(nk, nv, True)
         elif self.spec.satisfies("throughput=oui"):
             n_resources = 1
             for pk, pv in num_procs.items():
-                self.add_experiment_variable(pk, pv, True) 
+                self.add_experiment_variable(pk, pv, True)
                 n_resources *= pv
             scaled_variables = self.generate_throughput_scaling_params(
                 {tuple(problem_sizes.keys()): list(problem_sizes.values())},
@@ -80,7 +86,7 @@ class Kripke(Experiment,
                 int(self.spec.variants["scaling-iterations"][0]),
             )
             for nk, nv in scaled_variables.items():
-                self.add_experiment_variable(nk, nv, True) 
+                self.add_experiment_variable(nk, nv, True)
         elif self.spec.satisfies("strong=oui"):
             scaled_variables = self.generate_strong_scaling_params(
                 {tuple(num_procs.keys()): list(num_procs.values())},
@@ -88,10 +94,15 @@ class Kripke(Experiment,
                 int(self.spec.variants["scaling-iterations"][0]),
             )
             for pk, pv in scaled_variables.items():
-                self.add_experiment_variable(pk, pv, True) 
-            n_resources = [x * y * z for x, y, z in zip(*(scaled_variables[p] for p in num_procs if p in scaled_variables))]
+                self.add_experiment_variable(pk, pv, True)
+            n_resources = [
+                x * y * z
+                for x, y, z in zip(
+                    *(scaled_variables[p] for p in num_procs if p in scaled_variables)
+                )
+            ]
             for nk, nv in problem_sizes.items():
-                self.add_experiment_variable(nk, nv, True) 
+                self.add_experiment_variable(nk, nv, True)
         elif self.spec.satisfies("weak=oui"):
             scaled_variables = self.generate_weak_scaling_params(
                 {tuple(num_procs.keys()): list(num_procs.values())},
@@ -99,9 +110,14 @@ class Kripke(Experiment,
                 int(self.spec.variants["scaling-factor"][0]),
                 int(self.spec.variants["scaling-iterations"][0]),
             )
-            n_resources = [px * py * pz for px, py, pz in zip(*(scaled_variables[p] for p in num_procs if p in scaled_variables))]
+            n_resources = [
+                x * y * z
+                for x, y, z in zip(
+                    *(scaled_variables[p] for p in num_procs if p in scaled_variables)
+                )
+            ]
             for k, v in scaled_variables.items():
-                self.add_experiment_variable(k, v, True) 
+                self.add_experiment_variable(k, v, True)
 
         if self.spec.satisfies("openmp=oui"):
             self.add_experiment_variable("n_ranks", n_resources, True)

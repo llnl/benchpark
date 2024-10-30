@@ -111,9 +111,7 @@ class Experiment(ExperimentSystemBase, SingleNode):
         if "workload" in self.spec.variants:
             self.workload = self.spec.variants["workload"][0]
         else:
-            raise BenchparkError(
-                f"No workload variant defined for package {self.name}"
-            )
+            raise BenchparkError(f"No workload variant defined for package {self.name}")
 
         self.package_specs = {}
 
@@ -229,7 +227,12 @@ class Experiment(ExperimentSystemBase, SingleNode):
                 f"Spack section must be defined for application package {self.name}"
             )
 
-        spack_variants = list(filter(lambda v: v is not None, (cls.get_spack_variants() for cls in self.helpers)))
+        spack_variants = list(
+            filter(
+                lambda v: v is not None,
+                (cls.get_spack_variants() for cls in self.helpers),
+            )
+        )
         self.package_specs[self.name]["pkg_spec"] += " ".join(
             spack_variants + list(self.spec.variants["extra_spack_specs"])
         ).strip()
