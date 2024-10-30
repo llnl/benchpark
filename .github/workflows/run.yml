@@ -378,13 +378,14 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic osu-micro-benchmarks on dynamic CTS ruby
+      - name: Dry run dynamic osu-micro-benchmarks/mpi-only with dynamic CTS ruby
 		run: |
-			benchpark experiment init --dest=osu-micro-benchmarks-mpi-only osu-micro-benchmarks
-			benchpark setup ./osu-micro-benchmarks ./ruby-system workspace/
-			. workspace/setup.sh
-			ramble \
-			  --workspace-dir workspace/saxpy/osu-micro-benchmarks-mpi-only/Cts-6d48f81/workspace \
-			  --disable-progress-bar \
-			  --disable-logger \
-			  workspace setup --dry-run
+          benchpark system init --dest=ruby-system cts cluster=ruby
+	      benchpark experiment init --dest=osu-micro-benchmarks-mpi-only osu-micro-benchmarks
+	      benchpark setup ./osu-micro-benchmarks-mpi-only ./ruby-system workspace/
+		  . workspace/setup.sh
+	      ramble \
+			--workspace-dir workspace/osu-micro-benchmarks-mpi-only/Cts-6d48f81/workspace \
+			--disable-progress-bar \
+			--disable-logger \
+			workspace setup --dry-run
