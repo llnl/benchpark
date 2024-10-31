@@ -92,7 +92,7 @@ legacy_test_run:
     # Run Saxpy Experiments
     - ramble --workspace-dir . --disable-progress-bar --disable-logger on
     # Analyze Experiments
-    - ramble --workspace-dir . --disable-progress-bar workspace analyze --format json yaml text
+    - ramble --workspace-dir . --disable-progress-bar workspace analyze --always-print-foms --format json yaml text
 
 test_run_tioga_rocm:
   stage: test
@@ -161,7 +161,7 @@ test_run_kripke_openmp:
     # Run Experiments
     - ramble --workspace-dir . --disable-progress-bar --disable-logger on
     # Analyze Experiments
-    - ramble --workspace-dir . --disable-progress-bar workspace analyze --format json yaml text
+    - ramble --workspace-dir . --disable-progress-bar workspace analyze --always-print-foms --format json yaml text
 
 test_run_saxpy_openmp:
   stage: test
@@ -199,4 +199,4 @@ test_run_saxpy_openmp:
     # Run Experiments
     - ramble --workspace-dir . --disable-progress-bar --disable-logger on
     # Analyze Experiments
-    - ramble --workspace-dir . --disable-progress-bar workspace analyze --format json yaml text
+    - ramble --workspace-dir . --disable-progress-bar workspace analyze --always-print-foms --format json yaml text
