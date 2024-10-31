@@ -88,7 +88,9 @@ def benchpark_check_experiment(arg_str):
         )
         raise ValueError(out_str)
 
-    experiment_src_dir = benchpark.paths.benchpark_root / "experiments" / str(arg_str)
+    experiment_src_dir = (
+        benchpark.paths.benchpark_root / "legacy" / "experiments" / str(arg_str)
+    )
     return arg_str, experiment_src_dir
 
 
@@ -116,7 +118,9 @@ def benchpark_check_system(arg_str):
         )
         raise ValueError(out_str)
 
-    configs_src_dir = benchpark.paths.benchpark_root / "configs" / str(arg_str)
+    configs_src_dir = (
+        benchpark.paths.benchpark_root / "legacy" / "systems" / str(arg_str)
+    )
     return arg_str, configs_src_dir
 
 
@@ -196,7 +200,7 @@ def command(args):
     symlink_tree(experiment_src_dir, ramble_configs_dir, include_fn)
     symlink_tree(modifier_config_dir, ramble_configs_dir, include_fn)
     symlink_tree(
-        source_dir / "configs" / "common",
+        source_dir / "legacy" / "systems" / "common",
         ramble_spack_experiment_configs_dir,
         include_fn,
     )

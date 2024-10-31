@@ -53,16 +53,14 @@ Editing an Existing System to Match
   make all these x86 example. Automate the directory structure?
 
 If you want to add support for a new system you can add a class definition
-for that system in a separate directory in ``var/sys_repo/systems/``. 
+for that system in a separate directory in ``systems/``. 
 The best way is to copy the system.py for the most similar system identified above, and then paste it in a new directory and update it.
 For example the genericx86 system is defined in::
 
   $benchpark
-  ├── var
-     ├── sys_repo
-        ├── systems
-           ├── genericx86
-              ├── system.py
+  ├── systems
+     ├── genericx86
+        ├── system.py
 
 
 The System base class defined in ``/lib/benchpark/system.py`` is shown below, some or all of the functions can be overridden to define custom system behavior.
@@ -70,14 +68,14 @@ The System base class defined in ``/lib/benchpark/system.py`` is shown below, so
 .. literalinclude:: ../lib/benchpark/system.py
    :language: python
 
-The main driver for configuring a system is done by defining a subclass for that system in a ``var/sys_repo/{SYSTEM}/system.py`` file, which inherits from the System base class. 
+The main driver for configuring a system is done by defining a subclass for that system in a ``systems/{SYSTEM}/system.py`` file, which inherits from the System base class. 
 
 As is, the generic_x86 system subclass should run on most x86_64 systems, but we mostly provide it as a starting point for modifying or testing.
 Potential common changes might be to edit the scheduler or number of cores per node, adding a GPU configuration, or adding other external compilers or packages.
 
 To make these changes, we provided an example below, where we start with the generic_x86 system.py, and make a system called Modifiedx86.
 
-1. First, make a copy of the system.py file in generic_x86 folder and move it into a new folder, e.g., ``var/sys_repo/modified_x86/system.py``. 
+1. First, make a copy of the system.py file in generic_x86 folder and move it into a new folder, e.g., ``systems/modified_x86/system.py``. 
 Then, update the class name to ``Modifiedx86``.::
   
     class Modifiedx86(System):
@@ -92,7 +90,7 @@ Then, update the class name to ``Modifiedx86``.::
         self.sys_gpus_per_node = "2"
 
 3. Let's say the new system's GPUs are NVIDIA, we can add a variant that allows us to specify the version of CUDA we want to use, and the location of those CUDA installations on our system.
-We then add the spack package configuration for our CUDA installations into the ``var/sys_repo/systems/modified_x86/externals/cuda`` directory (examples in Siera and Tioga systems).
+We then add the spack package configuration for our CUDA installations into the ``systems/modified_x86/externals/cuda`` directory (examples in Siera and Tioga systems).
 ::
     # import the variant feature at the top of your system.py
     from benchpark.directives import variant

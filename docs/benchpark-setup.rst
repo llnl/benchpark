@@ -11,14 +11,14 @@ To setup an experiment workspace you must first initialize both an experiment an
 Any system or experiment variants are specified at the end of the command as shown below.
 The order of the two init commands does not matter, but they both need to be run before the setup command.::
 
-benchpark system init --dest=</output/path/to/system_root> <SystemName> compiler=<Compiler>
-benchpark experiment init --dest=</output/path/to/experiments_root> <Benchmark> experiment=<Experiment> programming_model=<ProgrammingModel>
+benchpark system init --dest=</output/path/to/system_def_dir> <SystemName> compiler=<Compiler>
+benchpark experiment init --dest=</output/path/to/experiment_def_dir> <Benchmark> experiment=<Experiment> programming_model=<ProgrammingModel>
 
 
 Once you have a benchmark experiment to run, along with the programming model to use, and a system to run them on.
 Also choose a directory for your experiment::
 
-    benchpark setup </output/path/to/experiments_root> </output/path/to/system_root> </output/path/to/workspace> 
+    benchpark setup </output/path/to/experiment_def> </output/path/to/system_def> </output/path/to/workspace>
 
 where:
 
@@ -36,8 +36,8 @@ with the following directory structure::
             <System>/
                 workspace/
                     configs/
-                        (everything from source/configs/<System>)
-                        (everything from source/experiments/<Benchmark/ProgrammingModel>)
+                        (everything from system_def_dir)
+                        (everything from experiment_def_dir>)
 
 ``benchpark setup`` will output instructions to follow::
 
