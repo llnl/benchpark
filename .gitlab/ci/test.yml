@@ -93,6 +93,9 @@ legacy_test_run:
     - ramble --workspace-dir . --disable-progress-bar --disable-logger on
     # Analyze Experiments
     - ramble --workspace-dir . --disable-progress-bar workspace analyze --always-print-foms --format json yaml text
+    # Check Experiment Exit Codes
+    - cd -
+    - python ./.gitlab/ci/bin/exit-codes ./workspace/saxpy/openmp/$ARCHCONFIG/workspace/results.latest.json
 
 test_run_tioga_rocm:
   stage: test
@@ -162,6 +165,9 @@ test_run_kripke_openmp:
     - ramble --workspace-dir . --disable-progress-bar --disable-logger on
     # Analyze Experiments
     - ramble --workspace-dir . --disable-progress-bar workspace analyze --always-print-foms --format json yaml text
+    # Check Experiment Exit Codes
+    - cd -
+    - python ./.gitlab/ci/bin/exit-codes ./workspace/kripke-benchmark/$SYSTEMHASH/workspace/results.latest.json
 
 test_run_saxpy_openmp:
   stage: test
@@ -200,3 +206,6 @@ test_run_saxpy_openmp:
     - ramble --workspace-dir . --disable-progress-bar --disable-logger on
     # Analyze Experiments
     - ramble --workspace-dir . --disable-progress-bar workspace analyze --always-print-foms --format json yaml text
+    # Check Experiment Exit Codes
+    - cd -
+    - python ./.gitlab/ci/bin/exit-codes ./workspace/saxpy-benchmark/$SYSTEMHASH/workspace/results.latest.json
