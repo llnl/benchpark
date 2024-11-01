@@ -1,10 +1,18 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
 from contextlib import contextmanager
 import os
 import pathlib
 import shlex
 import subprocess
 import sys
+
 import yaml
+
+import benchpark.paths
 
 DEBUG = False
 
@@ -29,11 +37,6 @@ def git_clone_commit(url, commit, destination):
 
     with working_dir(destination):
         run_command(f"git checkout {commit}")
-
-
-def benchpark_root():
-    this_module_path = pathlib.Path(os.path.abspath(__file__))
-    return this_module_path.parents[2]
 
 
 def run_command(command_str, env=None):
@@ -66,7 +69,7 @@ class Command:
 
 class RuntimeResources:
     def __init__(self, dest):
-        self.root = benchpark_root()
+        self.root = benchpark.paths.benchpark_root
         self.dest = pathlib.Path(dest)
 
         checkout_versions_location = self.root / "checkout-versions.yaml"
@@ -79,6 +82,7 @@ class RuntimeResources:
         self.spack_location = self.dest / "spack"
 
     def bootstrap(self):
+        print("Hold tight, Benchpark is bootstrapping itself.")
         if not self.ramble_location.exists():
             self._install_ramble()
         ramble_lib_path = self.ramble_location / "lib" / "ramble"
@@ -96,7 +100,7 @@ class RuntimeResources:
             self._install_spack()
 
     def _install_ramble(self):
-        debug_print(f"Cloning Ramble to {self.ramble_location}")
+        print(f"Cloning Ramble to {self.ramble_location}")
         git_clone_commit(
             "https://github.com/GoogleCloudPlatform/ramble.git",
             self.ramble_commit,
@@ -105,7 +109,7 @@ class RuntimeResources:
         debug_print(f"Done cloning Ramble ({self.ramble_location})")
 
     def _install_spack(self):
-        debug_print(f"Cloning Spack to {self.spack_location}")
+        print(f"Cloning Spack to {self.spack_location}")
         git_clone_commit(
             "https://github.com/spack/spack.git", self.spack_commit, self.spack_location
         )

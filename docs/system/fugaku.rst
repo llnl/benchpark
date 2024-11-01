@@ -63,7 +63,7 @@ Build the benchmark:
     source ./workspace/setup.sh
     export TMP=/local
     export TMPDIR=/local
-    ramble -P -D $(readlink -f $(pwd)/workspace/${BM}/${SYS}/workspace) workspace setup
+    ramble --disable-progress-bar --workspace-dir $(readlink -f $(pwd)/workspace/${BM}/${SYS}/workspace) workspace setup
 
 
 Go back to login node and submit benchmarks:
@@ -79,7 +79,7 @@ Go back to login node and submit benchmarks:
     pip install -r requirements.txt
     export BM='saxpy/openmp'
     export SYS='RCCS-Fugaku-Fujitsu-A64FX-TofuD'
-    ./workspace/ramble/bin/ramble -P -D $(readlink -f $(pwd)/workspace/${BM}/${SYS}/workspace) on
+    ./workspace/ramble/bin/ramble --disable-progress-bar --workspace-dir $(readlink -f $(pwd)/workspace/${BM}/${SYS}/workspace) on
 
 Finding the benchmark output (Fujitsu MPI does not write to STDOUT):
 

@@ -1,3 +1,9 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# Copyright 2013-2024 Spack project developers
+#
+# SPDX-License-Identifier: Apache-2.0
 import inspect
 
 
@@ -85,6 +91,14 @@ class Variant:
         ]
         if not_allowed_values:
             raise ValueError(f"{not_allowed_values} are not valid values for {pkg_cls}")
+
+    def validate_values_bool(self, *args, **kwargs):
+        """Wrapper around ``validate_values`` that returns boolean instead of raising."""
+        try:
+            self.validate_values(*args, **kwargs)
+            return True
+        except Exception:
+            return False
 
     @property
     def allowed_values(self):

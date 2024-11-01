@@ -1,0 +1,81 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+ramble:
+  include:
+  - ./configs/software.yaml
+  - ./configs/variables.yaml
+  - ./configs/modifier.yaml
+
+  config:
+    deprecated: true
+    spack_flags:
+      install: '--add --keep-stage'
+      concretize: '-U -f'
+
+  modifiers:
+  - name: allocation
+      
+  applications:
+    salmon-tddft:
+      workloads:
+        gs:
+          env_vars:
+            set:
+              OMP_NUM_THREADS: '{omp_num_threads}'
+          variables:
+            experiment_setup: ''
+            n_ranks: '{processes_per_node} * {n_nodes}'
+            processes_per_node: '4'
+            n_nodes: '1'
+            omp_num_threads: '12'
+            exercise: 'exercise_01_C2H2_gs'
+            inp_file: 'C2H2_gs.inp'
+          experiments:
+            salmon_{n_nodes}_{n_ranks}_{n_threads}:
+              variants:
+                package_manager: spack
+              variables:
+                n_threads: ['12']
+                processes_per_node: ['4']
+                n_nodes: '1'
+        rt:
+          env_vars:
+            set:
+              OMP_NUM_THREADS: '{omp_num_threads}'
+          variables:
+            experiment_setup: ''
+            n_ranks: '{processes_per_node} * {n_nodes}'
+            processes_per_node: '4'
+            n_nodes: '1'
+            omp_num_threads: '12'
+            exercise: 'exercise_03_C2H2_rt'
+            inp_file: 'C2H2_rt_pulse.inp'
+            restart_data: '../../gs/salmon_{n_nodes}_{n_ranks}_{n_threads}/data_for_restart/'
+          experiments:
+            salmon_{n_nodes}_{n_ranks}_{n_threads}:
+              variants:
+                package_manager: spack
+              variables:
+                n_threads: ['12']
+                processes_per_node: ['4']      
+                n_nodes: '1'
+
+  software:
+    packages:
+      default-compiler:
+        pkg_spec: fj@4.10.0
+      salmon-tddft:
+        pkg_spec: salmon-tddft@2.0.2
+        compiler: compiler-fj
+      cmake:
+        pkg_spec: cmake
+        compiler: compiler-gcc
+    environments:
+      salmon-tddft:
+        packages:
+        - cmake
+        - salmon-tddft
+        - '{modifier_package_name}'

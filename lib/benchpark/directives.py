@@ -1,6 +1,10 @@
 # Copyright 2023 Lawrence Livermore National Security, LLC and other
 # Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 #
+# Copyright 2022-2024 The Ramble Authors
+#
+# Copyright 2013-2024 Spack Project Developers
+#
 # SPDX-License-Identifier: Apache-2.0
 
 import collections.abc
@@ -53,6 +57,53 @@ class DirectiveMeta(ramble.language.shared_language.SharedMeta):
 benchpark_directive = DirectiveMeta.directive
 
 
+def _make_when_spec(
+    value: Optional[Union["benchpark.spec.Spec", str, bool]]
+) -> Optional["benchpark.spec.Spec"]:
+    """Create a ``Spec`` that indicates when a directive should be applied.
+
+    Directives with ``when`` specs, e.g.:
+
+        patch('foo.patch', when='@4.5.1:')
+        depends_on('mpi', when='+mpi')
+        depends_on('readline', when=sys.platform() != 'darwin')
+
+    are applied conditionally depending on the value of the ``when``
+    keyword argument.  Specifically:
+
+      1. If the ``when`` argument is ``True``, the directive is always applied
+      2. If it is ``False``, the directive is never applied
+      3. If it is a ``Spec`` string, it is applied when the package's
+         concrete spec satisfies the ``when`` spec.
+
+    The first two conditions are useful for the third example case above.
+    It allows package authors to include directives that are conditional
+    at package definition time, in additional to ones that are evaluated
+    as part of concretization.
+
+    Arguments:
+        value: a conditional Spec, constant ``bool``, or None if not supplied
+           value indicating when a directive should be applied.
+
+    """
+    if isinstance(value, benchpark.spec.Spec):
+        return value
+
+    # Unsatisfiable conditions are discarded by the caller, and never
+    # added to the package class
+    if value is False:
+        return None
+
+    # If there is no constraint, the directive should always apply;
+    # represent this by returning the unconstrained `Spec()`, which is
+    # always satisfied.
+    if value is None or value is True:
+        return benchpark.spec.Spec()
+
+    # This is conditional on the spec
+    return benchpark.spec.Spec(value)
+
+
 @benchpark_directive("variants")
 def variant(
     name: str,
@@ -82,6 +133,8 @@ def variant(
     Raises:
         DirectiveError: If arguments passed to the directive are invalid
     """
+    if sticky:
+        raise NotImplementedError("Sticky variants are not yet implemented in Ramble")
 
     def format_error(msg, pkg):
         msg += " @*r{{[{0}, variant '{1}']}}"
@@ -140,12 +193,15 @@ def variant(
     description = str(description).strip()
 
     def _execute_variant(pkg):
+        when_spec = _make_when_spec(when)
+
         if not re.match(benchpark.spec.IDENTIFIER, name):
             directive = "variant"
             msg = "Invalid variant name in {0}: '{1}'"
             raise DirectiveError(directive, msg.format(pkg.name, name))
 
-        pkg.variants[name] = benchpark.variant.Variant(
+        variants_by_name = pkg.variants.setdefault(when_spec, {})
+        variants_by_name[name] = benchpark.variant.Variant(
             name, default, description, values, multi, validator, sticky
         )
 
