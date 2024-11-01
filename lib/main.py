@@ -103,7 +103,7 @@ def benchpark_list(subparsers, actions_dict):
 def benchpark_benchmarks():
     source_dir = benchpark.paths.benchpark_root
     benchmarks = []
-    experiments_dir = source_dir / "experiments"
+    experiments_dir = source_dir / "legacy" / "experiments"
     for x in os.listdir(experiments_dir):
         benchmarks.append(f"{x}")
     return benchmarks

@@ -11,7 +11,7 @@ import benchpark.paths
 def benchpark_experiments():
     source_dir = benchpark.paths.benchpark_root
     experiments = []
-    experiments_dir = source_dir / "experiments"
+    experiments_dir = source_dir / "legacy" / "experiments"
     for x in os.listdir(experiments_dir):
         for y in os.listdir(experiments_dir / x):
             experiments.append(f"{x}/{y}")
@@ -29,7 +29,7 @@ def benchpark_modifiers():
 def benchpark_systems():
     source_dir = benchpark.paths.benchpark_root
     systems = []
-    for x in os.listdir(source_dir / "configs"):
+    for x in os.listdir(source_dir / "legacy" / "systems"):
         if not (
             os.path.isfile(os.path.join(source_dir / "configs", x)) or x == "common"
         ):

@@ -85,21 +85,22 @@ Editing the experiment (optional)
 Benchpark configuration files are organized as follows::
 
   $benchpark
-  ├── configs
-  │  ├── ${SYSTEM1}
-  │  │  ├── auxiliary_software_files
-  │  │  │  ├── compilers.yaml
-  │  │  │  └── packages.yaml
-  │  │  ├── software.yaml
-  │  │  └── variables.yaml
-  ├── experiments
-  │  ├── ${BENCHMARK1}
-  │  │  ├── ${ProgrammingModel1}
-  │  │  │  ├── execute_experiment.tpl
-  │  │  │  └── ramble.yaml
-  │  │  ├── ${ProgrammingModel1}
-  │  │  │  ├── execute_experiment.tpl
-  │  │  │  └── ramble.yaml
+  ├── legacy
+  │  ├── systems
+  │  │  ├── ${SYSTEM1}
+  │  │  │  ├── auxiliary_software_files
+  │  │  │  │  ├── compilers.yaml
+  │  │  │  │  └── packages.yaml
+  │  │  │  ├── software.yaml
+  │  │  │  └── variables.yaml
+  │  └── experiments
+  │     ├── ${BENCHMARK1}
+  │     │  ├── ${ProgrammingModel1}
+  │     │  │  ├── execute_experiment.tpl
+  │     │  │  └── ramble.yaml
+  │     │  ├── ${ProgrammingModel1}
+  │     │  │  ├── execute_experiment.tpl
+  │     │  │  └── ramble.yaml
   └── repo
      ├── ${BENCHMARK1}
      │  ├── application.py
@@ -110,7 +111,7 @@ You can edit these configuration files to change the behavior of your experiment
 
 System Specification
 ~~~~~~~~~~~~~~~~~~~~
-Files under ``benchpark/configs/${SYSTEM}`` provide the specification
+Files under ``benchpark/legacy/systems/${SYSTEM}`` provide the specification
 of the software stack on your system
 (see :ref:`legacy-add-system` for details).
 
@@ -281,8 +282,8 @@ with the following directory structure::
             <System>/
                 workspace/
                     configs/
-                        (everything from source/configs/<System>)
-                        (everything from source/experiments/<Benchmark/ProgrammingModel>)
+                        (everything from system_def_dir)
+                        (everything from experiment_def_dir)
 
 ``benchpark setup`` will output instructions to follow::
 
@@ -316,8 +317,8 @@ Ramble will build the source code and set up the following workspace directory s
             <System>/
                 workspace/
                     configs/
-                        (everything from source/configs/<System>)
-                        (everything from source/experiments/<Benchmark/ProgrammingModel>)
+                        (everything from system_def_dir)
+                        (everything from experiment_def_dir>)
                     experiments/
                         <Benchmark>/
                            <Problem>/
