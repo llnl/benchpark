@@ -398,3 +398,16 @@ jobs:
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
+
+      
+      - name: Dry run dynamic gpcNet/mpi-only with dynamic CTS ruby
+        run: |
+          ./bin/benchpark system init --dest=ruby-system cts cluster=ruby
+          ./bin/benchpark experiment init --dest=gpcnet-mpi-only gpcnet
+          ./bin/benchpark setup ./gpcnet-mpi-only ./ruby-system workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/gpcnet-mpi-only/Cts-6d48f81/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
