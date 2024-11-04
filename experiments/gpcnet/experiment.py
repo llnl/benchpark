@@ -45,10 +45,10 @@ class Gpcnet(Experiment, StrongScaling):
     def compute_applications_section(self):
         # TODO: Replace with conflicts clause
         self.add_experiment_variable(
-                "n_ranks", "{n_nodes}*{sys_cores_per_node}//2", True
+            "n_ranks", "{n_nodes}*{sys_cores_per_node}//2", True
         )
         if self.spec.satisfies("workload=network_test"):        
-            self.add_experiment_variable("n_nodes", ["2","4"])
+            self.add_experiment_variable("n_nodes", ["2", "4"])
         elif self.spec.satisfies("workload=network_load_test"):
             self.add_experiment_variable("n_nodes", "10")
 
