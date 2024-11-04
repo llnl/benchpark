@@ -47,8 +47,7 @@ class Gpcnet(Experiment, StrongScaling):
         self.add_experiment_variable(
             "n_ranks", "{n_nodes}*{sys_cores_per_node}//2", True
         )
-
-        if self.spec.satisfies("workload=network_test"):        
+        if self.spec.satisfies("workload=network_test"):
             self.add_experiment_variable("n_nodes", ["2", "4"])
         elif self.spec.satisfies("workload=network_load_test"):
             self.add_experiment_variable("n_nodes", "10")
