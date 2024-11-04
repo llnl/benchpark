@@ -34,25 +34,28 @@ Some or all of the functions in the Experiment base class can be overridden to d
   This will change and need updates
 
 Variants of the experiment can be added to utilize different *ProgrammingModels* used for on-node parallelization,
-e.g., ``benchpark/experiments/amg2023/experiment.py`` has variant ``programming_model``, which can be
+e.g., ``benchpark/experiments/amg2023/experiment.py`` can be updated to inherit from different experiments to , which can be
 set to ``cuda`` for an experiment using CUDA (on an NVIDIA GPU),
 or ``openmp`` for an experiment using OpenMP (on a CPU).::
 
-    class Amg2023(Experiment):
-      variant(
-          "programming_model",
-          default="openmp",
-          values=("openmp", "cuda", "rocm"),
-          description="on-node parallelism model",
-      )
+    class Amg2023(
+      Experiment,
+      OpenMPExperiment,
+      CudaExperiment,
+      ROCmExperiment,
+      StrongScaling,
+      WeakScaling,
+      ThroughputScaling,
+      Caliper,
+    ):
 
 Multiple types of experiments can be created using variants as well (e.g., strong scaling, weak scaling). See AMG2023 or Kripke for examples.
 
 Once an experiment class has been written, an experiment is initialized with the following command, with any variants that have been defined in your experiment.py passed in as key-value pairs: 
-``benchpark experiment init --dest {path/to/dest} experiment={experiment_variant} programming_model={prog_model_variant}``
+``benchpark experiment init --dest {path/to/dest} {benchmark_name} {variant}={oui/non/value}``
 
 For example, to run the AMG2023 strong scaling experiment for problem 1, using CUDA the command would be:
-``benchpark experiment init --dest amg2023 programming_model=cuda workload=problem1 experiment=strong``
+``benchpark experiment init --dest amg2023_experiment amg2023 cuda=oui workload=problem1 strong=oui``
 
 Initializing an experiment generates the following yaml files:
 
@@ -71,7 +74,7 @@ To manually validate your new experiments work, you should initialize an existin
 For example if you just created a benchmark *baz* with OpenMP and strong scaling variants it may look like this:::
 
   benchpark system init --dest=genericx86-system genericx86 
-  benchpark experiment init --dest=baz-benchmark baz programming_model=openmp scaling=strong
+  benchpark experiment init --dest=baz-benchmark baz openmp=oui strong=oui
   benchpark setup ./baz-benchmark ./x86 workspace/
 
 
