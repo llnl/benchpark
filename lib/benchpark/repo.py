@@ -88,7 +88,7 @@ def _exprs():
 
     TODO: consider not making this a singleton.
     """
-    experiments_repo = benchpark.paths.benchpark_root / "var" / "exp_repo"
+    experiments_repo = benchpark.paths.benchpark_root / "experiments"
     return _add_repo(experiments_repo, ObjectTypes.experiments)
 
 
@@ -106,7 +106,7 @@ def _add_repo(repo_dir, obj_type):
 
 # Systems
 def _systems():
-    systems_repo = benchpark.paths.benchpark_root / "var" / "sys_repo"
+    systems_repo = benchpark.paths.benchpark_root / "systems"
     return _add_repo(systems_repo, ObjectTypes.systems)
 
 

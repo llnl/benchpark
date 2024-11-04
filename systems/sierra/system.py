@@ -42,7 +42,10 @@ class Sierra(System):
             f.write(self.sw_description())
 
     def system_specific_variables(self):
-        return {"cuda_arch": "70"}
+        return {
+            "cuda_arch": "70",
+            "default_cuda_version": self.spec.variants["cuda"][0].replace("-", "."),
+        }
 
     def external_pkg_configs(self):
         externals = Sierra.resource_location / "externals"

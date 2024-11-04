@@ -18,7 +18,7 @@ def construct_tag_groups(tag_groups, tag_dicts, dictionary):
 
 
 def benchpark_benchmarks(benchmarks):
-    experiments_dir = "../experiments"
+    experiments_dir = "../legacy/experiments"
     for x in os.listdir(experiments_dir):
         benchmarks.append(f"{x}")
     return benchmarks

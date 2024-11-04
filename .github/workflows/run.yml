@@ -112,7 +112,7 @@ jobs:
 
       - name: Dry run dynamic amg2023-openmp on Dane with allocation modifier
         run: |
-          ./bin/benchpark experiment init --dest=amg2023-openmp amg2023 programming_model=openmp
+          ./bin/benchpark experiment init --dest=amg2023-openmp amg2023 openmp=oui
           ./bin/benchpark setup ./amg2023-openmp LLNL-Dane-DELL-sapphirerapids-OmniPath workspace/
           . workspace/setup.sh
           ramble \
@@ -143,7 +143,7 @@ jobs:
 
       - name: Dry run dynamic kripke-openmp on nosite-x86_64 with allocation modifier
         run: |
-          ./bin/benchpark experiment init --dest=kripke-openmp kripke programming_model=openmp
+          ./bin/benchpark experiment init --dest=kripke-openmp kripke openmp=oui
           ./bin/benchpark setup ./kripke-openmp nosite-x86_64 workspace/
           . workspace/setup.sh
           ramble \
@@ -154,7 +154,7 @@ jobs:
 
       - name: Dry run dynamic kripke-rocm on LLNL-Tioga-HPECray-zen3-MI250X-Slingshot with allocation modifier
         run: |
-          ./bin/benchpark experiment init --dest=kripke-rocm kripke programming_model=rocm
+          ./bin/benchpark experiment init --dest=kripke-rocm kripke rocm=oui
           ./bin/benchpark setup ./kripke-openmp LLNL-Tioga-HPECray-zen3-MI250X-Slingshot workspace/
           . workspace/setup.sh
           ramble \
@@ -186,7 +186,7 @@ jobs:
 
       - name: Dry run dynamic saxpy/rocm with static Tioga
         run: |
-          ./bin/benchpark experiment init --dest=saxpy-rocm saxpy programming_model=rocm
+          ./bin/benchpark experiment init --dest=saxpy-rocm saxpy rocm=oui
           ./bin/benchpark setup ./saxpy-rocm LLNL-Tioga-HPECray-zen3-MI250X-Slingshot workspace/
           . workspace/setup.sh
           ramble \
@@ -198,7 +198,7 @@ jobs:
       - name: Dry run dynamic saxpy/rocm with dynamic Tioga
         run: |
           ./bin/benchpark system init --dest=tioga-system2 tioga rocm=551 compiler=cce ~gtl
-          ./bin/benchpark experiment init --dest=saxpy-rocm2 saxpy programming_model=rocm
+          ./bin/benchpark experiment init --dest=saxpy-rocm2 saxpy rocm=oui
           ./bin/benchpark setup ./saxpy-rocm2 ./tioga-system2 workspace/
           . workspace/setup.sh
           ramble \
@@ -210,7 +210,7 @@ jobs:
       - name: Dry run dynamic saxpy/cuda with dynamic Sierra
         run: |
           ./bin/benchpark system init --dest=sierra-system sierra cuda=10-1-243 compiler=xl
-          ./bin/benchpark experiment init --dest=saxpy-cuda saxpy programming_model=cuda
+          ./bin/benchpark experiment init --dest=saxpy-cuda saxpy cuda=oui
           ./bin/benchpark setup ./saxpy-cuda ./sierra-system workspace/
           . workspace/setup.sh
           ramble \
@@ -261,7 +261,7 @@ jobs:
 
       - name: Dry run dynamic quicksilver-openmp on nosite-x86_64 with allocation modifier
         run: |
-          ./bin/benchpark experiment init --dest=quicksilver-openmp quicksilver experiment=weak
+          ./bin/benchpark experiment init --dest=quicksilver-openmp quicksilver openmp=oui experiment=weak
           ./bin/benchpark setup ./quicksilver-openmp nosite-x86_64 workspace/
           . workspace/setup.sh
           ramble \
@@ -333,7 +333,7 @@ jobs:
       - name: Dry run dynamic saxpy/openmp with dynamic CTS ruby
         run: |
           ./bin/benchpark system init --dest=ruby-system cts cluster=ruby
-          ./bin/benchpark experiment init --dest=saxpy-openmp saxpy programming_model=openmp
+          ./bin/benchpark experiment init --dest=saxpy-openmp saxpy openmp=oui
           ./bin/benchpark setup ./saxpy-openmp ./ruby-system workspace/
           . workspace/setup.sh
           ramble \
@@ -345,7 +345,7 @@ jobs:
       - name: Dry run dynamic saxpy/openmp with dynamic CTS dane
         run: |
           ./bin/benchpark system init --dest=dane-system cts cluster=dane
-          ./bin/benchpark experiment init --dest=saxpy-openmp2 saxpy programming_model=openmp
+          ./bin/benchpark experiment init --dest=saxpy-openmp2 saxpy openmp=oui
           ./bin/benchpark setup ./saxpy-openmp2 ./dane-system workspace/
           . workspace/setup.sh
           ramble \
@@ -357,7 +357,7 @@ jobs:
       - name: Dry run dynamic saxpy/openmp with dynamic CTS magma
         run: |
           ./bin/benchpark system init --dest=magma-system cts cluster=magma
-          ./bin/benchpark experiment init --dest=saxpy-openmp3 saxpy programming_model=openmp
+          ./bin/benchpark experiment init --dest=saxpy-openmp3 saxpy openmp=oui
           ./bin/benchpark setup ./saxpy-openmp3 ./magma-system workspace/
           . workspace/setup.sh
           ramble \
@@ -369,7 +369,7 @@ jobs:
       - name: Dry run dynamic saxpy/openmp with dynamic generic x86
         run: |
           ./bin/benchpark system init --dest=x86-system genericx86
-          ./bin/benchpark experiment init --dest=saxpy-omp-generic saxpy programming_model=openmp
+          ./bin/benchpark experiment init --dest=saxpy-omp-generic saxpy openmp=oui
           ./bin/benchpark setup ./saxpy-omp-generic ./x86-system workspace/
           . workspace/setup.sh
           ramble \

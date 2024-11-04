@@ -50,7 +50,7 @@ with command line arguments.
 Using System API to Generate a System Description
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-System classes are defined in ``var/sys_repo``; once the class has been
+System classes are defined in ``systems/``; once the class has been
 defined, you can invoke ``benchpark system init`` to generate a system
 configuration directory that can then be passed to ``benchpark setup``::
 
@@ -60,20 +60,18 @@ where "tioga rocm=551 compiler=cce ~gtl" describes a config for Tioga that
 uses ROCm 5.5.1 components, a CCE compiler, and MPI without GTL support.
 
 If you want to add support for a new system you can add a class definition
-for that system in a separate directory in ``var/sys_repo/systems/``. For
+for that system in a separate directory in ``/systems/``. For
 example the Tioga system is defined in::
 
   $benchpark
-  ├── var
-     ├── sys_repo
-        ├── systems
-           ├── tioga
-              ├── system.py
+  ├── systems
+     ├── tioga
+        ├── system.py
 
 Static System Configurations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``benchpark/configs`` contains a number of static, manually-generated system
+``benchpark/legacy/systems`` contains a number of static, manually-generated system
 definitions. As an alternative to implementing a new ``System`` class, you
 can add a new directory with a name which identifies the system.
 
@@ -114,7 +112,7 @@ Benchpark has definitions for the following site-specific systems:
 - LLNL-Tioga-HPECray-zen3-MI250X-Slingshot
 
 
-The following files are required for each nosite system ``benchpark/configs/${SYSTEM}``:
+The following files are required for each nosite system ``benchpark/legacy/systems/${SYSTEM}``:
 
 1. ``system_definition.yaml`` describes the system hardware, including the integrator (and the name of the product node or cluster type), the processor, (optionally) the accelerator, and the network; the information included here is what you will typically see recorded about the system on Top500.org.  We intend to make the system definitions in Benchpark searchable, and will add a schema to enforce consistency; until then, please copy the file and fill out all of the fields without changing the keys.  Also listed is the specific system the config was developed and tested on, as well as the known systems with the same hardware so that the users of those systems can find this system specification.
 

@@ -15,7 +15,7 @@ This guide is intended for those wanting to define a new set of experiment param
 Similar to systems, Benchpark also provides an API where you can represent experiments 
 as objects and customize their description with command line arguments.
 
-Experiment specifications are created with ``experiment.py`` files each located in the experiment repo: ``benchpark/var/exp_repo/experiments/${Benchmark1}``. 
+Experiment specifications are created with ``experiment.py`` files each located in the experiment repo: ``benchpark/experiments/${Benchmark1}``.
 
 * If you are adding experiments to an existing benchmark, it is best to extend the current experiment.py for that benchmark in the experiment repo.
 
@@ -34,7 +34,7 @@ Some or all of the functions in the Experiment base class can be overridden to d
   This will change and need updates
 
 Variants of the experiment can be added to utilize different *ProgrammingModels* used for on-node parallelization,
-e.g., ``benchpark/var/exp_repo/experiments/amg2023/experiment.py`` has variant ``programming_model``, which can be 
+e.g., ``benchpark/experiments/amg2023/experiment.py`` has variant ``programming_model``, which can be
 set to ``cuda`` for an experiment using CUDA (on an NVIDIA GPU),
 or ``openmp`` for an experiment using OpenMP (on a CPU).::
 

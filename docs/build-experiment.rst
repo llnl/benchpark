@@ -23,8 +23,8 @@ Ramble will build the source code and set up the following workspace directory s
             <System>/
                 workspace/
                     configs/
-                        (everything from source/configs/<System>)
-                        (everything from source/experiments/<Benchmark/ProgrammingModel>)
+                        (everything from system_def_dir)
+                        (everything from experiment_def_dir)
                     experiments/
                         <Benchmark>/
                            <Problem>/
