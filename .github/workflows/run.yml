@@ -403,7 +403,6 @@ jobs:
       
       - name: Dry run dynamic gpcnet/mpi-only with dynamic CTS ruby
         run: |
-          ./bin/benchpark system init --dest=ruby-system cts cluster=ruby
           ./bin/benchpark experiment init --dest=gpcnet-mpi gpcnet
           ./bin/benchpark setup ./gpcnet-mpi ./ruby-system workspace/
           . workspace/setup.sh
