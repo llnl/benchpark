@@ -57,12 +57,12 @@ def list_files(root):
 SPDX_MISMATCH, GENERAL_MISMATCH, COPYRIGHT_YEAR_MISMATCH = range(1, 4)
 
 #: Latest year that copyright applies. UPDATE THIS when bumping copyright.
-latest_year = 2023
+latest_year = "202[34]"
 strict_date = r"Copyright %s" % latest_year
 
 #: regexes for valid license lines at tops of files
 license_line_regexes = [
-    r"Copyright (%d|[0-9]{4}) Lawrence Livermore National Security, LLC and other"
+    r"Copyright (%s|[0-9]{4}) Lawrence Livermore National Security, LLC and other"
     % latest_year,
     r"Benchpark Project Developers. See the top-level COPYRIGHT file for details.",
     r"SPDX-License-Identifier: Apache-2.0",

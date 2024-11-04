@@ -1,15 +1,12 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
 # Copyright 2022-2024 The Ramble Authors
 #
-# Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
-# https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
-# <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
-# option. This file may not be copied, modified, or distributed
-# except according to those terms.
+# SPDX-License-Identifier: Apache-2.0
 
-import sys
 import contextlib
-import pathlib
-
+import sys
 from enum import Enum
 
 import benchpark.paths
@@ -83,10 +80,6 @@ def override_ramble_hardcoded_globals():
     ramble.language.language_base.namespaces = _old[2]
 
 
-def _base_path():
-    return pathlib.Path(__file__).resolve().parents[2]
-
-
 # Experiments
 def _exprs():
     """Get the singleton RepoPath instance for Ramble.
@@ -95,7 +88,7 @@ def _exprs():
 
     TODO: consider not making this a singleton.
     """
-    experiments_repo = _base_path() / "var" / "exp_repo"
+    experiments_repo = benchpark.paths.benchpark_root / "experiments"
     return _add_repo(experiments_repo, ObjectTypes.experiments)
 
 
@@ -113,7 +106,7 @@ def _add_repo(repo_dir, obj_type):
 
 # Systems
 def _systems():
-    systems_repo = _base_path() / "var" / "sys_repo"
+    systems_repo = benchpark.paths.benchpark_root / "systems"
     return _add_repo(systems_repo, ObjectTypes.systems)
 
 

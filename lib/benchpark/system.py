@@ -1,3 +1,6 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
 # SPDX-License-Identifier: Apache-2.0
 
 import hashlib
@@ -148,19 +151,29 @@ system:
 
         self._merge_config_files(compilers_schema.schema, selections, aux_compilers)
 
+    def system_specific_variables(self):
+        return {}
+
     def variables_yaml(self):
         for attr in self.required:
             if not getattr(self, attr, None):
                 raise ValueError(f"Missing required info: {attr}")
 
         optionals = list()
-        optionals_as_cfg = ""
         for opt in ["sys_gpus_per_node", "sys_mem_per_node", "queue"]:
             if getattr(self, opt, None):
                 optionals.append(f"{opt}: {getattr(self, opt)}")
+
+        system_specific = list()
+        for k, v in self.system_specific_variables().items():
+            system_specific.append(f"{k}: {v}")
+
+        extra_variables = optionals + system_specific
         indent = " " * 2
-        if optionals:
-            optionals_as_cfg = f"\n{indent}".join(optionals)
+        extras_as_cfg = ""
+        if extra_variables:
+            extras_as_cfg = f"\n{indent}".join(extra_variables)
+
         return f"""\
 # SPDX-License-Identifier: Apache-2.0
 
@@ -168,7 +181,7 @@ variables:
   timeout: "{self.timeout}"
   scheduler: "{self.scheduler}"
   sys_cores_per_node: "{self.sys_cores_per_node}"
-  {optionals_as_cfg}
+  {extras_as_cfg}
   max_request: "1000"  # n_ranks/n_nodes cannot exceed this
   n_ranks: '1000001'  # placeholder value
   n_nodes: '1000001'  # placeholder value

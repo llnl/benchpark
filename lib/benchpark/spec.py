@@ -1,4 +1,13 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# Copyright 2013-2024 Spack project developers
+#
+# SPDX-License-Identifier: Apache-2.0
+
 import enum
+import io
+import json
 import pathlib
 import re
 from typing import Iterable, Iterator, List, Match, Optional, Union
@@ -46,6 +55,12 @@ class VariantMap(llnl.util.lang.HashableMap):
             name in self and set(self[name]) >= set(other[name]) for name in other
         )
 
+    def constrain(self, other: "VariantMap") -> None:
+        for name in other:
+            self_values = list(self.dict.get(name, []))
+            values = llnl.util.lang.dedupe(self_values + list(other[name]))
+            self[name] = values
+
     @staticmethod
     def stringify(name: str, values: tuple) -> str:
         if len(values) == 1:
@@ -53,12 +68,35 @@ class VariantMap(llnl.util.lang.HashableMap):
                 return f"+{name}"
             if values[0].lower() == "false":
                 return f"~{name}"
-        return f"{name}={','.join(values)}"
+        v_string = quote_if_needed(",".join(values))
+        return f"{name}={v_string}"
 
     def __str__(self):
-        return " ".join(
-            self.stringify(name, values) for name, values in self.dict.items()
-        )
+        if not self:
+            return ""
+
+        # print keys in order
+        sorted_keys = sorted(self.keys())
+
+        # Separate boolean variants from key-value pairs as they print
+        # differently. All booleans go first to avoid ' ~foo' strings that
+        # break spec reuse in zsh.
+        bool_keys = []
+        kv_keys = []
+        for key in sorted_keys:
+            is_bool = len(self[key]) == 1 and self[key][0].lower() in ("true", "false")
+            bool_keys.append(key) if is_bool else kv_keys.append(key)
+
+        # add spaces before and after key/value variants.
+        string = io.StringIO()
+
+        string.write("".join(self.stringify(key, self[key]) for key in bool_keys))
+        if bool_keys and kv_keys:
+            string.write(" ")
+
+        string.write(" ".join(self.stringify(key, self[key]) for key in kv_keys))
+
+        return string.getvalue()
 
 
 class ConcreteVariantMap(VariantMap):
@@ -124,6 +162,10 @@ class Spec(object):
             and self.variants == other.variants
         )
 
+    def __hash__(self):
+        # If hashing specs, client code is responsible for ensuring they do not mutate
+        return hash((self.name, self.namespace, self.variants))
+
     def __str__(self):
         string = ""
         if self.namespace is not None:
@@ -132,9 +174,9 @@ class Spec(object):
             string += self.name
 
         variants = str(self.variants)
-        if not string:
-            return variants
-        string += f" {variants}" if variants else ""
+        if string and variants and not variants.startswith(("+", "~")):
+            string += " "
+        string += variants
         return string
 
     def __repr__(self):
@@ -176,6 +218,21 @@ class Spec(object):
             and self.variants.satisfies(other.variants)
         )
 
+    def constrain(self, other: Union[str, "Spec"]) -> None:
+        if not isinstance(other, Spec):
+            other = Spec(other)
+        if other.name:
+            if self.name and self.name != other.name:
+                raise Exception
+            self.name == other.name
+
+        if other.namespace:
+            if self.namespace and self.namespace != other.namespace:
+                raise Exception
+            self.namespace == other.namespace
+
+        self.variants.constrain(other.variants)
+
     def concretize(self):
         raise NotImplementedError("Spec.concretize must be implemented by subclass")
 
@@ -204,9 +261,6 @@ class ConcreteSpec(Spec):
     def __init__(self, str_or_spec: Union[str, Spec]):
         super().__init__(str_or_spec)
         self._concretize()
-
-    def __hash__(self):
-        return hash((self.name, self.namespace, self.variants))
 
     @property
     def name(self):
@@ -237,19 +291,62 @@ class ConcreteSpec(Spec):
             raise AnonymousSpecError(f"Cannot concretize anonymous {type(self)} {self}")
 
         if not self.namespace:
-            # TODO interface combination ##
             self._namespace = self.object_class.namespace
 
-        # TODO interface combination ##
-        for name, variant in self.object_class.variants.items():
-            if name not in self.variants:
-                self._variants[name] = variant.default
+        # For variants that are set, set whatever they imply
+        variants_to_check = set(
+            (name, values) for name, values in self.variants.items()
+        )
+        checked = set()
+        while variants_to_check:
+            name, values = variants_to_check.pop()
+            checked.add((name, values))
 
-        for name, values in self.variants.items():
-            if name not in self.object_class.variants:
+            conditions = [
+                w
+                for w, v_by_n in self.object_class.variants.items()
+                for n, v in v_by_n.items()
+                if n == name and v.validate_values_bool(values)
+            ]
+
+            if not conditions:
                 raise Exception(f"{name} is not a valid variant of {self.name}")
 
-            variant = self.object_class.variants[name]
+            # This variant is already valid on self
+            if any(self.satisfies(c) for c in conditions):
+                continue
+
+            # If there is not a condition that allows this variant already, add one
+            cond = conditions[0]
+            for n, v in cond.variants.items():
+                if (n, v) not in checked:
+                    variants_to_check.add((n, v))
+            self.constrain(cond)
+
+        # Concretize variants that aren't set
+        changed = True
+        while changed:
+            changed = False
+
+            for when, variants_by_name in self.object_class.variants.items():
+                for name, variant in variants_by_name.items():
+                    if self.satisfies(when):
+                        if name not in self.variants:
+                            changed = True
+                            self._variants[name] = variant.default
+
+        # Validate all set variant values
+        for name, values in self.variants.items():
+            try:
+                variant = next(
+                    v
+                    for w, v_by_n in self.object_class.variants.items()
+                    for n, v in v_by_n.items()
+                    if self.satisfies(w) and n == name
+                )
+            except StopIteration:
+                raise Exception(f"{name} is not a valid variant of {self.name}")
+
             variant.validate_values(self.variants[name])
 
         # Convert to immutable type
@@ -296,8 +393,14 @@ IDENTIFIER = r"(?:[a-zA-Z_0-9][a-zA-Z_0-9\-]*)"
 DOTTED_IDENTIFIER = rf"(?:{IDENTIFIER}(?:\.{IDENTIFIER})+)"
 NAME = r"[a-zA-Z_0-9][a-zA-Z_0-9\-.]*"
 
-#: These are legal values that *can* be parsed bare, without quotes on the command line.
-VALUE = r"(?:[a-zA-Z_0-9\-+\*.,:=\~\/\\]+)"
+#: These are legal values that *can* be parsed bare, without quotes on the command line. Cannot start with `=`
+VALUE = r"(?:[a-zA-Z_0-9\-+\*.,:\~\/\\][a-zA-Z_0-9\-+\*.,:=\~\/\\]*)"
+
+#: Variant/flag values that match this can be left unquoted in Spack output
+NO_QUOTES_NEEDED = re.compile(r"^[a-zA-Z0-9,/_.-]+$")
+
+#: Quoted values can be *anything* in between quotes, including escaped quotes.
+QUOTED_VALUE = r"(?:'(?:[^']|(?<=\\)')*'|\"(?:[^\"]|(?<=\\)\")*\")"
 
 #: Regex with groups to use for splitting (optionally propagated) key-value pairs
 SPLIT_KVP = re.compile(rf"^({NAME})=(.*)$")
@@ -329,10 +432,10 @@ class TokenType(TokenBase):
 
     # variants
     BOOL_VARIANT = rf"(?:[~+-]\s*{NAME})"
-    KEY_VALUE_PAIR = rf"(?:{NAME}=(?:{VALUE}))"
+    KEY_VALUE_PAIR = rf"(?:{NAME}=(?:{VALUE}|{QUOTED_VALUE}))"
     # Package name
-    FULLY_QUALIFIED_PACKAGE_NAME = rf"(?:{DOTTED_IDENTIFIER})"
-    UNQUALIFIED_PACKAGE_NAME = rf"(?:{IDENTIFIER})"
+    FULLY_QUALIFIED_SPEC_NAME = rf"(?:{DOTTED_IDENTIFIER})"
+    UNQUALIFIED_SPEC_NAME = rf"(?:{IDENTIFIER})"
     # White spaces
     WS = r"(?:\s+)"
 
@@ -342,6 +445,58 @@ class ErrorTokenType(TokenBase):
 
     # Unexpected character
     UNEXPECTED = r"(?:.[\s]*)"
+
+
+#: Regex to strip quotes. Group 2 will be the unquoted string.
+STRIP_QUOTES = re.compile(r"^(['\"])(.*)\1$")
+
+
+def quote_kvp(string: str) -> str:
+    """For strings like ``name=value``, quote and escape the value if needed.
+
+    This is a compromise to respect quoting of key-value pairs on the CLI. The shell
+    strips quotes from quoted arguments, so we cannot know *exactly* how CLI arguments
+    were quoted. To compensate, we re-add quotes around anything staritng with ``name=``,
+    and we assume the rest of the argument is the value. This covers the
+    common cases of passing variant arguments with spaces in them, e.g.,
+    ``cflags="-O2 -g"`` on the command line.
+    """
+    match = SPLIT_KVP.match(string)
+    if not match:
+        return string
+
+    key, value = match.groups()
+    return f"{key}={quote_if_needed(value)}"
+
+
+def strip_quotes_and_unescape(string: str) -> str:
+    """Remove surrounding single or double quotes from string, if present."""
+    match = STRIP_QUOTES.match(string)
+    if not match:
+        return string
+
+    # replace any escaped quotes with bare quotes
+    quote, result = match.groups()
+    return result.replace(rf"\{quote}", quote)
+
+
+def quote_if_needed(value: str) -> str:
+    """Add quotes around the value if it requires quotes.
+
+    This will add quotes around the value unless it matches ``NO_QUOTES_NEEDED``.
+
+    This adds:
+    * single quotes by default
+    * double quotes around any value that contains single quotes
+
+    If double quotes are used, we json-escape the string. That is, we escape ``\\``,
+    ``"``, and control codes.
+
+    """
+    if NO_QUOTES_NEEDED.match(value):
+        return value
+
+    return json.dumps(value) if "'" in value else f"'{value}'"
 
 
 class Token:
@@ -447,10 +602,13 @@ class TokenContext:
 class SpecParser(object):
     __slots__ = "literal_str", "ctx", "type"
 
-    def __init__(self, type, literal_str: str):
-        self.literal_str = literal_str
+    def __init__(self, type, literal: Union[str, list]):
+        if isinstance(literal, list):
+            self.literal_str = " ".join([quote_kvp(arg) for arg in literal])
+        else:
+            self.literal_str = literal
         self.ctx = TokenContext(
-            filter(lambda x: x.kind != TokenType.WS, tokenize(literal_str))
+            filter(lambda x: x.kind != TokenType.WS, tokenize(self.literal_str))
         )
         self.type = type
 
@@ -477,9 +635,9 @@ class SpecParser(object):
 
         spec = self.type()
 
-        if self.ctx.accept(TokenType.UNQUALIFIED_PACKAGE_NAME):
+        if self.ctx.accept(TokenType.UNQUALIFIED_SPEC_NAME):
             spec.name = self.ctx.current_token.value
-        elif self.ctx.accept(TokenType.FULLY_QUALIFIED_PACKAGE_NAME):
+        elif self.ctx.accept(TokenType.FULLY_QUALIFIED_SPEC_NAME):
             parts = self.ctx.current_token.value.split(".")
             name = parts[-1]
             namespace = ".".join(parts[:-1])
@@ -498,7 +656,7 @@ class SpecParser(object):
                 ), f"SPLIT_KVP cannot split pair {self.ctx.current_token.value}"
 
                 name, value = match.groups()
-                spec.variants[name] = value.split(",")
+                spec.variants[name] = strip_quotes_and_unescape(value).split(",")
             else:
                 break
 
