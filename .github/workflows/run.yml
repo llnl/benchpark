@@ -272,21 +272,23 @@ jobs:
             
       - name: Dry run gpcnet/mpi-only on nosite-x86_64 with allocation modifier
         run: |
-          ./bin/benchpark setup gpcnet/mpi-only nosite-x86_64 workspace/
+          ./bin/benchpark experiment init --dest=gpcnet-mpi-only gpcnet
+          ./bin/benchpark setup gpcnet-mpi-only nosite-x86_64 workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/gpcnet/mpi-only/nosite-x86_64/workspace \
+            --workspace-dir workspace/gpcnet-mpi-only/nosite-x86_64/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
 
       - name: Dry run gpcnet/mpi-only on dynamic Tioga with allocation modifier
         run: |
-          ./bin/benchpark system init --dest=tioga-system-gpcnet tioga rocm=551 compiler=cce ~gtl
-          ./bin/benchpark setup gpcnet/mpi-only-gpcnet ./tioga-system workspace/
+          ./bin/benchpark experiment init --dest=gpcnet-mpi-only gpcnet
+          ./bin/benchpark system init --dest=tioga-system tioga rocm=551 compiler=cce ~gtl
+          ./bin/benchpark setup gpcnet-mpi-only ./tioga-system workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/gpcnet/mpi-only-gpcnet/Tioga-d34a754/workspace \
+            --workspace-dir workspace/gpcnet-mpi-only/Tioga-d34a754/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
