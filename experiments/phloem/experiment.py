@@ -24,7 +24,9 @@ class Phloem(Experiment, StrongScaling):
 
     def compute_applications_section(self):
         if self.spec.satisfies("workload=sqmr"):
-            self.add_experiment_variable("n_ranks", "{num_cores}*{num_nbors}+{num_cores}")
+            self.add_experiment_variable(
+                    "n_ranks", "{num_cores}*{num_nbors}+{num_cores}"
+            )
             self.add_experiment_variable("num_cores", "4")
             self.add_experiment_variable("num_nbors", "{num_cores}")
         elif self.spec.satisfies("workload=mpiBench"):
