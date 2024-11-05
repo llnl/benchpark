@@ -13,7 +13,7 @@ class Phloem(Experiment, StrongScaling):
         "workload",
         default="sqmr",
         values=("sqmr", "mpiBench", "mpiGraph"),
-        description="network_test or network_load_test",
+        description="sqmr, mpiBench, or mpiGraph",
     )
 
     variant(
