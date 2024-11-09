@@ -116,8 +116,10 @@ def variant(
     sticky: bool = False,
 ):
     """Define a variant.
+
     Can specify a default value as well as a text description.
-    Args:
+
+    Arguments:
         name: Name of the variant
         default: Default value for the variant, if not specified otherwise the default will be
             False for a boolean variant and 'nothing' for a multi-valued variant
@@ -130,6 +132,7 @@ def variant(
             if the group doesn't meet the additional constraints
         when: Optional condition on which the variant applies
         sticky: The variant should not be changed by the concretizer to find a valid concrete spec
+
     Raises:
         DirectiveError: If arguments passed to the directive are invalid
     """
