@@ -14,7 +14,7 @@ class Remhos(ExecutableApplication):
 
 
 
-    executable('run', 'remhos'+' -m {mesh}'+' -p {p}'+' -rs {rs}'+'{rp}'+' -dt {dt}'+' -tf {tf}'+' -ho {ho}' ' -lo {lo}'+' -fct {fct}', use_mpi=True)
+    executable('run', 'remhos'+' -m {mesh}'+' -p {p}'+' -rs {rs}'+' -rp {rp}'+' -dt {dt}'+' -tf {tf}'+' -ho {ho}' ' -lo {lo}'+' -fct {fct}', use_mpi=True)
 
     workload('remhos', executables=['run'])
     
@@ -30,7 +30,7 @@ class Remhos(ExecutableApplication):
         description='number of serial refinements',
         workloads=['remhos'])
     
-    workload_variable('rp', default='',
+    workload_variable('rp', default='1',
         description='number of parallel refinements',
         workloads=['remhos'])
 
