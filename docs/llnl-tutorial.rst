@@ -26,9 +26,9 @@ system specification in Benchpark::
 
     benchpark system init --dest=ruby-system cts cluster=ruby
 
-To run the cuda version of the AMG20223 benchmark, initialize it for experiments::
+To run the cuda, strong scaling version of the AMG20223 benchmark, initialize it for experiments::
 
-    benchpark experiment init --dest=amg2023-benchmark amg2023 programming_model=openmp
+    benchpark experiment init --dest=amg2023-benchmark amg2023 cuda=oui strong=oui
 
 Then setup the workspace directory for the system and experiment together::
 
@@ -59,7 +59,7 @@ The parameters for initializing the system are slightly different due to the
 different variants defined for the system. For example, the variant ``~gtl`` turns off gtl-enabled MPI, ``+gtl`` turns it on::
 
     benchpark system init --dest=tioga-system tioga ~gtl
-    benchpark experiment init --dest=saxpy-benchmark saxpy programming_model=cuda
+    benchpark experiment init --dest=saxpy-benchmark saxpy cuda=oui
     benchpark setup ./saxpy-benchmark ./tioga-system workspace/
     . workspace/setup.sh
     cd ./workspace/saxpy-benchmark/Tioga-975af3c/workspace/

@@ -219,7 +219,7 @@ Validating the System
 To manually validate your new system, you should initialize it and run an existing experiment such as saxpy. For example::
 
   benchpark system init --dest=modifiedx86-system modifiedx86
-  benchpark experiment init --dest=saxpy saxpy
+  benchpark experiment init --dest=saxpy saxpy openmp=oui
   benchpark setup ./saxpy ./modifiedx86-system workspace/
 
 Then you can run the commands provided by the output, the experiments should be built and run successfully without any errors. 
