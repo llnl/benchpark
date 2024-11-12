@@ -78,5 +78,5 @@ class Remhos(
         )
         self.add_spack_spec(
             "hypre",
-            [f"hypre@2.31.0 +mpi+openmp+mixedint~fortran", system_specs["compiler"]],
+            ["hypre@2.31.0 +mpi+openmp+mixedint~fortran", system_specs["compiler"]],
         )
