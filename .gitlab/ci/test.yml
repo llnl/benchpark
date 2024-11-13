@@ -100,7 +100,7 @@ legacy_test_run:
     - ramble -w ./workspace workspace archive --tar-archive
   artifacts:
     expire_in: 2 weeks
-    when: always
+    when: on_success
     paths:
       - ./workspace/saxpy/openmp/$ARCHCONFIG/workspace/archive/workspace-archive*.tar.gz
 
@@ -179,7 +179,7 @@ test_run_kripke_openmp:
     - ramble -w ./workspace workspace archive --tar-archive
   artifacts:
     expire_in: 2 weeks
-    when: always
+    when: on_success
     paths:
       - ./workspace/kripke-benchmark/$SYSTEMHASH/workspace/archive/workspace-archive*.tar.gz
 
@@ -227,6 +227,6 @@ test_run_saxpy_openmp:
     - ramble -w ./workspace workspace archive --tar-archive
   artifacts:
     expire_in: 2 weeks
-    when: always
+    when: on_success
     paths:
       - ./workspace/saxpy-benchmark/$SYSTEMHASH/workspace/archive/workspace-archive*.tar.gz
