@@ -221,7 +221,7 @@ jobs:
 
       - name: Dry run dynamic laghos/mpi-only on LLNL-Magma-Penguin-icelake-OmniPath with allocation modifier
         run: |
-            ./bin/benchpark experiment init --dest=laghos-mpi-only laghos
+          ./bin/benchpark experiment init --dest=laghos-mpi-only laghos
           ./bin/benchpark setup ./laghos-mpi-only LLNL-Magma-Penguin-icelake-OmniPath workspace/
           . workspace/setup.sh
           ramble \
