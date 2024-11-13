@@ -623,11 +623,11 @@ class SpecParser(object):
     def next_spec(self) -> Optional[Spec]:
         """Return the next spec parsed from text.
 
-        Args:
+        Parameters:
             initial_spec: object where to parse the spec. If None a new one
                 will be created.
 
-        Return
+        Returns:
             The spec that was parsed
         """
         if not self.ctx.next_token:
