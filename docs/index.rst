@@ -49,6 +49,12 @@
    add-a-dryrun
 
 .. toctree::
+   :maxdepth: 2
+   :caption: API Docs
+
+   Benchpark API Docs <source/benchpark>
+
+.. toctree::
    :maxdepth: 1
    :caption: Legacy Workflow
 

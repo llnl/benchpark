@@ -151,7 +151,7 @@ def set_path(repo, object_type=default_type):
 def additional_repository(repository, object_type=default_type):
     """Adds temporarily a repository to the default one.
 
-    Args:
+    Parameters:
         repository: repository to be added
     """
     paths[object_type].put_first(repository)
@@ -163,8 +163,8 @@ def additional_repository(repository, object_type=default_type):
 def use_repositories(*paths_and_repos, object_type=default_type):
     """Use the repositories passed as arguments within the context manager.
 
-    Args:
-        *paths_and_repos: paths to the repositories to be used, or
+    Parameters:
+        `*paths_and_repos`: paths to the repositories to be used, or
             already constructed Repo objects
 
     Returns:
