@@ -380,8 +380,8 @@ jobs:
 
       - name: Dry run dynamic sandia microbenchmarks mpi_overhead with dynamic CTS ruby
         run: |
-            ./bin/benchpark experiment init --dest=smb-mpi_overhead smb
-            ./bin/benchpark setup ./smb-mpi_overhead ./ruby-system workspace/
+          ./bin/benchpark experiment init --dest=smb-mpi_overhead smb
+          ./bin/benchpark setup ./smb-mpi_overhead ./ruby-system workspace/
           . workspace/setup.sh
           ramble \
           --workspace-dir workspace/smb-mpi_overhead/Cts-6d48f81/workspace \
@@ -391,8 +391,8 @@ jobs:
 
       - name: Dry run dynamic sandia microbenchmarks msgrate with dynamic CTS ruby
         run: |
-            ./bin/benchpark experiment init --dest=smb-msgrate smb workload=msgrate
-            ./bin/benchpark setup ./smb-msgrate ./ruby-system workspace/
+          ./bin/benchpark experiment init --dest=smb-msgrate smb workload=msgrate
+          ./bin/benchpark setup ./smb-msgrate ./ruby-system workspace/
           . workspace/setup.sh
           ramble \
           --workspace-dir workspace/smb-msgrate/Cts-6d48f81/workspace \
