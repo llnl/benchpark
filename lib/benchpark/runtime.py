@@ -82,7 +82,6 @@ class RuntimeResources:
         self.spack_location = self.dest / "spack"
 
     def bootstrap(self):
-        print("Hold tight, Benchpark is bootstrapping itself.")
         if not self.ramble_location.exists():
             self._install_ramble()
         ramble_lib_path = self.ramble_location / "lib" / "ramble"

@@ -11,7 +11,7 @@ import sys
 import benchpark.paths
 import benchpark.repo
 
-# import benchpark.system as system
+import benchpark.system as system
 from benchpark.runtime import RuntimeResources
 
 bootstrapper = RuntimeResources(benchpark.paths.benchpark_home)  # noqa
@@ -30,6 +30,10 @@ def setup_parser(subparser):
 
 def audit_experiment(exp_cls):
     required_methods = ["compute_applications_section", "compute_spack_section"]
+
+    if exp_cls.__name__ == "Caliper":
+        # Caliper is an abstract class, and is never directly instantiated
+        return []
 
     errors = list()
 
@@ -76,17 +80,12 @@ def audit_system(sys_cls):
     externals = basedir / "externals"
     if externals.exists():
         for f in _find_yaml_files(externals):
-            pass
-            # TODO: this fails for reasons I don't understand, even though
-            # this duplicates logic from system.py
-            # cfg.read_config_file(f, system.packages_schema)
+            cfg.read_config_file(f, system.packages_schema.schema)
 
     compilers = basedir / "compilers"
     if compilers.exists():
         for f in _find_yaml_files(compilers):
-            pass
-            # cfg.read_config_file(f, system.compilers_schema)
-            # TODO: same problem as prior loop
+            cfg.read_config_file(f, system.compilers_schema.schema)
     return errors
 
 
