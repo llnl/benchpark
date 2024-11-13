@@ -22,20 +22,6 @@ class Gpcnet(Experiment, StrongScaling):
         description="app version",
     )
 
-    # requires("system+papi", when(caliper=topdown*))
-
-    # TODO: Support list of 3-tuples
-    # variant(
-    #     "p",
-    #     description="value of p",
-    # )
-
-    # TODO: Support list of 3-tuples
-    # variant(
-    #     "n",
-    #     description="value of n",
-    # )
-
     def compute_applications_section(self):
         # TODO: Replace with conflicts clause
         self.add_experiment_variable(
