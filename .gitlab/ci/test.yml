@@ -96,6 +96,13 @@ legacy_test_run:
     # Check Experiment Exit Codes
     - cd -
     - python ./.gitlab/ci/bin/exit-codes ./workspace/saxpy/openmp/$ARCHCONFIG/workspace/results.latest.json
+    # Archive workspace
+    - ramble -w ./workspace workspace archive --tar-archive
+  artifacts:
+    expire_in: 2 weeks
+    when: always
+    paths:
+      - ./workspace/saxpy/openmp/$ARCHCONFIG/workspace/archive/workspace-archive*.tar.gz
 
 test_run_tioga_rocm:
   stage: test
@@ -168,6 +175,13 @@ test_run_kripke_openmp:
     # Check Experiment Exit Codes
     - cd -
     - python ./.gitlab/ci/bin/exit-codes ./workspace/kripke-benchmark/$SYSTEMHASH/workspace/results.latest.json
+    # Archive workspace
+    - ramble -w ./workspace workspace archive --tar-archive
+  artifacts:
+    expire_in: 2 weeks
+    when: always
+    paths:
+      - ./workspace/kripke-benchmark/$SYSTEMHASH/workspace/archive/workspace-archive*.tar.gz
 
 test_run_saxpy_openmp:
   stage: test
@@ -209,3 +223,10 @@ test_run_saxpy_openmp:
     # Check Experiment Exit Codes
     - cd -
     - python ./.gitlab/ci/bin/exit-codes ./workspace/saxpy-benchmark/$SYSTEMHASH/workspace/results.latest.json
+    # Archive workspace
+    - ramble -w ./workspace workspace archive --tar-archive
+  artifacts:
+    expire_in: 2 weeks
+    when: always
+    paths:
+      - ./workspace/saxpy-benchmark/$SYSTEMHASH/workspace/archive/workspace-archive*.tar.gz
