@@ -45,23 +45,24 @@ class Ior(
         num_nodes = {"n_nodes": 1} 
         t = "{b}/256"
         self.add_experiment_variable("t", t, True)
-        # Per-process size (in zones) in each dimension
 
         if self.spec.satisfies("single_node=oui"):
-            n_resources = 1
             for pk, pv in num_nodes.items():
                 self.add_experiment_variable(pk, pv, True)
             self.add_experiment_variable("b", "268435456", True)
         elif self.spec.satisfies("strong=oui"):
             scaled_variables = self.generate_strong_scaling_params(
-                {tuple(num_nodes.keys()): list(num_nodes.values())},
+		{tuple(num_nodes.keys()): list(num_nodes.values())},
                 int(self.spec.variants["scaling-factor"][0]),
                 int(self.spec.variants["scaling-iterations"][0]),
             )
+            for k, v in scaled_variables.items():
+                self.add_experiment_variable(k, v, True)
             #256 mb
-            self.add_experiment_variable("b", "268435456\/{n_nodes}", True)
+            self.add_experiment_variable("b", "268435456 / {n_nodes}", True)
         elif self.spec.satisfies("weak=oui"):
             scaled_variables = self.generate_weak_scaling_params(
+                {tuple(num_nodes.keys()): list(num_nodes.values())},
                 {tuple(num_nodes.keys()): list(num_nodes.values())},
                 int(self.spec.variants["scaling-factor"][0]),
                 int(self.spec.variants["scaling-iterations"][0]),
@@ -89,5 +90,5 @@ class Ior(
         self.add_spack_spec(system_specs["mpi"])
 
         self.add_spack_spec(
-            self.name, [f"ior@{app_version} +mpi", system_specs["compiler"]]
+            self.name, [f"ior@{app_version}", system_specs["compiler"]]
         )
