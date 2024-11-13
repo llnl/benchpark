@@ -25,7 +25,7 @@ For example, if you are contributing a system called foo you would test it with 
   - name: Dry run dynamic saxpy on dynamic foo
     run: |
       benchpark system init --dest=foo-system foo
-      benchpark experiment init --dest=saxpy-openmp saxpy
+      benchpark experiment init --dest=saxpy-openmp saxpy openmp=oui
       benchpark setup ./saxpy ./foo-system workspace/
       . workspace/setup.sh
       ramble \
