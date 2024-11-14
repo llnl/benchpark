@@ -33,8 +33,8 @@ class Tioga(System):
 
     def initialize(self):
         super().initialize()
-
-        self.scheduler = "flux"
+        if (self.spec.variants["scheduler"][0]):
+            self.scheduler = "flux"
         self.sys_cores_per_node = "64"
         self.sys_gpus_per_node = "4"
 
