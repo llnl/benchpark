@@ -75,8 +75,8 @@ class System(ExperimentSystemBase):
 
     variant(
         "scheduler",
-        default=True,
-        values=("true", "false"),
+        default="yes",
+        values=("yes", "none"),
         description="Use the scheduler on the system, or generate scripts without the scheduler commands",
     )
 
