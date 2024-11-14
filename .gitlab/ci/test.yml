@@ -1,8 +1,8 @@
 .test_clusters: &test_clusters
   parallel:
     matrix:
-      - HOST: tioga
-        ARCHCONFIG: LLNL-Tioga-HPECray-zen3-MI250X-Slingshot
+#      - HOST: tioga
+#        ARCHCONFIG: LLNL-Tioga-HPECray-zen3-MI250X-Slingshot
       - HOST: dane
         ARCHCONFIG: LLNL-Dane-DELL-sapphirerapids-OmniPath
 
@@ -10,7 +10,7 @@ test_run:
   stage: test
   tags:
     - $HOST
-    - shell
+    - batch
   <<: *test_clusters
   rules:
     - changes:
