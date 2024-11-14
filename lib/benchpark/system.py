@@ -72,6 +72,13 @@ class System(ExperimentSystemBase):
         Tuple["benchpark.variant.Variant", "benchpark.spec.ConcreteSystemSpec"],
     ]
 
+    variant(
+        "scheduler",
+        default=True,
+        values=("true", "false"),
+        description="Use the scheduler on the system, or generate scripts without the scheduler commands",
+    )
+
     def __init__(self, spec):
         self.spec: "benchpark.spec.ConcreteSystemSpec" = spec
         super().__init__()
@@ -82,7 +89,7 @@ class System(ExperimentSystemBase):
         self.sys_cores_per_node = None
         self.sys_gpus_per_node = None
         self.sys_mem_per_node = None
-        self.scheduler = None
+        self.scheduler = "mpi"
         self.timeout = "120"
         self.queue = None
 
