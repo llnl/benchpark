@@ -11,6 +11,7 @@ import sys
 
 import benchpark.paths
 from benchpark.directives import ExperimentSystemBase
+from benchpark.directives import variant
 import benchpark.repo
 from benchpark.runtime import RuntimeResources
 
