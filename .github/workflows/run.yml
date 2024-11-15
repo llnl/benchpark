@@ -219,22 +219,23 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run laghos/mpi-only on LLNL-Magma-Penguin-icelake-OmniPath with allocation modifier
+      - name: Dry run dynamic laghos/mpi-only on LLNL-Magma-Penguin-icelake-OmniPath with allocation modifier
         run: |
-          ./bin/benchpark setup laghos/mpi-only LLNL-Magma-Penguin-icelake-OmniPath workspace/
+          ./bin/benchpark experiment init --dest=laghos-mpi-only laghos
+          ./bin/benchpark setup ./laghos-mpi-only LLNL-Magma-Penguin-icelake-OmniPath workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/laghos/mpi-only/LLNL-Magma-Penguin-icelake-OmniPath/workspace \
+            --workspace-dir workspace/laghos-mpi-only/LLNL-Magma-Penguin-icelake-OmniPath/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
 
       - name: Dry run laghos/mpi-only on LLNL-Ruby-icelake-OmniPath with allocation modifier
         run: |
-          ./bin/benchpark setup laghos/mpi-only LLNL-Ruby-icelake-OmniPath workspace/
+          ./bin/benchpark setup laghos-mpi-only LLNL-Ruby-icelake-OmniPath workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/laghos/mpi-only/LLNL-Ruby-icelake-OmniPath/workspace \
+            --workspace-dir workspace/laghos-mpi-only/LLNL-Ruby-icelake-OmniPath/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run

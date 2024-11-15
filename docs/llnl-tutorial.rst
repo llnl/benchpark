@@ -26,9 +26,9 @@ system specification in Benchpark::
 
     benchpark system init --dest=ruby-system cts cluster=ruby
 
-To run the cuda, strong scaling version of the AMG20223 benchmark, initialize it for experiments::
+To run the openmp, strong scaling version of the AMG20223 benchmark, initialize it for experiments::
 
-    benchpark experiment init --dest=amg2023-benchmark amg2023 cuda=oui strong=oui
+    benchpark experiment init --dest=amg2023-benchmark amg2023 openmp=oui
 
 Then setup the workspace directory for the system and experiment together::
 
@@ -44,8 +44,8 @@ Then setup the Ramble experiment workspace, this builds all software and may tak
     cd ./workspace/amg2023-benchmark/Cts-6d48f81/workspace/
     ramble --workspace-dir . --disable-progress-bar workspace setup
 
-Next, we run the Saxpy experiments, which will launch jobs through the
-scheduler on Tioga::
+Next, we run the AMG2023 experiments, which will launch jobs through the
+scheduler on the CTS system::
 
     ramble --workspace-dir . --disable-progress-bar on
 
@@ -53,13 +53,13 @@ scheduler on Tioga::
 Tioga
 ------
 
-This second tutorial will guide you through the process of using the cuda 
+This second tutorial will guide you through the process of using the ROCm
 version of the Saxpy benchmark on Tioga. 
 The parameters for initializing the system are slightly different due to the 
 different variants defined for the system. For example, the variant ``~gtl`` turns off gtl-enabled MPI, ``+gtl`` turns it on::
 
     benchpark system init --dest=tioga-system tioga ~gtl
-    benchpark experiment init --dest=saxpy-benchmark saxpy cuda=oui
+    benchpark experiment init --dest=saxpy-benchmark saxpy rocm=oui
     benchpark setup ./saxpy-benchmark ./tioga-system workspace/
     . workspace/setup.sh
     cd ./workspace/saxpy-benchmark/Tioga-975af3c/workspace/

@@ -99,7 +99,7 @@ setup step::
 
     benchpark experiment init --dest=</path/to/experiment_root> caliper=<caliper_modifier> </output/path/to/workspace> 
 
-Valid values for ``<caliper>`` are found in the **Caliper Variant**
+Valid values for ``<caliper_variant>`` are found in the **Caliper Variant**
 column of the table below.  Benchpark will link the experiment to Caliper,
 and inject appropriate Caliper configuration at runtime.  After the experiments
 in the workspace have completed running, a ``.cali`` file
