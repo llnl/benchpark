@@ -69,6 +69,6 @@ class Remhos(ExecutableApplication):
         description='ms',
         workloads=['2d','3d'])
     #FOM_regex=r'(?<=Merit)\s+[\+\-]*[0-9]*\.*[0-9]+e*[\+\-]*[0-9]*'
-    figure_of_merit("success", log_file='{experiment_run_dir}/{experiment_name}.out', fom_regex=r'FOM:\s+(?P<fom>[0-9]*\.[0-9]*)', group_name='fom', units='megadofs x time steps / second')
+    figure_of_merit("FOM", log_file='{experiment_run_dir}/{experiment_name}.out', fom_regex=r'FOM:\s+(?P<fom>[0-9]*\.[0-9]*)', group_name='fom', units='megadofs x time steps / second')
     success_criteria('valid', mode='string', match=r'.*', file='{experiment_run_dir}/{experiment_name}.out')
 
