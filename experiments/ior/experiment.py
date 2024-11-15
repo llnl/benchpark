@@ -51,7 +51,7 @@ class Ior(
             self.add_experiment_variable("b", "268435456", True)
         elif self.spec.satisfies("strong=oui"):
             scaled_variables = self.generate_strong_scaling_params(
-	        {tuple(num_nodes.keys()): list(num_nodes.values())},
+                {tuple(num_nodes.keys()): list(num_nodes.values())},
                 int(self.spec.variants["scaling-factor"][0]),
                 int(self.spec.variants["scaling-iterations"][0]),
             )
