@@ -49,3 +49,5 @@ packages:
       buildable: false
   mpi:
     buildable: false
+  zlib-api:                                                                     
+      require: zlib

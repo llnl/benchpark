@@ -7,13 +7,19 @@
         ARCHCONFIG: LLNL-Dane-DELL-sapphirerapids-OmniPath
 
 test_run:
+  resource_group: $HOST
   stage: test
   tags:
     - $HOST
-    - shell
+    - batch
   <<: *test_clusters
+  variables:
+    SCHEDULER_PARAMETERS: -N 1 -t 1h
   rules:
-    - changes:
+    - if: |
+        $CI_PIPELINE_SOURCE == "merge_request_event" ||
+        $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
         - .gitlab-ci.yml
         - .gitlab/ci/*
         - experiments/**
@@ -32,4 +38,5 @@ test_run:
     - cd ./workspace/saxpy/openmp/$ARCHCONFIG/workspace/
     - ramble --workspace-dir . --disable-progress-bar --disable-logger workspace setup
     # Run Saxpy Experiments
-    - ramble --workspace-dir . --disable-progress-bar --disable-logger on
+    - ramble --workspace-dir . --disable-progress-bar --disable-logger
+      on --executor '{execute_experiment}' --where '{n_nodes} == 1'
