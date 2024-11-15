@@ -1,3 +1,8 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
 from benchpark.directives import variant
 from benchpark.error import BenchparkError
 from benchpark.experiment import Experiment
