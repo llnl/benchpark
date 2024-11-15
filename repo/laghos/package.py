@@ -33,7 +33,8 @@ class Laghos(MakefilePackage):
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
 
-    depends_on("mfem@develop", when="@develop")
+    depends_on("zlib@1.3.1+optimize+pic+shared", when="@develop")
+    depends_on("mfem@develop^zlib@1.3.1+optimize+pic+shared", when="@develop")
     depends_on("mfem@4.2.0:", when="@3.1")
     depends_on("mfem@4.1.0:4.1", when="@3.0")
     # Recommended mfem version for laghos v2.0 is: ^mfem@3.4.1-laghos-v2.0
