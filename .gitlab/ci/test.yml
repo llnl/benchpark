@@ -16,7 +16,10 @@ test_run:
   variables:
     SCHEDULER_PARAMETERS: -N 1 -t 1h
   rules:
-    - changes:
+    - if: |
+        $CI_PIPELINE_SOURCE == "merge_request_event" ||
+        $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
         - .gitlab-ci.yml
         - .gitlab/ci/*
         - experiments/**
