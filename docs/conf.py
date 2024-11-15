@@ -7,6 +7,8 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 import subprocess
+import sys
+import os
 
 subprocess.call(
     [
@@ -32,7 +34,11 @@ author = "Olga Pearce, Alec Scott, Peter Scheibel, Greg Becker, Riyaz Haque, and
 extensions = [
     "sphinx_rtd_theme",
     "sphinxcontrib.programoutput",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.napoleon",
 ]
+
+sys.path.insert(0, os.path.abspath("../lib"))
 
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", ".spack-env"]
 

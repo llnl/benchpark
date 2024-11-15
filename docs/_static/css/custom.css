@@ -89,3 +89,7 @@ a:visited {
 html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-content dl[class]:not(.option-list):not(.field-list):not(.footnote):not(.citation):not(.glossary):not(.simple) > dt {
     color: #7fa866
 }
+
+.rst-content div[class^="highlight"] pre {
+    max-height: 600px;
+}
