@@ -377,3 +377,14 @@ jobs:
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
+
+      - name: Dry run dynamic ior/mpi with dynamic CTS ruby
+        run: |
+          ./bin/benchpark experiment init --dest=ior-mpi ior
+          ./bin/benchpark setup ./ior-mpi ./ruby-system workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/ior-mpi/Cts-6d48f81/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
