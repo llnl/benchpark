@@ -24,7 +24,7 @@ class Variant:
     ):
         """Initialize a package variant.
 
-        Args:
+        Parameters:
             name (str): name of the variant
             default (str): default value for the variant in case
                 nothing has been specified
@@ -74,12 +74,13 @@ class Variant:
         """Validate a variant spec against this package variant. Raises an
         exception if any error is found.
 
-        Args:
+        Parameters:
             vspec_values (tuple): values to be validated
             pkg_cls (spack.package_base.PackageBase): the package class
                 that required the validation, if available
 
-        Raises: Exception
+        Raises:
+            Exception
         """
         # If the value is exclusive there must be at most one
         if not self.multi and len(variant_values) != 1:
