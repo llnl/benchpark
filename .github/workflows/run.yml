@@ -381,7 +381,6 @@ jobs:
 
       - name: Dry run dynamic osu-micro-benchmarks/mpi-only with dynamic CTS ruby
         run: |
-          ./bin/benchpark system init --dest=ruby-system cts cluster=ruby
           ./bin/benchpark experiment init --dest=osu-micro-benchmarks-mpi-only osu-micro-benchmarks
           ./bin/benchpark setup ./osu-micro-benchmarks-mpi-only ./ruby-system workspace/
           . workspace/setup.sh
