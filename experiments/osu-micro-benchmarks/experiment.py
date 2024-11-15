@@ -94,7 +94,6 @@ class OsuMicroBenchmarks(Experiment):
                 f"Only one type of scaling per experiment is allowed for application package {self.name}"
             )
 
-        variables = {}
         num_nodes = {"n_nodes": 2}
 
         if self.spec.satisfies("single_node=oui"):
@@ -107,5 +106,5 @@ class OsuMicroBenchmarks(Experiment):
         system_specs["mpi"] = "default-mpi"
         self.add_spack_spec(system_specs["mpi"])
         self.add_spack_spec(
-            self.name, [f"osu-micro-benchmarks", system_specs["compiler"]]
+            self.name, ["osu-micro-benchmarks", system_specs["compiler"]]
         )
