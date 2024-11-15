@@ -7,22 +7,25 @@ from benchpark.error import BenchparkError
 from benchpark.directives import variant
 from benchpark.experiment import Experiment
 from benchpark.scaling import StrongScaling
+from benchpark.expr.builtin.caliper import Caliper
 
 
 class Remhos(
     Experiment,
     StrongScaling,
+    Caliper,
 ):
 
     variant(
         "workload",
-        default="remhos",
-        description="workload to execute",
+        default="2d",
+        values=("2d", "3d"),
+        description="2d or 3d run",
     )
 
     variant(
         "version",
-        default="1.0",
+        default="gpu-fom",
         values=("1.0", "develop", "gpu-fom"),
         description="app version",
     )
