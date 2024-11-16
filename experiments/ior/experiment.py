@@ -75,6 +75,7 @@ class Ior(
         self.add_experiment_variable(
             "n_ranks", "{sys_cores_per_node} * {n_nodes}", True
         )
+
     def compute_spack_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
