@@ -125,10 +125,10 @@ class Amg2023(
             for k, v in scaled_variables.items():
                 self.add_experiment_variable(k, v, True)
 
-        if self.spec.satisfies("openmp=oui"):
+        if self.spec.satisfies("openmp"):
             self.add_experiment_variable("n_ranks", n_resources, True)
             self.add_experiment_variable("n_threads_per_proc", 1, True)
-        elif self.spec.satisfies("cuda=oui") or self.spec.satisfies("rocm=oui"):
+        elif self.spec.satisfies("cuda") or self.spec.satisfies("rocm"):
             self.add_experiment_variable("n_gpus", n_resources, True)
 
     def compute_spack_section(self):
@@ -141,16 +141,16 @@ class Amg2023(
         system_specs["compiler"] = "default-compiler"
         system_specs["mpi"] = "default-mpi"
         system_specs["lapack"] = "lapack"
-        if self.spec.satisfies("cuda=oui"):
+        if self.spec.satisfies("cuda"):
             system_specs["cuda_version"] = "{default_cuda_version}"
             system_specs["cuda_arch"] = "{cuda_arch}"
             system_specs["blas"] = "cublas-cuda"
-        if self.spec.satisfies("rocm=oui"):
+        if self.spec.satisfies("rocm"):
             system_specs["rocm_arch"] = "{rocm_arch}"
             system_specs["blas"] = "blas-rocm"
 
         # set package spack specs
-        if self.spec.satisfies("cuda=oui") or self.spec.satisfies("rocm=oui"):
+        if self.spec.satisfies("cuda") or self.spec.satisfies("rocm"):
             # empty package_specs value implies external package
             self.add_spack_spec(system_specs["blas"])
         # empty package_specs value implies external package
