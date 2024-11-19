@@ -9,12 +9,7 @@ from benchpark.experiment import ExperimentHelper
 
 
 class OpenMPExperiment:
-    variant(
-        "openmp",
-        default="non",
-        values=("oui", "non"),
-        description="Build and run with OpenMP",
-    )
+    variant("openmp", default=False, description="Build and run with OpenMP")
 
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):
