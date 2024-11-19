@@ -210,7 +210,7 @@ jobs:
       - name: Dry run dynamic saxpy/cuda with dynamic Sierra
         run: |
           ./bin/benchpark system init --dest=sierra-system sierra cuda=10-1-243 compiler=xl
-          ./bin/benchpark experiment init --dest=saxpy-cuda saxpy cuda=oui
+          ./bin/benchpark experiment init --dest=saxpy-cuda saxpy+cuda
           ./bin/benchpark setup ./saxpy-cuda ./sierra-system workspace/
           . workspace/setup.sh
           ramble \
