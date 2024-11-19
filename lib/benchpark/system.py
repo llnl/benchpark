@@ -75,9 +75,9 @@ class System(ExperimentSystemBase):
 
     variant(
         "scheduler",
-        default="yes",
-        values=("yes", "none"),
-        description="Use the scheduler on the system, or generate scripts without the scheduler commands",
+        default="mpi",
+        values=("mpi"),
+        description="Base generates scripts without the scheduler commands",
     )
 
     def __init__(self, spec):
@@ -90,7 +90,7 @@ class System(ExperimentSystemBase):
         self.sys_cores_per_node = None
         self.sys_gpus_per_node = None
         self.sys_mem_per_node = None
-        self.scheduler = "mpi"
+        self.scheduler = self.spec.variants["scheduler"].value
         self.timeout = "120"
         self.queue = None
 
