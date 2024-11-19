@@ -23,7 +23,7 @@ class CudaExperiment:
             # set package spack specs
             package_specs = {}
 
-            if self.spec.satisfies("cuda=oui"):
+            if self.spec.satisfies("cuda"):
                 package_specs["cuda"] = {
                     "pkg_spec": "cuda@{}+allow-unsupported-compilers".format(
                         system_specs["cuda_version"]
@@ -37,11 +37,11 @@ class CudaExperiment:
             }
 
         def get_helper_name_prefix(self):
-            return "cuda" if self.spec.satisfies("cuda=oui") else ""
+            return "cuda" if self.spec.satisfies("cuda") else ""
 
         def get_spack_variants(self):
             return (
                 "+cuda cuda_arch={cuda_arch}"
-                if self.spec.satisfies("cuda=oui")
+                if self.spec.satisfies("cuda")
                 else "~cuda"
             )
