@@ -119,17 +119,17 @@ class Kripke(
             for k, v in scaled_variables.items():
                 self.add_experiment_variable(k, v, True)
 
-        if self.spec.satisfies("openmp=oui"):
+        if self.spec.satisfies("+openmp"):
             self.add_experiment_variable("n_ranks", n_resources, True)
             self.add_experiment_variable("n_threads_per_proc", 1, True)
-        elif self.spec.satisfies("cuda=oui") or self.spec.satisfies("rocm=oui"):
+        elif self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_experiment_variable("n_gpus", n_resources, True)
 
-        if self.spec.satisfies("openmp=oui"):
+        if self.spec.satisfies("+openmp"):
             self.add_experiment_variable("arch", "OpenMP")
-        elif self.spec.satisfies("cuda=oui"):
+        elif self.spec.satisfies("+cuda"):
             self.add_experiment_variable("arch", "CUDA")
-        elif self.spec.satisfies("rocm=oui"):
+        elif self.spec.satisfies("+rocm"):
             self.add_experiment_variable("arch", "HIP")
 
     def compute_spack_section(self):
@@ -141,10 +141,10 @@ class Kripke(
         system_specs = {}
         system_specs["compiler"] = "default-compiler"
         system_specs["mpi"] = "default-mpi"
-        if self.spec.satisfies("cuda=oui"):
+        if self.spec.satisfies("+cuda"):
             system_specs["cuda_version"] = "{default_cuda_version}"
             system_specs["cuda_arch"] = "{cuda_arch}"
-        if self.spec.satisfies("rocm=oui"):
+        if self.spec.satisfies("+rocm"):
             system_specs["rocm_arch"] = "{rocm_arch}"
 
         # set package spack specs
