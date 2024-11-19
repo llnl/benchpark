@@ -9,12 +9,7 @@ from benchpark.experiment import ExperimentHelper
 
 
 class ROCmExperiment:
-    variant(
-        "rocm",
-        default="non",
-        values=("oui", "non"),
-        description="Build and run with ROCm",
-    )
+    variant("rocm", default=False, description="Build and run with ROCm")
 
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):
