@@ -13,11 +13,11 @@ class ROCmExperiment:
 
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):
-            return "rocm" if self.spec.satisfies("rocm") else ""
+            return "rocm" if self.spec.satisfies("+rocm") else ""
 
         def get_spack_variants(self):
             return (
                 "+rocm amdgpu_target={rocm_arch}"
-                if self.spec.satisfies("rocm")
+                if self.spec.satisfies("+rocm")
                 else "~rocm"
             )
