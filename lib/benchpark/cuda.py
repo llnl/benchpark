@@ -9,12 +9,7 @@ from benchpark.experiment import ExperimentHelper
 
 
 class CudaExperiment:
-    variant(
-        "cuda",
-        default="non",
-        values=("oui", "non"),
-        description="Build and run with CUDA",
-    )
+    variant("cuda", default=False, description="Build and run with CUDA")
 
     class Helper(ExperimentHelper):
         def compute_spack_section(self):
