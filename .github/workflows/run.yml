@@ -262,7 +262,7 @@ jobs:
 
       - name: Dry run dynamic quicksilver-openmp on nosite-x86_64 with allocation modifier
         run: |
-          ./bin/benchpark experiment init --dest=quicksilver-openmp quicksilver+openmp experiment=weak
+          ./bin/benchpark experiment init --dest=quicksilver-openmp quicksilver+openmp +weak~single_node
           ./bin/benchpark setup ./quicksilver-openmp nosite-x86_64 workspace/
           . workspace/setup.sh
           ramble \

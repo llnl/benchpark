@@ -31,8 +31,8 @@ class Laghos(
     def compute_applications_section(self):
         # TODO: Replace with conflicts clause
         scaling_modes = {
-            "strong": self.spec.satisfies("strong=oui"),
-            "single_node": self.spec.satisfies("single_node=oui"),
+            "strong": self.spec.satisfies("+strong"),
+            "single_node": self.spec.satisfies("+single_node"),
         }
 
         scaling_mode_enabled = [key for key, value in scaling_modes.items() if value]
@@ -44,10 +44,10 @@ class Laghos(
         # Number of initial nodes
         num_nodes = {"n_nodes": 1}
 
-        if self.spec.satisfies("single_node=oui"):
+        if self.spec.satisfies("+single_node"):
             for pk, pv in num_nodes.items():
                 self.add_experiment_variable(pk, pv, True)
-        elif self.spec.satisfies("strong=oui"):
+        elif self.spec.satisfies("+strong"):
             scaled_variables = self.generate_strong_scaling_params(
                 {tuple(num_nodes.keys()): list(num_nodes.values())},
                 int(self.spec.variants["scaling-factor"][0]),

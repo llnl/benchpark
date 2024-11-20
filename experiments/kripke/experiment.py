@@ -38,10 +38,10 @@ class Kripke(
     def compute_applications_section(self):
         # TODO: Replace with conflicts clause
         scaling_modes = {
-            "strong": self.spec.satisfies("strong=oui"),
-            "weak": self.spec.satisfies("weak=oui"),
-            "throughput": self.spec.satisfies("throughput=oui"),
-            "single_node": self.spec.satisfies("single_node=oui"),
+            "strong": self.spec.satisfies("+strong"),
+            "weak": self.spec.satisfies("+weak"),
+            "throughput": self.spec.satisfies("+throughput"),
+            "single_node": self.spec.satisfies("+single_node"),
         }
 
         scaling_mode_enabled = [key for key, value in scaling_modes.items() if value]
@@ -67,7 +67,7 @@ class Kripke(
         for k, v in input_variables.items():
             self.add_experiment_variable(k, v, True)
 
-        if self.spec.satisfies("single_node=oui"):
+        if self.spec.satisfies("+single_node"):
             n_resources = 1
             # TODO: Check if n_ranks / n_resources_per_node <= 1
             for pk, pv in num_procs.items():
@@ -75,7 +75,7 @@ class Kripke(
                 n_resources *= pv
             for nk, nv in problem_sizes.items():
                 self.add_experiment_variable(nk, nv, True)
-        elif self.spec.satisfies("throughput=oui"):
+        elif self.spec.satisfies("+throughput"):
             n_resources = 1
             for pk, pv in num_procs.items():
                 self.add_experiment_variable(pk, pv, True)
@@ -87,7 +87,7 @@ class Kripke(
             )
             for nk, nv in scaled_variables.items():
                 self.add_experiment_variable(nk, nv, True)
-        elif self.spec.satisfies("strong=oui"):
+        elif self.spec.satisfies("+strong"):
             scaled_variables = self.generate_strong_scaling_params(
                 {tuple(num_procs.keys()): list(num_procs.values())},
                 int(self.spec.variants["scaling-factor"][0]),
@@ -103,7 +103,7 @@ class Kripke(
             ]
             for nk, nv in problem_sizes.items():
                 self.add_experiment_variable(nk, nv, True)
-        elif self.spec.satisfies("weak=oui"):
+        elif self.spec.satisfies("+weak"):
             scaled_variables = self.generate_weak_scaling_params(
                 {tuple(num_procs.keys()): list(num_procs.values())},
                 {tuple(problem_sizes.keys()): list(problem_sizes.values())},

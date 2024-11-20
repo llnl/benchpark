@@ -30,9 +30,9 @@ class Ior(
     def compute_applications_section(self):
         # TODO: Replace with conflicts clause
         scaling_modes = {
-            "strong": self.spec.satisfies("strong=oui"),
-            "weak": self.spec.satisfies("weak=oui"),
-            "single_node": self.spec.satisfies("single_node=oui"),
+            "strong": self.spec.satisfies("+strong"),
+            "weak": self.spec.satisfies("+weak"),
+            "single_node": self.spec.satisfies("+single_node"),
         }
 
         scaling_mode_enabled = [key for key, value in scaling_modes.items() if value]
@@ -45,11 +45,11 @@ class Ior(
         t = "{b}/256"
         self.add_experiment_variable("t", t, True)
 
-        if self.spec.satisfies("single_node=oui"):
+        if self.spec.satisfies("+single_node"):
             for pk, pv in num_nodes.items():
                 self.add_experiment_variable(pk, pv, True)
             self.add_experiment_variable("b", "268435456", True)
-        elif self.spec.satisfies("strong=oui"):
+        elif self.spec.satisfies("+strong"):
             scaled_variables = self.generate_strong_scaling_params(
                 {tuple(num_nodes.keys()): list(num_nodes.values())},
                 int(self.spec.variants["scaling-factor"][0]),
@@ -59,7 +59,7 @@ class Ior(
                 self.add_experiment_variable(k, v, True)
             # 256 mb
             self.add_experiment_variable("b", "268435456 / {n_nodes}", True)
-        elif self.spec.satisfies("weak=oui"):
+        elif self.spec.satisfies("+weak"):
             scaled_variables = self.generate_weak_scaling_params(
                 {tuple(num_nodes.keys()): list(num_nodes.values())},
                 {tuple(num_nodes.keys()): list(num_nodes.values())},
