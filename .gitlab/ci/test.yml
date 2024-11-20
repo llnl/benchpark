@@ -7,13 +7,13 @@ workflow:
     matrix:
       - HOST: tioga
         ARCHCONFIG: LLNL-Tioga-HPECray-zen3-MI250X-Slingshot
-        SYSTEMHASH: Tioga-975af3c
+        RUN_PARAMS: -N 1 -t 1h
       - HOST: dane
         ARCHCONFIG: LLNL-Dane-DELL-sapphirerapids-OmniPath
-        SYSTEMHASH: Cts-2c51a80
+        RUN_PARAMS: -N 1 -t 01:00:00
       - HOST: ruby
         ARCHCONFIG: LLNL-Ruby-icelake-OmniPath
-        SYSTEMHASH: Cts-6d48f81
+        RUN_PARAMS: -N 1 -t 01:00:00
 
 .test_benchmarks: &test_benchmarks
   parallel:
@@ -76,7 +76,7 @@ legacy_test_run:
     - batch
   <<: *test_clusters
   variables:
-    SCHEDULER_PARAMETERS: -N 1 -t 1h
+    SCHEDULER_PARAMETERS: $RUN_PARAMS
   rules:
     - if: |
         $CI_PIPELINE_SOURCE == "merge_request_event" ||
@@ -114,6 +114,8 @@ test_run_tioga_rocm:
   tags:
     - tioga
     - batch
+  variables:
+    SCHEDULER_PARAMETERS: $RUN_PARAMS
   rules:
     - changes:
         - .gitlab-ci.yml
@@ -127,14 +129,15 @@ test_run_tioga_rocm:
   script:
     - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
     # Initialize system & experiment
-    - ./bin/benchpark system init --dest=tioga-system tioga ~gtl
-    - ./bin/benchpark experiment init --dest=${BENCHMARK}-benchmark ${BENCHMARK} rocm=oui
+    - ./bin/benchpark system init --dest=tioga-system llnl-elcapitan ~gtl
+    - system_id=$(./bin/benchpark system id ./tioga-system)
+    - ./bin/benchpark experiment init --dest=${BENCHMARK}-benchmark ${BENCHMARK}+rocm
     # Build Workspace
     - ./bin/benchpark setup ${BENCHMARK}-benchmark tioga-system workspace/
     # Setup Ramble & Spack
     - . workspace/setup.sh
     # Setup Workspace
-    - cd ./workspace/${BENCHMARK}-benchmark/Tioga-975af3c/workspace/
+    - cd ./workspace/${BENCHMARK}-benchmark/${system_id}/workspace/
     - ramble --workspace-dir . --disable-progress-bar --disable-logger workspace setup
     # Run Experiments
     - ramble --workspace-dir . --disable-progress-bar --disable-logger
@@ -149,7 +152,7 @@ test_run_kripke_openmp:
     - batch
   <<: *test_clusters
   variables:
-    SCHEDULER_PARAMETERS: -N 1 -t 1h
+    SCHEDULER_PARAMETERS: $RUN_PARAMS
   rules:
     - changes:
         - .gitlab-ci.yml
@@ -165,17 +168,19 @@ test_run_kripke_openmp:
     # Initialize system & experiment
     - |
         if [ "$HOST" == "tioga" ]; then
-            ./bin/benchpark system init --dest=tioga-system tioga ~gtl
+            ./bin/benchpark system init --dest=tioga-system llnl-elcapitan ~gtl
+            system_id=$(./bin/benchpark system id ./tioga-system)
         else
-            ./bin/benchpark system init --dest=$HOST-system cts cluster=$HOST
+            ./bin/benchpark system init --dest=$HOST-system llnl-cluster  cluster=$HOST
+            system_id=$(./bin/benchpark system id ./$HOST-system)
         fi
-    - ./bin/benchpark experiment init --dest=kripke-benchmark kripke openmp=oui
+    - ./bin/benchpark experiment init --dest=kripke-benchmark kripke+openmp
     # Build Workspace
     - ./bin/benchpark setup kripke-benchmark $HOST-system workspace/
     # Setup Ramble & Spack
     - . workspace/setup.sh
     # Setup Workspace
-    - cd ./workspace/kripke-benchmark/$SYSTEMHASH/workspace/
+    - cd ./workspace/kripke-benchmark/${system_id}/workspace/
     - ramble --workspace-dir . --disable-progress-bar --disable-logger workspace setup
     # Run Experiments
     - ramble --workspace-dir . --disable-progress-bar --disable-logger
@@ -184,7 +189,7 @@ test_run_kripke_openmp:
     - ramble --workspace-dir . --disable-progress-bar workspace analyze --always-print-foms --format json yaml text
     # Check Experiment Exit Codes
     - cd -
-    - python ./.gitlab/ci/bin/exit-codes ./workspace/kripke-benchmark/$SYSTEMHASH/workspace/results.latest.json
+    - python ./.gitlab/ci/bin/exit-codes ./workspace/kripke-benchmark/${system_id}/workspace/results.latest.json
 
 test_run_saxpy_openmp:
   resource_group: $HOST
@@ -194,7 +199,7 @@ test_run_saxpy_openmp:
     - batch
   <<: *test_clusters
   variables:
-    SCHEDULER_PARAMETERS: -N 1 -t 1h
+    SCHEDULER_PARAMETERS: -N 1 -t 01:00:00
   rules:
     - changes:
         - .gitlab-ci.yml
@@ -210,17 +215,19 @@ test_run_saxpy_openmp:
     # Initialize system & experiment
     - |
         if [ "$HOST" == "tioga" ]; then
-            ./bin/benchpark system init --dest=tioga-system tioga ~gtl
+            ./bin/benchpark system init --dest=tioga-system llnl-elcapitan ~gtl
+            system_id=$(./bin/benchpark system id ./tioga-system)
         else
-            ./bin/benchpark system init --dest=$HOST-system cts cluster=$HOST
+            ./bin/benchpark system init --dest=$HOST-system llnl-cluster  cluster=$HOST
+            system_id=$(./bin/benchpark system id ./$HOST-system)
         fi
-    - ./bin/benchpark experiment init --dest=saxpy-benchmark saxpy openmp=oui
+    - ./bin/benchpark experiment init --dest=saxpy-benchmark saxpy+openmp
     # Build Workspace
     - ./bin/benchpark setup saxpy-benchmark $HOST-system workspace/
     # Setup Ramble & Spack
     - . workspace/setup.sh
     # Setup Workspace
-    - cd ./workspace/saxpy-benchmark/$SYSTEMHASH/workspace/
+    - cd ./workspace/saxpy-benchmark/${system_id}/workspace/
     - ramble --workspace-dir . --disable-progress-bar --disable-logger workspace setup
     # Run Experiments
     - ramble --workspace-dir . --disable-progress-bar --disable-logger
@@ -229,4 +236,4 @@ test_run_saxpy_openmp:
     - ramble --workspace-dir . --disable-progress-bar workspace analyze --always-print-foms --format json yaml text
     # Check Experiment Exit Codes
     - cd -
-    - python ./.gitlab/ci/bin/exit-codes ./workspace/saxpy-benchmark/$SYSTEMHASH/workspace/results.latest.json
+    - python ./.gitlab/ci/bin/exit-codes ./workspace/saxpy-benchmark/${system_id}/workspace/results.latest.json
