@@ -14,6 +14,13 @@ Running on an LLNL System
 This tutorial will guide you through the process of using Benchpark on LLNL
 systems. 
 
+To run Benchpark, you will need to install its requirements: go to the
+Benchpark root directory::
+
+    python -m venv my-env
+    . my-env/bin/activate
+    pip install -r requirements.txt
+
 ------------------------
 CTS (Ruby, Dane, Magma)
 ------------------------
