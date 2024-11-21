@@ -11,7 +11,7 @@ scaling = ["weak"]
 
 f = open("daneRun.sh", "w")
 f.write("#!/bin/bash\n#SBATCH -n 32\n#SBATCH -N 1\n#SBATCH --time 599")
-for i in range(2,6):
+for i in range(1,2):
     for progOpt in progOpts:
         for n_rank in n_ranks:
             for scale in scaling:
