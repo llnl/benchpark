@@ -1,0 +1,13 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+packages:
+  mpi:
+    buildable: false
+    externals:
+    - spec: mvapich2@2.3.7-gcc1211
+      prefix: /usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-12.1.1
+      extra_attributes:
+        ldflags: "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-12.1.1/lib -lmpi"

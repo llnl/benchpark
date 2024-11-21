@@ -41,7 +41,7 @@ class Quicksilver(ExecutableApplication):
     workload_variable('f', default='',
                       description='max random mesh node displacement',
                       workloads=['quicksilver'])
-    workload_variable('i', default='{quicksilver}/Examples/CTS2_Benchmark/CTS2.inp',
+    workload_variable('i', default='{quicksilver}/Examples/CORAL2_Benchmark/Problem1/Coral2_P1.inp',
                       description='name of input file',
                       workloads=['quicksilver'])
     workload_variable('e', default='',

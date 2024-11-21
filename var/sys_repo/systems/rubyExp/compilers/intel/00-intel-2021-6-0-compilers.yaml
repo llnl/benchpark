@@ -1,0 +1,19 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+compilers:
+- compiler:
+    spec: intel@2021.6.0-classic
+    paths:
+      cc: /usr/tce/packages/intel-classic/intel-classic-2021.6.0/bin/icc
+      cxx: /usr/tce/packages/intel-classic/intel-classic-2021.6.0/bin/icpc
+      f77: /usr/tce/packages/intel-classic/intel-classic-2021.6.0/bin/ifort
+      fc: /usr/tce/packages/intel-classic/intel-classic-2021.6.0/bin/ifort
+    flags: {}
+    operating_system: rhel8
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
