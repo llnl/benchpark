@@ -4,10 +4,11 @@ compilers=("gcc12" "gccSpack")
 optParams=("O2")
 scaling=("weak")
 . setup-env.sh
-. workspace/setup.sh
-spack install gcc@12.1.0
 benchpark system init --dest=daneTCE rubyExp cluster=dane compiler=gcc
 benchpark system init --dest=daneSpack rubyExp cluster=dane compiler=gccSpack
+benchpark setup quicksilvergcc12O2weak1 daneTCE workspace
+. workspace/setup.sh
+spack install gcc@12.1.0
 for runNum in {1..2}
 do 
     for j in ${optParams[@]}
