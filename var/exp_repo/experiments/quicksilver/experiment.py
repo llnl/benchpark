@@ -5,9 +5,9 @@
 
 from benchpark.directives import variant
 from benchpark.experiment import Experiment
+from benchpark.expr.builtin.caliper import Caliper
 
-
-class Quicksilver(Experiment):
+class Quicksilver(Experiment, Caliper):
     variant(
         "experiment",
         default="weak",
@@ -26,17 +26,17 @@ class Quicksilver(Experiment):
         variables["x"] = "{X}"
         variables["y"] = "{Y}"
         variables["z"] = "{Z}"
-        if self.spec.satisfies("scaling=weak"):
-            variables["X"] = ["32", "32", "64", "64"]
-            variables["Y"] = ["32", "32", "32", "64"]
-            variables["Z"] = ["16", "32", "32", "32"]
+        if self.spec.satisfies("experiment=weak"):
+            variables["X"] =  ['24','24','36','48','60','48','84','48']
+            variables["Y"] =  ['24','24','24','24','24','36','24','48']
+            variables["Z"] =  ['12','24','24','24','24','24','24','24']
         else:
             variables["X"] = "32"
             variables["Y"] = "32"
             variables["Z"] = "16"
-        variables["I"] = ["2", "2", "4", "4"]
-        variables["J"] = ["2", "2", "2", "4"]
-        variables["K"] = ["1", "2", "2", "2"]
+        variables["I"] = ['2','2','3','4','5','4','7','4']
+        variables["J"] = ['2','2','2','2','2','3','2','4']
+        variables["K"] = ['1','2','2','2','2','2','2','2']
         variants["package_manager"] = "spack"
         experiment_name_template = f"quicksilver_{self.spec.variants['experiment'][0]}"
         experiment_name_template += "{n_ranks}"
@@ -54,19 +54,29 @@ class Quicksilver(Experiment):
                 }
             }
         }
-
+    def compute_modifiers_section(self):
+        return Experiment.compute_modifiers_section(
+            self
+        ) + Caliper.compute_modifiers_section(self)
     def compute_spack_section(self):
         # TODO: express that we need certain variables from system
         # Does not need to happen before merge, separate task
-        qs_spack_spec = "quicksilver +openmp+mpi"
+        package_specs= {}
+        qs_spack_spec = "quicksilver@caliper +openmp+mpi+caliper"
+        package_specs["quicksilver"] = {
+	    "pkg_spec": "quicksilver@caliper +openmp+mpi+caliper",
+ 	    "compiler": "default-compiler",
+        }
+        caliper_package_specs = Caliper.compute_spack_section(self)
         packages = ["default-mpi", self.spec.name]
 
         return {
-            "packages": {
-                "quicksilver": {
-                    "pkg_spec": qs_spack_spec,
-                    "compiler": "default-compiler",
+            "packages": {k: v for k, v in package_specs.items() if v}
+            | caliper_package_specs["packages"],
+            "environments": {
+                "quicksilver":{
+                    "packages": list(package_specs.keys())
+                    + list(caliper_package_specs["packages"].keys())
                 }
             },
-            "environments": {"quicksilver": {"packages": packages}},
         }
