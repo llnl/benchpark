@@ -6,6 +6,7 @@ scaling=("weak")
 . setup-env.sh
 benchpark system init --dest=daneTCE rubyExp cluster=dane compiler=gcc
 benchpark system init --dest=daneSpack rubyExp cluster=dane compiler=gccSpack
+benchpark experiment init --dest=quicksilvergcc12O2weak1 quicksilver experiment=$scale caliper=mpi
 benchpark setup quicksilvergcc12O2weak1 daneTCE workspace
 . workspace/setup.sh
 spack install gcc@12.1.0
