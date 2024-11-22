@@ -1,0 +1,32 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+system_definition:
+  name: Sierra
+  site: LLNL
+  system: IBM-power9-V100-Infiniband
+  integrator:
+    vendor: IBM
+    name: AC922
+  processor:
+    vendor: IBM
+    name: POWER9
+    ISA: ppc64le
+    uArch: power9
+  accelerator:
+    vendor: NVIDIA
+    name: V100
+    ISA: PTX
+    uArch: sm_70
+  interconnect:
+    vendor: Mellanox
+    name: EDR-Infiniband
+  system-tested:
+    site: LLNL
+    name: lassen
+    installation-year: 2018
+    description: top500 <https://www.top500.org/system/179398>
+  top500-system-instances:
+    - Sierra (LLNL)

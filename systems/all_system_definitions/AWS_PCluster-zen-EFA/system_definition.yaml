@@ -1,0 +1,32 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+system_definition:
+  name: AWS_PCluster_Hpc7a-zen4-EFA
+  site:
+  system: AWS_PCluster_Hpc7a-zen4-EFA
+  integrator:
+    vendor: AWS
+    name: ParallelCluster3.7.2-Hpc7a
+  processor:
+    vendor: AMD
+    name: EPYC-Zen4
+    ISA: x86_64
+    uArch: zen4
+  accelerator:
+    vendor:
+    name:
+    ISA:
+    uArch:
+  interconnect:
+    vendor: AWS
+    name: EFA
+  system-tested:
+    site: AWS
+    name:
+    installation-year:
+    description: aws/hpc7a <https://aws.amazon.com/ec2/instance-types/hpc7a>
+  top500-system-instances:
+    -

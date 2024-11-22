@@ -1,0 +1,32 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+system_definition:
+  name: Ruby
+  site: LLNL
+  system: Penguin-icelake-OmniPath
+  integrator:
+    vendor: Supermicro
+    name:
+  processor:
+    vendor: Intel
+    name: XeonPlatinum8276L
+    ISA: x86_64
+    uArch: icelake
+  accelerator:
+    vendor:
+    name:
+    ISA:
+    uArch:
+  interconnect:
+    vendor: CornelisNetworks
+    name: OmniPath
+  system-tested:
+    site: LLNL
+    name: ruby
+    installation-year: 2020
+    description: top500 <https://www.top500.org/system/179866>
+  top500-system-instances:
+    - Ruby (LLNL)
