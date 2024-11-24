@@ -9,6 +9,10 @@ from spack.pkg.builtin.lammps import Lammps as BuiltinLammps
 
 class Lammps(BuiltinLammps):
 
+  depends_on("kokkos+openmp", when="+openmp")
+  depends_on("kokkos+rocm", when="+rocm")
+  depends_on("kokkos+cuda", when="+cuda")
+
   def setup_run_environment(self, env):
 
     super(BuiltinLammps, self).setup_run_environment(env)
