@@ -56,7 +56,11 @@ class Lammps(
 
         self.add_experiment_variable("timesteps", 100, False)
         self.add_experiment_variable("input_file", "{input_path}/in.reaxc.hns", False)
-        self.add_experiment_variable("lammps_flags", f"{input_sizes} -k on {kokkos_mode} -sf kk -pk kokkos gpu/aware {kokkos_gpu_aware} neigh half comm {kokkos_comm} neigh/qeq full newton on -nocite", False)
+        self.add_experiment_variable(
+            "lammps_flags",
+            f"{input_sizes} -k on {kokkos_mode} -sf kk -pk kokkos gpu/aware {kokkos_gpu_aware} neigh half comm {kokkos_comm} neigh/qeq full newton on -nocite",
+            False,
+        )
 
     def compute_spack_section(self):
         # get package version
@@ -79,5 +83,9 @@ class Lammps(
         self.add_spack_spec(system_specs["mpi"])
 
         self.add_spack_spec(
-            self.name, [f"lammps@{app_version} +opt+manybody+molecule+kspace+rigid+kokkos+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth+reaxff lammps_sizes=bigbig ", system_specs["compiler"]]
+            self.name,
+            [
+                f"lammps@{app_version} +opt+manybody+molecule+kspace+rigid+kokkos+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth+reaxff lammps_sizes=bigbig ",
+                system_specs["compiler"],
+            ],
         )
