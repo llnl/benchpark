@@ -112,7 +112,7 @@ jobs:
 
       - name: Dry run dynamic amg2023-openmp on Dane with allocation modifier
         run: |
-          ./bin/benchpark experiment init --dest=amg2023-openmp amg2023 openmp=oui
+          ./bin/benchpark experiment init --dest=amg2023-openmp amg2023+openmp
           ./bin/benchpark setup ./amg2023-openmp LLNL-Dane-DELL-sapphirerapids-OmniPath workspace/
           . workspace/setup.sh
           ramble \
@@ -143,7 +143,7 @@ jobs:
 
       - name: Dry run dynamic kripke-openmp on nosite-x86_64 with allocation modifier
         run: |
-          ./bin/benchpark experiment init --dest=kripke-openmp kripke openmp=oui
+          ./bin/benchpark experiment init --dest=kripke-openmp kripke+openmp
           ./bin/benchpark setup ./kripke-openmp nosite-x86_64 workspace/
           . workspace/setup.sh
           ramble \
@@ -154,7 +154,7 @@ jobs:
 
       - name: Dry run dynamic kripke-rocm on LLNL-Tioga-HPECray-zen3-MI250X-Slingshot with allocation modifier
         run: |
-          ./bin/benchpark experiment init --dest=kripke-rocm kripke rocm=oui
+          ./bin/benchpark experiment init --dest=kripke-rocm kripke+rocm
           ./bin/benchpark setup ./kripke-openmp LLNL-Tioga-HPECray-zen3-MI250X-Slingshot workspace/
           . workspace/setup.sh
           ramble \
@@ -186,7 +186,7 @@ jobs:
 
       - name: Dry run dynamic saxpy/rocm with static Tioga
         run: |
-          ./bin/benchpark experiment init --dest=saxpy-rocm saxpy rocm=oui
+          ./bin/benchpark experiment init --dest=saxpy-rocm saxpy+rocm
           ./bin/benchpark setup ./saxpy-rocm LLNL-Tioga-HPECray-zen3-MI250X-Slingshot workspace/
           . workspace/setup.sh
           ramble \
@@ -198,7 +198,7 @@ jobs:
       - name: Dry run dynamic saxpy/rocm with dynamic Tioga
         run: |
           ./bin/benchpark system init --dest=tioga-system2 tioga rocm=551 compiler=cce ~gtl
-          ./bin/benchpark experiment init --dest=saxpy-rocm2 saxpy rocm=oui
+          ./bin/benchpark experiment init --dest=saxpy-rocm2 saxpy+rocm
           ./bin/benchpark setup ./saxpy-rocm2 ./tioga-system2 workspace/
           . workspace/setup.sh
           ramble \
@@ -210,7 +210,7 @@ jobs:
       - name: Dry run dynamic saxpy/cuda with dynamic Sierra
         run: |
           ./bin/benchpark system init --dest=sierra-system sierra cuda=10-1-243 compiler=xl
-          ./bin/benchpark experiment init --dest=saxpy-cuda saxpy cuda=oui
+          ./bin/benchpark experiment init --dest=saxpy-cuda saxpy+cuda
           ./bin/benchpark setup ./saxpy-cuda ./sierra-system workspace/
           . workspace/setup.sh
           ramble \
@@ -219,22 +219,23 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run laghos/mpi-only on LLNL-Magma-Penguin-icelake-OmniPath with allocation modifier
+      - name: Dry run dynamic laghos/mpi-only on LLNL-Magma-Penguin-icelake-OmniPath with allocation modifier
         run: |
-          ./bin/benchpark setup laghos/mpi-only LLNL-Magma-Penguin-icelake-OmniPath workspace/
+          ./bin/benchpark experiment init --dest=laghos-mpi-only laghos
+          ./bin/benchpark setup ./laghos-mpi-only LLNL-Magma-Penguin-icelake-OmniPath workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/laghos/mpi-only/LLNL-Magma-Penguin-icelake-OmniPath/workspace \
+            --workspace-dir workspace/laghos-mpi-only/LLNL-Magma-Penguin-icelake-OmniPath/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
 
       - name: Dry run laghos/mpi-only on LLNL-Ruby-icelake-OmniPath with allocation modifier
         run: |
-          ./bin/benchpark setup laghos/mpi-only LLNL-Ruby-icelake-OmniPath workspace/
+          ./bin/benchpark setup laghos-mpi-only LLNL-Ruby-icelake-OmniPath workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/laghos/mpi-only/LLNL-Ruby-icelake-OmniPath/workspace \
+            --workspace-dir workspace/laghos-mpi-only/LLNL-Ruby-icelake-OmniPath/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
@@ -261,7 +262,7 @@ jobs:
 
       - name: Dry run dynamic quicksilver-openmp on nosite-x86_64 with allocation modifier
         run: |
-          ./bin/benchpark experiment init --dest=quicksilver-openmp quicksilver openmp=oui experiment=weak
+          ./bin/benchpark experiment init --dest=quicksilver-openmp quicksilver+openmp +weak~single_node
           ./bin/benchpark setup ./quicksilver-openmp nosite-x86_64 workspace/
           . workspace/setup.sh
           ramble \
@@ -333,7 +334,7 @@ jobs:
       - name: Dry run dynamic saxpy/openmp with dynamic CTS ruby
         run: |
           ./bin/benchpark system init --dest=ruby-system cts cluster=ruby
-          ./bin/benchpark experiment init --dest=saxpy-openmp saxpy openmp=oui
+          ./bin/benchpark experiment init --dest=saxpy-openmp saxpy+openmp
           ./bin/benchpark setup ./saxpy-openmp ./ruby-system workspace/
           . workspace/setup.sh
           ramble \
@@ -345,7 +346,7 @@ jobs:
       - name: Dry run dynamic saxpy/openmp with dynamic CTS dane
         run: |
           ./bin/benchpark system init --dest=dane-system cts cluster=dane
-          ./bin/benchpark experiment init --dest=saxpy-openmp2 saxpy openmp=oui
+          ./bin/benchpark experiment init --dest=saxpy-openmp2 saxpy+openmp
           ./bin/benchpark setup ./saxpy-openmp2 ./dane-system workspace/
           . workspace/setup.sh
           ramble \
@@ -357,7 +358,7 @@ jobs:
       - name: Dry run dynamic saxpy/openmp with dynamic CTS magma
         run: |
           ./bin/benchpark system init --dest=magma-system cts cluster=magma
-          ./bin/benchpark experiment init --dest=saxpy-openmp3 saxpy openmp=oui
+          ./bin/benchpark experiment init --dest=saxpy-openmp3 saxpy+openmp
           ./bin/benchpark setup ./saxpy-openmp3 ./magma-system workspace/
           . workspace/setup.sh
           ramble \
@@ -369,7 +370,7 @@ jobs:
       - name: Dry run dynamic saxpy/openmp with dynamic generic x86
         run: |
           ./bin/benchpark system init --dest=x86-system genericx86
-          ./bin/benchpark experiment init --dest=saxpy-omp-generic saxpy openmp=oui
+          ./bin/benchpark experiment init --dest=saxpy-omp-generic saxpy+openmp
           ./bin/benchpark setup ./saxpy-omp-generic ./x86-system workspace/
           . workspace/setup.sh
           ramble \
@@ -396,6 +397,17 @@ jobs:
           . workspace/setup.sh
           ramble \
             --workspace-dir workspace/remhos-tioga/Tioga-975af3c/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic ior/mpi with dynamic CTS ruby
+        run: |
+          ./bin/benchpark experiment init --dest=ior-mpi ior
+          ./bin/benchpark setup ./ior-mpi ./ruby-system workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/ior-mpi/Cts-6d48f81/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run

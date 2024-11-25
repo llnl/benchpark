@@ -6,20 +6,20 @@
 from benchpark.directives import variant
 from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
+from benchpark.scaling import StrongScaling
+from benchpark.scaling import WeakScaling
 
 
-class Quicksilver(Experiment, OpenMPExperiment):
+class Quicksilver(
+    Experiment,
+    OpenMPExperiment,
+    StrongScaling,
+    WeakScaling,
+):
     variant(
         "workload",
         default="quicksilver",
         description="quicksilver",
-    )
-
-    variant(
-        "experiment",
-        default="weak",
-        values=("weak", "strong"),
-        description="weak or strong scaling",
     )
 
     variant(
@@ -35,13 +35,11 @@ class Quicksilver(Experiment, OpenMPExperiment):
         self.add_experiment_variable("x", "{X}")
         self.add_experiment_variable("y", "{Y}")
         self.add_experiment_variable("z", "{Z}")
-        if self.spec.satisfies("scaling=weak"):
-            self.add_experiment_name_prefix("weak")
+        if self.spec.satisfies("+weak"):
             self.add_experiment_variable("X", ["32", "32", "64", "64"])
             self.add_experiment_variable("Y", ["32", "32", "32", "64"])
             self.add_experiment_variable("Z", ["16", "32", "32", "32"])
         else:
-            self.add_experiment_name_prefix("strong")
             self.add_experiment_variable("X", "32")
             self.add_experiment_variable("Y", "32")
             self.add_experiment_variable("Z", "16")
