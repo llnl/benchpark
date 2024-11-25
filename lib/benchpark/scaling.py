@@ -156,8 +156,7 @@ class Scaling:
 class StrongScaling(Scaling):
     variant(
         "strong",
-        default="non",
-        values=("oui", "non"),
+        default=False,
         description="Strong scaling",
     )
 
@@ -170,14 +169,13 @@ class StrongScaling(Scaling):
 
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):
-            return "strong_scaling" if self.spec.satisfies("strong=oui") else ""
+            return "strong_scaling" if self.spec.satisfies("+strong") else ""
 
 
 class WeakScaling(Scaling):
     variant(
         "weak",
-        default="non",
-        values=("oui", "non"),
+        default=False,
         description="Weak scaling",
     )
 
@@ -194,14 +192,13 @@ class WeakScaling(Scaling):
 
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):
-            return "weak_scaling" if self.spec.satisfies("weak=oui") else ""
+            return "weak_scaling" if self.spec.satisfies("+weak") else ""
 
 
 class ThroughputScaling(Scaling):
     variant(
         "throughput",
-        default="non",
-        values=("oui", "non"),
+        default=False,
         description="Throughput scaling",
     )
 
@@ -214,4 +211,4 @@ class ThroughputScaling(Scaling):
 
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):
-            return "throughput_scaling" if self.spec.satisfies("throughput=oui") else ""
+            return "throughput_scaling" if self.spec.satisfies("+throughput") else ""

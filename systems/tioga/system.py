@@ -27,7 +27,7 @@ class Tioga(System):
     variant(
         "gtl",
         default=False,
-        values=("true", "false"),
+        values=(True, False),
         description="Use GTL-enabled MPI",
     )
 

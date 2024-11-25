@@ -90,7 +90,7 @@ class OsuMicroBenchmarks(Experiment):
 
     def compute_applications_section(self):
         scaling_modes = {
-            "single_node": self.spec.satisfies("single_node=oui"),
+            "single_node": self.spec.satisfies("+single_node"),
         }
 
         scaling_mode_enabled = [key for key, value in scaling_modes.items() if value]
@@ -101,7 +101,7 @@ class OsuMicroBenchmarks(Experiment):
 
         num_nodes = {"n_nodes": 2}
 
-        if self.spec.satisfies("single_node=oui"):
+        if self.spec.satisfies("+single_node"):
             for pk, pv in num_nodes.items():
                 self.add_experiment_variable(pk, pv, True)
 
