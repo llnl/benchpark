@@ -4,9 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 system_definition:
-  name: Ruby
-  site: LLNL
-  system: Penguin-icelake-OmniPath
+  name: Penguin-icelake-OmniPath
   integrator:
     vendor: Supermicro
     name:
@@ -23,10 +21,7 @@ system_definition:
   interconnect:
     vendor: CornelisNetworks
     name: OmniPath
-  system-tested:
-    site: LLNL
-    name: ruby
-    installation-year: 2020
-    description: top500 <https://www.top500.org/system/179866>
+  systems-tested:
+    - llnl-cluster
   top500-system-instances:
-    - Ruby (LLNL)
+    - Ruby (LLNL) <https://www.top500.org/system/179866>

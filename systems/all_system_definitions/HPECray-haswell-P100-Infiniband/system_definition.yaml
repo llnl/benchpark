@@ -4,9 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 system_definition:
-  name: Piz Daint
-  site: CSCS
-  system: HPECray-haswell-P100-Infiniband
+  name: HPECray-haswell-P100-Infiniband
   integrator:
     vendor: HPECray
     name:
@@ -23,10 +21,7 @@ system_definition:
   interconnect:
     vendor: HPECray
     name: Aries
-  system-tested:
-    site: CSCS
-    name: daint
-    installation-year: 2017
-    description: top500 <https://www.top500.org/system/177824>
+  systems-tested:
+    - cscs-daint
   top500-system-instances:
-    - Piz Daint (CSCS)
+    - Piz Daint (CSCS) <https://www.top500.org/system/177824>

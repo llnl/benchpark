@@ -5,8 +5,6 @@
 
 system_definition:
   name: x86_64
-  site:
-  system: x86_64
   integrator:
     vendor:
     name:
@@ -23,10 +21,7 @@ system_definition:
   interconnect:
     vendor:
     name:
-  system-tested:
-    site:
-    name:
-    installation-year:
-    description:
+  systems-tested:
+    -
   top500-system-instances:
     -

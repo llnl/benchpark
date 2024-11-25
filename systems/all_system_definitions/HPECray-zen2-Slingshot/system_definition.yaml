@@ -4,9 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 system_definition:
-  name: Eiger
-  site: CSCS
-  system: HPECray-zen2-Slingshot
+  name: HPECray-zen2-Slingshot
   integrator:
     vendor: HPECray
     name:
@@ -23,10 +21,7 @@ system_definition:
   interconnect:
     vendor: HPECray
     name: Slingshot
-  system-tested:
-    site: CSCS
-    name: daint
-    installation-year: 2017
-    description: top500 <https://www.top500.org/system/177824>
+  systems-tested:
+    - cscs-eiger
   top500-system-instances:
-    -
+    - Eiger (CSCS) <https://www.top500.org/system/177824>

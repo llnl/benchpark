@@ -4,13 +4,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 system_definition:
-  name: JUWELS-Booster
-  site: JSC
-  system: JUWELS-Booster-rome-A100-Infiniband
+  name: Atos-zen2-A100-Infiniband
   integrator:
     vendor: Atos
     name: XH2000
-  processor: 
+  processor:
     vendor: AMD
     name: EPYC-Zen2
     ISA: x86_64
@@ -23,10 +21,12 @@ system_definition:
   interconnect:
     vendor: Mellanox
     name: Infiniband
-  system-tested:
-    site: JSC
-    name: JUWELS-Booster
-    installation-year: 2020
-    description: top500 <https://www.top500.org/system/179894/>
+  systems-tested:
+    jsc-juwels-booster:
+      os:
+      scheduler:
+      compiler:
+      runtime:
+      mpi:
   top500-system-instances:
-    - JUWELS Booster (JSC)
+    - JUWELS Booster (JSC) <https://www.top500.org/system/179894/>

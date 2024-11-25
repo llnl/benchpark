@@ -4,13 +4,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 system_definition:
-  name: Grace-CPU
-  site: TAMU
-  system: Dell-cascadelake-InfiniBand
+  name: DELL-cascadelake-InfiniBand
   integrator:
-    vendor: Dell
+    vendor: DELL
     name:
-  processor: 
+  processor:
     vendor: Intel
     name: Xeon6248R
     ISA: x86_64
@@ -20,13 +18,15 @@ system_definition:
     name: A100
     ISA:
     uArch:
-  interconnect: 
-    vendor: Mellanox 
+  interconnect:
+    vendor: Mellanox
     name: HDR100InfiniBand
-  system-tested:
-    site: TAMU
-    name: Grace
-    installation-year: 2020
-    description: top500 <https://www.top500.org/system/179905/>
-  top500-system-instances: 
-    - Grace
+  systems-tested:
+    tamu-grace:
+      os:
+      scheduler: slurm
+      compiler:
+      runtime:
+      mpi: intelmpi
+  top500-system-instances:
+    - Grace (TAMU) <https://www.top500.org/system/179905/>

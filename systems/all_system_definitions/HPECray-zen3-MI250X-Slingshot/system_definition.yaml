@@ -4,9 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 system_definition:
-  name: Tioga
-  site: LLNL
-  system: HPECray-zen3-MI250X-Slingshot
+  name: HPECray-zen3-MI250X-Slingshot
   integrator:
     vendor: HPECray
     name: EX235a
@@ -23,12 +21,18 @@ system_definition:
   interconnect:
     vendor: HPECray
     name: Slingshot11
-  system-tested:
-    site: LLNL
-    name: tioga
-    installation-year: 2022
-    description: top500 <https://www.top500.org/system/180052>
+  systems-tested:
+    csc-lumi:
+      os: HPECrayOS
+      compiler: cce
+      runtime: rocm
+      mpi: cray-mpich
+    llnl-tioga
+      os: TOSS
+      compiler: cce
+      runtime: rocm
+      mpi: cray-mpich
   top500-system-instances:
-    - Frontier (ORNL)
-    - Lumi     (CSC)
-    - Tioga    (LLNL)
+    - Frontier (ORNL)  <https://www.top500.org/system/180047>
+    - Lumi     (CSC)   <https://www.top500.org/system/180048>
+    - Tioga    (LLNL)  <https://www.top500.org/system/180052>

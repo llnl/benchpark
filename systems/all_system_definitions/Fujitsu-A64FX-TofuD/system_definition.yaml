@@ -4,9 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 system_definition:
-  name: Fugaku
-  site: RIKEN Center for Computational Science
-  system: Fujitsu-A64FX-TofuD
+  name: Fujitsu-A64FX-TofuD
   integrator:
     vendor: Fujitsu
     name: FX1000
@@ -23,10 +21,7 @@ system_definition:
   interconnect:
     vendor: Fujitsu
     name: TofuInterconnectD
-  system-tested:
-    site: R-CCS
-    name: Fugaku
-    installation-year: 2020
-    description: top500 <https://www.top500.org/system/179807/>
+  systems-tested:
+    - rccs-fugaku
   top500-system-instances:
-    - Fugaku (R-CCS)
+    - Fugaku (R-CCS) <https://www.top500.org/system/179807/>

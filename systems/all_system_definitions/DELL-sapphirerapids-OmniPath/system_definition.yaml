@@ -4,9 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 system_definition:
-  name: Dane
-  site: LLNL
-  system: Dane-sapphirerapids-OmniPath
+  name: DELL-sapphirerapids-OmniPath
   integrator:
     vendor: DELLEMC
     name: PowerEdge
@@ -23,10 +21,7 @@ system_definition:
   interconnect:
     vendor: CornelisNetworks
     name: OmniPath
-  system-tested:
-    site: LLNL
-    name: dane
-    installation-year: 2023
-    description: top500 <https://www.top500.org/system/180228>
+  systems-tested:
+    - llnl-cluster
   top500-system-instances:
-    - Dane (LLNL)
+    - Dane (LLNL) <https://www.top500.org/system/180228>
