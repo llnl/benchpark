@@ -20,6 +20,7 @@ from benchpark.accounting import (
 )
 from benchpark.debug import debug_print
 from benchpark.runtime import RuntimeResources
+import benchpark.system
 
 
 # Note: it would be nice to vendor spack.llnl.util.link_tree, but that
@@ -100,11 +101,7 @@ def benchpark_check_system(arg_str):
     if cfg_path.is_dir():
         system_id_path = cfg_path / "system_id.yaml"
         if system_id_path.exists():
-            with open(system_id_path, "r") as f:
-                data = yaml.safe_load(f)
-            name = data["system"]["name"]
-            spec_hash = data["system"]["config-hash"]
-            system_id = f"{name}-{spec_hash[:7]}"
+            system_id = benchpark.system.unique_dir_for_description(cfg_path)
             return system_id, cfg_path
 
     # If it's not a directory, it might be a shorthand that refers
