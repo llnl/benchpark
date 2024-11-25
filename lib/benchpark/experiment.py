@@ -51,14 +51,13 @@ class ExperimentHelper:
 class SingleNode:
     variant(
         "single_node",
-        default="oui",
-        values=("oui", "non"),
+        default=True,
         description="Single node execution mode",
     )
 
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):
-            return "single_node" if self.spec.satisfies("single_node=oui") else ""
+            return "single_node" if self.spec.satisfies("+single_node") else ""
 
 
 class Experiment(ExperimentSystemBase, SingleNode):
