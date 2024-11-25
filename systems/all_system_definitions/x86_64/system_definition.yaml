@@ -22,6 +22,11 @@ system_definition:
     vendor:
     name:
   systems-tested:
-    -
+    any:
+      os:
+      scheduler:
+      compiler:
+      runtime:
+      mpi:
   top500-system-instances:
     -

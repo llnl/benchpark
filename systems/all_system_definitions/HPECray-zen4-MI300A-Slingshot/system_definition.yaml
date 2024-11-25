@@ -22,7 +22,12 @@ system_definition:
     vendor: HPECray
     name: Slingshot11
   systems-tested:
-    - llnl-elcapitan (TOSS, tce, rocm, cray-mpich)
+    llnl-elcapitan:
+      os: TOSS
+      scheduler: flux
+      compiler: cce
+      runtime: rocm
+      mpi: cray-mpich
   top500-system-instances:
     - El Capitan (LLNL) <https://www.top500.org/system/180307>
     - Tuolumne   (LLNL) <https://www.top500.org/system/180308>

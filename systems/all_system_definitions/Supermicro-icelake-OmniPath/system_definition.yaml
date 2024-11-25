@@ -22,6 +22,11 @@ system_definition:
     vendor: CornelisNetworks
     name: OmniPath
   systems-tested:
-    - llnl-cluster
+    llnl-cluster:
+      os: TOSS
+      scheduler: flux
+      compiler: gcc
+      runtime:
+      mpi: mvapich
   top500-system-instances:
     - Ruby (LLNL) <https://www.top500.org/system/179866>

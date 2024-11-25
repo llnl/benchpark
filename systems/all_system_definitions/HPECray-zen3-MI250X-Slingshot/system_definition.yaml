@@ -24,11 +24,13 @@ system_definition:
   systems-tested:
     csc-lumi:
       os: HPECrayOS
+      scheduler: slurm
       compiler: cce
       runtime: rocm
       mpi: cray-mpich
-    llnl-tioga
+    llnl-tioga:
       os: TOSS
+      scheduler: flux
       compiler: cce
       runtime: rocm
       mpi: cray-mpich

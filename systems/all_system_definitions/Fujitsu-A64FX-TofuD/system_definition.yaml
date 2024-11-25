@@ -22,6 +22,11 @@ system_definition:
     vendor: Fujitsu
     name: TofuInterconnectD
   systems-tested:
-    - rccs-fugaku
+    rccs-fugaku:
+      os: RHEL
+      scheduler: pjm
+      compiler: fj
+      runtime:
+      mpi: fujitsu-mpi
   top500-system-instances:
     - Fugaku (R-CCS) <https://www.top500.org/system/179807/>

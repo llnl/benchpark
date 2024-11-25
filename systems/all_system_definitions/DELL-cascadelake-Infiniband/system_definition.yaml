@@ -25,8 +25,8 @@ system_definition:
     tamu-grace:
       os:
       scheduler: slurm
-      compiler:
-      runtime:
+      compiler: gcc
+      runtime: gpu
       mpi: intelmpi
   top500-system-instances:
-    - Grace (TAMU) <https://www.top500.org/system/179905/>
+    - Grace (TAMU) <https://www.top500.org/system/179905>

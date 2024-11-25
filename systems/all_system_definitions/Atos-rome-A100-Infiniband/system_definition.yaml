@@ -24,9 +24,9 @@ system_definition:
   systems-tested:
     jsc-juwels-booster:
       os:
-      scheduler:
-      compiler:
-      runtime:
-      mpi:
+      scheduler: slurm
+      compiler: gcc
+      runtime: cuda
+      mpi: openmpi
   top500-system-instances:
-    - JUWELS Booster (JSC) <https://www.top500.org/system/179894/>
+    - JUWELS Booster (JSC) <https://www.top500.org/system/179894>
