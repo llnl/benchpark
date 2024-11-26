@@ -10,8 +10,6 @@ import pathlib
 import shutil
 import sys
 
-import yaml
-
 import benchpark.paths
 from benchpark.accounting import (
     benchpark_experiments,
