@@ -36,7 +36,7 @@ class Lammps(
         elif self.spec.satisfies("+rocm"):
             problem_sizes = {"x": 20, "y": 40, "z": 32}
             kokkos_mode = "g 1"
-            kokkos_gpu_aware = "off"
+            kokkos_gpu_aware = "on"
             kokkos_comm = "device"
 
         for nk, nv in problem_sizes.items():
