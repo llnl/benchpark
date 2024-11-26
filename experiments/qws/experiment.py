@@ -1,14 +1,10 @@
 from benchpark.directives import variant
 from benchpark.experiment import Experiment
+from benchpark.openmp import OpenMPExperiment
 
 
-class Qws(Experiment):
-    variant(
-        "programming_model",
-        default="openmp",
-        values=("mpi", "openmp"),
-        description="on-node parallelism model",
-    )
+class Qws(Experiment,
+          OpenMPExperiment):
 
     def compute_applications_section(self):
         # env_vars = {}
