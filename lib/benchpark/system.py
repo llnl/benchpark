@@ -90,7 +90,7 @@ class System(ExperimentSystemBase):
         self.sys_cores_per_node = None
         self.sys_gpus_per_node = None
         self.sys_mem_per_node = None
-        self.scheduler = self.spec.variants["scheduler"].value
+        self.scheduler = self.spec.variants["scheduler"][0]
         self.timeout = "120"
         self.queue = None
 
