@@ -27,19 +27,6 @@ class Fugaku(System):
         self.sys_cores_per_node = "48"
         self.sys_mem_per_node = "32"
 
-        # self.extra_cmd_opts = """
-        # |
-        #   -std-proc fjmpioutdir/bmexe
-        #   """
-        # self.extra_batch_opts = """
-        # |
-        #   -x PJM_LLIO_GFSCACHE="/vol0002:/vol0003:/vol0004:/vol0005:/vol0006" 
-        #   """
-        # self.post_exec_cmds = """
-        # | 
-        #   for F in $(ls -1v fjmpioutdir/bmexe.*); do cat $F >> {log_file}; done
-        #   """
-
     def generate_description(self, output_dir):
         super().generate_description(output_dir)
 
@@ -75,16 +62,13 @@ class Fugaku(System):
     def system_specific_variables(self):
         return {"extra_cmd_opts": """
         |
-          -std-proc fjmpioutdir/bmexe
-          """,
+          -std-proc fjmpioutdir/bmexe""",
           "extra_batch_opts":"""
         |
-          -x PJM_LLIO_GFSCACHE="/vol0002:/vol0003:/vol0004:/vol0005:/vol0006" 
-          """,
+          -x PJM_LLIO_GFSCACHE="/vol0002:/vol0003:/vol0004:/vol0005:/vol0006"""",
           "post_exec_cmds": """
         | 
-          for F in $(ls -1v fjmpioutdir/bmexe.*); do cat $F >> {log_file}; done
-          """
+          for F in $(ls -1v fjmpioutdir/bmexe.*); do cat $F >> {log_file}; done"""
         }
 
     def sw_description(self):
