@@ -76,7 +76,7 @@ class System(ExperimentSystemBase):
     variant(
         "scheduler",
         default="mpi",
-        values=("mpi"),
+        values=("mpi",),
         description="Base generates scripts without the scheduler commands",
     )
 
