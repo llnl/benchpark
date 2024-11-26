@@ -102,7 +102,7 @@ def benchpark_check_system(arg_str):
         system_id_path = cfg_path / "system_id.yaml"
         if system_id_path.exists():
             system_id = benchpark.system.unique_dir_for_description(cfg_path)
-            return system_id, cfg_path
+            return system_id, cfg_path.name, cfg_path
 
     # If it's not a directory, it might be a shorthand that refers
     # to a pre-constructed config
@@ -118,7 +118,7 @@ def benchpark_check_system(arg_str):
     configs_src_dir = (
         benchpark.paths.benchpark_root / "legacy" / "systems" / str(arg_str)
     )
-    return arg_str, configs_src_dir
+    return arg_str, None, configs_src_dir
 
 
 def benchpark_check_modifier(arg_str):
@@ -151,7 +151,7 @@ def command(args):
     debug_print(f"source_dir = {source_dir}")
     experiment_id, experiment_src_dir = benchpark_check_experiment(args.experiment)
     debug_print(f"specified experiment (benchmark/ProgrammingModel) = {experiment_id}")
-    system_id, configs_src_dir = benchpark_check_system(args.system)
+    system_id, simple_system_name, configs_src_dir = benchpark_check_system(args.system)
     debug_print(f"specified system = {system_id}")
     debug_print(f"specified modifier = {modifier}")
     benchpark_check_modifier(modifier)
@@ -169,6 +169,8 @@ def command(args):
             sys.exit(1)
 
     workspace_dir.mkdir(parents=True)
+    if simple_system_name:
+        os.symlink(workspace_dir, experiments_root / str(experiment_id) / simple_system_name)
 
     ramble_workspace_dir = workspace_dir / "workspace"
     ramble_configs_dir = ramble_workspace_dir / "configs"
