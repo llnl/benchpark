@@ -10,6 +10,11 @@ from benchpark.openmp import OpenMPExperiment
 
 class Qws(Experiment,
           OpenMPExperiment):
+    variant(
+        "workload",
+        default="qws",
+        description="qws",
+    )
 
     def compute_applications_section(self):
         # env_vars = {}
@@ -37,43 +42,31 @@ class Qws(Experiment,
             variables["omp_num_threads"] = ["48"]
             variables["arch"] = "OpenMP"
 
-        return {
-            "qws": {
-                "workloads": {
-                    "qws": {
-                        # "env_vars": env_vars,
-                        "experiments": {
-                            "qws_mpi_{n_nodes}_{omp_num_threads}_{lx}_{ly}_{lz}_{lt}_{px}_{py}_{pz}_{pt}_{tol_outer}_{tol_inner}_{maxiter_plus1_outer}_{maxiter_inner}": {
-                            "qws_omp_{n_nodes}_{omp_num_threads}_{lx}_{ly}_{lz}_{lt}_{px}_{py}_{pz}_{pt}_{tol_outer}_{tol_inner}_{maxiter_plus1_outer}_{maxiter_inner}": {
-                                "variants": {
-                                    "package_manager": "spack",
-                                },
-                                "variables": variables,
-                                },
-                            },
-                        },
-                    },
-                },
-            }
-        }
+        # return {
+        #     "qws": {
+        #         "workloads": {
+        #             "qws": {
+        #                 # "env_vars": env_vars,
+        #                 "experiments": {
+        #                     "qws_mpi_{n_nodes}_{omp_num_threads}_{lx}_{ly}_{lz}_{lt}_{px}_{py}_{pz}_{pt}_{tol_outer}_{tol_inner}_{maxiter_plus1_outer}_{maxiter_inner}": {
+        #                     "qws_omp_{n_nodes}_{omp_num_threads}_{lx}_{ly}_{lz}_{lt}_{px}_{py}_{pz}_{pt}_{tol_outer}_{tol_inner}_{maxiter_plus1_outer}_{maxiter_inner}": {
+        #                         "variants": {
+        #                             "package_manager": "spack",
+        #                         },
+        #                         "variables": variables,
+        #                         },
+        #                     },
+        #                 },
+        #             },
+        #         },
+        #     }
+        # }
 
     def compute_spack_section(self):
-        # TODO: express that we need certain variables from system
-        # Does not need to happen before merge, separate task
-        # spack_spec = "qws@master +mpi{modifier_spack_variant}"
-        spack_spec = "qws@master +mpi"
-        packages = [self.spec.name, "default-mpi"]
+        system_specs = {}
+        system_specs["compiler"] = "default-compiler"
+        system_specs["mpi"] = "default-mpi"
 
-        if self.spec.satisfies("+openmp"):
-            spack_spec += "+openmp"
-            # packages.append("openmp")
-
-        return {
-            "packages": {
-                self.spec.name: {
-                    "pkg_spec": spack_spec,
-                    "compiler": "default-compiler",  # TODO: this should probably move?
-                }
-            },
-            "environments": {"qws": {"packages": packages}},
-        }
+        self.add_spack_spec(
+            self.name, [f"qws@master +mpi", system_specs["compiler"]]
+        )
