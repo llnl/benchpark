@@ -170,7 +170,9 @@ def command(args):
 
     workspace_dir.mkdir(parents=True)
     if simple_system_name:
-        os.symlink(workspace_dir, experiments_root / str(experiment_id) / simple_system_name)
+        os.symlink(
+            workspace_dir, experiments_root / str(experiment_id) / simple_system_name
+        )
 
     ramble_workspace_dir = workspace_dir / "workspace"
     ramble_configs_dir = ramble_workspace_dir / "configs"
