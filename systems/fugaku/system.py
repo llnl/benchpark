@@ -63,7 +63,7 @@ class Fugaku(System):
     -std-proc fjmpioutdir/bmexe""",
             "extra_batch_opts": '''|
     -x PJM_LLIO_GFSCACHE="/vol0002:/vol0003:/vol0004:/vol0005:/vol0006"''',
-            "post_exec_cmds": """| 
+            "post_exec_cmds": """|
     for F in $(ls -1v fjmpioutdir/bmexe.*); do cat $F >> {log_file}; done""",
         }
 
