@@ -331,6 +331,18 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
+      - name: Dry run dynamic qws + openmp with allocation modifier on dynamic CTS ruby
+        run: |
+          ./bin/benchpark system init --dest ruby-system cts cluster=ruby
+          ./bin/benchpark experiment init --dest qws-test qws +openmp
+          ./bin/benchpark setup qws-test ruby-system workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/qws/openmp/RCCS-Fugaku-Fujitsu-A64FX-TofuD/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
       - name: Dry run dynamic saxpy/openmp with dynamic CTS ruby
         run: |
           ./bin/benchpark system init --dest=ruby-system cts cluster=ruby
