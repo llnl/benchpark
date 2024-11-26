@@ -23,7 +23,7 @@ jobs:
       license: ${{ steps.filter.outputs.license }}
 
     steps:
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # @v2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # @v2
         if: ${{ github.event_name == 'push' }}
         with:
           fetch-depth: 0
@@ -40,7 +40,10 @@ jobs:
               - 'docs/**'
               - 'experiments/**'
               - 'repo/**'
+              - 'var/**'
               - 'README.rst'
+              - 'tags.yaml'
+              - 'lib/**'
             style:
               - '.github/**'
               - 'bin/**'
@@ -48,6 +51,8 @@ jobs:
               - 'docs/conf.py'
               - 'experiments/**'
               - 'repo/**'
+              - 'var/**'
+              - 'lib/**'
             run:
               - '.github/**'
               - 'bin/**'
@@ -55,6 +60,8 @@ jobs:
               - 'checkout-versions.yaml'
               - 'experiments/**'
               - 'repo/**'
+              - 'var/**'
+              - 'lib/**'
             license:
               - '.github/**'
               - 'bin/**'
@@ -62,6 +69,8 @@ jobs:
               - 'docs/**'
               - 'experiments/**'
               - 'repo/**'
+              - 'var/**'
+              - 'lib/**'
 
   docs:
     if: ${{ needs.changes.outputs.docs == 'true' }}

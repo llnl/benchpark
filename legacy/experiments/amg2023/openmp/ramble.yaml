@@ -1,0 +1,130 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+ramble:
+  include:
+  - ./configs/software.yaml
+  - ./configs/variables.yaml
+  - ./configs/modifier.yaml
+
+  config:
+    deprecated: true
+    spack_flags:
+      install: '--add --keep-stage'
+      concretize: '-U -f'
+
+  modifiers:
+  - name: allocation
+
+  applications:
+    amg2023:
+      workloads:
+        problem1:
+          experiments:
+            amg2023_omp_throughput_problem1_{n_nodes}_{n_threads_per_proc}_{px}_{py}_{pz}_{nx}_{ny}_{nz}:
+              variants:
+                package_manager: spack
+              variables:
+                p: 2
+                px: '{p}'
+                py: '{p}'
+                pz: '{p}'
+                nx: ['10', '20', '20']
+                ny: ['10', '10', '20']
+                nz: ['10', '10', '10']
+                n_ranks: '{px}*{py}*{pz}'
+                n_threads_per_proc: '1'
+                omp_num_threads: '{n_threads_per_proc}'
+                env_name: amg2023-omp
+            amg2023_omp_strong_problem1_{n_nodes}_{n_threads_per_proc}_{px}_{py}_{pz}_{nx}_{ny}_{nz}:
+              variants:
+                package_manager: spack
+              variables:
+                px: ['2', '4', '4']
+                py: ['2', '2', '4']
+                pz: ['2', '2', '2']
+                nx: '10'
+                ny: '10'
+                nz: '10'
+                n_ranks: '{px}*{py}*{pz}'
+                n_threads_per_proc: '1'
+                omp_num_threads: '{n_threads_per_proc}'
+                env_name: amg2023-omp
+            amg2023_omp_weak_problem1_{n_nodes}_{n_threads_per_proc}_{px}_{py}_{pz}_{nx}_{ny}_{nz}:
+              variants:
+                package_manager: spack
+              variables:
+                px: ['2', '4', '4']
+                py: ['2', '2', '4']
+                pz: ['2', '2', '2']
+                nx: ['10', '20', '20']
+                ny: ['10', '10', '20']
+                nz: ['10', '10', '10']
+                n_ranks: '{px}*{py}*{pz}'
+                n_threads_per_proc: '1'
+                omp_num_threads: '{n_threads_per_proc}'
+                env_name: amg2023-omp
+        problem2:
+          experiments:
+            amg2023_omp_throughput_problem2_{n_nodes}_{n_threads_per_proc}_{px}_{py}_{pz}_{nx}_{ny}_{nz}:
+              variants:
+                package_manager: spack
+              variables:
+                p: 2
+                px: '{p}'
+                py: '{p}'
+                pz: '{p}'
+                nx: ['10', '20', '20']
+                ny: ['10', '10', '20']
+                nz: ['10', '10', '10']
+                n_ranks: '{px}*{py}*{pz}'
+                n_threads_per_proc: '1'
+                omp_num_threads: '{n_threads_per_proc}'
+                env_name: amg2023-omp
+            amg2023_omp_strong_problem2_{n_nodes}_{n_threads_per_proc}_{px}_{py}_{pz}_{nx}_{ny}_{nz}:
+              variants:
+                package_manager: spack
+              variables:
+                px: ['2', '4', '4']
+                py: ['2', '2', '4']
+                pz: ['2', '2', '2']
+                nx: '10'
+                ny: '10'
+                nz: '10'
+                n_ranks: '{px}*{py}*{pz}'
+                n_threads_per_proc: '1'
+                omp_num_threads: '{n_threads_per_proc}'
+                env_name: amg2023-omp
+            amg2023_omp_weak_problem2_{n_nodes}_{n_threads_per_proc}_{px}_{py}_{pz}_{nx}_{ny}_{nz}:
+              variants:
+                package_manager: spack
+              variables:
+                px: ['2', '4', '4']
+                py: ['2', '2', '4']
+                pz: ['2', '2', '2']
+                nx: ['10', '20', '20']
+                ny: ['10', '10', '20']
+                nz: ['10', '10', '10']
+                n_ranks: '{px}*{py}*{pz}'
+                n_threads_per_proc: '1'
+                omp_num_threads: '{n_threads_per_proc}'
+                arch: 'OpenMP'
+                env_name: amg2023-omp
+  software:
+    packages:
+      hypre-omp:
+        pkg_spec: hypre@2.31.0 +mpi+openmp+mixedint~fortran{modifier_spack_variant}
+        compiler: default-compiler
+      amg2023-omp:
+        pkg_spec: amg2023@develop +mpi+openmp{modifier_spack_variant}
+        compiler: default-compiler
+    environments:
+      amg2023-omp:
+        packages:
+        - lapack
+        - default-mpi
+        - hypre-omp
+        - amg2023-omp
+        - '{modifier_package_name}'

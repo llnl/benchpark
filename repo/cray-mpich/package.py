@@ -21,7 +21,7 @@ class CrayMpich(BuiltinCM):
             env.set("GTL_HSA_VSMSG_CUTOFF_SIZE", str(self.spec.extra_attributes["gtl_cutoff_size"]))
             env.set("FI_CXI_ATS", str(self.spec.extra_attributes["fi_cxi_ats"]))
         else:
-            env.unset("MPICH_GPU_SUPPORT_ENABLED")
+            env.set("MPICH_GPU_SUPPORT_ENABLED", "0")
             gtl_path = self.spec.extra_attributes.get("gtl_lib_path", "")
             if gtl_path:
                 env.prepend_path("LD_LIBRARY_PATH", gtl_path)

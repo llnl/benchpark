@@ -8,7 +8,7 @@ requires-python = ">=3.8"
 line-length = 88
 color = true
 target-version = ['py38', 'py39', 'py310', 'py311']
-include = '\.pyi?$|bin\/benchpark'
+include = '\.pyi?$|bin\/benchpark$'
 exclude = '''
 /(
     \.eggs
@@ -24,11 +24,37 @@ exclude = '''
   | repo
 )/
 '''
+force-exclude = '''
+/(
+    '/lib/benchpark/test_repo/(/.*)?$'
+  | /lib/benchpark/test_repo(/.*)?$
+  | lib/benchpark/test_repo
+  | '/bin/benchpark-python'
+  | \.github
+)/
+'''
 
 [tool.isort]
 profile = "black"
 skip_gitignore = true
 color_output = true
+skip_glob = [
+  "lib/benchpark/test_repo/**"
+]
+
+[tool.flake8]
+exclude = [
+  "lib/benchpark/test_repo/**"
+]
+skip_glob = [
+  "lib/benchpark/test_repo/**"
+]
+force-exclude = [
+  "./lib/benchpark/test_repo/**"
+]
+per-file-ignores = """
+    ./lib/benchpark/test_repo/**
+"""
 
 [tool.codespell]
 skip = './docs/_build,./docs/_static'

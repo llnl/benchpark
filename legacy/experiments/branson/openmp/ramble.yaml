@@ -1,0 +1,49 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+# 
+# SPDX-License-Identifier: Apache-2.0
+ramble:
+  include:
+  - ./configs/software.yaml
+  - ./configs/variables.yaml
+  - ./configs/modifier.yaml
+  config:
+    deprecated: true
+    spack_flags:
+      install: '--add --keep-stage'
+      concretize: '-U -f'
+#Branson does not currently work on lassen 
+  modifiers:
+  - name: allocation
+  applications:
+    branson:
+      workloads:
+        branson:
+          variables:
+            n_ranks: '{n_nodes}*{sys_cores_per_node}'
+          experiments:
+             branson_strong_{n_nodes}:
+              variants:
+                package_manager: spack
+              variables:
+                #looks like branson should use ~25% of memory per node
+                num_particles: '850000000'
+                n_nodes: ['1','2','4','8']
+
+             branson_weak_{n_nodes}:
+              variants:
+                package_manager: spack
+              variables:
+                num_particles: '850000000*{n_nodes}'
+                n_nodes: ['1','2','4','8']
+  software:
+    packages:
+      branson:
+        pkg_spec: branson@develop  
+        compiler: default-compiler
+    environments:
+      branson:
+        packages:
+        - default-mpi
+        - branson
+        - '{modifier_package_name}'

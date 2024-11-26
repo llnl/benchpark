@@ -1,0 +1,32 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+system_definition:
+  name: Dane
+  site: LLNL
+  system: Dane-sapphirerapids-OmniPath
+  integrator:
+    vendor: DELLEMC
+    name: PowerEdge
+  processor:
+    vendor: Intel
+    name: XeonPlatinum8480
+    ISA: x86_64
+    uArch: sapphirerapids
+  accelerator:
+    vendor:
+    name:
+    ISA:
+    uArch:
+  interconnect:
+    vendor: CornelisNetworks
+    name: OmniPath
+  system-tested:
+    site: LLNL
+    name: dane
+    installation-year: 2023
+    description: top500 <https://www.top500.org/system/180228>
+  top500-system-instances:
+    - Dane (LLNL)

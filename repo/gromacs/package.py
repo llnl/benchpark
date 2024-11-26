@@ -8,9 +8,10 @@ import os
 import llnl.util.filesystem as fs
 
 from spack.package import *
+from spack.pkg.benchpark.rocm_consistency import RocmConsistency as RocmConsistency
 
 
-class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
+class Gromacs(CMakePackage, CudaPackage, ROCmPackage, RocmConsistency):
     """GROMACS is a molecular dynamics package primarily designed for simulations
     of proteins, lipids and nucleic acids. It was originally developed in
     the Biophysical Chemistry department of University of Groningen, and is now
@@ -28,8 +29,12 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
     git = "https://gitlab.com/gromacs/gromacs.git"
     maintainers("danielahlin", "eirrgang", "junghans")
 
+    license("BSD-2-Clause")
+
     version("main", branch="main")
     version("master", branch="main", deprecated=True)
+    version("2024", sha256="04d226d52066a8bc3a42e00d6213de737b4ec292e26703065924ff01956801e2")
+    version("2023.4", sha256="e5d6c4d9e7ccacfaccb0888619bd21b5ea8911f82b410e68d6db5d40f695f231")
     version("2023.3", sha256="4ec8f8d0c7af76b13f8fd16db8e2c120e749de439ae9554d9f653f812d78d1cb")
     version("2023.2", sha256="bce1480727e4b2bb900413b75d99a3266f3507877da4f5b2d491df798f9fcdae")
     version("2023.1", sha256="eef2bb4a6cb6314cf9da47f26df2a0d27af4bf7b3099723d43601073ab0a42f4")
@@ -96,6 +101,7 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
         when="@2022: +cuda+mpi",
         description="Enable multi-GPU FFT support with cuFFTMp",
     )
+
     variant(
         "heffte",
         default=False,
@@ -104,6 +110,7 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
     )
     variant("opencl", default=False, description="Enable OpenCL support")
     variant("sycl", default=False, when="@2021:", description="Enable SYCL support")
+    variant("sycl", default=True, when="@2021: +rocm", description="Enable SYCL support when using ROCm")
     variant(
         "intel-data-center-gpu-max",
         default=False,
@@ -271,10 +278,14 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("cmake@3.18.4:3", type="build", when="@main")
     depends_on("cmake@3.16.0:3", type="build", when="%fj")
     depends_on("cuda", when="+cuda")
-    depends_on("sycl", when="+sycl")
+
+    with when("+rocm"):
+        depends_on("sycl")
+        depends_on("hip")
+        depends_on("rocfft")
+
     depends_on("lapack")
     depends_on("blas")
-    depends_on("hipsycl", when="+rocm")
     depends_on("gcc", when="%oneapi ~intel_provided_gcc")
     depends_on("gcc", when="%intel ~intel_provided_gcc")
 
@@ -285,8 +296,6 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
 
     depends_on("nvhpc", when="+cufftmp")
     depends_on("heffte", when="+heffte")
-
-    conflicts("^hipsycl~rocm", when="+rocm")
 
     requires(
         "%intel",
@@ -394,6 +403,10 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
                     r"-gencode;arch=compute_20,code=sm_21;?", "", "cmake/gmxManageNvccConfig.cmake"
                 )
 
+    def setup_run_environment(self, env):
+        if self.compiler.extra_rpaths:
+            for rpath in self.compiler.extra_rpaths:
+                env.prepend_path("LD_LIBRARY_PATH", rpath)
 
 class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
     @run_after("build")
@@ -439,6 +452,22 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
         # In other words, the mapping between package variants and the
         # GMX CMake variables is often non-trivial.
 
+        gmx_cc = spack_cc
+        gmx_cxx = spack_cxx
+        if "+rocm" in self.spec:
+            # The ROCm version requires the ROCm LLVM installation
+            gmx_cc = os.path.join(self.spec["llvm"].prefix.bin, "clang")
+            gmx_cxx = os.path.join(self.spec["llvm"].prefix.bin, "clang++")
+            if not fs.is_exe(gmx_cc) or not fs.is_exe(gmx_cxx):
+                gmx_cc = path.join(self.spec["llvm"].prefix.bin, "amdclang")
+                gmx_cxx = path.join(self.spec["llvm"].prefix.bin, "amdclang++")
+                if not fs.is_exe(gmx_cc) or not fs.is_exe(gmx_cxx):
+                    raise InstallError(
+                        "concretized LLVM dependency must provide a "
+                        "valid clang/amdclang executable, found invalid: "
+                        "{0}/{1}".format(gmx_cc, gmx_cxx)
+                    )
+
         if "+mpi" in self.spec:
             options.append("-DGMX_MPI:BOOL=ON")
             if self.pkg.version < Version("2020"):
@@ -462,8 +491,8 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
             else:
                 options.extend(
                     [
-                        "-DCMAKE_C_COMPILER=%s" % spack_cc,
-                        "-DCMAKE_CXX_COMPILER=%s" % spack_cxx,
+                        "-DCMAKE_C_COMPILER=%s" % gmx_cc,
+                        "-DCMAKE_CXX_COMPILER=%s" % gmx_cxx,
                         "-DMPI_C_COMPILER=%s" % self.spec["mpi"].mpicc,
                         "-DMPI_CXX_COMPILER=%s" % self.spec["mpi"].mpicxx,
                     ]
@@ -471,12 +500,16 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
         else:
             options.extend(
                 [
-                    "-DCMAKE_C_COMPILER=%s" % spack_cc,
-                    "-DCMAKE_CXX_COMPILER=%s" % spack_cxx,
+                    "-DCMAKE_C_COMPILER=%s" % gmx_cc,
+                    "-DCMAKE_CXX_COMPILER=%s" % gmx_cxx,
                     "-DGMX_MPI:BOOL=OFF",
                     "-DGMX_THREAD_MPI:BOOL=ON",
                 ]
             )
+
+        # Here we cannot use spack_cc because we need also libstdc++ to be reachable
+        # Spack wrapper (spack_cc) hides includes/lib and CMake will fail
+        options.append("-DGMX_GPLUSPLUS_PATH=%s" % self.pkg.compiler.cxx)
 
         if self.spec.satisfies("%aocc"):
             options.append("-DCMAKE_CXX_FLAGS=--stdlib=libc++")
@@ -515,18 +548,14 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
                 options.append("-DGMX_GPU:STRING=CUDA")
             elif "+opencl" in self.spec:
                 options.append("-DGMX_GPU:STRING=OpenCL")
-            elif "+rocm" in self.spec:
-                archs = self.spec.variants["amdgpu_target"].value
-                arch_str = ",".join(archs)
-                options.extend(
-                    [
-                        "-DGMX_GPU:STRING=SYCL",
-                        "-DGMX_SYCL_HIPSYCL=ON",
-                        f"-DHIPSYCL_TARGETS=hip:{arch_str}",
-                    ]
-                )
-            elif "+sycl" in self.spec:
+            elif "+sycl" in self.spec or "+rocm" in self.spec:
                 options.append("-DGMX_GPU:STRING=SYCL")
+                if "+rocm" in self.spec:
+                    options.append("-DGMX_SYCL_HIPSYCL:BOOL=ON")
+                    hipsycl_dir = os.path.join(self.spec["sycl"].prefix.lib, "cmake/hipSYCL/")
+                    options.append(f"-Dhipsycl_DIR:STRING={hipsycl_dir}")
+                    rocm_archs = ",".join(self.spec.variants["amdgpu_target"].value)
+                    options.append(f"-DHIPSYCL_TARGETS:STRING=hip:{rocm_archs}")
             else:
                 options.append("-DGMX_GPU:STRING=OFF")
         else:
@@ -698,6 +727,9 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
                     "-DFFTWF_INCLUDE_DIR={0}".format(self.spec["acfl"].headers.directories[0])
                 )
                 options.append("-DFFTWF_LIBRARY={0}".format(self.spec["acfl"].libs.joined(";")))
+            elif self.pkg.version >= Version("2023") and "+rocm" in self.spec:
+                # Use ROCm FFT library
+                options.append("-DGMX_GPU_FFT_LIBRARY=rocFFT")
 
         # Ensure that the GROMACS log files report how the code was patched
         # during the build, so that any problems are easier to diagnose.

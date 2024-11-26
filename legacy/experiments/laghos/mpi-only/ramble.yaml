@@ -1,0 +1,49 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+ramble:
+  include:
+  - ./configs/software.yaml
+  - ./configs/variables.yaml
+  - ./configs/modifier.yaml
+
+  config:
+    deprecated: true
+    spack_flags:
+      install: '--add --keep-stage'
+      concretize: '-U -f'
+
+  modifiers:
+  - name: allocation
+
+  applications:
+    laghos:
+      workloads:
+        problem:
+          env_vars:
+          variables:
+            n_nodes: ['1', '2', '4', '8', '16', '32', '64', '128']
+            n_ranks: '{sys_cores_per_node} * {n_nodes}'
+          experiments:
+            laghos_mpi_triplept_{n_nodes}_{n_ranks}:
+              variants:
+                package_manager: spack
+              variables:
+  software:
+    packages:
+      zlib:
+        pkg_spec: zlib@1.3.1 +optimize+pic+shared
+        compiler: default-compiler
+      laghos:
+        pkg_spec: laghos@develop +metis{modifier_spack_variant}
+        compiler: default-compiler
+    environments:
+      laghos:
+        packages:
+        - default-mpi
+        - zlib
+        - blas
+        - laghos
+        - '{modifier_package_name}'

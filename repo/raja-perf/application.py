@@ -8,7 +8,7 @@ import sys
 from ramble.appkit import *
 
 
-class RajaPerf(SpackApplication):
+class RajaPerf(ExecutableApplication):
     """RAJA Performance suite"""
     name = "raja-perf"
 

@@ -53,7 +53,10 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     variant("openmp", default=False, description="Build with OpenMP enabled.")
     variant("caliper", default=False, description="Build with Caliper support enabled.")
 
+    depends_on('chai@2024.02', when='@develop')
+
     depends_on("mpi", when="+mpi")
+    depends_on("chai+mpi", when="+mpi")
     depends_on("caliper", when="+caliper")
     depends_on("adiak@0.4:", when="+caliper")
     conflicts("^blt@:0.3.6", when="+rocm")
@@ -71,8 +74,14 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("chai~openmp", when="~openmp")
     depends_on("chai+cuda", when="+cuda")
     depends_on("chai~cuda", when="~cuda")
+
+    for arch in ("none", "50", "60", "70", "80"):
+        depends_on(f"chai cuda_arch={arch}", when=f"cuda_arch={arch}")
+
     depends_on("chai+rocm", when="+rocm")
     depends_on("chai~rocm", when="~rocm")
+    for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
+        depends_on(f"chai amdgpu_target={target}", when=f"amdgpu_target={target}")
 
     depends_on("umpire+openmp", when="+openmp")
     depends_on("umpire~openmp", when="~openmp")

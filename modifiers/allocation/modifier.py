@@ -30,9 +30,23 @@ class AllocOpt(Enum):
     MAX_REQUEST = 202
     QUEUE = 203
 
+    # Exec customization for inserting arbitrary options and commands,
+    # inserted verbatim
+    EXTRA_BATCH_OPTS = 300
+    EXTRA_CMD_OPTS = 301
+    POST_EXEC_CMDS = 302
+    PRE_EXEC_CMDS = 303
+
     @staticmethod
     def as_type(enumval, input):
-        if enumval in [AllocOpt.SCHEDULER, AllocOpt.QUEUE]:
+        if enumval in [
+            AllocOpt.SCHEDULER,
+            AllocOpt.QUEUE,
+            AllocOpt.EXTRA_BATCH_OPTS,
+            AllocOpt.EXTRA_CMD_OPTS,
+            AllocOpt.POST_EXEC_CMDS,
+            AllocOpt.PRE_EXEC_CMDS,
+        ]:
             return str(input)
         else:
             return int(input)
@@ -230,6 +244,8 @@ class Allocation(BasicModifier):
         # Definitions
         for var, val in v.defined():
             # print(f"<--- Define {str(var)} = {str(val)}")
+            if not val:
+                val = ""
             app.define_variable(var, str(val))
 
         if v.n_threads_per_proc:
@@ -290,8 +306,7 @@ class Allocation(BasicModifier):
                 raise ValueError(f"Request exceeds maximum: {var}/{val}/{max_request}")
 
     def slurm_instructions(self, v):
-        srun_opts = []
-        sbatch_opts = []  # opts just for the sbatch script
+        sbatch_opts, srun_opts = Allocation._init_batch_and_cmd_opts(v)
 
         if v.n_ranks:
             srun_opts.append(f"-n {v.n_ranks}")
@@ -331,17 +346,39 @@ class Allocation(BasicModifier):
         else:
             raise ValueError(err_msg)
 
+    @staticmethod
+    def _init_batch_and_cmd_opts(v):
+        """System/experiment may have universal options they want to apply
+        for all batch allocations or exec calls.
+        """
+        batch_opts, cmd_opts = [], []
+        if v.extra_batch_opts:
+            batch_opts.extend(v.extra_batch_opts.strip().split("\n"))
+        if v.extra_cmd_opts:
+            cmd_opts.extend(v.extra_cmd_opts.strip().split("\n"))
+
+        if v.pre_exec_cmds:
+            v.pre_exec = v.pre_exec_cmds
+        else:
+            v.pre_exec = ""
+        if v.post_exec_cmds:
+            v.post_exec = v.post_exec_cmds
+        else:
+            v.post_exec = ""
+
+        return batch_opts, cmd_opts
+
     def flux_instructions(self, v):
-        cmd_opts = []
-        batch_opts = []
+        batch_opts, cmd_opts = Allocation._init_batch_and_cmd_opts(v)
 
         if v.n_ranks:
             cmd_opts.append(f"-n {v.n_ranks}")
         if v.n_nodes:
             cmd_opts.append(f"-N {v.n_nodes}")
+            cmd_opts.append("--exclusive")
         if v.n_gpus:
-            gpus_per_rank = self.gpus_as_gpus_per_rank(v)
-            cmd_opts.append(f"--gpus-per-task={gpus_per_rank}")
+            gpus_per_rank = 1  # self.gpus_as_gpus_per_rank(v)
+            cmd_opts.append(f"-g={gpus_per_rank}")
 
         if v.timeout:
             batch_opts.append(f"-t {v.timeout}m")
@@ -353,7 +390,10 @@ class Allocation(BasicModifier):
         v.allocation_directives = "\n".join(batch_directives)
 
     def mpi_instructions(self, v):
-        v.mpi_command = f"mpirun -n {v.n_ranks} --oversubscribe"
+        batch_opts, cmd_opts = Allocation._init_batch_and_cmd_opts(v)
+        cmd_opts.extend([f"-n {v.n_ranks}"])
+
+        v.mpi_command = "mpirun " + " ".join(cmd_opts)
         v.batch_submit = "{execute_experiment}"
         v.allocation_directives = ""
 
@@ -363,8 +403,7 @@ class Allocation(BasicModifier):
         machines (there is not currently a method for generating jsrun
         invocations).
         """
-        cmd_opts = []
-        batch_opts = []
+        batch_opts, cmd_opts = Allocation._init_batch_and_cmd_opts(v)
 
         if v.n_ranks:
             cmd_opts.append(f"-n {v.n_ranks}")
@@ -372,7 +411,7 @@ class Allocation(BasicModifier):
             batch_opts.append(f"-nnodes {v.n_nodes}")
         if v.n_gpus:
             gpus_per_rank = self.gpus_as_gpus_per_rank(v)
-            batch_opts.append(f"-g {gpus_per_rank}")
+            cmd_opts.append(f"-g {gpus_per_rank}")
         if v.n_ranks_per_node:
             cmd_opts.append(f"-T {v.n_ranks_per_node}")
         # TODO: this might have to be an option on the batch_submit vs.
@@ -389,7 +428,7 @@ class Allocation(BasicModifier):
         v.allocation_directives = "\n".join(batch_directives)
 
     def pjm_instructions(self, v):
-        batch_opts = []
+        batch_opts, cmd_opts = Allocation._init_batch_and_cmd_opts(v)
 
         if v.n_ranks:
             batch_opts.append(f"--mpi proc={v.n_ranks}")
@@ -397,13 +436,10 @@ class Allocation(BasicModifier):
             batch_opts.append(f'-L "node={v.n_nodes}"')
         if v.timeout:
             batch_opts.append(f'-L "elapse={TimeFormat.as_hhmmss(v.timeout)}"')
-        batch_opts.append(
-            '-x PJM_LLIO_GFSCACHE="/vol0001:/vol0002:/vol0003:/vol0004:/vol0005:/vol0006"'
-        )
 
         batch_directives = list(f"#PJM {x}" for x in batch_opts)
 
-        v.mpi_command = "mpiexec"
+        v.mpi_command = "mpiexec " + " ".join(cmd_opts)
         v.batch_submit = "pjsub {execute_experiment}"
         v.allocation_directives = "\n".join(batch_directives)
 

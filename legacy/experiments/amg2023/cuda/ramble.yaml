@@ -1,0 +1,120 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+ramble:
+  include:
+  - ./configs/software.yaml
+  - ./configs/variables.yaml
+  - ./configs/modifier.yaml
+
+  config:
+    deprecated: true
+    spack_flags:
+      install: '--add --keep-stage'
+      concretize: '-U -f'
+
+  modifiers:
+  - name: allocation
+
+  applications:
+    amg2023:
+      workloads:
+        problem1:
+          experiments:
+            'amg2023_cuda_throughput_problem1_{px}_{py}_{pz}_{nx}_{ny}_{nz}':
+              variants:
+                package_manager: spack
+              variables:
+                px: '2'
+                py: '2'
+                pz: '2'
+                nx: ['10', '20', '20']
+                ny: ['10', '10', '20']
+                nz: ['10', '10', '10']
+                env_name: 'amg2023'
+                n_gpus: '{px}*{py}*{pz}'
+            'amg2023_cuda_strong_problem1_{px}_{py}_{pz}_{nx}_{ny}_{nz}':
+              variants:
+                package_manager: spack
+              variables:
+                px: ['2', '2', '4']
+                py: ['2', '2', '2']
+                pz: ['1', '2', '2']
+                nx: '10'
+                ny: '10'
+                nz: '10'
+                env_name: 'amg2023'
+                n_gpus: '{px}*{py}*{pz}'
+            'amg2023_cuda_weak_problem1_{px}_{py}_{pz}_{nx}_{ny}_{nz}':
+              variants:
+                package_manager: spack
+              variables:
+                px: ['2', '2', '4']
+                py: ['2', '2', '2']
+                pz: ['1', '2', '2']
+                nx: ['10', '20', '20']
+                ny: ['10', '10', '20']
+                nz: ['10', '10', '10']
+                env_name: 'amg2023'
+                n_gpus: '{px}*{py}*{pz}'
+        problem2:
+          experiments:
+            'amg2023_cuda_throughput_problem2_{px}_{py}_{pz}_{nx}_{ny}_{nz}':
+              variants:
+                package_manager: spack
+              variables:
+                px: '2'
+                py: '2'
+                pz: '2'
+                nx: ['10', '20', '20']
+                ny: ['10', '10', '20']
+                nz: ['10', '10', '10']
+                env_name: 'amg2023'
+                n_gpus: '{px}*{py}*{pz}'
+            'amg2023_cuda_strong_problem2_{px}_{py}_{pz}_{nx}_{ny}_{nz}':
+              variants:
+                package_manager: spack
+              variables:
+                px: ['2', '2', '4']
+                py: ['2', '2', '2']
+                pz: ['1', '2', '2']
+                nx: '10'
+                ny: '10'
+                nz: '10'
+                env_name: 'amg2023'
+                n_gpus: '{px}*{py}*{pz}'
+            'amg2023_cuda_weak_problem2_{px}_{py}_{pz}_{nx}_{ny}_{nz}':
+              variants:
+                package_manager: spack
+              variables:
+                px: ['2', '2', '4']
+                py: ['2', '2', '2']
+                pz: ['1', '2', '2']
+                nx: ['10', '20', '20']
+                ny: ['10', '10', '20']
+                nz: ['10', '10', '10']
+                env_name: 'amg2023'
+                n_gpus: '{px}*{py}*{pz}'
+  software:
+    packages:
+      cuda:
+        pkg_spec: cuda@{default_cuda_version}+allow-unsupported-compilers
+        compiler: default-compiler
+      hypre:
+        pkg_spec: hypre@2.31.0 +mpi+cuda+mixedint~fortran{modifier_spack_variant} cuda_arch=={cuda_arch}
+        compiler: default-compiler
+      amg2023:
+        pkg_spec: amg2023@develop +mpi+cuda{modifier_spack_variant} cuda_arch=={cuda_arch}
+        compiler: default-compiler
+    environments:
+      amg2023:
+        packages:
+        - cuda
+        - cublas-cuda
+        - lapack
+        - default-mpi
+        - hypre
+        - amg2023
+        - '{modifier_package_name}'

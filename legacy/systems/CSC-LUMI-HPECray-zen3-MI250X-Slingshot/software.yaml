@@ -1,0 +1,26 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+software:
+  packages:
+    default-compiler:
+      pkg_spec: cce@16
+    default-mpi:
+      pkg_spec: cray-mpich@8.1%cce ~gtl
+    compiler-rocm:
+      pkg_spec: cce@16
+    blas-rocm:
+       pkg_spec: rocblas@5.6.1
+     blas:
+       pkg_spec: cray-libsci@23
+    lapack:
+      pkg_spec: cray-libsci@23
+    mpi-rocm-gtl:
+      pkg_spec: cray-mpich@8.1%cce +gtl
+    mpi-rocm-no-gtl:
+      pkg_spec: cray-mpich@8.1%cce ~gtl
+    mpi-gcc:
+      pkg_spec: cray-mpich@8.1%gcc ~gtl
+
