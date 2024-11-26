@@ -24,7 +24,7 @@ class Qws(Experiment,
         variables["maxiter_plus1_outer"] = "6"
         variables["maxiter_inner"] = "50"
 
-        if self.spec.satisfies("programming_model=openmp"):
+        if self.spec.satisfies("+openmp"):
             # env_vars["OMP_NUM_THREADS"] = "{omp_num_threads}"
             variables["processes_per_node"] = ["1"]
             variables["n_nodes"] = ["1"]
@@ -59,7 +59,7 @@ class Qws(Experiment,
         spack_spec = "qws@master +mpi"
         packages = [self.spec.name, "default-mpi"]
 
-        if self.spec.satisfies("programming_model=openmp"):
+        if self.spec.satisfies("+openmp"):
             spack_spec += "+openmp"
             # packages.append("openmp")
 
