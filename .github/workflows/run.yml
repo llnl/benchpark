@@ -162,7 +162,7 @@ jobs:
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
-            
+
       - name: Dry run kripke/cuda on Sierra with allocation modifier
         run: |
           ./bin/benchpark setup kripke/cuda LLNL-Sierra-IBM-power9-V100-Infiniband workspace/
@@ -331,38 +331,38 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic saxpy/openmp with dynamic CTS ruby
+      - name: Dry run dynamic saxpy/openmp with dynamic llnl-cluster ruby
         run: |
-          ./bin/benchpark system init --dest=ruby-system cts cluster=ruby
+          ./bin/benchpark system init --dest=ruby-system llnl-cluster cluster=ruby
           ./bin/benchpark experiment init --dest=saxpy-openmp saxpy+openmp
           ./bin/benchpark setup ./saxpy-openmp ./ruby-system workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/saxpy-openmp/Cts-6d48f81/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-            
-      - name: Dry run dynamic saxpy/openmp with dynamic CTS dane
-        run: |
-          ./bin/benchpark system init --dest=dane-system cts cluster=dane
-          ./bin/benchpark experiment init --dest=saxpy-openmp2 saxpy+openmp
-          ./bin/benchpark setup ./saxpy-openmp2 ./dane-system workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/saxpy-openmp2/Cts-2c51a80/workspace \
+            --workspace-dir workspace/saxpy-openmp/ruby-system/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic saxpy/openmp with dynamic CTS magma
+      - name: Dry run dynamic saxpy/openmp with dynamic llnl-cluster dane
         run: |
-          ./bin/benchpark system init --dest=magma-system cts cluster=magma
+          ./bin/benchpark system init --dest=dane-system llnl-cluster cluster=dane
+          ./bin/benchpark experiment init --dest=saxpy-openmp2 saxpy+openmp
+          ./bin/benchpark setup ./saxpy-openmp2 ./dane-system workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/saxpy-openmp2/dane-system/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic saxpy/openmp with dynamic llnl-cluster magma
+        run: |
+          ./bin/benchpark system init --dest=magma-system llnl-cluster cluster=magma
           ./bin/benchpark experiment init --dest=saxpy-openmp3 saxpy+openmp
           ./bin/benchpark setup ./saxpy-openmp3 ./magma-system workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/saxpy-openmp3/Cts-54a5761/workspace \
+            --workspace-dir workspace/saxpy-openmp3/magma-system/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
@@ -379,13 +379,13 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic ior/mpi with dynamic CTS ruby
+      - name: Dry run dynamic ior/mpi with dynamic llnl-cluster ruby
         run: |
           ./bin/benchpark experiment init --dest=ior-mpi ior
           ./bin/benchpark setup ./ior-mpi ./ruby-system workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/ior-mpi/Cts-6d48f81/workspace \
+            --workspace-dir workspace/ior-mpi/ruby-system/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
