@@ -363,12 +363,11 @@ jobs:
       - name: Dry run dynamic saxpy/openmp with dynamic CTS magma
         run: |
           ./bin/benchpark system init --dest=magma-system cts cluster=magma
-          system_id=$(./bin/benchpark system id ./magma-system)
           ./bin/benchpark experiment init --dest=saxpy-openmp3 saxpy+openmp
           ./bin/benchpark setup ./saxpy-openmp3 ./magma-system workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir "workspace/saxpy-openmp3/$system_id/workspace" \
+            --workspace-dir "workspace/saxpy-openmp3/magma-system/workspace" \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
@@ -376,12 +375,11 @@ jobs:
       - name: Dry run dynamic saxpy/openmp with dynamic generic x86
         run: |
           ./bin/benchpark system init --dest=x86-system genericx86
-          system_id=$(./bin/benchpark system id ./x86-system)
           ./bin/benchpark experiment init --dest=saxpy-omp-generic saxpy+openmp
           ./bin/benchpark setup ./saxpy-omp-generic ./x86-system workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir "workspace/saxpy-omp-generic/$system_id/workspace" \
+            --workspace-dir "workspace/saxpy-omp-generic/x86-system/workspace" \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
