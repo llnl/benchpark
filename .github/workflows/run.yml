@@ -333,12 +333,12 @@ jobs:
 
       - name: Dry run dynamic qws + openmp with allocation modifier on dynamic CTS ruby
         run: |
-          ./bin/benchpark system init --dest ruby-system cts cluster=ruby
+          ./bin/benchpark system init --dest ruby-system-qws cts cluster=ruby
           ./bin/benchpark experiment init --dest qws-test qws +openmp
-          ./bin/benchpark setup qws-test ruby-system workspace/
+          ./bin/benchpark setup qws-test ruby-system-qws workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/qws/openmp/RCCS-Fugaku-Fujitsu-A64FX-TofuD/workspace \
+            --workspace-dir workspace/qws/openmp/Cts-6d48f81/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
