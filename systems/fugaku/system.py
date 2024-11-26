@@ -49,7 +49,7 @@ class Fugaku(System):
         compiler = self.spec.variants["compiler"][0]
 
         selections = []
- 
+
         if compiler == "clang":
             selections.append(compilers / "clang" / "00-clang-17-compilers.yaml")
         elif compiler == "gcc":
@@ -60,12 +60,13 @@ class Fugaku(System):
         return selections
 
     def system_specific_variables(self):
-        return {"extra_cmd_opts": '''|
-    -std-proc fjmpioutdir/bmexe''',
-          "extra_batch_opts": '''|
+        return {
+            "extra_cmd_opts": """|
+    -std-proc fjmpioutdir/bmexe""",
+            "extra_batch_opts": '''|
     -x PJM_LLIO_GFSCACHE="/vol0002:/vol0003:/vol0004:/vol0005:/vol0006"''',
-          "post_exec_cmds": '''| 
-    for F in $(ls -1v fjmpioutdir/bmexe.*); do cat $F >> {log_file}; done'''
+            "post_exec_cmds": """| 
+    for F in $(ls -1v fjmpioutdir/bmexe.*); do cat $F >> {log_file}; done""",
         }
 
     def sw_description(self):

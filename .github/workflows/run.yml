@@ -290,6 +290,7 @@ jobs:
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
+<<<<<<< HEAD
 
       - name: Dry run genesis/openmp with allocation modifier on nosite-x86_64
         run: |
@@ -386,6 +387,17 @@ jobs:
           . workspace/setup.sh
           ramble \
             --workspace-dir workspace/ior-mpi/Cts-6d48f81/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+      
+      - name: Dry run dynamic qws/openmp with allocation modifier on Fugaku
+        run:
+          ./bin/benchpark experiment init --dest=qws-openmp qws programming_model=openmp
+          ./bin/benchpark setup qws-openmp RCCS-Fugaku-Fujitsu-A64FX-TofuD workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/qws-openmp/RCCS-Fugaku-Fujitsu-A64FX-TofuD/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
