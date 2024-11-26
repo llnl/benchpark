@@ -37,7 +37,6 @@ class Tioga(System):
             "scheduler",
             values=("flux", "mpi"),
             default="flux",
-            sticky=True,
             description="Scheduler to use on the system",
         )
         self.sys_cores_per_node = "64"
