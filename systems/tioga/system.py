@@ -113,7 +113,7 @@ class Tioga(System):
         return selections
 
     def system_specific_variables(self):
-        return {"rocm_arch": self.rocm_arch }
+        return {"rocm_arch": self.rocm_arch}
 
     def sw_description(self):
         """This is somewhat vestigial: for the Tioga config that is committed
