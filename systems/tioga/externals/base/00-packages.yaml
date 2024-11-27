@@ -1,7 +1,6 @@
 packages:
   all:
     require: 'target=x86_64:'
-    variants: amdgpu_target=gfx90a
   tar:
     externals:
     - spec: tar@1.30
@@ -184,5 +183,5 @@ packages:
     buildable: false
   rocsolver:
     buildable: false
-  zlib-api:                                                                     
+  zlib-api:
     require: zlib
