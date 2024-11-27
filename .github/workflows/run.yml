@@ -420,12 +420,12 @@ jobs:
 
       - name: Dry run dynamic qws/openmp with dynamic CTS ruby
         run: |
-          ./bin/benchpark system init --dest ruby-system-qws cts cluster=ruby
-          ./bin/benchpark experiment init --dest qws-test qws +openmp
-          ./bin/benchpark setup qws-test ruby-system-qws workspace/
+          system_id=$(./bin/benchpark system id ./ruby-system-qws)
+          ./bin/benchpark experiment init --dest qws-openmp qws +openmp
+          ./bin/benchpark setup qws-openmp ./ruby-system-qws workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/qws/openmp/Cts-6d48f81/workspace \
+            --workspace-dir workspace/qws-openmp/$system_id/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
