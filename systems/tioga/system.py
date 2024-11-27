@@ -9,7 +9,29 @@ from benchpark.directives import variant
 from benchpark.system import System
 
 
+id_to_resources = {
+    "tioga": {
+        "rocm_arch": "gfx90a",
+        "sys_cores_per_node": 64,
+        "sys_gpus_per_node": 4,
+    },
+    "elcapitan": {
+        "rocm_arch": "gfx940",
+        "sys_cores_per_node": 128,
+        "sys_gpus_per_node": 4,
+    },
+}
+
+
 class Tioga(System):
+
+    variant(
+        "cluster",
+        default="tioga",
+        values=("tioga", "elcapitan"),
+        description="Which cluster to run on",
+    )
+
     variant(
         "rocm",
         default="551",
@@ -35,8 +57,9 @@ class Tioga(System):
         super().initialize()
 
         self.scheduler = "flux"
-        self.sys_cores_per_node = "64"
-        self.sys_gpus_per_node = "4"
+        attrs = id_to_resources.get(self.spec.variants["cluster"][0])
+        for k, v in attrs.items():
+            setattr(self, k, v)
 
     def generate_description(self, output_dir):
         super().generate_description(output_dir)
@@ -90,7 +113,7 @@ class Tioga(System):
         return selections
 
     def system_specific_variables(self):
-        return {"rocm_arch": "gfx90a"}
+        return {"rocm_arch": self.rocm_arch}
 
     def sw_description(self):
         """This is somewhat vestigial: for the Tioga config that is committed

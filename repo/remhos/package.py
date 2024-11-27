@@ -18,28 +18,36 @@ class Remhos(MakefilePackage):
 
     homepage = "https://github.com/CEED/Remhos"
     url = "https://github.com/CEED/Remhos/archive/v1.0.tar.gz"
-    git = "https://github.com/CEED/Remhos.git"
+    git = "https://github.com/august-knox/Remhos.git"
 
     maintainers("v-dobrev", "tzanio", "vladotomov")
 
     license("BSD-2-Clause")
 
     version("develop", branch="master")
+    version("gpu-fom", branch="gpu-fom")
     version("1.0", sha256="e60464a867fe5b1fd694fbb37bb51773723427f071c0ae26852a2804c08bbb32")
 
     variant("metis", default=True, description="Enable/disable METIS support")
+    variant("caliper", default=False, description= "Enable/disable caliper support")
 
     depends_on("mfem+mpi+metis", when="+metis")
     depends_on("mfem+mpi~metis", when="~metis")
 
     depends_on("mfem@develop", when="@develop")
     depends_on("mfem@4.1.0:", when="@1.0")
+    depends_on("mfem@develop", when="@gpu-fom")
 
+    depends_on("caliper", when="+caliper")
+    depends_on("adiak", when="+caliper")
     @property
     def build_targets(self):
         targets = []
         spec = self.spec
-
+        if "+caliper" in spec:
+            cal_dir=spec["caliper"].prefix
+            targets.append("CALIPER_DIR=%s" % spec["caliper"].prefix)
+            targets.append("ADIAK_DIR=%s" % spec["adiak"].prefix)
         targets.append("MFEM_DIR=%s" % spec["mfem"].prefix)
         targets.append("CONFIG_MK=%s" % spec["mfem"].package.config_mk)
         targets.append("TEST_MK=%s" % spec["mfem"].package.test_mk)
