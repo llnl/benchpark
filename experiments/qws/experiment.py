@@ -8,8 +8,7 @@ from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 
 
-class Qws(Experiment,
-          OpenMPExperiment):
+class Qws(Experiment, OpenMPExperiment):
 
     variant(
         "workload",
@@ -24,7 +23,7 @@ class Qws(Experiment,
     )
 
     def compute_applications_section(self):
-        
+
         self.add_experiment_variable("experiment_setup", "")
         self.add_experiment_variable("lx", "32")
         self.add_experiment_variable("ly", "6")
@@ -38,7 +37,7 @@ class Qws(Experiment,
         self.add_experiment_variable("tol_inner", "-1")
         self.add_experiment_variable("maxiter_plus1_outer", "6")
         self.add_experiment_variable("maxiter_inner", "50")
-        
+
         if self.spec.satisfies("+openmp"):
             self.add_experiment_variable("n_nodes", ["1"], True)
             self.add_experiment_variable("processes_per_node", ["1"])
@@ -49,12 +48,12 @@ class Qws(Experiment,
     def compute_spack_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-        
+
         system_specs = {}
         system_specs["compiler"] = "default-compiler"
         system_specs["mpi"] = "default-mpi"
-        
-        # if package_spec left empty spack will use external 
+
+        # if package_spec left empty spack will use external
         self.add_spack_spec(system_specs["mpi"])
 
         self.add_spack_spec(
