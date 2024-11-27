@@ -9,15 +9,16 @@ import os
 import pathlib
 import shutil
 import sys
+
 import yaml
 
+import benchpark.paths
 from benchpark.accounting import (
     benchpark_experiments,
     benchpark_modifiers,
     benchpark_systems,
 )
 from benchpark.debug import debug_print
-from benchpark.paths import source_location
 from benchpark.runtime import RuntimeResources
 
 
@@ -87,7 +88,9 @@ def benchpark_check_experiment(arg_str):
         )
         raise ValueError(out_str)
 
-    experiment_src_dir = source_location() / "experiments" / str(arg_str)
+    experiment_src_dir = (
+        benchpark.paths.benchpark_root / "legacy" / "experiments" / str(arg_str)
+    )
     return arg_str, experiment_src_dir
 
 
@@ -115,7 +118,9 @@ def benchpark_check_system(arg_str):
         )
         raise ValueError(out_str)
 
-    configs_src_dir = source_location() / "configs" / str(arg_str)
+    configs_src_dir = (
+        benchpark.paths.benchpark_root / "legacy" / "systems" / str(arg_str)
+    )
     return arg_str, configs_src_dir
 
 
@@ -145,7 +150,7 @@ def command(args):
 
     experiments_root = pathlib.Path(os.path.abspath(args.experiments_root))
     modifier = args.modifier
-    source_dir = source_location()
+    source_dir = benchpark.paths.benchpark_root
     debug_print(f"source_dir = {source_dir}")
     experiment_id, experiment_src_dir = benchpark_check_experiment(args.experiment)
     debug_print(f"specified experiment (benchmark/ProgrammingModel) = {experiment_id}")
@@ -195,7 +200,7 @@ def command(args):
     symlink_tree(experiment_src_dir, ramble_configs_dir, include_fn)
     symlink_tree(modifier_config_dir, ramble_configs_dir, include_fn)
     symlink_tree(
-        source_dir / "configs" / "common",
+        source_dir / "legacy" / "systems" / "common",
         ramble_spack_experiment_configs_dir,
         include_fn,
     )
@@ -252,6 +257,6 @@ To complete the benchpark setup, do the following:
 
     . {initializer_script}
 
-Further steps are needed to build the experiments (ramble -P -D {ramble_workspace_dir} workspace setup) and run them (ramble -P -D {ramble_workspace_dir} on)
+Further steps are needed to build the experiments (ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} workspace setup) and run them (ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} on)
 """
     print(instructions)

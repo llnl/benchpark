@@ -1,0 +1,26 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+packages:
+  curand:
+    externals:
+    - spec: curand@10.1.243
+      prefix: /usr/tce/packages/cuda/cuda-10.1.243
+    buildable: false
+  cusparse:
+    externals:
+    - spec: cusparse@10.1.243
+      prefix: /usr/tce/packages/cuda/cuda-10.1.243
+    buildable: false
+  cuda:
+    externals:
+    - spec: cuda@10.1.243
+      prefix: /usr/tce/packages/cuda/cuda-10.1.243
+    buildable: false
+  blas:
+    externals:
+    - spec: cublas@10.1.243
+      prefix: /usr/tce/packages/cuda/cuda-10.1.243
+    buildable: false

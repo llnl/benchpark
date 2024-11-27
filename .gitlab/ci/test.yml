@@ -1,0 +1,42 @@
+.test_clusters: &test_clusters
+  parallel:
+    matrix:
+      - HOST: tioga
+        ARCHCONFIG: LLNL-Tioga-HPECray-zen3-MI250X-Slingshot
+      - HOST: dane
+        ARCHCONFIG: LLNL-Dane-DELL-sapphirerapids-OmniPath
+
+test_run:
+  resource_group: $HOST
+  stage: test
+  tags:
+    - $HOST
+    - batch
+  <<: *test_clusters
+  variables:
+    SCHEDULER_PARAMETERS: -N 1 -t 1h
+  rules:
+    - if: |
+        $CI_PIPELINE_SOURCE == "merge_request_event" ||
+        $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/*
+        - experiments/**
+        - systems/**
+        - repo/**
+        - modifiers/**
+        - var/**
+        - lib/**
+  script:
+    - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
+    # Build Saxpy Workspace
+    - ./bin/benchpark setup saxpy/openmp $ARCHCONFIG workspace/
+    # Setup Ramble & Spack
+    - . workspace/setup.sh
+    # Setup Saxpy Workspace
+    - cd ./workspace/saxpy/openmp/$ARCHCONFIG/workspace/
+    - ramble --workspace-dir . --disable-progress-bar --disable-logger workspace setup
+    # Run Saxpy Experiments
+    - ramble --workspace-dir . --disable-progress-bar --disable-logger
+      on --executor '{execute_experiment}' --where '{n_nodes} == 1'

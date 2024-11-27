@@ -6,6 +6,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import enum
+import io
+import json
 import pathlib
 import re
 from typing import Iterable, Iterator, List, Match, Optional, Union
@@ -22,6 +24,9 @@ import llnl.util.lang  # noqa
 repo_path = benchpark.repo.paths[benchpark.repo.ObjectTypes.experiments]
 sys_repo = benchpark.repo.paths[benchpark.repo.ObjectTypes.systems]
 
+value_types = str, bool, int, float
+SingleValue = Union[value_types]
+
 
 class VariantMap(llnl.util.lang.HashableMap):
     def __init__(self, init: "VariantMap" = None):
@@ -29,10 +34,10 @@ class VariantMap(llnl.util.lang.HashableMap):
         if init:
             self.dict = init.dict.copy()
 
-    def __setitem__(self, name: str, values: Union[str, Iterable]):
+    def __setitem__(self, name: str, values: Union[Iterable, SingleValue]):
         if name in self.dict:
             raise Exception(f"Cannot specify variant {name} twice")
-        if isinstance(values, str):
+        if isinstance(values, value_types):
             values = (values,)
         else:
             values = tuple(values)
@@ -62,16 +67,38 @@ class VariantMap(llnl.util.lang.HashableMap):
     @staticmethod
     def stringify(name: str, values: tuple) -> str:
         if len(values) == 1:
-            if values[0].lower() == "true":
-                return f"+{name}"
-            if values[0].lower() == "false":
-                return f"~{name}"
-        return f"{name}={','.join(values)}"
+            if isinstance(values[0], bool):
+                prefix = "+" if values[0] else "~"
+                return prefix + name
+        v_string = quote_if_needed(",".join(values))
+        return f"{name}={v_string}"
 
     def __str__(self):
-        return " ".join(
-            self.stringify(name, values) for name, values in self.dict.items()
-        )
+        if not self:
+            return ""
+
+        # print keys in order
+        sorted_keys = sorted(self.keys())
+
+        # Separate boolean variants from key-value pairs as they print
+        # differently. All booleans go first to avoid ' ~foo' strings that
+        # break spec reuse in zsh.
+        bool_keys = []
+        kv_keys = []
+        for key in sorted_keys:
+            is_bool = len(self[key]) == 1 and isinstance(self[key][0], bool)
+            bool_keys.append(key) if is_bool else kv_keys.append(key)
+
+        # add spaces before and after key/value variants.
+        string = io.StringIO()
+
+        string.write("".join(self.stringify(key, self[key]) for key in bool_keys))
+        if bool_keys and kv_keys:
+            string.write(" ")
+
+        string.write(" ".join(self.stringify(key, self[key]) for key in kv_keys))
+
+        return string.getvalue()
 
 
 class ConcreteVariantMap(VariantMap):
@@ -149,9 +176,9 @@ class Spec(object):
             string += self.name
 
         variants = str(self.variants)
-        if not string:
-            return variants
-        string += f" {variants}" if variants else ""
+        if string and variants and not variants.startswith(("+", "~")):
+            string += " "
+        string += variants
         return string
 
     def __repr__(self):
@@ -368,8 +395,14 @@ IDENTIFIER = r"(?:[a-zA-Z_0-9][a-zA-Z_0-9\-]*)"
 DOTTED_IDENTIFIER = rf"(?:{IDENTIFIER}(?:\.{IDENTIFIER})+)"
 NAME = r"[a-zA-Z_0-9][a-zA-Z_0-9\-.]*"
 
-#: These are legal values that *can* be parsed bare, without quotes on the command line.
-VALUE = r"(?:[a-zA-Z_0-9\-+\*.,:=\~\/\\]+)"
+#: These are legal values that *can* be parsed bare, without quotes on the command line. Cannot start with `=`
+VALUE = r"(?:[a-zA-Z_0-9\-+\*.,:\~\/\\][a-zA-Z_0-9\-+\*.,:=\~\/\\]*)"
+
+#: Variant/flag values that match this can be left unquoted in Spack output
+NO_QUOTES_NEEDED = re.compile(r"^[a-zA-Z0-9,/_.-]+$")
+
+#: Quoted values can be *anything* in between quotes, including escaped quotes.
+QUOTED_VALUE = r"(?:'(?:[^']|(?<=\\)')*'|\"(?:[^\"]|(?<=\\)\")*\")"
 
 #: Regex with groups to use for splitting (optionally propagated) key-value pairs
 SPLIT_KVP = re.compile(rf"^({NAME})=(.*)$")
@@ -401,10 +434,10 @@ class TokenType(TokenBase):
 
     # variants
     BOOL_VARIANT = rf"(?:[~+-]\s*{NAME})"
-    KEY_VALUE_PAIR = rf"(?:{NAME}=(?:{VALUE}))"
+    KEY_VALUE_PAIR = rf"(?:{NAME}=(?:{VALUE}|{QUOTED_VALUE}))"
     # Package name
-    FULLY_QUALIFIED_PACKAGE_NAME = rf"(?:{DOTTED_IDENTIFIER})"
-    UNQUALIFIED_PACKAGE_NAME = rf"(?:{IDENTIFIER})"
+    FULLY_QUALIFIED_SPEC_NAME = rf"(?:{DOTTED_IDENTIFIER})"
+    UNQUALIFIED_SPEC_NAME = rf"(?:{IDENTIFIER})"
     # White spaces
     WS = r"(?:\s+)"
 
@@ -414,6 +447,58 @@ class ErrorTokenType(TokenBase):
 
     # Unexpected character
     UNEXPECTED = r"(?:.[\s]*)"
+
+
+#: Regex to strip quotes. Group 2 will be the unquoted string.
+STRIP_QUOTES = re.compile(r"^(['\"])(.*)\1$")
+
+
+def quote_kvp(string: str) -> str:
+    """For strings like ``name=value``, quote and escape the value if needed.
+
+    This is a compromise to respect quoting of key-value pairs on the CLI. The shell
+    strips quotes from quoted arguments, so we cannot know *exactly* how CLI arguments
+    were quoted. To compensate, we re-add quotes around anything staritng with ``name=``,
+    and we assume the rest of the argument is the value. This covers the
+    common cases of passing variant arguments with spaces in them, e.g.,
+    ``cflags="-O2 -g"`` on the command line.
+    """
+    match = SPLIT_KVP.match(string)
+    if not match:
+        return string
+
+    key, value = match.groups()
+    return f"{key}={quote_if_needed(value)}"
+
+
+def strip_quotes_and_unescape(string: str) -> str:
+    """Remove surrounding single or double quotes from string, if present."""
+    match = STRIP_QUOTES.match(string)
+    if not match:
+        return string
+
+    # replace any escaped quotes with bare quotes
+    quote, result = match.groups()
+    return result.replace(rf"\{quote}", quote)
+
+
+def quote_if_needed(value: str) -> str:
+    """Add quotes around the value if it requires quotes.
+
+    This will add quotes around the value unless it matches ``NO_QUOTES_NEEDED``.
+
+    This adds:
+    * single quotes by default
+    * double quotes around any value that contains single quotes
+
+    If double quotes are used, we json-escape the string. That is, we escape ``\\``,
+    ``"``, and control codes.
+
+    """
+    if NO_QUOTES_NEEDED.match(value):
+        return value
+
+    return json.dumps(value) if "'" in value else f"'{value}'"
 
 
 class Token:
@@ -519,10 +604,13 @@ class TokenContext:
 class SpecParser(object):
     __slots__ = "literal_str", "ctx", "type"
 
-    def __init__(self, type, literal_str: str):
-        self.literal_str = literal_str
+    def __init__(self, type, literal: Union[str, list]):
+        if isinstance(literal, list):
+            self.literal_str = " ".join([quote_kvp(arg) for arg in literal])
+        else:
+            self.literal_str = literal
         self.ctx = TokenContext(
-            filter(lambda x: x.kind != TokenType.WS, tokenize(literal_str))
+            filter(lambda x: x.kind != TokenType.WS, tokenize(self.literal_str))
         )
         self.type = type
 
@@ -537,11 +625,11 @@ class SpecParser(object):
     def next_spec(self) -> Optional[Spec]:
         """Return the next spec parsed from text.
 
-        Args:
+        Parameters:
             initial_spec: object where to parse the spec. If None a new one
                 will be created.
 
-        Return
+        Returns:
             The spec that was parsed
         """
         if not self.ctx.next_token:
@@ -549,9 +637,9 @@ class SpecParser(object):
 
         spec = self.type()
 
-        if self.ctx.accept(TokenType.UNQUALIFIED_PACKAGE_NAME):
+        if self.ctx.accept(TokenType.UNQUALIFIED_SPEC_NAME):
             spec.name = self.ctx.current_token.value
-        elif self.ctx.accept(TokenType.FULLY_QUALIFIED_PACKAGE_NAME):
+        elif self.ctx.accept(TokenType.FULLY_QUALIFIED_SPEC_NAME):
             parts = self.ctx.current_token.value.split(".")
             name = parts[-1]
             namespace = ".".join(parts[:-1])
@@ -562,7 +650,7 @@ class SpecParser(object):
             if self.ctx.accept(TokenType.BOOL_VARIANT):
                 name = self.ctx.current_token.value[1:].strip()
                 value = self.ctx.current_token.value[0] == "+"
-                spec.variants[name] = str(value).lower()
+                spec.variants[name] = value
             elif self.ctx.accept(TokenType.KEY_VALUE_PAIR):
                 match = SPLIT_KVP.match(self.ctx.current_token.value)
                 assert (
@@ -570,7 +658,7 @@ class SpecParser(object):
                 ), f"SPLIT_KVP cannot split pair {self.ctx.current_token.value}"
 
                 name, value = match.groups()
-                spec.variants[name] = value.split(",")
+                spec.variants[name] = strip_quotes_and_unescape(value).split(",")
             else:
                 break
 
