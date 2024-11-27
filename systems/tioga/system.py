@@ -12,13 +12,13 @@ from benchpark.system import System
 id_to_resources = {
     "tioga": {
         "rocm_arch": "gfx90a",
-        "sys_cores_per_node" = 64,
-        "sys_gpus_per_node" = 4,
+        "sys_cores_per_node": 64,
+        "sys_gpus_per_node": 4,
     },
     "elcapitan": {
         "rocm_arch": "gfx940",
-        "sys_cores_per_node" = 128,
-        "sys_gpus_per_node" = 4,
+        "sys_cores_per_node": 128,
+        "sys_gpus_per_node": 4,
     },
 }
 
