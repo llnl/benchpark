@@ -48,6 +48,8 @@ packages:
     externals:
     - spec: fftw@3.3.10
       prefix: /usr/tce/packages/fftw/fftw-3.3.10
+  zlib-api:                                                                     
+    require: zlib
   mpi:
     buildable: false
     externals:

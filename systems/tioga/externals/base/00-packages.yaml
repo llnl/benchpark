@@ -184,5 +184,3 @@ packages:
     buildable: false
   rocsolver:
     buildable: false
-  zlib-api:                                                                     
-    require: zlib
