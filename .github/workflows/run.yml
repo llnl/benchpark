@@ -384,6 +384,28 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
+      - name: Dry run dynamic remhos/mpi with dynamic CTS ruby
+        run: |
+          ./bin/benchpark experiment init --dest=remhos-ruby remhos
+          ./bin/benchpark setup ./remhos-ruby ./ruby-system workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/remhos-ruby/Cts-6d48f81/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic remhos/mpi with dynamic Tioga
+        run: |
+          ./bin/benchpark experiment init --dest=remhos-tioga remhos
+          ./bin/benchpark setup remhos-tioga ./tioga-system workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/remhos-tioga/Tioga-975af3c/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
       - name: Dry run dynamic ior/mpi with dynamic CTS ruby
         run: |
           system_id=$(./bin/benchpark system id ./ruby-system)
