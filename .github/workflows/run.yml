@@ -243,12 +243,56 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run lammps/rocm on Tioga with allocation modifier
+      - name: Dry run lammps/openmp with static Ruby
+        run: |
+          ./bin/benchpark setup lammps/openmp LLNL-Ruby-icelake-OmniPath workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/lammps/openmp/LLNL-Ruby-icelake-OmniPath/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run lammps/rocm with static Tioga
         run: |
           ./bin/benchpark setup lammps/rocm LLNL-Tioga-HPECray-zen3-MI250X-Slingshot workspace/
           . workspace/setup.sh
           ramble \
             --workspace-dir workspace/lammps/rocm/LLNL-Tioga-HPECray-zen3-MI250X-Slingshot/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic lammps/openmp on static Ruby
+        run: |
+          ./bin/benchpark experiment init --dest=lammps-openmp lammps+openmp
+          ./bin/benchpark setup ./lammps-openmp LLNL-Ruby-icelake-OmniPath workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/lammps-openmp/LLNL-Ruby-icelake-OmniPath/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic lammps/rocm on static Tioga 
+        run: |
+          ./bin/benchpark experiment init --dest=lammps-rocm lammps+rocm
+          ./bin/benchpark setup ./lammps-rocm LLNL-Tioga-HPECray-zen3-MI250X-Slingshot workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/lammps-rocm/LLNL-Tioga-HPECray-zen3-MI250X-Slingshot/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic lammps/rocm with dynamic Tioga
+        run: |
+          ./bin/benchpark experiment init --dest=lammps-rocm-tioga lammps+rocm
+          ./bin/benchpark setup lammps-rocm-tioga ./tioga-system workspace/
+          system_id=$(./bin/benchpark system id ./tioga-system)
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/lammps-rocm-tioga/$system_id/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
