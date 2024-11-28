@@ -33,6 +33,7 @@ class Laghos(MakefilePackage):
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
 
+    depends_on("hypre~fortran", when="@develop")
     depends_on("zlib@1.3.1+optimize+pic+shared", when="@develop")
     depends_on("mfem@develop^zlib@1.3.1+optimize+pic+shared", when="@develop")
     depends_on("mfem@4.2.0:", when="@3.1")
