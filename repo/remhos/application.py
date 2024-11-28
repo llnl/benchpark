@@ -11,49 +11,64 @@ from ramble.appkit import *
 class Remhos(ExecutableApplication):
     """Remhos benchmark"""
     name = "remhos"
-
-
-
-    executable('run', 'remhos'+' -m {mesh}'+' -p {p}'+' -rs {rs}'+'{rp}'+' -dt {dt}'+' -tf {tf}'+' -ho {ho}' ' -lo {lo}'+' -fct {fct}', use_mpi=True)
-
-    workload('remhos', executables=['run'])
+#TODO: add -ms flag once it's implemented
+    executable('2d', 'remhos'+' -m {remhos}/data/inline-quad.mesh'+' -p 14'+' -rs {rs2d}'+' -dt {dt}'+' -tf {tf}'+' -ho {ho}' ' -lo {lo}'+' -fct {fct}'+' -vs {vs}'+' -ms {ms}'+'  -no-vis', use_mpi=True)
+    executable('3d', 'remhos'+' -m {remhos}/data/cube01_hex.mesh'+' -p 10'+' -rs {rs3d}'+' -o {o}'+' -dt {dt}'+' -tf {tf}'+' -ho {ho}' ' -lo {lo}'+' -fct {fct}'+' -vs {vs}'+' -ms {ms}'+' -no-vis', use_mpi=True)
+    workload('2d', executables=['2d'])
+    workload('3d', executables=['3d'])
     
-    workload_variable('mesh', default='{remhos}/data/periodic-square.mesh',
-        description='mesh file',
-        workloads=['remhos'])
+    #workload_variable('mesh', default='{remhos}/data/periodic-square.mesh',
+     #   description='mesh file',
+      #  workloads=[''])
 
-    workload_variable('p', default='5',
-        description='problem number',
-        workloads=['remhos'])
+    #workload_variable('p', default='5',
+     #   description='problem number',
+     #   workloads=['remhos'])
     
-    workload_variable('rs', default='3',
+    workload_variable('rs2d', default='4',
         description='number of serial refinements',
-        workloads=['remhos'])
+        workloads=['2d'])
     
-    workload_variable('rp', default='',
-        description='number of parallel refinements',
-        workloads=['remhos'])
+    workload_variable('rs3d', default='3',
+        description='number of serial refinements',
+        workloads=['3d'])
 
-    workload_variable('dt', default='0.005',
+    #workload_variable('rp', default='',
+     #   description='number of parallel refinements',
+      #  workloads=['remhos'])
+
+    workload_variable('o', default='2',
+        description='',
+        workloads=['2d','3d'])
+
+    workload_variable('dt', default='-1.0',
         description='time step',
-        workloads=['remhos'])
+        workloads=['2d','3d'])
 
-    workload_variable('tf', default='0.8',
+    workload_variable('tf', default='0.5',
         description='time final',
-        workloads=['remhos'])
+        workloads=['2d','3d'])
     
-    workload_variable('ho', default='1',
+    workload_variable('ho', default='3',
         description='high order solver',
-        workloads=['remhos'])
+        workloads=['2d','3d'])
 
-    workload_variable('lo', default='2',
+    workload_variable('lo', default='5',
         description='low order solver',
-        workloads=['remhos'])
+        workloads=['2d','3d'])
 
     workload_variable('fct', default='2',
         description='fct type',
-        workloads=['remhos'])
+        workloads=['2d','3d'])
+
+    workload_variable('vs', default='1',
+        description='vs',
+        workloads=['2d','3d'])
+
+    workload_variable('ms', default='5',
+        description='ms',
+        workloads=['2d','3d'])
     #FOM_regex=r'(?<=Merit)\s+[\+\-]*[0-9]*\.*[0-9]+e*[\+\-]*[0-9]*'
-    figure_of_merit("success", log_file='{experiment_run_dir}/{experiment_name}.out', fom_regex=r'(?P<done>.*)', group_name='done', units='')
+    figure_of_merit("FOM", log_file='{experiment_run_dir}/{experiment_name}.out', fom_regex=r'FOM:\s+(?P<fom>[0-9]*\.[0-9]*)', group_name='fom', units='megadofs x time steps / second')
     success_criteria('valid', mode='string', match=r'.*', file='{experiment_run_dir}/{experiment_name}.out')
 

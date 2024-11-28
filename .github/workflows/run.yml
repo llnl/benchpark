@@ -384,11 +384,36 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
+      - name: Dry run dynamic remhos/mpi with dynamic llnl-cluster ruby
+        run: |
+          ./bin/benchpark experiment init --dest=remhos-ruby remhos
+          ./bin/benchpark setup ./remhos-ruby ./ruby-system workspace/
+          system_id=$(./bin/benchpark system id ./ruby-system)
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/remhos-ruby/$system_id/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic remhos/mpi with dynamic Tioga
+        run: |
+          ./bin/benchpark experiment init --dest=remhos-tioga remhos
+          ./bin/benchpark setup remhos-tioga ./tioga-system workspace/
+          system_id=$(./bin/benchpark system id ./tioga-system)
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/remhos-tioga/$system_id/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
       - name: Dry run dynamic ior/mpi with dynamic llnl-cluster ruby
         run: |
           system_id=$(./bin/benchpark system id ./ruby-system)
           ./bin/benchpark experiment init --dest=ior-mpi ior
           ./bin/benchpark setup ./ior-mpi ./ruby-system workspace/
+          system_id=$(./bin/benchpark system id ./ruby-system)
           . workspace/setup.sh
           ramble \
             --workspace-dir "workspace/ior-mpi/$system_id/workspace" \
