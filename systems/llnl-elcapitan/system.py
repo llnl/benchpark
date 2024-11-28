@@ -22,7 +22,7 @@ id_to_resources = {
 }
 
 
-class LlnlElCapitan(System):
+class LlnlElcapitan(System):
 
     variant(
         "cluster",
@@ -69,7 +69,7 @@ class LlnlElCapitan(System):
             f.write(self.sw_description())
 
     def external_pkg_configs(self):
-        externals = LlnlElCapitan.resource_location / "externals"
+        externals = LlnlElcapitan.resource_location / "externals"
 
         rocm = self.spec.variants["rocm"][0]
         gtl = self.spec.variants["gtl"][0]
@@ -94,7 +94,7 @@ class LlnlElCapitan(System):
         return selections
 
     def compiler_configs(self):
-        compilers = LlnlElCapitan.resource_location / "compilers"
+        compilers = LlnlElcapitan.resource_location / "compilers"
 
         compiler = self.spec.variants["compiler"][0]
         # rocm = self.spec.variants["rocm"][0]
