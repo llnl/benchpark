@@ -32,6 +32,9 @@ class Branson(CMakePackage):
     )
     version("0.81", sha256="493f720904791f06b49ff48c17a681532c6a4d9fa59636522cf3f9700e77efe4")
     version("0.8", sha256="85ffee110f89be00c37798700508b66b0d15de1d98c54328b6d02a9eb2cf1cb8")
+
+    variant("caliper", default=False, description="Enable Caliper monitoring")
+
     #depends_on("mpi")
     depends_on("mpi@2:")
 
@@ -41,6 +44,8 @@ class Branson(CMakePackage):
     depends_on(Boost.with_default_variants, when="@:0.81")
     depends_on("metis")
     depends_on("parmetis", when="@:0.81")
+    depends_on("caliper", when="+caliper")
+    depends_on("adiak", when="+caliper")
 
     root_cmakelists_dir = "src"
 
@@ -62,9 +67,16 @@ class Branson(CMakePackage):
         args.append(f"-DCMAKE_C_COMPILER={spec['mpi'].mpicc}")
         args.append(f"-DCMAKE_CXX_COMPILER={spec['mpi'].mpicxx}")
         args.append(f"-DCMAKE_Fortran_COMPILER={spec['mpi'].mpifc}")
-        args.append("-DCMAKE_C_FLAGS={} -I{}/src/random123/features".format(" ".join(self.compiler.flags['cflags']), self.stage.source_path))
-        args.append("-DCMAKE_CXX_FLAGS={} -I{}/src/random123/features".format(" ".join(self.compiler.flags['cxxflags']), self.stage.source_path))
+
+        cflags = " ".join(self.compiler.flags['cflags']) if 'cflags' in self.compiler.flags else ""
+        cxxflags = " ".join(self.compiler.flags['cxxflags']) if 'cxxflags' in self.compiler.flags else ""
+
+        args.append("-DCMAKE_C_FLAGS={} -I{}/src/random123/features".format(cflags, self.stage.source_path))
+        args.append("-DCMAKE_CXX_FLAGS={} -I{}/src/random123/features".format(cxxflags, self.stage.source_path))
         args.append(f"-DBUILD_TESTING=OFF")
+        if self.spec.satisfies("+caliper"):
+            args.append(f"-DCALIPER_ROOT_DIR={self.spec['caliper'].prefix}")
+
         return args
 
     def install(self, spec, prefix):

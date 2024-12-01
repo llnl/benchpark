@@ -1,49 +1,51 @@
-# Copyright 2023 Lawrence Livermore National Security, LLC and other
-# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
-# 
-# SPDX-License-Identifier: Apache-2.0
 ramble:
-  include:
-  - ./configs/software.yaml
-  - ./configs/variables.yaml
-  - ./configs/modifier.yaml
-  config:
-    deprecated: true
-    spack_flags:
-      install: '--add --keep-stage'
-      concretize: '-U -f'
-#Branson does not currently work on lassen 
-  modifiers:
-  - name: allocation
   applications:
     branson:
       workloads:
         branson:
-          variables:
-            n_ranks: '{n_nodes}*{sys_cores_per_node}'
           experiments:
-             branson_strong_{n_nodes}:
+            branson_branson_weak_scaling_caliper_time_mpi_{n_nodes}_{num_particles}_{n_ranks}:
+              exclude: {}
+              matrix: []
+              variables:
+                n_nodes:
+                - 1
+                - 2
+                - 4
+                - 8
+                n_ranks: '{n_nodes}*{sys_cores_per_node}'
+                num_particles:
+                - 850000000
+                - 1700000000
+                - 3400000000
+                - 6800000000
               variants:
                 package_manager: spack
-              variables:
-                #looks like branson should use ~25% of memory per node
-                num_particles: '850000000'
-                n_nodes: ['1','2','4','8']
-
-             branson_weak_{n_nodes}:
-              variants:
-                package_manager: spack
-              variables:
-                num_particles: '850000000*{n_nodes}'
-                n_nodes: ['1','2','4','8']
+              zips: {}
+  config:
+    deprecated: true
+    spack_flags:
+      concretize: -U -f
+      install: --add --keep-stage
+  include:
+  - ./configs
+  modifiers:
+  - name: allocation
+  - mode: mpi
+    name: caliper
+  - mode: time
+    name: caliper
   software:
-    packages:
-      branson:
-        pkg_spec: branson@develop  
-        compiler: default-compiler
     environments:
       branson:
         packages:
+        - caliper
         - default-mpi
         - branson
-        - '{modifier_package_name}'
+    packages:
+      branson:
+        compiler: default-compiler
+        pkg_spec: branson@develop+caliper
+      caliper:
+        compiler: default-compiler
+        pkg_spec: caliper@master+adiak+mpi~libunwind~libdw~papi
