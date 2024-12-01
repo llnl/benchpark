@@ -6,6 +6,8 @@
 from spack.package import *
 from spack.pkg.builtin.boost import Boost
 
+import os
+
 
 class Branson(CMakePackage):
     """Branson's purpose is to study different algorithms for parallel Monte
@@ -42,6 +44,17 @@ class Branson(CMakePackage):
 
     root_cmakelists_dir = "src"
 
+    def patch(self):
+        ppu_intrinsics_file = os.path.join(self.stage.source_path, "src", "random123", "features", "ppu_intrinsics.h")
+        with open(ppu_intrinsics_file , "w") as f:
+            pass
+
+    def setup_build_environment(self, env):
+        if not self.spec.satisfies("+cuda"):
+            env.unset("CUDA_HOME")
+            env.unset("CUDADIR")
+            env.unset("CUDACXX")
+
     def cmake_args(self):
         spec = self.spec
         args = []
@@ -49,6 +62,9 @@ class Branson(CMakePackage):
         args.append(f"-DCMAKE_C_COMPILER={spec['mpi'].mpicc}")
         args.append(f"-DCMAKE_CXX_COMPILER={spec['mpi'].mpicxx}")
         args.append(f"-DCMAKE_Fortran_COMPILER={spec['mpi'].mpifc}")
+        args.append("-DCMAKE_C_FLAGS={} -I{}/src/random123/features".format(" ".join(self.compiler.flags['cflags']), self.stage.source_path))
+        args.append("-DCMAKE_CXX_FLAGS={} -I{}/src/random123/features".format(" ".join(self.compiler.flags['cxxflags']), self.stage.source_path))
+        args.append(f"-DBUILD_TESTING=OFF")
         return args
 
     def install(self, spec, prefix):
