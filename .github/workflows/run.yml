@@ -292,7 +292,7 @@ jobs:
           system_id=$(./bin/benchpark system id ./tioga-system)
           . workspace/setup.sh
           ramble \
-            --workspace-dir "workspace/gpcnet-mpi-only2/$tioga-system/workspace" \
+            --workspace-dir "workspace/gpcnet-mpi-only2/$system_id/workspace" \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
