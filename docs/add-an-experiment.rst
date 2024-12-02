@@ -51,11 +51,12 @@ or ``openmp`` for an experiment using OpenMP (on a CPU).::
 
 Multiple types of experiments can be created using variants as well (e.g., strong scaling, weak scaling). See AMG2023 or Kripke for examples.
 
-Once an experiment class has been written, an experiment is initialized with the following command, with any variants that have been defined in your experiment.py passed in as key-value pairs: 
-``benchpark experiment init --dest {path/to/dest} {benchmark_name} {variant}={oui/non/value}``
+Once an experiment class has been written, an experiment is initialized with the following command, with any boolean variants with +/~ or 
+string variants defined in your experiment.py passed in as key-value pairs: 
+``benchpark experiment init --dest {path/to/dest} {benchmark_name} +/~{boolean variant} {string variant}={value} ``
 
 For example, to run the AMG2023 strong scaling experiment for problem 1, using CUDA the command would be:
-``benchpark experiment init --dest amg2023_experiment amg2023 cuda=oui workload=problem1 strong=oui``
+``benchpark experiment init --dest amg2023_experiment amg2023 +cuda workload=problem1 +strong``
 
 Initializing an experiment generates the following yaml files:
 
@@ -74,7 +75,7 @@ To manually validate your new experiments work, you should initialize an existin
 For example if you just created a benchmark *baz* with OpenMP and strong scaling variants it may look like this:::
 
   benchpark system init --dest=genericx86-system genericx86 
-  benchpark experiment init --dest=baz-benchmark baz openmp=oui strong=oui
+  benchpark experiment init --dest=baz-benchmark baz +openmp +strong
   benchpark setup ./baz-benchmark ./x86 workspace/
 
 

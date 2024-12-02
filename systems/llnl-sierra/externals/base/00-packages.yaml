@@ -1,0 +1,51 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+packages:
+  tar:
+    externals:
+    - spec: tar@1.26
+      prefix: /usr
+    buildable: false
+  cmake:
+    externals:
+    - spec: cmake@3.29.2
+      prefix: /usr/tce/packages/cmake/cmake-3.29.2
+    buildable: false
+  gmake:
+    externals:
+    - spec: gmake@4.2.1
+      prefix: /usr/tcetmp/packages/gmake/gmake-4.2.1
+    buildable: false
+  automake:
+    externals:
+    - spec: automake@1.13.4
+      prefix: /usr
+  autoconf:
+    externals:
+    - spec: autoconf@2.69
+      prefix: /usr
+  cub:
+    buildable: false
+    externals:
+    - spec: cub@11.8.0
+      prefix: /usr/tce/packages/cuda/cuda-11.8.0/
+  fftw:
+    externals:
+    - spec: fftw@3.3.10
+      prefix: /usr/tcetmp/packages/fftw/fftw-3.3.10-xl-2023.06.28
+    buildable: false
+  lapack:
+    externals:
+    - spec: lapack-xl@3.9.0
+      prefix: /usr/tcetmp/packages/lapack/lapack-3.9.0-xl-2020.03.18
+    buildable: false
+  python:
+    externals:
+    - spec: python@3.8.2
+      prefix: /usr/tce/packages/python/python-3.8.2
+      buildable: false
+  mpi:
+    buildable: false

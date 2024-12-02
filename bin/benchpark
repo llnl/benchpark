@@ -12,6 +12,8 @@ import sys
 
 
 def main():
+    if sys.version_info[0] < 3 or sys.version_info[1] < 8:
+        raise Exception("\n\nERR: Must be using Python 3.8 or later!\n")
     basedir = pathlib.Path(__file__).resolve().parents[1]
     main_py = basedir / "lib" / "main.py"
     subprocess.run([sys.executable, main_py] + sys.argv[1:], check=True)

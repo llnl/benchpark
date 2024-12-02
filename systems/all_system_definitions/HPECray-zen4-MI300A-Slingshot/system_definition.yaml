@@ -1,0 +1,34 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+system_definition:
+  name: HPECray-zen4-MI300A-Slingshot
+  integrator:
+    vendor: HPECray
+    name: EX255a
+  processor:
+    vendor: AMD
+    name: EPYC-Zen4
+    ISA: x86_64
+    uArch: zen4
+  accelerator:
+    vendor: AMD
+    name: MI300A
+    ISA: GCN
+    uArch: gfx940
+  interconnect:
+    vendor: HPECray
+    name: Slingshot11
+  systems-tested:
+    llnl-elcapitan:
+      os: TOSS
+      scheduler: flux
+      compiler: cce
+      runtime: rocm
+      mpi: cray-mpich
+  top500-system-instances:
+    - El Capitan (LLNL) <https://www.top500.org/system/180307>
+    - Tuolumne   (LLNL) <https://www.top500.org/system/180308>
+    - rzAdams    (LLNL) <https://www.top500.org/system/180284>
