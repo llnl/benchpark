@@ -74,7 +74,7 @@ class Branson(
             for k, v in scaled_variables.items():
                 self.add_experiment_variable(k, v, True)
 
-        self.add_experiment_variable("n_ranks", '{n_nodes}*{sys_cores_per_node}', True)
+        self.add_experiment_variable("n_ranks", "{n_nodes}*{sys_cores_per_node}", True)
 
     def compute_spack_section(self):
         # get package version
@@ -85,13 +85,13 @@ class Branson(
         system_specs = {}
         system_specs["compiler"] = "default-compiler"
         system_specs["mpi"] = "default-mpi"
-        #if self.spec.satisfies("+cuda"):
-        #    system_specs["cuda_version"] = "{default_cuda_version}"
-        #    system_specs["cuda_arch"] = "{cuda_arch}"
-        #    system_specs["blas"] = "cublas-cuda"
-        #if self.spec.satisfies("+rocm"):
-        #    system_specs["rocm_arch"] = "{rocm_arch}"
-        #    system_specs["blas"] = "blas-rocm"
+        # if self.spec.satisfies("+cuda"):
+        #     system_specs["cuda_version"] = "{default_cuda_version}"
+        #     system_specs["cuda_arch"] = "{cuda_arch}"
+        #     system_specs["blas"] = "cublas-cuda"
+        # if self.spec.satisfies("+rocm"):
+        #     system_specs["rocm_arch"] = "{rocm_arch}"
+        #     system_specs["blas"] = "blas-rocm"
 
         # set package spack specs
         self.add_spack_spec(system_specs["mpi"])
