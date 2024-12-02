@@ -1,0 +1,32 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+system_definition:
+  name: AWS_PCluster-zen-EFA
+  integrator:
+    vendor: AWS
+    name: ParallelCluster
+  processor:
+    vendor: AMD
+    name: EPYC-Zen
+    ISA: x86_64
+    uArch: zen
+  accelerator:
+    vendor:
+    name:
+    ISA:
+    uArch:
+  interconnect:
+    vendor: AWS
+    name: EFA
+  systems-tested:
+    aws-pcluster:
+      os: alinux2
+      scheduler: slurm
+      compiler: gcc
+      runtime:
+      mpi: openmpi
+  top500-system-instances:
+    - instance-types <https://aws.amazon.com/ec2/instance-types>

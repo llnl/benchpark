@@ -45,6 +45,10 @@ def system_list(args):
     raise NotImplementedError("'benchpark system list' is not available")
 
 
+def system_id(args):
+    print(benchpark.system.unique_dir_for_description(args.system_dir))
+
+
 def setup_parser(root_parser):
     system_subparser = root_parser.add_subparsers(dest="system_subcommand")
 
@@ -58,11 +62,15 @@ def setup_parser(root_parser):
 
     system_subparser.add_parser("list")
 
+    id_parser = system_subparser.add_parser("id")
+    id_parser.add_argument("system_dir")
+
 
 def command(args):
     actions = {
         "init": system_init,
         "list": system_list,
+        "id": system_id,
     }
     if args.system_subcommand in actions:
         actions[args.system_subcommand](args)

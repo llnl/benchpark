@@ -24,6 +24,9 @@ import llnl.util.lang  # noqa
 repo_path = benchpark.repo.paths[benchpark.repo.ObjectTypes.experiments]
 sys_repo = benchpark.repo.paths[benchpark.repo.ObjectTypes.systems]
 
+value_types = str, bool, int, float
+SingleValue = Union[value_types]
+
 
 class VariantMap(llnl.util.lang.HashableMap):
     def __init__(self, init: "VariantMap" = None):
@@ -31,10 +34,10 @@ class VariantMap(llnl.util.lang.HashableMap):
         if init:
             self.dict = init.dict.copy()
 
-    def __setitem__(self, name: str, values: Union[str, Iterable]):
+    def __setitem__(self, name: str, values: Union[Iterable, SingleValue]):
         if name in self.dict:
             raise Exception(f"Cannot specify variant {name} twice")
-        if isinstance(values, str):
+        if isinstance(values, value_types):
             values = (values,)
         else:
             values = tuple(values)
@@ -64,10 +67,9 @@ class VariantMap(llnl.util.lang.HashableMap):
     @staticmethod
     def stringify(name: str, values: tuple) -> str:
         if len(values) == 1:
-            if values[0].lower() == "true":
-                return f"+{name}"
-            if values[0].lower() == "false":
-                return f"~{name}"
+            if isinstance(values[0], bool):
+                prefix = "+" if values[0] else "~"
+                return prefix + name
         v_string = quote_if_needed(",".join(values))
         return f"{name}={v_string}"
 
@@ -84,7 +86,7 @@ class VariantMap(llnl.util.lang.HashableMap):
         bool_keys = []
         kv_keys = []
         for key in sorted_keys:
-            is_bool = len(self[key]) == 1 and self[key][0].lower() in ("true", "false")
+            is_bool = len(self[key]) == 1 and isinstance(self[key][0], bool)
             bool_keys.append(key) if is_bool else kv_keys.append(key)
 
         # add spaces before and after key/value variants.
@@ -648,7 +650,7 @@ class SpecParser(object):
             if self.ctx.accept(TokenType.BOOL_VARIANT):
                 name = self.ctx.current_token.value[1:].strip()
                 value = self.ctx.current_token.value[0] == "+"
-                spec.variants[name] = str(value).lower()
+                spec.variants[name] = value
             elif self.ctx.accept(TokenType.KEY_VALUE_PAIR):
                 match = SPLIT_KVP.match(self.ctx.current_token.value)
                 assert (
