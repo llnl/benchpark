@@ -420,3 +420,15 @@ jobs:
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
+
+      - name: Dry run dynamic saxpy/openmp with dynamic fugaku
+        run: |
+          ./bin/benchpark system init --dest=fugaku-system fugaku
+          ./bin/benchpark experiment init --dest=saxpy-omp-fugaku saxpy+openmp
+          ./bin/benchpark setup ./saxpy-omp-fugaku ./fugaku-system workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/saxpy-omp-fugaku/Fugaku-cf3cb1d/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
