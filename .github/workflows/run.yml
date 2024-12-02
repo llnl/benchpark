@@ -437,9 +437,10 @@ jobs:
         run: |
           ./bin/benchpark experiment init --dest=phloem-mpi phloem
           ./bin/benchpark setup ./phloem-mpi ./ruby-system workspace/
+          system_id=$(./bin/benchpark system id ./ruby-system)
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/phloem-mpi/Cts-6d48f81/workspace \
+            --workspace-dir "workspace/phloem-mpi/$system_id/workspace" \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
