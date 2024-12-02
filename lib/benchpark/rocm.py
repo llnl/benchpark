@@ -9,20 +9,15 @@ from benchpark.experiment import ExperimentHelper
 
 
 class ROCmExperiment:
-    variant(
-        "rocm",
-        default="non",
-        values=("oui", "non"),
-        description="Build and run with ROCm",
-    )
+    variant("rocm", default=False, description="Build and run with ROCm")
 
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):
-            return "rocm" if self.spec.satisfies("rocm=oui") else ""
+            return "rocm" if self.spec.satisfies("+rocm") else ""
 
         def get_spack_variants(self):
             return (
                 "+rocm amdgpu_target={rocm_arch}"
-                if self.spec.satisfies("rocm=oui")
+                if self.spec.satisfies("+rocm")
                 else "~rocm"
             )

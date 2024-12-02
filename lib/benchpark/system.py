@@ -8,6 +8,7 @@ import importlib.util
 import os
 import pathlib
 import sys
+import yaml
 
 import benchpark.paths
 from benchpark.directives import ExperimentSystemBase
@@ -188,3 +189,12 @@ variables:
   batch_submit: "placeholder"
   mpi_command: "placeholder"
 """
+
+
+def unique_dir_for_description(system_dir):
+    system_id_path = os.path.join(system_dir, "system_id.yaml")
+    with open(system_id_path, "r") as f:
+        data = yaml.safe_load(f)
+    name = data["system"]["name"]
+    spec_hash = data["system"]["config-hash"]
+    return f"{name}-{spec_hash[:7]}"

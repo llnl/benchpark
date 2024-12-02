@@ -28,7 +28,7 @@ class Saxpy(Experiment, OpenMPExperiment, CudaExperiment, ROCmExperiment, Calipe
     def compute_applications_section(self):
         # GPU tests include some smaller sizes
         n = ["512", "1024"]
-        if self.spec.satisfies("openmp=oui"):
+        if self.spec.satisfies("+openmp"):
             self.add_experiment_variable("n_nodes", ["1", "2"], True)
             self.add_experiment_variable("n_ranks", "8")
             self.add_experiment_variable("n_threads_per_proc", ["2", "4"], True)
