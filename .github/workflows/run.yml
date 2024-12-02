@@ -289,9 +289,10 @@ jobs:
         run: |
           ./bin/benchpark experiment init --dest=gpcnet-mpi-only2 gpcnet
           ./bin/benchpark setup gpcnet-mpi-only2 ./tioga-system workspace/
+          system_id=$(./bin/benchpark system id ./tioga-system)
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/gpcnet-mpi-only2/Tioga-975af3c/workspace \
+            --workspace-dir "workspace/gpcnet-mpi-only2/$tioga-system/workspace" \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
