@@ -11,7 +11,7 @@ from benchpark.directives import variant
 from benchpark.system import System
 
 
-class Sierra(System):
+class LlnlSierra(System):
     variant(
         "cuda",
         default="11-8-0",
@@ -48,7 +48,7 @@ class Sierra(System):
         }
 
     def external_pkg_configs(self):
-        externals = Sierra.resource_location / "externals"
+        externals = LlnlSierra.resource_location / "externals"
 
         compiler = self.spec.variants["compiler"][0]
         cuda_ver = self.spec.variants["cuda"][0]
