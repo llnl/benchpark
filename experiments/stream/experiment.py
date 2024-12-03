@@ -9,6 +9,7 @@ from benchpark.experiment import Experiment
 from benchpark.scaling import ThroughputScaling
 from benchpark.expr.builtin.caliper import Caliper
 
+
 class Stream(
     Experiment,
     ThroughputScaling,
