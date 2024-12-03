@@ -20,10 +20,28 @@ from benchpark.debug import debug_print
 from benchpark.runtime import RuntimeResources
 import benchpark.system
 
-bootstrapper = RuntimeResources(benchpark.paths.benchpark_home)  # noqa
-bootstrapper.bootstrap()  # noqa
 
-import llnl.util.link_tree  # noqa
+# Note: it would be nice to vendor spack.llnl.util.link_tree, but that
+# involves pulling in most of llnl/util/ and spack/util/
+def symlink_tree(src, dst, include_fn=None):
+    """Like ``cp -R`` but instead of files, create symlinks"""
+    src = os.path.abspath(src)
+    dst = os.path.abspath(dst)
+    # By default, we include all filenames
+    include_fn = include_fn or (lambda f: True)
+    for x in [src, dst]:
+        if not os.path.isdir(x):
+            raise ValueError(f"Not a directory: {x}")
+    for src_subdir, directories, files in os.walk(src):
+        relative_src_dir = pathlib.Path(os.path.relpath(src_subdir, src))
+        dst_dir = pathlib.Path(dst) / relative_src_dir
+        dst_dir.mkdir(parents=True, exist_ok=True)
+        for x in files:
+            if not include_fn(x):
+                continue
+            dst_symlink = dst_dir / x
+            src_file = os.path.join(src_subdir, x)
+            os.symlink(src_file, dst_symlink)
 
 
 def setup_parser(root_parser):
@@ -168,25 +186,23 @@ def command(args):
     ramble_logs_dir.mkdir(parents=True)
     ramble_spack_experiment_configs_dir.mkdir(parents=True)
 
-    def ignore_fn(fname):
+    def include_fn(fname):
         # Only include .yaml files
         # Always exclude files that start with "."
         if fname.startswith("."):
-            return True
-        if fname.endswith(".yaml"):
             return False
-        return True
+        if fname.endswith(".yaml"):
+            return True
+        return False
 
-    configs_tree = llnl.util.link_tree.LinkTree(configs_src_dir)
-    experiment_tree = llnl.util.link_tree.LinkTree(experiment_src_dir)
-    modifier_tree = llnl.util.link_tree.LinkTree(modifier_config_dir)
-    for tree in (configs_tree, experiment_tree, modifier_tree):
-        tree.merge(ramble_configs_dir, ignore=ignore_fn)
-
-    systems_tree = llnl.util.link_tree.LinkTree(
-        source_dir / "legacy" / "systems" / "common"
+    symlink_tree(configs_src_dir, ramble_configs_dir, include_fn)
+    symlink_tree(experiment_src_dir, ramble_configs_dir, include_fn)
+    symlink_tree(modifier_config_dir, ramble_configs_dir, include_fn)
+    symlink_tree(
+        source_dir / "legacy" / "systems" / "common",
+        ramble_spack_experiment_configs_dir,
+        include_fn,
     )
-    systems_tree.merge(ramble_spack_experiment_configs_dir, ignore=ignore_fn)
 
     template_name = "execute_experiment.tpl"
     experiment_template_options = [
