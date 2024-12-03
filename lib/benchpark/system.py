@@ -26,36 +26,10 @@ bootstrapper.bootstrap()  # noqa
 import ramble.config as cfg  # noqa
 import ramble.language.language_helpers  # noqa
 import ramble.language.shared_language  # noqa
+
 import spack.util.spack_yaml as syaml  # noqa
-
-# We cannot import this the normal way because it from modern Spack
-# and mixing modern Spack modules with ramble modules that depend on
-# ancient Spack will cause errors. This module is safe to load as an
-# individual because it is not used by Ramble
-# The following code block implements the line
-# import spack.schema.packages as packages_schema
-schemas = {
-    "spack.schema.packages": f"{bootstrapper.spack_location}/lib/spack/spack/schema/packages.py",
-    "spack.schema.compilers": f"{bootstrapper.spack_location}/lib/spack/spack/schema/compilers.py",
-}
-
-
-def load_schema(schema_id, schema_path):
-    schema_spec = importlib.util.spec_from_file_location(schema_id, schema_path)
-    schema = importlib.util.module_from_spec(schema_spec)
-    sys.modules[schema_id] = schema
-    schema_spec.loader.exec_module(schema)
-    return schema
-
-
-packages_schema = load_schema(
-    "spack.schema.packages",
-    f"{bootstrapper.spack_location}/lib/spack/spack/schema/packages.py",
-)
-compilers_schema = load_schema(
-    "spack.schema.compilers",
-    f"{bootstrapper.spack_location}/lib/spack/spack/schema/compilers.py",
-)
+import spack.schema.packages as packages_schema  # noqa
+import spack.schema.compilers as compilers_schema  # noqa
 
 
 _repo_path = benchpark.repo.paths[benchpark.repo.ObjectTypes.systems]
