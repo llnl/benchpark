@@ -3,6 +3,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import pathlib
+
 from benchpark.system import System
 from benchpark.directives import variant
 
@@ -28,7 +30,7 @@ id_to_resources = {
 }
 
 
-class Aws(System):
+class AwsPcluster(System):
     variant(
         "instance_type",
         values=("c6g.xlarge", "c4.xlarge", "hpc7a.48xlarge", "hpc6a.48xlarge"),
@@ -44,8 +46,16 @@ class Aws(System):
         for k, v in attrs.items():
             setattr(self, k, v)
 
+    def system_specific_variables(self):
+        return {
+            "extra_cmd_opts": """|
+    --mpi=pmix
+    --export=ALL,FI_EFA_USE_DEVICE_RDMA=1,FI_PROVIDER="efa",OMPI_MCA_mtl_base_verbose=100'
+"""
+        }
+
     def external_pkg_configs(self):
-        externals = LlnlElcapitan.resource_location / "externals"
+        externals = AwsPcluster.resource_location / "externals"
 
         selections = [
             externals / "base" / "00-packages.yaml",
@@ -54,13 +64,21 @@ class Aws(System):
         return selections
 
     def compiler_configs(self):
-        compilers = LlnlElcapitan.resource_location / "compilers"
+        compilers = AwsPcluster.resource_location / "compilers"
 
         selections = [
             compilers / "gcc" / "00-gcc-7-compilers.yaml",
         ]
 
         return selections
+
+    def generate_description(self, output_dir):
+        super().generate_description(output_dir)
+
+        sw_description = pathlib.Path(output_dir) / "software.yaml"
+
+        with open(sw_description, "w") as f:
+            f.write(self.sw_description())
 
     def sw_description(self):
         return """\
