@@ -178,7 +178,7 @@ def command(args):
         return True
 
     configs_tree = llnl.util.link_tree.LinkTree(configs_src_dir)
-    experiment_tree = llnl.util.link_tree.LinkTree(experiments_src_dir)
+    experiment_tree = llnl.util.link_tree.LinkTree(experiment_src_dir)
     modifier_tree = llnl.util.link_tree.LinkTree(modifier_config_dir)
     for tree in (configs_tree, experiment_tree, modifier_tree):
         tree.merge(ramble_configs_dir, ignore=ignore_fn)
