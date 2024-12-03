@@ -384,6 +384,17 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
+      - name: Dry run dynamic saxpy/openmp with dynamic aws
+        run: |
+          ./bin/benchpark system init --dest=aws1 aws-pcluster instance_type=hpc6a.48xlarge
+          ./bin/benchpark setup ./saxpy-omp-generic ./aws1 workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir "workspace/saxpy-omp-generic/aws1/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
       - name: Dry run dynamic remhos/mpi with dynamic llnl-cluster ruby
         run: |
           ./bin/benchpark experiment init --dest=remhos-ruby remhos
