@@ -7,6 +7,7 @@ from contextlib import contextmanager
 import os
 import pathlib
 import shlex
+import stat
 import subprocess
 import sys
 
@@ -82,9 +83,28 @@ class RuntimeResources:
         self.spack_location = self.dest / "spack"
 
     def bootstrap(self):
+        # Bootstrap Spack first because we will use Spack resources while bootstrapping ramble
+        if not self.spack_location.exists():
+            self._install_spack()
+
+        spack_lib_path = self.spack_location / "lib" / "spack"
+        externals = str(spack_lib_path / "external")
+        if externals not in sys.path:
+            sys.path.insert(1, externals)
+        internals = str(spack_lib_path)
+        if internals not in sys.path:
+            sys.path.insert(1, internals)
+
         if not self.ramble_location.exists():
             self._install_ramble()
+
         ramble_lib_path = self.ramble_location / "lib" / "ramble"
+
+        # If ramble is present but not yet name mangled, do that
+        ramble_spack_path = ramble_lib_path / "ramble_spack"
+        if not ramble_spack_path.exists():
+            self._mangle_ramble()
+
         externals = str(ramble_lib_path / "external")
         if externals not in sys.path:
             sys.path.insert(1, externals)
@@ -92,11 +112,23 @@ class RuntimeResources:
         if internals not in sys.path:
             sys.path.insert(1, internals)
 
-        # Spack does not go in sys.path, but we will manually access modules from it
-        # The reason for this oddity is that spack modules will compete with the internal
-        # spack modules from ramble
-        if not self.spack_location.exists():
-            self._install_spack()
+    def _mangle_ramble(self):
+        """Name mangle ramble spack.* symbols to allow separate spack imports."""
+        import llnl.util.filesystem as fs
+
+        files = [
+            f
+            for f in fs.find(self.ramble_location, "*")
+            if os.stat(f).st_mode & stat.S_IWUSR and not os.path.isdir(f)
+        ]
+        file_filter = fs.FileFilter(*files)
+        # Don't replace if it's already replaced or if it's a field in an existing module
+        file_filter.filter(r"(?<!_|\.)spack\.", "ramble_spack.")
+        file_filter.filter(r"(?<!_)llnl\.", "ramble_llnl.")
+
+        ramble_lib_path = self.ramble_location / "lib" / "ramble"
+        os.rename(ramble_lib_path / "spack", ramble_lib_path / "ramble_spack")
+        os.rename(ramble_lib_path / "llnl", ramble_lib_path / "ramble_llnl")
 
     def _install_ramble(self):
         print(f"Cloning Ramble to {self.ramble_location}")
