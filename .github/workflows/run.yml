@@ -586,3 +586,15 @@ jobs:
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
+
+      - name: Dry run dynamic stream/openmp with dynamic CTS ruby
+        run: |
+          system_id=$(./bin/benchpark system id ./ruby-system)
+          ./bin/benchpark experiment init --dest=stream stream
+          ./bin/benchpark setup stream ./ruby-system workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/stream/$system_id/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run

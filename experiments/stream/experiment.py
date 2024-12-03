@@ -6,7 +6,6 @@
 from benchpark.error import BenchparkError
 from benchpark.directives import variant
 from benchpark.experiment import Experiment
-from benchpark.scaling import StrongScaling
 from benchpark.scaling import ThroughputScaling
 from benchpark.expr.builtin.caliper import Caliper
 
@@ -42,14 +41,14 @@ class Stream(
 
         array_size = {"s": 32000000}
 
-        self.add_experiment_variable("processes_per_node", '1', True)
-        self.add_experiment_variable("n", '35', True)
-        self.add_experiment_variable("o", '0', True)
-        self.add_experiment_variable("n_ranks", '{sys_cores_per_node}', True)
+        self.add_experiment_variable("processes_per_node", "1", True)
+        self.add_experiment_variable("n", "35", True)
+        self.add_experiment_variable("o", "0", True)
+        self.add_experiment_variable("n_ranks", "{sys_cores_per_node}", True)
+
         if self.spec.satisfies("+single_node"):
             for pk, pv in array_size.items():
                 self.add_experiment_variable(pk, pv, True)
-            #self.add_experiment_variable("n_ranks", "1", True)
 
         elif self.spec.satisfies("+throughput"):
             scaled_variables = self.generate_throughput_scaling_params(
@@ -73,4 +72,6 @@ class Stream(
         # set package spack specs
         self.add_spack_spec(system_specs["mpi"])
 
-        self.add_spack_spec(self.name, [f"stream@{app_version}", system_specs["compiler"]])
+        self.add_spack_spec(
+            self.name, [f"stream@{app_version}", system_specs["compiler"]]
+        )
