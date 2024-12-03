@@ -48,10 +48,7 @@ class AwsPcluster(System):
 
     def system_specific_variables(self):
         return {
-            "extra_cmd_opts": """|
-    --mpi=pmix
-    --export=ALL,FI_EFA_USE_DEVICE_RDMA=1,FI_PROVIDER="efa",OMPI_MCA_mtl_base_verbose=100'
-"""
+            "extra_cmd_opts": '--mpi=pmix --export=ALL,FI_EFA_USE_DEVICE_RDMA=1,FI_PROVIDER="efa",OMPI_MCA_mtl_base_verbose=100',
         }
 
     def external_pkg_configs(self):
