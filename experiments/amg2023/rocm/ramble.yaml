@@ -35,30 +35,7 @@ ramble:
                 nz: ['120', '120', '120']
                 env_name: 'amg2023-gpu'
                 n_gpus: '{px}*{py}*{pz}'
-            'amg2023_rocm_strong_problem1_120_{px}_{py}_{pz}_{nx}_{ny}_{nz}':
-              variants:
                 package_manager: spack
-              variables:
-                px: ['2', '4', '4', '4']
-                py: ['2', '2', '4', '4']
-                pz: ['2', '2', '2', '4']
-                nx: ['60', '30','30', '30']
-                ny: ['60', '60', '30', '30']
-                nz: ['60', '60', '60', '30']
-                env_name: 'amg2023-gpu'
-                n_gpus: '{px}*{py}*{pz}'
-            'amg2023_rocm_strong_problem1_160_{px}_{py}_{pz}_{nx}_{ny}_{nz}':
-              variants:
-                package_manager: spack
-              variables:
-                px: ['2', '4', '4', '4']
-                py: ['2', '2', '4', '4']
-                pz: ['2', '2', '2', '4']
-                nx: ['80', '40','40', '40']
-                ny: ['80', '80', '40', '40']
-                nz: ['80', '80', '80', '40']
-                env_name: 'amg2023-gpu'
-                n_gpus: '{px}*{py}*{pz}'
             'amg2023_rocm_strong_problem1_200_{px}_{py}_{pz}_{nx}_{ny}_{nz}':
               variants:
                 package_manager: spack
@@ -69,6 +46,30 @@ ramble:
                 nx: ['100', '50','50', '50']
                 ny: ['100', '100', '50', '50']
                 nz: ['100', '100', '100', '50']
+                env_name: 'amg2023-gpu'
+                n_gpus: '{px}*{py}*{pz}'
+            'amg2023_rocm_strong_problem1_256_{px}_{py}_{pz}_{nx}_{ny}_{nz}':
+              variants:
+                package_manager: spack
+              variables:
+                px: ['2', '4', '4', '4']
+                py: ['2', '2', '4', '4']
+                pz: ['2', '2', '2', '4']
+                nx: ['128', '64','64', '64']
+                ny: ['128', '128', '64', '64']
+                nz: ['128', '128', '128', '64']
+                env_name: 'amg2023-gpu'
+                n_gpus: '{px}*{py}*{pz}'
+            'amg2023_rocm_strong_problem1_320_{px}_{py}_{pz}_{nx}_{ny}_{nz}':
+              variants:
+                package_manager: spack
+              variables:
+                px: ['2', '4', '4', '4']
+                py: ['2', '2', '4', '4']
+                pz: ['2', '2', '2', '4']
+                nx: ['160', '80','80', '80']
+                ny: ['160', '160', '80', '80']
+                nz: ['160', '160', '160', '80']
                 env_name: 'amg2023-gpu'
                 n_gpus: '{px}*{py}*{pz}'
             'amg2023_rocm_weak_60_problem1_{px}_{py}_{pz}_{nx}_{ny}_{nz}':
@@ -83,16 +84,16 @@ ramble:
                 nz: '60'
                 env_name: 'amg2023-gpu'
                 n_gpus: '{px}*{py}*{pz}'
-            'amg2023_rocm_weak_40_problem1_{px}_{py}_{pz}_{nx}_{ny}_{nz}':
+            'amg2023_rocm_weak_80_problem1_{px}_{py}_{pz}_{nx}_{ny}_{nz}':
               variants:
                 package_manager: spack
               variables:
                 px: ['2', '4', '4', '4']
                 py: ['2', '2', '4', '4']
                 pz: ['2', '2', '2', '4']
-                nx: '40'
-                ny: '40'
-                nz: '40'
+                nx: '80'
+                ny: '80'
+                nz: '80'
                 env_name: 'amg2023-gpu'
                 n_gpus: '{px}*{py}*{pz}'
         problem2:
