@@ -28,7 +28,7 @@ ramble:
             n_gpus: '{npx}*{npy}*{npz}'
             arch: 'HIP'
           experiments:
-            kripke_rocm_strong_{n_nodes}_{ngroups}_{gs}_{nquad}_{ds}_{lorder}_{nzx}_{nzy}_{nzz}_{npx}_{npy}_{npz}:
+            kripke_rocm_strong_64_{n_nodes}_{ngroups}_{gs}_{nquad}_{ds}_{lorder}_{nzx}_{nzy}_{nzz}_{npx}_{npy}_{npz}:
               variants:
                 package_manager: spack
               variables:
@@ -43,7 +43,37 @@ ramble:
                 npx: ['2', '2', '4', '4']
                 npy: ['2', '2', '2', '4']
                 npz: ['1', '2', '2', '2']
-            kripke_rocm_weak_{n_nodes}_{ngroups}_{gs}_{nquad}_{ds}_{lorder}_{nzx}_{nzy}_{nzz}_{npx}_{npy}_{npz}:
+            kripke_rocm_strong_128_{n_nodes}_{ngroups}_{gs}_{nquad}_{ds}_{lorder}_{nzx}_{nzy}_{nzz}_{npx}_{npy}_{npz}:
+              variants:
+                package_manager: spack
+              variables:
+                ngroups: 64
+                gs: 1
+                nquad: 128
+                ds: 128
+                lorder: 4
+                nzx: '128'
+                nzy: '128'
+                nzz: '64'
+                npx: ['2', '2', '4', '4']
+                npy: ['2', '2', '2', '4']
+                npz: ['1', '2', '2', '2']
+            kripke_rocm_strong_256{n_nodes}_{ngroups}_{gs}_{nquad}_{ds}_{lorder}_{nzx}_{nzy}_{nzz}_{npx}_{npy}_{npz}:
+              variants:
+                package_manager: spack
+              variables:
+                ngroups: 64
+                gs: 1
+                nquad: 128
+                ds: 128
+                lorder: 4
+                nzx: '256'
+                nzy: '256'
+                nzz: '64'
+                npx: ['2', '2', '4', '4']
+                npy: ['2', '2', '2', '4']
+                npz: ['1', '2', '2', '2']
+            kripke_rocm_weak_64_{n_nodes}_{ngroups}_{gs}_{nquad}_{ds}_{lorder}_{nzx}_{nzy}_{nzz}_{npx}_{npy}_{npz}:
               variants:
                 package_manager: spack
               variables:
@@ -58,6 +88,37 @@ ramble:
                 npx: ['2', '2', '4', '4']
                 npy: ['2', '2', '2', '4']
                 npz: ['1', '2', '2', '2']
+            kripke_rocm_weak_128_{n_nodes}_{ngroups}_{gs}_{nquad}_{ds}_{lorder}_{nzx}_{nzy}_{nzz}_{npx}_{npy}_{npz}:
+              variants:
+                package_manager: spack
+              variables:
+                ngroups: 64
+                gs: 1
+                nquad: 128
+                ds: 128
+                lorder: 4
+                nzx: ['128', '128', '256', '256']
+                nzy: ['128', '128', '128', '256']
+                nzz: ['64', '128', '128', '128']
+                npx: ['2', '2', '4', '4']
+                npy: ['2', '2', '2', '4']
+                npz: ['1', '2', '2', '2']
+            kripke_rocm_weak_256_{n_nodes}_{ngroups}_{gs}_{nquad}_{ds}_{lorder}_{nzx}_{nzy}_{nzz}_{npx}_{npy}_{npz}:
+              variants:
+                package_manager: spack
+              variables:
+                ngroups: 64
+                gs: 1
+                nquad: 128
+                ds: 128
+                lorder: 4
+                nzx: ['256', '256', '512', '512']
+                nzy: ['256', '256', '256', '512']
+                nzz: ['64', '256', '256', '256']
+                npx: ['2', '2', '4', '4']
+                npy: ['2', '2', '2', '4']
+                npz: ['1', '2', '2', '2']
+
   software:
     packages:
       kripke:
