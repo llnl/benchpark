@@ -72,28 +72,17 @@ ramble:
                 nz: ['160', '160', '160', '80']
                 env_name: 'amg2023-gpu'
                 n_gpus: '{px}*{py}*{pz}'
-            'amg2023_rocm_weak_60_problem1_{px}_{py}_{pz}_{nx}_{ny}_{nz}':
+            'amg2023_rocm_weak_64_problem1_n_nodes_{px}_{py}_{pz}_{nx}_{ny}_{nz}':
               variants:
                 package_manager: spack
               variables:
-                px: ['2', '4', '4', '4']
-                py: ['2', '2', '4', '4']
-                pz: ['2', '2', '2', '4']
-                nx: '60'
-                ny: '60'
-                nz: '60'
-                env_name: 'amg2023-gpu'
-                n_gpus: '{px}*{py}*{pz}'
-            'amg2023_rocm_weak_80_problem1_{px}_{py}_{pz}_{nx}_{ny}_{nz}':
-              variants:
-                package_manager: spack
-              variables:
-                px: ['2', '4', '4', '4']
-                py: ['2', '2', '4', '4']
-                pz: ['2', '2', '2', '4']
-                nx: '80'
-                ny: '80'
-                nz: '80'
+                px: ['2', '4', '4']
+                py: ['2', '2', '4']
+                pz: ['2', '2', '2']
+                nx: '64'
+                ny: '64'
+                nz: '64'
+                n_nodes: ['1', '2', '4']
                 env_name: 'amg2023-gpu'
                 n_gpus: '{px}*{py}*{pz}'
         problem2:
