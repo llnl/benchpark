@@ -61,7 +61,7 @@ ramble:
   software:
     packages:
       kripke:
-        pkg_spec: kripke@develop +mpi+rocm{modifier_spack_variant} ^chai@2024.02
+        pkg_spec: kripke@comm_cali +mpi+rocm{modifier_spack_variant} ^chai@2024.02
         compiler: default-compiler
     environments:
       kripke:
