@@ -425,6 +425,9 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage, RocmConsistency):
                 env.append_flags("LDFLAGS", self.spec["mpi"].extra_attributes["ldflags"])
 
     def setup_build_environment(self, env):
+        if self.compiler.extra_rpaths:
+            for rpath in self.compiler.extra_rpaths:
+                env.prepend_path("LD_LIBRARY_PATH", rpath)
         if "+mpi" in self.spec:
             if self.spec["mpi"].extra_attributes and "ldflags" in self.spec["mpi"].extra_attributes:
                 env.append_flags("LDFLAGS", self.spec["mpi"].extra_attributes["ldflags"])
@@ -522,13 +525,14 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
                 options.extend(
                     [
                         "-DGMX_ENABLE_DIRECT_GPU_COMM=ON",
+                        "-DGMX_FORCE_GPU_AWARE_MPI=OFF",
                     ]
                 )
             elif 'force' in self.spec.variants['gpu-aware-mpi'].value:
                 options.extend(
                     [
                         "-DGMX_ENABLE_DIRECT_GPU_COMM=ON",
-                        "-DGMX_FORCE_GPU_AWARE_MPI=OFF",
+                        "-DGMX_FORCE_GPU_AWARE_MPI=ON",
                     ]
                 )
             if self.spec["mpi"].extra_attributes and "ldflags" in self.spec["mpi"].extra_attributes:
