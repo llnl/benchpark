@@ -89,6 +89,16 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage, RocmConsistency):
     variant(
         "mpi", default=True, description="Activate MPI support (disable for Thread-MPI support)"
     )
+    # off: turn off GPU-aware MPI
+    # on: turn on, but allow groamcs to disable it if GPU-aware MPI is not supported
+    # force: turn on and force gromacs to use GPU-aware MPI. May result in error if unsupported
+    variant(
+        "gpu-aware-mpi",
+        default="on",
+        values=("on", "off", "force"),
+        when="@2021: +mpi",
+        description="Use GPU-aware MPI",
+    )
     variant("shared", default=True, description="Enables the build of shared libraries")
     variant(
         "double",
@@ -279,6 +289,9 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage, RocmConsistency):
     depends_on("cmake@3.16.0:3", type="build", when="%fj")
     depends_on("cuda", when="+cuda")
 
+    for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
+        requires(f"^hipsycl@23.10.0+rocm amdgpu_target={target}", when=f"gromacs@2024+rocm amdgpu_target={target}")
+
     with when("+rocm"):
         depends_on("sycl")
         depends_on("hip")
@@ -407,6 +420,14 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage, RocmConsistency):
         if self.compiler.extra_rpaths:
             for rpath in self.compiler.extra_rpaths:
                 env.prepend_path("LD_LIBRARY_PATH", rpath)
+        if "+mpi" in self.spec:
+            if self.spec["mpi"].extra_attributes and "ldflags" in self.spec["mpi"].extra_attributes:
+                env.append_flags("LDFLAGS", self.spec["mpi"].extra_attributes["ldflags"])
+
+    def setup_build_environment(self, env):
+        if "+mpi" in self.spec:
+            if self.spec["mpi"].extra_attributes and "ldflags" in self.spec["mpi"].extra_attributes:
+                env.append_flags("LDFLAGS", self.spec["mpi"].extra_attributes["ldflags"])
 
 class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
     @run_after("build")
@@ -495,6 +516,25 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
                         "-DCMAKE_CXX_COMPILER=%s" % gmx_cxx,
                         "-DMPI_C_COMPILER=%s" % self.spec["mpi"].mpicc,
                         "-DMPI_CXX_COMPILER=%s" % self.spec["mpi"].mpicxx,
+                    ]
+                )
+            if 'on' in self.spec.variants['gpu-aware-mpi'].value:
+                options.extend(
+                    [
+                        "-DGMX_ENABLE_DIRECT_GPU_COMM=ON",
+                    ]
+                )
+            elif 'force' in self.spec.variants['gpu-aware-mpi'].value:
+                options.extend(
+                    [
+                        "-DGMX_ENABLE_DIRECT_GPU_COMM=ON",
+                        "-DGMX_FORCE_GPU_AWARE_MPI=OFF",
+                    ]
+                )
+            if self.spec["mpi"].extra_attributes and "ldflags" in self.spec["mpi"].extra_attributes:
+                options.extend(
+                    [
+                        "-DCMAKE_EXE_LINKER_FLAGS=%s" % self.spec["mpi"].extra_attributes["ldflags"],
                     ]
                 )
         else:

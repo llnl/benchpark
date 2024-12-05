@@ -12,7 +12,7 @@ id_to_resources = {
     "tioga": {
         "rocm_arch": "gfx90a",
         "sys_cores_per_node": 64,
-        "sys_gpus_per_node": 4,
+        "sys_gpus_per_node": 8,
     },
     "elcapitan": {
         "rocm_arch": "gfx940",
@@ -52,6 +52,20 @@ class LlnlElcapitan(System):
         description="Use GTL-enabled MPI",
     )
 
+    variant(
+        "lapack",
+        default="intel-oneapi-mkl",
+        values=("intel-oneapi-mkl", "rocsolver"),
+        description="Which lapack to use",
+    )
+
+    variant(
+        "blas",
+        default="intel-oneapi-mkl",
+        values=("intel-oneapi-mkl", "rocblas"),
+        description="Which blas to use",
+    )
+
     def initialize(self):
         super().initialize()
 
@@ -71,23 +85,19 @@ class LlnlElcapitan(System):
     def external_pkg_configs(self):
         externals = LlnlElcapitan.resource_location / "externals"
 
-        rocm = self.spec.variants["rocm"][0]
-        gtl = self.spec.variants["gtl"][0]
-        compiler = self.spec.variants["compiler"][0]
-
         selections = [externals / "base" / "00-packages.yaml"]
-        if rocm == "543":
+        if self.spec.satisfies("rocm=543"):
             selections.append(externals / "rocm" / "00-version-543-packages.yaml")
-        elif rocm == "551":
+        elif self.spec.satisfies("rocm=551"):
             selections.append(externals / "rocm" / "01-version-551-packages.yaml")
 
-        if compiler == "cce":
-            if gtl == "true":
+        if self.spec.satisfies("compiler=cce"):
+            if self.spec.satisfies("+gtl"):
                 selections.append(externals / "mpi" / "02-cce-ygtl-packages.yaml")
             else:
                 selections.append(externals / "mpi" / "01-cce-ngtl-packages.yaml")
             selections.append(externals / "libsci" / "01-cce-packages.yaml")
-        elif compiler == "gcc":
+        elif self.spec.satisfies("compiler=gcc"):
             selections.append(externals / "mpi" / "00-gcc-ngtl-packages.yaml")
             selections.append(externals / "libsci" / "00-gcc-packages.yaml")
 
@@ -96,17 +106,14 @@ class LlnlElcapitan(System):
     def compiler_configs(self):
         compilers = LlnlElcapitan.resource_location / "compilers"
 
-        compiler = self.spec.variants["compiler"][0]
-        # rocm = self.spec.variants["rocm"][0]
-
         selections = []
         # TODO: I'm not actually sure what compiler mixing is desired, if any
         # so I don't think the choices here make much sense, but this
         # demonstrate how system spec variants can be used to choose what
         # configuration to construct
-        if compiler == "cce":
+        if self.spec.satisfies("compiler=cce"):
             selections.append(compilers / "rocm" / "00-rocm-551-compilers.yaml")
-        elif compiler == "gcc":
+        elif self.spec.satisfies("compiler=gcc"):
             selections.append(compilers / "gcc" / "00-gcc-12-compilers.yaml")
 
         return selections
@@ -123,13 +130,18 @@ class LlnlElcapitan(System):
         will fail if these variables are not defined though, so for now
         they are still generated (but with more-generic values).
         """
-        return """\
+
+        return f"""\
 software:
   packages:
     default-compiler:
       pkg_spec: cce
     default-mpi:
       pkg_spec: cray-mpich
+    default-lapack:
+      pkg_spec: {self.spec.variants["lapack"][0]}
+    default-blas:
+      pkg_spec: {self.spec.variants["blas"][0]}
     compiler-rocm:
       pkg_spec: cce
     compiler-amdclang:
@@ -150,6 +162,4 @@ software:
       pkg_spec: cray-mpich~gtl
     mpi-gcc:
       pkg_spec: cray-mpich~gtl
-    fftw:
-      pkg_spec: intel-oneapi-mkl
 """
