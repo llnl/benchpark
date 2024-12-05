@@ -2,10 +2,10 @@ compilers:
 - compiler:
     spec: gcc@12.1.0
     paths:
-      cc: /usr/workspace/knox10/addingEx/benchpark/workspace/spack/opt/spack/linux-rhel8-cascadelake/gcc-10.3.1/gcc-12.1.0-66hd6a2pz3qd5ri64ejfhuesvqvbn75n/bin/gcc
-      cxx: /usr/workspace/knox10/addingEx/benchpark/workspace/spack/opt/spack/linux-rhel8-cascadelake/gcc-10.3.1/gcc-12.1.0-66hd6a2pz3qd5ri64ejfhuesvqvbn75n/bin/g++
-      f77: /usr/workspace/knox10/addingEx/benchpark/workspace/spack/opt/spack/linux-rhel8-cascadelake/gcc-10.3.1/gcc-12.1.0-66hd6a2pz3qd5ri64ejfhuesvqvbn75n/bin/gfortran
-      fc: /usr/workspace/knox10/addingEx/benchpark/workspace/spack/opt/spack/linux-rhel8-cascadelake/gcc-10.3.1/gcc-12.1.0-66hd6a2pz3qd5ri64ejfhuesvqvbn75n/bin/gfortran
+      cc: /usr/workspace/asde/qsExperimentPackages/linux-rhel8-cascadelake/gcc-12.2.1/gcc-12.1.0-dgytc2lghfuh6hkdkisswas2oio3ospo/bin/gcc
+      cxx: /usr/workspace/asde/qsExperimentPackages/linux-rhel8-cascadelake/gcc-12.2.1/gcc-12.1.0-dgytc2lghfuh6hkdkisswas2oio3ospo/bin/g++
+      f77: /usr/workspace/asde/qsExperimentPackages/linux-rhel8-cascadelake/gcc-12.2.1/gcc-12.1.0-dgytc2lghfuh6hkdkisswas2oio3ospo/bin/gfortran
+      fc: /usr/workspace/asde/qsExperimentPackages/linux-rhel8-cascadelake/gcc-12.2.1/gcc-12.1.0-dgytc2lghfuh6hkdkisswas2oio3ospo/bin/gfortran
     flags: {}
     operating_system: rhel8
     target: x86_64

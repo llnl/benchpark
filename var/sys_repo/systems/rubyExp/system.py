@@ -80,7 +80,9 @@ class Rubyexp(System):
             selections.append(compilers / "intel" / "00-intel-2021-6-0-compilers.yaml")
         elif compiler == "gccSpack":
             selections.append(compilers / "gccSpack" / "00-gcc-spack-compilers.yaml")
+
         return selections
+
 
     def sw_description(self):
         """This is somewhat vestigial, and maybe deleted later. The experiments
@@ -91,11 +93,11 @@ class Rubyexp(System):
 software:
   packages:
     default-compiler:
-      pkg_spec: gcc
+      pkg_spec: gcc@12
     default-mpi:
       pkg_spec: mvapich2
     compiler-gcc:
-      pkg_spec: gcc
+      pkg_spec: gcc@12
     compiler-intel:
       pkg_spec: intel
     blas:

@@ -8,9 +8,11 @@ benchpark system init --dest=daneTCE rubyExp cluster=dane compiler=gcc
 benchpark system init --dest=daneSpack rubyExp cluster=dane compiler=gccSpack
 benchpark experiment init --dest=quicksilvergcc12O2weak1 quicksilver experiment=weak caliper=mpi
 benchpark setup quicksilvergcc12O2weak1 daneTCE workspace
+cp config.yaml workspace/spack/etc/spack/defaults/config.yaml
 . workspace/setup.sh
 spack install gcc@12.1.0
-for runNum in {1..2}
+spack load gcc@12.1.0
+for runNum in {1..5}
 do 
     for j in ${optParams[@]}
     do
@@ -25,6 +27,7 @@ do
                     ramble -P -D ./workspace/quicksilver$i$j$scale$runNum/Rubyexp-957b932/workspace workspace setup
 
                 else
+
                     benchpark setup quicksilver$i$j$scale$runNum daneSpack workspace
                     ramble -P -D ./workspace/quicksilver$i$j$scale$runNum/Rubyexp-fd15164/workspace workspace setup
                 fi
