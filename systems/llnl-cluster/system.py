@@ -37,6 +37,18 @@ class LlnlCluster(System):
         description="Which compiler to use",
     )
 
+    variant(
+        "lapack",
+        default="intel-oneapi-mkl",
+        description="Which lapack to use",
+    )
+
+    variant(
+        "blas",
+        default="intel-oneapi-mkl",
+        description="Which blas to use",
+    )
+
     def initialize(self):
         super().initialize()
 
@@ -56,13 +68,11 @@ class LlnlCluster(System):
     def external_pkg_configs(self):
         externals = LlnlCluster.resource_location / "externals"
 
-        compiler = self.spec.variants["compiler"][0]
-
         selections = [externals / "base" / "00-packages.yaml"]
 
-        if compiler == "gcc":
+        if self.spec.satisfies("compiler=gcc"):
             selections.append(externals / "mpi" / "00-gcc-packages.yaml")
-        elif compiler == "intel":
+        elif self.spec.satisfies("compiler=intel"):
             selections.append(externals / "mpi" / "01-intel-packages.yaml")
 
         return selections
@@ -70,12 +80,10 @@ class LlnlCluster(System):
     def compiler_configs(self):
         compilers = LlnlCluster.resource_location / "compilers"
 
-        compiler = self.spec.variants["compiler"][0]
-
         selections = []
-        if compiler == "gcc":
+        if self.spec.satisfies("compiler=gcc"):
             selections.append(compilers / "gcc" / "00-gcc-12-compilers.yaml")
-        elif compiler == "intel":
+        elif self.spec.satisfies("compiler=intel"):
             selections.append(compilers / "intel" / "00-intel-2021-6-0-compilers.yaml")
 
         return selections
@@ -85,13 +93,17 @@ class LlnlCluster(System):
         will fail if these variables are not defined though, so for now
         they are still generated (but with more-generic values).
         """
-        return """\
+        return f"""\
 software:
   packages:
     default-compiler:
       pkg_spec: gcc
     default-mpi:
       pkg_spec: mvapich2
+    default-lapack:
+      pkg_spec: {self.spec.variants["lapack"][0]}
+    default-blas:
+      pkg_spec: {self.spec.variants["blas"][0]}
     compiler-gcc:
       pkg_spec: gcc
     compiler-intel:
