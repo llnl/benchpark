@@ -22,7 +22,7 @@ class Quicksilver(Experiment, Caliper):
         variables["n_threads_per_proc"] = "1"
         variables["omp_num_threads"] = "{n_threads_per_proc}"
         variables["n_ranks"] = "{I}*{J}*{K}"
-        variables["n"] = "{x}*{y}*{z}*10"
+        variables["n"] = "{x}*{y}*{z}*30"
         variables["x"] = "{X}"
         variables["y"] = "{Y}"
         variables["z"] = "{Z}"

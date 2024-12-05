@@ -19,7 +19,7 @@ class Quicksilver(ExecutableApplication):
             'mpi',
             'c++','openmp']
 
-    executable('run', 'qs'+
+    executable('run', '--mpibind=v qs'+
             ' -i {i}' +
             ' -X {X}' +
             ' -Y {Y}' +
