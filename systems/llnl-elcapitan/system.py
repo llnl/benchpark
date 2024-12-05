@@ -8,7 +8,6 @@ import pathlib
 from benchpark.directives import variant
 from benchpark.system import System
 
-
 id_to_resources = {
     "tioga": {
         "rocm_arch": "gfx90a",
@@ -23,7 +22,7 @@ id_to_resources = {
 }
 
 
-class Tioga(System):
+class LlnlElcapitan(System):
 
     variant(
         "cluster",
@@ -70,7 +69,7 @@ class Tioga(System):
             f.write(self.sw_description())
 
     def external_pkg_configs(self):
-        externals = Tioga.resource_location / "externals"
+        externals = LlnlElcapitan.resource_location / "externals"
 
         rocm = self.spec.variants["rocm"][0]
         gtl = self.spec.variants["gtl"][0]
@@ -95,7 +94,7 @@ class Tioga(System):
         return selections
 
     def compiler_configs(self):
-        compilers = Tioga.resource_location / "compilers"
+        compilers = LlnlElcapitan.resource_location / "compilers"
 
         compiler = self.spec.variants["compiler"][0]
         # rocm = self.spec.variants["rocm"][0]

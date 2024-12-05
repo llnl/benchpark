@@ -175,7 +175,7 @@ jobs:
 
       - name: Dry run kripke/rocm on dynamic Tioga with allocation modifier
         run: |
-          ./bin/benchpark system init --dest=tioga-system tioga rocm=551 compiler=cce ~gtl
+          ./bin/benchpark system init --dest=tioga-system llnl-elcapitan rocm=551 compiler=cce ~gtl
           ./bin/benchpark setup kripke/rocm ./tioga-system workspace/
           system_id=$(./bin/benchpark system id ./tioga-system)
           . workspace/setup.sh
@@ -198,7 +198,7 @@ jobs:
 
       - name: Dry run dynamic saxpy/rocm with dynamic Tioga
         run: |
-          ./bin/benchpark system init --dest=tioga-system2 tioga rocm=551 compiler=cce ~gtl
+          ./bin/benchpark system init --dest=tioga-system2 llnl-elcapitan rocm=551 compiler=cce ~gtl
           system_id=$(./bin/benchpark system id ./tioga-system2)
           ./bin/benchpark experiment init --dest=saxpy-rocm2 saxpy+rocm
           ./bin/benchpark setup ./saxpy-rocm2 ./tioga-system2 workspace/
@@ -211,7 +211,7 @@ jobs:
 
       - name: Dry run dynamic saxpy/cuda with dynamic Sierra
         run: |
-          ./bin/benchpark system init --dest=sierra-system sierra cuda=10-1-243 compiler=xl
+          ./bin/benchpark system init --dest=sierra-system llnl-sierra cuda=10-1-243 compiler=xl
           system_id=$(./bin/benchpark system id ./sierra-system)
           ./bin/benchpark experiment init --dest=saxpy-cuda saxpy+cuda
           ./bin/benchpark setup ./saxpy-cuda ./sierra-system workspace/
@@ -378,9 +378,9 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic saxpy/openmp with dynamic CTS ruby
+      - name: Dry run dynamic saxpy/openmp with dynamic llnl-cluster ruby
         run: |
-          ./bin/benchpark system init --dest=ruby-system cts cluster=ruby
+          ./bin/benchpark system init --dest=ruby-system llnl-cluster cluster=ruby
           system_id=$(./bin/benchpark system id ./ruby-system)
           ./bin/benchpark experiment init --dest=saxpy-openmp saxpy+openmp
           ./bin/benchpark setup ./saxpy-openmp ./ruby-system workspace/
@@ -391,9 +391,9 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic saxpy/openmp with dynamic CTS dane
+      - name: Dry run dynamic saxpy/openmp with dynamic llnl-cluster dane
         run: |
-          ./bin/benchpark system init --dest=dane-system cts cluster=dane
+          ./bin/benchpark system init --dest=dane-system llnl-cluster cluster=dane
           system_id=$(./bin/benchpark system id ./dane-system)
           ./bin/benchpark experiment init --dest=saxpy-openmp2 saxpy+openmp
           ./bin/benchpark setup ./saxpy-openmp2 ./dane-system workspace/
@@ -404,9 +404,9 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic saxpy/openmp with dynamic CTS magma
+      - name: Dry run dynamic saxpy/openmp with dynamic llnl-cluster magma
         run: |
-          ./bin/benchpark system init --dest=magma-system cts cluster=magma
+          ./bin/benchpark system init --dest=magma-system llnl-cluster cluster=magma
           ./bin/benchpark experiment init --dest=saxpy-openmp3 saxpy+openmp
           ./bin/benchpark setup ./saxpy-openmp3 ./magma-system workspace/
           . workspace/setup.sh
@@ -428,7 +428,18 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic remhos/mpi with dynamic CTS ruby
+      - name: Dry run dynamic saxpy/openmp with dynamic aws
+        run: |
+          ./bin/benchpark system init --dest=aws1 aws-pcluster instance_type=hpc6a.48xlarge
+          ./bin/benchpark setup ./saxpy-omp-generic ./aws1 workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir "workspace/saxpy-omp-generic/aws1/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic remhos/mpi with dynamic llnl-cluster ruby
         run: |
           ./bin/benchpark experiment init --dest=remhos-ruby remhos
           ./bin/benchpark setup ./remhos-ruby ./ruby-system workspace/
@@ -452,7 +463,7 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic ior/mpi with dynamic CTS ruby
+      - name: Dry run dynamic ior/mpi with dynamic llnl-cluster ruby
         run: |
           system_id=$(./bin/benchpark system id ./ruby-system)
           ./bin/benchpark experiment init --dest=ior-mpi ior
@@ -461,6 +472,30 @@ jobs:
           . workspace/setup.sh
           ramble \
             --workspace-dir "workspace/ior-mpi/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic qws/openmp with dynamic CTS ruby
+        run: |
+          system_id=$(./bin/benchpark system id ./ruby-system)
+          ./bin/benchpark experiment init --dest qws-openmp qws +openmp
+          ./bin/benchpark setup qws-openmp ./ruby-system workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/qws-openmp/$system_id/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic saxpy/openmp with dynamic fugaku
+        run: |
+          ./bin/benchpark system init --dest=fugaku-system fugaku
+          ./bin/benchpark experiment init --dest=saxpy-omp-fugaku saxpy+openmp
+          ./bin/benchpark setup ./saxpy-omp-fugaku ./fugaku-system workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/saxpy-omp-fugaku/Fugaku-cf3cb1d/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run

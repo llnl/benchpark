@@ -1,0 +1,25 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+compilers:
+- compiler:
+    spec: gcc@13.2.0
+    paths:
+      cc: /vol0004/apps/oss/spack-v0.21/opt/spack/linux-rhel8-a64fx/gcc-8.5.0/gcc-13.2.0-abihbe7ykvpedq54j6blfvfppy7ojbmd/bin/gcc
+      cxx: /vol0004/apps/oss/spack-v0.21/opt/spack/linux-rhel8-a64fx/gcc-8.5.0/gcc-13.2.0-abihbe7ykvpedq54j6blfvfppy7ojbmd/bin/g++
+      f77: /vol0004/apps/oss/spack-v0.21/opt/spack/linux-rhel8-a64fx/gcc-8.5.0/gcc-13.2.0-abihbe7ykvpedq54j6blfvfppy7ojbmd/bin/gfortran
+      fc: /vol0004/apps/oss/spack-v0.21/opt/spack/linux-rhel8-a64fx/gcc-8.5.0/gcc-13.2.0-abihbe7ykvpedq54j6blfvfppy7ojbmd/bin/gfortran
+    flags:
+      ldflags: {"-lelf -ldl"}
+    environment:
+      set:
+        OPAL_PREFIX: /vol0004/apps/oss/mpigcc/fjmpi-gcc12
+      append_path:
+        LD_LIBRARY_PATH: /opt/FJSVxtclanga/tcsds-1.2.38/lib64
+    operating_system: rhel8
+    target: aarch64
+    modules: []
+    extra_rpaths: []
+
