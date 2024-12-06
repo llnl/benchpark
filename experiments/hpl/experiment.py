@@ -49,7 +49,7 @@ class Hpl(
 
         # Number of initial nodes
         num_nodes = {"n_nodes": 1}
-        problem_size = {"Ns": 10000} 
+        problem_size = {"Ns": 10000}
 
         self.add_experiment_variable("N-Grids", 1, False)
         self.add_experiment_variable("Ps", "4 * {n_nodes}", True)
@@ -60,10 +60,12 @@ class Hpl(
         self.add_experiment_variable("N-NBs", 1, False)
         self.add_experiment_variable("NBs", 128, False)
 
-        self.add_experiment_variable("n_ranks", "{sys_cores_per_node} * {n_nodes}", False)
+        self.add_experiment_variable(
+            "n_ranks", "{sys_cores_per_node} * {n_nodes}", False
+        )
         self.add_experiment_variable("n_threads_per_proc", ['2'], True)
 
-        self.matrix_experiment_variables('n_threads_per_proc')
+        self.matrix_experiment_variables("n_threads_per_proc")
 
         if self.spec.satisfies("+single_node"):
             for pk, pv in num_nodes.items():
@@ -88,14 +90,13 @@ class Hpl(
                 int(self.spec.variants["scaling-factor"][0]),
                 int(self.spec.variants["scaling-iterations"][0]),
             )
-            #for k, v in scaled_variables.items():
-             #   self.add_experiment_variable(k, v, True)
             num_resources = scaled_variables["n_nodes"]
             self.add_experiment_variable("n_nodes", num_resources, True)
 
             problem_size = scaled_variables["Ns"]
             self.add_experiment_variable("Ns", problem_size, True)
-            
+           
+
     def compute_spack_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
@@ -112,6 +113,4 @@ class Hpl(
         self.add_spack_spec(system_specs["mpi"])
         self.add_spack_spec(system_specs["blas"])
 
-        self.add_spack_spec(
-            self.name, [f"hpl@{app_version}", system_specs["compiler"]]
-        )
+        self.add_spack_spec(self.name, [f"hpl@{app_version}", system_specs["compiler"]])
