@@ -76,13 +76,13 @@ ramble:
               variants:
                 package_manager: spack
               variables:
-                px: ['2', '4', '4']
-                py: ['2', '2', '4']
-                pz: ['2', '2', '2']
+                px: ['2', '2', '4', '4']
+                py: ['2', '2', '2', '4']
+                pz: ['1', '2', '2', '2']
                 nx: '64'
                 ny: '64'
                 nz: '64'
-                n_nodes: ['2', '4', '8']
+                n_nodes: ['1', '2', '4', '8']
                 env_name: 'amg2023-gpu'
                 n_gpus: '{px}*{py}*{pz}'
         problem2:
