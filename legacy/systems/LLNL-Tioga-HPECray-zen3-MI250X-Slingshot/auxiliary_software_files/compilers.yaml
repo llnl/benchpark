@@ -21,8 +21,8 @@ compilers:
     modules: []
     environment:
       prepend_path:
-        LD_LIBRARY_PATH: /opt/cray/pe/cce/16.0.0/cce/x86_64/lib
-    extra_rpaths: [/opt/cray/pe/cce/16.0.0/cce/x86_64/lib/, /opt/cray/pe/gcc-libs/]
+        LD_LIBRARY_PATH: "/opt/cray/pe/cce/16.0.0/cce/x86_64/lib:/opt/rocm-5.5.1/lib"
+    extra_rpaths: [/opt/cray/pe/cce/16.0.0/cce/x86_64/lib/, /opt/cray/pe/gcc-libs/, /opt/rocm-5.5.1/lib]
 - compiler:
     spec: rocmcc@5.5.1
     paths:

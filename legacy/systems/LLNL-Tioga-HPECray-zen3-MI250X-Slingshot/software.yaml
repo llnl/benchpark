@@ -8,7 +8,7 @@ software:
     default-compiler:
       pkg_spec: cce@16.0.0-rocm5.5.1
     default-mpi:
-      pkg_spec: cray-mpich@8.1.26%cce@16.0.0 ~gtl
+      pkg_spec: cray-mpich@8.1.26%cce@16.0.0 +gtl
     compiler-rocm:
       pkg_spec: cce@16.0.0-rocm5.5.1
     compiler-amdclang:
