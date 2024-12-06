@@ -98,15 +98,14 @@ class LlnlElcapitan(System):
         compilers = LlnlElcapitan.resource_location / "compilers"
 
         compiler = self.spec.variants["compiler"][0]
-        # rocm = self.spec.variants["rocm"][0]
+        rocm = self.spec.variants["rocm"][0]
 
         selections = []
-        # TODO: I'm not actually sure what compiler mixing is desired, if any
-        # so I don't think the choices here make much sense, but this
-        # demonstrate how system spec variants can be used to choose what
-        # configuration to construct
         if compiler == "cce":
-            selections.append(compilers / "rocm" / "00-rocm-551-compilers.yaml")
+            compiler_cfg_path = self.next_adhoc_cfg()
+            with open(compiler_cfg_path, "w") as f:
+                f.write(self.rocm_cce_compiler_cfg(rocm, "16.0.0"))
+            selections.append(compiler_cfg_path)
         elif compiler == "gcc":
             selections.append(compilers / "gcc" / "00-gcc-12-compilers.yaml")
 
@@ -191,7 +190,57 @@ packages:
     - spec: rocsolver@{x}
       prefix: /opt/rocm-{x}
 """
-        return template.format(rocm_version)
+        return template.format(x=rocm_version)
+
+    def rocm_cce_compiler_cfg(self, rocm_version, cce_version):
+        template = """\
+compilers:
+- compiler:
+    spec: cce@{y}-rocm{x}
+    paths:
+      cc:  /opt/cray/pe/cce/{y}/bin/craycc
+      cxx:  /opt/cray/pe/cce/{y}/bin/crayCC
+      f77:  /opt/cray/pe/cce/{y}/bin/crayftn
+      fc:  /opt/cray/pe/cce/{y}/bin/crayftn
+    flags:
+      cflags: -g -O2
+      cxxflags: -g -O2 -std=c++17
+      fflags: -g -O2 -hnopattern
+      ldflags: -ldl
+    operating_system: rhel8
+    target: x86_64
+    modules: []
+    environment:
+      prepend_path:
+        LD_LIBRARY_PATH: "/opt/cray/pe/cce/{y}/cce/x86_64/lib:/opt/rocm-{x}/lib"
+    extra_rpaths: [/opt/cray/pe/cce/{y}/cce/x86_64/lib/, /opt/cray/pe/gcc-libs/, /opt/rocm-{x}/lib]
+- compiler:
+    spec: rocmcc@{x}
+    paths:
+      cc:  /opt/rocm-{x}/bin/amdclang
+      cxx:  /opt/rocm-{x}/bin/amdclang++
+      f77: /opt/rocm-{x}/bin/amdflang
+      fc:  /opt/rocm-{x}/bin/amdflang
+    flags:
+      cflags: -g -O2
+      cxxflags: -g -O2
+    operating_system: rhel8
+    target: x86_64
+    modules: []
+    environment:
+      set:
+        RFE_811452_DISABLE: '1'
+      append_path:
+        LD_LIBRARY_PATH: /opt/cray/pe/gcc-libs
+      prepend_path:
+        LD_LIBRARY_PATH: "/opt/cray/pe/cce/{y}/cce/x86_64/lib:/opt/cray/pe/pmi/6.1.12/lib"
+        LIBRARY_PATH: /opt/rocm-{x}/lib
+    extra_rpaths:
+    - /opt/rocm-{x}/lib
+    - /opt/cray/pe/gcc-libs
+    - /opt/cray/pe/cce/{y}/cce/x86_64/lib
+"""
+        return template.format(x=rocm_version, y=cce_version)
 
     def sw_description(self):
         """This is somewhat vestigial: for the Tioga config that is committed
