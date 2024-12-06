@@ -8,6 +8,7 @@ from benchpark.directives import variant
 from benchpark.experiment import Experiment
 from benchpark.expr.builtin.caliper import Caliper
 
+
 class Stream(
     Experiment,
     Caliper,
@@ -49,7 +50,6 @@ class Stream(
         if self.spec.satisfies("+single_node"):
             for pk, pv in array_size.items():
                 self.add_experiment_variable(pk, pv, True)
-
 
     def compute_spack_section(self):
         # get package version
