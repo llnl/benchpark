@@ -79,7 +79,7 @@ class LlnlElcapitan(System):
 
         rocm_cfg_path = self.next_adhoc_cfg()
         with open(rocm_cfg_path, "w") as f:
-            f.write(self.rocm_cfg(rocm))
+            f.write(self.rocm_config(rocm))
         selections.append(rocm_cfg_path)
 
         if compiler == "cce":

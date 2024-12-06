@@ -8,6 +8,7 @@ import importlib.util
 import os
 import pathlib
 import sys
+import tempfile
 import yaml
 
 import benchpark.paths
