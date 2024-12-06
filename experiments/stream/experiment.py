@@ -6,13 +6,10 @@
 from benchpark.error import BenchparkError
 from benchpark.directives import variant
 from benchpark.experiment import Experiment
-from benchpark.scaling import ThroughputScaling
 from benchpark.expr.builtin.caliper import Caliper
-
 
 class Stream(
     Experiment,
-    ThroughputScaling,
     Caliper,
 ):
     variant(
@@ -30,7 +27,6 @@ class Stream(
     def compute_applications_section(self):
         # TODO: Replace with conflicts clause
         scaling_modes = {
-            "throughput": self.spec.satisfies("+throughput"),
             "single_node": self.spec.satisfies("+single_node"),
         }
 
@@ -40,25 +36,20 @@ class Stream(
                 f"Only one type of scaling per experiment is allowed for application package {self.name}"
             )
 
-        array_size = {"s": 32000000}
+        array_size = {"s": 650000000}
 
         self.add_experiment_variable("processes_per_node", "1", True)
-        self.add_experiment_variable("n", "35", True)
-        self.add_experiment_variable("o", "0", True)
-        self.add_experiment_variable("n_ranks", "{sys_cores_per_node}", True)
+        self.add_experiment_variable("n", "35", False)
+        self.add_experiment_variable("o", "0", False)
+        self.add_experiment_variable("n_ranks", 1, True)
+        self.add_experiment_variable("n_threads_per_proc", ['16', '32'], True)
+
+        self.matrix_experiment_variables("n_threads_per_proc")
 
         if self.spec.satisfies("+single_node"):
             for pk, pv in array_size.items():
                 self.add_experiment_variable(pk, pv, True)
 
-        elif self.spec.satisfies("+throughput"):
-            scaled_variables = self.generate_throughput_scaling_params(
-                {tuple(array_size.keys()): list(array_size.values())},
-                int(self.spec.variants["scaling-factor"][0]),
-                int(self.spec.variants["scaling-iterations"][0]),
-            )
-            for k, v in scaled_variables.items():
-                self.add_experiment_variable(k, v, True)
 
     def compute_spack_section(self):
         # get package version
