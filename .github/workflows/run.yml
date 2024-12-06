@@ -499,3 +499,15 @@ jobs:
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
+
+      - name: Dry run dynamic hpl/openmp with dynamic CTS ruby
+        run: |
+          system_id=$(./bin/benchpark system id ./ruby-system)
+          ./bin/benchpark experiment init --dest=hpl hpl
+          ./bin/benchpark setup hpl ./ruby-system workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/hpl/$system_id/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
