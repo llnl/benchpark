@@ -75,7 +75,7 @@ ramble:
                 npz: ['1', '2', '2', '2']
             kripke_rocm_weak_{n_nodes}_{ngroups}_{gs}_{nquad}_{ds}_{lorder}_{nzx}_{nzy}_{nzz}_{npx}_{npy}_{npz}:
               variants:
-                package_manager: spack
+                package_man{128,128,64}ager: spack
               variables:
                 ngroups: 64
                 gs: 1
