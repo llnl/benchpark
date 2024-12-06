@@ -33,8 +33,8 @@ class LlnlElcapitan(System):
 
     variant(
         "rocm",
-        default="551",
-        values=("543", "551"),
+        default="5.5.1",
+        values=("5.4.3", "5.5.1"),
         description="ROCm version",
     )
 
@@ -76,10 +76,11 @@ class LlnlElcapitan(System):
         compiler = self.spec.variants["compiler"][0]
 
         selections = [externals / "base" / "00-packages.yaml"]
-        if rocm == "543":
-            selections.append(externals / "rocm" / "00-version-543-packages.yaml")
-        elif rocm == "551":
-            selections.append(externals / "rocm" / "01-version-551-packages.yaml")
+
+        rocm_cfg_path = self.next_adhoc_cfg()
+        with open(rocm_cfg_path, "w") as f:
+            f.write(self.rocm_cfg(rocm))
+        selections.append(rocm_cfg_path)
 
         if compiler == "cce":
             if gtl == "true":
@@ -113,6 +114,84 @@ class LlnlElcapitan(System):
 
     def system_specific_variables(self):
         return {"rocm_arch": self.rocm_arch}
+
+    def rocm_config(self, rocm_version):
+        template = """\
+packages:
+  hipfft:
+    externals:
+    - spec: hipfft@{x}
+      prefix: /opt/rocm-{x}
+  rocfft:
+    externals:
+    - spec: rocfft@{x}
+      prefix: /opt/rocm-{x}
+  rocprim:
+    externals:
+    - spec: rocprim@{x}
+      prefix: /opt/rocm-{x}
+  rocrand:
+    externals:
+    - spec: rocrand@{x}
+      prefix: /opt/rocm-{x}/hiprand
+  rocsparse:
+    externals:
+    - spec: rocsparse@{x}
+      prefix: /opt/rocm-{x}
+  rocthrust:
+    externals:
+    - spec: rocthrust@{x}
+      prefix: /opt/rocm-{x}
+  hip:
+    externals:
+    - spec: hip@{x}
+      prefix: /opt/rocm-{x}
+  hsa-rocr-dev:
+    externals:
+    - spec: hsa-rocr-dev@{x}
+      prefix: /opt/rocm-{x}
+  comgr:
+    externals:
+    - spec: comgr@{x}
+      prefix: /opt/rocm-{x}/
+  hipsparse:
+    externals:
+    - spec: hipsparse@{x}
+      prefix: /opt/rocm-{x}
+  hipblas:
+    externals:
+    - spec: hipblas@{x}
+      prefix: /opt/rocm-{x}/
+  hsakmt-roct:
+    externals:
+    - spec: hsakmt-roct@{x}
+      prefix: /opt/rocm-{x}/
+  roctracer-dev-api:
+    externals:
+    - spec: roctracer-dev-api@{x}
+      prefix: /opt/rocm-{x}/
+  rocminfo:
+    externals:
+    - spec: rocminfo@{x}
+      prefix: /opt/rocm-{x}/
+  llvm:
+    externals:
+    - spec: llvm@15.0.0-{x}
+      prefix: /opt/rocm-{x}/llvm
+  llvm-amdgpu:
+    externals:
+    - spec: llvm-amdgpu@{x}
+      prefix: /opt/rocm-{x}/llvm
+  rocblas:
+    externals:
+    - spec: rocblas@{x}
+      prefix: /opt/rocm-{x}
+  rocsolver:
+    externals:
+    - spec: rocsolver@{x}
+      prefix: /opt/rocm-{x}
+"""
+        return template.format(rocm_version)
 
     def sw_description(self):
         """This is somewhat vestigial: for the Tioga config that is committed
