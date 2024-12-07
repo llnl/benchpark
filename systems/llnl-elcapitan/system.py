@@ -72,7 +72,7 @@ class LlnlElcapitan(System):
         externals = LlnlElcapitan.resource_location / "externals"
 
         rocm = self.spec.variants["rocm"][0]
-        gtl = self.spec.variants["gtl"][0]
+        # gtl = self.spec.variants["gtl"][0]
         compiler = self.spec.variants["compiler"][0]
 
         selections = [externals / "base" / "00-packages.yaml"]
@@ -115,7 +115,6 @@ class LlnlElcapitan(System):
         return {"rocm_arch": self.rocm_arch}
 
     def mpi_config(self, cce_version):
-        rocm = self.spec.variants["rocm"][0]
         gtl = self.spec.variants["gtl"][0]
         compiler = self.spec.variants["compiler"][0]
 
