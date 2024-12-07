@@ -82,14 +82,14 @@ class LlnlElcapitan(System):
             f.write(self.rocm_config(rocm))
         selections.append(rocm_cfg_path)
 
+        mpi_cfg_path = self.next_adhoc_cfg()
+        with open(mpi_cfg_path, "w") as f:
+            f.write(self.mpi_config("16.0.0"))
+        selections.append(mpi_cfg_path)
+
         if compiler == "cce":
-            if gtl == "true":
-                selections.append(externals / "mpi" / "02-cce-ygtl-packages.yaml")
-            else:
-                selections.append(externals / "mpi" / "01-cce-ngtl-packages.yaml")
             selections.append(externals / "libsci" / "01-cce-packages.yaml")
         elif compiler == "gcc":
-            selections.append(externals / "mpi" / "00-gcc-ngtl-packages.yaml")
             selections.append(externals / "libsci" / "00-gcc-packages.yaml")
 
         return selections
@@ -113,6 +113,50 @@ class LlnlElcapitan(System):
 
     def system_specific_variables(self):
         return {"rocm_arch": self.rocm_arch}
+
+    def mpi_config(self, cce_version):
+        rocm = self.spec.variants["rocm"][0]
+        gtl = self.spec.variants["gtl"][0]
+        compiler = self.spec.variants["compiler"][0]
+
+        short_cce_version = ".".join(cce_version.split(".")[:2])
+        mpi_version = "8.1.26"
+
+        if compiler == "cce":
+            dont_use_gtl = f"""\
+        gtl_lib_path: /opt/cray/pe/mpich/{mpi_version}/gtl/lib
+        ldflags: "-L/opt/cray/pe/mpich/{mpi_version}/ofi/crayclang/{short_cce_version}/lib -lmpi -L/opt/cray/pe/mpich/{mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{mpi_version}/gtl/lib"
+"""
+
+            use_gtl = f"""\
+        gtl_cutoff_size: 4096
+        fi_cxi_ats: 0
+        gtl_lib_path: /opt/cray/pe/mpich/{mpi_version}/gtl/lib
+        ldflags: "-L/opt/cray/pe/mpich/{mpi_version}/ofi/crayclang/{short_cce_version}/lib -lmpi -L/opt/cray/pe/mpich/{mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{mpi_version}/gtl/lib -lmpi_gtl_hsa"
+"""
+
+            if gtl:
+                gtl_cfg = use_gtl
+            else:
+                gtl_cfg = dont_use_gtl
+
+            return f"""\
+packages:
+  cray-mpich:
+    externals:
+    - spec: cray-mpich@{mpi_version}%cce@{cce_version} ~gtl +wrappers
+      prefix: /opt/cray/pe/mpich/{mpi_version}/ofi/crayclang/{short_cce_version}
+      extra_attributes:
+{gtl_cfg}
+"""
+        elif compiler == "gcc":
+            return """\
+packages:
+  cray-libsci:
+    externals:
+    - spec: cray-libsci@23.05.1.4%gcc
+      prefix: /opt/cray/pe/libsci/23.05.1.4/gnu/10.3/x86_64/
+"""
 
     def rocm_config(self, rocm_version):
         template = """\
