@@ -154,10 +154,13 @@ packages:
         elif compiler == "gcc":
             return """\
 packages:
-  cray-libsci:
+  cray-mpich:
     externals:
-    - spec: cray-libsci@23.05.1.4%gcc
-      prefix: /opt/cray/pe/libsci/23.05.1.4/gnu/10.3/x86_64/
+    - spec: cray-mpich@8.1.26%gcc@12.2.0 ~gtl +wrappers
+      prefix: /opt/cray/pe/mpich/8.1.26/ofi/gnu/10.3
+      extra_attributes:
+        gtl_lib_path: /opt/cray/pe/mpich/8.1.26/gtl/lib
+        ldflags: "-L/opt/cray/pe/mpich/8.1.26/ofi/gnu/10.3/lib -lmpi -L/opt/cray/pe/mpich/8.1.26/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/8.1.26/gtl/lib"
 """
 
     def rocm_config(self, rocm_version):
