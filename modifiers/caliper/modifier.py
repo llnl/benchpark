@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from ramble.modkit import *
-
+import json
 
 def add_mode(mode_name, mode_option, description):
     mode(
@@ -21,7 +21,11 @@ def add_mode(mode_name, mode_option, description):
     )
 
 
+<<<<<<< HEAD
 class Caliper(BasicModifier):
+=======
+class Caliper(SpackModifier, BaseModifier):
+>>>>>>> 87437f3 (initial checkin, needs merge and initial testing)
     """Define a modifier for Caliper"""
 
     name = "caliper"
@@ -30,9 +34,20 @@ class Caliper(BasicModifier):
 
     maintainers("pearce8")
 
+    # The filename for Caliper output data
     _cali_datafile = "{experiment_run_dir}/{experiment_name}.cali"
 
+    # The filename for metadata forwarded from Benchpark to Caliper
+    _caliper_metadata_file = "{experiment_run_dir}/{experiment_name}_metadata.json"
+
+    # The metadata dictionary 
+    caliper_metadata = {"application_name": "{application_name}", "experiment_name": "{experiment_name}", 
+                     "workload_name": "{workload_name}"}
+
     _default_mode = "time"
+
+    # Write out the metadata file once all variables are resolved
+    register_phase('build_metadata', pipeline='setup', run_after=['make_experiments']) 
 
     add_mode(
         mode_name=_default_mode,
@@ -42,7 +57,7 @@ class Caliper(BasicModifier):
 
     env_var_modification(
         "CALI_CONFIG",
-        "spot(output={}{})".format(_cali_datafile, "${CALI_CONFIG_MODE}"),
+        "spot(output={}),metadata(file={})".format(_cali_datafile, _caliper_metadata_file),
         method="set",
         modes=[_default_mode],
     )
@@ -83,8 +98,23 @@ class Caliper(BasicModifier):
         description="Top-down analysis for Intel CPUs (top level)",
     )
 
+    def _build_metadata(self, workspace, app_inst):
+        ''' Write the caliper metadata to json '''
+
+        # Load the Caliper metadata variable from ramble.yaml
+        experiment_metadata = self.expander.expand_var('caliper_metadata', typed=True, merge_used_stage=False)	
+        self.expander.flush_used_variables() 
+
+        # Write     
+        cali_metadata_file = self.expander.expand_var(_caliper_metadata_file) 
+        
+        with open(cali_metadata_file, "w+") as f: 
+            json.dump(experiment_metadata, stream=f) 
+
+
     archive_pattern(_cali_datafile)
 
     software_spec("caliper", pkg_spec="caliper")
 
     required_package("caliper")
+    
