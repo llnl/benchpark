@@ -26,6 +26,7 @@ class Gromacs(
     variant(
         "version",
         default="2024",
+        values=("2024", "2023.3"),
         description="app version",
     )
 

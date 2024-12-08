@@ -535,12 +535,13 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
                         "-DGMX_FORCE_GPU_AWARE_MPI=ON",
                     ]
                 )
-            if self.spec["mpi"].extra_attributes and "ldflags" in self.spec["mpi"].extra_attributes:
-                options.extend(
-                    [
-                        "-DCMAKE_EXE_LINKER_FLAGS=%s" % self.spec["mpi"].extra_attributes["ldflags"],
-                    ]
-                )
+            if "+rocm" in self.spec:
+                if self.spec["mpi"].extra_attributes and "ldflags" in self.spec["mpi"].extra_attributes:
+                    options.extend(
+                        [
+                            "-DCMAKE_EXE_LINKER_FLAGS=%s" % self.spec["mpi"].extra_attributes["ldflags"],
+                        ]
+                    )
         else:
             options.extend(
                 [
@@ -614,14 +615,14 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
             options.append("-DCUDA_TOOLKIT_ROOT_DIR:STRING=" + self.spec["cuda"].prefix)
 
         target = self.spec.target
-        if "+cuda" in self.spec and target.family == "ppc64le":
+        if target.family == "ppc64le":
             options.append("-DGMX_EXTERNAL_LAPACK:BOOL=OFF")
         else:
             options.append("-DGMX_EXTERNAL_LAPACK:BOOL=ON")
             if self.spec["lapack"].libs:
                 options.append("-DGMX_LAPACK_USER={0}".format(self.spec["lapack"].libs.joined(";")))
 
-        if "+cuda" in self.spec and target.family == "ppc64le":
+        if target.family == "ppc64le":
             options.append("-DGMX_EXTERNAL_BLAS:BOOL=OFF")
         else:
             options.append("-DGMX_EXTERNAL_BLAS:BOOL=ON")
