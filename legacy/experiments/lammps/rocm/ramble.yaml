@@ -1,63 +1,44 @@
-# Copyright 2023 Lawrence Livermore National Security, LLC and other
-# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
-#
-# SPDX-License-Identifier: Apache-2.0
-
 ramble:
-  include:
-  - ./configs/software.yaml
-  - ./configs/variables.yaml
-  - ./configs/modifier.yaml
-
-  config:
-    deprecated: true
-    spack_flags:
-      install: '--add --keep-stage'
-      concretize: '-U -f'
-
-  modifiers:
-  - name: allocation
-
   applications:
     lammps:
       workloads:
         hns-reaxff:
-          variables:
-            scaling_nodes: ['8']
-            n_ranks_per_node: ['8']
-            n_nodes: '{scaling_nodes}'
-            n_gpus: 64
           experiments:
-            scaling_{n_nodes}nodes_{size_name}:
+            lammps_hns-reaxff_single_node_rocm_{x}_{y}_{z}_{n_nodes}_{n_ranks_per_node}_{n_gpus}:
+              exclude: {}
+              matrix: []
+              variables:
+                input_file: '{input_path}/in.reaxc.hns'
+                lammps_flags: -v x {x} -v y {y} -v z {z} -k on g 1 -sf kk -pk kokkos
+                  gpu/aware on neigh half comm device neigh/qeq full newton on -nocite
+                n_gpus: 64
+                n_nodes: 8
+                n_ranks_per_node: 8
+                timesteps: 100
+                x: 20
+                y: 40
+                z: 32
               variants:
                 package_manager: spack
-              variables:
-                size_name: ['bigbig']
-                size_x: [20]
-                size_y: [40]
-                size_z: [32]
-                timesteps: 100
-                input_file: '{input_path}/in.reaxc.hns'
-                lammps_flags: '-k on g 1 -sf kk -pk kokkos gpu/aware off neigh half comm device neigh/qeq full newton on -v x {size_x} -v y {size_y} -v z {size_z} -nocite'
-              zips:
-                problems:
-                - size_name
-                - size_x
-                - size_y
-                - size_z
-              matrix:
-              - problems
-              - scaling_nodes
-
+              zips: {}
+  config:
+    deprecated: true
+    spack_flags:
+      concretize: -U -f
+      install: --add --keep-stage
+  include:
+  - ./configs
+  modifiers:
+  - name: allocation
   software:
-    packages:
-      lammps:
-        pkg_spec: lammps@20231121 +opt+manybody+molecule+kspace+rigid+kokkos+rocm+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth+reaxff~openmp lammps_sizes=bigbig amdgpu_target={rocm_arch}
-        compiler: compiler-rocm
     environments:
       lammps:
         packages:
         - blas-rocm
-        - lapack
-        - mpi-rocm-no-gtl
+        - default-mpi
         - lammps
+    packages:
+      lammps:
+        compiler: default-compiler
+        pkg_spec: lammps@20231121 +opt+manybody+molecule+kspace+rigid+kokkos+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth+reaxff
+          lammps_sizes=bigbig ~openmp +rocm amdgpu_target={rocm_arch}

@@ -175,7 +175,7 @@ jobs:
 
       - name: Dry run kripke/rocm on dynamic Tioga with allocation modifier
         run: |
-          ./bin/benchpark system init --dest=tioga-system llnl-elcapitan rocm=551 compiler=cce ~gtl
+          ./bin/benchpark system init --dest=tioga-system llnl-elcapitan rocm=5.5.1 compiler=cce ~gtl
           ./bin/benchpark setup kripke/rocm ./tioga-system workspace/
           system_id=$(./bin/benchpark system id ./tioga-system)
           . workspace/setup.sh
@@ -198,7 +198,7 @@ jobs:
 
       - name: Dry run dynamic saxpy/rocm with dynamic Tioga
         run: |
-          ./bin/benchpark system init --dest=tioga-system2 llnl-elcapitan rocm=551 compiler=cce ~gtl
+          ./bin/benchpark system init --dest=tioga-system2 llnl-elcapitan rocm=5.5.1 compiler=cce ~gtl
           system_id=$(./bin/benchpark system id ./tioga-system2)
           ./bin/benchpark experiment init --dest=saxpy-rocm2 saxpy+rocm
           ./bin/benchpark setup ./saxpy-rocm2 ./tioga-system2 workspace/
@@ -243,12 +243,56 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run lammps/rocm on Tioga with allocation modifier
+      - name: Dry run lammps/openmp with static Ruby
+        run: |
+          ./bin/benchpark setup lammps/openmp LLNL-Ruby-icelake-OmniPath workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/lammps/openmp/LLNL-Ruby-icelake-OmniPath/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run lammps/rocm with static Tioga
         run: |
           ./bin/benchpark setup lammps/rocm LLNL-Tioga-HPECray-zen3-MI250X-Slingshot workspace/
           . workspace/setup.sh
           ramble \
             --workspace-dir workspace/lammps/rocm/LLNL-Tioga-HPECray-zen3-MI250X-Slingshot/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic lammps/openmp on static Ruby
+        run: |
+          ./bin/benchpark experiment init --dest=lammps-openmp lammps+openmp
+          ./bin/benchpark setup ./lammps-openmp LLNL-Ruby-icelake-OmniPath workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/lammps-openmp/LLNL-Ruby-icelake-OmniPath/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic lammps/rocm on static Tioga 
+        run: |
+          ./bin/benchpark experiment init --dest=lammps-rocm lammps+rocm
+          ./bin/benchpark setup ./lammps-rocm LLNL-Tioga-HPECray-zen3-MI250X-Slingshot workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/lammps-rocm/LLNL-Tioga-HPECray-zen3-MI250X-Slingshot/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic lammps/rocm with dynamic Tioga
+        run: |
+          ./bin/benchpark experiment init --dest=lammps-rocm-tioga lammps+rocm
+          ./bin/benchpark setup lammps-rocm-tioga ./tioga-system workspace/
+          system_id=$(./bin/benchpark system id ./tioga-system)
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/lammps-rocm-tioga/$system_id/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
@@ -384,6 +428,17 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
+      - name: Dry run dynamic saxpy/openmp with dynamic aws
+        run: |
+          ./bin/benchpark system init --dest=aws1 aws-pcluster instance_type=hpc6a.48xlarge
+          ./bin/benchpark setup ./saxpy-omp-generic ./aws1 workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir "workspace/saxpy-omp-generic/aws1/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
       - name: Dry run dynamic remhos/mpi with dynamic llnl-cluster ruby
         run: |
           ./bin/benchpark experiment init --dest=remhos-ruby remhos
@@ -417,6 +472,18 @@ jobs:
           . workspace/setup.sh
           ramble \
             --workspace-dir "workspace/ior-mpi/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic qws/openmp with dynamic CTS ruby
+        run: |
+          system_id=$(./bin/benchpark system id ./ruby-system)
+          ./bin/benchpark experiment init --dest qws-openmp qws +openmp
+          ./bin/benchpark setup qws-openmp ./ruby-system workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/qws-openmp/$system_id/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run

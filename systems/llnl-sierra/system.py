@@ -3,9 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import os
 import pathlib
-import tempfile
 
 from benchpark.directives import variant
 from benchpark.system import System
@@ -122,17 +120,6 @@ packages:
         selections.append(gen_file)
 
         return selections
-
-    def _adhoc_cfgs(self):
-        if not getattr(self, "_tmp_cfgs", None):
-            self._tmp_cfgs = tempfile.mkdtemp()
-            self._adhoc_cfg_idx = 0
-        return self._tmp_cfgs
-
-    def next_adhoc_cfg(self):
-        basedir = self._adhoc_cfgs()
-        self._adhoc_cfg_idx += 1
-        return os.path.join(basedir, str(self._adhoc_cfg_idx))
 
     def compiler_configs(self):
         # values=("clang-ibm", "xl", "xl-gcc", "clang"),
