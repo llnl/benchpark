@@ -4,6 +4,8 @@ compilers=("gcc12" "gccSpack")
 optParams=("O2")
 scaling=("weak")
 . setup-env.sh
+rm -rf daneTCE
+rm -rf quicksilvergcc*
 benchpark system init --dest=daneTCE rubyExp cluster=dane compiler=gcc
 benchpark system init --dest=daneSpack rubyExp cluster=dane compiler=gccSpack
 benchpark experiment init --dest=quicksilvergcc12O2weak1 quicksilver experiment=weak caliper=mpi
