@@ -2,10 +2,10 @@ compilers:
 - compiler:
     spec: gcc@12.1.0
     paths:
-      cc: /usr/workspace/asde/qsExperimentPackages/linux-rhel8-cascadelake/gcc-12.2.1/gcc-12.1.0-dgytc2lghfuh6hkdkisswas2oio3ospo/bin/gcc
-      cxx: /usr/workspace/asde/qsExperimentPackages/linux-rhel8-cascadelake/gcc-12.2.1/gcc-12.1.0-dgytc2lghfuh6hkdkisswas2oio3ospo/bin/g++
-      f77: /usr/workspace/asde/qsExperimentPackages/linux-rhel8-cascadelake/gcc-12.2.1/gcc-12.1.0-dgytc2lghfuh6hkdkisswas2oio3ospo/bin/gfortran
-      fc: /usr/workspace/asde/qsExperimentPackages/linux-rhel8-cascadelake/gcc-12.2.1/gcc-12.1.0-dgytc2lghfuh6hkdkisswas2oio3ospo/bin/gfortran
+      cc: /usr/workspace/asde/qsExperimentPackages/linux-rhel8-sapphirerapids/clang-18.1.8/gcc-12.1.0-rugmyfjo343unzxo4oqs6ehmvkfaylgb/bin/gcc
+      cxx: /usr/workspace/asde/qsExperimentPackages/linux-rhel8-sapphirerapids/clang-18.1.8/gcc-12.1.0-rugmyfjo343unzxo4oqs6ehmvkfaylgb/bin/g++
+      f77: /usr/workspace/asde/qsExperimentPackages/linux-rhel8-sapphirerapids/clang-18.1.8/gcc-12.1.0-rugmyfjo343unzxo4oqs6ehmvkfaylgb/bin/gfortran
+      fc: /usr/workspace/asde/qsExperimentPackages/linux-rhel8-sapphirerapids/clang-18.1.8/gcc-12.1.0-rugmyfjo343unzxo4oqs6ehmvkfaylgb/bin/gfortran
     flags: {}
     operating_system: rhel8
     target: x86_64
