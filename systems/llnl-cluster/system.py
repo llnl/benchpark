@@ -21,7 +21,7 @@ id_to_resources = {
 }
 
 
-class Cts(System):
+class LlnlCluster(System):
 
     variant(
         "cluster",
@@ -54,7 +54,7 @@ class Cts(System):
             f.write(self.sw_description())
 
     def external_pkg_configs(self):
-        externals = Cts.resource_location / "externals"
+        externals = LlnlCluster.resource_location / "externals"
 
         compiler = self.spec.variants["compiler"][0]
 
@@ -68,7 +68,7 @@ class Cts(System):
         return selections
 
     def compiler_configs(self):
-        compilers = Cts.resource_location / "compilers"
+        compilers = LlnlCluster.resource_location / "compilers"
 
         compiler = self.spec.variants["compiler"][0]
 

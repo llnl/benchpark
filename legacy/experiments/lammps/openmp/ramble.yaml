@@ -1,59 +1,44 @@
-# Copyright 2023 Lawrence Livermore National Security, LLC and other
-# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
-#
-# SPDX-License-Identifier: Apache-2.0
-
 ramble:
-  include:
-  - ./configs/software.yaml
-  - ./configs/variables.yaml
-
-  config:
-    deprecated: true
-    spack_flags:
-      install: '--add --keep-stage'
-      concretize: '-U -f'
-
-  modifiers:
-  - name: allocation
-
   applications:
     lammps:
       workloads:
         hns-reaxff:
-          variables:
-            size_name: ['medium']
-            size_x: [2]
-            size_y: [2]
-            size_z: [2]
-            scaling_nodes: [1]
-            n_nodes: '{scaling_nodes}'
-            n_threads_per_proc: '1'
-            lammps_flags: '-v x {size_x} -v y {size_y} -v z {size_z}'
           experiments:
-            scaling_{n_nodes}nodes_{size_name}:
+            lammps_hns-reaxff_single_node_openmp_{x}_{y}_{z}_{n_nodes}_{n_ranks_per_node}_{n_threads_per_proc}:
+              exclude: {}
+              matrix: []
+              variables:
+                input_file: '{input_path}/in.reaxc.hns'
+                lammps_flags: -v x {x} -v y {y} -v z {z} -k on t {n_threads_per_proc}
+                  -sf kk -pk kokkos gpu/aware off neigh half comm host neigh/qeq full
+                  newton on -nocite
+                n_nodes: 1
+                n_ranks_per_node: 36
+                n_threads_per_proc: 1
+                timesteps: 100
+                x: 8
+                y: 8
+                z: 8
               variants:
                 package_manager: spack
-              variables:
-                env_name: lammps
-                n_ranks_per_node: ['36']
-              zips:
-                problems:
-                - size_name
-                - size_x
-                - size_y
-                - size_z
-              matrix:
-              - problems
-              - scaling_nodes
+              zips: {}
+  config:
+    deprecated: true
+    spack_flags:
+      concretize: -U -f
+      install: --add --keep-stage
+  include:
+  - ./configs
+  modifiers:
+  - name: allocation
   software:
-    packages:
-      lammps:
-        pkg_spec: lammps@20231121 +opt+manybody+molecule+kspace+rigid+openmp+openmp-package+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth+reaxff
-        compiler: default-compiler
     environments:
       lammps:
         packages:
-        - lapack
         - default-mpi
         - lammps
+    packages:
+      lammps:
+        compiler: default-compiler
+        pkg_spec: lammps@20231121 +opt+manybody+molecule+kspace+rigid+kokkos+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth+reaxff
+          lammps_sizes=bigbig +openmp ~rocm
