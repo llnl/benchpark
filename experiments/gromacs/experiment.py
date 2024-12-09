@@ -116,5 +116,5 @@ class Gromacs(
 
         self.add_spack_spec(
             self.name,
-            [f"gromacs@{app_version} {spack_specs}", system_specs["compiler"]]
+            [f"gromacs@{app_version} {spack_specs}", system_specs["compiler"]],
         )
