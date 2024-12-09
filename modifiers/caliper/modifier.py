@@ -21,11 +21,7 @@ def add_mode(mode_name, mode_option, description):
     )
 
 
-<<<<<<< HEAD
 class Caliper(BasicModifier):
-=======
-class Caliper(SpackModifier, BaseModifier):
->>>>>>> 87437f3 (initial checkin, needs merge and initial testing)
     """Define a modifier for Caliper"""
 
     name = "caliper"
@@ -40,10 +36,6 @@ class Caliper(SpackModifier, BaseModifier):
     # The filename for metadata forwarded from Benchpark to Caliper
     _caliper_metadata_file = "{experiment_run_dir}/{experiment_name}_metadata.json"
 
-    # The metadata dictionary 
-    caliper_metadata = {"application_name": "{application_name}", "experiment_name": "{experiment_name}", 
-                     "workload_name": "{workload_name}"}
-
     _default_mode = "time"
 
     # Write out the metadata file once all variables are resolved
@@ -57,7 +49,7 @@ class Caliper(SpackModifier, BaseModifier):
 
     env_var_modification(
         "CALI_CONFIG",
-        "spot(output={}),metadata(file={})".format(_cali_datafile, _caliper_metadata_file),
+        "spot(output={}{}),metadata(file={})".format(_cali_datafile, "${CALI_CONFIG_MODE}", _caliper_metadata_file),
         method="set",
         modes=[_default_mode],
     )
@@ -100,16 +92,19 @@ class Caliper(SpackModifier, BaseModifier):
 
     def _build_metadata(self, workspace, app_inst):
         ''' Write the caliper metadata to json '''
-
         # Load the Caliper metadata variable from ramble.yaml
-        experiment_metadata = self.expander.expand_var('caliper_metadata', typed=True, merge_used_stage=False)	
-        self.expander.flush_used_variables() 
+        # experiment_metadata = self.expander.expand_var('caliper_metadata', typed=True, merge_used_stage=False)
+        # Error: expand_var() got an unexpected keyword argument 'merge_used_stage'
+        # TODO: How to get this from the ramble.yaml?
+        experiment_metadata = self.expander.expand_var('caliper_metadata', typed=True)	
+        #self.expander.flush_used_variables() 
+        # Error: 'Expander' object has no attribute 'flush_used_variables'
 
-        # Write     
-        cali_metadata_file = self.expander.expand_var(_caliper_metadata_file) 
-        
-        with open(cali_metadata_file, "w+") as f: 
-            json.dump(experiment_metadata, stream=f) 
+        # Write to the Caliper metadata file    
+        cali_metadata_file = self.expander.expand_var(self._caliper_metadata_file) 
+        print(f"writing to %s", cali_metadata_file)
+        with open(cali_metadata_file, "w") as f: 
+            f.write(json.dumps(experiment_metadata)) 
 
 
     archive_pattern(_cali_datafile)
