@@ -71,15 +71,23 @@ class LlnlSierra(System):
 
         if self.spec.satisfies("lapack=cusolver"):
             if self.spec.satisfies("cuda=10-1-243"):
-                selections.append(externals / "lapack" / "00-version-10-1-243-packages.yaml")
+                selections.append(
+                    externals / "lapack" / "00-version-10-1-243-packages.yaml"
+                )
             elif self.spec.satisfies("cuda=11-8-0"):
-                selections.append(externals / "lapack" / "01-version-11-8-0-packages.yaml")
+                selections.append(
+                    externals / "lapack" / "01-version-11-8-0-packages.yaml"
+                )
 
         if self.spec.satisfies("blas=cublas"):
             if self.spec.satisfies("cuda=10-1-243"):
-                selections.append(externals / "blas" / "00-version-10-1-243-packages.yaml")
+                selections.append(
+                    externals / "blas" / "00-version-10-1-243-packages.yaml"
+                )
             elif self.spec.satisfies("cuda=11-8-0"):
-                selections.append(externals / "blas" / "01-version-11-8-0-packages.yaml")
+                selections.append(
+                    externals / "blas" / "01-version-11-8-0-packages.yaml"
+                )
 
         mpi_cfgs = {
             (

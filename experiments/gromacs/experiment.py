@@ -48,19 +48,19 @@ class Gromacs(
             self.add_experiment_variable("n_ranks", 8, True)
             target = "cpu"
             bonded_target = "cpu"
-            npme = '0'
+            npme = "0"
 
         # Overrides +openmp settings
         if self.spec.satisfies("+cuda"):
             self.add_experiment_variable("n_gpus", 8, True)
             target = "gpu"
             bonded_target = "cpu"
-            npme = '1'
+            npme = "1"
         elif self.spec.satisfies("+rocm"):
             self.add_experiment_variable("n_gpus", 8, True)
             target = "gpu"
             bonded_target = "cpu"
-            npme = '1'
+            npme = "1"
 
         input_variables = {
             "target": f"{target}",
@@ -115,5 +115,6 @@ class Gromacs(
             spack_specs += " gpu-aware-mpi=off "
 
         self.add_spack_spec(
-            self.name, [f"gromacs@{app_version} {spack_specs}", system_specs["compiler"]]
+            self.name,
+            [f"gromacs@{app_version} {spack_specs}", system_specs["compiler"]]
         )
