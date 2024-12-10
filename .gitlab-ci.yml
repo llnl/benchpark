@@ -1,5 +1,12 @@
 variables:
   LLNL_SERVICE_USER: benchpark
+# Required information about GitHub repository
+  GITHUB_PROJECT_NAME: "benchpark"
+  GITHUB_PROJECT_ORG: "LLNL"
+# Override the pattern describing branches that will skip the "draft PR filter
+# test".  Add protected branches here. See default value in
+# preliminary-ignore-draft-pr.yml.
+  ALWAYS_RUN_PATTERN: "^develop$|^master$|^v[0-9.]*$|^releases/$"
 
 default:
   id_tokens:

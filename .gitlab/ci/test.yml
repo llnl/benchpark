@@ -115,7 +115,7 @@ test_run_tioga_rocm:
     - tioga
     - batch
   variables:
-    SCHEDULER_PARAMETERS: $RUN_PARAMS
+    SCHEDULER_PARAMETERS: -N 1 -t 1h
   rules:
     - changes:
         - .gitlab-ci.yml
