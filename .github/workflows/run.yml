@@ -175,7 +175,7 @@ jobs:
 
       - name: Dry run kripke/rocm on dynamic Tioga with allocation modifier
         run: |
-          ./bin/benchpark system init --dest=tioga-system llnl-elcapitan rocm=551 compiler=cce ~gtl
+          ./bin/benchpark system init --dest=tioga-system llnl-elcapitan rocm=5.5.1 compiler=cce ~gtl
           ./bin/benchpark setup kripke/rocm ./tioga-system workspace/
           system_id=$(./bin/benchpark system id ./tioga-system)
           . workspace/setup.sh
@@ -198,7 +198,7 @@ jobs:
 
       - name: Dry run dynamic saxpy/rocm with dynamic Tioga
         run: |
-          ./bin/benchpark system init --dest=tioga-system2 llnl-elcapitan rocm=551 compiler=cce ~gtl
+          ./bin/benchpark system init --dest=tioga-system2 llnl-elcapitan rocm=5.5.1 compiler=cce ~gtl
           system_id=$(./bin/benchpark system id ./tioga-system2)
           ./bin/benchpark experiment init --dest=saxpy-rocm2 saxpy+rocm
           ./bin/benchpark setup ./saxpy-rocm2 ./tioga-system2 workspace/
