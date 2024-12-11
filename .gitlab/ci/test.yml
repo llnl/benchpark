@@ -1,14 +1,9 @@
-workflow:
-  auto_cancel:
-    on_new_commit: interruptible
-
-default:
-  before_script:
-    - export pipeline_status="pending"
-    - *status_report
-  after_script:
-    - export pipeline_status="$CI_JOB_STATUS"
-    - *status_report
+.status_report: &status_report
+    - |
+      curl --url "https://api.github.com/repos/llnl/${CI_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+           --header 'Content-Type: application/json' \
+           --header "authorization: Bearer ${GITHUB_TOKEN}" \
+           --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_JOB_URL}\", \"description\": \"${CI_JOB_NAME}\", \"context\": \"ci/gitlab/${$CI_JOB_NAME}\" }"
 
 .test_clusters: &test_clusters
   parallel:
@@ -38,13 +33,6 @@ default:
         VARIANT:
           - openmp
 
-.status_report: &status_report
-    - |
-      curl --url "https://api.github.com/repos/llnl/${CI_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
-           --header 'Content-Type: application/json' \
-           --header "authorization: Bearer ${GITHUB_TOKEN}" \
-           --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_JOB_URL}\", \"description\": \"${CI_JOB_NAME}\", \"context\": \"ci/gitlab/${$CI_JOB_NAME}\" }"
-
 .legacy_test_clusters: &legacy_test_clusters
   parallel:
     matrix:
@@ -69,6 +57,18 @@ default:
           - saxpy
         LEGACY_VARIANT:
           - openmp
+
+workflow:
+  auto_cancel:
+    on_new_commit: interruptible
+
+default:
+  before_script:
+    - export pipeline_status="pending"
+    - *status_report
+  after_script:
+    - export pipeline_status="$CI_JOB_STATUS"
+    - *status_report
 
 legacy_test_run:
   resource_group: $LEGACY_HOST
