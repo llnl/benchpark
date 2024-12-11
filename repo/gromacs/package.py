@@ -8,10 +8,9 @@ import os
 import llnl.util.filesystem as fs
 
 from spack.package import *
-from spack.pkg.benchpark.rocm_consistency import RocmConsistency as RocmConsistency
 
 
-class Gromacs(CMakePackage, CudaPackage, ROCmPackage, RocmConsistency):
+class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
     """GROMACS is a molecular dynamics package primarily designed for simulations
     of proteins, lipids and nucleic acids. It was originally developed in
     the Biophysical Chemistry department of University of Groningen, and is now

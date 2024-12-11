@@ -237,7 +237,7 @@ packages:
       prefix: /opt/rocm-{x}/
   llvm:
     externals:
-    - spec: llvm@15.0.0-{x}
+    - spec: llvm@16.0.0
       prefix: /opt/rocm-{x}/llvm
   llvm-amdgpu:
     externals:
