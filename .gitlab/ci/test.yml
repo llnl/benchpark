@@ -3,7 +3,7 @@
       curl --url "https://api.github.com/repos/llnl/${CI_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
            --header 'Content-Type: application/json' \
            --header "authorization: Bearer ${GITHUB_TOKEN}" \
-           --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_JOB_URL}\", \"description\": \"${CI_JOB_NAME}\", \"context\": \"ci/gitlab/${$CI_JOB_NAME}\" }"
+           --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_JOB_URL}\", \"description\": \"${CI_JOB_NAME}\", \"context\": \"ci/gitlab/${CI_JOB_NAME}\" }"
 
 .test_clusters: &test_clusters
   parallel:
