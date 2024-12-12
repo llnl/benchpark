@@ -511,5 +511,3 @@ jobs:
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
-
-      - name: Dry run dynamic ior/mpi with dynamic CTS ruby
