@@ -67,6 +67,7 @@ default:
     - export pipeline_status="pending"
     - *status_report
   after_script:
+    - echo -e "RRR $CI_JOB_STATUS"
     - export pipeline_status="$CI_JOB_STATUS"
     - *status_report
 
