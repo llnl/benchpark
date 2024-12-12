@@ -157,7 +157,7 @@ test_run:
     - ramble --workspace-dir . --disable-progress-bar workspace analyze --always-print-foms --format json yaml text
     # Check Experiment Exit Codes
     - cd -
-    - python ./.gitlab/ci/bin/exit-codes ./workspace/kripke-benchmark/${system_id}/workspace/results.latest.json
+    - python ./.gitlab/ci/bin/exit-codes ./workspace/${BENCHMARK}-benchmark/${system_id}/workspace/results.latest.json
 
 # notes
 # error message if try to init an experiment iwht a unsupported variant?
