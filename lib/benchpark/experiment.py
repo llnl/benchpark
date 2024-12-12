@@ -184,9 +184,7 @@ class Experiment(ExperimentSystemBase, SingleNode):
             "variables": self.variables,
             "zips": self.zips,
             "matrix": self.matrix,
-            "exclude": (
-                {"where": self.excludes} if self.excludes else {}
-            ),
+            "exclude": ({"where": self.excludes} if self.excludes else {}),
         }
 
         workloads = {}

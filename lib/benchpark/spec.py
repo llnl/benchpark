@@ -306,7 +306,9 @@ class ConcreteSpec(Spec):
                     del self.variants["workload"]
                     self.variants["workload"] = variant_map["workload"].values
                 else:
-                    raise BenchparkError(f"The workload variant in must be multi-valued to use the 'all' option in package {self.name}")
+                    raise BenchparkError(
+                        f"The workload variant in must be multi-valued to use the 'all' option in package {self.name}"
+                    )
         else:
             raise BenchparkError(f"Package {self.name} must define a workload variant")
 
