@@ -159,12 +159,3 @@ test_run:
     # Check Experiment Exit Codes
     - cd -
     - python ./.gitlab/ci/bin/exit-codes ./workspace/${BENCHMARK}-benchmark/${system_id}/workspace/results.latest.json
-
-# notes
-# error message if try to init an experiment iwht a unsupported variant?
-# add grep here for available system+experiment variants (look for return code)
-# if grep CUDA; then
-#    append CUDA to list of variants
-# iterate over list of variants
-#    append cuda variant job to larger benchmark job
-# for loop over variants
