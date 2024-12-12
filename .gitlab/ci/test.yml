@@ -1,6 +1,6 @@
 .status_report: &status_report
     - |
-      curl --url "https://api.github.com/repos/llnl/${CI_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+      curl -X POST --url "https://api.github.com/repos/llnl/${CI_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
            --header 'Content-Type: application/json' \
            --header "authorization: Bearer ${GITHUB_TOKEN}" \
            --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_JOB_URL}\", \"description\": \"${CI_JOB_NAME}\", \"context\": \"ci/gitlab/${CI_JOB_NAME}\" }"
@@ -67,8 +67,12 @@ default:
     - export pipeline_status="pending"
     - *status_report
   after_script:
-    - echo -e "RRR $CI_JOB_STATUS"
-    - export pipeline_status="$CI_JOB_STATUS"
+    - |
+      if [[ "$CI_JOB_STATUS" == "failed" ]]; then
+        export pipeline_status="failure"
+      else
+        export pipeline_status="$CI_JOB_STATUS"
+      fi
     - *status_report
 
 legacy_test_run:
