@@ -311,7 +311,9 @@ class ConcreteSpec(Spec):
                             f"The workload variant in must be multi-valued to use the 'all' option in package {self.name}"
                         )
             else:
-                raise BenchparkError(f"Package {self.name} must define a workload variant")
+                raise BenchparkError(
+                    f"Package {self.name} must define a workload variant"
+                )
 
         # For variants that are set, set whatever they imply
         variants_to_check = set(
