@@ -249,7 +249,7 @@ jobs:
             workspace setup --dry-run
 
       - name: Dry run dynamic gromacs/rocm with dynamic Tioga
-        run: 
+        run: |
           ./bin/benchpark system init --dest=tioga-system1 llnl-elcapitan rocm=5.5.1 compiler=cce +gtl lapack=intel-oneapi-mkl blas=intel-oneapi-mkl
           system_id=$(./bin/benchpark system id ./tioga-system1)
           ./bin/benchpark experiment init --dest=gromacs-rocm gromacs +openmp+rocm~cuda gpu-aware-mpi=force
