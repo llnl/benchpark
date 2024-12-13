@@ -2,19 +2,87 @@
   parallel:
     matrix:
       - HOST: tioga
-        ARCHCONFIG: LLNL-Tioga-HPECray-zen3-MI250X-Slingshot
+        ARCHCONFIG: llnl-elcapitan
+        SCHEDULER_PARAMETERS: -N 1 -t 1h
+        BENCHMARK:
+          - kripke
+          - saxpy
+        VARIANT:
+          - rocm
       - HOST: dane
-        ARCHCONFIG: LLNL-Dane-DELL-sapphirerapids-OmniPath
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: -N 1 -t 01:00:00
+        BENCHMARK:
+          - kripke
+          - saxpy
+        VARIANT:
+          - openmp
+      - HOST: ruby
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: -N 1 -t 01:00:00
+        BENCHMARK:
+          - kripke
+          - saxpy
+        VARIANT:
+          - openmp
 
-test_run:
-  resource_group: $HOST
+.legacy_test_clusters: &legacy_test_clusters
+  parallel:
+    matrix:
+      - LEGACY_HOST: tioga
+        LEGACY_ARCHCONFIG: LLNL-Tioga-HPECray-zen3-MI250X-Slingshot
+        SCHEDULER_PARAMETERS: -N 1 -t 1h
+        LEGACY_BENCHMARK:
+          - saxpy
+        LEGACY_VARIANT:
+          - openmp
+      - LEGACY_HOST: dane
+        LEGACY_ARCHCONFIG: LLNL-Dane-DELL-sapphirerapids-OmniPath
+        SCHEDULER_PARAMETERS: -N 1 -t 01:00:00
+        LEGACY_BENCHMARK:
+          - saxpy
+        LEGACY_VARIANT:
+          - openmp
+      - LEGACY_HOST: ruby
+        LEGACY_ARCHCONFIG: LLNL-Ruby-icelake-OmniPath
+        SCHEDULER_PARAMETERS: -N 1 -t 01:00:00
+        LEGACY_BENCHMARK:
+          - saxpy
+        LEGACY_VARIANT:
+          - openmp
+
+.push_status: &push_status
+    - |
+      curl -X POST --url "https://api.github.com/repos/llnl/${CI_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+           --header 'Content-Type: application/json' \
+           --header "authorization: Bearer ${GITHUB_TOKEN}" \
+           --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_JOB_URL}\", \"description\": \"${CI_JOB_NAME}\", \"context\": \"ci/gitlab/${CI_JOB_NAME}\" }"
+
+.report_status: &report_status
+  before_script:
+    - export pipeline_status="pending"
+    - *push_status
+  after_script:
+    - |
+      if [[ "$CI_JOB_STATUS" == "failed" ]]; then
+        export pipeline_status="failure"
+      else
+        export pipeline_status="$CI_JOB_STATUS"
+      fi
+    - *push_status
+
+workflow:
+  auto_cancel:
+    on_new_commit: conservative
+
+legacy_test_run:
+  resource_group: $LEGACY_HOST
   stage: test
   tags:
-    - $HOST
+    - $LEGACY_HOST
     - batch
-  <<: *test_clusters
-  variables:
-    SCHEDULER_PARAMETERS: -N 1 -t 1h
+  <<: *legacy_test_clusters
+  <<: *report_status
   rules:
     - if: |
         $CI_PIPELINE_SOURCE == "merge_request_event" ||
@@ -23,20 +91,77 @@ test_run:
         - .gitlab-ci.yml
         - .gitlab/ci/*
         - experiments/**
-        - systems/**
-        - repo/**
+        - systems/${LEGACY_ARCHCONFIG}/**
+        - repo/${LEGACY_BENCHMARK}/**
         - modifiers/**
         - var/**
         - lib/**
   script:
+    # Activate Virtual Environment
     - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
     # Build Saxpy Workspace
-    - ./bin/benchpark setup saxpy/openmp $ARCHCONFIG workspace/
+    - ./bin/benchpark setup ${LEGACY_BENCHMARK}/${LEGACY_VARIANT} ${LEGACY_ARCHCONFIG} workspace/
     # Setup Ramble & Spack
     - . workspace/setup.sh
     # Setup Saxpy Workspace
-    - cd ./workspace/saxpy/openmp/$ARCHCONFIG/workspace/
+    - cd ./workspace/${LEGACY_BENCHMARK}/${LEGACY_VARIANT}/${LEGACY_ARCHCONFIG}/workspace/
     - ramble --workspace-dir . --disable-progress-bar --disable-logger workspace setup
     # Run Saxpy Experiments
     - ramble --workspace-dir . --disable-progress-bar --disable-logger
       on --executor '{execute_experiment}' --where '{n_nodes} == 1'
+    # Analyze Experiments
+    - ramble --workspace-dir . --disable-progress-bar workspace analyze --always-print-foms --format json yaml text
+    # Check Experiment Exit Codes
+    - cd -
+    - python ./.gitlab/ci/bin/exit-codes ./workspace/${LEGACY_BENCHMARK}/${LEGACY_VARIANT}/${LEGACY_ARCHCONFIG}/workspace/results.latest.json
+
+test_run:
+  resource_group: $HOST
+  stage: test
+  tags:
+    - $HOST
+    - batch
+  <<: *test_clusters
+  <<: *report_status
+  rules:
+    - if: |
+        $CI_PIPELINE_SOURCE == "merge_request_event" ||
+        $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - .gitlab-ci.yml
+        - .gitlab/ci/*
+        - experiments/**
+        - systems/${ARCHCONFIG}/**
+        - repo/${BENCHMARK}/**
+        - modifiers/**
+        - var/**
+        - lib/**
+  script:
+    # Activate Virtual Environment
+    - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
+    # Initialize System
+    - |
+        if [ "$HOST" == "tioga" ]; then
+            ./bin/benchpark system init --dest=tioga-system ${ARCHCONFIG} ~gtl
+            system_id=$(./bin/benchpark system id ./tioga-system)
+        else
+            ./bin/benchpark system init --dest=$HOST-system ${ARCHCONFIG} cluster=$HOST
+            system_id=$(./bin/benchpark system id ./$HOST-system)
+        fi
+    # Initialize Experiment
+    - ./bin/benchpark experiment init --dest=${BENCHMARK}-benchmark ${BENCHMARK}+${VARIANT}
+    # Build Workspace
+    - ./bin/benchpark setup ${BENCHMARK}-benchmark ${HOST}-system workspace/
+    # Setup Ramble & Spack
+    - . workspace/setup.sh
+    # Setup Workspace
+    - cd ./workspace/${BENCHMARK}-benchmark/${system_id}/workspace/
+    - ramble --workspace-dir . --disable-progress-bar --disable-logger workspace setup
+    # Run Experiments
+    - ramble --workspace-dir . --disable-progress-bar --disable-logger
+      on --executor '{execute_experiment}' --where '{n_nodes} == 1'
+    # Analyze Experiments
+    - ramble --workspace-dir . --disable-progress-bar workspace analyze --always-print-foms --format json yaml text
+    # Check Experiment Exit Codes
+    - cd -
+    - python ./.gitlab/ci/bin/exit-codes ./workspace/${BENCHMARK}-benchmark/${system_id}/workspace/results.latest.json
