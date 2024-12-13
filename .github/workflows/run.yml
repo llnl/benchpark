@@ -175,9 +175,9 @@ jobs:
 
       - name: Dry run kripke/rocm on dynamic Tioga with allocation modifier
         run: |
-          ./bin/benchpark system init --dest=tioga-system llnl-elcapitan rocm=5.5.1 compiler=cce ~gtl
-          ./bin/benchpark setup kripke/rocm ./tioga-system workspace/
-          system_id=$(./bin/benchpark system id ./tioga-system)
+          ./bin/benchpark system init --dest=tioga-system1 llnl-elcapitan rocm=5.5.1 compiler=cce ~gtl
+          ./bin/benchpark setup kripke/rocm ./tioga-system1 workspace/
+          system_id=$(./bin/benchpark system id ./tioga-system1)
           . workspace/setup.sh
           ramble \
             --workspace-dir "workspace/kripke/rocm/$system_id/workspace" \
@@ -237,10 +237,10 @@ jobs:
 
       - name: Dry run dynamic gromacs/cuda with dynamic Sierra
         run: |
-          ./bin/benchpark system init --dest=sierra-system llnl-sierra cuda=11-8-0 compiler=clang-ibm lapack=cusolver blas=cublas
-          system_id=$(./bin/benchpark system id ./sierra-system)
+          ./bin/benchpark system init --dest=sierra-system1 llnl-sierra cuda=11-8-0 compiler=clang-ibm lapack=cusolver blas=cublas
+          system_id=$(./bin/benchpark system id ./sierra-system1)
           ./bin/benchpark experiment init --dest=gromacs-cuda gromacs +openmp+cuda~rocm gpu-aware-mpi=on
-          ./bin/benchpark setup ./gromacs-cuda ./sierra-system workspace/
+          ./bin/benchpark setup ./gromacs-cuda ./sierra-system1 workspace/
           . workspace/setup.sh
           ramble \
             --workspace-dir "workspace/gromacs-cuda/$system_id/workspace" \
