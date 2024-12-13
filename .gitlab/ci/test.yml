@@ -71,6 +71,28 @@
       fi
     - *push_status
 
+.ignore_draft_prs: &ignore_draft_prs
+  before_script:
+    - |
+      curl --header "authorization: Bearer ${GITHUB_TOKEN}" -X POST -d " \
+      { \
+        \"query\": \"query { \
+                             repository(name: \\\"${GITHUB_PROJECT_NAME}\\\", owner: \\\"${GITHUB_PROJECT_ORG}\\\") { \
+                               pullRequests(last: 1, headRefName: \\\"${CI_COMMIT_BRANCH}\\\") { \
+                                 nodes { \
+                                   number, \
+                                   isDraft \
+                                 } \
+                               } \
+                             } \
+                          }\" \
+      } \
+      " https://api.github.com/graphql > data.json 2> /dev/null
+      if $(jq '.data.repository.pullRequests.nodes[].isDraft' data.json)
+      then
+          export pipeline_status="$CI_JOB_STATUS"
+      fi
+
 workflow:
   auto_cancel:
     on_new_commit: conservative
@@ -83,6 +105,7 @@ legacy_test_run:
     - batch
   <<: *legacy_test_clusters
   <<: *report_status
+  <<: *ignore_draft_prs
   rules:
     - if: |
         $CI_PIPELINE_SOURCE == "merge_request_event" ||
@@ -123,6 +146,7 @@ test_run:
     - batch
   <<: *test_clusters
   <<: *report_status
+  <<: *ignore_draft_prs
   rules:
     - if: |
         $CI_PIPELINE_SOURCE == "merge_request_event" ||
