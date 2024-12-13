@@ -22,6 +22,4 @@ include:
 #    file: 'utilities/preliminary-ignore-draft-pr.yml'
 
 stages:
-  - status_initiate
   - test
-  - status_update
