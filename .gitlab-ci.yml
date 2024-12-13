@@ -3,7 +3,6 @@ variables:
 # Required information about GitHub repository
   GITHUB_PROJECT_NAME: "benchpark"
   GITHUB_PROJECT_ORG: "LLNL"
-  CI_PROJECT_NAME: "benchpark"  # TODO remove before merge??
 # Override the pattern describing branches that will skip the "draft PR filter
 # test".  Add protected branches here. See default value in
 # preliminary-ignore-draft-pr.yml.
@@ -22,6 +21,4 @@ include:
     file: 'utilities/preliminary-ignore-draft-pr.yml'
 
 stages:
-  - status_initiate
   - test
-  - status_update
