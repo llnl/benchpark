@@ -175,9 +175,9 @@ jobs:
 
       - name: Dry run kripke/rocm on dynamic Tioga with allocation modifier
         run: |
-          ./bin/benchpark system init --dest=tioga-system1 llnl-elcapitan rocm=5.5.1 compiler=cce ~gtl
-          ./bin/benchpark setup kripke/rocm ./tioga-system1 workspace/
-          system_id=$(./bin/benchpark system id ./tioga-system1)
+          ./bin/benchpark system init --dest=tioga-system llnl-elcapitan rocm=5.5.1 compiler=cce ~gtl
+          ./bin/benchpark setup kripke/rocm ./tioga-system workspace/
+          system_id=$(./bin/benchpark system id ./tioga-system)
           . workspace/setup.sh
           ramble \
             --workspace-dir "workspace/kripke/rocm/$system_id/workspace" \
@@ -250,10 +250,10 @@ jobs:
 
       - name: Dry run dynamic gromacs/rocm with dynamic Tioga
         run: 
-          ./bin/benchpark system init --dest=tioga-system llnl-elcapitan rocm=5.5.1 compiler=cce +gtl lapack=intel-oneapi-mkl blas=intel-oneapi-mkl|
-          system_id=$(./bin/benchpark system id ./tioga-system)
+          ./bin/benchpark system init --dest=tioga-system1 llnl-elcapitan rocm=5.5.1 compiler=cce +gtl lapack=intel-oneapi-mkl blas=intel-oneapi-mkl|
+          system_id=$(./bin/benchpark system id ./tioga-system1)
           ./bin/benchpark experiment init --dest=gromacs-rocm gromacs +openmp+rocm~cuda gpu-aware-mpi=force
-          ./bin/benchpark setup ./gromacs-rocm ./tioga-system workspace/
+          ./bin/benchpark setup ./gromacs-rocm ./tioga-system1 workspace/
           . workspace/setup.sh
           ramble \
             --workspace-dir "workspace/gromacs-rocm/$system_id/workspace" \
