@@ -420,7 +420,7 @@ jobs:
         run: |
           ./bin/benchpark system init --dest=x86-system genericx86
           ./bin/benchpark experiment init --dest=amg2023-openmp-generic amg2023+openmp
-          ./bin/benchpark setup ./amg2023-openmp ./x86-system workspace/
+          ./bin/benchpark setup ./amg2023-openmp-generic ./x86-system workspace/
           . workspace/setup.sh
           ramble \
             --workspace-dir "workspace/amg2023-openmp-generic/x86-system/workspace" \
