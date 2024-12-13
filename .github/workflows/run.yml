@@ -431,10 +431,11 @@ jobs:
       - name: Dry run dynamic saxpy/openmp with dynamic aws
         run: |
           ./bin/benchpark system init --dest=aws1 aws-pcluster instance_type=hpc6a.48xlarge
-          ./bin/benchpark setup ./saxpy-omp-generic ./aws1 workspace/
+          ./bin/benchpark experiment init --dest=saxpy-openmp-generic saxpy+openmp
+          ./bin/benchpark setup ./saxpy-openmp-generic ./aws1 workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir "workspace/saxpy-omp-generic/aws1/workspace" \
+            --workspace-dir "workspace/saxpy-openmp-generic/aws1/workspace" \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
@@ -491,11 +492,11 @@ jobs:
       - name: Dry run dynamic saxpy/openmp with dynamic fugaku
         run: |
           ./bin/benchpark system init --dest=fugaku-system fugaku
-          ./bin/benchpark experiment init --dest=saxpy-omp-fugaku saxpy+openmp
-          ./bin/benchpark setup ./saxpy-omp-fugaku ./fugaku-system workspace/
+          ./bin/benchpark experiment init --dest=saxpy-openmp-fugaku saxpy+openmp
+          ./bin/benchpark setup ./saxpy-openmp-fugaku ./fugaku-system workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/saxpy-omp-fugaku/Fugaku-cf3cb1d/workspace \
+            --workspace-dir workspace/saxpy-openmp-fugaku/Fugaku-cf3cb1d/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
