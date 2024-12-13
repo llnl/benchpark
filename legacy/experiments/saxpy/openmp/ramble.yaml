@@ -44,6 +44,6 @@ ramble:
     environments:
       saxpy:
         packages:
-        - default-mpi
+        - mpi-rocm-no-gtl
         - saxpy
         - '{modifier_package_name}'
