@@ -294,7 +294,9 @@ class Allocation(BasicModifier):
             v.n_nodes = max(cores_node_request or 0, gpus_node_request or 0)
 
         if v.run_single_node_expr and v.n_nodes > 1:
-            raise ValueError(f"Experiment must run on 1 node. Requested {v.n_nodes} nodes")
+            raise ValueError(
+                f"Experiment must run on 1 node. Requested {v.n_nodes} nodes"
+            )
 
 
         if not v.n_threads_per_proc:

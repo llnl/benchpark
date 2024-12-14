@@ -175,7 +175,9 @@ class Experiment(ExperimentSystemBase, SingleNode):
 
         self.compute_applications_section()
 
-        self.add_experiment_variable("run_single_node_expr", self.run_single_node_expr())
+        self.add_experiment_variable(
+            "run_single_node_expr", self.run_single_node_expr()
+        )
 
         expr_helper_list = []
         for cls in self.helpers:
