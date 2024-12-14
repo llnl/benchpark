@@ -31,11 +31,7 @@ class Ior(
         t = "{b}/256"
         self.add_experiment_variable("t", t, True)
 
-        if self.spec.satisfies("+single_node"):
-            for pk, pv in num_nodes.items():
-                self.add_experiment_variable(pk, pv, True)
-            self.add_experiment_variable("b", "268435456", True)
-        elif self.spec.satisfies("+strong"):
+        if self.spec.satisfies("+strong"):
             scaled_variables = self.generate_strong_scaling_params(
                 {tuple(num_nodes.keys()): list(num_nodes.values())},
                 int(self.spec.variants["scaling-factor"][0]),
@@ -55,6 +51,10 @@ class Ior(
             for k, v in scaled_variables.items():
                 self.add_experiment_variable(k, v, True)
 
+            self.add_experiment_variable("b", "268435456", True)
+        else:
+            for pk, pv in num_nodes.items():
+                self.add_experiment_variable(pk, pv, True)
             self.add_experiment_variable("b", "268435456", True)
 
         self.add_experiment_variable("t", t, True)

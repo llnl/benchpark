@@ -91,9 +91,8 @@ class OsuMicroBenchmarks(Experiment):
     def compute_applications_section(self):
         num_nodes = {"n_nodes": 2}
 
-        if self.spec.satisfies("+single_node"):
-            for pk, pv in num_nodes.items():
-                self.add_experiment_variable(pk, pv, True)
+        for pk, pv in num_nodes.items():
+            self.add_experiment_variable(pk, pv, True)
 
     def compute_spack_section(self):
         system_specs = {}
