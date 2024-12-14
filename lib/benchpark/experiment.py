@@ -55,6 +55,9 @@ class SingleNode:
         description="Single node execution mode",
     )
 
+    def run_single_node_expr(self):
+        return 1 if self.spec.satisfies("+single_node") else 0
+
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):
             return "single_node" if self.spec.satisfies("+single_node") else ""
@@ -171,6 +174,8 @@ class Experiment(ExperimentSystemBase, SingleNode):
         self.excludes = []
 
         self.compute_applications_section()
+
+        self.add_experiment_variable("run_single_node_expr", self.run_single_node_expr())
 
         expr_name_list = [self.name, self.workload]
         for cls in self.helpers:

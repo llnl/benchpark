@@ -41,7 +41,6 @@ class Kripke(
             "strong": self.spec.satisfies("+strong"),
             "weak": self.spec.satisfies("+weak"),
             "throughput": self.spec.satisfies("+throughput"),
-            "single_node": self.spec.satisfies("+single_node"),
         }
 
         scaling_mode_enabled = [key for key, value in scaling_modes.items() if value]
