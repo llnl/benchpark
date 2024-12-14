@@ -52,15 +52,7 @@ class Kripke(
         for k, v in input_variables.items():
             self.add_experiment_variable(k, v, True)
 
-        if self.spec.satisfies("+single_node"):
-            n_resources = 1
-            # TODO: Check if n_ranks / n_resources_per_node <= 1
-            for pk, pv in num_procs.items():
-                self.add_experiment_variable(pk, pv, True)
-                n_resources *= pv
-            for nk, nv in problem_sizes.items():
-                self.add_experiment_variable(nk, nv, True)
-        elif self.spec.satisfies("+throughput"):
+        if self.spec.satisfies("+throughput"):
             n_resources = 1
             for pk, pv in num_procs.items():
                 self.add_experiment_variable(pk, pv, True)
@@ -103,6 +95,14 @@ class Kripke(
             ]
             for k, v in scaled_variables.items():
                 self.add_experiment_variable(k, v, True)
+        else:
+            n_resources = 1
+            # TODO: Check if n_ranks / n_resources_per_node <= 1
+            for pk, pv in num_procs.items():
+                self.add_experiment_variable(pk, pv, True)
+                n_resources *= pv
+            for nk, nv in problem_sizes.items():
+                self.add_experiment_variable(nk, nv, True)
 
         if self.spec.satisfies("+openmp"):
             self.add_experiment_variable("n_ranks", n_resources, True)

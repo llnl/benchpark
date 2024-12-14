@@ -154,7 +154,7 @@ jobs:
 
       - name: Dry run dynamic kripke-rocm on LLNL-Tioga-HPECray-zen3-MI250X-Slingshot with allocation modifier
         run: |
-          ./bin/benchpark experiment init --dest=kripke-rocm kripke+rocm~single_node
+          ./bin/benchpark experiment init --dest=kripke-rocm kripke+rocm
           ./bin/benchpark setup ./kripke-openmp LLNL-Tioga-HPECray-zen3-MI250X-Slingshot workspace/
           . workspace/setup.sh
           ramble \
@@ -309,7 +309,7 @@ jobs:
 
       - name: Dry run dynamic quicksilver-openmp on nosite-x86_64 with allocation modifier
         run: |
-          ./bin/benchpark experiment init --dest=quicksilver-openmp quicksilver+openmp +weak~single_node
+          ./bin/benchpark experiment init --dest=quicksilver-openmp quicksilver+openmp +weak
           ./bin/benchpark setup ./quicksilver-openmp nosite-x86_64 workspace/
           . workspace/setup.sh
           ramble \
