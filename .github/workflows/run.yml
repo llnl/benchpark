@@ -382,7 +382,7 @@ jobs:
         run: |
           ./bin/benchpark system init --dest=ruby-system llnl-cluster cluster=ruby
           system_id=$(./bin/benchpark system id ./ruby-system)
-          ./bin/benchpark experiment init --dest=saxpy-openmp saxpy+openmp
+          ./bin/benchpark experiment init --dest=saxpy-openmp saxpy+openmp~single_node
           ./bin/benchpark setup ./saxpy-openmp ./ruby-system workspace/
           . workspace/setup.sh
           ramble \
@@ -395,7 +395,7 @@ jobs:
         run: |
           ./bin/benchpark system init --dest=dane-system llnl-cluster cluster=dane
           system_id=$(./bin/benchpark system id ./dane-system)
-          ./bin/benchpark experiment init --dest=saxpy-openmp2 saxpy+openmp
+          ./bin/benchpark experiment init --dest=saxpy-openmp2 saxpy+openmp~single_node
           ./bin/benchpark setup ./saxpy-openmp2 ./dane-system workspace/
           . workspace/setup.sh
           ramble \
@@ -407,7 +407,7 @@ jobs:
       - name: Dry run dynamic saxpy/openmp with dynamic llnl-cluster magma
         run: |
           ./bin/benchpark system init --dest=magma-system llnl-cluster cluster=magma
-          ./bin/benchpark experiment init --dest=saxpy-openmp3 saxpy+openmp
+          ./bin/benchpark experiment init --dest=saxpy-openmp3 saxpy+openmp~single_node
           ./bin/benchpark setup ./saxpy-openmp3 ./magma-system workspace/
           . workspace/setup.sh
           ramble \
@@ -419,7 +419,7 @@ jobs:
       - name: Dry run dynamic saxpy/openmp with dynamic generic x86
         run: |
           ./bin/benchpark system init --dest=x86-system genericx86
-          ./bin/benchpark experiment init --dest=saxpy-omp-generic saxpy+openmp
+          ./bin/benchpark experiment init --dest=saxpy-omp-generic saxpy+openmp~single_node
           ./bin/benchpark setup ./saxpy-omp-generic ./x86-system workspace/
           . workspace/setup.sh
           ramble \
@@ -441,7 +441,7 @@ jobs:
 
       - name: Dry run dynamic remhos/mpi with dynamic llnl-cluster ruby
         run: |
-          ./bin/benchpark experiment init --dest=remhos-ruby remhos
+          ./bin/benchpark experiment init --dest=remhos-ruby remhos~single_node
           ./bin/benchpark setup ./remhos-ruby ./ruby-system workspace/
           system_id=$(./bin/benchpark system id ./ruby-system)
           . workspace/setup.sh
@@ -451,7 +451,7 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic remhos/mpi with dynamic Tioga
+      - name: Dry run dynamic remhos/mpi with dynamic Tioga~single_node
         run: |
           ./bin/benchpark experiment init --dest=remhos-tioga remhos
           ./bin/benchpark setup remhos-tioga ./tioga-system workspace/
@@ -491,7 +491,7 @@ jobs:
       - name: Dry run dynamic saxpy/openmp with dynamic fugaku
         run: |
           ./bin/benchpark system init --dest=fugaku-system fugaku
-          ./bin/benchpark experiment init --dest=saxpy-omp-fugaku saxpy+openmp
+          ./bin/benchpark experiment init --dest=saxpy-omp-fugaku saxpy+openmp~single_node
           ./bin/benchpark setup ./saxpy-omp-fugaku ./fugaku-system workspace/
           . workspace/setup.sh
           ramble \
