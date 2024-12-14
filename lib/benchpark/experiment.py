@@ -111,7 +111,7 @@ class Experiment(ExperimentSystemBase, SingleNode):
         self.name = self.spec.name
 
         if "workload" in self.spec.variants:
-            self.workload = self.spec.variants["workload"][0]
+            self.workload = self.spec.variants["workload"]
         else:
             raise BenchparkError(f"No workload variant defined for package {self.name}")
 
@@ -177,30 +177,33 @@ class Experiment(ExperimentSystemBase, SingleNode):
 
         self.add_experiment_variable("run_single_node_expr", self.run_single_node_expr())
 
-        expr_name_list = [self.name, self.workload]
+        expr_helper_list = []
         for cls in self.helpers:
             helper_prefix = cls.get_helper_name_prefix()
             if helper_prefix:
-                expr_name_list.append(helper_prefix)
-        expr_name = "_".join(expr_name_list + self.expr_name)
+                expr_helper_list.append(helper_prefix)
+        expr_name_suffix = "_".join(expr_helper_list + self.expr_name)
+
+        expr_setup = {
+            "variants": {"package_manager": "spack"},
+            "variables": self.variables,
+            "zips": self.zips,
+            "matrix": self.matrix,
+            "exclude": ({"where": self.excludes} if self.excludes else {}),
+        }
+
+        workloads = {}
+        for workload in self.workload:
+            expr_name = f"{self.name}_{workload}_{expr_name_suffix}"
+            workloads[workload] = {
+                "experiments": {
+                    expr_name: expr_setup,
+                }
+            }
 
         return {
             self.name: {
-                "workloads": {
-                    self.workload: {
-                        "experiments": {
-                            expr_name: {
-                                "variants": {"package_manager": "spack"},
-                                "variables": self.variables,
-                                "zips": self.zips,
-                                "matrix": self.matrix,
-                                "exclude": (
-                                    {"where": self.excludes} if self.excludes else {}
-                                ),
-                            }
-                        }
-                    }
-                }
+                "workloads": workloads,
             }
         }
 
