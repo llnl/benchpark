@@ -298,7 +298,6 @@ class Allocation(BasicModifier):
                 f"Experiment must run on 1 node. Requested {v.n_nodes} nodes"
             )
 
-
         if not v.n_threads_per_proc:
             v.n_threads_per_proc = 1
 
