@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from benchpark.directives import variant
-from benchpark.error import BenchparkError
 from benchpark.experiment import Experiment
 
 
@@ -90,16 +89,6 @@ class OsuMicroBenchmarks(Experiment):
     )
 
     def compute_applications_section(self):
-        scaling_modes = {
-            "single_node": self.spec.satisfies("+single_node"),
-        }
-
-        scaling_mode_enabled = [key for key, value in scaling_modes.items() if value]
-        if len(scaling_mode_enabled) != 1:
-            raise BenchparkError(
-                f"Only one type of scaling per experiment is allowed for application package {self.name}"
-            )
-
         num_nodes = {"n_nodes": 2}
 
         if self.spec.satisfies("+single_node"):

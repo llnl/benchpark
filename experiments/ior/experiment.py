@@ -3,7 +3,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.error import BenchparkError
 from benchpark.directives import variant
 from benchpark.experiment import Experiment
 from benchpark.scaling import StrongScaling
@@ -28,18 +27,6 @@ class Ior(
     )
 
     def compute_applications_section(self):
-        # TODO: Replace with conflicts clause
-        scaling_modes = {
-            "strong": self.spec.satisfies("+strong"),
-            "weak": self.spec.satisfies("+weak"),
-        }
-
-        scaling_mode_enabled = [key for key, value in scaling_modes.items() if value]
-        if len(scaling_mode_enabled) != 1:
-            raise BenchparkError(
-                f"Only one type of scaling per experiment is allowed for application package {self.name}"
-            )
-
         num_nodes = {"n_nodes": 1}
         t = "{b}/256"
         self.add_experiment_variable("t", t, True)

@@ -3,7 +3,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.error import BenchparkError
 from benchpark.directives import variant
 from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
@@ -36,19 +35,6 @@ class Kripke(
     )
 
     def compute_applications_section(self):
-        # TODO: Replace with conflicts clause
-        scaling_modes = {
-            "strong": self.spec.satisfies("+strong"),
-            "weak": self.spec.satisfies("+weak"),
-            "throughput": self.spec.satisfies("+throughput"),
-        }
-
-        scaling_mode_enabled = [key for key, value in scaling_modes.items() if value]
-        if len(scaling_mode_enabled) != 1:
-            raise BenchparkError(
-                f"Only one type of scaling per experiment is allowed for application package {self.name}"
-            )
-
         input_variables = {
             "ngroups": 64,
             "gs": 1,
