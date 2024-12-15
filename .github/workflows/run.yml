@@ -222,6 +222,45 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
+      - name: Dry run dynamic gromacs/openmp with dynamic Ruby
+        run: |
+          ./bin/benchpark system init --dest=cluster-system llnl-cluster compiler=gcc lapack=intel-oneapi-mkl blas=intel-oneapi-mkl
+          system_id=$(./bin/benchpark system id ./cluster-system)
+          ./bin/benchpark experiment init --dest=gromacs-openmp gromacs +openmp~cuda~rocm gpu-aware-mpi=off
+          ./bin/benchpark setup ./gromacs-openmp ./cluster-system workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir "workspace/gromacs-openmp/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic gromacs/cuda with dynamic Sierra
+        run: |
+          ./bin/benchpark system init --dest=sierra-system1 llnl-sierra cuda=11-8-0 compiler=clang-ibm lapack=cusolver blas=cublas
+          system_id=$(./bin/benchpark system id ./sierra-system1)
+          ./bin/benchpark experiment init --dest=gromacs-cuda gromacs +openmp+cuda~rocm gpu-aware-mpi=on
+          ./bin/benchpark setup ./gromacs-cuda ./sierra-system1 workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir "workspace/gromacs-cuda/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic gromacs/rocm with dynamic Tioga
+        run: |
+          ./bin/benchpark system init --dest=tioga-system1 llnl-elcapitan rocm=5.5.1 compiler=cce +gtl lapack=intel-oneapi-mkl blas=intel-oneapi-mkl
+          system_id=$(./bin/benchpark system id ./tioga-system1)
+          ./bin/benchpark experiment init --dest=gromacs-rocm gromacs +openmp+rocm~cuda gpu-aware-mpi=force
+          ./bin/benchpark setup ./gromacs-rocm ./tioga-system1 workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir "workspace/gromacs-rocm/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
       - name: Dry run dynamic laghos/mpi-only on LLNL-Magma-Penguin-icelake-OmniPath with allocation modifier
         run: |
           ./bin/benchpark experiment init --dest=laghos-mpi-only laghos

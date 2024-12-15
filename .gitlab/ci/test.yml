@@ -84,10 +84,7 @@ legacy_test_run:
   <<: *legacy_test_clusters
   <<: *report_status
   rules:
-    - if: |
-        $CI_PIPELINE_SOURCE == "merge_request_event" ||
-        $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes:
+    - changes:
         - .gitlab-ci.yml
         - .gitlab/ci/*
         - experiments/**
@@ -124,10 +121,7 @@ test_run:
   <<: *test_clusters
   <<: *report_status
   rules:
-    - if: |
-        $CI_PIPELINE_SOURCE == "merge_request_event" ||
-        $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes:
+    - changes:
         - .gitlab-ci.yml
         - .gitlab/ci/*
         - experiments/**

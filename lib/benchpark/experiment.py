@@ -147,6 +147,9 @@ class Experiment(ExperimentSystemBase, SingleNode):
         if use_in_expr_name:
             self.expr_name.append(f"{{{name}}}")
 
+    def set_environment_variable(self, name, values):
+        self.set_env_vars[name] = values
+
     def zip_experiment_variables(self, name, variable_names):
         self.zips[name] = list(variable_names)
 
@@ -168,6 +171,7 @@ class Experiment(ExperimentSystemBase, SingleNode):
 
     def compute_applications_section_wrapper(self):
         self.expr_name = []
+        self.set_env_vars = {}
         self.variables = {}
         self.zips = {}
         self.matrix = []
