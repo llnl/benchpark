@@ -1,0 +1,52 @@
+ignore-branches-not-a-pr:
+  stage: .pre
+  tags: [shell, oslic]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - |
+      # Create a pattern of branch names on which we always run.
+      # Note: the pattern can be overridden setting ALWAYS_RUN_PATTERN.
+      always_run_pattern="${ALWAYS_RUN_PATTERN:-"^develop$|^main$|^master$|^v[0-9.]*$"}"
+      # If the current branch is not in the always run pattern
+      echo ""
+      echo "### Draft filter parameters ###"
+      echo "# CI_COMMIT_BRANCH = ${CI_COMMIT_BRANCH}"
+      echo "# ALWAYS_RUN_PATTERN = ${ALWAYS_RUN_PATTERN}"
+      echo "# CI_COMMIT_SHA = ${CI_COMMIT_SHA}"
+      echo ""
+      description="GitLab: Pull Request vetted for testing"
+      status="success"
+      return_code=0
+      # CI_COMMIT_BRANCH is only empty for tags, we always run CI on tags.
+      if [[ ! "${CI_COMMIT_BRANCH}" =~ ${always_run_pattern} && -n "${CI_COMMIT_BRANCH}" ]];
+      then
+          curl --header "authorization: Bearer ${GITHUB_TOKEN}" -X POST -d " \
+          { \
+            \"query\": \"query { \
+                                 repository(name: \\\"${GITHUB_PROJECT_NAME}\\\", owner: \\\"${GITHUB_PROJECT_ORG}\\\") { \
+                                   pullRequests(last: 1, headRefName: \\\"${CI_COMMIT_BRANCH}\\\") { \
+                                     nodes { \
+                                       number \
+                                     } \
+                                   } \
+                                 } \
+                              }\" \
+          } \
+          " https://api.github.com/graphql > data.json 2> /dev/null
+          if $(jq '.data.repository.pullRequests.nodes[]' data.json)
+          then
+              description="GitLab: skipped branch not a Pull Request"
+              status="failure"
+              return_code=1
+          fi
+      fi
+      curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+           --header 'Content-Type: application/json' \
+           --header "authorization: Bearer ${GITHUB_TOKEN}" \
+           --data "{ \"state\": \"${status}\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"${description}\", \"context\": \"ci/gitlab/skipped-is-not-a-pr\" }"
+      exit ${return_code}
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: never
+    - when: on_success
