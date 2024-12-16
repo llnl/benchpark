@@ -1,0 +1,28 @@
+packages:
+  tar:
+    externals:
+    - spec: tar@1.26
+      prefix: /usr
+    buildable: false
+  gmake:
+    externals:
+    - spec: gmake@3.8.2
+      prefix: /usr
+  blas:
+    externals:
+    - spec: blas@3.4.2
+      prefix: /usr
+    buildable: false
+  lapack:
+    externals:
+    - spec: lapack@3.4.2
+      prefix: /usr
+    buildable: false
+  mpi:
+    buildable: false
+  openmpi:
+    externals:
+    - spec: openmpi@4.1.5%gcc@7.3.1
+      prefix: /opt/amazon/openmpi
+      extra_attributes:
+        ldflags: "-L/opt/amazon/openmpi/lib -lmpi"
