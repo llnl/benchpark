@@ -547,6 +547,9 @@ jobs:
           . workspace/setup.sh
           ramble \
             --workspace-dir "workspace/phloem-mpi/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
 
       - name: Dry run dynamic osu-micro-benchmarks/mpi-only with dynamic CTS ruby
         run: |
