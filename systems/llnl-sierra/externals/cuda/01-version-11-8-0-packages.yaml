@@ -19,8 +19,18 @@ packages:
     - spec: cuda@11.8.0
       prefix: /usr/tce/packages/cuda/cuda-11.8.0
     buildable: false
-  blas:
+  cub:
+    externals:
+    - spec: cub@11.8.0
+      prefix: /usr/tce/packages/cuda/cuda-11.8.0
+    buildable: false
+  cublas:
     externals:
     - spec: cublas@11.8.0
+      prefix: /usr/tce/packages/cuda/cuda-11.8.0
+    buildable: false
+  cusolver:
+    externals:
+    - spec: cusolver@11.8.0
       prefix: /usr/tce/packages/cuda/cuda-11.8.0
     buildable: false
