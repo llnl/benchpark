@@ -1,0 +1,48 @@
+ramble:
+  applications:
+    remhos:
+      workloads:
+        2d:
+          experiments:
+            remhos_2d_strong_scaling_caliper_time_mpi_{n_nodes}_{n_ranks}:
+              exclude: {}
+              matrix: []
+              variables:
+                n_nodes:
+                - 1
+                - 2
+                n_ranks: '{sys_cores_per_node} * {n_nodes}'
+              variants:
+                package_manager: spack
+              zips: {}
+  config:
+    deprecated: true
+    spack_flags:
+      concretize: -U -f
+      install: --add --keep-stage
+  include:
+  - ./configs
+  modifiers:
+  - name: allocation
+  - mode: mpi
+    name: caliper
+  - mode: time
+    name: caliper
+  software:
+    environments:
+      remhos:
+        packages:
+        - caliper
+        - default-mpi
+        - remhos
+        - hypre
+    packages:
+      caliper:
+        compiler: default-compiler
+        pkg_spec: caliper@master+adiak+mpi~libunwind~libdw~papi
+      hypre:
+        compiler: default-compiler
+        pkg_spec: hypre@2.31.0 +mpi+openmp+mixedint~fortran
+      remhos:
+        compiler: default-compiler
+        pkg_spec: remhos@gpu-fom +metis+caliper

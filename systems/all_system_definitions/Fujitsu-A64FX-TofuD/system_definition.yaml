@@ -1,0 +1,32 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+system_definition:
+  name: Fujitsu-A64FX-TofuD
+  integrator:
+    vendor: Fujitsu
+    name: FX1000
+  processor:
+    vendor: Fujitsu
+    name: A64FX
+    ISA: Armv8.2-A-SVE
+    uArch: aarch64
+  accelerator:
+    vendor:
+    name:
+    ISA:
+    uArch:
+  interconnect:
+    vendor: Fujitsu
+    name: TofuInterconnectD
+  systems-tested:
+    rccs-fugaku:
+      os: RHEL
+      scheduler: pjm
+      compiler: fj
+      runtime:
+      mpi: fujitsu-mpi
+  top500-system-instances:
+    - Fugaku (R-CCS) <https://www.top500.org/system/179807/>

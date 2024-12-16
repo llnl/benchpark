@@ -1,0 +1,32 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+system_definition:
+  name: DELL-cascadelake-InfiniBand
+  integrator:
+    vendor: DELL
+    name:
+  processor:
+    vendor: Intel
+    name: Xeon6248R
+    ISA: x86_64
+    uArch: cascadelake
+  accelerator:
+    vendor: NVIDIA
+    name: A100
+    ISA:
+    uArch:
+  interconnect:
+    vendor: Mellanox
+    name: HDR100InfiniBand
+  systems-tested:
+    tamu-grace:
+      os:
+      scheduler: slurm
+      compiler: gcc
+      runtime: gpu
+      mpi: intelmpi
+  top500-system-instances:
+    - Grace (TAMU) <https://www.top500.org/system/179905>
