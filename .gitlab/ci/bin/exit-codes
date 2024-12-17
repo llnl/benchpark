@@ -1,0 +1,23 @@
+#!/usr/bin/env python3
+
+import json
+import sys
+
+def main(results_file):
+    with open(results_file, "r") as f:
+        data = json.load(f)
+
+    res = 0
+
+    for experiment in data["experiments"]:
+        for context in experiment["CONTEXTS"]:
+          for fom in context["foms"]:
+            if fom["origin"] == "exit-code":
+                if int(fom["value"]) != 0:
+                    res += 1
+
+    return res
+
+if __name__ == "__main__":
+    f = sys.argv[1]  # path to results.latest.json
+    sys.exit(main(f))
