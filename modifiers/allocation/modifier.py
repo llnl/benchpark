@@ -37,8 +37,6 @@ class AllocOpt(Enum):
     POST_EXEC_CMDS = 302
     PRE_EXEC_CMDS = 303
 
-    RUN_SINGLE_NODE_EXPR = 666
-
     @staticmethod
     def as_type(enumval, input):
         if enumval in [
@@ -292,11 +290,6 @@ class Allocation(BasicModifier):
                         "is not specified for the system"
                     )
             v.n_nodes = max(cores_node_request or 0, gpus_node_request or 0)
-
-        if v.run_single_node_expr and v.n_nodes > 1:
-            raise ValueError(
-                f"Experiment must run on 1 node. Requested {v.n_nodes} nodes"
-            )
 
         if not v.n_threads_per_proc:
             v.n_threads_per_proc = 1

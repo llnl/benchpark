@@ -13,6 +13,7 @@ import yaml
 
 import benchpark.paths
 from benchpark.directives import ExperimentSystemBase
+from benchpark.directives import variant
 import benchpark.repo
 from benchpark.runtime import RuntimeResources
 
@@ -74,6 +75,13 @@ class System(ExperimentSystemBase):
         Tuple["benchpark.variant.Variant", "benchpark.spec.ConcreteSystemSpec"],
     ]
 
+    variant(
+        "max_node_limit",
+        default="1",
+        values=int,
+        description="Max number of allocatable nodes for experiments, 0 (no limits), default 1",
+    )
+
     def __init__(self, spec):
         self.spec: "benchpark.spec.ConcreteSystemSpec" = spec
         super().__init__()
@@ -87,6 +95,7 @@ class System(ExperimentSystemBase):
         self.scheduler = None
         self.timeout = "120"
         self.queue = None
+        self.max_node_limit = self.spec.variants["max_node_limit"][0]
 
         self.required = ["sys_cores_per_node", "scheduler", "timeout"]
 
@@ -185,6 +194,7 @@ variables:
   sys_cores_per_node: "{self.sys_cores_per_node}"
   {extras_as_cfg}
   max_request: "1000"  # n_ranks/n_nodes cannot exceed this
+  max_node_limit: "{self.max_node_limit}" # 0: no limits, default: 1
   n_ranks: '1000001'  # placeholder value
   n_nodes: '1000001'  # placeholder value
   batch_submit: "placeholder"

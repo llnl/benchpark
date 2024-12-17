@@ -10,6 +10,7 @@ variables:
   extra_cmd_opts: |
     --oversubscribe
   max_request: "1000"  # n_ranks/n_nodes cannot exceed this
+  max_node_limit: "0"
   n_ranks: '1000001'  # placeholder value
   n_nodes: '1000001'  # placeholder value
   batch_submit: "placeholder"

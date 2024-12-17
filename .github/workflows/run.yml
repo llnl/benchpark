@@ -143,7 +143,7 @@ jobs:
 
       - name: Dry run dynamic kripke-openmp on nosite-x86_64 with allocation modifier
         run: |
-          ./bin/benchpark experiment init --dest=kripke-openmp kripke+openmp~single_node
+          ./bin/benchpark experiment init --dest=kripke-openmp kripke+openmp
           ./bin/benchpark setup ./kripke-openmp nosite-x86_64 workspace/
           . workspace/setup.sh
           ramble \
@@ -152,7 +152,7 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic kripke-rocm on LLNL-Tioga-HPECray-zen3-MI250X-Slingshot with allocation modifier~single_node
+      - name: Dry run dynamic kripke-rocm on LLNL-Tioga-HPECray-zen3-MI250X-Slingshot with allocation modifier
         run: |
           ./bin/benchpark experiment init --dest=kripke-rocm kripke+rocm
           ./bin/benchpark setup ./kripke-openmp LLNL-Tioga-HPECray-zen3-MI250X-Slingshot workspace/
@@ -304,7 +304,7 @@ jobs:
 
       - name: Dry run dynamic lammps/openmp on static Ruby
         run: |
-          ./bin/benchpark experiment init --dest=lammps-openmp lammps+openmp~single_node
+          ./bin/benchpark experiment init --dest=lammps-openmp lammps+openmp
           ./bin/benchpark setup ./lammps-openmp LLNL-Ruby-icelake-OmniPath workspace/
           . workspace/setup.sh
           ramble \
@@ -315,7 +315,7 @@ jobs:
 
       - name: Dry run dynamic lammps/rocm on static Tioga 
         run: |
-          ./bin/benchpark experiment init --dest=lammps-rocm lammps+rocm~single_node
+          ./bin/benchpark experiment init --dest=lammps-rocm lammps+rocm
           ./bin/benchpark setup ./lammps-rocm LLNL-Tioga-HPECray-zen3-MI250X-Slingshot workspace/
           . workspace/setup.sh
           ramble \
@@ -326,7 +326,7 @@ jobs:
 
       - name: Dry run dynamic lammps/rocm with dynamic Tioga
         run: |
-          ./bin/benchpark experiment init --dest=lammps-rocm-tioga lammps+rocm~single_node
+          ./bin/benchpark experiment init --dest=lammps-rocm-tioga lammps+rocm
           ./bin/benchpark setup lammps-rocm-tioga ./tioga-system workspace/
           system_id=$(./bin/benchpark system id ./tioga-system)
           . workspace/setup.sh
@@ -348,7 +348,7 @@ jobs:
 
       - name: Dry run dynamic quicksilver-openmp on nosite-x86_64 with allocation modifier
         run: |
-          ./bin/benchpark experiment init --dest=quicksilver-openmp quicksilver+openmp +weak~single_node
+          ./bin/benchpark experiment init --dest=quicksilver-openmp quicksilver+openmp +weak
           ./bin/benchpark setup ./quicksilver-openmp nosite-x86_64 workspace/
           . workspace/setup.sh
           ramble \
@@ -419,9 +419,9 @@ jobs:
 
       - name: Dry run dynamic saxpy/openmp with dynamic llnl-cluster ruby
         run: |
-          ./bin/benchpark system init --dest=ruby-system llnl-cluster cluster=ruby
+          ./bin/benchpark system init --dest=ruby-system llnl-cluster cluster=ruby max_node_limit=0
           system_id=$(./bin/benchpark system id ./ruby-system)
-          ./bin/benchpark experiment init --dest=saxpy-openmp saxpy+openmp~single_node
+          ./bin/benchpark experiment init --dest=saxpy-openmp saxpy+openmp
           ./bin/benchpark setup ./saxpy-openmp ./ruby-system workspace/
           . workspace/setup.sh
           ramble \
@@ -432,9 +432,9 @@ jobs:
 
       - name: Dry run dynamic saxpy/openmp with dynamic llnl-cluster dane
         run: |
-          ./bin/benchpark system init --dest=dane-system llnl-cluster cluster=dane
+          ./bin/benchpark system init --dest=dane-system llnl-cluster cluster=dane max_node_limit=0
           system_id=$(./bin/benchpark system id ./dane-system)
-          ./bin/benchpark experiment init --dest=saxpy-openmp2 saxpy+openmp~single_node
+          ./bin/benchpark experiment init --dest=saxpy-openmp2 saxpy+openmp
           ./bin/benchpark setup ./saxpy-openmp2 ./dane-system workspace/
           . workspace/setup.sh
           ramble \
@@ -445,8 +445,8 @@ jobs:
 
       - name: Dry run dynamic saxpy/openmp with dynamic llnl-cluster magma
         run: |
-          ./bin/benchpark system init --dest=magma-system llnl-cluster cluster=magma
-          ./bin/benchpark experiment init --dest=saxpy-openmp3 saxpy+openmp~single_node
+          ./bin/benchpark system init --dest=magma-system llnl-cluster cluster=magma max_node_limit=0
+          ./bin/benchpark experiment init --dest=saxpy-openmp3 saxpy+openmp
           ./bin/benchpark setup ./saxpy-openmp3 ./magma-system workspace/
           . workspace/setup.sh
           ramble \
@@ -457,8 +457,8 @@ jobs:
 
       - name: Dry run dynamic saxpy/openmp with dynamic generic x86
         run: |
-          ./bin/benchpark system init --dest=x86-system genericx86
-          ./bin/benchpark experiment init --dest=saxpy-omp-generic saxpy+openmp~single_node
+          ./bin/benchpark system init --dest=x86-system genericx86 max_node_limit=0
+          ./bin/benchpark experiment init --dest=saxpy-omp-generic saxpy+openmp
           ./bin/benchpark setup ./saxpy-omp-generic ./x86-system workspace/
           . workspace/setup.sh
           ramble \
@@ -480,7 +480,7 @@ jobs:
 
       - name: Dry run dynamic remhos/mpi with dynamic llnl-cluster ruby
         run: |
-          ./bin/benchpark experiment init --dest=remhos-ruby remhos~single_node
+          ./bin/benchpark experiment init --dest=remhos-ruby remhos
           ./bin/benchpark setup ./remhos-ruby ./ruby-system workspace/
           system_id=$(./bin/benchpark system id ./ruby-system)
           . workspace/setup.sh
@@ -490,7 +490,7 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic remhos/mpi with dynamic Tioga~single_node
+      - name: Dry run dynamic remhos/mpi with dynamic Tioga
         run: |
           ./bin/benchpark experiment init --dest=remhos-tioga remhos
           ./bin/benchpark setup remhos-tioga ./tioga-system workspace/
@@ -529,8 +529,8 @@ jobs:
 
       - name: Dry run dynamic saxpy/openmp with dynamic fugaku
         run: |
-          ./bin/benchpark system init --dest=fugaku-system fugaku
-          ./bin/benchpark experiment init --dest=saxpy-omp-fugaku saxpy+openmp~single_node
+          ./bin/benchpark system init --dest=fugaku-system fugaku max_node_limit=0
+          ./bin/benchpark experiment init --dest=saxpy-omp-fugaku saxpy+openmp
           ./bin/benchpark setup ./saxpy-omp-fugaku ./fugaku-system workspace/
           . workspace/setup.sh
           ramble \
@@ -541,7 +541,7 @@ jobs:
 
       - name: Dry run dynamic osu-micro-benchmarks/mpi-only with dynamic CTS ruby
         run: |
-          ./bin/benchpark experiment init --dest=osu-micro-benchmarks-mpi-only osu-micro-benchmarks workload=all ~single_node
+          ./bin/benchpark experiment init --dest=osu-micro-benchmarks-mpi-only osu-micro-benchmarks workload=all
           ./bin/benchpark setup ./osu-micro-benchmarks-mpi-only ./ruby-system workspace/
           system_id=$(./bin/benchpark system id ./ruby-system)
           . workspace/setup.sh

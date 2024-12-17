@@ -13,6 +13,7 @@ variables:
   sys_cores_per_node: "44"
   sys_gpus_per_node: "4"
   max_request: "1000"  # n_ranks/n_nodes cannot exceed this
+  max_node_limit: "0"
   n_ranks: '1000001'  # placeholder value
   n_nodes: '1000001'  # placeholder value
   batch_submit: "placeholder"
