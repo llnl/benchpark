@@ -530,11 +530,12 @@ jobs:
       - name: Dry run dynamic saxpy/openmp with dynamic fugaku
         run: |
           ./bin/benchpark system init --dest=fugaku-system fugaku max_node_limit=0
+          system_id=$(./bin/benchpark system id ./fugaku-system)
           ./bin/benchpark experiment init --dest=saxpy-omp-fugaku saxpy+openmp
           ./bin/benchpark setup ./saxpy-omp-fugaku ./fugaku-system workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/saxpy-omp-fugaku/Fugaku-cf3cb1d/workspace \
+            --workspace-dir workspace/saxpy-omp-fugaku/$system_id/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
