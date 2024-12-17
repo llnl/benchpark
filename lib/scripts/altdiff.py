@@ -85,6 +85,9 @@ def diff_specs(spec_a, spec_b):
                     _write(xi)
                 else:
                     highlight(f"{xi}/{yi}")
+                # I want to put `separator` "between" components. Since I'm
+                # writing as I go, I need to handle this fenceposting issue
+                # manually
                 if i < size - 1:
                     _write(separator)
 
@@ -92,7 +95,6 @@ def diff_specs(spec_a, spec_b):
             this = [self.arch.platform, self.arch.os, str(self.arch.target)]
             other_arch = other_spec.architecture
             other = [other_arch.platform, other_arch.os, str(other_arch.target)]
-            other[2] = "foo"
             if this == other:
                 _write(f" arch={self.arch}")
             else:
