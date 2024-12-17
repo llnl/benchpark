@@ -73,6 +73,32 @@ def diff_specs(spec_a, spec_b):
                 self.newline_cb()
                 highlight(f"-> [{' '.join(extra)}]")
 
+    class ArchComparator:
+        def __init__(self, spec):
+            self.arch = spec.architecture
+
+        def _component_wise_diff(self, x, y, separator):
+            pairs = list(zip(x, y))
+            size = len(pairs)
+            for i, (xi, yi) in enumerate(pairs):
+                if xi == yi:
+                    _write(xi)
+                else:
+                    highlight(f"{xi}/{yi}")
+                if i < size - 1:
+                    _write(separator)
+
+        def compare(self, other_spec):
+            this = [self.arch.platform, self.arch.os, str(self.arch.target)]
+            other_arch = other_spec.architecture
+            other = [other_arch.platform, other_arch.os, str(other_arch.target)]
+            other[2] = "foo"
+            if this == other:
+                _write(f" arch={self.arch}")
+            else:
+                _write(" arch=")
+                self._component_wise_diff(this, other, "-")
+
     class NewlineWithDepthIndent:
         def __init__(self):
             self.depth = 0
@@ -88,6 +114,7 @@ def diff_specs(spec_a, spec_b):
             VersionComparator(spec),
             CompilerComparator(spec),
             VariantsComparator(spec),
+            ArchComparator(spec),
             DepsComparator(spec, nl_cb),
         ]
 
