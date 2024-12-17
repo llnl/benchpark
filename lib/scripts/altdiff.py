@@ -3,10 +3,11 @@ import spack.environment as ev
 import spack.traverse as traverse
 from llnl.util.tty.color import cwrite
 
+import argparse
 import sys
 
 
-def diff_specs(spec_a, spec_b):
+def diff_specs(spec_a, spec_b, truncate=False):
     def highlight(element):
         cwrite("@R{%s}" % str(element))
 
@@ -20,8 +21,9 @@ def diff_specs(spec_a, spec_b):
             return " " + str(v)
 
     class VariantsComparator:
-        def __init__(self, spec):
+        def __init__(self, spec, truncate):
             self.variants = spec.variants
+            self.truncate = truncate
 
         def compare(self, other_spec):
             if not self.variants:
@@ -31,34 +33,38 @@ def diff_specs(spec_a, spec_b):
                     highlight(_variant_str(v))
                 elif not v.satisfies(other_spec.variants[k]):
                     highlight(_variant_str(v))
-                else:
+                elif not self.truncate:
                     _write(_variant_str(v))
+                # else: there is no difference and truncate=True
 
     class VersionComparator:
-        def __init__(self, spec):
+        def __init__(self, spec, truncate):
             self.version = spec.version
+            self.truncate = truncate
 
         def compare(self, other_spec):
             other_version = other_spec.version
-            if self.version.satisfies(other_version):
-                _write(f"@{self.version}")
-            else:
+
+            if not self.version.satisfies(other_version):
                 highlight(f"@{self.version}")
+            elif not self.truncate:
+                _write(f"@{self.version}")
 
     class CompilerComparator:
-        def __init__(self, spec):
+        def __init__(self, spec, truncate):
             self.compiler = spec.compiler
+            self.truncate = truncate
 
         def compare(self, other_spec):
             other_cmp = other_spec.compiler
-            if self.compiler.name == other_cmp.name:
-                _write(f"%{self.compiler.name}")
-                if self.compiler.version.satisfies(other_cmp.version):
-                    _write(f"@{self.compiler.version}")
-                else:
-                    highlight(f"@{self.compiler.version}")
-            else:
+            if self.compiler.name != other_cmp.name:
                 highlight(f"%{self.compiler}")
+            else:
+                if not self.compiler.version.satisfies(other_cmp.version):
+                    _write(f"%{self.compiler.name}")
+                    highlight("@{self.compiler.version}")
+                elif not self.truncate:
+                    _write(f"%{self.compiler}")
 
     class DepsComparator:
         def __init__(self, spec, newline_cb):
@@ -74,8 +80,9 @@ def diff_specs(spec_a, spec_b):
                 highlight(f"-> [{' '.join(extra)}]")
 
     class ArchComparator:
-        def __init__(self, spec):
+        def __init__(self, spec, truncate):
             self.arch = spec.architecture
+            self.truncate = truncate
 
         def _component_wise_diff(self, x, y, separator):
             pairs = list(zip(x, y))
@@ -95,11 +102,11 @@ def diff_specs(spec_a, spec_b):
             this = [self.arch.platform, self.arch.os, str(self.arch.target)]
             other_arch = other_spec.architecture
             other = [other_arch.platform, other_arch.os, str(other_arch.target)]
-            if this == other:
-                _write(f" arch={self.arch}")
-            else:
+            if this != other:
                 _write(" arch=")
                 self._component_wise_diff(this, other, "-")
+            elif not self.truncate:
+                _write(f" arch={self.arch}")
 
     class NewlineWithDepthIndent:
         def __init__(self):
@@ -113,10 +120,10 @@ def diff_specs(spec_a, spec_b):
 
     def decompose(spec):
         return [
-            VersionComparator(spec),
-            CompilerComparator(spec),
-            VariantsComparator(spec),
-            ArchComparator(spec),
+            VersionComparator(spec, truncate),
+            CompilerComparator(spec, truncate),
+            VariantsComparator(spec, truncate),
+            ArchComparator(spec, truncate),
             DepsComparator(spec, nl_cb),
         ]
 
@@ -141,8 +148,20 @@ def diff_specs(spec_a, spec_b):
 def main():
     env = ev.active_environment()
 
+    parser = argparse.ArgumentParser(description="diff two specs")
+
+    parser.add_argument("-t", "--truncate", action="store_true",
+        help="don't show most details unless they are different"
+    )
+
+    parser.add_argument("specs", nargs=argparse.REMAINDER,
+        help="two specs to compare"
+    )
+
+    args = parser.parse_args()
+
     specs = []
-    for spec in spack.cmd.parse_specs(sys.argv[1:]):
+    for spec in spack.cmd.parse_specs(args.specs):
         # If the spec has a hash, check it before disambiguating
         spec.replace_hash()
         if spec.concrete:
@@ -153,7 +172,7 @@ def main():
     if len(specs) != 2:
         raise Exception("Need two specs")
 
-    diff_specs(specs[0], specs[1])
+    diff_specs(specs[0], specs[1], truncate=args.truncate)
 
 
 if __name__ == "__main__":
