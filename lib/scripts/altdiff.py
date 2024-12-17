@@ -150,13 +150,14 @@ def main():
 
     parser = argparse.ArgumentParser(description="diff two specs")
 
-    parser.add_argument("-t", "--truncate", action="store_true",
-        help="don't show most details unless they are different"
+    parser.add_argument(
+        "-t",
+        "--truncate",
+        action="store_true",
+        help="don't show most details unless they are different",
     )
 
-    parser.add_argument("specs", nargs=argparse.REMAINDER,
-        help="two specs to compare"
-    )
+    parser.add_argument("specs", nargs=argparse.REMAINDER, help="two specs to compare")
 
     args = parser.parse_args()
 
