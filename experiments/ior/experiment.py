@@ -9,6 +9,7 @@ from benchpark.experiment import Experiment
 from benchpark.scaling import StrongScaling
 from benchpark.scaling import WeakScaling
 
+import os
 
 class Ior(
     Experiment,
@@ -26,7 +27,34 @@ class Ior(
         default="3.3.0",
         description="app version",
     )
+    
+    variant(
+        "t",
+        default="good",
+        values=("small","medium","good","large"),
+        description="transfer size",
+    )
 
+    variant(
+        "a",
+        default="POSIX",
+        values=("POSIX","MPIIO","HDF5"),
+        description="interface",
+    )
+
+    variant(
+        "fileSys",
+        default="lustre1",
+        values=("lustre1","lustre2","lustre3","lustre4", "lustre5"),
+        description="file system",
+    )
+
+    variant(
+        "filePath",
+        default="none",
+        description="filePath",
+    )
+    
     def compute_applications_section(self):
         # TODO: Replace with conflicts clause
         scaling_modes = {
@@ -42,13 +70,36 @@ class Ior(
             )
 
         num_nodes = {"n_nodes": 1}
-        t = "{b}/256"
-        self.add_experiment_variable("t", t, True)
-
+        t = ""
+        self.add_experiment_variable("b", "256m", True)
+        variants=self.spec._variants
+        tSize=str(variants.dict.get("t",[])[0])
+        if self.spec.satisfies("t=small"):
+            t="16k"
+        elif self.spec.satisfies("t=medium"):
+            t="256k"
+        elif self.spec.satisfies("t=good"):
+            t="4m"
+        elif self.spec.satisfies("t=large"):
+            t="256m"
+        filePath=str(variants.dict.get("filePath",[])[0])
+        if not filePath.endswith('/'):
+            filePath += '/'
+        if os.path.exists(filePath):
+            if os.access(filePath, os.R_OK):
+                self.add_experiment_variable("o",'-o '+ filePath, False)
+            else:
+                raise BenchparkError(
+                    f"You do not have permission to access {filePath}"
+                )
+        else:
+            raise BenchparkError(
+                f"The file path {filePath} does not exist"
+            )
         if self.spec.satisfies("+single_node"):
             for pk, pv in num_nodes.items():
                 self.add_experiment_variable(pk, pv, True)
-            self.add_experiment_variable("b", "268435456", True)
+            self.add_experiment_variable("t", t, True)
         elif self.spec.satisfies("+strong"):
             scaled_variables = self.generate_strong_scaling_params(
                 {tuple(num_nodes.keys()): list(num_nodes.values())},
@@ -58,7 +109,7 @@ class Ior(
             for k, v in scaled_variables.items():
                 self.add_experiment_variable(k, v, True)
             # 256 mb
-            self.add_experiment_variable("b", "268435456 / {n_nodes}", True)
+            self.add_experiment_variable("t", t, True)
         elif self.spec.satisfies("+weak"):
             scaled_variables = self.generate_weak_scaling_params(
                 {tuple(num_nodes.keys()): list(num_nodes.values())},
@@ -69,9 +120,8 @@ class Ior(
             for k, v in scaled_variables.items():
                 self.add_experiment_variable(k, v, True)
 
-            self.add_experiment_variable("b", "268435456", True)
+            self.add_experiment_variable("t", t, True)
 
-        self.add_experiment_variable("t", t, True)
         self.add_experiment_variable(
             "n_ranks", "{sys_cores_per_node} * {n_nodes}", True
         )

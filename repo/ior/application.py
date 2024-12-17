@@ -16,15 +16,16 @@ class Ior(ExecutableApplication):
             'multi-node','single-node','mpi','network-latency-bound',
             'network-collectives','unstructured-grid']
 
-    executable('p', 'ior -Cge -vv -F -i5'+
+    executable('p', 'ior -c -vv -w -F -i5'+
             ' -b {b}' +
             ' -t {t}' + 
-            ' -a {a}'
+            ' -a {a}' +
+            ' {o}'
             , use_mpi=True)
 
     workload('ior', executables=['p'])
 
-    workload_variable('a', default='MPIIO',
+    workload_variable('a', default='POSIX',
         description='api',
         workloads=['ior'])
 
@@ -39,7 +40,10 @@ class Ior(ExecutableApplication):
     workload_variable('N', default='1',
         description='numTasks -- number of tasks that are participating in the test (overrides MPI)',
         workloads=['ior'])
-    #TODO: Simplify FOMs
+
+    workload_variable('o', default='',
+        description='directory to read/write to',
+        workloads=['ior'])
     
     figure_of_merit('Mean write OPs',
                     log_file='{experiment_run_dir}/{experiment_name}.out',
