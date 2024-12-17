@@ -177,7 +177,7 @@ class Experiment(ExperimentSystemBase, SingleNode):
         self.compute_applications_section()
 
         self.add_experiment_exclude(
-            f"{{n_nodes}} > 0 and {{n_nodes}} <= {{max_node_limit}}"
+            "{n_nodes} > 0 and {n_nodes} <= {max_node_limit}"
         )
 
         expr_helper_list = []
