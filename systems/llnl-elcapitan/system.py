@@ -161,6 +161,7 @@ packages:
     externals:
     - spec: cray-mpich@{mpi_version}%cce@{cce_version} {gtl_spec} +wrappers
       prefix: /opt/cray/pe/mpich/{mpi_version}/ofi/crayclang/{short_cce_version}
+      gtl_prefix: /opt/cray/pe/mpich/{mpi_version}/gtl
       extra_attributes:
 {gtl_cfg}
 """

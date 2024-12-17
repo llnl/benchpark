@@ -534,13 +534,6 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
                         "-DGMX_FORCE_GPU_AWARE_MPI=ON",
                     ]
                 )
-            if "+rocm" in self.spec:
-                if self.spec["mpi"].extra_attributes and "ldflags" in self.spec["mpi"].extra_attributes:
-                    options.extend(
-                        [
-                            "-DCMAKE_EXE_LINKER_FLAGS=%s" % self.spec["mpi"].extra_attributes["ldflags"],
-                        ]
-                    )
         else:
             options.extend(
                 [
