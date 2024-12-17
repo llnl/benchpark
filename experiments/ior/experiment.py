@@ -83,19 +83,20 @@ class Ior(
         elif self.spec.satisfies("t=large"):
             t="256m"
         filePath=str(variants.dict.get("filePath",[])[0])
-        if not filePath.endswith('/'):
-            filePath += '/'
-        if os.path.exists(filePath):
-            if os.access(filePath, os.R_OK):
-                self.add_experiment_variable("o",'-o '+ filePath, False)
+        if filePath!="none":
+            if not filePath.endswith('/'):
+                filePath += '/'
+            if os.path.exists(filePath):
+                if os.access(filePath, os.R_OK):
+                    self.add_experiment_variable("o",'-o '+ filePath, False)
+                else:
+                    raise BenchparkError(
+                        f"You do not have permission to access {filePath}"
+                    )
             else:
                 raise BenchparkError(
-                    f"You do not have permission to access {filePath}"
+                    f"The file path {filePath} does not exist"
                 )
-        else:
-            raise BenchparkError(
-                f"The file path {filePath} does not exist"
-            )
         if self.spec.satisfies("+single_node"):
             for pk, pv in num_nodes.items():
                 self.add_experiment_variable(pk, pv, True)
