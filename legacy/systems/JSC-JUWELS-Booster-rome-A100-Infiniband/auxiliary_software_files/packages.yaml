@@ -1,0 +1,85 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+
+# SPDX-License-Identifier: Apache-2.0
+
+packages:
+  tar:
+    externals:
+    - spec: tar@1.30
+      prefix: /usr
+    buildable: false
+  cmake:
+      externals:
+      - spec: cmake@3.26.3
+        prefix: /p/software/juwelsbooster/stages/2024/software/CMake/3.26.3-GCCcore-12.3.0
+        modules:
+        - Stages/2024
+        - CMake
+        buildable: false
+  gmake:
+    externals:
+    - spec: gmake@4.2.1
+      prefix: /usr
+    buildable: false
+  automake:
+      externals:
+      - spec: automake@1.16.5
+        prefix: /p/software/juwelsbooster/stages/2024/software/Automake/1.16.5-GCCcore-12.3.0
+  autoconf:
+      externals:
+      - spec: autoconf@2.71
+        prefix: /p/software/juwelsbooster/stages/2024/software/Autoconf/2.71-GCCcore-12.3.0
+  openmpi:
+        externals:
+        - spec: openmpi@4.1.5
+          prefix: /p/software/juwelsbooster/stages/2024/software/OpenMPI/4.1.5-NVHPC-23.7-CUDA-12
+          modules:
+          - Stages/2024
+          - NVHPC/23.7-CUDA-12
+          - OpenMPI/4.1.5
+        buildable: false
+  cuda:
+    buildable: false
+    externals:
+    - spec: cuda@12.2.0
+      prefix: /p/software/juwelsbooster/stages/2024/software/CUDA/12
+      modules:
+          - Stages/2024
+          - CUDA/12
+          - NVHPC/23.7-CUDA-12
+  curand:
+    externals:
+    - spec: curand@12.2.0
+      prefix: /p/software/juwelsbooster/stages/2024/software/CUDA/12
+    buildable: false
+  cusparse:
+    externals:
+    - spec: cusparse@12.2.0
+      prefix: /p/software/juwelsbooster/stages/2024/software/CUDA/12
+    buildable: false
+  cublas:
+    externals:
+    - spec: cublas@12.2.0
+      prefix: /p/software/juwelsbooster/stages/2024/software/CUDA/12
+    buildable: false
+  blas:
+    buildable: false
+  lapack:
+    buildable: false
+  openblas:
+    externals:
+    - spec: openblas@0.3.23%gcc@12.3.0
+      prefix: /p/software/juwelsbooster/stages/2024/software/OpenBLAS/0.3.23-GCC-12.3.0
+      modules: 
+        - Stages/2024
+        - OpenBLAS
+  all:
+      providers:
+        mpi:
+        - openmpi
+        zlib-api: [zlib]
+  zlib:
+      externals:
+      - spec: zlib@1.2.13
+        prefix: /p/software/juwelsbooster/stages/2024/software/zlib/1.2.13-GCCcore-12.3.0

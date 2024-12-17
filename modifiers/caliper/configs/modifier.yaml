@@ -11,7 +11,7 @@ modifiers:
   - name: caliper
     mode: time
 
-spack:
+software:
   packages:
     caliper:
-      spack_spec: caliper+adiak+mpi~libunwind~libdw~papi
+      pkg_spec: caliper+adiak+mpi~libunwind~libdw~papi

@@ -1,0 +1,53 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+# 
+# SPDX-License-Identifier: Apache-2.0
+ramble:
+  include:
+  - ./configs/software.yaml
+  - ./configs/variables.yaml
+  - ./configs/modifier.yaml
+  config:
+    deprecated: true
+    spack_flags:
+      install: '--add --keep-stage'
+      concretize: '-U -f'
+
+  modifiers:
+  - name: allocation
+
+  applications:
+    ior:
+      workloads:
+        ior:
+          variables:
+            n_ranks: '{n_nodes}*{sys_cores_per_node}'
+          experiments:
+            ior_mpi_weak_{n_nodes}:
+              variants:
+                package_manager: spack 
+              variables:
+                n_nodes: ['1','2','4'] 
+                b: '268435456' #256 mb
+
+                t: '{b}/256'
+
+            ior_mpi_strong_{n_nodes}:
+              variants:
+                package_manager: spack 
+              variables:
+                n_nodes: ['1','2','4']
+                b: '268435456/{n_nodes}'
+                t: '{b}/256'
+                #t: '{b}/({sys_cores_per_node}*4)'
+  software:
+    packages:
+      ior:
+        pkg_spec: ior@3.3.0 
+        compiler: default-compiler
+    environments:
+      ior:
+        packages:
+        - default-mpi
+        - ior
+        - '{modifier_package_name}'

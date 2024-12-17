@@ -11,8 +11,8 @@ modifiers:
   - name: caliper-cuda
     mode: cuda
 
-spack:
+software:
   packages:
     caliper-cuda:
-      spack_spec: caliper+adiak+mpi~libunwind~libdw~papi+cuda cuda_arch=={cuda_arch}
+      pkg_spec: caliper+adiak+mpi~libunwind~libdw~papi+cuda cuda_arch=={cuda_arch}
 

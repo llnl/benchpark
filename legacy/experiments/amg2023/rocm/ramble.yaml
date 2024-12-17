@@ -1,0 +1,118 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+ramble:
+  include:
+  - ./configs/software.yaml
+  - ./configs/variables.yaml
+  - ./configs/modifier.yaml
+
+  config:
+    deprecated: true
+    spack_flags:
+      install: '--add --keep-stage'
+      concretize: '-U -f'
+
+  modifiers:
+  - name: allocation
+
+  applications:
+    amg2023:
+      workloads:
+        problem1:
+          experiments:
+            'amg2023_rocm_throughput_problem1_{px}_{py}_{pz}_{nx}_{ny}_{nz}':
+              variants:
+                package_manager: spack
+              variables:
+                px: '2'
+                py: '2'
+                pz: '2'
+                nx: ['10', '20', '20']
+                ny: ['10', '10', '20']
+                nz: ['10', '10', '10']
+                env_name: 'amg2023-gpu'
+                n_gpus: '{px}*{py}*{pz}'
+            'amg2023_rocm_strong_problem1_{px}_{py}_{pz}_{nx}_{ny}_{nz}':
+              variants:
+                package_manager: spack
+              variables:
+                px: ['2', '2', '4']
+                py: ['2', '2', '2']
+                pz: ['1', '2', '2']
+                nx: '10'
+                ny: '10'
+                nz: '10'
+                env_name: 'amg2023-gpu'
+                n_gpus: '{px}*{py}*{pz}'
+            'amg2023_rocm_weak_problem1_{px}_{py}_{pz}_{nx}_{ny}_{nz}':
+              variants:
+                package_manager: spack
+              variables:
+                px: ['2', '2', '4']
+                py: ['2', '2', '2']
+                pz: ['1', '2', '2']
+                nx: ['10', '20', '20']
+                ny: ['10', '10', '20']
+                nz: ['10', '10', '10']
+                env_name: 'amg2023-gpu'
+                n_gpus: '{px}*{py}*{pz}'
+        problem2:
+          experiments:
+            'amg2023_rocm_throughput_problem2_{px}_{py}_{pz}_{nx}_{ny}_{nz}':
+              variants:
+                package_manager: spack
+              variables:
+                px: '2'
+                py: '2'
+                pz: '2'
+                nx: ['10', '20', '20']
+                ny: ['10', '10', '20']
+                nz: ['10', '10', '10']
+                env_name: 'amg2023-gpu'
+                n_gpus: '{px}*{py}*{pz}'
+            'amg2023_rocm_strong_problem2_{px}_{py}_{pz}_{nx}_{ny}_{nz}':
+              variants:
+                package_manager: spack
+              variables:
+                px: ['2', '2', '4']
+                py: ['2', '2', '2']
+                pz: ['1', '2', '2']
+                nx: '10'
+                ny: '10'
+                nz: '10'
+                env_name: 'amg2023-gpu'
+                n_gpus: '{px}*{py}*{pz}'
+            'amg2023_rocm_weak_problem2_{px}_{py}_{pz}_{nx}_{ny}_{nz}':
+              variants:
+                package_manager: spack
+              variables:
+                px: ['2', '2', '4']
+                py: ['2', '2', '2']
+                pz: ['1', '2', '2']
+                nx: ['10', '20', '20']
+                ny: ['10', '10', '20']
+                nz: ['10', '10', '10']
+                env_name: 'amg2023-gpu'
+                n_gpus: '{px}*{py}*{pz}'
+  software:
+    packages:
+      hypre:
+        pkg_spec: hypre@2.31.0 +mpi+rocm+mixedint~fortran{modifier_spack_variant} amdgpu_target={rocm_arch}
+        compiler: compiler-rocm
+      amg2023-gpu:
+        pkg_spec: amg2023@develop +mpi+rocm{modifier_spack_variant} amdgpu_target={rocm_arch}
+        compiler: compiler-rocm
+    environments:
+      amg2023-gpu:
+        packages:
+        - blas-rocm
+        - lapack
+        - mpi-rocm
+        - hypre
+        - mpi-rocm
+        - hypre
+        - amg2023-gpu
+        - '{modifier_package_name}'

@@ -11,8 +11,8 @@ modifiers:
   - name: caliper-topdown
     mode: topdown-all
 
-spack:
+software:
   packages:
     caliper-topdown:
-      spack_spec: caliper+adiak+mpi~libunwind~libdw+papi
+      pkg_spec: caliper+adiak+mpi~libunwind~libdw+papi
 

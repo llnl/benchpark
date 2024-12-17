@@ -1,0 +1,32 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+system_definition:
+  name: Atos-zen2-A100-Infiniband
+  integrator:
+    vendor: Atos
+    name: XH2000
+  processor:
+    vendor: AMD
+    name: EPYC-Zen2
+    ISA: x86_64
+    uArch: zen2
+  accelerator:
+    vendor: NVIDIA
+    name: A100
+    ISA: PTX
+    uArch: sm_80
+  interconnect:
+    vendor: Mellanox
+    name: Infiniband
+  systems-tested:
+    jsc-juwels-booster:
+      os:
+      scheduler: slurm
+      compiler: gcc
+      runtime: cuda
+      mpi: openmpi
+  top500-system-instances:
+    - JUWELS Booster (JSC) <https://www.top500.org/system/179894>

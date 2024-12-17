@@ -1,0 +1,27 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+software:
+  packages:
+    default-compiler:
+      pkg_spec: gcc@=11.2.1
+    default-mpi:
+      pkg_spec: mvapich2@2.3.7-gcc-11.2.1
+    compiler-gcc:
+      pkg_spec: gcc@=11.2.1
+    compiler-clang:
+      pkg_spec: clang@=14.0.6
+    mpi-clang:
+      pkg_spec: mvapich2@2.3.7-clang-14.0.6
+    mpi-gcc:
+      pkg_spec: mvapich2@2.3.7-gcc-11.2.1
+    blas:
+      pkg_spec: intel-oneapi-mkl@2022.1.0
+    cublas-cuda:
+      pkg_spec: cublas@{default_cuda_version}
+    lapack:
+      pkg_spec: intel-oneapi-mkl@2022.1.0
+    fftw:
+      pkg_spec: intel-oneapi-mkl@2022.1.0

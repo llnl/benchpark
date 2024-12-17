@@ -8,11 +8,11 @@ import sys
 from ramble.appkit import *
 
 
-class Saxpy(SpackApplication):
+class Saxpy(ExecutableApplication):
     """saxpy benchmark"""
     name = "saxpy"
 
-    tags = ['single-node','high-memory-bandwidth',
+    tags = ['synthetic','single-node','high-memory-bandwidth',
             'regular-memory-access',
             'c++','cuda','hip','openmp']
 

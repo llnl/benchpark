@@ -1,0 +1,72 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+ramble:
+  include:
+  - ./configs/software.yaml
+  - ./configs/variables.yaml
+  - ./configs/modifier.yaml
+  config:
+    deprecated: true
+    spack_flags:
+      install: '--add --keep-stage'
+      concretize: '-U -f'
+
+  modifiers:
+  - name: allocation
+
+  applications:
+    quicksilver:
+      workloads:
+        quicksilver:
+          variables:
+            experiment_setup: ''
+            arch: 'OpenMP'
+            n_threads_per_proc: '1'
+            omp_num_threads: '{n_threads_per_proc}'
+            n_ranks: '{I}*{J}*{K}' 
+          experiments:
+            quicksilver_openmp_weak_{n_nodes}_{n_ranks}:
+              variants:
+                package_manager: spack 
+              variables:
+                n: '{x}*{y}*{z}*10'
+                x: '{X}'
+                y: '{Y}'
+                z: '{Z}'
+                X: ['32','32','64','64']
+                Y: ['32','32','32','64']
+                Z: ['16','32','32','32']
+
+                I: ['2','2','4','4']
+                J: ['2','2','2','4']
+                K: ['1','2','2','2']
+
+            quicksilver_openmp_strong_{n_nodes}_{n_ranks}:
+              variants:
+                package_manager: spack 
+              variables:
+                n: '{x}*{y}*{z}*10'
+                x: '{X}'
+                y: '{Y}'
+                z: '{Z}'
+                X: '32'
+                Y: '32'
+                Z: '16'
+
+                I: ['2','2','4','4']
+                J: ['2','2','2','4']
+                K: ['1','2','2','2']
+  software:
+    packages:
+      quicksilver:
+        pkg_spec: quicksilver +openmp+mpi
+        compiler: default-compiler
+    environments:
+      quicksilver:
+        packages:
+        - default-mpi
+        - quicksilver
+        - '{modifier_package_name}'

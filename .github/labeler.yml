@@ -12,6 +12,7 @@ configs:
 - changed-files:
   - any-glob-to-any-file:
     - configs/**
+    - var/sys_repo/**    
 
 dependencies:
 - changed-files:
@@ -24,8 +25,10 @@ docs:
   - any-glob-to-any-file:
     - docs/**
     - README.rst
+    - tags.yaml
 
 experiment:
 - changed-files:
   - any-glob-to-any-file:
     - experiments/**
+    - var/exp_repo/**

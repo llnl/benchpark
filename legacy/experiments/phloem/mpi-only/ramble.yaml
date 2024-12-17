@@ -1,0 +1,58 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+# 
+# SPDX-License-Identifier: Apache-2.0
+
+ramble:
+  include:
+  - ./configs/software.yaml
+  - ./configs/variables.yaml
+  - ./configs/modifier.yaml
+  config:
+    deprecated: true
+    spack_flags:
+      install: '--add --keep-stage'
+      concretize: '-U -f'
+
+  modifiers:
+  - name: allocation
+
+  applications:
+    phloem:
+      workloads:
+        sqmr:
+          variables:
+          experiments:
+            phloem_sqmr_strong_{n_ranks}:
+              variants: 
+                package_manager: spack  
+              variables:
+                n_ranks: '{num_cores}*{num_nbors}+{num_cores}'
+                num_cores: ['1','2','4']
+                num_nbors: '{num_cores}'
+        mpiBench:
+          experiments:
+            phloem_mpiBench_strong_{n_ranks}:
+              variants: 
+                package_manager: spack  
+              variables:
+                n_ranks: '2'
+
+        mpiGraph:
+          experiments:
+            phloem_mpiGraph_strong_{n_ranks}:
+              variants: 
+                package_manager: spack  
+              variables:
+                n_ranks: '2'
+  software:
+    packages:
+      phloem:
+        pkg_spec: phloem@master +mpi
+        compiler: default-compiler
+    environments:
+      phloem:
+        packages:
+        - default-mpi
+        - phloem
+        - '{modifier_package_name}'
