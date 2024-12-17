@@ -88,10 +88,12 @@ def diff_specs(spec_a, spec_b):
             VersionComparator(spec),
             CompilerComparator(spec),
             VariantsComparator(spec),
-            DepsComparator(spec, nl_cb)
+            DepsComparator(spec, nl_cb),
         ]
 
-    for depth, dep_spec in traverse.traverse_tree([spec_a], deptype=("link", "run"), depth_first=True):
+    for depth, dep_spec in traverse.traverse_tree(
+        [spec_a], deptype=("link", "run"), depth_first=True
+    ):
         indent = "  " * depth
         nl_cb.depth = depth
         node = dep_spec.spec
@@ -105,6 +107,7 @@ def diff_specs(spec_a, spec_b):
         else:
             highlight(node.name)
         print()  # New line
+
 
 def main():
     env = ev.active_environment()
@@ -122,6 +125,7 @@ def main():
         raise Exception("Need two specs")
 
     diff_specs(specs[0], specs[1])
+
 
 if __name__ == "__main__":
     main()
