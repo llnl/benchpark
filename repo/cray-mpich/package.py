@@ -13,10 +13,10 @@ class CrayMpich(BuiltinCM):
 
     @property
     def libs(self):
-        libs = super(CrayMpich, self).libs()
+        libs = super(CrayMpich, self).libs
 
         if self.spec.satisfies("+gtl"):
-            gtl_lib_prefix = self.gtl_prefix.lib if self.gtl_prefix else self.prefix.lib
+            gtl_lib_prefix = self.spec.extra_attributes["gtl_lib_path"]
             libraries = ["libmpi_gtl_hsa"]
             libs += find_libraries(libraries, root=gtl_lib_prefix, recursive=True)
 
