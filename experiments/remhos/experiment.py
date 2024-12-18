@@ -100,9 +100,14 @@ class Remhos(
         if self.spec.satisfies("+cuda"):
             system_specs["cuda_version"] = "{default_cuda_version}"
             system_specs["cuda_arch"] = "{cuda_arch}"
-        
+            system_specs["blas"] = "cublas-cuda"
+
         if self.spec.satisfies("+rocm"):
             system_specs["rocm_arch"] = "{rocm_arch}"
+            system_specs["blas"] = "blas-rocm"
+        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+            # empty package_specs value implies external package
+            self.add_spack_spec(system_specs["blas"])
 
 
         self.add_spack_spec(
@@ -110,5 +115,5 @@ class Remhos(
         )
         self.add_spack_spec(
             "hypre",
-            ["hypre@2.31.0 +mpi+openmp+mixedint~fortran amdgpu_target={rocm_arch}", system_specs["compiler"]],
+            ["hypre@2.31.0 +mpi+openmp+rocm+mixedint+rocblas~fortran amdgpu_target={rocm_arch}", system_specs["compiler"]],
         )
