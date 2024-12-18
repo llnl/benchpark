@@ -12,7 +12,7 @@ from benchpark.rocm import ROCmExperiment
 from benchpark.scaling import StrongScaling
 from benchpark.scaling import WeakScaling
 from benchpark.scaling import ThroughputScaling
-
+from benchpark.expr.builtin.caliper import Caliper
 
 class Kripke(
     Experiment,
@@ -22,6 +22,7 @@ class Kripke(
     StrongScaling,
     WeakScaling,
     ThroughputScaling,
+    Caliper,
 ):
     variant(
         "workload",
