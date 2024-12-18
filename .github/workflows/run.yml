@@ -539,6 +539,30 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
+      - name: Dry run dynamic smb-mpi_overhead with dynamic CTS ruby
+        run: |
+          ./bin/benchpark experiment init --dest=smb-mpi_overhead smb
+          ./bin/benchpark setup ./smb-mpi_overhead ./ruby-system workspace/
+          system_id=$(./bin/benchpark system id ./ruby-system)
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir "workspace/smb-mpi_overhead/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic smb-msgrate with dynamic CTS ruby
+        run: |
+          ./bin/benchpark experiment init --dest=smb-msgrate smb workload=msgrate
+          ./bin/benchpark setup ./smb-msgrate ./ruby-system workspace/
+          system_id=$(./bin/benchpark system id ./ruby-system)
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir "workspace/smb-msgrate/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
       - name: Dry run dynamic phloem/mpi with dynamic CTS ruby
         run: |
           ./bin/benchpark experiment init --dest=phloem-mpi phloem
