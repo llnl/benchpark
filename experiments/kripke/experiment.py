@@ -14,6 +14,7 @@ from benchpark.scaling import WeakScaling
 from benchpark.scaling import ThroughputScaling
 from benchpark.expr.builtin.caliper import Caliper
 
+
 class Kripke(
     Experiment,
     OpenMPExperiment,
