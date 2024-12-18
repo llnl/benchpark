@@ -19,9 +19,21 @@ class LlnlSierra(System):
 
     variant(
         "compiler",
-        default="cce",
+        default="clang-ibm",
         values=("clang-ibm", "xl", "xl-gcc", "clang"),
         description="Which compiler to use",
+    )
+
+    variant(
+        "lapack",
+        default="cusolver",
+        description="Which lapack to use",
+    )
+
+    variant(
+        "blas",
+        default="cublas",
+        description="Which blas to use",
     )
 
     def initialize(self):
@@ -48,15 +60,32 @@ class LlnlSierra(System):
     def external_pkg_configs(self):
         externals = LlnlSierra.resource_location / "externals"
 
-        compiler = self.spec.variants["compiler"][0]
-        cuda_ver = self.spec.variants["cuda"][0]
-
         selections = [externals / "base" / "00-packages.yaml"]
         # 00-version-10-1-243-packages.yaml  01-version-11-8-0-packages.yaml
-        if cuda_ver == "10-1-243":
+        if self.spec.satisfies("cuda=10-1-243"):
             selections.append(externals / "cuda" / "00-version-10-1-243-packages.yaml")
-        elif cuda_ver == "11-8-0":
+        elif self.spec.satisfies("cuda=11-8-0"):
             selections.append(externals / "cuda" / "01-version-11-8-0-packages.yaml")
+
+        if self.spec.satisfies("lapack=cusolver"):
+            if self.spec.satisfies("cuda=10-1-243"):
+                selections.append(
+                    externals / "lapack" / "00-version-10-1-243-packages.yaml"
+                )
+            elif self.spec.satisfies("cuda=11-8-0"):
+                selections.append(
+                    externals / "lapack" / "01-version-11-8-0-packages.yaml"
+                )
+
+        if self.spec.satisfies("blas=cublas"):
+            if self.spec.satisfies("cuda=10-1-243"):
+                selections.append(
+                    externals / "blas" / "00-version-10-1-243-packages.yaml"
+                )
+            elif self.spec.satisfies("cuda=11-8-0"):
+                selections.append(
+                    externals / "blas" / "01-version-11-8-0-packages.yaml"
+                )
 
         mpi_cfgs = {
             (
@@ -107,6 +136,8 @@ class LlnlSierra(System):
 """,
         }
 
+        compiler = self.spec.variants["compiler"][0]
+        cuda_ver = self.spec.variants["cuda"][0]
         cfg = mpi_cfgs[(compiler, cuda_ver)]
         full_cfg = f"""\
 packages:
@@ -262,6 +293,10 @@ software:
       pkg_spec: clang
     default-mpi:
       pkg_spec: spectrum-mpi
+    default-lapack:
+      pkg_spec: lapack
+    default-blas:
+      pkg_spec: blas
     compiler-xl:
       pkg_spec: xl
     mpi-xl:
@@ -282,6 +317,4 @@ software:
       pkg_spec: cublas
     lapack:
       pkg_spec: lapack@3.9.0
-    fftw:
-      pkg_spec: fftw@3.3.10
 """

@@ -4,7 +4,7 @@
    SPDX-License-Identifier: Apache-2.0
 
 =====================
-Adding a System 
+Adding a System
 =====================
 
 This guide is intended for those wanting to run a benchmark on a new system,
@@ -25,19 +25,19 @@ Identifying a Similar System
 
 The easiest place to start when configuring a new system is to find the closest similar
 one that has an existing configuration already. Existing system configurations are listed
-in the table in :doc:`system-list`. 
+in the table in :doc:`system-list`.
 
 If you are running on a system with an accelerator, find an existing system with the same accelerator vendor,
-and then secondarily, if you can, match the actual accererator. 
+and then secondarily, if you can, match the actual accererator.
 
 1. accelerator.vendor
 2. accelerator.name
 
-Once you have found an existing system with a similar accelerator or if you do not have an accelerator, 
-match the following processor specs as closely as you can. 
+Once you have found an existing system with a similar accelerator or if you do not have an accelerator,
+match the following processor specs as closely as you can.
 
 1. processor.name
-2. processor.ISA 
+2. processor.ISA
 3. processor.uArch
 
 For example, if your system has an NVIDIA A100 GPU and an Intel x86 Icelake CPUs, a similar config would share the A100 GPU, and CPU architecture may or may not match.
@@ -53,7 +53,7 @@ Editing an Existing System to Match
   make all these x86 example. Automate the directory structure?
 
 If you want to add support for a new system you can add a class definition
-for that system in a separate directory in ``systems/``. 
+for that system in a separate directory in ``systems/``.
 The best way is to copy the system.py for the most similar system identified above, and then paste it in a new directory and update it.
 For example the genericx86 system is defined in::
 
@@ -68,23 +68,23 @@ The System base class defined in ``/lib/benchpark/system.py`` is shown below, so
 .. literalinclude:: ../lib/benchpark/system.py
    :language: python
 
-The main driver for configuring a system is done by defining a subclass for that system in a ``systems/{SYSTEM}/system.py`` file, which inherits from the System base class. 
+The main driver for configuring a system is done by defining a subclass for that system in a ``systems/{SYSTEM}/system.py`` file, which inherits from the System base class.
 
 As is, the generic_x86 system subclass should run on most x86_64 systems, but we mostly provide it as a starting point for modifying or testing.
 Potential common changes might be to edit the scheduler or number of cores per node, adding a GPU configuration, or adding other external compilers or packages.
 
 To make these changes, we provided an example below, where we start with the generic_x86 system.py, and make a system called Modifiedx86.
 
-1. First, make a copy of the system.py file in generic_x86 folder and move it into a new folder, e.g., ``systems/modified_x86/system.py``. 
+1. First, make a copy of the system.py file in generic_x86 folder and move it into a new folder, e.g., ``systems/modified_x86/system.py``.
 Then, update the class name to ``Modifiedx86``.::
-  
+
     class Modifiedx86(System):
 
 2. Next, to match our new system, we change the scheduler to slurm and the number of cores per node to 48, and number of GPUs per node to 2.::
 
     # this sets basic attributes of our system
-    def initialize(self): 
-        super().initialize() 
+    def initialize(self):
+        super().initialize()
         self.scheduler = "slurm"
         self.sys_cores_per_node = "48"
         self.sys_gpus_per_node = "2"
@@ -120,6 +120,8 @@ We then add the spack package configuration for our CUDA installations into the 
             selections.append(externals / "cuda" / "01-version-11-8-0-packages.yaml")
 
         return selections
+
+Note, if your externals are *not* installed via Spack, read `Spack documentation on modules <https://spack.readthedocs.io/en/latest/packages_yaml.html#external-packages>`_.
 
 4. Next, add any of the packages that can be managed by spack, such as blas/cublas pointing to the correct version,
 this will generate the software configurations for spack (``software.yaml``). The actual version will be rendered by Ramble when it is built.
@@ -207,7 +209,7 @@ this will generate the software configurations for spack (``software.yaml``). Th
             pkg_spec: cublas@{default_cuda_version}
     """
 
-Once the modified system subclass is written, run: 
+Once the modified system subclass is written, run:
 ``benchpark system init --dest=modifiedx86-system modifiedx86``
 
 This will generate the required yaml configurations for your system and you can validate it works with a static experiment test.
@@ -222,7 +224,7 @@ To manually validate your new system, you should initialize it and run an existi
   benchpark experiment init --dest=saxpy saxpy +openmp
   benchpark setup ./saxpy ./modifiedx86-system workspace/
 
-Then you can run the commands provided by the output, the experiments should be built and run successfully without any errors. 
+Then you can run the commands provided by the output, the experiments should be built and run successfully without any errors.
 
 The following yaml files are examples of what is generated for the modified_x86 system from the example after it is initialized:
 
@@ -275,5 +277,3 @@ file
 
 
 Once you can run an experiment successfully, and the yaml looks correct the new system has been validated and you can continue your :doc:`benchpark-workflow`.
-
-

@@ -12,6 +12,7 @@ import pathlib
 import re
 from typing import Iterable, Iterator, List, Match, Optional, Union
 
+from benchpark.error import BenchparkError
 import benchpark.paths
 import benchpark.repo
 import benchpark.runtime
@@ -294,6 +295,25 @@ class ConcreteSpec(Spec):
 
         if not self.namespace:
             self._namespace = self.object_class.namespace
+
+        if isinstance(self, ExperimentSpec):
+            variant_map = list(self.object_class.variants.values())[0]
+            if "workload" in variant_map.keys():
+                if "workload" not in self.variants:
+                    if variant_map["workload"].default:
+                        self.variants["workload"] = variant_map["workload"].default
+                if "all" in self.variants["workload"]:
+                    if variant_map["workload"].multi:
+                        del self.variants["workload"]
+                        self.variants["workload"] = variant_map["workload"].values
+                    else:
+                        raise BenchparkError(
+                            f"The workload variant in must be multi-valued to use the 'all' option in package {self.name}"
+                        )
+            else:
+                raise BenchparkError(
+                    f"Package {self.name} must define a workload variant"
+                )
 
         # For variants that are set, set whatever they imply
         variants_to_check = set(
