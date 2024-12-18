@@ -27,20 +27,10 @@ packages:
     externals:
     - spec: autoconf@2.69
       prefix: /usr
-  cub:
-    buildable: false
-    externals:
-    - spec: cub@11.8.0
-      prefix: /usr/tce/packages/cuda/cuda-11.8.0/
   fftw:
     externals:
     - spec: fftw@3.3.10
       prefix: /usr/tcetmp/packages/fftw/fftw-3.3.10-xl-2023.06.28
-    buildable: false
-  lapack:
-    externals:
-    - spec: lapack-xl@3.9.0
-      prefix: /usr/tcetmp/packages/lapack/lapack-3.9.0-xl-2020.03.18
     buildable: false
   python:
     externals:
