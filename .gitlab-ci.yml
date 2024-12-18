@@ -12,6 +12,7 @@ default:
   id_tokens:
     SITE_ID_TOKEN:
       aud: https://lc.llnl.gov/gitlab
+  interruptible: true
 
 include:
   - local: '/.gitlab/ci/test.yml'
@@ -19,6 +20,7 @@ include:
   - project: 'radiuss/radiuss-shared-ci'
     ref: 'v2024.07.0'
     file: 'utilities/preliminary-ignore-draft-pr.yml'
+  - local: '/.gitlab/skip-branch-not-a-pr.yml'
 
 stages:
   - test
