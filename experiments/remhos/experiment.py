@@ -126,7 +126,3 @@ class Remhos(
         self.add_spack_spec(
             self.name, [f"remhos@{app_version} +metis", system_specs["compiler"]]
         )
-        self.add_spack_spec(
-            "hypre",
-            ["hypre@2.31.0 +mpi+openmp+rocm+mixedint+rocblas~fortran amdgpu_target={rocm_arch}", system_specs["compiler"]],
-        )
