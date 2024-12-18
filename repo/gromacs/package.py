@@ -8,10 +8,9 @@ import os
 import llnl.util.filesystem as fs
 
 from spack.package import *
-from spack.pkg.benchpark.rocm_consistency import RocmConsistency as RocmConsistency
 
 
-class Gromacs(CMakePackage, CudaPackage, ROCmPackage, RocmConsistency):
+class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
     """GROMACS is a molecular dynamics package primarily designed for simulations
     of proteins, lipids and nucleic acids. It was originally developed in
     the Biophysical Chemistry department of University of Groningen, and is now
@@ -88,6 +87,16 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage, RocmConsistency):
 
     variant(
         "mpi", default=True, description="Activate MPI support (disable for Thread-MPI support)"
+    )
+    # off: turn off GPU-aware MPI
+    # on: turn on, but allow groamcs to disable it if GPU-aware MPI is not supported
+    # force: turn on and force gromacs to use GPU-aware MPI. May result in error if unsupported
+    variant(
+        "gpu-aware-mpi",
+        default="on",
+        values=("on", "off", "force"),
+        when="@2021: +mpi",
+        description="Use GPU-aware MPI",
     )
     variant("shared", default=True, description="Enables the build of shared libraries")
     variant(
@@ -279,6 +288,9 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage, RocmConsistency):
     depends_on("cmake@3.16.0:3", type="build", when="%fj")
     depends_on("cuda", when="+cuda")
 
+    for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
+        requires(f"^hipsycl@23.10.0+rocm amdgpu_target={target}", when=f"gromacs@2024+rocm amdgpu_target={target}")
+
     with when("+rocm"):
         depends_on("sycl")
         depends_on("hip")
@@ -407,6 +419,17 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage, RocmConsistency):
         if self.compiler.extra_rpaths:
             for rpath in self.compiler.extra_rpaths:
                 env.prepend_path("LD_LIBRARY_PATH", rpath)
+        if "+mpi" in self.spec:
+            if self.spec["mpi"].extra_attributes and "ldflags" in self.spec["mpi"].extra_attributes:
+                env.append_flags("LDFLAGS", self.spec["mpi"].extra_attributes["ldflags"])
+
+    def setup_build_environment(self, env):
+        if self.compiler.extra_rpaths:
+            for rpath in self.compiler.extra_rpaths:
+                env.prepend_path("LD_LIBRARY_PATH", rpath)
+        if "+mpi" in self.spec:
+            if self.spec["mpi"].extra_attributes and "ldflags" in self.spec["mpi"].extra_attributes:
+                env.append_flags("LDFLAGS", self.spec["mpi"].extra_attributes["ldflags"])
 
 class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
     @run_after("build")
@@ -497,6 +520,27 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
                         "-DMPI_CXX_COMPILER=%s" % self.spec["mpi"].mpicxx,
                     ]
                 )
+            if 'on' in self.spec.variants['gpu-aware-mpi'].value:
+                options.extend(
+                    [
+                        "-DGMX_ENABLE_DIRECT_GPU_COMM=ON",
+                        "-DGMX_FORCE_GPU_AWARE_MPI=OFF",
+                    ]
+                )
+            elif 'force' in self.spec.variants['gpu-aware-mpi'].value:
+                options.extend(
+                    [
+                        "-DGMX_ENABLE_DIRECT_GPU_COMM=ON",
+                        "-DGMX_FORCE_GPU_AWARE_MPI=ON",
+                    ]
+                )
+            if "+rocm" in self.spec:
+                if self.spec["mpi"].extra_attributes and "ldflags" in self.spec["mpi"].extra_attributes:
+                    options.extend(
+                        [
+                            "-DCMAKE_EXE_LINKER_FLAGS=%s" % self.spec["mpi"].extra_attributes["ldflags"],
+                        ]
+                    )
         else:
             options.extend(
                 [
@@ -570,14 +614,14 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
             options.append("-DCUDA_TOOLKIT_ROOT_DIR:STRING=" + self.spec["cuda"].prefix)
 
         target = self.spec.target
-        if "+cuda" in self.spec and target.family == "ppc64le":
+        if target.family == "ppc64le":
             options.append("-DGMX_EXTERNAL_LAPACK:BOOL=OFF")
         else:
             options.append("-DGMX_EXTERNAL_LAPACK:BOOL=ON")
             if self.spec["lapack"].libs:
                 options.append("-DGMX_LAPACK_USER={0}".format(self.spec["lapack"].libs.joined(";")))
 
-        if "+cuda" in self.spec and target.family == "ppc64le":
+        if target.family == "ppc64le":
             options.append("-DGMX_EXTERNAL_BLAS:BOOL=OFF")
         else:
             options.append("-DGMX_EXTERNAL_BLAS:BOOL=ON")
