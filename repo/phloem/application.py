@@ -15,9 +15,11 @@ class Phloem(ExecutableApplication):
     executable('p1', 'sqmr  --num_cores={num_cores} --num_nbors={num_nbors}', use_mpi=True)
     executable('p2', 'mpiBench', use_mpi=True)
     executable('p3', 'mpiGraph', use_mpi=True)
+    #executable('p4', 'com', use_mpi=True)
     workload('sqmr', executables=['p1'])
     workload('mpiBench', executables=['p2'])
     workload('mpiGraph', executables=['p3'])
+    #workload('com', executables=['p4'])
 
     workload_variable('num_cores', default='1',
                       description='Number of MPI ranks on the core node, correlates to number of cores on one compute node.',
@@ -26,7 +28,7 @@ class Phloem(ExecutableApplication):
     workload_variable('num_nbors', default='1',
                       description='Number of distinct neighbors to each rank on the core node.',
                       workloads=['sqmr'])
-    #TODO: Figure out FOMs
+    #TODO: Determine FOMs
     figure_of_merit('TBD',
                     log_file='{experiment_run_dir}/{experiment_name}.out',
                     fom_regex=r'.*',
