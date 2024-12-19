@@ -11,6 +11,7 @@ Fixes #<issue>
 - [ ] Modifying an existing system, benchmark, or experiment
 - [ ] Documentation update
 - [ ] Build/CI update
+- [ ] Benchpark core functionality
 
 # Checklist:
 
@@ -29,3 +30,7 @@ If adding/modifying a benchpark:
 If adding/modifying a experiment:
 - [ ] Extend `experiment.py` under existing directory for specific benchmark
 - [ ] Define a single node and multi-node experiments
+
+If adding/modifying core functionality:
+- [ ] Update docs
+- [ ] Update github and gitlab unit tests (if needed)
