@@ -1,11 +1,13 @@
-# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
-# Spack Project Developers. See the top-level COPYRIGHT file for details.
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 #
-# SPDX-License-Identifier: (Apache-2.0 OR MIT)
+# SPDX-License-Identifier: Apache-2.0
 
-import spack.pkg.builtin.spectrum_mpi
+from spack.package import *
+from spack.pkg.builtin.spectrum_mpi import SpectrumMpi as BuiltinSM
 
-class SpectrumMpi(spack.pkg.builtin.spectrum_mpi.SpectrumMpi):
+
+class SpectrumMpi(BuiltinSM):
     @property
     def libs(self):
         libnames = [
