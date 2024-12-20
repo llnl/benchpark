@@ -85,6 +85,7 @@ class OsuMicroBenchmarks(Experiment):
             "osu_hello",
             "osu_init",
         ),
+        multi=True,
         description="workloads available",
     )
 

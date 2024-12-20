@@ -12,7 +12,7 @@ id_to_resources = {
     "tioga": {
         "rocm_arch": "gfx90a",
         "sys_cores_per_node": 64,
-        "sys_gpus_per_node": 4,
+        "sys_gpus_per_node": 8,
     },
     "elcapitan": {
         "rocm_arch": "gfx940",
@@ -50,6 +50,20 @@ class LlnlElcapitan(System):
         default=False,
         values=(True, False),
         description="Use GTL-enabled MPI",
+    )
+
+    variant(
+        "lapack",
+        default="intel-oneapi-mkl",
+        values=("intel-oneapi-mkl", "rocsolver"),
+        description="Which lapack to use",
+    )
+
+    variant(
+        "blas",
+        default="intel-oneapi-mkl",
+        values=("intel-oneapi-mkl", "rocblas"),
+        description="Which blas to use",
     )
 
     def initialize(self):
@@ -223,7 +237,7 @@ packages:
       prefix: /opt/rocm-{x}/
   llvm:
     externals:
-    - spec: llvm@15.0.0-{x}
+    - spec: llvm@16.0.0
       prefix: /opt/rocm-{x}/llvm
   llvm-amdgpu:
     externals:
@@ -299,13 +313,17 @@ compilers:
         will fail if these variables are not defined though, so for now
         they are still generated (but with more-generic values).
         """
-        return """\
+        return f"""\
 software:
   packages:
     default-compiler:
       pkg_spec: cce
     default-mpi:
       pkg_spec: cray-mpich
+    default-lapack:
+      pkg_spec: {self.spec.variants["lapack"][0]}
+    default-blas:
+      pkg_spec: {self.spec.variants["blas"][0]}
     compiler-rocm:
       pkg_spec: cce
     compiler-amdclang:
@@ -326,6 +344,4 @@ software:
       pkg_spec: cray-mpich~gtl
     mpi-gcc:
       pkg_spec: cray-mpich~gtl
-    fftw:
-      pkg_spec: intel-oneapi-mkl
 """
