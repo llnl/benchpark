@@ -37,24 +37,35 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
 
     depends_on("mfem+mpi+metis", when="+metis")
     depends_on("mfem+mpi~metis", when="~metis")
-
+    depends_on("mfem+caliper", when="+caliper")
     depends_on("mfem@develop", when="@develop")
     depends_on("mfem@4.1.0:", when="@1.0")
     depends_on("mfem@develop", when="@gpu-fom")
-    depends_on("mfem@develop", when="@gpu-opt")
+    depends_on("mfem@4.4_comm_cali", when="@gpu-opt")
+
+    depends_on("mpi")
+    depends_on("hypre+mpi")
+    #requires("+mpi", when="^hypre+mpi")
+    depends_on("hypre+caliper", when="+caliper")
+    #depends_on("hypre@2.31.0:")
+    depends_on("hypre@2.31.0+mixedint~fortran")
+
 
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
 
-    depends_on("hypre+cuda", when="+cuda")
+    depends_on("hypre+cuda+mpi", when="+cuda")
     requires("+cuda", when="^hypre+cuda")
     for arch in ("none", "50", "60", "70", "80"):
         depends_on(f"hypre cuda_arch={arch}", when=f"cuda_arch={arch}")
-
-    depends_on("hypre+rocm+rocblas", when="+rocm")
+        depends_on(f"mfem cuda_arch={arch}", when=f"cuda_arch={arch}")
+    depends_on("mfem +cuda+mpi", when="+cuda")
+    depends_on("mfem +rocm+mpi", when="+rocm")
+    depends_on("hypre +rocm +mpi", when="+rocm")
     requires("+rocm", when="^hypre+rocm")
     for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
-        depends_on(f"hypre amdgpu_target={target}", when=f"amdgpu_target={target}")
+        #depends_on(f"hypre amdgpu_target={target}", when=f"amdgpu_target={target}")
+        depends_on(f"mfem amdgpu_target={target}", when=f"amdgpu_target={target}")
 
 
     @property
