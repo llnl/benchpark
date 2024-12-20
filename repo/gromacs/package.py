@@ -528,7 +528,7 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
                         "-DGMX_FORCE_GPU_AWARE_MPI=ON",
                     ]
                 )
-            options.extend([f"-DMPI_LINK_FLAGS='{self.spec['mpi'].libs.ld_flags}'"])
+            options.extend([f"-DMPI_CXX_LINK_FLAGS='{self.spec['mpi'].libs.ld_flags}'"])
         else:
             options.extend(
                 [
