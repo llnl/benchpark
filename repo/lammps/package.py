@@ -24,7 +24,5 @@ class Lammps(BuiltinLammps):
   def setup_build_environment(self, env):
     super().setup_build_environment(env)
 
-    spec = self.spec
-    if "+mpi" in spec:
-      if spec["mpi"].extra_attributes and "ldflags" in spec["mpi"].extra_attributes:
-        env.append_flags("LDFLAGS", spec["mpi"].extra_attributes["ldflags"])
+    if "+mpi" in self.spec:
+      env.append_flags("LDFLAGS", self.spec["mpi"].libs.ld_flags)

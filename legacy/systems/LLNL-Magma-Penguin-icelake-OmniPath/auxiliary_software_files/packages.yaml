@@ -53,9 +53,5 @@ packages:
     externals:
     - spec: mvapich2@2.3.7-gcc1211
       prefix: /usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-12.1.1
-      extra_attributes:
-        ldflags: "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-12.1.1/lib -lmpi"
     - spec: mvapich2@2.3.7-intel202160classic
       prefix: /usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-classic-2021.6.0
-      extra_attributes:
-        ldflags: "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-classic-2021.6.0/lib -lmpi"

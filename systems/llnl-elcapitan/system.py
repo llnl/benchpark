@@ -138,14 +138,12 @@ class LlnlElcapitan(System):
         if compiler == "cce":
             dont_use_gtl = f"""\
         gtl_lib_path: /opt/cray/pe/mpich/{mpi_version}/gtl/lib
-        ldflags: "-L/opt/cray/pe/mpich/{mpi_version}/ofi/crayclang/{short_cce_version}/lib -lmpi -L/opt/cray/pe/mpich/{mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{mpi_version}/gtl/lib"
 """
 
             use_gtl = f"""\
         gtl_cutoff_size: 4096
         fi_cxi_ats: 0
         gtl_lib_path: /opt/cray/pe/mpich/{mpi_version}/gtl/lib
-        ldflags: "-L/opt/cray/pe/mpich/{mpi_version}/ofi/crayclang/{short_cce_version}/lib -lmpi -L/opt/cray/pe/mpich/{mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{mpi_version}/gtl/lib -lmpi_gtl_hsa"
 """
 
             if gtl:
@@ -173,7 +171,6 @@ packages:
       prefix: /opt/cray/pe/mpich/8.1.26/ofi/gnu/10.3
       extra_attributes:
         gtl_lib_path: /opt/cray/pe/mpich/8.1.26/gtl/lib
-        ldflags: "-L/opt/cray/pe/mpich/8.1.26/ofi/gnu/10.3/lib -lmpi -L/opt/cray/pe/mpich/8.1.26/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/8.1.26/gtl/lib"
 """
 
     def rocm_config(self, rocm_version):

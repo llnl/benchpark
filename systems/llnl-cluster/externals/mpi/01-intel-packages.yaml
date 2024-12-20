@@ -9,5 +9,3 @@ packages:
     externals:
     - spec: mvapich2@2.3.7-intel202160classic
       prefix: /usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-classic-2021.6.0
-      extra_attributes:
-        ldflags: "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-classic-2021.6.0/lib -lmpi"

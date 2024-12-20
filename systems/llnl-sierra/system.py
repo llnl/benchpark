@@ -94,9 +94,6 @@ class LlnlSierra(System):
             ): """\
     - spec: spectrum-mpi@2023.06.28-clang-ibm-16.0.6-cuda-11.8.0-gcc-11.2.1
       prefix: /usr/tce/packages/spectrum-mpi/spectrum-mpi-rolling-release-clang-ibm-16.0.6-cuda-11.8.0-gcc-11.2.1
-      extra_attributes:
-        extra_link_flags: "-L/usr/tce/packages/spectrum-mpi/spectrum-mpi-rolling-release-clang-ibm-16.0.6-cuda-11.8.0-gcc-11.2.1 -lmpiprofilesupport -lmpi_ibm_usempi -lmpi_ibm_mpifh -lmpi_ibm"
-        ldflags: "-lmpiprofilesupport -lmpi_ibm_usempi -lmpi_ibm_mpifh -lmpi_ibm"
 """,
             (
                 "xl-gcc",
@@ -104,8 +101,6 @@ class LlnlSierra(System):
             ): """\
     - spec: spectrum-mpi@2023.06.28-cuda-11.8.0-gcc-11.2.1
       prefix: /usr/tce/packages/spectrum-mpi/spectrum-mpi-rolling-release-xl-2023.06.28-cuda-11.8.0-gcc-11.2.1
-      extra_attributes:
-        ldflags: "-lmpiprofilesupport -lmpi_ibm_usempi -lmpi_ibm_mpifh -lmpi_ibm"
 """,
             (
                 "xl",
@@ -113,8 +108,6 @@ class LlnlSierra(System):
             ): """\
     - spec: spectrum-mpi@2022.08.19-cuda-10.1.243
       prefix: /usr/tce/packages/spectrum-mpi/spectrum-mpi-rolling-release-xl-2022.08.19-cuda-10.1.243
-      extra_attributes:
-        ldflags: "-lmpiprofilesupport -lmpi_ibm_usempi -lmpi_ibm_mpifh -lmpi_ibm"
 """,
             (
                 "clang",
@@ -122,8 +115,6 @@ class LlnlSierra(System):
             ): """\
     - spec: spectrum-mpi@2022.08.19-clang16.0.6-cuda-11.8.0
       prefix: /usr/tce/packages/spectrum-mpi/spectrum-mpi-rolling-release-clang-16.0.6-cuda-11.8.0-gcc-11.2.1
-      extra_attributes:
-        ldflags: "-lmpiprofilesupport -lmpi_ibm_usempi -lmpi_ibm_mpifh -lmpi_ibm"
 """,
             (
                 "xl",
@@ -131,8 +122,6 @@ class LlnlSierra(System):
             ): """\
     - spec: spectrum-mpi@2022.08.19-cuda-11.8.0
       prefix: /usr/tce/packages/spectrum-mpi/spectrum-mpi-rolling-release-xl-2022.08.19-cuda-11.8.0
-      extra_attributes:
-        ldflags: "-lmpiprofilesupport -lmpi_ibm_usempi -lmpi_ibm_mpifh -lmpi_ibm"
 """,
         }
 

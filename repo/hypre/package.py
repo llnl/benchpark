@@ -41,8 +41,7 @@ class Hypre(BuiltinHypre):
         if "+mpi" in spec:
             if "+fortran" in spec:
                 env.set("FC", spec["mpi"].mpifc)
-            if spec["mpi"].extra_attributes and "ldflags" in spec["mpi"].extra_attributes:
-                env.append_flags("LDFLAGS", spec["mpi"].extra_attributes["ldflags"])
+            env.append_flags("LDFLAGS", spec["mpi"].libs.ld_flags)
         if spec["lapack"].satisfies("rocsolver"):
             rocm_rpath_flag = f"-Wl,-rpath,{os.path.dirname(spec['lapack'].prefix)}/lib"
             env.append_flags("LDFLAGS", rocm_rpath_flag)
