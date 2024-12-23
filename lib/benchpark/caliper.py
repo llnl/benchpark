@@ -107,12 +107,11 @@ class Caliper:
         def compute_variables_section(self):
             """ Add Caliper metadata variables for the ramble.yaml """    
             if not self.spec.satisfies("caliper=none"):
-                return {
-                "caliper_metadata": {
-                    "application_name": "{application_name}", 
+                metadata_dict = {"application_name": "{application_name}", 
                     "experiment_name": "{experiment_name}", 
-                    "workload_name": "{workload_name}"
-                    }
+                    "workload_name": "{workload_name}"}
+                return {
+                "caliper_metadata": metadata_dict
                 }
             else:
                 return {}

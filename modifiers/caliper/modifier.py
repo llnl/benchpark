@@ -93,18 +93,18 @@ class Caliper(BasicModifier):
     def _build_metadata(self, workspace, app_inst):
         ''' Write the caliper metadata to json '''
         # Load the Caliper metadata variable from ramble.yaml
-        # experiment_metadata = self.expander.expand_var('caliper_metadata', typed=True, merge_used_stage=False)
-        # Error: expand_var() got an unexpected keyword argument 'merge_used_stage'
-        # TODO: How to get this from the ramble.yaml?
-        experiment_metadata = self.expander.expand_var('caliper_metadata', typed=True)	
-        #self.expander.flush_used_variables() 
-        # Error: 'Expander' object has no attribute 'flush_used_variables'
+        experiment_metadata = app_inst.expander.expand_var_name('caliper_metadata', typed=True, merge_used_stage=False)	
+        app_inst.expander.flush_used_variable_stage() 
+
+        # rebuild dictionary with expanded variables
+        cali_metadata = {}
+        for key, val in experiment_metadata.items():
+            cali_metadata[key] = app_inst.expander.expand_var(val)
 
         # Write to the Caliper metadata file    
         cali_metadata_file = self.expander.expand_var(self._caliper_metadata_file) 
-        # print(json.dumps(experiment_metadata))
         with open(cali_metadata_file, "w") as f: 
-            f.write(json.dumps(experiment_metadata)) 
+            f.write(json.dumps(cali_metadata)) 
 
 
     archive_pattern(_cali_datafile)

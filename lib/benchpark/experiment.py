@@ -285,10 +285,11 @@ class Experiment(ExperimentSystemBase, SingleNode):
             }
         }
         # Add any variables from helper classes
+        self.additional_vars = {}
         for cls in self.helpers:
-            additional_vars = cls.compute_variables_section()
-            if additional_vars:
-                ramble_dict["ramble"].update({"variables": additional_vars})
+            self.additional_vars = cls.compute_variables_section()
+            if self.additional_vars:
+                ramble_dict["ramble"].update({"variables": self.additional_vars})
 
         return ramble_dict
 
