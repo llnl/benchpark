@@ -43,8 +43,8 @@ class Babelstream(
         if self.spec.satisfies("+openmp"):
             self.add_experiment_variable("n_ranks", n_resources, True)
             self.add_experiment_variable("execute", "omp-stream", False)
-            #self.add_experiment_variable("n_threads_per_proc", 1, True)
-            #self.matrix_experiment_variables("n_threads_per_proc")
+            # self.add_experiment_variable("n_threads_per_proc", 1, True)
+            # self.matrix_experiment_variables("n_threads_per_proc")
         if self.spec.satisfies("+cuda"):
             self.add_experiment_variable("execute", "cuda-stream", False)
 
