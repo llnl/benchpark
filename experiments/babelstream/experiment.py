@@ -33,8 +33,6 @@ class Babelstream(
 
     def compute_applications_section(self):
 
-        array_size = {"s": 650000000}
-
         self.add_experiment_variable("processes_per_node", "1", True)
         self.add_experiment_variable("n", "35", False)
         self.add_experiment_variable("o", "0", False)
