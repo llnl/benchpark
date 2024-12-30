@@ -39,12 +39,12 @@ class Babelstream(
         self.add_experiment_variable("o", "0", False)
         n_resources = 1
 
-
         if self.spec.satisfies("+openmp"):
             self.add_experiment_variable("n_ranks", n_resources, True)
             self.add_experiment_variable("execute", "omp-stream", False)
             # self.add_experiment_variable("n_threads_per_proc", 1, True)
             # self.matrix_experiment_variables("n_threads_per_proc")
+
         if self.spec.satisfies("+cuda"):
             self.add_experiment_variable("execute", "cuda-stream", False)
 
@@ -68,7 +68,6 @@ class Babelstream(
             system_specs["cuda_arch"] = "{cuda_arch}"
         if self.spec.satisfies("+rocm"):
             system_specs["rocm_arch"] = "{rocm_arch}"
-
 
         # set package spack specs
         self.add_spack_spec(system_specs["mpi"])

@@ -49,7 +49,7 @@ class Babelstream(CMakePackage, CudaPackage, ROCmPackage):
 
     # Kokkos conflict and variant
     conflicts(
-        "dir=none", when="+kokkos", msg="KOKKKOS requires architecture to be specfied by dir="
+        "dir=none", when="+kokkos", msg="KOKKKOS requires architecture to be specified by dir="
     )
     variant("kokkos", default=False, description="Enable KOKKOS support")
 
@@ -66,7 +66,7 @@ class Babelstream(CMakePackage, CudaPackage, ROCmPackage):
     conflicts(
         "cuda_arch=none",
         when="+cuda",
-        msg="CUDA requires architecture to be specfied by cuda_arch=",
+        msg="CUDA requires architecture to be specified by cuda_arch=",
     )
     variant("mem", values=str, default="DEFAULT", description="Enable MEM Target for CUDA")
     # Raja Conflict
@@ -76,14 +76,14 @@ class Babelstream(CMakePackage, CudaPackage, ROCmPackage):
     conflicts(
         "offload=none",
         when="+raja",
-        msg="RAJA requires architecture to be specfied by target=[CPU,NVIDIA]",
+        msg="RAJA requires architecture to be specified by target=[CPU,NVIDIA]",
     )
 
     # download raja from https://github.com/LLNL/RAJA
     conflicts(
         "dir=none",
         when="+raja",
-        msg="RAJA implementation requires architecture to be specfied by dir=",
+        msg="RAJA implementation requires architecture to be specified by dir=",
     )
 
     # Thrust Conflict
@@ -411,13 +411,13 @@ class Babelstream(CMakePackage, CudaPackage, ROCmPackage):
                     args.append("-DKokkos_ENABLE_CUDA=ON")
                     cuda_arch_list = self.spec.variants["cuda_arch"].value
                     int_cuda_arch = int(cuda_arch_list[0])
-                    # arhitecture kepler optimisations
+                    # architecture kepler optimisations
                     if int_cuda_arch in (30, 32, 35, 37):
                         args.append("-D" + "Kokkos_ARCH_KEPLER" + str(int_cuda_arch) + "=ON")
-                    # arhitecture maxwell optimisations
+                    # architecture maxwell optimisations
                     if int_cuda_arch in (50, 52, 53):
                         args.append("-D" + "Kokkos_ARCH_MAXWELL" + str(int_cuda_arch) + "=ON")
-                    # arhitecture pascal optimisations
+                    # architecture pascal optimisations
                     if int_cuda_arch in (60, 61):
                         args.append("-D" + "Kokkos_ARCH_PASCAL" + str(int_cuda_arch) + "=ON")
                     # architecture volta optimisations
