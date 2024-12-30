@@ -10,6 +10,7 @@ from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
 
+
 class Babelstream(
     Experiment,
     Caliper,
