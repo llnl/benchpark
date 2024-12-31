@@ -91,37 +91,22 @@ class Remhos(
         system_specs = {}
         system_specs["compiler"] = "default-compiler"
         system_specs["mpi"] = "default-mpi"
-        system_specs["lapack"] = "lapack"
+        system_specs["lapack"] = "default-lapack"
+        system_specs["blas"] = "default-blas"
+
         # set package spack specs
         # empty package_specs value implies external package
         self.add_spack_spec(system_specs["mpi"])
-        # self.add_spack_spec(system_specs["blas"])
         
         if self.spec.satisfies("+cuda"):
             system_specs["cuda_version"] = "{default_cuda_version}"
             system_specs["cuda_arch"] = "{cuda_arch}"
-            system_specs["blas"] = "cublas-cuda"
-            #TODO: Add hypre spec for cuda
-
         elif self.spec.satisfies("+rocm"):
             system_specs["rocm_arch"] = "{rocm_arch}"
-            system_specs["blas"] = "blas-rocm"
 
-            #self.add_spack_spec(
-            #    "hypre",
-            #    ["hypre@2.31.0 +mpi+openmp+rocm+mixedint+rocblas~fortran amdgpu_target={rocm_arch}", system_specs["compiler"]],
-            #)
-
-        #else:   
-        #    self.add_spack_spec(
-        #        "hypre",
-        #        ["hypre@2.31.0 +mpi+openmp+mixedint~fortran", system_specs["compiler"]],
-        #    )
-
-        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
-            # empty package_specs value implies external package
-            self.add_spack_spec(system_specs["blas"]) 
-            self.add_spack_spec(system_specs["lapack"])
+        # empty package_specs value implies external package
+        self.add_spack_spec(system_specs["blas"]) 
+        self.add_spack_spec(system_specs["lapack"])
 
         self.add_spack_spec(
             self.name, [f"remhos@{app_version} +metis", system_specs["compiler"]]

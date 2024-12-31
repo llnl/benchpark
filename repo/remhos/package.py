@@ -42,6 +42,7 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
     depends_on("mfem@4.1.0:", when="@1.0")
     depends_on("mfem@develop", when="@gpu-fom")
     depends_on("mfem@4.4_comm_cali", when="@gpu-opt")
+    depends_on("mfem cxxstd=14")
 
     depends_on("mpi")
     depends_on("hypre+mpi")

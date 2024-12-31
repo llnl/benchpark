@@ -194,7 +194,7 @@ packages:
   rocrand:
     externals:
     - spec: rocrand@{x}
-      prefix: /opt/rocm-{x}/hiprand
+      prefix: /opt/rocm-{x}
   rocsparse:
     externals:
     - spec: rocsparse@{x}
@@ -215,6 +215,10 @@ packages:
     externals:
     - spec: comgr@{x}
       prefix: /opt/rocm-{x}/
+  hiprand:
+    externals:
+    - spec: hiprand@{x}
+      prefix: /opt/rocm-{x}
   hipsparse:
     externals:
     - spec: hipsparse@{x}

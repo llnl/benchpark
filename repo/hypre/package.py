@@ -10,7 +10,6 @@ from spack.pkg.builtin.hypre import Hypre as BuiltinHypre
 
 
 class Hypre(BuiltinHypre):
-
     requires("+rocm", when="^rocblas")
     requires("+rocm", when="^rocsolver")
 
@@ -18,7 +17,7 @@ class Hypre(BuiltinHypre):
         "cce": "cray",
         "gcc": "gnu",
     }
-    #depends_on("hiprand")
+
     def configure_args(self):
         configure_args = super().configure_args()
 

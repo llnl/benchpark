@@ -27,6 +27,7 @@ class LlnlSierra(System):
     variant(
         "lapack",
         default="cusolver",
+        values=("cusolver", "essl"),
         description="Which lapack to use",
     )
 
@@ -75,6 +76,10 @@ class LlnlSierra(System):
             elif self.spec.satisfies("cuda=11-8-0"):
                 selections.append(
                     externals / "lapack" / "01-version-11-8-0-packages.yaml"
+                )
+        elif self.spec.satisfies("lapack=essl"):
+                selections.append(
+                    externals / "lapack" / "02-version-6-2-packages.yaml"
                 )
 
         if self.spec.satisfies("blas=cublas"):
@@ -141,6 +146,12 @@ class LlnlSierra(System):
         cfg = mpi_cfgs[(compiler, cuda_ver)]
         full_cfg = f"""\
 packages:
+  blas:
+    require:
+      - {self.spec.variants["blas"][0]}
+  lapack:
+    require:
+      - {self.spec.variants["lapack"][0]}
   mpi:
     externals:
 {cfg}
@@ -169,7 +180,7 @@ packages:
       fc: /usr/tce/packages/xl/xl-2023.06.28-cuda-11.8.0-gcc-11.2.1/bin/xlf_r
     flags:
       cflags: -g -O2
-      cxxflags: -g -O2 -std=c++17
+      cxxflags: -g -O2 -std=c++14
       fflags: -g -O2
     operating_system: rhel7
     target: ppc64le
@@ -253,7 +264,7 @@ packages:
       fc: /usr/tce/packages/gcc/gcc-11.2.1/bin/gfortran
     flags:
       cflags: -g -O2
-      cxxflags: -g -O2 -std=c++17
+      cxxflags: -g -O2 -std=c++14
       fflags: ''
     operating_system: rhel7
     target: ppc64le
@@ -315,6 +326,4 @@ software:
       pkg_spec: cublas
     cublas-cuda:
       pkg_spec: cublas
-    lapack:
-      pkg_spec: lapack@3.9.0
 """
