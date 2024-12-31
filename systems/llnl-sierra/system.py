@@ -297,7 +297,7 @@ compilers:
         will fail if these variables are not defined though, so for now
         they are still generated (but with more-generic values).
         """
-        return """\
+        return f"""\
 software:
   packages:
     default-compiler:
@@ -305,9 +305,9 @@ software:
     default-mpi:
       pkg_spec: spectrum-mpi
     default-lapack:
-      pkg_spec: lapack
+      pkg_spec: {self.spec.variants["lapack"][0]}
     default-blas:
-      pkg_spec: blas
+      pkg_spec: {self.spec.variants["blas"][0]}
     compiler-xl:
       pkg_spec: xl
     mpi-xl:
