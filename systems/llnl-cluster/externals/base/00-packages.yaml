@@ -41,7 +41,7 @@ packages:
   hwloc:
     buildable: false
     externals:
-    - spec: hwloc@2.9.1
+    - spec: hwloc@2.11.1
       prefix: /usr
   fftw:
     buildable: false
