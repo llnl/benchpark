@@ -54,5 +54,8 @@ class Mfem(BuiltinMfem):
         options.append("MFEM_USE_CALIPER=%s" % yes_no("+caliper"))
         if "+caliper" in self.spec: 
             options.append("CALIPER_DIR=%s" % self.spec["caliper"].prefix)
+            options.append("MFEM_USE_ADIAK=%s" % yes_no("+adiak"))
+            options.append("ADIAK_DIR=%s" % self.spec["adiak"].prefix)
+
         return options
 

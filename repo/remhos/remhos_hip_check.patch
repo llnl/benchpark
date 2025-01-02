@@ -1,0 +1,11 @@
+--- a/remhos_fct.cpp	2025-01-01 16:15:23.957570628 -0800
++++ b/remhos_fct.cpp	2025-01-01 18:55:06.715259238 -0800
+@@ -529,7 +529,7 @@
+          auto umin = U_MIN(dof_id);
+          auto umax = U_MAX(dof_id);
+ 
+-#ifndef MFEM_USE_CUDA
++#if !defined(MFEM_USE_CUDA) && !defined(MFEM_USE_HIP)
+          if (update_bounds)
+          {
+             const auto u_new_ho   = U(dof_id) + δt * DU_HO(dof_id);

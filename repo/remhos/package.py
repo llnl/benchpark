@@ -68,6 +68,7 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
         #depends_on(f"hypre amdgpu_target={target}", when=f"amdgpu_target={target}")
         depends_on(f"mfem amdgpu_target={target}", when=f"amdgpu_target={target}")
 
+    patch("remhos_hip_check.patch", when="+rocm")
 
     @property
     def build_targets(self):
