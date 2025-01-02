@@ -49,7 +49,7 @@ class Remhos(
             )
 
         n_resources = {"n_nodes": 1}
-        problem_size = {"epm": 512}
+        #problem_size = {"epm": 512}
         device = "n_nodes"
 
         if self.spec.satisfies("+cuda"):
