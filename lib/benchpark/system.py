@@ -8,6 +8,8 @@ import importlib.util
 import os
 import pathlib
 import sys
+import tempfile
+import yaml
 
 import benchpark.paths
 from benchpark.directives import ExperimentSystemBase
@@ -188,3 +190,23 @@ variables:
   batch_submit: "placeholder"
   mpi_command: "placeholder"
 """
+
+    def _adhoc_cfgs(self):
+        if not getattr(self, "_tmp_cfgs", None):
+            self._tmp_cfgs = tempfile.mkdtemp()
+            self._adhoc_cfg_idx = 0
+        return self._tmp_cfgs
+
+    def next_adhoc_cfg(self):
+        basedir = self._adhoc_cfgs()
+        self._adhoc_cfg_idx += 1
+        return os.path.join(basedir, str(self._adhoc_cfg_idx))
+
+
+def unique_dir_for_description(system_dir):
+    system_id_path = os.path.join(system_dir, "system_id.yaml")
+    with open(system_id_path, "r") as f:
+        data = yaml.safe_load(f)
+    name = data["system"]["name"]
+    spec_hash = data["system"]["config-hash"]
+    return f"{name}-{spec_hash[:7]}"
