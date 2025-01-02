@@ -34,6 +34,7 @@ class LlnlSierra(System):
     variant(
         "blas",
         default="cublas",
+        values=("cublas", "essl"),
         description="Which blas to use",
     )
 
