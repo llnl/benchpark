@@ -106,7 +106,29 @@ class LlnlElcapitan(System):
         elif compiler == "gcc":
             selections.append(externals / "libsci" / "00-gcc-packages.yaml")
 
+        cmp_preference_path = self.next_adhoc_cfg()
+        with open(cmp_preference_path, "w") as f:
+            f.write(self.compiler_weighting_cfg())
+        selections.append(cmp_preference_path)
+
         return selections
+
+    def compiler_weighting_cfg(self):
+        compiler = self.spec.variants["compiler"][0]
+
+        if compiler == "cce":
+            return """\
+packages:
+  all:
+    require:
+    - one_of: ["%cce", "@:"]
+"""
+        elif compiler == "gcc":
+            return """\
+packages: {}
+"""
+        else:
+            raise ValueError(f"Unexpected value for compiler: {compiler}")
 
     def compiler_configs(self):
         compilers = LlnlElcapitan.resource_location / "compilers"
@@ -115,13 +137,16 @@ class LlnlElcapitan(System):
         rocm = self.spec.variants["rocm"][0]
 
         selections = []
+
         if compiler == "cce":
             compiler_cfg_path = self.next_adhoc_cfg()
             with open(compiler_cfg_path, "w") as f:
                 f.write(self.rocm_cce_compiler_cfg(rocm, "16.0.0"))
             selections.append(compiler_cfg_path)
-        elif compiler == "gcc":
-            selections.append(compilers / "gcc" / "00-gcc-12-compilers.yaml")
+
+        # Note: this is always included for some low-level dependencies
+        # that shouldn't build with %cce
+        selections.append(compilers / "gcc" / "00-gcc-12-compilers.yaml")
 
         return selections
 
