@@ -114,7 +114,9 @@ class LlnlElcapitan(System):
         if self.spec.satisfies("compiler=cce"):
             compiler_cfg_path = self.next_adhoc_cfg()
             with open(compiler_cfg_path, "w") as f:
-                f.write(self.rocm_cce_compiler_cfg(self.spec.variants["rocm"][0], "16.0.0"))
+                f.write(
+                    self.rocm_cce_compiler_cfg(self.spec.variants["rocm"][0], "16.0.0")
+                )
             selections.append(compiler_cfg_path)
         elif self.spec.satisfies("compiler=gcc"):
             selections.append(compilers / "gcc" / "00-gcc-12-compilers.yaml")
@@ -278,7 +280,11 @@ packages:
       prefix: /opt/rocm-{x}
     buildable: false
 """
-        return template.format(x=rocm_version, blas=self.spec.variants["blas"][0], lapack=self.spec.variants["lapack"][0])
+        return template.format(
+            x=rocm_version,
+            blas=self.spec.variants["blas"][0],
+            lapack=self.spec.variants["lapack"][0],
+        )
 
     def rocm_cce_compiler_cfg(self, rocm_version, cce_version):
         template = """\

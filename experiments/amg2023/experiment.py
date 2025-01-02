@@ -154,7 +154,7 @@ class Amg2023(
             system_specs["rocm_arch"] = "{rocm_arch}"
 
         # empty package_specs value implies external package
-        self.add_spack_spec(system_specs["blas"]) 
+        self.add_spack_spec(system_specs["blas"])
         self.add_spack_spec(system_specs["lapack"])
 
         self.add_spack_spec(

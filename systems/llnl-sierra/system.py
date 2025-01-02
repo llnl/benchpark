@@ -78,9 +78,7 @@ class LlnlSierra(System):
                     externals / "lapack" / "01-version-11-8-0-packages.yaml"
                 )
         elif self.spec.satisfies("lapack=essl"):
-                selections.append(
-                    externals / "lapack" / "02-version-6-2-packages.yaml"
-                )
+            selections.append(externals / "lapack" / "02-version-6-2-packages.yaml")
 
         if self.spec.satisfies("blas=cublas"):
             if self.spec.satisfies("cuda=10-1-243"):

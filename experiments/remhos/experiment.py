@@ -47,7 +47,7 @@ class Remhos(
                 f"Only one type of scaling per experiment is allowed for application package {self.name}"
             )
 
-        n_resources = {"n_nodes": 1}    
+        n_resources = {"n_nodes": 1}
         problem_size = {"epm": 512}
         device = "n_nodes"
 
@@ -81,7 +81,6 @@ class Remhos(
         elif self.spec.satisfies("+rocm"):
             self.add_experiment_variable("arch", "HIP")
 
-
     def compute_spack_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
@@ -97,7 +96,7 @@ class Remhos(
         # set package spack specs
         # empty package_specs value implies external package
         self.add_spack_spec(system_specs["mpi"])
-        
+
         if self.spec.satisfies("+cuda"):
             system_specs["cuda_version"] = "{default_cuda_version}"
             system_specs["cuda_arch"] = "{cuda_arch}"
@@ -105,7 +104,7 @@ class Remhos(
             system_specs["rocm_arch"] = "{rocm_arch}"
 
         # empty package_specs value implies external package
-        self.add_spack_spec(system_specs["blas"]) 
+        self.add_spack_spec(system_specs["blas"])
         self.add_spack_spec(system_specs["lapack"])
 
         self.add_spack_spec(
