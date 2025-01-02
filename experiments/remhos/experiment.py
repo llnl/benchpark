@@ -11,6 +11,7 @@ from benchpark.expr.builtin.caliper import Caliper
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
 
+
 class Remhos(
     Experiment,
     StrongScaling,
