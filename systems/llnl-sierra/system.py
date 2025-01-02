@@ -34,6 +34,7 @@ class LlnlSierra(System):
     variant(
         "blas",
         default="cublas",
+        values=("cublas", "essl"),
         description="Which blas to use",
     )
 
@@ -89,6 +90,8 @@ class LlnlSierra(System):
                 selections.append(
                     externals / "blas" / "01-version-11-8-0-packages.yaml"
                 )
+        elif self.spec.satisfies("blas=essl"):
+            selections.append(externals / "blas" / "02-version-6-2-packages.yaml")
 
         mpi_cfgs = {
             (
