@@ -12,8 +12,8 @@ class Remhos(ExecutableApplication):
     """Remhos benchmark"""
     name = "remhos"
 #TODO: add -ms flag once it's implemented
-    executable('2d', 'remhos'+' -m {remhos}/data/inline-quad.mesh'+' -dim 2 -epm 1024'+' -p 14'+' -rs {rs2d}'+' -dt {dt}'+' -tf {tf}'+' -ho {ho}' ' -lo {lo}'+' -fct {fct}'+' -vs {vs}'+' -ms {ms}'+' -d {device}'+'  -no-vis', use_mpi=True)
-    executable('3d', 'remhos'+' -m {remhos}/data/cube01_hex.mesh'+' -dim 3 -epm 512'+' -p 10'+' -rs {rs3d}'+' -o {o}'+' -dt {dt}'+' -tf {tf}'+' -ho {ho}' ' -lo {lo}'+' -fct {fct}'+' -vs {vs}'+' -ms {ms}'+' -d {device}'+' -no-vis', use_mpi=True)
+    executable('2d', 'remhos'+' -dim 2 -epm 1024'+' -p 14'+' -rs {rs2d}'+' -o 3 -dt {dt}'+' -tf {tf}'+' -ho {ho}' ' -lo {lo}'+' -fct {fct}'+' -vs {vs}'+' -ms {ms}'+' -d {device}'+' -pa -no-vis', use_mpi=True)
+    executable('3d', 'remhos'+' -dim 3 -epm 512'+' -p 10'+' -rs {rs3d}'+' -o 2'+' -dt {dt}'+' -tf {tf}'+' -ho {ho}' ' -lo {lo}'+' -fct {fct}'+' -vs {vs}'+' -ms {ms}'+' -d {device}'+' -pa -no-vis', use_mpi=True)
     workload('2d', executables=['2d'])
     workload('3d', executables=['3d'])
     

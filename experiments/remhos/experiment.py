@@ -48,20 +48,21 @@ class Remhos(
                 f"Only one type of scaling per experiment is allowed for application package {self.name}"
             )
 
-        n_resources = {"n_nodes": 1}
+        n_resources = {"n_nodes": 8}
         # problem_size = {"epm": 512}
-        device = "n_nodes"
+        device = "n_ranks"
 
         if self.spec.satisfies("+cuda"):
-            device = "n_gpus"
-            self.add_experiment_variable("-d", "cuda", True)
+            self.add_experiment_variable("device", "cuda", True)
         elif self.spec.satisfies("+rocm"):
-            self.add_experiment_variable("-d", "rocm", True)
+            self.add_experiment_variable("device", "hip", True)
+        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+            device = "n_gpus"
         else:
             self.add_experiment_variable(
                 "n_ranks", "{sys_cores_per_node} * {n_nodes}", True
             )
-            self.add_experiment_variable("-d", "cpu", True)
+            self.add_experiment_variable("device", "cpu", True)
 
         if self.spec.satisfies("+single_node"):
             for pk, pv in n_resources.items():
