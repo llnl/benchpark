@@ -29,51 +29,14 @@ class Hpcg(CMakePackage):
     depends_on("caliper", when="+caliper") 
     depends_on("adiak", when="+caliper") 
 
-    """
-    patch(
-        "https://github.com/daboehme/hpcg/commit/114602d458d1034faa52b71e4c15aba9b3a17698.patch?full_index=1",
-        #sha256="b13c74454a2166767e3cde77b0f1d080522828122defc8477cc0b9919dcc231a",
-        sha256="1200e257da66c1824cc19f37f5df12d8b34ad7f738dd978d119ade0ac14da802",
-        when="%gcc@9:",
-    )   
-    patch(
-        "https://github.com/daboehme/hpcg/commit/114602d458d1034faa52b71e4c15aba9b3a17698.patch?full_index=1",
-        #sha256="b13c74454a2166767e3cde77b0f1d080522828122defc8477cc0b9919dcc231a",
-        sha256="1200e257da66c1824cc19f37f5df12d8b34ad7f738dd978d119ade0ac14da802",
-        when="%aocc",
-    )   
-    patch(
-        "https://github.com/daboehme/hpcg/commit/114602d458d1034faa52b71e4c15aba9b3a17698.patch?full_index=1",
-        #sha256="b13c74454a2166767e3cde77b0f1d080522828122defc8477cc0b9919dcc231a",
-        sha256="1200e257da66c1824cc19f37f5df12d8b34ad7f738dd978d119ade0ac14da802",
-        when="%arm",
-    )   
-    patch(
-        "https://github.com/daboehme/hpcg/commit/114602d458d1034faa52b71e4c15aba9b3a17698.patch?full_index=1",
-        #sha256="b13c74454a2166767e3cde77b0f1d080522828122defc8477cc0b9919dcc231a",
-        sha256="1200e257da66c1824cc19f37f5df12d8b34ad7f738dd978d119ade0ac14da802",
-        when="%oneapi",
-    )
-    patch(
-        "https://github.com/daboehme/hpcg/commit/114602d458d1034faa52b71e4c15aba9b3a17698.patch?full_index=1",
-        #sha256="b13c74454a2166767e3cde77b0f1d080522828122defc8477cc0b9919dcc231a",
-        sha256="1200e257da66c1824cc19f37f5df12d8b34ad7f738dd978d119ade0ac14da802",
-        when="%intel",
-    )
-    patch(
-        "https://github.com/daboehme/hpcg/commit/114602d458d1034faa52b71e4c15aba9b3a17698.patch?full_index=1",
-        #sha256="b13c74454a2166767e3cde77b0f1d080522828122defc8477cc0b9919dcc231a",
-        sha256="1200e257da66c1824cc19f37f5df12d8b34ad7f738dd978d119ade0ac14da802",
-        when="%clang",
-    )
-    """
 
     def cmake_args(self):
         build_targets = ["all", "docs"]
         install_targets = ["install", "docs"]
         args = [
             "-DHPCG_ENABLE_MPI=TRUE",
-            self.define_from_variant("-DHPCG_ENABLE_CALIPER=TRUE", "caliper"),
-            self.define_from_variant("-DHPCG_ENABLE_OPENMP=TRUE", "openmp"),
+            self.define_from_variant("HPCG_ENABLE_CALIPER", "caliper"),
+            self.define_from_variant("HPCG_ENABLE_OPENMP", "openmp"),
         ]
+        
         return args

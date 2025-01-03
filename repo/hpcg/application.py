@@ -22,7 +22,7 @@ class Hpcg(ExecutableApplication):
 
     executable("execute", "xhpcg", use_mpi=True)
 
-    executable("move-log", "mv HPCG-Benchmark*.txt {out_file}", use_mpi=False)
+    executable("move-log", "mv {experiment_run_dir}/HPCG-Benchmark*.txt {out_file}", use_mpi=False)
 
     workload("standard", executables=["execute", "move-log"])
 
@@ -42,7 +42,7 @@ class Hpcg(ExecutableApplication):
 
     workload_variable(
         "out_file",
-        default="{experiment_run_dir}/hpcg_result.out",
+        default="{experiment_run_dir}/{experiment_name}.out",
         description="Output file for results",
         workloads=["standard"],
     )
