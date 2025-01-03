@@ -586,3 +586,15 @@ jobs:
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
+
+      - name: Dry run dynamic raja-perf/mpi with dynamic CTS ruby
+        run: |
+          ./bin/benchpark experiment init --dest=raja-perf raja-perf
+          ./bin/benchpark setup ./raja-perf ./ruby-system workspace/
+          system_id=$(./bin/benchpark system id ./ruby-system)
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir "workspace/raja-perf/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
