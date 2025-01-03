@@ -12,6 +12,7 @@ from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
 from benchpark.expr.builtin.caliper import Caliper
 
+
 class RajaPerf(
     Experiment,
     StrongScaling,
@@ -41,7 +42,7 @@ class RajaPerf(
                 n_resources = pv
 
         elif self.spec.satisfies("+strong"):
-            scaled_variables= self.generate_strong_scaling_params(
+            scaled_variables = self.generate_strong_scaling_params(
                 {tuple(n_resources.keys()): list(n_resources.values())},
                 int(self.spec.variants["scaling-factor"][0]),
                 int(self.spec.variants["scaling-iterations"][0]),
@@ -63,7 +64,7 @@ class RajaPerf(
         system_specs = {}
         system_specs["compiler"] = "default-compiler"
         system_specs["mpi"] = "default-mpi"
-        
+
         if self.spec.satisfies("+cuda"):
             system_specs["cuda_version"] = "{default_cuda_version}"
             system_specs["cuda_arch"] = "{cuda_arch}"
@@ -72,4 +73,6 @@ class RajaPerf(
 
         self.add_spack_spec(system_specs["mpi"])
 
-        self.add_spack_spec(self.name, [f"raja-perf@{app_version}", system_specs["compiler"]])
+        self.add_spack_spec(
+            self.name, [f"raja-perf@{app_version}", system_specs["compiler"]]
+        )
