@@ -40,7 +40,6 @@ schemas = {
 }
 
 
-# Test comment to trigger CI
 def load_schema(schema_id, schema_path):
     schema_spec = importlib.util.spec_from_file_location(schema_id, schema_path)
     schema = importlib.util.module_from_spec(schema_spec)
