@@ -18,7 +18,11 @@ class Hpcg(ExecutableApplication):
 
     maintainers("douglasjacobsen")
 
-
+    tags = ['synthetic',
+            'conjugate-gradient','solver','sparse-linear-algebra',
+            'large-scale',
+            'mpi','network-point-to-point',
+            'c++','openmp']
 
     executable("execute", "xhpcg", use_mpi=True)
 
