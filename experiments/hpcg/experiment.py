@@ -47,7 +47,7 @@ class Hpcg(
                 int(self.spec.variants["scaling-iterations"][0]),
             )
             n_resources = [
-                x * y * z 
+                x * y * z
                 for x, y, z in zip(
                     *(scaled_variables[p] for p in num_procs if p in scaled_variables)
                 )
@@ -63,7 +63,7 @@ class Hpcg(
                 int(self.spec.variants["scaling-iterations"][0]),
             )
             n_resources = [
-                x * y * z 
+                x * y * z
                 for x, y, z in zip(
                     *(scaled_variables[p] for p in num_procs if p in scaled_variables)
                 )
