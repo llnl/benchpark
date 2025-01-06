@@ -38,6 +38,11 @@ packages:
     - spec: cmake@3.24.2
       prefix: /usr/tce
     buildable: false
+  elf:
+    externals:
+    - spec: elf@0.190
+      prefix: /usr
+    buildable: false
   pkgconf:
     externals:
     - spec: pkgconf@1.4.2
