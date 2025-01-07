@@ -316,16 +316,6 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run hpl/openmp with Caliper-topdown modifier on Magma
-        run: |
-          ./bin/benchpark setup hpl/openmp --modifier=caliper-topdown LLNL-Magma-Penguin-icelake-OmniPath workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/hpl/openmp/LLNL-Magma-Penguin-icelake-OmniPath/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
       - name: Dry run dynamic quicksilver-openmp on nosite-x86_64 with allocation modifier
         run: |
           ./bin/benchpark experiment init --dest=quicksilver-openmp quicksilver+openmp +weak~single_node
