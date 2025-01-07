@@ -28,7 +28,7 @@ def main(workspace):
     benchmarks = list()
     benchpark_benchmarks(benchmarks)
 
-    f = "../tags.yaml"
+    f = "../taxonomy.yaml"
     with open(f, "r") as stream:
         try:
             data = yaml.safe_load(stream)

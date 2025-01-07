@@ -4,7 +4,7 @@ sphinx-rtd-theme==3.0.2
 codespell==2.3.0
 pandas==2.2.3
 pyyaml==6.0.2
-sphinxcontrib-programoutput==0.17
+sphinxcontrib-programoutput==0.18
 # The remaining requirements are from Ramble
 pytest
 flake8

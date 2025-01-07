@@ -110,7 +110,7 @@ def benchpark_benchmarks():
 
 
 def benchpark_get_tags():
-    f = benchpark.paths.benchpark_root / "tags.yaml"
+    f = benchpark.paths.benchpark_root / "taxonomy.yaml"
     tags = []
 
     with open(f, "r") as stream:
