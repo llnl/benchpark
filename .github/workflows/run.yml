@@ -4,7 +4,7 @@ on:
 
 jobs:
   saxpy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout Benchpark
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -91,7 +91,7 @@ jobs:
             --update-index ci-buildcache \
             $(spack find --format '/{hash}')
   dryrunexperiments:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout Benchpark
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -590,11 +590,11 @@ jobs:
       - name: Dry run dynamic hpl/openmp with dynamic CTS ruby
         run: |
           system_id=$(./bin/benchpark system id ./ruby-system)
-          ./bin/benchpark experiment init --dest=hpl hpl
-          ./bin/benchpark setup hpl ./ruby-system workspace/
+          ./bin/benchpark experiment init --dest=hpl-openmp hpl
+          ./bin/benchpark setup hpl-openmp ./ruby-system workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/hpl/$system_id/workspace \
+            --workspace-dir workspace/hpl-openmp/$system_id/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
