@@ -1,8 +1,0 @@
-packages:
-  cray-mpich:
-    externals:
-    - spec: cray-mpich@8.1.26%cce@16.0.0 ~gtl +wrappers
-      prefix: /opt/cray/pe/mpich/8.1.26/ofi/crayclang/16.0
-      extra_attributes:
-        gtl_lib_path: /opt/cray/pe/mpich/8.1.26/gtl/lib
-        ldflags: "-L/opt/cray/pe/mpich/8.1.26/ofi/crayclang/16.0/lib -lmpi -L/opt/cray/pe/mpich/8.1.26/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/8.1.26/gtl/lib"
