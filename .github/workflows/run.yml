@@ -282,26 +282,6 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run lammps/openmp with static Ruby
-        run: |
-          ./bin/benchpark setup lammps/openmp LLNL-Ruby-icelake-OmniPath workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/lammps/openmp/LLNL-Ruby-icelake-OmniPath/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
-      - name: Dry run lammps/rocm with static Tioga
-        run: |
-          ./bin/benchpark setup lammps/rocm LLNL-Tioga-HPECray-zen3-MI250X-Slingshot workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/lammps/rocm/LLNL-Tioga-HPECray-zen3-MI250X-Slingshot/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
       - name: Dry run dynamic lammps/openmp on static Ruby
         run: |
           ./bin/benchpark experiment init --dest=lammps-openmp lammps+openmp
@@ -353,16 +333,6 @@ jobs:
           . workspace/setup.sh
           ramble \
             --workspace-dir workspace/quicksilver-openmp/nosite-x86_64/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
-      - name: Dry run phloem/mpi-only on nosite-x86_64 with allocation modifier
-        run: |
-          ./bin/benchpark setup phloem/mpi-only nosite-x86_64 workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/phloem/mpi-only/nosite-x86_64/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
