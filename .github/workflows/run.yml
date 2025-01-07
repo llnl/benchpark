@@ -478,26 +478,54 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic remhos/mpi with dynamic llnl-cluster ruby
+      - name: Dry run dynamic remhos/mpi with dynamic Ruby
         run: |
-          ./bin/benchpark experiment init --dest=remhos-ruby remhos
-          ./bin/benchpark setup ./remhos-ruby ./ruby-system workspace/
-          system_id=$(./bin/benchpark system id ./ruby-system)
+          ./bin/benchpark system init --dest=cluster-system1 llnl-cluster compiler=gcc lapack=intel-oneapi-mkl blas=intel-oneapi-mkl
+          system_id=$(./bin/benchpark system id ./cluster-system1)
+          ./bin/benchpark experiment init --dest=remhos-mpi-ruby remhos ~cuda~rocm caliper=mpi,time
+          ./bin/benchpark setup ./remhos-mpi-ruby ./cluster-system1 workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/remhos-ruby/$system_id/workspace \
+            --workspace-dir "workspace/remhos-mpi-ruby/$system_id/workspace" \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
 
       - name: Dry run dynamic remhos/mpi with dynamic Tioga
         run: |
-          ./bin/benchpark experiment init --dest=remhos-tioga remhos
-          ./bin/benchpark setup remhos-tioga ./tioga-system workspace/
-          system_id=$(./bin/benchpark system id ./tioga-system)
+          ./bin/benchpark system init --dest=tioga-system4 llnl-elcapitan rocm=5.5.1 +gtl compiler=cce lapack=intel-oneapi-mkl blas=intel-oneapi-mkl
+          system_id=$(./bin/benchpark system id ./tioga-system4)
+          ./bin/benchpark experiment init --dest=remhos-mpi-tioga remhos ~cuda~rocm caliper=mpi,time
+          ./bin/benchpark setup ./remhos-mpi-tioga ./tioga-system4 workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/remhos-tioga/$system_id/workspace \
+            --workspace-dir "workspace/remhos-mpi-tioga/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic remhos/cuda with dynamic Sierra
+        run: |
+          ./bin/benchpark system init --dest=sierra-system2 llnl-sierra cuda=11-8-0 compiler=clang-ibm lapack=essl blas=cublas
+          system_id=$(./bin/benchpark system id ./sierra-system2)
+          ./bin/benchpark experiment init --dest=remhos-cuda remhos +cuda~rocm caliper=mpi,time
+          ./bin/benchpark setup ./remhos-cuda ./sierra-system2 workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir "workspace/remhos-cuda/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic remhos/rocm with dynamic Tioga
+        run: |
+          ./bin/benchpark system init --dest=tioga-system5 llnl-elcapitan rocm=5.5.1 +gtl compiler=cce lapack=cray-libsci blas=rocblas
+          system_id=$(./bin/benchpark system id ./tioga-system5)
+          ./bin/benchpark experiment init --dest=remhos-rocm remhos ~cuda+rocm caliper=mpi,time
+          ./bin/benchpark setup ./remhos-rocm ./tioga-system5 workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir "workspace/remhos-rocm/$system_id/workspace" \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
