@@ -4,7 +4,7 @@ on:
 
 jobs:
   saxpy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout Benchpark
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -91,7 +91,7 @@ jobs:
             --update-index ci-buildcache \
             $(spack find --format '/{hash}')
   dryrunexperiments:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout Benchpark
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
