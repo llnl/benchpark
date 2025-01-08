@@ -41,7 +41,7 @@ class Genesis(Experiment, OpenMPExperiment):
 
         if self.spec.satisfies("+openmp"):
             self.add_experiment_variable("n_nodes", ["1"], True)
-            self.add_experiment_variable("processes_per_node", ["1"])
+            self.add_experiment_variable("processes_per_node", ["8"])
             self.add_experiment_variable("n_ranks", "{processes_per_node} * {n_nodes}")
             self.add_experiment_variable("omp_num_threads", ["48"])
             self.add_experiment_variable("arch", "OpenMP")
