@@ -11,7 +11,6 @@ from ramble.app.builtin.lammps import Lammps as LammpsBase
 
 class Lammps(LammpsBase):
 
-
     tags = ['chemistry','material-science','molecular-dynamics',
             'fft','particles','nbody','spatial-discretization',
             'large-scale','multi-node','single-node','sub-node',

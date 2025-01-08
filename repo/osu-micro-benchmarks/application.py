@@ -11,7 +11,6 @@ from ramble.app.builtin.osu_micro_benchmarks import OsuMicroBenchmarks as OsuMic
 
 class OsuMicroBenchmarks(OsuMicroBenchmarksBase):
 
-
     tags = ['synthetic',
             'large-scale','multi-node','single-node',
             'atomics','managed-memory',
