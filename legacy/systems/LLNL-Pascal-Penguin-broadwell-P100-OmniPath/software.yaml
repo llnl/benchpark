@@ -9,6 +9,10 @@ software:
       pkg_spec: gcc@=11.2.1
     default-mpi:
       pkg_spec: mvapich2@2.3.7-gcc-11.2.1
+    default-blas:
+      pkg_spec: cublas@{default_cuda_version}
+    default-lapack:
+      pkg_spec: cublas@{default_cuda_version}
     compiler-gcc:
       pkg_spec: gcc@=11.2.1
     compiler-clang:
