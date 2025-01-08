@@ -148,9 +148,9 @@ packages:
     buildable: false
     externals:
     - spec: rocrand@5.4.3
-      prefix: /opt/rocm-5.4.3/hiprand
+      prefix: /opt/rocm-5.4.3
     - spec: rocrand@5.5.1
-      prefix: /opt/rocm-5.5.1/hiprand
+      prefix: /opt/rocm-5.5.1
   rocsparse:
     buildable: false
     externals:
@@ -186,6 +186,13 @@ packages:
       prefix: /opt/rocm-5.4.3/
     - spec: comgr@5.5.1
       prefix: /opt/rocm-5.5.1/
+  hiprand:
+    buildable: false
+    externals:
+    - spec: hiprand@5.4.3
+      prefix: /opt/rocm-5.4.3
+    - spec: hiprand@5.5.1
+      prefix: /opt/rocm-5.5.1
   hipsparse:
     buildable: false
     externals:
