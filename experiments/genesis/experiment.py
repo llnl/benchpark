@@ -19,7 +19,7 @@ class Genesis(Experiment, OpenMPExperiment):
 
     variant(
         "version",
-        default="master",
+        default="main",
         description="app version",
     )
 
