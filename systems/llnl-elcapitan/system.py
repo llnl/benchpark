@@ -55,7 +55,7 @@ class LlnlElcapitan(System):
     variant(
         "lapack",
         default="intel-oneapi-mkl",
-        values=("intel-oneapi-mkl", "rocsolver"),
+        values=("intel-oneapi-mkl", "cray-libsci", "rocsolver"),
         description="Which lapack to use",
     )
 
@@ -82,18 +82,17 @@ class LlnlElcapitan(System):
         with open(sw_description, "w") as f:
             f.write(self.sw_description())
 
+    def system_specific_variables(self):
+        return {"rocm_arch": self.rocm_arch}
+
     def external_pkg_configs(self):
         externals = LlnlElcapitan.resource_location / "externals"
-
-        rocm = self.spec.variants["rocm"][0]
-        # gtl = self.spec.variants["gtl"][0]
-        compiler = self.spec.variants["compiler"][0]
 
         selections = [externals / "base" / "00-packages.yaml"]
 
         rocm_cfg_path = self.next_adhoc_cfg()
         with open(rocm_cfg_path, "w") as f:
-            f.write(self.rocm_config(rocm))
+            f.write(self.rocm_config(self.spec.variants["rocm"][0]))
         selections.append(rocm_cfg_path)
 
         mpi_cfg_path = self.next_adhoc_cfg()
@@ -101,9 +100,9 @@ class LlnlElcapitan(System):
             f.write(self.mpi_config("16.0.0"))
         selections.append(mpi_cfg_path)
 
-        if compiler == "cce":
+        if self.spec.satisfies("compiler=cce"):
             selections.append(externals / "libsci" / "01-cce-packages.yaml")
-        elif compiler == "gcc":
+        elif self.spec.satisfies("compiler=gcc"):
             selections.append(externals / "libsci" / "00-gcc-packages.yaml")
 
         return selections
@@ -111,31 +110,26 @@ class LlnlElcapitan(System):
     def compiler_configs(self):
         compilers = LlnlElcapitan.resource_location / "compilers"
 
-        compiler = self.spec.variants["compiler"][0]
-        rocm = self.spec.variants["rocm"][0]
-
         selections = []
-        if compiler == "cce":
+        if self.spec.satisfies("compiler=cce"):
             compiler_cfg_path = self.next_adhoc_cfg()
             with open(compiler_cfg_path, "w") as f:
-                f.write(self.rocm_cce_compiler_cfg(rocm, "16.0.0"))
+                f.write(
+                    self.rocm_cce_compiler_cfg(self.spec.variants["rocm"][0], "16.0.0")
+                )
             selections.append(compiler_cfg_path)
-        elif compiler == "gcc":
+        elif self.spec.satisfies("compiler=gcc"):
             selections.append(compilers / "gcc" / "00-gcc-12-compilers.yaml")
 
         return selections
 
-    def system_specific_variables(self):
-        return {"rocm_arch": self.rocm_arch}
-
     def mpi_config(self, cce_version):
         gtl = self.spec.variants["gtl"][0]
-        compiler = self.spec.variants["compiler"][0]
 
         short_cce_version = ".".join(cce_version.split(".")[:2])
         mpi_version = "8.1.26"
 
-        if compiler == "cce":
+        if self.spec.satisfies("compiler=cce"):
             dont_use_gtl = f"""\
         gtl_lib_path: /opt/cray/pe/mpich/{mpi_version}/gtl/lib
         ldflags: "-L/opt/cray/pe/mpich/{mpi_version}/ofi/crayclang/{short_cce_version}/lib -lmpi -L/opt/cray/pe/mpich/{mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{mpi_version}/gtl/lib"
@@ -164,7 +158,7 @@ packages:
       extra_attributes:
 {gtl_cfg}
 """
-        elif compiler == "gcc":
+        elif self.spec.satisfies("compiler=gcc"):
             return """\
 packages:
   cray-mpich:
@@ -179,80 +173,118 @@ packages:
     def rocm_config(self, rocm_version):
         template = """\
 packages:
+  blas:
+    require:
+      - {blas}
+  lapack:
+    require:
+      - {lapack}
   hipfft:
     externals:
     - spec: hipfft@{x}
       prefix: /opt/rocm-{x}
+    buildable: false
   rocfft:
     externals:
     - spec: rocfft@{x}
       prefix: /opt/rocm-{x}
+    buildable: false
   rocprim:
     externals:
     - spec: rocprim@{x}
       prefix: /opt/rocm-{x}
+    buildable: false
   rocrand:
     externals:
     - spec: rocrand@{x}
-      prefix: /opt/rocm-{x}/hiprand
+      prefix: /opt/rocm-{x}
+    buildable: false
   rocsparse:
     externals:
     - spec: rocsparse@{x}
       prefix: /opt/rocm-{x}
+    buildable: false
   rocthrust:
     externals:
     - spec: rocthrust@{x}
       prefix: /opt/rocm-{x}
+    buildable: false
   hip:
     externals:
     - spec: hip@{x}
       prefix: /opt/rocm-{x}
+    buildable: false
   hsa-rocr-dev:
     externals:
     - spec: hsa-rocr-dev@{x}
       prefix: /opt/rocm-{x}
+    buildable: false
   comgr:
     externals:
     - spec: comgr@{x}
       prefix: /opt/rocm-{x}/
+    buildable: false
+  hiprand:
+    externals:
+    - spec: hiprand@{x}
+      prefix: /opt/rocm-{x}
+    buildable: false
   hipsparse:
     externals:
     - spec: hipsparse@{x}
       prefix: /opt/rocm-{x}
+    buildable: false
   hipblas:
     externals:
     - spec: hipblas@{x}
       prefix: /opt/rocm-{x}/
+    buildable: false
+  hipsolver:
+    externals:
+    - spec: hipsolver@{x}
+      prefix: /opt/rocm-{x}/
+    buildable: false
   hsakmt-roct:
     externals:
     - spec: hsakmt-roct@{x}
       prefix: /opt/rocm-{x}/
+    buildable: false
   roctracer-dev-api:
     externals:
     - spec: roctracer-dev-api@{x}
       prefix: /opt/rocm-{x}/
+    buildable: false
   rocminfo:
     externals:
     - spec: rocminfo@{x}
       prefix: /opt/rocm-{x}/
+    buildable: false
   llvm:
     externals:
     - spec: llvm@16.0.0
       prefix: /opt/rocm-{x}/llvm
+    buildable: false
   llvm-amdgpu:
     externals:
     - spec: llvm-amdgpu@{x}
       prefix: /opt/rocm-{x}/llvm
+    buildable: false
   rocblas:
     externals:
     - spec: rocblas@{x}
       prefix: /opt/rocm-{x}
+    buildable: false
   rocsolver:
     externals:
     - spec: rocsolver@{x}
       prefix: /opt/rocm-{x}
+    buildable: false
 """
-        return template.format(x=rocm_version)
+        return template.format(
+            x=rocm_version,
+            blas=self.spec.variants["blas"][0],
+            lapack=self.spec.variants["lapack"][0],
+        )
 
     def rocm_cce_compiler_cfg(self, rocm_version, cce_version):
         template = """\
@@ -266,7 +298,7 @@ compilers:
       fc:  /opt/cray/pe/cce/{y}/bin/crayftn
     flags:
       cflags: -g -O2
-      cxxflags: -g -O2 -std=c++17
+      cxxflags: -g -O2 -std=c++14
       fflags: -g -O2 -hnopattern
       ldflags: -ldl
     operating_system: rhel8
@@ -330,18 +362,18 @@ software:
       pkg_spec: clang
     compiler-gcc:
       pkg_spec: gcc
-    blas-rocm:
-      pkg_spec: rocblas
-    blas:
-      pkg_spec: rocblas
-    lapack-rocm:
-      pkg_spec: rocsolver
-    lapack:
-      pkg_spec: cray-libsci
     mpi-rocm-gtl:
       pkg_spec: cray-mpich+gtl
     mpi-rocm-no-gtl:
       pkg_spec: cray-mpich~gtl
     mpi-gcc:
       pkg_spec: cray-mpich~gtl
+    blas:
+      pkg_spec: rocblas
+    blas-rocm:
+      pkg_spec: rocblas
+    lapack-rocm:
+      pkg_spec: rocsolver
+    lapack:
+      pkg_spec: intel-oneapi-mkl
 """
