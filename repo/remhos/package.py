@@ -7,7 +7,7 @@ from typing import List
 from spack.package import *
 
 
-class Remhos(MakefilePackage):
+class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
     """Remhos (REMap High-Order Solver) is a CEED miniapp that performs monotonic
     and conservative high-order discontinuous field interpolation (remap)
     using DG advection-based spatial discretization and explicit high-order
@@ -18,7 +18,7 @@ class Remhos(MakefilePackage):
 
     homepage = "https://github.com/CEED/Remhos"
     url = "https://github.com/CEED/Remhos/archive/v1.0.tar.gz"
-    git = "https://github.com/august-knox/Remhos.git"
+    git = "https://github.com/CEED/Remhos.git"
 
     maintainers("v-dobrev", "tzanio", "vladotomov")
 
@@ -26,20 +26,48 @@ class Remhos(MakefilePackage):
 
     version("develop", branch="master")
     version("gpu-fom", branch="gpu-fom")
+    version("gpu-opt", branch="gpu-opt")
     version("1.0", sha256="e60464a867fe5b1fd694fbb37bb51773723427f071c0ae26852a2804c08bbb32")
 
     variant("metis", default=True, description="Enable/disable METIS support")
-    variant("caliper", default=False, description= "Enable/disable caliper support")
+    variant("caliper", default=True, description= "Enable/disable caliper support")
+
+    variant("cuda", default=False, description= "Enable/disable CUDA")
+    variant("rocm", default=False, description= "Enable/disable ROCm")
 
     depends_on("mfem+mpi+metis", when="+metis")
     depends_on("mfem+mpi~metis", when="~metis")
-
+    depends_on("mfem+caliper", when="+caliper")
     depends_on("mfem@develop", when="@develop")
     depends_on("mfem@4.1.0:", when="@1.0")
     depends_on("mfem@develop", when="@gpu-fom")
+    depends_on("mfem@4.4_comm_cali", when="@gpu-opt")
+    depends_on("mfem cxxstd=14")
+
+    depends_on("mpi")
+    depends_on("hypre+mpi")
+    #requires("+mpi", when="^hypre+mpi")
+    depends_on("hypre+caliper", when="+caliper")
+    #depends_on("hypre@2.31.0:")
+    depends_on("hypre@2.31.0+mixedint~fortran")
+
 
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
+
+    depends_on("hypre+cuda+mpi", when="+cuda")
+    requires("+cuda", when="^hypre+cuda")
+    for arch in ("none", "50", "60", "70", "80"):
+        depends_on(f"hypre cuda_arch={arch}", when=f"cuda_arch={arch}")
+        depends_on(f"mfem cuda_arch={arch}", when=f"cuda_arch={arch}")
+    depends_on("mfem +cuda+mpi", when="+cuda")
+    depends_on("mfem +rocm+mpi", when="+rocm")
+    depends_on("hypre +rocm +mpi", when="+rocm")
+    requires("+rocm", when="^hypre+rocm")
+    for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
+        #depends_on(f"hypre amdgpu_target={target}", when=f"amdgpu_target={target}")
+        depends_on(f"mfem amdgpu_target={target}", when=f"amdgpu_target={target}")
+
     @property
     def build_targets(self):
         targets = []
