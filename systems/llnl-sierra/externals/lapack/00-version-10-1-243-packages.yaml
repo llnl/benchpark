@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 packages:
-  lapack:
+  cusolver:
     externals:
     - spec: cusolver@10.1.243
       prefix: /usr/tce/packages/cuda/cuda-10.1.243
