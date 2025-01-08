@@ -4,9 +4,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 packages:
-  elf:
+  elfutils:
     externals:
-    - spec: elf@0.176
+    - spec: elfutils@0.176
       prefix: /usr
     buildable: false
   papi:
