@@ -9,6 +9,10 @@ software:
       pkg_spec: gcc@12.1.1
     default-mpi:
       pkg_spec: mvapich2@2.3.7-gcc1211
+    default-blas:
+      pkg_spec: intel-oneapi-mkl@2022.1.0
+    default-lapack:
+      pkg_spec: intel-oneapi-mkl@2022.1.0
     compiler-gcc:
       pkg_spec: gcc@12.1.1
     compiler-intel:
