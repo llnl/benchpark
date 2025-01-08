@@ -12,7 +12,8 @@ class Genesis(Experiment, OpenMPExperiment):
 
     variant(
         "workload",
-        default="genesis",
+        default="DHFR",
+        values=("DHFR", "ApoA1", "UUN", "cryoEM"),
         description="genesis",
     )
 
