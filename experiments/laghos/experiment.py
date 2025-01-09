@@ -52,15 +52,11 @@ class Laghos(
                 {tuple(n_resources.keys()): list(n_resources.values())},
                 int(self.spec.variants["scaling-factor"][0]),
                 int(self.spec.variants["scaling-iterations"][0]),
-            )   
+            ) 
             for pk, pv in scaled_variables.items():
                 self.add_experiment_variable(pk, pv, True)
             num_resources = scaled_variables["n_nodes"]
             self.add_experiment_variable(device, num_resources, True)
-        if self.spec.satisfies("+cuda"):
-            self.add_experiment_variable("arch", "CUDA")
-        elif self.spec.satisfies("+rocm"):
-            self.add_experiment_variable("arch", "HIP")
 
     def compute_spack_section(self):
         # get package version
