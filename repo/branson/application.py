@@ -12,7 +12,9 @@ class Branson(ExecutableApplication):
     """Branson benchmark"""
     name = "branson"
 
-    tags = []
+    tags = ['asc','montecarlo','particles',
+            'high-branching','irregular-memory-access',
+            'mpi','c++','cuda']
 
     executable('setup_experiment',
            template=[
