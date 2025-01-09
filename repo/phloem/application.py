@@ -12,6 +12,12 @@ class Phloem(ExecutableApplication):
     """Phloem benchmark"""
     name = "Phloem"
 
+    tags = ['synthetic',
+            'large-scale','multi-node','single-node',
+            'c','mpi','network-point-to-point',
+            'network-bandwidth-bound','network-latency-bound',
+            'network-collectives','network-nonblocking-collectives']
+
     executable('p1', 'sqmr  --num_cores={num_cores} --num_nbors={num_nbors}', use_mpi=True)
     executable('p2', 'mpiBench', use_mpi=True)
     executable('p3', 'mpiGraph', use_mpi=True)
