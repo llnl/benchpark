@@ -52,7 +52,7 @@ class Laghos(
                 {tuple(n_resources.keys()): list(n_resources.values())},
                 int(self.spec.variants["scaling-factor"][0]),
                 int(self.spec.variants["scaling-iterations"][0]),
-            ) 
+            )
             for pk, pv in scaled_variables.items():
                 self.add_experiment_variable(pk, pv, True)
             num_resources = scaled_variables["n_nodes"]
