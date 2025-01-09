@@ -17,8 +17,16 @@ class Gpcnet(ExecutableApplication):
     workload('network_test', executables=['p1'])
     workload('network_load_test', executables=['p2'])
 
-    figure_of_merit('TBD',
+    figure_of_merit('Avg Multiple Allreduce',
                     log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex=r'.*',
+                    fom_regex=r'\|\s+Multiple Allreduce \([0-9]* B\)\s+\|\s+(?P<fom>[0-9]+\.[0-9]*)',
+                    group_name='fom', units='MiB/sec')
+    figure_of_merit('Avg RR Two-sided Lat',
+                    log_file='{experiment_run_dir}/{experiment_name}.out',
+                    fom_regex=r'\|\s+RR Two-sided Lat \([0-9]* B\)\s+\|\s+(?P<fom>[0-9]+\.[0-9]*)',
+                    group_name='fom', units='MiB/sec')
+    figure_of_merit('Avg RR Get Lat',
+                    log_file='{experiment_run_dir}/{experiment_name}.out',
+                    fom_regex=r'\|\s+RR Get Lat \([0-9]* B\)\s+\|\s+(?P<fom>[0-9]+\.[0-9]*)',
                     group_name='fom', units='MiB/sec')
     success_criteria('pass', mode='string', match=r'.*', file='{experiment_run_dir}/{experiment_name}.out')
