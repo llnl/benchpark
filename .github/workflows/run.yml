@@ -143,7 +143,7 @@ jobs:
 
       - name: Dry run dynamic kripke-openmp on nosite-x86_64 with allocation modifier
         run: |
-          ./bin/benchpark experiment init --dest=kripke-openmp kripke+openmp
+          ./bin/benchpark experiment init --dest=kripke-openmp kripke+openmp caliper=mpi,time
           ./bin/benchpark setup ./kripke-openmp nosite-x86_64 workspace/
           . workspace/setup.sh
           ramble \
