@@ -261,27 +261,6 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic laghos/mpi-only on LLNL-Magma-Penguin-icelake-OmniPath with allocation modifier
-        run: |
-          ./bin/benchpark experiment init --dest=laghos-mpi-only laghos
-          ./bin/benchpark setup ./laghos-mpi-only LLNL-Magma-Penguin-icelake-OmniPath workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/laghos-mpi-only/LLNL-Magma-Penguin-icelake-OmniPath/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
-      - name: Dry run laghos/mpi-only on LLNL-Ruby-icelake-OmniPath with allocation modifier
-        run: |
-          ./bin/benchpark setup laghos-mpi-only LLNL-Ruby-icelake-OmniPath workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/laghos-mpi-only/LLNL-Ruby-icelake-OmniPath/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
       - name: Dry run lammps/openmp with static Ruby
         run: |
           ./bin/benchpark setup lammps/openmp LLNL-Ruby-icelake-OmniPath workspace/
@@ -611,6 +590,29 @@ jobs:
           . workspace/setup.sh
           ramble \
             --workspace-dir "workspace/osu-micro-benchmarks-mpi-only/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic laghos/mpi-only with dynamic CTS magma
+        run: |
+          ./bin/benchpark experiment init --dest=laghos-mpi-only laghos
+          ./bin/benchpark setup ./laghos-mpi-only magma-system workspace/
+          system_id=$(./bin/benchpark system id ./magma-system)
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir "workspace/laghos-mpi-only/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run laghos/mpi-only with dynamic CTS ruby
+        run: |
+          ./bin/benchpark setup laghos-mpi-only ruby-system workspace/
+          system_id=$(./bin/benchpark system id ./ruby-system)
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir "workspace/laghos-mpi-only/$system_id/workspace" \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
