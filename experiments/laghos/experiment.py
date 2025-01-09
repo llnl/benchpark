@@ -11,6 +11,7 @@ from benchpark.expr.builtin.caliper import Caliper
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
 
+
 class Laghos(
     Experiment,
     StrongScaling,
@@ -35,12 +36,12 @@ class Laghos(
 
         # Number of initial nodes
         n_resources = {"n_nodes": 1}
-        device= "n_ranks"
+        device = "n_ranks"
         if self.spec.satisfies("+cuda"):
             self.add_experiment_variable("device", "cuda", True)
         elif self.spec.satisfies("+rocm"):
             self.add_experiment_variable("device", "hip", True)
- 
+
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             device = "n_gpus"
         if self.spec.satisfies("+single_node"):
