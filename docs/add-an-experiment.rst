@@ -56,7 +56,7 @@ string variants defined in your experiment.py passed in as key-value pairs:
 ``benchpark experiment init --dest {path/to/dest} {benchmark_name} +/~{boolean variant} {string variant}={value} ``
 
 For example, to run the AMG2023 strong scaling experiment for problem 1, using CUDA the command would be:
-``benchpark experiment init --dest amg2023_experiment amg2023 +cuda workload=problem1 +strong``
+``benchpark experiment init --dest amg2023_experiment amg2023 +cuda workload=problem1 +strong ~single_node``
 
 Initializing an experiment generates the following yaml files:
 
@@ -75,7 +75,7 @@ To manually validate your new experiments work, you should initialize an existin
 For example if you just created a benchmark *baz* with OpenMP and strong scaling variants it may look like this:::
 
   benchpark system init --dest=genericx86-system genericx86 
-  benchpark experiment init --dest=baz-benchmark baz +openmp +strong
+  benchpark experiment init --dest=baz-benchmark baz +openmp +strong ~single_node
   benchpark setup ./baz-benchmark ./x86 workspace/
 
 
