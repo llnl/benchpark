@@ -181,7 +181,9 @@ def command(args):
 
     print(f"Setting up configs for Ramble workspace {ramble_configs_dir}")
 
-    legacy_modifier_config_dir = source_dir / "legacy" / "modifiers" / modifier / "configs"
+    legacy_modifier_config_dir = (
+        source_dir / "legacy" / "modifiers" / modifier / "configs"
+    )
     ramble_configs_dir.mkdir(parents=True)
     ramble_logs_dir.mkdir(parents=True)
     ramble_spack_experiment_configs_dir.mkdir(parents=True)

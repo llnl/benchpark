@@ -24,7 +24,9 @@ def benchpark_modifiers():
     for x in os.listdir(source_dir / "modifiers"):
         modifiers.append(x)
 
-    modifiers += [x for x in os.listdir(source_dir / "legacy" / "modifiers") if x not in modifiers]
+    modifiers += [
+        x for x in os.listdir(source_dir / "legacy" / "modifiers") if x not in modifiers
+    ]
 
     return modifiers
 
