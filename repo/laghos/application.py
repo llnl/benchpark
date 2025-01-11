@@ -19,7 +19,7 @@ class Laghos(ExecutableApplication):
             'lagrangian','spatial-discretization','unstructured-grid',
             'network-latency-bound','network-collectives','unstructured-grid']
 
-    executable('prob', 'laghos -p {problem} -m {mesh} -rs {rs} -rp {rp} -ms {ms}', use_mpi=True)
+    executable('prob', 'laghos -p {problem} -m {mesh} -rs {rs} -rp {rp} -ms {ms} -d {device}', use_mpi=True)
 
     workload('triplept', executables=['prob'])
 
@@ -31,7 +31,7 @@ class Laghos(ExecutableApplication):
             description='problem number',
             workloads=['triplept'])
         
-    workload_variable('rs', default='5',
+    workload_variable('rs', default='2',
             description='number of serial refinements',
             workloads=['triplept'])
     
@@ -39,9 +39,12 @@ class Laghos(ExecutableApplication):
             description='number of parallel refinements',
             workloads=['triplept'])
     
-    workload_variable('ms', default='500',
+    workload_variable('ms', default='250',
             description='max number of steps',
             workloads=['triplept'])
+    workload_variable('device', default='cpu',
+        description='cpu or cuda',
+        workloads=['triplept'])
 
     figure_of_merit('Major kernels total time',
                     log_file='{experiment_run_dir}/{experiment_name}.out',

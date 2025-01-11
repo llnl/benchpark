@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 packages:
-  cublas:
+  essl:
     externals:
-    - spec: cublas@10.1.243
-      prefix: /usr/tce/packages/cuda/cuda-10.1.243
+    - spec: essl@6.2 +lapackforessl
+      prefix: /opt/ibmmath/essl/6.2
     buildable: false
