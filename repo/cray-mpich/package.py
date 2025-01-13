@@ -11,6 +11,17 @@ class CrayMpich(BuiltinCM):
 
     variant("gtl", default=False, description="enable GPU-aware mode")
 
+    @property
+    def libs(self):
+        libs = super(CrayMpich, self).libs
+
+        if self.spec.satisfies("+gtl"):
+            gtl_lib_prefix = self.spec.extra_attributes["gtl_lib_path"]
+            libraries = ["libmpi_gtl_hsa"]
+            libs += find_libraries(libraries, root=gtl_lib_prefix, recursive=True)
+
+        return libs
+
     def setup_run_environment(self, env):
 
         super(CrayMpich, self).setup_run_environment(env)

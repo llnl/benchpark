@@ -26,7 +26,7 @@ class Branson(ExecutableApplication):
 
     workload('branson', executables=['setup_experiment','p'])
     
-    workload_variable('input_file', default='3D_hohlraum_multi_node.xml',
+    workload_variable('input_file', default='3D_hohlraum_single_node.xml',
     	description='input file name',
       	workloads=['branson'])
 

@@ -6,6 +6,9 @@
 from benchpark.error import BenchparkError
 from benchpark.directives import variant
 from benchpark.experiment import Experiment
+from benchpark.openmp import OpenMPExperiment
+from benchpark.cuda import CudaExperiment
+from benchpark.rocm import ROCmExperiment
 from benchpark.scaling import StrongScaling
 from benchpark.scaling import WeakScaling
 from benchpark.expr.builtin.caliper import Caliper
@@ -13,6 +16,9 @@ from benchpark.expr.builtin.caliper import Caliper
 
 class Branson(
     Experiment,
+    OpenMPExperiment,
+    CudaExperiment,
+    ROCmExperiment,
     StrongScaling,
     WeakScaling,
     Caliper,
@@ -27,6 +33,13 @@ class Branson(
         "version",
         default="develop",
         description="app version",
+    )
+
+    variant(
+        "n_groups",
+        default="30",
+        values=int,
+        description="Number of groups",
     )
 
     def compute_applications_section(self):
@@ -85,17 +98,15 @@ class Branson(
         system_specs = {}
         system_specs["compiler"] = "default-compiler"
         system_specs["mpi"] = "default-mpi"
-        # if self.spec.satisfies("+cuda"):
-        #     system_specs["cuda_version"] = "{default_cuda_version}"
-        #     system_specs["cuda_arch"] = "{cuda_arch}"
-        #     system_specs["blas"] = "cublas-cuda"
-        # if self.spec.satisfies("+rocm"):
-        #     system_specs["rocm_arch"] = "{rocm_arch}"
-        #     system_specs["blas"] = "blas-rocm"
+        if self.spec.satisfies("+cuda"):
+            system_specs["cuda_version"] = "{default_cuda_version}"
+            system_specs["cuda_arch"] = "{cuda_arch}"
+        if self.spec.satisfies("+rocm"):
+            system_specs["rocm_arch"] = "{rocm_arch}"
 
         # set package spack specs
         self.add_spack_spec(system_specs["mpi"])
 
         self.add_spack_spec(
-            self.name, [f"branson@{app_version}", system_specs["compiler"]]
+            self.name, [f"branson@{app_version} n_groups={self.spec.variants['n_groups'][0]} ", system_specs["compiler"]]
         )

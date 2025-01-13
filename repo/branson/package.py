@@ -9,7 +9,7 @@ from spack.pkg.builtin.boost import Boost
 import os
 
 
-class Branson(CMakePackage):
+class Branson(CMakePackage, CudaPackage, ROCmPackage):
     """Branson's purpose is to study different algorithms for parallel Monte
     Carlo transport. Currently it contains particle passing and mesh passing
     methods for domain decomposition."""
@@ -33,7 +33,9 @@ class Branson(CMakePackage):
     version("0.81", sha256="493f720904791f06b49ff48c17a681532c6a4d9fa59636522cf3f9700e77efe4")
     version("0.8", sha256="85ffee110f89be00c37798700508b66b0d15de1d98c54328b6d02a9eb2cf1cb8")
 
+    variant("openmp", default=False, description="Enable OpenMP support")
     variant("caliper", default=False, description="Enable Caliper monitoring")
+    variant("n_groups", default=30, values=int, description="Number of groups")
 
     #depends_on("mpi")
     depends_on("mpi@2:")
@@ -49,33 +51,60 @@ class Branson(CMakePackage):
 
     root_cmakelists_dir = "src"
 
+    patch("branson_cmake.patch")
+    patch("branson_power9.patch")
+
     def patch(self):
         ppu_intrinsics_file = os.path.join(self.stage.source_path, "src", "random123", "features", "ppu_intrinsics.h")
         with open(ppu_intrinsics_file , "w") as f:
             pass
 
-    def setup_build_environment(self, env):
-        if not self.spec.satisfies("+cuda"):
-            env.unset("CUDA_HOME")
-            env.unset("CUDADIR")
-            env.unset("CUDACXX")
-
     def cmake_args(self):
         spec = self.spec
         args = []
-        #args.append("--enable-mpi")
-        args.append(f"-DCMAKE_C_COMPILER={spec['mpi'].mpicc}")
-        args.append(f"-DCMAKE_CXX_COMPILER={spec['mpi'].mpicxx}")
+
+        args.append(f"-DCMAKE_C_COMPILER={self.compiler.cc}")
+        args.append(f"-DCMAKE_CXX_COMPILER={self.compiler.cxx}")
+        args.append(f"-DMPI_C_COMPILER={spec['mpi'].mpicc}")
+        args.append(f"-DMPI_CXX_COMPILER={spec['mpi'].mpicxx}")
         args.append(f"-DCMAKE_Fortran_COMPILER={spec['mpi'].mpifc}")
 
-        cflags = " ".join(self.compiler.flags['cflags']) if 'cflags' in self.compiler.flags else ""
-        cxxflags = " ".join(self.compiler.flags['cxxflags']) if 'cxxflags' in self.compiler.flags else ""
+        args.append(f"-DMETIS_ROOT_DIR={spec['metis'].prefix}")
 
-        args.append("-DCMAKE_C_FLAGS={} -I{}/src/random123/features".format(cflags, self.stage.source_path))
-        args.append("-DCMAKE_CXX_FLAGS={} -I{}/src/random123/features".format(cxxflags, self.stage.source_path))
-        args.append(f"-DBUILD_TESTING=OFF")
-        if self.spec.satisfies("+caliper"):
-            args.append(f"-DCALIPER_ROOT_DIR={self.spec['caliper'].prefix}")
+        if '+cuda' in spec:
+            args.append("-DENABLE_CUDA=ON")
+            args.append(f"-DCMAKE_CUDA_COMPILER={spec['cuda'].prefix}/bin/nvcc")
+            cuda_arch_vals = spec.variants["cuda_arch"].value
+            if cuda_arch_vals:
+              cuda_arch_sorted = list(sorted(cuda_arch_vals, reverse=True))
+              cuda_arch = cuda_arch_sorted[0]
+              args.append(f"-DCUDA_ARCH={cuda_arch}")
+        else:
+            args.append("-DENABLE_CUDA=OFF")
+
+        if '+rocm' in spec:
+            args.append("-DENABLE_HIP=ON")
+            rocm_arch_vals = spec.variants["amdgpu_target"].value
+            args.append(f"-DROCM_PATH={spec['hip'].prefix}")
+            args.append(f"-DHIP_PATH={spec['hip'].prefix}/hip")
+            if rocm_arch_vals:
+              rocm_arch_sorted = list(sorted(rocm_arch_vals, reverse=True))
+              rocm_arch = rocm_arch_sorted[0]
+              args.append(f"-DROCM_ARCH={rocm_arch}")
+              args.append(f"-DHIP_ARCH={rocm_arch}")
+        else:
+            args.append("-DENABLE_HIP=OFF")
+
+        args.append(self.define_from_variant("ENABLE_OPENMP", "openmp"))
+
+        if '+caliper' in spec:
+            args.append(self.define_from_variant("ENABLE_CALIPER", "caliper"))
+            args.append(f"-Dcaliper_DIR={spec['caliper'].prefix}")
+
+        args.append("-DBUILD_TESTING=OFF")
+        args.append(f"-DN_GROUPS={self.spec.variants['n_groups'].value}")
+
+        args.append(f"-DMPI_CXX_LINK_FLAGS={spec['mpi'].libs.ld_flags}")
 
         return args
 
