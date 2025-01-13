@@ -19,7 +19,8 @@ class Branson(ExecutableApplication):
     executable('setup_experiment',
            template=[
                'cp {branson}/inputs/* {experiment_run_dir}/.',
-               'sed -i "s|<photons>250000000</photons>|<photons>{num_particles}</photons>|g" {experiment_run_dir}/{input_file}'
+               'sed -i "s|<photons>[0-9]*</photons>|<photons>{num_particles}</photons>|g" {experiment_run_dir}/{input_file}',
+               'sed -i "s|<use_gpu_transporter>.*</use_gpu_transporter>|<use_gpu_transporter>{use_gpu}</use_gpu_transporter>|g" {experiment_run_dir}/{input_file}'
            ])
 
     executable('p', '{branson}/bin/BRANSON {experiment_run_dir}/{input_file}', use_mpi=True)

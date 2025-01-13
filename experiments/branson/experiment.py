@@ -87,6 +87,8 @@ class Branson(
             for k, v in scaled_variables.items():
                 self.add_experiment_variable(k, v, True)
 
+        self.add_experiment_variable("use_gpu", "TRUE" if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm") else "FALSE")
+
         self.add_experiment_variable("n_ranks", "{n_nodes}*{sys_cores_per_node}", True)
 
     def compute_spack_section(self):
