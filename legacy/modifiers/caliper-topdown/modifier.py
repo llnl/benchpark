@@ -12,23 +12,6 @@ class CaliperTopdown(CaliperBase):
 
     name = "caliper-topdown"
 
-    mode(
-        "topdown-counters-all",
-        description="Raw counter values for Intel top-down analysis (all levels)",
-    )
-    mode(
-        "topdown-counters-toplevel",
-        description="Raw counter values for Intel top-down analysis (top level)",
-    )
-    mode(
-        "topdown-all",
-        description="Top-down analysis for Intel CPUs (all levels)",
-    )
-    mode(
-        "topdown-toplevel",
-        description="Top-down analysis for Intel CPUs (top level)",
-    )
-
     _cali_datafile = CaliperBase._cali_datafile
 
     env_var_modification(

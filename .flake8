@@ -11,6 +11,7 @@ ignore = E501,W503,E203
 
 per-file-ignores =
   modifiers/*/modifier.py:F403,F405
+  legacy/modifiers/*/modifier.py:F403,F405
 
 builtins = IPython
 exclude =
