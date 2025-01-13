@@ -87,7 +87,14 @@ class Branson(
             for k, v in scaled_variables.items():
                 self.add_experiment_variable(k, v, True)
 
-        self.add_experiment_variable("use_gpu", "TRUE" if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm") else "FALSE")
+        self.add_experiment_variable(
+            "use_gpu",
+            (
+                "TRUE"
+                if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm")
+                else "FALSE"
+            ),
+        )
 
         self.add_experiment_variable("n_ranks", "{n_nodes}*{sys_cores_per_node}", True)
 
@@ -110,5 +117,9 @@ class Branson(
         self.add_spack_spec(system_specs["mpi"])
 
         self.add_spack_spec(
-            self.name, [f"branson@{app_version} n_groups={self.spec.variants['n_groups'][0]} ", system_specs["compiler"]]
+            self.name,
+            [
+                f"branson@{app_version} n_groups={self.spec.variants['n_groups'][0]} ",
+                system_specs["compiler"],
+            ],
         )
