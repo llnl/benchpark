@@ -42,14 +42,6 @@ class Saxpy(CMakePackage, CudaPackage, ROCmPackage):
     def setup_build_environment(self, env):
         if "+cuda" in self.spec:
             env.set("CUDAHOSTCXX", self.spec["mpi"].mpicxx)
-        if self.spec["mpi"].extra_attributes and "gtl_lib_path" in self.spec["mpi"].extra_attributes:
-            if self.spec.satisfies("+rocm"):  # no gtl for cpu-only runs
-                env.prepend_path("LD_LIBRARY_PATH", self.spec['mpi'].extra_attributes["gtl_lib_path"])
-
-    def setup_run_environment(self, env):
-        if self.spec["mpi"].extra_attributes and "gtl_lib_path" in self.spec["mpi"].extra_attributes:
-            if self.spec.satisfies("+rocm"):  # no gtl for cpu-only runs
-                env.prepend_path("LD_LIBRARY_PATH", self.spec['mpi'].extra_attributes["gtl_lib_path"])
 
     def cmake_args(self):
         spec = self.spec
@@ -80,5 +72,6 @@ class Saxpy(CMakePackage, CudaPackage, ROCmPackage):
                 args.append("-DROCM_ARCH={0}".format(rocm_arch))
 
         args.append(self.define_from_variant("USE_CALIPER", "caliper"))
+        args.append("-DMPI_CXX_LINK_FLAGS={0}".format(spec["mpi"].libs.ld_flags))
 
         return args
