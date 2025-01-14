@@ -9,6 +9,10 @@ software:
       pkg_spec: clang@16.0.6-ibm-cuda-{default_cuda_version}-gcc-11.2.1
     default-mpi:
       pkg_spec: spectrum-mpi@2023.06.28-clang-ibm-16.0.6-cuda-{default_cuda_version}-gcc-11.2.1
+    default-blas:
+      pkg_spec: cublas@{default_cuda_version}
+    default-lapack:
+      pkg_spec: cublas@{default_cuda_version}
     compiler-xl:
       pkg_spec: xl@16.1.1-2023.06.28-cuda-{default_cuda_version}-gcc-11.2.1
     mpi-xl:
