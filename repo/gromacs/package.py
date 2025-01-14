@@ -419,17 +419,11 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
         if self.compiler.extra_rpaths:
             for rpath in self.compiler.extra_rpaths:
                 env.prepend_path("LD_LIBRARY_PATH", rpath)
-        if "+mpi" in self.spec:
-            if self.spec["mpi"].extra_attributes and "ldflags" in self.spec["mpi"].extra_attributes:
-                env.append_flags("LDFLAGS", self.spec["mpi"].extra_attributes["ldflags"])
 
     def setup_build_environment(self, env):
         if self.compiler.extra_rpaths:
             for rpath in self.compiler.extra_rpaths:
                 env.prepend_path("LD_LIBRARY_PATH", rpath)
-        if "+mpi" in self.spec:
-            if self.spec["mpi"].extra_attributes and "ldflags" in self.spec["mpi"].extra_attributes:
-                env.append_flags("LDFLAGS", self.spec["mpi"].extra_attributes["ldflags"])
 
 class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
     @run_after("build")
@@ -534,13 +528,7 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
                         "-DGMX_FORCE_GPU_AWARE_MPI=ON",
                     ]
                 )
-            if "+rocm" in self.spec:
-                if self.spec["mpi"].extra_attributes and "ldflags" in self.spec["mpi"].extra_attributes:
-                    options.extend(
-                        [
-                            "-DCMAKE_EXE_LINKER_FLAGS=%s" % self.spec["mpi"].extra_attributes["ldflags"],
-                        ]
-                    )
+            options.extend([f"-DMPI_CXX_LINK_FLAGS='{self.spec['mpi'].libs.ld_flags}'"])
         else:
             options.extend(
                 [
