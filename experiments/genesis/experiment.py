@@ -40,10 +40,10 @@ class Genesis(Experiment, OpenMPExperiment):
         self.add_experiment_variable("maxiter_inner", "50")
 
         if self.spec.satisfies("+openmp"):
-            self.add_experiment_variable("n_nodes", ["1"], True)
-            self.add_experiment_variable("processes_per_node", ["8"])
+            self.add_experiment_variable("n_nodes", ["2"], True)
+            self.add_experiment_variable("processes_per_node", ["4"])
             self.add_experiment_variable("n_ranks", "{processes_per_node} * {n_nodes}")
-            self.add_experiment_variable("omp_num_threads", ["48"])
+            self.add_experiment_variable("omp_num_threads", ["12"])
             self.add_experiment_variable("arch", "OpenMP")
 
     def compute_spack_section(self):
@@ -53,10 +53,15 @@ class Genesis(Experiment, OpenMPExperiment):
         system_specs = {}
         system_specs["compiler"] = "default-compiler"
         system_specs["mpi"] = "default-mpi"
+        system_specs["lapack"] = "lapack"
 
         # if package_spec left empty spack will use external
         self.add_spack_spec(system_specs["mpi"])
+        self.add_spack_spec(system_specs["lapack"])
 
         self.add_spack_spec(
             self.name, [f"genesis@{app_version} +mpi", system_specs["compiler"]]
+        )
+        self.add_spack_spec(
+            system_specs["lapack"], [system_specs["lapack"], system_specs["compiler"]]
         )
