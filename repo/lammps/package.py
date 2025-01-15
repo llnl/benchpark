@@ -9,9 +9,17 @@ from spack.pkg.builtin.lammps import Lammps as BuiltinLammps
 
 class Lammps(BuiltinLammps):
 
-  depends_on("kokkos+openmp", when="+openmp")
+  depends_on("kokkos+openmp cxxstd=17", when="+openmp")
   depends_on("kokkos+rocm", when="+rocm")
-  depends_on("kokkos+cuda", when="+cuda")
+  depends_on("kokkos@4.3.01 +cuda cxxstd=17", when="+cuda")
+  
+  def cmake_args(self):
+    args=super(BuiltinLammps, self).cmake_args()
+    if "+cuda" in self.spec:
+        args.append(f"-DKokkos_DIR=%s/lib64/cmake/Kokkos" % self.spec["kokkos"].prefix)
+        args.append(f"-DKokkos_ENABLE_CUDA=ON")
+
+    return args
 
   def setup_run_environment(self, env):
 
@@ -28,3 +36,5 @@ class Lammps(BuiltinLammps):
     if "+mpi" in spec:
       if spec["mpi"].extra_attributes and "ldflags" in spec["mpi"].extra_attributes:
         env.append_flags("LDFLAGS", spec["mpi"].extra_attributes["ldflags"])
+
+

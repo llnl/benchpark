@@ -7,12 +7,13 @@ from benchpark.directives import variant
 from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.rocm import ROCmExperiment
-
+from benchpark.cuda import CudaExperiment
 
 class Lammps(
     Experiment,
     OpenMPExperiment,
     ROCmExperiment,
+    CudaExperiment,
 ):
     variant(
         "workload",
@@ -33,7 +34,7 @@ class Lammps(
             kokkos_mode = "t {n_threads_per_proc}"
             kokkos_gpu_aware = "off"
             kokkos_comm = "host"
-        elif self.spec.satisfies("+rocm"):
+        elif self.spec.satisfies("+rocm") or self.spec.satisfies("+cuda"):
             problem_sizes = {"x": 20, "y": 40, "z": 32}
             kokkos_mode = "g 1"
             kokkos_gpu_aware = "on"
@@ -48,7 +49,7 @@ class Lammps(
             self.add_experiment_variable("n_nodes", 1, True)
             self.add_experiment_variable("n_ranks_per_node", 36, True)
             self.add_experiment_variable("n_threads_per_proc", 1, True)
-        elif self.spec.satisfies("+rocm"):
+        elif self.spec.satisfies("+rocm") or self.spec.satisfies("+cuda"):
             self.add_experiment_variable("n_nodes", 8, True)
             self.add_experiment_variable("n_ranks_per_node", 8, True)
             self.add_experiment_variable("n_gpus", 64, True)
@@ -70,12 +71,16 @@ class Lammps(
         system_specs = {}
         system_specs["compiler"] = "default-compiler"
         system_specs["mpi"] = "default-mpi"
+        system_specs["blas"] = "default-blas"
+
         if self.spec.satisfies("+rocm"):
             system_specs["rocm_arch"] = "{rocm_arch}"
-            system_specs["blas"] = "blas-rocm"
+        elif self.spec.satisfies("+cuda"):
+            system_specs["cuda_version"] = "{default_cuda_version}"
+            system_specs["cuda_arch"] = "{cuda_arch}"
 
         # set package spack specs
-        if self.spec.satisfies("+rocm"):
+        if self.spec.satisfies("+rocm") or self.spec.satisfies("+cuda"):
             # empty package_specs value implies external package
             self.add_spack_spec(system_specs["blas"])
         # empty package_specs value implies external package
