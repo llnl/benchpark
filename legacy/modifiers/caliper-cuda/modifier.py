@@ -7,23 +7,16 @@ from ramble.modkit import *
 from ramble.mod.benchpark.caliper import Caliper as CaliperBase
 
 
-class CaliperMpi(CaliperBase):
+class CaliperCuda(CaliperBase):
     """Define a modifier for Caliper"""
 
-    name = "caliper-mpi"
-
-    mode(
-        "mpi",
-        description="Profile MPI functions",
-    )
+    name = "caliper-cuda"
 
     _cali_datafile = CaliperBase._cali_datafile
 
     env_var_modification(
         "CALI_CONFIG",
-        "spot(output={},profile.mpi,mpi.message.size,mpi.message.count)".format(
-            _cali_datafile
-        ),
+        "spot(output={}, profile.cuda)".format(_cali_datafile),
         method="set",
-        modes=["mpi"],
+        modes=["cuda"],
     )
