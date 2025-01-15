@@ -66,8 +66,8 @@ ramble:
   software:
     packages:
       salmon-tddft:
-        pkg_spec: salmon-tddft@2.0.2
-        compiler: default-compiler
+        pkg_spec: salmon-tddft@2.0.0
+        compiler: compiler-fortran
       cmake:
         pkg_spec: cmake
         compiler: default-compiler
