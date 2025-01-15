@@ -37,5 +37,10 @@ packages:
     - spec: python@3.8.2
       prefix: /usr/tce/packages/python/python-3.8.2
       buildable: false
+  papi:
+    externals:
+    - spec: papi@5.2.0.0
+      prefix: /usr
+    buildable: false
   mpi:
     buildable: false
