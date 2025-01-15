@@ -12,11 +12,7 @@ class Ior(ExecutableApplication):
     """Ior benchmark"""
     name = "ior"
 
-    tags = ['asc','engineering','hypre','solver','cfd','large-scale',
-            'multi-node','single-node','mpi','network-latency-bound',
-            'network-collectives','unstructured-grid']
-
-    executable('p', 'ior -c -vv -w -F -i5'+
+    executable('p', 'ior -w -F'+
             ' -b {b}' +
             ' -t {t}' + 
             ' -a {a}' +
@@ -44,23 +40,15 @@ class Ior(ExecutableApplication):
     workload_variable('o', default='',
         description='directory to read/write to',
         workloads=['ior'])
-    
-    figure_of_merit('Mean write OPs',
-                    log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex=r'write\s+[0-9]+\.[0-9]*[0-9]*\s+[0-9]+\.[0-9]*[0-9]*\s+[0-9]+\.[0-9]*[0-9]*\s+[0-9]+\.[0-9]*[0-9]*\s+[0-9]+\.[0-9]*[0-9]*\s+[0-9]+\.[0-9]*[0-9]*\s+(?P<fom>[0-9]+\.[0-9]*([0-9]*)?)',
-                    group_name='fom', units='OPs')
 
-    figure_of_merit('Mean read OPs',
-                    log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex=r'read\s+[0-9]+\.[0-9]*[0-9]*\s+[0-9]+\.[0-9]*[0-9]*\s+[0-9]+\.[0-9]*[0-9]*\s+[0-9]+\.[0-9]*[0-9]*\s+[0-9]+\.[0-9]*[0-9]*\s+[0-9]+\.[0-9]*[0-9]*\s+(?P<fom>[0-9]+\.[0-9]*([0-9]*)?)',
-                    group_name='fom', units='OPs')
     figure_of_merit('Mean write',
-                    log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex=r'write\s+[0-9]+\.[0-9]*[0-9]*\s+[0-9]+\.[0-9]*[0-9]*\s+(?P<fom>[0-9]+\.[0-9]*([0-9]*)?)',
-                    group_name='fom', units='MiB/sec')
+        log_file='{experiment_run_dir}/{experiment_name}.out',
+        fom_regex=r'write\s+\d*\.\d*\s+\d*\.\d*\s+(?P<fom>[0-9]+\.[0-9]*)',
+        group_name='fom', units='MiB')
 
-    figure_of_merit('Mean read',
-                    log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex=r'read\s+[0-9]+\.[0-9]*[0-9]*\s+[0-9]+\.[0-9]*[0-9]*\s+(?P<fom>[0-9]+\.[0-9]*([0-9]*)?)',
-                    group_name='fom', units='MiB/sec')
+    figure_of_merit('Std Deviation',
+        log_file='{experiment_run_dir}/{experiment_name}.out',
+        fom_regex=r'write\s+\d*\.\d*\s+\d*\.\d*\s+\d*\.\d*\s+(?P<fom>[0-9]+\.[0-9]*)',
+        group_name='fom', units='')
+
     success_criteria('pass', mode='string', match=r'.*', file='{experiment_run_dir}/{experiment_name}.out')
