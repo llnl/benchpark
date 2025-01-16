@@ -82,6 +82,7 @@ class LanlVenado(System):
         return {
             "cuda_arch": "90",
             "default_cuda_version": self.spec.variants["cuda"][0],
+            "extra_batch_opts": '"-A llnl_ai_g -pgpu"',
         }
 
     def external_pkg_configs(self):
