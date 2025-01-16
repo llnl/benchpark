@@ -51,8 +51,14 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
 
     root_cmakelists_dir = "src"
 
+    flag_handler = build_system_flags
+
     patch("branson_cmake.patch")
     patch("branson_power9.patch")
+
+    def setup_build_environment(self, env):
+        if "+cuda" in self.spec:
+            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
 
     def patch(self):
         ppu_intrinsics_file = os.path.join(self.stage.source_path, "src", "random123", "features", "ppu_intrinsics.h")
@@ -63,8 +69,6 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
         spec = self.spec
         args = []
 
-        args.append(f"-DCMAKE_C_COMPILER={self.compiler.cc}")
-        args.append(f"-DCMAKE_CXX_COMPILER={self.compiler.cxx}")
         args.append(f"-DMPI_C_COMPILER={spec['mpi'].mpicc}")
         args.append(f"-DMPI_CXX_COMPILER={spec['mpi'].mpicxx}")
         args.append(f"-DCMAKE_Fortran_COMPILER={spec['mpi'].mpifc}")
