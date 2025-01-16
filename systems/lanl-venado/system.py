@@ -120,7 +120,11 @@ class LanlVenado(System):
 
     def mpi_config(self):
         mpi_version = "8.1.30"
-        gtl = "+gtl" if self.spec.satisfies("compiler=cce") and self.spec.satisfies("+gtl") else "~gtl"
+        gtl = (
+            "+gtl"
+            if self.spec.satisfies("compiler=cce") and self.spec.satisfies("+gtl")
+            else "~gtl"
+        )
 
         # TODO: Construct/extract this information from the working set
         if self.spec.satisfies("compiler=cce"):
@@ -212,7 +216,7 @@ compilers:
     - /opt/cray/pe/gcc-libs
     - /opt/cray/pe/cce/{y}/cce/aarch64/lib
 """
-        return template.format(x=rocm_version, y=cce_version)
+        return template.format(y=compiler_version)
 
     def sw_description(self):
         """This is somewhat vestigial: for the Tioga config that is committed
