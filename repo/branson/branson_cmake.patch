@@ -1,6 +1,6 @@
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -9,65 +9,159 @@
+@@ -9,65 +9,160 @@
  # Enbable debug mode by passing -DCMAKE_BUILD_TYPE=Debug to CMake, default is
  # Release
  
@@ -28,6 +28,7 @@
 +set(CMAKE_CXX_STANDARD 17)
 +set(CMAKE_CXX_STANDARD_REQUIRED ON)
 +set(CMAKE_CXX_EXTENSIONS OFF)
++set(CMAKE_BRANSON_CXXFLAGS ${CMAKE_CXX_FLAGS})
 +
 +option(ENABLE_CUDA "Use CUDA" FALSE)
 +option(ENABLE_HIP "Use HIP" FALSE)
@@ -203,7 +204,7 @@
    message(STATUS
      "HARDCODED NUMBER OF GROUPS NOT SET, DEFAULTING TO ONE GROUP (GRAY)
       use '-DN_GROUPS=<int>' when running cmake to select multigroup.\n")
-@@ -83,28 +177,10 @@ set(ENABLE_VERBOSE_GPU_TRANSPORT ${ENABLE_VERBOSE_GPU_TRANSPORT} CACHE STRING "F
+@@ -83,28 +178,10 @@ set(ENABLE_VERBOSE_GPU_TRANSPORT ${ENABLE_VERBOSE_GPU_TRANSPORT} CACHE STRING "F
  #------------------------------------------------------------------------------#
  # Record the site name
  
@@ -235,7 +236,7 @@
  
  # GCC options for address or undefined sanitizing
  #set(GCC_SANITIZE_COMPILE_FLAGS "-fsanitize=address")
-@@ -113,65 +189,68 @@ endif ()
+@@ -113,65 +190,68 @@ endif ()
  #set(GCC_SANITIZE_LINK_FLAGS "-fsanitize=undefined")
  
  # add compiler flags
@@ -336,7 +337,7 @@
  endif()
  message("\n")
  
-@@ -180,68 +259,55 @@ message("\n")
+@@ -180,68 +260,55 @@ message("\n")
  
  # set(DMAPP_DYNAMIC -Wl,--whole-archive,-ldmapp,--no-whole-archive)
  
@@ -442,7 +443,7 @@
  if(BUILD_TESTING)
    enable_testing()
    add_subdirectory(test)
-@@ -252,11 +318,38 @@ else()
+@@ -252,11 +319,38 @@ else()
      "Building tests disabled, set BUILD_TESTING=TRUE or don't set BUILD_TESTING to enable test builds")
  endif()
  
