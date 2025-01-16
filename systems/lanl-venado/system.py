@@ -120,7 +120,11 @@ class LanlVenado(System):
 
     def mpi_config(self):
         mpi_version = "8.1.30"
-        gtl = "+gtl" if self.spec.satisfies("compiler=cce") and self.spec.satisfies("+gtl") else "~gtl"
+        gtl = (
+            "+gtl"
+            if self.spec.satisfies("compiler=cce") and self.spec.satisfies("+gtl")
+            else "~gtl"
+        )
 
         # TODO: Construct/extract this information from the working set
         if self.spec.satisfies("compiler=cce"):
