@@ -216,7 +216,7 @@ compilers:
     - /opt/cray/pe/gcc-libs
     - /opt/cray/pe/cce/{y}/cce/aarch64/lib
 """
-        return template.format(x=rocm_version, y=cce_version)
+        return template.format(y=compiler_version)
 
     def sw_description(self):
         """This is somewhat vestigial: for the Tioga config that is committed
