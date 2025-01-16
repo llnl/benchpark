@@ -191,33 +191,6 @@ packages:
             lapack=self.spec.variants["lapack"][0],
         )
 
-    def cce_compiler_cfg(self, compiler_version):
-        template = """\
-compilers:
-- compiler:
-    spec: cce@{y}
-    paths:
-      cc:  /opt/cray/pe/cce/{y}/bin/craycc
-      cxx:  /opt/cray/pe/cce/{y}/bin/crayCC
-      f77:  /opt/cray/pe/cce/{y}/bin/crayftn
-      fc:  /opt/cray/pe/cce/{y}/bin/crayftn
-    flags:
-      cflags: -g -O2
-      cxxflags: -g -O2 -std=c++14
-      fflags: -g -O2 -hnopattern
-      ldflags: -ldl
-    operating_system: sles15
-    target: aarch64
-    modules: []
-    environment:
-      prepend_path:
-        LD_LIBRARY_PATH: "/opt/cray/pe/cce/{y}/cce/aarch64/lib"
-    extra_rpaths:
-    - /opt/cray/pe/gcc-libs
-    - /opt/cray/pe/cce/{y}/cce/aarch64/lib
-"""
-        return template.format(y=compiler_version)
-
     def sw_description(self):
         """This is somewhat vestigial: for the Tioga config that is committed
         to the repo, multiple instances of mpi/compilers are stored and
