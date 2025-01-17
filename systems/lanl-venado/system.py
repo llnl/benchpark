@@ -142,7 +142,7 @@ packages:
       prefix: /opt/cray/pe/mpich/{mpi_version}/ofi/{mpi_compiler_suffix}
       extra_attributes:
         gtl_lib_path: /opt/cray/pe/mpich/{mpi_version}/gtl/lib
-        ldflags: "-L/opt/cray/pe/mpich/{mpi_version}/ofi/{mpi_compiler_suffix}/lib -lmpi -L/opt/cray/pe/mpich/{mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{mpi_version}/gtl/lib"
+        ldflags: "-L/opt/cray/pe/mpich/{mpi_version}/ofi/{mpi_compiler_suffix}/lib -lmpi -L/opt/cray/pe/mpich/{mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{mpi_version}/gtl/lib -lmpi_gtl_cuda"
 """
 
     def cuda_config(self, cuda_version):
@@ -177,12 +177,12 @@ packages:
   cublas:
     externals:
     - spec: cublas@{x}
-      prefix: /opt/nvidia/hpc_sdk/Linux_aarch64/24.7/cuda/{x}
+      prefix: /opt/nvidia/hpc_sdk/Linux_aarch64/24.7/math_libs/{x}
     buildable: false
   cusolver:
     externals:
     - spec: cusolver@{x}
-      prefix: /opt/nvidia/hpc_sdk/Linux_aarch64/24.7/cuda/{x}
+      prefix: /opt/nvidia/hpc_sdk/Linux_aarch64/24.7/math_libs/{x}
     buildable: false
 """
         return template.format(
