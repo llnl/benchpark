@@ -43,6 +43,21 @@ packages:
     - spec: cmake@3.24.2
       prefix: /usr/tce
     buildable: false
+  elfutils:
+    externals:
+    - spec: elfutils@0.190
+      prefix: /usr
+    buildable: false
+  papi:
+    externals:
+    - spec: papi@5.6.0.0
+      prefix: /usr
+    buildable: false
+  unwind:
+    externals:
+    - spec: unwind@8.0.1
+      prefix: /usr
+    buildable: false
   pkgconf:
     externals:
     - spec: pkgconf@1.4.2
