@@ -163,6 +163,7 @@ packages: {}
         gtl_cutoff_size: 4096
         fi_cxi_ats: 0
         gtl_lib_path: /opt/cray/pe/mpich/{mpi_version}/gtl/lib
+        gtl_libs: ["libmpi_gtl_hsa"]
         ldflags: "-L/opt/cray/pe/mpich/{mpi_version}/ofi/crayclang/{short_cce_version}/lib -lmpi -L/opt/cray/pe/mpich/{mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{mpi_version}/gtl/lib -lmpi_gtl_hsa"
 """
 

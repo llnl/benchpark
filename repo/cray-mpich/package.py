@@ -17,8 +17,8 @@ class CrayMpich(BuiltinCM):
 
         if self.spec.satisfies("+gtl"):
             gtl_lib_prefix = self.spec.extra_attributes["gtl_lib_path"]
-            libraries = ["libmpi_gtl_hsa", "libmpi_gtl_cuda"]
-            libs += find_libraries(libraries, root=gtl_lib_prefix, recursive=True)
+            gtl_libs = self.spec.extra_attributes["gtl_libs"]
+            libs += find_libraries(gtl_libs, root=gtl_lib_prefix, recursive=True)
 
         return libs
 
