@@ -88,8 +88,8 @@ legacy_test_run:
         - .gitlab-ci.yml
         - .gitlab/ci/*
         - experiments/**
-        - systems/${LEGACY_ARCHCONFIG}/**
-        - repo/${LEGACY_BENCHMARK}/**
+        - systems/$LEGACY_ARCHCONFIG/**
+        - repo/$LEGACY_BENCHMARK/**
         - modifiers/**
         - var/**
         - lib/**
@@ -125,8 +125,8 @@ test_run:
         - .gitlab-ci.yml
         - .gitlab/ci/*
         - experiments/**
-        - systems/${ARCHCONFIG}/**
-        - repo/${BENCHMARK}/**
+        - systems/$ARCHCONFIG/**
+        - repo/$BENCHMARK/**
         - modifiers/**
         - var/**
         - lib/**
