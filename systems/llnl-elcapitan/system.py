@@ -105,29 +105,7 @@ class LlnlElcapitan(System):
         elif self.spec.satisfies("compiler=gcc"):
             selections.append(externals / "libsci" / "00-gcc-packages.yaml")
 
-        cmp_preference_path = self.next_adhoc_cfg()
-        with open(cmp_preference_path, "w") as f:
-            f.write(self.compiler_weighting_cfg())
-        selections.append(cmp_preference_path)
-
         return selections
-
-    def compiler_weighting_cfg(self):
-        compiler = self.spec.variants["compiler"][0]
-
-        if compiler == "cce":
-            return """\
-packages:
-  all:
-    require:
-    - one_of: ["%cce", "@:"]
-"""
-        elif compiler == "gcc":
-            return """\
-packages: {}
-"""
-        else:
-            raise ValueError(f"Unexpected value for compiler: {compiler}")
 
     def compiler_configs(self):
         compilers = LlnlElcapitan.resource_location / "compilers"
@@ -163,6 +141,7 @@ packages: {}
         gtl_cutoff_size: 4096
         fi_cxi_ats: 0
         gtl_lib_path: /opt/cray/pe/mpich/{mpi_version}/gtl/lib
+        gtl_libs: ["libmpi_gtl_hsa"]
         ldflags: "-L/opt/cray/pe/mpich/{mpi_version}/ofi/crayclang/{short_cce_version}/lib -lmpi -L/opt/cray/pe/mpich/{mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{mpi_version}/gtl/lib -lmpi_gtl_hsa"
 """
 
