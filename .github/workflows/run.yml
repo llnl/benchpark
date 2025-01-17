@@ -597,7 +597,6 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-
       - name: Dry run dynamic genesis/openmp with dynamic CTS ruby
         run: |
           system_id=$(./bin/benchpark system id ./ruby-system)
