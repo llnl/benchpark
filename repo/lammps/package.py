@@ -17,20 +17,20 @@ class Lammps(BuiltinLammps):
   conflicts("+cuda", when="+rocm")
 
   def setup_run_environment(self, env):
-    super(BuiltinLammps, self).setup_run_environment(env)
+    super().setup_run_environment(env)
 
     if self.compiler.extra_rpaths:
       for rpath in self.compiler.extra_rpaths:
         env.prepend_path("LD_LIBRARY_PATH", rpath)
 
   def setup_build_environment(self, env):
-    super(BuiltinLammps, self).setup_build_environment(env)
+    super().setup_build_environment(env)
 
     if "+cuda" in self.spec:
       env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
 
   def cmake_args(self):
-    args = super(BuiltinLammps, self).cmake_args()
+    args = super().cmake_args()
     args.append(f"-DMPI_CXX_LINK_FLAGS='{self.spec['mpi'].libs.ld_flags}'")
 
     cflags = self.spec.compiler_flags['cflags']
