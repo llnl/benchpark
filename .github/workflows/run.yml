@@ -346,26 +346,6 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run genesis/openmp with allocation modifier on Fugaku
-        run: |
-          ./bin/benchpark setup genesis/openmp RCCS-Fugaku-Fujitsu-A64FX-TofuD workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/genesis/openmp/RCCS-Fugaku-Fujitsu-A64FX-TofuD/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
-      - name: Dry run genesis/openmp with allocation modifier on nosite-x86_64
-        run: |
-          ./bin/benchpark setup genesis/openmp nosite-x86_64 workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/genesis/openmp/nosite-x86_64/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
       - name: Dry run salmon/openmp with allocation modifier on Fugaku
         run: |
           ./bin/benchpark setup salmon/openmp RCCS-Fugaku-Fujitsu-A64FX-TofuD workspace/
@@ -613,6 +593,30 @@ jobs:
           . workspace/setup.sh
           ramble \
             --workspace-dir "workspace/laghos-mpi-only/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic genesis/openmp with dynamic CTS ruby
+        run: |
+          system_id=$(./bin/benchpark system id ./ruby-system)
+          ./bin/benchpark experiment init --dest genesis-openmp genesis +openmp
+          ./bin/benchpark setup genesis-openmp ./ruby-system workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/genesis-openmp/$system_id/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic genesis/openmp with dynamic fugaku
+        run: |
+          system_id=$(./bin/benchpark system id ./fugaku-system)
+          ./bin/benchpark experiment init --dest=genesis-openmp-fugaku genesis+openmp
+          ./bin/benchpark setup ./genesis-openmp-fugaku ./fugaku-system workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/genesis-openmp-fugaku/$system_id/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
