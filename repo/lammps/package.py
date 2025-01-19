@@ -16,6 +16,8 @@ class Lammps(BuiltinLammps):
   conflicts("+rocm", when="+cuda")
   conflicts("+cuda", when="+rocm")
 
+  flag_handler = build_system_flags
+
   def setup_run_environment(self, env):
     super().setup_run_environment(env)
 
@@ -32,11 +34,7 @@ class Lammps(BuiltinLammps):
   def cmake_args(self):
     args = super().cmake_args()
     args.append(f"-DMPI_CXX_LINK_FLAGS='{self.spec['mpi'].libs.ld_flags}'")
-
-    cflags = self.spec.compiler_flags['cflags']
-    args.append(f"-DCMAKE_C_FLAGS={' '.join(cflags)}")
-
-    cxxflags = self.spec.compiler_flags['cxxflags']
-    args.append(f"-DCMAKE_CXX_FLAGS={' '.join(cxxflags)}")
+    args.append(f"-DMPI_C_COMPILER='{self.spec['mpi'].mpicc}'")
+    args.append(f"-DMPI_CXX_COMPILER={self.spec['mpi'].mpicxx}")
 
     return args
