@@ -376,10 +376,6 @@ software:
       pkg_spec: cce
     default-mpi:
       pkg_spec: cray-mpich
-    default-lapack:
-      pkg_spec: {self.spec.variants["lapack"][0]}
-    default-blas:
-      pkg_spec: {self.spec.variants["blas"][0]}
     compiler-rocm:
       pkg_spec: cce
     compiler-amdclang:
@@ -396,8 +392,10 @@ software:
       pkg_spec: rocblas
     blas-rocm:
       pkg_spec: rocblas
+    lapack:
+      pkg_spec: rocsolver
+    lapack-oneapi:
+      pkg_spec: intel-oneapi-mkl
     lapack-rocm:
       pkg_spec: rocsolver
-    lapack:
-      pkg_spec: intel-oneapi-mkl
 """
