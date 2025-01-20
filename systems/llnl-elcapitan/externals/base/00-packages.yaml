@@ -1,3 +1,8 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
 packages:
   all:
     require: 'target=x86_64:'
@@ -37,6 +42,21 @@ packages:
       prefix: /usr/tce
     - spec: cmake@3.24.2
       prefix: /usr/tce
+    buildable: false
+  elfutils:
+    externals:
+    - spec: elfutils@0.190
+      prefix: /usr
+    buildable: false
+  papi:
+    externals:
+    - spec: papi@5.6.0.0
+      prefix: /usr
+    buildable: false
+  unwind:
+    externals:
+    - spec: unwind@8.0.1
+      prefix: /usr
     buildable: false
   pkgconf:
     externals:
@@ -136,50 +156,10 @@ packages:
     - spec: intel-oneapi-mkl@2023.2.0
       prefix: /opt/intel/oneapi
     buildable: false
-  lapack:
-    buildable: false
-  blas:
-    buildable: false
   mpi:
     buildable: false
   libfabric:
     externals:
     - spec: libfabric@2.1
       prefix: /opt/cray/libfabric/2.1
-    buildable: false
-  hipfft:
-    buildable: false
-  rocfft:
-    buildable: false
-  rocprim:
-    buildable: false
-  rocrand:
-    buildable: false
-  rocsparse:
-    buildable: false
-  rocthrust:
-    buildable: false
-  hip:
-    buildable: false
-  hsa-rocr-dev:
-    buildable: false
-  comgr:
-    buildable: false
-  hipsparse:
-    buildable: false
-  hipblas:
-    buildable: false
-  hsakmt-roct:
-    buildable: false
-  roctracer-dev-api:
-    buildable: false
-  rocminfo:
-    buildable: false
-  llvm:
-    buildable: false
-  llvm-amdgpu:
-    buildable: false
-  rocblas:
-    buildable: false
-  rocsolver:
     buildable: false

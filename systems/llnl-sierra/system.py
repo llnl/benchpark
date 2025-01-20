@@ -27,12 +27,14 @@ class LlnlSierra(System):
     variant(
         "lapack",
         default="cusolver",
+        values=("cusolver", "essl"),
         description="Which lapack to use",
     )
 
     variant(
         "blas",
         default="cublas",
+        values=("cublas", "essl"),
         description="Which blas to use",
     )
 
@@ -76,6 +78,8 @@ class LlnlSierra(System):
                 selections.append(
                     externals / "lapack" / "01-version-11-8-0-packages.yaml"
                 )
+        elif self.spec.satisfies("lapack=essl"):
+            selections.append(externals / "lapack" / "02-version-6-2-packages.yaml")
 
         if self.spec.satisfies("blas=cublas"):
             if self.spec.satisfies("cuda=10-1-243"):
@@ -86,6 +90,8 @@ class LlnlSierra(System):
                 selections.append(
                     externals / "blas" / "01-version-11-8-0-packages.yaml"
                 )
+        elif self.spec.satisfies("blas=essl"):
+            selections.append(externals / "blas" / "02-version-6-2-packages.yaml")
 
         mpi_cfgs = {
             (
@@ -141,6 +147,12 @@ class LlnlSierra(System):
         cfg = mpi_cfgs[(compiler, cuda_ver)]
         full_cfg = f"""\
 packages:
+  blas:
+    require:
+      - {self.spec.variants["blas"][0]}
+  lapack:
+    require:
+      - {self.spec.variants["lapack"][0]}
   mpi:
     externals:
 {cfg}
@@ -169,7 +181,7 @@ packages:
       fc: /usr/tce/packages/xl/xl-2023.06.28-cuda-11.8.0-gcc-11.2.1/bin/xlf_r
     flags:
       cflags: -g -O2
-      cxxflags: -g -O2 -std=c++17
+      cxxflags: -g -O2 -std=c++14
       fflags: -g -O2
     operating_system: rhel7
     target: ppc64le
@@ -253,7 +265,7 @@ packages:
       fc: /usr/tce/packages/gcc/gcc-11.2.1/bin/gfortran
     flags:
       cflags: -g -O2
-      cxxflags: -g -O2 -std=c++17
+      cxxflags: -g -O2 -std=c++14
       fflags: ''
     operating_system: rhel7
     target: ppc64le
@@ -286,7 +298,7 @@ compilers:
         will fail if these variables are not defined though, so for now
         they are still generated (but with more-generic values).
         """
-        return """\
+        return f"""\
 software:
   packages:
     default-compiler:
@@ -294,9 +306,9 @@ software:
     default-mpi:
       pkg_spec: spectrum-mpi
     default-lapack:
-      pkg_spec: lapack
+      pkg_spec: {self.spec.variants["lapack"][0]}
     default-blas:
-      pkg_spec: blas
+      pkg_spec: {self.spec.variants["blas"][0]}
     compiler-xl:
       pkg_spec: xl
     mpi-xl:
@@ -315,6 +327,4 @@ software:
       pkg_spec: cublas
     cublas-cuda:
       pkg_spec: cublas
-    lapack:
-      pkg_spec: lapack@3.9.0
 """
