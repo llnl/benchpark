@@ -224,7 +224,7 @@ jobs:
 
       - name: Dry run dynamic gromacs/openmp with dynamic Ruby
         run: |
-          ./bin/benchpark system init --dest=cluster-system llnl-cluster compiler=gcc lapack=intel-oneapi-mkl blas=intel-oneapi-mkl
+          ./bin/benchpark system init --dest=cluster-system llnl-cluster compiler=gcc 
           system_id=$(./bin/benchpark system id ./cluster-system)
           ./bin/benchpark experiment init --dest=gromacs-openmp gromacs +openmp~cuda~rocm gpu-aware-mpi=off
           ./bin/benchpark setup ./gromacs-openmp ./cluster-system workspace/
@@ -376,9 +376,9 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic saxpy/openmp with dynamic llnl-cluster ruby
+      - name: Dry run dynamic saxpy/openmp with dynamic llnl-cluster ruby compiler=intel
         run: |
-          ./bin/benchpark system init --dest=ruby-system llnl-cluster cluster=ruby
+          ./bin/benchpark system init --dest=ruby-system llnl-cluster cluster=ruby compiler=intel
           system_id=$(./bin/benchpark system id ./ruby-system)
           ./bin/benchpark experiment init --dest=saxpy-openmp saxpy+openmp
           ./bin/benchpark setup ./saxpy-openmp ./ruby-system workspace/
@@ -440,7 +440,7 @@ jobs:
 
       - name: Dry run dynamic remhos/mpi with dynamic Ruby
         run: |
-          ./bin/benchpark system init --dest=cluster-system1 llnl-cluster compiler=gcc lapack=intel-oneapi-mkl blas=intel-oneapi-mkl
+          ./bin/benchpark system init --dest=cluster-system1 llnl-cluster compiler=gcc 
           system_id=$(./bin/benchpark system id ./cluster-system1)
           ./bin/benchpark experiment init --dest=remhos-mpi-ruby remhos ~cuda~rocm caliper=mpi,time
           ./bin/benchpark setup ./remhos-mpi-ruby ./cluster-system1 workspace/
