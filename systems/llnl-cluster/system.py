@@ -100,10 +100,6 @@ software:
       pkg_spec: gcc
     default-mpi:
       pkg_spec: mvapich2
-    default-lapack:
-      pkg_spec: {self.spec.variants["lapack"][0]}
-    default-blas:
-      pkg_spec: {self.spec.variants["blas"][0]}
     compiler-gcc:
       pkg_spec: gcc
     compiler-intel:
