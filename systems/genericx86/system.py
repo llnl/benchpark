@@ -40,6 +40,8 @@ software:
       pkg_spec: gcc
     default-mpi:
       pkg_spec: openmpi
+    blas:
+      pkg_spec: openblas
     lapack:
       pkg_spec: openblas
 """
