@@ -68,21 +68,11 @@ class Amg2023(
             )
 
         # Number of processes in each dimension
-        # num_procs = {"px": 2, "py": 2, "pz": 2}
-        num_procs = {
-           "px": [4, 8, 8, 8],
-           "py": [4, 4, 8, 8],
-           "pz": [4, 4, 4, 8]
-        }
+        num_procs = {"px": 4, "py": 4, "pz": 4}
 
         # Per-process size (in zones) in each dimension
-        # problem_sizes = {"nx": 80, "ny": 80, "nz": 80}
-        problem_sizes = {
-            "nx": [32, 16, 32, 32],
-            "ny": [32, 32, 16, 32],
-            "nz": [16, 32, 32, 16]
-        }
-    
+        problem_sizes = {"nx": 32, "ny": 32, "nz": 16}
+        
         if self.spec.satisfies("+single_node"):
             n_resources = 1
             # TODO: Check if n_ranks / n_resources_per_node <= 1
