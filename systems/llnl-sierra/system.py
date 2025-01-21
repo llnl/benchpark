@@ -298,11 +298,11 @@ compilers:
         will fail if these variables are not defined though, so for now
         they are still generated (but with more-generic values).
         """
-        return """\
+        return f"""\
 software:
   packages:
     default-compiler:
-      pkg_spec: clang
+      pkg_spec: "{self.spec.variants["compiler"][0]}"
     default-mpi:
       pkg_spec: spectrum-mpi
     compiler-xl:
@@ -320,11 +320,11 @@ software:
     mpi-clang-ibm:
       pkg_spec: spectrum-mpi
     blas:
-      pkg_spec: cublas
+      pkg_spec: "{self.spec.variants["blas"][0]}"
     blas-cuda:
       pkg_spec: cublas
     lapack:
-      pkg_spec: cusolver
+      pkg_spec: "{self.spec.variants["lapack"][0]}"
     lapack-cuda:
       pkg_spec: cusolver
 """
