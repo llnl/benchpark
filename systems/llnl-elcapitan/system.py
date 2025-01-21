@@ -373,7 +373,7 @@ compilers:
 software:
   packages:
     default-compiler:
-      pkg_spec: {self.spec.variants["compiler"][0]}
+      pkg_spec: "{self.spec.variants["compiler"][0]}"
     default-mpi:
       pkg_spec: cray-mpich
     compiler-rocm:
@@ -389,11 +389,11 @@ software:
     mpi-gcc:
       pkg_spec: cray-mpich~gtl
     blas:
-      pkg_spec: {self.spec.variants["blas"][0]}
+      pkg_spec: "{self.spec.variants["blas"][0]}"
     blas-rocm:
       pkg_spec: rocblas
     lapack:
-      pkg_spec: {self.spec.variants["lapack"][0]}
+      pkg_spec: "{self.spec.variants["lapack"][0]}"
     lapack-oneapi:
       pkg_spec: intel-oneapi-mkl
     lapack-rocm:
