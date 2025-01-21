@@ -302,13 +302,9 @@ compilers:
 software:
   packages:
     default-compiler:
-      pkg_spec: clang
+      pkg_spec: "{self.spec.variants["compiler"][0]}"
     default-mpi:
       pkg_spec: spectrum-mpi
-    default-lapack:
-      pkg_spec: {self.spec.variants["lapack"][0]}
-    default-blas:
-      pkg_spec: {self.spec.variants["blas"][0]}
     compiler-xl:
       pkg_spec: xl
     mpi-xl:
@@ -324,7 +320,11 @@ software:
     mpi-clang-ibm:
       pkg_spec: spectrum-mpi
     blas:
+      pkg_spec: "{self.spec.variants["blas"][0]}"
+    blas-cuda:
       pkg_spec: cublas
-    cublas-cuda:
-      pkg_spec: cublas
+    lapack:
+      pkg_spec: "{self.spec.variants["lapack"][0]}"
+    lapack-cuda:
+      pkg_spec: cusolver
 """
