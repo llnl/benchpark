@@ -85,7 +85,7 @@ class LlnlCluster(System):
 software:
   packages:
     default-compiler:
-      pkg_spec: {self.spec.variants["compiler"][0]}
+      pkg_spec: "{self.spec.variants["compiler"][0]}"
     default-mpi:
       pkg_spec: mvapich2
     compiler-gcc:
