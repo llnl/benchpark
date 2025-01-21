@@ -120,7 +120,7 @@ class LlnlElcapitan(System):
 packages:
   all:
     require:
-    - one_of: ["%cce", "@:"]
+    - one_of: ["%cce", "%gcc"]
 """
         elif compiler == "gcc":
             return """\
