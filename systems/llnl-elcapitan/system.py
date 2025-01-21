@@ -41,7 +41,7 @@ class LlnlElcapitan(System):
     variant(
         "compiler",
         default="cce",
-        values=("gcc", "cce"),
+        values=("cce", "gcc"),
         description="Which compiler to use",
     )
 
@@ -369,11 +369,11 @@ compilers:
         will fail if these variables are not defined though, so for now
         they are still generated (but with more-generic values).
         """
-        return """\
+        return f"""\
 software:
   packages:
     default-compiler:
-      pkg_spec: cce
+      pkg_spec: {self.spec.variants["compiler"][0]}
     default-mpi:
       pkg_spec: cray-mpich
     compiler-rocm:
@@ -389,11 +389,11 @@ software:
     mpi-gcc:
       pkg_spec: cray-mpich~gtl
     blas:
-      pkg_spec: rocblas
+      pkg_spec: {self.spec.variants["blas"][0]}
     blas-rocm:
       pkg_spec: rocblas
     lapack:
-      pkg_spec: rocsolver
+      pkg_spec: {self.spec.variants["lapack"][0]}
     lapack-oneapi:
       pkg_spec: intel-oneapi-mkl
     lapack-rocm:
