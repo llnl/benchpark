@@ -37,18 +37,6 @@ class LlnlCluster(System):
         description="Which compiler to use",
     )
 
-    variant(
-        "lapack",
-        default="intel-oneapi-mkl",
-        description="Which lapack to use",
-    )
-
-    variant(
-        "blas",
-        default="intel-oneapi-mkl",
-        description="Which blas to use",
-    )
-
     def initialize(self):
         super().initialize()
 
@@ -97,13 +85,9 @@ class LlnlCluster(System):
 software:
   packages:
     default-compiler:
-      pkg_spec: gcc
+      pkg_spec: {self.spec.variants["compiler"][0]}
     default-mpi:
       pkg_spec: mvapich2
-    default-lapack:
-      pkg_spec: {self.spec.variants["lapack"][0]}
-    default-blas:
-      pkg_spec: {self.spec.variants["blas"][0]}
     compiler-gcc:
       pkg_spec: gcc
     compiler-intel:
