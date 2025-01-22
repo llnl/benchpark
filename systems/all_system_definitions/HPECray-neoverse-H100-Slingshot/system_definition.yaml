@@ -1,0 +1,32 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+system_definition:
+  name: HPECray-neoverse-H100-Slingshot
+  integrator:
+    vendor: HPECray
+    name: EX254n
+  processor:
+    vendor: NVIDIA
+    name: Grace
+    ISA: Armv9
+    uArch: neoverse
+  accelerator:
+    vendor: NVIDIA
+    name: H100
+    ISA: PTX
+    uArch: sm_90
+  interconnect:
+    vendor: HPECray
+    name: Slingshot11
+  systems-tested:
+    lanl-venado:
+      os: HPECrayOS
+      scheduler: slurm
+      compiler: cce
+      runtime: cuda
+      mpi: cray-mpich
+  top500-system-instances:
+    - Venado (LANL) <https://www.top500.org/system/180246>

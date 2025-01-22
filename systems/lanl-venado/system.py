@@ -185,6 +185,11 @@ packages:
     - spec: cusolver@{x}
       prefix: /opt/nvidia/hpc_sdk/Linux_aarch64/24.7/math_libs/{x}
     buildable: false
+  cufft:
+    externals:
+    - spec: cufft@{x}
+      prefix: /opt/nvidia/hpc_sdk/Linux_aarch64/24.7/math_libs/{x}
+    buildable: false
 """
         return template.format(
             x=cuda_version,
