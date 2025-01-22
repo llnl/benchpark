@@ -94,6 +94,13 @@ class Amg2023(
             for nk, nv in scaled_variables.items():
                 self.add_experiment_variable(nk, nv, True)
         elif self.spec.satisfies("+strong"):
+            # Number of processes in each dimension
+            num_procs = {"px": 2, "py": 2, "pz": 2}
+
+            # Per-process size (in zones) in each dimension
+            problem_sizes = {"nx": 100, "ny": 100, "nz": 100}
+
+
             scaled_variables = self.generate_strong_scaling_params(
                 {tuple(num_procs.keys()): list(num_procs.values())},
                 int(self.spec.variants["scaling-factor"][0]),
