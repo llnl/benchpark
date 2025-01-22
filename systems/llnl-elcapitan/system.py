@@ -41,7 +41,7 @@ class LlnlElcapitan(System):
     variant(
         "compiler",
         default="cce",
-        values=("gcc", "cce"),
+        values=("cce", "gcc"),
         description="Which compiler to use",
     )
 
@@ -105,7 +105,29 @@ class LlnlElcapitan(System):
         elif self.spec.satisfies("compiler=gcc"):
             selections.append(externals / "libsci" / "00-gcc-packages.yaml")
 
+        cmp_preference_path = self.next_adhoc_cfg()
+        with open(cmp_preference_path, "w") as f:
+            f.write(self.compiler_weighting_cfg())
+        selections.append(cmp_preference_path)
+
         return selections
+
+    def compiler_weighting_cfg(self):
+        compiler = self.spec.variants["compiler"][0]
+
+        if compiler == "cce":
+            return """\
+packages:
+  all:
+    require:
+    - one_of: ["%cce", "%gcc"]
+"""
+        elif compiler == "gcc":
+            return """\
+packages: {}
+"""
+        else:
+            raise ValueError(f"Unexpected value for compiler: {compiler}")
 
     def compiler_configs(self):
         compilers = LlnlElcapitan.resource_location / "compilers"
@@ -352,13 +374,9 @@ compilers:
 software:
   packages:
     default-compiler:
-      pkg_spec: cce
+      pkg_spec: "{self.spec.variants["compiler"][0]}"
     default-mpi:
       pkg_spec: cray-mpich
-    default-lapack:
-      pkg_spec: {self.spec.variants["lapack"][0]}
-    default-blas:
-      pkg_spec: {self.spec.variants["blas"][0]}
     compiler-rocm:
       pkg_spec: cce
     compiler-amdclang:
@@ -372,11 +390,13 @@ software:
     mpi-gcc:
       pkg_spec: cray-mpich~gtl
     blas:
-      pkg_spec: rocblas
+      pkg_spec: "{self.spec.variants["blas"][0]}"
     blas-rocm:
       pkg_spec: rocblas
+    lapack:
+      pkg_spec: "{self.spec.variants["lapack"][0]}"
+    lapack-oneapi:
+      pkg_spec: intel-oneapi-mkl
     lapack-rocm:
       pkg_spec: rocsolver
-    lapack:
-      pkg_spec: intel-oneapi-mkl
 """
