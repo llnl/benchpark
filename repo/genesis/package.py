@@ -17,7 +17,10 @@ class Genesis(AutotoolsPackage):
     homepage = "https://www.r-ccs.riken.jp/labs/cbrt/"
     git = "https://github.com/genesis-release-r-ccs/genesis"
 
-    version("master", branch="master", submodules=False)
+    version("main", branch="main", submodules=False)
+    version(
+        "2.1.4", submodules=False, tag="v2.1.4", commit="48fa5654ae1ecdf606fb6cd0bdcc2952f5caaa65"
+    )
     version(
         "2.1.3", submodules=False, tag="v2.1.3", commit="835ef1538f9350cfa7e9489f340837d0908afbd2"
     )
