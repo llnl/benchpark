@@ -301,6 +301,8 @@ compilers:
         compiler_id = self.spec.variants["compiler"][0]
         if compiler_id == "clang-ibm":
             compiler_id = "clang"
+        elif compiler_id == "xl-gcc":
+            compiler_id = "xl"
 
         return f"""\
 software:
