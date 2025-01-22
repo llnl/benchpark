@@ -47,7 +47,7 @@ class Babelstream(
         else:
             self.add_experiment_variable("n_ranks", n_resources, True)
             self.add_experiment_variable("execute", "omp-stream", False)
-            
+
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_experiment_variable("n_gpus", n_resources, True)
 
@@ -71,4 +71,3 @@ class Babelstream(
         self.add_spack_spec(
             self.name, [f"babelstream@{app_version}", system_specs["compiler"]]
         )
-
