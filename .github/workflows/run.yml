@@ -598,6 +598,43 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
+      - name: Dry run dynamic raja-perf/mpi with dynamic CTS ruby
+        run: |
+          ./bin/benchpark experiment init --dest=raja-perf raja-perf
+          ./bin/benchpark setup ./raja-perf ./ruby-system workspace/
+          system_id=$(./bin/benchpark system id ./ruby-system)
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir "workspace/raja-perf/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic raja-perf/mpi with dynamic CTS tioga
+        run: |
+          ./bin/benchpark experiment init --dest=raja-perf-tioga raja-perf
+          ./bin/benchpark setup ./raja-perf-tioga ./tioga-system workspace/
+          system_id=$(./bin/benchpark system id ./tioga-system)
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir "workspace/raja-perf-tioga/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic raja-perf/mpi with dynamic CTS lassen
+        run: |
+          ./bin/benchpark experiment init --dest=raja-perf-lassen raja-perf
+          ./bin/benchpark system init --dest=lassen-clang llnl-sierra compiler=clang
+          ./bin/benchpark setup ./raja-perf-lassen ./lassen-clang workspace/
+          system_id=$(./bin/benchpark system id ./lassen-clang)
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir "workspace/raja-perf-lassen/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
       - name: Dry run dynamic genesis/openmp with dynamic CTS ruby
         run: |
           system_id=$(./bin/benchpark system id ./ruby-system)

@@ -298,11 +298,17 @@ compilers:
         will fail if these variables are not defined though, so for now
         they are still generated (but with more-generic values).
         """
+        compiler_id = self.spec.variants["compiler"][0]
+        if compiler_id == "clang-ibm":
+            compiler_id = "clang"
+        elif compiler_id == "xl-gcc":
+            compiler_id = "xl"
+
         return f"""\
 software:
   packages:
     default-compiler:
-      pkg_spec: "{self.spec.variants["compiler"][0]}"
+      pkg_spec: "{compiler_id}"
     default-mpi:
       pkg_spec: spectrum-mpi
     compiler-xl:
