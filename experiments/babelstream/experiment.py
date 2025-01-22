@@ -8,13 +8,14 @@ from benchpark.experiment import Experiment
 from benchpark.expr.builtin.caliper import Caliper
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
-
+from benchpark.openmp import OpenMPExperiment
 
 class Babelstream(
     Experiment,
     Caliper,
     CudaExperiment,
     ROCmExperiment,
+    OpenMPExperiment,
 ):
     variant(
         "workload",
@@ -28,6 +29,7 @@ class Babelstream(
         values=("4.0", "develop", "caliper"),
         description="app version",
     )
+ 
 
     def compute_applications_section(self):
 
@@ -66,13 +68,7 @@ class Babelstream(
 
         # set package spack specs
         self.add_spack_spec(system_specs["mpi"])
-        if self.spec.satisfies("~cuda") and self.spec.satisfies("~rocm"):
-            self.add_spack_spec(
-                self.name, 
-                [f"babelstream@{app_version}+openmp", system_specs["compiler"]]
-            )
-        else:
-            self.add_spack_spec(
-                self.name, [f"babelstream@{app_version}", system_specs["compiler"]]
-            )
+        self.add_spack_spec(
+            self.name, [f"babelstream@{app_version}", system_specs["compiler"]]
+        )
 

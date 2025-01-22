@@ -598,18 +598,6 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic babelstream/openmp with dynamic CTS ruby
-        run: |
-          ./bin/benchpark experiment init --dest=babelstream babelstream
-          ./bin/benchpark setup ./babelstream ./ruby-system workspace/
-          system_id=$(./bin/benchpark system id ./ruby-system)
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir "workspace/babelstream/$system_id/workspace" \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
       - name: Dry run dynamic raja-perf/mpi with dynamic CTS ruby
         run: |
           ./bin/benchpark experiment init --dest=raja-perf raja-perf
@@ -673,7 +661,7 @@ jobs:
 
       - name: Dry run dynamic babelstream/openmp with dynamic CTS tioga
         run: |
-          ./bin/benchpark experiment init --dest=babelstream-tioga babelstream
+          ./bin/benchpark experiment init --dest=babelstream-tioga babelstream +openmp
           ./bin/benchpark setup ./babelstream-tioga ./tioga-system workspace/
           system_id=$(./bin/benchpark system id ./tioga-system)
           . workspace/setup.sh
@@ -683,14 +671,26 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic babelstream/openmp with dynamic CTS sierra
+      - name: Dry run dynamic babelstream/openmp with dynamic CTS sierra 
         run: |
-          ./bin/benchpark experiment init --dest=babelstream-sierra babelstream
+          ./bin/benchpark experiment init --dest=babelstream-sierra babelstream +openmp
           ./bin/benchpark setup ./babelstream-sierra ./sierra-system1 workspace/
           system_id=$(./bin/benchpark system id ./sierra-system1)
           . workspace/setup.sh
           ramble \
             --workspace-dir "workspace/babelstream-sierra/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic babelstream/openmp with dynamic CTS ruby
+        run: |
+          ./bin/benchpark experiment init --dest=babelstream babelstream +openmp
+          ./bin/benchpark setup ./babelstream ./ruby-system workspace/
+          system_id=$(./bin/benchpark system id ./ruby-system)
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir "workspace/babelstream/$system_id/workspace" \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
