@@ -68,9 +68,10 @@ class Babelstream(
         self.add_spack_spec(system_specs["mpi"])
         if self.spec.satisfies("~cuda") and self.spec.satisfies("~rocm"):
             self.add_spack_spec(
-                self.name, [f"babelstream@{app_version}+openmp", system_specs["compiler"]]
+                self.name, 
+                [f"babelstream@{app_version}+openmp", system_specs["compiler"]]
             )
-        else: 
+        else:
             self.add_spack_spec(
                 self.name, [f"babelstream@{app_version}", system_specs["compiler"]]
             )
