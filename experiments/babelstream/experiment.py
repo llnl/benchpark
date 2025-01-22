@@ -29,7 +29,7 @@ class Babelstream(
         default="caliper",
         values=("4.0", "develop", "caliper"),
         description="app version",
-    ) 
+    )
 
     def compute_applications_section(self):
 
