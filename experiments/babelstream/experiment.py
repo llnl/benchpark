@@ -6,7 +6,6 @@
 from benchpark.directives import variant
 from benchpark.experiment import Experiment
 from benchpark.expr.builtin.caliper import Caliper
-from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
 
@@ -14,7 +13,6 @@ from benchpark.rocm import ROCmExperiment
 class Babelstream(
     Experiment,
     Caliper,
-    OpenMPExperiment,
     CudaExperiment,
     ROCmExperiment,
 ):
@@ -38,16 +36,16 @@ class Babelstream(
         self.add_experiment_variable("o", "0", False)
         n_resources = 1
 
-        if self.spec.satisfies("+openmp"):
-            self.add_experiment_variable("n_ranks", n_resources, True)
-            self.add_experiment_variable("execute", "omp-stream", False)
-
-        elif self.spec.satisfies("+cuda"):
+        if self.spec.satisfies("+cuda"):
             self.add_experiment_variable("execute", "cuda-stream", False)
 
         elif self.spec.satisfies("+rocm"):
             self.add_experiment_variable("execute", "hip-stream", False)
 
+        else:
+            self.add_experiment_variable("n_ranks", n_resources, True)
+            self.add_experiment_variable("execute", "omp-stream", False)
+            
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_experiment_variable("n_gpus", n_resources, True)
 
@@ -68,7 +66,12 @@ class Babelstream(
 
         # set package spack specs
         self.add_spack_spec(system_specs["mpi"])
+        if self.spec.satisfies("~cuda") and self.spec.satisfies("~rocm"):
+            self.add_spack_spec(
+                self.name, [f"babelstream@{app_version}+openmp", system_specs["compiler"]]
+            )
+        else: 
+            self.add_spack_spec(
+                self.name, [f"babelstream@{app_version}", system_specs["compiler"]]
+            )
 
-        self.add_spack_spec(
-            self.name, [f"babelstream@{app_version}", system_specs["compiler"]]
-        )
