@@ -10,6 +10,7 @@ from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
 from benchpark.openmp import OpenMPExperiment
 
+
 class Babelstream(
     Experiment,
     Caliper,
@@ -28,8 +29,7 @@ class Babelstream(
         default="caliper",
         values=("4.0", "develop", "caliper"),
         description="app version",
-    )
- 
+    ) 
 
     def compute_applications_section(self):
 
