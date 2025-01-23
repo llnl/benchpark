@@ -92,6 +92,13 @@ class Genesis(AutotoolsPackage):
             env["CXXFLAGS"] = f"{opt_flags}"
             env["FCFLAGS"] = f"{opt_flags}"
             env["F77FLAGS"] = f"{opt_flags}"
+            if spec.target == "a64fx":
+                # Using same flags as the version installed outside benchpark
+                env["CFLAGS"] = "-Kfast -Kocl -Kswp"
+                env["FCFLAGS"] = "-Kocl -Kfast -Kopenmp -Nlst=t -Koptmsg=2"
+                env["LDFLAGS"] = "-SSL2BLAMP -Kparallel -Kopenmp -Nlibomp"
+                # if Lapack_libs is not specified, build fails when linking
+                env["LAPACK_LIBS"] = spec["lapack"].libs.ld_flags
         elif spec.satisfies("%gcc"):
             opt_flags = "-O3 -ffast-math"
             env["CFLAGS"] = f"{opt_flags}"
