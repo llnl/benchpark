@@ -444,10 +444,11 @@ jobs:
         run: |
           ./bin/benchpark system init --dest=x86-system generic-x86
           ./bin/benchpark experiment init --dest=amg2023-openmp-generic amg2023+openmp
+          system_id=$(./bin/benchpark system id ./x86-system)
           ./bin/benchpark setup ./amg2023-openmp-generic ./x86-system workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir "workspace/amg2023-openmp-generic/x86-system/workspace" \
+            --workspace-dir "workspace/amg2023-openmp-generic/$system_id/workspace" \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
