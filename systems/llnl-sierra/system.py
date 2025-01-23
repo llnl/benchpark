@@ -287,17 +287,19 @@ compilers:
         will fail if these variables are not defined though, so for now
         they are still generated (but with more-generic values).
         """
+        compiler_id = self.spec.variants["compiler"][0]
+        if compiler_id == "clang-ibm":
+            compiler_id = "clang"
+        elif compiler_id == "xl-gcc":
+            compiler_id = "xl"
+
         return f"""\
 software:
   packages:
     default-compiler:
-      pkg_spec: clang
+      pkg_spec: "{compiler_id}"
     default-mpi:
       pkg_spec: spectrum-mpi
-    default-lapack:
-      pkg_spec: {self.spec.variants["lapack"][0]}
-    default-blas:
-      pkg_spec: {self.spec.variants["blas"][0]}
     compiler-xl:
       pkg_spec: xl
     mpi-xl:
@@ -313,7 +315,11 @@ software:
     mpi-clang-ibm:
       pkg_spec: spectrum-mpi
     blas:
+      pkg_spec: "{self.spec.variants["blas"][0]}"
+    blas-cuda:
       pkg_spec: cublas
-    cublas-cuda:
-      pkg_spec: cublas
+    lapack:
+      pkg_spec: "{self.spec.variants["lapack"][0]}"
+    lapack-cuda:
+      pkg_spec: cusolver
 """

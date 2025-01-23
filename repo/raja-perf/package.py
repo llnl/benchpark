@@ -171,9 +171,8 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
     conflicts("~openmp", when="+openmp_target", msg="OpenMP target requires OpenMP")
     conflicts("+cuda", when="+openmp_target", msg="Cuda may not be activated when openmp_target is ON")
 
-    depends_on("caliper@master",when="+caliper")
-    depends_on("caliper@master +cuda",when="+caliper +cuda")
-    depends_on("caliper@master +rocm",when="+caliper +rocm")
+    depends_on("caliper", when="+caliper")
+    depends_on("adiak@0.4:", when="+caliper")
 
     depends_on("mpi", when="+mpi")
 
@@ -352,12 +351,12 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
         entries.append(cmake_cache_option("ENABLE_TESTS", not "tests=none" in spec or self.run_tests))
 
         entries.append(cmake_cache_option("RAJA_PERFSUITE_USE_CALIPER","+caliper" in spec))
-        if "caliper" in self.spec:
+        if "+caliper" in self.spec:
             entries.append(cmake_cache_path("caliper_DIR", spec["caliper"].prefix+"/share/cmake/caliper/"))
             entries.append(cmake_cache_path("adiak_DIR", spec["adiak"].prefix+"/lib/cmake/adiak/"))
 
         return entries
 
     def cmake_args(self):
-        options = []
+        options = [f"-DMPI_CXX_LINK_FLAGS='{self.spec['mpi'].libs.ld_flags}'"]
         return options
