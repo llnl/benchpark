@@ -1,0 +1,5 @@
+packages:
+  cray-libsci:
+    externals:
+    - spec: cray-libsci@24.07.0%cce
+      prefix: /opt/cray/pe/libsci/24.07.0/cray/17.0/aarch64

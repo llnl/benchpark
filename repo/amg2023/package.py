@@ -36,13 +36,17 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
 
     depends_on("hypre+cuda", when="+cuda")
     requires("+cuda", when="^hypre+cuda")
-    for arch in ("none", "50", "60", "70", "80"):
+    for arch in ("none", "50", "60", "70", "80", "90"):
         depends_on(f"hypre cuda_arch={arch}", when=f"cuda_arch={arch}")
 
     depends_on("hypre+rocm", when="+rocm")
     requires("+rocm", when="^hypre+rocm")
     for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
         depends_on(f"hypre amdgpu_target={target}", when=f"amdgpu_target={target}")
+
+    def setup_build_environment(self, env):
+        if "+cuda" in self.spec:
+            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
 
     def cmake_args(self):
         cmake_options = []
