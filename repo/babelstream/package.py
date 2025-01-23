@@ -33,7 +33,7 @@ class Babelstream(CMakePackage, CudaPackage, ROCmPackage):
     # Also supported variants are cuda and rocm (for HIP)
     variant("sycl", default=False, description="Enable SYCL support")
     variant("sycl2020", default=False, description="Enable SYCL support")
-    variant("openmp", default=True, description="Enable OpenMP support")
+    variant("openmp", default=False, description="Enable OpenMP support")
     variant("ocl", default=False, description="Enable OpenCL support")
     variant("tbb", default=False, description="Enable TBB support")
     variant("acc", default=False, description="Enable OpenACC support")
@@ -195,9 +195,9 @@ class Babelstream(CMakePackage, CudaPackage, ROCmPackage):
             args = ["-DMODEL=hip"]
         elif "std" in self.spec:
             args = ["-DMODEL=" + "std-" + model_list[0].split("d", 1)[1]]
-        else:
+        #else:
             #args = ["-DMODEL=" + model_list[0]]
-            args = ["-DMODEL=omp"]
+            #args = ["-DMODEL=omp"]
 
 
         #enable caliper
