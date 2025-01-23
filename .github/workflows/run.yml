@@ -442,7 +442,7 @@ jobs:
 
       - name: Dry run dynamic amg2023+openmp with dynamic generic x86
         run: |
-          ./bin/benchpark system init --dest=x86-system genericx86
+          ./bin/benchpark system init --dest=x86-system generic-x86
           ./bin/benchpark experiment init --dest=amg2023-openmp-generic amg2023+openmp
           ./bin/benchpark setup ./amg2023-openmp-generic ./x86-system workspace/
           . workspace/setup.sh
@@ -543,12 +543,13 @@ jobs:
 
       - name: Dry run dynamic saxpy/openmp with dynamic fugaku
         run: |
-          ./bin/benchpark system init --dest=fugaku-system fugaku
+          ./bin/benchpark system init --dest=fugaku-system riken-fugaku
           ./bin/benchpark experiment init --dest=saxpy-openmp-fugaku saxpy+openmp
           ./bin/benchpark setup ./saxpy-openmp-fugaku ./fugaku-system workspace/
+          system_id=$(./bin/benchpark system id ./fugaku-system)
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/saxpy-openmp-fugaku/Fugaku-cf3cb1d/workspace \
+            --workspace-dir workspace/saxpy-openmp-fugaku/$system_id/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
