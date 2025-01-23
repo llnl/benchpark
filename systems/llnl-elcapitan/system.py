@@ -41,7 +41,7 @@ class LlnlElcapitan(System):
     variant(
         "compiler",
         default="cce",
-        values=("gcc", "cce"),
+        values=("cce", "gcc"),
         description="Which compiler to use",
     )
 
@@ -120,7 +120,7 @@ class LlnlElcapitan(System):
 packages:
   all:
     require:
-    - one_of: ["%cce", "@:"]
+    - one_of: ["%cce", "%gcc"]
 """
         elif compiler == "gcc":
             return """\
@@ -163,6 +163,7 @@ packages: {}
         gtl_cutoff_size: 4096
         fi_cxi_ats: 0
         gtl_lib_path: /opt/cray/pe/mpich/{mpi_version}/gtl/lib
+        gtl_libs: ["libmpi_gtl_hsa"]
         ldflags: "-L/opt/cray/pe/mpich/{mpi_version}/ofi/crayclang/{short_cce_version}/lib -lmpi -L/opt/cray/pe/mpich/{mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{mpi_version}/gtl/lib -lmpi_gtl_hsa"
 """
 
@@ -373,13 +374,9 @@ compilers:
 software:
   packages:
     default-compiler:
-      pkg_spec: cce
+      pkg_spec: "{self.spec.variants["compiler"][0]}"
     default-mpi:
       pkg_spec: cray-mpich
-    default-lapack:
-      pkg_spec: {self.spec.variants["lapack"][0]}
-    default-blas:
-      pkg_spec: {self.spec.variants["blas"][0]}
     compiler-rocm:
       pkg_spec: cce
     compiler-amdclang:
@@ -393,11 +390,13 @@ software:
     mpi-gcc:
       pkg_spec: cray-mpich~gtl
     blas:
-      pkg_spec: rocblas
+      pkg_spec: "{self.spec.variants["blas"][0]}"
     blas-rocm:
       pkg_spec: rocblas
+    lapack:
+      pkg_spec: "{self.spec.variants["lapack"][0]}"
+    lapack-oneapi:
+      pkg_spec: intel-oneapi-mkl
     lapack-rocm:
       pkg_spec: rocsolver
-    lapack:
-      pkg_spec: intel-oneapi-mkl
 """
