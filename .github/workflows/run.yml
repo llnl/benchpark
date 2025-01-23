@@ -70,7 +70,7 @@ jobs:
 
       - name: Upload Workspace Archive as CI Artifact
         if: always()
-        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
         with:
           name: workspace-archive
           path: './workspace/saxpy/openmp/nosite-x86_64/workspace/archive/**'
@@ -222,9 +222,35 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
+      - name: Dry run dynamic saxpy/openmp with dynamic Venado
+        run: |
+          ./bin/benchpark system init --dest=venado-system1 lanl-venado cuda=12.5 compiler=cce +gtl
+          system_id=$(./bin/benchpark system id ./venado-system1)
+          ./bin/benchpark experiment init --dest=saxpy-openmp-venado saxpy+openmp
+          ./bin/benchpark setup ./saxpy-openmp-venado ./venado-system1 workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir "workspace/saxpy-openmp-venado/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic saxpy/cuda with dynamic Venado
+        run: |
+          ./bin/benchpark system init --dest=venado-system2 lanl-venado cuda=12.5 compiler=cce +gtl
+          system_id=$(./bin/benchpark system id ./venado-system2)
+          ./bin/benchpark experiment init --dest=saxpy-cuda-venado saxpy+cuda
+          ./bin/benchpark setup ./saxpy-cuda-venado ./venado-system2 workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir "workspace/saxpy-cuda-venado/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
       - name: Dry run dynamic gromacs/openmp with dynamic Ruby
         run: |
-          ./bin/benchpark system init --dest=cluster-system llnl-cluster compiler=gcc lapack=intel-oneapi-mkl blas=intel-oneapi-mkl
+          ./bin/benchpark system init --dest=cluster-system llnl-cluster compiler=gcc 
           system_id=$(./bin/benchpark system id ./cluster-system)
           ./bin/benchpark experiment init --dest=gromacs-openmp gromacs +openmp~cuda~rocm gpu-aware-mpi=off
           ./bin/benchpark setup ./gromacs-openmp ./cluster-system workspace/
@@ -346,26 +372,6 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run genesis/openmp with allocation modifier on Fugaku
-        run: |
-          ./bin/benchpark setup genesis/openmp RCCS-Fugaku-Fujitsu-A64FX-TofuD workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/genesis/openmp/RCCS-Fugaku-Fujitsu-A64FX-TofuD/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
-      - name: Dry run genesis/openmp with allocation modifier on nosite-x86_64
-        run: |
-          ./bin/benchpark setup genesis/openmp nosite-x86_64 workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/genesis/openmp/nosite-x86_64/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
       - name: Dry run salmon/openmp with allocation modifier on Fugaku
         run: |
           ./bin/benchpark setup salmon/openmp RCCS-Fugaku-Fujitsu-A64FX-TofuD workspace/
@@ -396,9 +402,9 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic saxpy/openmp with dynamic llnl-cluster ruby
+      - name: Dry run dynamic saxpy/openmp with dynamic llnl-cluster ruby compiler=intel
         run: |
-          ./bin/benchpark system init --dest=ruby-system llnl-cluster cluster=ruby
+          ./bin/benchpark system init --dest=ruby-system llnl-cluster cluster=ruby compiler=intel
           system_id=$(./bin/benchpark system id ./ruby-system)
           ./bin/benchpark experiment init --dest=saxpy-openmp saxpy+openmp
           ./bin/benchpark setup ./saxpy-openmp ./ruby-system workspace/
@@ -434,14 +440,14 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic saxpy/openmp with dynamic generic x86
+      - name: Dry run dynamic amg2023+openmp with dynamic generic x86
         run: |
           ./bin/benchpark system init --dest=x86-system genericx86
-          ./bin/benchpark experiment init --dest=saxpy-omp-generic saxpy+openmp
-          ./bin/benchpark setup ./saxpy-omp-generic ./x86-system workspace/
+          ./bin/benchpark experiment init --dest=amg2023-openmp-generic amg2023+openmp
+          ./bin/benchpark setup ./amg2023-openmp-generic ./x86-system workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir "workspace/saxpy-omp-generic/x86-system/workspace" \
+            --workspace-dir "workspace/amg2023-openmp-generic/x86-system/workspace" \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
@@ -449,17 +455,18 @@ jobs:
       - name: Dry run dynamic saxpy/openmp with dynamic aws
         run: |
           ./bin/benchpark system init --dest=aws1 aws-pcluster instance_type=hpc6a.48xlarge
-          ./bin/benchpark setup ./saxpy-omp-generic ./aws1 workspace/
+          ./bin/benchpark experiment init --dest=saxpy-openmp-generic saxpy+openmp
+          ./bin/benchpark setup ./saxpy-openmp-generic ./aws1 workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir "workspace/saxpy-omp-generic/aws1/workspace" \
+            --workspace-dir "workspace/saxpy-openmp-generic/aws1/workspace" \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
 
       - name: Dry run dynamic remhos/mpi with dynamic Ruby
         run: |
-          ./bin/benchpark system init --dest=cluster-system1 llnl-cluster compiler=gcc lapack=intel-oneapi-mkl blas=intel-oneapi-mkl
+          ./bin/benchpark system init --dest=cluster-system1 llnl-cluster compiler=gcc 
           system_id=$(./bin/benchpark system id ./cluster-system1)
           ./bin/benchpark experiment init --dest=remhos-mpi-ruby remhos ~cuda~rocm caliper=mpi,time
           ./bin/benchpark setup ./remhos-mpi-ruby ./cluster-system1 workspace/
@@ -537,11 +544,11 @@ jobs:
       - name: Dry run dynamic saxpy/openmp with dynamic fugaku
         run: |
           ./bin/benchpark system init --dest=fugaku-system fugaku
-          ./bin/benchpark experiment init --dest=saxpy-omp-fugaku saxpy+openmp
-          ./bin/benchpark setup ./saxpy-omp-fugaku ./fugaku-system workspace/
+          ./bin/benchpark experiment init --dest=saxpy-openmp-fugaku saxpy+openmp
+          ./bin/benchpark setup ./saxpy-openmp-fugaku ./fugaku-system workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/saxpy-omp-fugaku/Fugaku-cf3cb1d/workspace \
+            --workspace-dir workspace/saxpy-openmp-fugaku/Fugaku-cf3cb1d/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
@@ -613,6 +620,67 @@ jobs:
           . workspace/setup.sh
           ramble \
             --workspace-dir "workspace/laghos-mpi-only/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic raja-perf/mpi with dynamic CTS ruby
+        run: |
+          ./bin/benchpark experiment init --dest=raja-perf raja-perf
+          ./bin/benchpark setup ./raja-perf ./ruby-system workspace/
+          system_id=$(./bin/benchpark system id ./ruby-system)
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir "workspace/raja-perf/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic raja-perf/mpi with dynamic CTS tioga
+        run: |
+          ./bin/benchpark experiment init --dest=raja-perf-tioga raja-perf
+          ./bin/benchpark setup ./raja-perf-tioga ./tioga-system workspace/
+          system_id=$(./bin/benchpark system id ./tioga-system)
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir "workspace/raja-perf-tioga/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic raja-perf/mpi with dynamic CTS lassen
+        run: |
+          ./bin/benchpark experiment init --dest=raja-perf-lassen raja-perf
+          ./bin/benchpark system init --dest=lassen-clang llnl-sierra compiler=clang
+          ./bin/benchpark setup ./raja-perf-lassen ./lassen-clang workspace/
+          system_id=$(./bin/benchpark system id ./lassen-clang)
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir "workspace/raja-perf-lassen/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic genesis/openmp with dynamic CTS ruby
+        run: |
+          system_id=$(./bin/benchpark system id ./ruby-system)
+          ./bin/benchpark experiment init --dest genesis-openmp genesis +openmp
+          ./bin/benchpark setup genesis-openmp ./ruby-system workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/genesis-openmp/$system_id/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic genesis/openmp with dynamic fugaku
+        run: |
+          system_id=$(./bin/benchpark system id ./fugaku-system)
+          ./bin/benchpark experiment init --dest=genesis-openmp-fugaku genesis+openmp
+          ./bin/benchpark setup ./genesis-openmp-fugaku ./fugaku-system workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/genesis-openmp-fugaku/$system_id/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run

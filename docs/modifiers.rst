@@ -97,7 +97,7 @@ benchmarks in Benchpark. More documentation on Caliper can be found `here
 To turn on profiling with Caliper, add ``caliper=<caliper_variant>`` to the experiment init
 setup step::
 
-    benchpark experiment init --dest=</path/to/experiment_root> caliper=<caliper_modifier> </output/path/to/workspace> 
+    benchpark experiment init --dest=</path/to/experiment_root> <benchmark> caliper=<caliper_variant>
 
 Valid values for ``<caliper_variant>`` are found in the **Caliper Variant**
 column of the table below.  Benchpark will link the experiment to Caliper,

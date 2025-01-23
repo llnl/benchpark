@@ -1,0 +1,25 @@
+compilers:
+- compiler:
+    spec: cce@18.0.0
+    paths:
+      cc: /opt/cray/pe/cce/18.0.0/bin/craycc
+      cxx: /opt/cray/pe/cce/18.0.0/bin/crayCC
+      f77: /opt/cray/pe/cce/18.0.0/bin/crayftn
+      fc: /opt/cray/pe/cce/18.0.0/bin/crayftn
+    flags:
+      cflags: -g -O2 --gcc-toolchain=/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0
+      cxxflags: -g -O2 --gcc-toolchain=/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0
+      fflags: -g -O2 -hnopattern
+      ldflags: -ldl
+    operating_system: sles15
+    target: aarch64
+    modules: []
+    environment:
+      prepend_path:
+        LD_LIBRARY_PATH: "/opt/cray/pe/cce/18.0.0/cce/aarch64/lib:/opt/cray/libfabric/1.20.1/lib64:/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/lib:/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/lib64:/opt/cray/pe/gcc-libs"
+    extra_rpaths:
+    - /opt/cray/pe/gcc-libs
+    - /opt/cray/pe/cce/18.0.0/cce/aarch64/lib
+    - /opt/cray/libfabric/1.20.1/lib64
+    - /usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/lib
+    - /usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/lib64
