@@ -13,17 +13,13 @@ class Lammps(BuiltinLammps):
   depends_on("kokkos+rocm", when="+rocm")
   depends_on("kokkos@4.3.01 +cuda cxxstd=17", when="+cuda")
   
-  def cmake_args(self):
-    args=super(BuiltinLammps, self).cmake_args()
-    if "+cuda" in self.spec:
-        args.append(f"-DKokkos_DIR=%s/lib64/cmake/Kokkos" % self.spec["kokkos"].prefix)
-        args.append(f"-DKokkos_ENABLE_CUDA=ON")
+  conflicts("+rocm", when="+cuda")
+  conflicts("+cuda", when="+rocm")
 
-    return args
+  flag_handler = build_system_flags
 
   def setup_run_environment(self, env):
-
-    super(BuiltinLammps, self).setup_run_environment(env)
+    super().setup_run_environment(env)
 
     if self.compiler.extra_rpaths:
       for rpath in self.compiler.extra_rpaths:
@@ -32,9 +28,13 @@ class Lammps(BuiltinLammps):
   def setup_build_environment(self, env):
     super().setup_build_environment(env)
 
-    spec = self.spec
-    if "+mpi" in spec:
-      if spec["mpi"].extra_attributes and "ldflags" in spec["mpi"].extra_attributes:
-        env.append_flags("LDFLAGS", spec["mpi"].extra_attributes["ldflags"])
+    if "+cuda" in self.spec:
+      env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
 
+  def cmake_args(self):
+    args = super().cmake_args()
+    args.append(f"-DMPI_CXX_LINK_FLAGS='{self.spec['mpi'].libs.ld_flags}'")
+    args.append(f"-DMPI_C_COMPILER='{self.spec['mpi'].mpicc}'")
+    args.append(f"-DMPI_CXX_COMPILER={self.spec['mpi'].mpicxx}")
 
+    return args

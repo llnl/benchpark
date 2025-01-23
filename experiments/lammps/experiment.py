@@ -6,14 +6,15 @@
 from benchpark.directives import variant
 from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
-from benchpark.rocm import ROCmExperiment
 from benchpark.cuda import CudaExperiment
+from benchpark.rocm import ROCmExperiment
+
 
 class Lammps(
     Experiment,
     OpenMPExperiment,
-    ROCmExperiment,
     CudaExperiment,
+    ROCmExperiment,
 ):
     variant(
         "workload",
@@ -28,6 +29,14 @@ class Lammps(
         description="app version",
     )
 
+    variant(
+        "gpu-aware-mpi",
+        default=True,
+        values=(True, False),
+        when=("+cuda" or "+rocm"),
+        description="Enable GPU-aware MPI",
+    )
+
     def compute_applications_section(self):
         if self.spec.satisfies("+openmp"):
             problem_sizes = {"x": 8, "y": 8, "z": 8}
@@ -37,7 +46,12 @@ class Lammps(
         elif self.spec.satisfies("+rocm") or self.spec.satisfies("+cuda"):
             problem_sizes = {"x": 20, "y": 40, "z": 32}
             kokkos_mode = "g 1"
-            kokkos_gpu_aware = "on"
+            kokkos_gpu_aware = "on" if self.spec.satisfies("+rocm") else "off"
+            kokkos_comm = "device"
+        elif self.spec.satisfies("+cuda"):
+            problem_sizes = {"x": 20, "y": 20, "z": 16}
+            kokkos_mode = "g 1"
+            kokkos_gpu_aware = "on" if self.spec.satisfies("+cuda") else "off"
             kokkos_comm = "device"
 
         for nk, nv in problem_sizes.items():
@@ -53,6 +67,10 @@ class Lammps(
             self.add_experiment_variable("n_nodes", 8, True)
             self.add_experiment_variable("n_ranks_per_node", 8, True)
             self.add_experiment_variable("n_gpus", 64, True)
+        elif self.spec.satisfies("+cuda"):
+            self.add_experiment_variable("n_nodes", 4, True)
+            self.add_experiment_variable("n_ranks_per_node", 4, True)
+            self.add_experiment_variable("n_gpus", 16, True)
 
         self.add_experiment_variable("timesteps", 100, False)
         self.add_experiment_variable("input_file", "{input_path}/in.reaxc.hns", False)
@@ -73,23 +91,23 @@ class Lammps(
         system_specs["mpi"] = "default-mpi"
         system_specs["blas"] = "default-blas"
 
-        if self.spec.satisfies("+rocm"):
-            system_specs["rocm_arch"] = "{rocm_arch}"
-        elif self.spec.satisfies("+cuda"):
-            system_specs["cuda_version"] = "{default_cuda_version}"
-            system_specs["cuda_arch"] = "{cuda_arch}"
-
         # set package spack specs
-        if self.spec.satisfies("+rocm") or self.spec.satisfies("+cuda"):
-            # empty package_specs value implies external package
-            self.add_spack_spec(system_specs["blas"])
         # empty package_specs value implies external package
         self.add_spack_spec(system_specs["mpi"])
+
+        if self.spec.satisfies("+cuda"):
+            system_specs["cuda_version"] = "{default_cuda_version}"
+            system_specs["cuda_arch"] = "{cuda_arch}"
+        elif self.spec.satisfies("+rocm"):
+            system_specs["rocm_arch"] = "{rocm_arch}"
+
+        # empty package_specs value implies external package
+        self.add_spack_spec(system_specs["blas"])
 
         self.add_spack_spec(
             self.name,
             [
-                f"lammps@{app_version} +opt+manybody+molecule+kspace+rigid+kokkos+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth+reaxff lammps_sizes=bigbig ",
+                f"lammps@{app_version} +mpi+opt+manybody+molecule+kspace+rigid+kokkos+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth+reaxff lammps_sizes=bigbig ",
                 system_specs["compiler"],
             ],
         )
