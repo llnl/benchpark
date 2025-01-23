@@ -222,6 +222,32 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
+      - name: Dry run dynamic saxpy/openmp with dynamic Venado
+        run: |
+          ./bin/benchpark system init --dest=venado-system1 lanl-venado cuda=12.5 compiler=cce +gtl
+          system_id=$(./bin/benchpark system id ./venado-system1)
+          ./bin/benchpark experiment init --dest=saxpy-openmp-venado saxpy+openmp
+          ./bin/benchpark setup ./saxpy-openmp-venado ./venado-system1 workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir "workspace/saxpy-openmp-venado/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run dynamic saxpy/cuda with dynamic Venado
+        run: |
+          ./bin/benchpark system init --dest=venado-system2 lanl-venado cuda=12.5 compiler=cce +gtl
+          system_id=$(./bin/benchpark system id ./venado-system2)
+          ./bin/benchpark experiment init --dest=saxpy-cuda-venado saxpy+cuda
+          ./bin/benchpark setup ./saxpy-cuda-venado ./venado-system2 workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir "workspace/saxpy-cuda-venado/$system_id/workspace" \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
       - name: Dry run dynamic gromacs/openmp with dynamic Ruby
         run: |
           ./bin/benchpark system init --dest=cluster-system llnl-cluster compiler=gcc 
