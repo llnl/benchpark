@@ -16,14 +16,10 @@ inputs:
   system_spec:
     required: true
     type: string
-  name_suffix:
-    default: ''
-    required: false
-    type: string
 
 runs:
   steps:
-    - name: "Dry run dynamic ${{ inputs.benchmark_name }}-${{ inputs.benchmark_mode }} on ${{ inputs.system_name }} (${{ inputs.name_suffix }})"
+    - name: "Dry run dynamic ${{ inputs.benchmark_name }}-${{ inputs.benchmark_mode }} on ${{ inputs.system_name }}
       run: |
         timestamp=$(date +%s)
         bn="${{ inputs.benchmark_name }}"
