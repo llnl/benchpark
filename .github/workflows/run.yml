@@ -687,18 +687,6 @@ jobs:
 
       - name: Dry run dynamic lammps/openmp with dynamic tioga
         run: |
-          system_id=$(./bin/benchpark system id ./tioga-system)
-          ./bin/benchpark experiment init --dest=lammps-openmp-tioga lammps+openmp
-          ./bin/benchpark setup ./lammps-openmp-tioga ./tioga-system workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/lammps-openmp-tioga/$system_id/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
-      - name: Dry run dynamic lammps/openmp with dynamic tioga
-        run: |
           system_id=$(./bin/benchpark system id ./tioga-system1)
           ./bin/benchpark experiment init --dest=lammps-openmp-tioga lammps+openmp
           ./bin/benchpark setup ./lammps-openmp-tioga ./tioga-system1 workspace/
