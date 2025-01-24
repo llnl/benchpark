@@ -279,7 +279,7 @@ packages:
         cuda_ver = self.spec.variants["cuda"][0]
         cfg = compiler_cfgs[(compiler, cuda_ver)]
         full_cfg = f"""\
-compilers:
+compilers::
 {cfg}
 """
         gen_file = self.next_adhoc_cfg()
