@@ -53,6 +53,11 @@ class Lammps(
             kokkos_mode = "g 1"
             kokkos_gpu_aware = "on" if self.spec.satisfies("+cuda") else "off"
             kokkos_comm = "device"
+        else:
+            problem_sizes = {"x": 8, "y": 8, "z": 8}
+            kokkos_mode = "t {n_threads_per_proc}"
+            kokkos_gpu_aware = "off"
+            kokkos_comm = "host"
 
         for nk, nv in problem_sizes.items():
             self.add_experiment_variable(nk, nv, True)
@@ -63,7 +68,7 @@ class Lammps(
             self.add_experiment_variable("n_nodes", 1, True)
             self.add_experiment_variable("n_ranks_per_node", 36, True)
             self.add_experiment_variable("n_threads_per_proc", 1, True)
-        elif self.spec.satisfies("+rocm") or self.spec.satisfies("+cuda"):
+        elif self.spec.satisfies("+rocm"):
             self.add_experiment_variable("n_nodes", 8, True)
             self.add_experiment_variable("n_ranks_per_node", 8, True)
             self.add_experiment_variable("n_gpus", 64, True)
@@ -71,6 +76,10 @@ class Lammps(
             self.add_experiment_variable("n_nodes", 4, True)
             self.add_experiment_variable("n_ranks_per_node", 4, True)
             self.add_experiment_variable("n_gpus", 16, True)
+        else:
+            self.add_experiment_variable("n_nodes", 1, True)
+            self.add_experiment_variable("n_ranks_per_node", 36, True)
+            self.add_experiment_variable("n_threads_per_proc", 1, True)
 
         self.add_experiment_variable("timesteps", 100, False)
         self.add_experiment_variable("input_file", "{input_path}/in.reaxc.hns", False)
@@ -89,7 +98,7 @@ class Lammps(
         system_specs = {}
         system_specs["compiler"] = "default-compiler"
         system_specs["mpi"] = "default-mpi"
-        system_specs["blas"] = "default-blas"
+        system_specs["blas"] = "blas"
 
         # set package spack specs
         # empty package_specs value implies external package
