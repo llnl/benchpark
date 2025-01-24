@@ -17,8 +17,8 @@ class CrayMpich(BuiltinCM):
 
         if self.spec.satisfies("+gtl"):
             gtl_lib_prefix = self.spec.extra_attributes["gtl_lib_path"]
-            libraries = ["libmpi_gtl_hsa"]
-            libs += find_libraries(libraries, root=gtl_lib_prefix, recursive=True)
+            gtl_libs = self.spec.extra_attributes["gtl_libs"]
+            libs += find_libraries(gtl_libs, root=gtl_lib_prefix, recursive=True)
 
         return libs
 
@@ -29,8 +29,6 @@ class CrayMpich(BuiltinCM):
         if self.spec.satisfies("+gtl"):
             env.set("MPICH_GPU_SUPPORT_ENABLED", "1")
             env.prepend_path("LD_LIBRARY_PATH", self.spec.extra_attributes["gtl_lib_path"])
-            env.set("GTL_HSA_VSMSG_CUTOFF_SIZE", str(self.spec.extra_attributes["gtl_cutoff_size"]))
-            env.set("FI_CXI_ATS", str(self.spec.extra_attributes["fi_cxi_ats"]))
         else:
             env.set("MPICH_GPU_SUPPORT_ENABLED", "0")
             gtl_path = self.spec.extra_attributes.get("gtl_lib_path", "")

@@ -68,11 +68,11 @@ class Fugaku(System):
         }
 
     def sw_description(self):
-        return """\
+        return f"""\
 software:
   packages:
     default-compiler:
-      pkg_spec: clang
+      pkg_spec: "{self.spec.variants["compiler"][0]}"
     default-mpi:
       pkg_spec: fujitsu-mpi
     compiler-clang:
