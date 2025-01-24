@@ -600,7 +600,7 @@ jobs:
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
-            
+
       - name: Dry run dynamic laghos/mpi-only with dynamic CTS magma
         run: |
           ./bin/benchpark experiment init --dest=laghos-mpi-only laghos
