@@ -156,7 +156,9 @@ system:
         os.makedirs(aux, exist_ok=True)
         aux_compilers = aux / "compilers.yaml"
 
-        self._merge_config_files(compilers_schema.schema, selections, aux_compilers, override=True)
+        self._merge_config_files(
+            compilers_schema.schema, selections, aux_compilers, override=True
+        )
 
     def system_specific_variables(self):
         return {}
