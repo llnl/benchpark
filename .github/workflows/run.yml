@@ -730,8 +730,7 @@ jobs:
         run: |
           pip install -r ./requirements.txt
 
-      - name: saxpy
-        uses: ./.github/actions/dynamic-dry-run
+      - uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: saxpy
           benchmark_mode: openmp
@@ -740,8 +739,7 @@ jobs:
           system_spec: llnl-cluster cluster=ruby compiler=intel
           name_suffix: intel compiler
 
-      - name: saxpy
-        uses: ./.github/actions/dynamic-dry-run
+      - uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: saxpy
           benchmark_mode: openmp
@@ -749,8 +747,7 @@ jobs:
           system_name: dane
           system_spec: llnl-cluster cluster=dane
 
-      - name: saxpy
-        uses: ./.github/actions/dynamic-dry-run
+      - uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: saxpy
           benchmark_mode: openmp
@@ -758,8 +755,7 @@ jobs:
           system_name: magma
           system_spec: llnl-cluster cluster=magma
 
-      - name: saxpy
-        uses: ./.github/actions/dynamic-dry-run
+      - uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: saxpy
           benchmark_mode: openmp
@@ -767,8 +763,7 @@ jobs:
           system_name: aws
           system_spec: aws-pcluster instance_type=hpc6a.48xlarge
 
-      - name: saxpy
-        uses: ./.github/actions/dynamic-dry-run
+      - uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: saxpy
           benchmark_mode: openmp
@@ -776,8 +771,7 @@ jobs:
           system_name: venado
           system_spec: lanl-venado cuda=12.5 compiler=cce +gtl
 
-      - name: saxpy
-        uses: ./.github/actions/dynamic-dry-run
+      - uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: saxpy
           benchmark_mode: cuda
@@ -785,8 +779,7 @@ jobs:
           system_name: lassen
           system_spec: llnl-sierra cuda=10-1-243 compiler=xl
 
-      - name: saxpy
-        uses: ./.github/actions/dynamic-dry-run
+      - uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: saxpy
           benchmark_mode: cuda
@@ -794,12 +787,10 @@ jobs:
           system_name: venado
           system_spec: lanl-venado cuda=12.5 compiler=cce +gtl
 
-      - name: saxpy
-        uses: ./.github/actions/dynamic-dry-run
+      - uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: saxpy
           benchmark_mode: rocm
           benchmark_spec: saxpy+rocm
           system_name: tioga
           system_spec: llnl-elcapitan rocm=5.5.1 compiler=cce ~gtl
-
