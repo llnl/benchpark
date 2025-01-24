@@ -730,7 +730,8 @@ jobs:
         run: |
           pip install -r ./requirements.txt
 
-      - uses: ./.github/actions/dynamic-dry-run
+      - name: saxpy
+        uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: saxpy
           benchmark_mode: openmp
@@ -739,7 +740,8 @@ jobs:
           system_spec: llnl-cluster cluster=ruby compiler=intel
           name_suffix: intel compiler
 
-      - uses: ./.github/actions/dynamic-dry-run
+      - name: saxpy
+        uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: saxpy
           benchmark_mode: openmp
@@ -747,7 +749,8 @@ jobs:
           system_name: dane
           system_spec: llnl-cluster cluster=dane
 
-      - uses: ./.github/actions/dynamic-dry-run
+      - name: saxpy
+        uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: saxpy
           benchmark_mode: openmp
