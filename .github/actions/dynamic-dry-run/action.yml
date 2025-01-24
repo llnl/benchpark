@@ -22,8 +22,10 @@ inputs:
     type: string
 
 runs:
+  using: "composite"
   steps:
     - name: "Dry run dynamic ${{ inputs.benchmark_name }}-${{ inputs.benchmark_mode }} on ${{ inputs.system_name }} (${{ inputs.name_suffix }})"
+      shell: bash 
       run: |
         timestamp=$(date +%s)
         bn="${{ inputs.benchmark_name }}"
