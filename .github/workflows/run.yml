@@ -730,7 +730,8 @@ jobs:
         run: |
           pip install -r ./requirements.txt
 
-      - uses: ./.github/workflows/dynamic-dry-run-template.yml
+      - name: saxpy
+        uses: ./.github/workflows/dynamic-dry-run-template.yml
         with:
           benchmark_name: saxpy
           benchmark_mode: openmp
@@ -739,7 +740,8 @@ jobs:
           system_spec: llnl-cluster cluster=ruby compiler=intel
           name_suffix: intel compiler
 
-      - uses: ./.github/workflows/dynamic-dry-run-template.yml
+      - name: saxpy
+        uses: ./.github/workflows/dynamic-dry-run-template.yml
         with:
           benchmark_name: saxpy
           benchmark_mode: openmp
@@ -747,7 +749,8 @@ jobs:
           system_name: dane
           system_spec: llnl-cluster cluster=dane
 
-      - uses: ./.github/workflows/dynamic-dry-run-template.yml
+      - name: saxpy
+        uses: ./.github/workflows/dynamic-dry-run-template.yml
         with:
           benchmark_name: saxpy
           benchmark_mode: openmp
@@ -755,7 +758,8 @@ jobs:
           system_name: magma
           system_spec: llnl-cluster cluster=magma
 
-      - uses: ./.github/workflows/dynamic-dry-run-template.yml
+      - name: saxpy
+        uses: ./.github/workflows/dynamic-dry-run-template.yml
         with:
           benchmark_name: saxpy
           benchmark_mode: openmp
@@ -763,7 +767,8 @@ jobs:
           system_name: aws
           system_spec: aws-pcluster instance_type=hpc6a.48xlarge
 
-      - uses: ./.github/workflows/dynamic-dry-run-template.yml
+      - name: saxpy
+        uses: ./.github/workflows/dynamic-dry-run-template.yml
         with:
           benchmark_name: saxpy
           benchmark_mode: openmp
@@ -771,7 +776,8 @@ jobs:
           system_name: venado
           system_spec: lanl-venado cuda=12.5 compiler=cce +gtl
 
-      - uses: ./.github/workflows/dynamic-dry-run-template.yml
+      - name: saxpy
+        uses: ./.github/workflows/dynamic-dry-run-template.yml
         with:
           benchmark_name: saxpy
           benchmark_mode: cuda
@@ -779,7 +785,8 @@ jobs:
           system_name: lassen
           system_spec: llnl-sierra cuda=10-1-243 compiler=xl
 
-      - uses: ./.github/workflows/dynamic-dry-run-template.yml
+      - name: saxpy
+        uses: ./.github/workflows/dynamic-dry-run-template.yml
         with:
           benchmark_name: saxpy
           benchmark_mode: cuda
@@ -787,7 +794,8 @@ jobs:
           system_name: venado
           system_spec: lanl-venado cuda=12.5 compiler=cce +gtl
 
-      - uses: ./.github/workflows/dynamic-dry-run-template.yml
+      - name: saxpy
+        uses: ./.github/workflows/dynamic-dry-run-template.yml
         with:
           benchmark_name: saxpy
           benchmark_mode: rocm
