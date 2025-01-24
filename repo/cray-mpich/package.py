@@ -13,7 +13,7 @@ class CrayMpich(BuiltinCM):
 
     @property
     def libs(self):
-        libs = super(CrayMpich, self).libs
+        libs = super().libs
 
         if self.spec.satisfies("+gtl"):
             gtl_lib_prefix = self.spec.extra_attributes["gtl_lib_path"]
@@ -24,7 +24,7 @@ class CrayMpich(BuiltinCM):
 
     def setup_run_environment(self, env):
 
-        super(CrayMpich, self).setup_run_environment(env)
+        super().setup_run_environment(env)
 
         if self.spec.satisfies("+gtl"):
             env.set("MPICH_GPU_SUPPORT_ENABLED", "1")
