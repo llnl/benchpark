@@ -20,13 +20,6 @@ subprocess.call(
 subprocess.call(
     [
         "make",
-        "legacytags",
-    ]
-)
-
-subprocess.call(
-    [
-        "make",
         "tags",
     ]
 )
