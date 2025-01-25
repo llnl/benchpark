@@ -59,3 +59,4 @@
    :caption: Legacy Workflow
 
    legacy-getting-started
+   legacy-system-list

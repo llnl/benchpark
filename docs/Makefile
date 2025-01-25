@@ -16,10 +16,13 @@ help:
 systemconfigs:
 	./generate-sys-defs-list.py
 
+legacysystemconfigs:
+	./generate-legacy-sys-defs-list.py
+
 tags:
 	./generate-benchmark-list.py $(WORKSPACE_PATH)
 
-.PHONY: help systemconfigs tags Makefile
+.PHONY: help legacysystemconfigs systemconfigs tags Makefile
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).

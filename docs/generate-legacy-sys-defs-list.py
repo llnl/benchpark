@@ -8,7 +8,7 @@ import yaml
 
 def main():
     sysconfig_yaml_files = glob.glob(
-        "../systems/all_system_definitions/**/system_definition.yaml", recursive=True
+        "../legacy/systems/**/system_definition.yaml", recursive=True
     )
 
     df_list = []
@@ -24,19 +24,19 @@ def main():
 
     df = pd.concat(df_list)
 
-    # # Data formatting: converts system-tested.description yaml value to rst
-    # # format for external links
-    # df.loc[
-    #     df["system_definition.system-tested.description"].notna(),
-    #     "system_definition.system-tested.description",
-    # ] = (
-    #     "`"
-    #     + df.loc[
-    #         df["system_definition.system-tested.description"].notna(),
-    #         "system_definition.system-tested.description",
-    #     ].astype(str)
-    #     + "`_"
-    # )
+    # Data formatting: converts system-tested.description yaml value to rst
+    # format for external links
+    df.loc[
+        df["system_definition.system-tested.description"].notna(),
+        "system_definition.system-tested.description",
+    ] = (
+        "`"
+        + df.loc[
+            df["system_definition.system-tested.description"].notna(),
+            "system_definition.system-tested.description",
+        ].astype(str)
+        + "`_"
+    )
 
     # Data formatting: converts top500-system-instances yaml list to rst string
     # of strings (ideally to put 1 per line)
@@ -56,7 +56,7 @@ def main():
     df.set_index("name", inplace=True)
 
     # Write out current system definitions to CSV format
-    df.to_csv("current-system-definitions.csv")
+    df.to_csv("legacy-current-system-definitions.csv")
 
 
 if __name__ == "__main__":
