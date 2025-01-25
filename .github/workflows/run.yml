@@ -768,7 +768,7 @@ jobs:
         run: |
           pip install -r ./requirements.txt
 
-      - name: Dynamic saxpy/openmp llnl-cluster cluster=ruby compiler=intel
+      - name: saxpy/openmp llnl-cluster cluster=ruby compiler=intel
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: saxpy
@@ -777,7 +777,7 @@ jobs:
           system_name: ruby
           system_spec: llnl-cluster cluster=ruby compiler=intel
 
-      - name: Dynamic saxpy/openmp llnl-cluster cluster=dane
+      - name: saxpy/openmp llnl-cluster cluster=dane
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: saxpy
@@ -786,7 +786,7 @@ jobs:
           system_name: dane
           system_spec: llnl-cluster cluster=dane
 
-      - name: Dynamic saxpy/openmp llnl-cluster cluster=magma
+      - name: saxpy/openmp llnl-cluster cluster=magma
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: saxpy
@@ -795,7 +795,7 @@ jobs:
           system_name: magma
           system_spec: llnl-cluster cluster=magma
 
-      - name: Dynamic saxpy/openmp aws-pcluster instance_type=hpc6a.48xlarge
+      - name: saxpy/openmp aws-pcluster instance_type=hpc6a.48xlarge
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: saxpy
@@ -804,7 +804,7 @@ jobs:
           system_name: aws
           system_spec: aws-pcluster instance_type=hpc6a.48xlarge
 
-      - name: Dynamic saxpy/openmp venado lanl-venado cuda=12.5 compiler=cce +gtl
+      - name: saxpy/openmp venado lanl-venado cuda=12.5 compiler=cce +gtl
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: saxpy
@@ -813,7 +813,7 @@ jobs:
           system_name: venado
           system_spec: lanl-venado cuda=12.5 compiler=cce +gtl
 
-      - name: Dynamic saxpy/cuda lassen llnl-sierra cuda=10-1-243 compiler=xl
+      - name: saxpy/cuda lassen llnl-sierra cuda=10-1-243 compiler=xl
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: saxpy
@@ -822,7 +822,7 @@ jobs:
           system_name: lassen
           system_spec: llnl-sierra cuda=10-1-243 compiler=xl
 
-      - name: Dynamic saxpy/cuda venado lanl-venado cuda=12.5 compiler=cce +gtl
+      - name: saxpy/cuda venado lanl-venado cuda=12.5 compiler=cce +gtl
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: saxpy
@@ -831,7 +831,7 @@ jobs:
           system_name: venado
           system_spec: lanl-venado cuda=12.5 compiler=cce +gtl
 
-      - name: Dynamic saxpy/rocm tioga llnl-elcapitan rocm=5.5.1 compiler=cce ~gtl
+      - name: saxpy/rocm tioga llnl-elcapitan rocm=5.5.1 compiler=cce ~gtl
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: saxpy
