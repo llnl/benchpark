@@ -18,7 +18,7 @@ def construct_tag_groups(tag_groups, tag_dicts, dictionary):
 
 
 def benchpark_benchmarks(benchmarks):
-    experiments_dir = "../experiments"
+    experiments_dir = "../legacy/experiments"
     for x in os.listdir(experiments_dir):
         benchmarks.append(f"{x}")
     return benchmarks
@@ -76,7 +76,7 @@ def main(workspace):
         main[bmark] = tags_taggroups[bmark]
 
     df = pd.DataFrame(main)
-    df.to_csv("benchmark-list.csv")
+    df.to_csv("legacy-benchmark-list.csv")
 
     #################
     # Tables
