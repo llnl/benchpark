@@ -415,79 +415,6 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic ior/mpi with dynamic llnl-cluster ruby
-        run: |
-          system_id=$(./bin/benchpark system id ./ruby-system)
-          ./bin/benchpark experiment init --dest=ior-mpi ior
-          ./bin/benchpark setup ./ior-mpi ./ruby-system workspace/
-          system_id=$(./bin/benchpark system id ./ruby-system)
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir "workspace/ior-mpi/$system_id/workspace" \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
-      - name: Dry run dynamic qws/openmp with dynamic CTS ruby
-        run: |
-          system_id=$(./bin/benchpark system id ./ruby-system)
-          ./bin/benchpark experiment init --dest qws-openmp qws +openmp
-          ./bin/benchpark setup qws-openmp ./ruby-system workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/qws-openmp/$system_id/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
-      - name: Dry run dynamic smb-mpi_overhead with dynamic CTS ruby
-        run: |
-          ./bin/benchpark experiment init --dest=smb-mpi_overhead smb
-          ./bin/benchpark setup ./smb-mpi_overhead ./ruby-system workspace/
-          system_id=$(./bin/benchpark system id ./ruby-system)
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir "workspace/smb-mpi_overhead/$system_id/workspace" \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
-      - name: Dry run dynamic smb-msgrate with dynamic CTS ruby
-        run: |
-          ./bin/benchpark experiment init --dest=smb-msgrate smb workload=msgrate
-          ./bin/benchpark setup ./smb-msgrate ./ruby-system workspace/
-          system_id=$(./bin/benchpark system id ./ruby-system)
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir "workspace/smb-msgrate/$system_id/workspace" \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
-      - name: Dry run dynamic phloem/mpi with dynamic CTS ruby
-        run: |
-          ./bin/benchpark experiment init --dest=phloem-mpi phloem
-          ./bin/benchpark setup ./phloem-mpi ./ruby-system workspace/
-          system_id=$(./bin/benchpark system id ./ruby-system)
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir "workspace/phloem-mpi/$system_id/workspace" \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
-      - name: Dry run dynamic osu-micro-benchmarks/mpi-only with dynamic CTS ruby
-        run: |
-          ./bin/benchpark experiment init --dest=osu-micro-benchmarks-mpi-only osu-micro-benchmarks workload=all
-          ./bin/benchpark setup ./osu-micro-benchmarks-mpi-only ./ruby-system workspace/
-          system_id=$(./bin/benchpark system id ./ruby-system)
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir "workspace/osu-micro-benchmarks-mpi-only/$system_id/workspace" \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
       - name: Dry run dynamic laghos/mpi-only with dynamic CTS magma
         run: |
           ./bin/benchpark experiment init --dest=laghos-mpi-only laghos
@@ -496,29 +423,6 @@ jobs:
           . workspace/setup.sh
           ramble \
             --workspace-dir "workspace/laghos-mpi-only/$system_id/workspace" \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
-      - name: Dry run laghos/mpi-only with dynamic CTS ruby
-        run: |
-          ./bin/benchpark setup laghos-mpi-only ruby-system workspace/
-          system_id=$(./bin/benchpark system id ./ruby-system)
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir "workspace/laghos-mpi-only/$system_id/workspace" \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
-      - name: Dry run dynamic raja-perf/mpi with dynamic CTS ruby
-        run: |
-          ./bin/benchpark experiment init --dest=raja-perf raja-perf
-          ./bin/benchpark setup ./raja-perf ./ruby-system workspace/
-          system_id=$(./bin/benchpark system id ./ruby-system)
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir "workspace/raja-perf/$system_id/workspace" \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
@@ -560,18 +464,6 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic genesis/openmp with dynamic CTS ruby
-        run: |
-          system_id=$(./bin/benchpark system id ./ruby-system)
-          ./bin/benchpark experiment init --dest genesis-openmp genesis +openmp
-          ./bin/benchpark setup genesis-openmp ./ruby-system workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/genesis-openmp/$system_id/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
       - name: Dry run dynamic babelstream/openmp with dynamic CTS tioga
         run: |
           ./bin/benchpark experiment init --dest=babelstream-tioga babelstream +openmp
@@ -596,18 +488,6 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic babelstream/openmp with dynamic CTS ruby
-        run: |
-          ./bin/benchpark experiment init --dest=babelstream babelstream +openmp
-          ./bin/benchpark setup ./babelstream ./ruby-system workspace/
-          system_id=$(./bin/benchpark system id ./ruby-system)
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir "workspace/babelstream/$system_id/workspace" \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
       - name: Dry run dynamic lammps/openmp with dynamic tioga
         run: |
           system_id=$(./bin/benchpark system id ./tioga-system1)
@@ -628,18 +508,6 @@ jobs:
           . workspace/setup.sh
           ramble \
             --workspace-dir workspace/lammps-openmp-sierra/$system_id/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
-      - name: Dry run dynamic lammps/openmp with dynamic ruby
-        run: |
-          system_id=$(./bin/benchpark system id ./ruby-system)
-          ./bin/benchpark experiment init --dest=lammps-openmp-ruby lammps+openmp
-          ./bin/benchpark setup ./lammps-openmp-ruby ./ruby-system workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/lammps-openmp-ruby/$system_id/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
@@ -733,3 +601,102 @@ jobs:
           benchmark_spec: saxpy+openmp
           system_name: fugaku
           system_spec: riken-fugaku
+
+      - name: lammps/openmp llnl-cluster cluster=ruby compiler=intel
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: lammps
+          benchmark_mode: openmp
+          benchmark_spec: lammps+openmp
+          system_name: ruby
+          system_spec: llnl-cluster cluster=ruby compiler=intel
+
+      - name: ior/mpi llnl-cluster cluster=ruby compiler=intel
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: ior
+          benchmark_mode: mpi
+          benchmark_spec: ior
+          system_name: ruby
+          system_spec: llnl-cluster cluster=ruby compiler=intel
+
+      - name: qws/openmp llnl-cluster cluster=ruby compiler=intel
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: qws
+          benchmark_mode: openmp
+          benchmark_spec: qws+openmp
+          system_name: ruby
+          system_spec: llnl-cluster cluster=ruby compiler=intel
+
+      - name: smb/mpi llnl-cluster cluster=ruby compiler=intel
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: smb
+          benchmark_mode: mpi
+          benchmark_spec: smb
+          system_name: ruby
+          system_spec: llnl-cluster cluster=ruby compiler=intel
+
+      - name: smb/mpi workload=msgrate llnl-cluster cluster=ruby compiler=intel
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: smb
+          benchmark_mode: mpi
+          benchmark_spec: smb workload=msgrate
+          system_name: ruby
+          system_spec: llnl-cluster cluster=ruby compiler=intel
+
+      - name: phloem/mpi llnl-cluster cluster=ruby compiler=intel
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: phloem
+          benchmark_mode: mpi
+          benchmark_spec: phloem
+          system_name: ruby
+          system_spec: llnl-cluster cluster=ruby compiler=intel
+
+      - name: osu-micro-benchmarks/mpi llnl-cluster cluster=ruby compiler=intel
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: osu-micro-benchmarks
+          benchmark_mode: mpi
+          benchmark_spec: osu-micro-benchmarks workload=all
+          system_name: ruby
+          system_spec: llnl-cluster cluster=ruby compiler=intel
+
+      - name: laghos/mpi llnl-cluster cluster=ruby compiler=intel
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: laghos
+          benchmark_mode: mpi
+          benchmark_spec: laghos
+          system_name: ruby
+          system_spec: llnl-cluster cluster=ruby compiler=intel
+
+      - name: raja-perf/mpi llnl-cluster cluster=ruby compiler=intel
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: raja-perf
+          benchmark_mode: mpi
+          benchmark_spec: raja-perf
+          system_name: ruby
+          system_spec: llnl-cluster cluster=ruby compiler=intel
+
+      - name: genesis/openmp llnl-cluster cluster=ruby compiler=intel
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: genesis
+          benchmark_mode: openmp
+          benchmark_spec: genesis+openmp
+          system_name: ruby
+          system_spec: llnl-cluster cluster=ruby compiler=intel
+
+      - name: babelstream/openmp llnl-cluster cluster=ruby compiler=intel
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: babelstream
+          benchmark_mode: openmp
+          benchmark_spec: babelstream+openmp
+          system_name: ruby
+          system_spec: llnl-cluster cluster=ruby compiler=intel
