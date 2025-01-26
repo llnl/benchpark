@@ -659,21 +659,21 @@ jobs:
           system_name: ruby
           system_spec: llnl-cluster cluster=ruby compiler=intel
 
-      - name: lammps/opemp lassen llnl-sierra cuda=11-8-0 compiler=clang-ibm
+      - name: lammps/openmp lassen llnl-sierra cuda=11-8-0 compiler=clang-ibm
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: lammps
-          benchmark_mode: opemp
-          benchmark_spec: lammps+opemp
+          benchmark_mode: openmp
+          benchmark_spec: lammps+openmp
           system_name: lassen
           system_spec: llnl-sierra cuda=11-8-0 compiler=clang-ibm
 
-      - name: lammps/opemp llnl-elcapitan rocm=5.5.1 compiler=cce +gtl
+      - name: lammps/openmp llnl-elcapitan rocm=5.5.1 compiler=cce +gtl
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: lammps
-          benchmark_mode: opemp
-          benchmark_spec: lammps+opemp
+          benchmark_mode: openmp
+          benchmark_spec: lammps+openmp
           system_name: tioga
           system_spec: llnl-elcapitan rocm=5.5.1 compiler=cce +gtl
 
