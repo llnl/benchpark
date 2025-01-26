@@ -20,7 +20,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: "Dry run dynamic ${{ inputs.benchmark_name }}-${{ inputs.benchmark_mode }} on ${{ inputs.system_name }}"
+    - name: "${{ inputs.benchmark_name }}/${{ inputs.benchmark_mode }} ${{ inputs.system_name }} ${{ inputs.system_spec }}"
       shell: bash 
       run: |
         timestamp=$(date +%s)
