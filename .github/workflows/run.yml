@@ -258,7 +258,7 @@ jobs:
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
-  
+
       - name: Dry run phloem/mpi-only on nosite-x86_64 with allocation modifier
         run: |
           ./bin/benchpark setup phloem/mpi-only nosite-x86_64 workspace/
@@ -344,18 +344,6 @@ jobs:
         run: |
           pip install -r ./requirements.txt
 
-      - name: Dry run dynamic genesis/openmp with dynamic fugaku
-        run: |
-          system_id=$(./bin/benchpark system id ./fugaku-system)
-          ./bin/benchpark experiment init --dest=genesis-openmp-fugaku genesis+openmp
-          ./bin/benchpark setup ./genesis-openmp-fugaku ./fugaku-system workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/genesis-openmp-fugaku/$system_id/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-            
       - name: saxpy/openmp ruby llnl-cluster cluster=ruby compiler=intel
         uses: ./.github/actions/dynamic-dry-run
         with:
