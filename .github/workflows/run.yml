@@ -323,7 +323,7 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
             
-      /- name: Dry run gpcnet/mpi-only on nosite-x86_64 with allocation modifier
+      - name: Dry run gpcnet/mpi-only on nosite-x86_64 with allocation modifier
         run: |
           ./bin/benchpark experiment init --dest=gpcnet-mpi-only1 gpcnet
           ./bin/benchpark setup gpcnet-mpi-only1 nosite-x86_64 workspace/
