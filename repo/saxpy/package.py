@@ -42,6 +42,7 @@ class Saxpy(CMakePackage, CudaPackage, ROCmPackage):
     def setup_build_environment(self, env):
         if "+cuda" in self.spec:
             env.set("CUDAHOSTCXX", self.spec["mpi"].mpicxx)
+            env.set("NVCC_APPEND_FLAGS", "-std=c++14 -allow-unsupported-compiler")
 
     def cmake_args(self):
         spec = self.spec
