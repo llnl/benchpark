@@ -11,21 +11,17 @@ This guide is intended for those wanting to run a benchmark on a new system,
 such as vendors, system administrators, or application developers. It assumes
 a system specification does not already exist.
 
-System specifications include details like:
+System specifications include two types of information:
 
-- How many CPUs are there per node on the system
-- What pre-installed MPI/GPU libraries are available
-
-A system description is a ``system.py`` file, where Benchpark provides the API
-where you can represent a systems as an object and customize the description with command line arguments.
+- Hardware description (e.g., how many CPU cores the node has)
+- Software stack details (e.g., locations of available compilers and libraries)
 
 ------------------------------
 Identifying a Similar System
 ------------------------------
 
-The easiest place to start when configuring a new system is to find the closest similar
-one that has an existing configuration already. Existing system configurations are listed
-in the table in :doc:`system-list`.
+To specify a new system, we recommend to identify a system in Benchpark with the most similar
+hardware. We list specified Benchpark Systems in the System Specifications Catalogue in :doc:`system-list`.
 
 If you are running on a system with an accelerator, find an existing system with the same accelerator vendor,
 and then secondarily, if you can, match the actual accererator.
@@ -43,18 +39,44 @@ match the following processor specs as closely as you can.
 For example, if your system has an NVIDIA A100 GPU and an Intel x86 Icelake CPUs, a similar config would share the A100 GPU, and CPU architecture may or may not match.
 Or, if I do not have GPUs and instead have SapphireRapids CPUs, the closest match would be another system with x86_64, Xeon Platinum, SapphireRapids.
 
-If there is not an exact match that is okay, steps for customizing are provided below.
+If there is not an exact match, you may add a new directory in the `systems/all_system_definitions` where you will describe the hardware on your system.  Please name it following the naming convention::
 
--------------------------------------------------
-Editing an Existing System to Match
--------------------------------------------------
+  [INTEGRATOR]-MICROARCHITECTURE[-GPU][-NETWORK]
+
+where::
+
+  INTEGRATOR = COMPANY[_PRODUCTNAME][...]
+
+  MICROARCHITECTURE = CPU Microarchitecture
+
+  GPU = GPU Product Name
+
+  NETWORK = Network Product Name
+
+Please follow the yaml format from existing system specifications in `systems/all_system_definitions`.
+
+------------------------------
+New System software stack definition
+------------------------------
+``system.py`` in Benchpark provides an API to represent a system software stack as a 
+command line parameterizable object.  
+If none of the available software stack specifications match your system, 
+you may add a new directory in the `systems` directory following the naming convention::
+
+  SITE-SYSTEMNAME
+
+where::
+
+  SITE = nosite | DATACENTERNAME
+
+  SYSTEMNAME = the name of the specific system
+ 
 
 .. note:
   make all these x86 example. Automate the directory structure?
 
-If you want to add support for a new system you can add a class definition
-for that system in a separate directory in ``systems/``.
-The best way is to copy the system.py for the most similar system identified above, and then paste it in a new directory and update it.
+Next, copy the system.py for the most similar system identified above into this new directory, 
+and update it to match your system.
 For example the genericx86 system is defined in::
 
   $benchpark
