@@ -258,7 +258,7 @@ jobs:
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
-            
+  
       - name: Dry run phloem/mpi-only on nosite-x86_64 with allocation modifier
         run: |
           ./bin/benchpark setup phloem/mpi-only nosite-x86_64 workspace/
@@ -299,7 +299,7 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
             
-       - name: Dry run dynamic gpcnet/mpi-only with dynamic CTS ruby
+      - name: Dry run dynamic gpcnet/mpi-only with dynamic CTS ruby
         run: |
           ./bin/benchpark experiment init --dest=gpcnet-mpi gpcnet
           ./bin/benchpark setup ./gpcnet-mpi ./ruby-system workspace/
@@ -778,4 +778,3 @@ jobs:
           benchmark_spec: kripke+rocm caliper=mpi,time
           system_name: tioga
           system_spec: llnl-elcapitan rocm=5.5.1 compiler=cce +gtl
-
