@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from benchpark.directives import variant
-from benchpark.error import BenchparkError
 from benchpark.experiment import Experiment
 from benchpark.rocm import ROCmExperiment
 from benchpark.cuda import CudaExperiment
