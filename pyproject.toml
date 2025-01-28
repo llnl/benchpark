@@ -57,5 +57,5 @@ per-file-ignores = """
 """
 
 [tool.codespell]
-skip = './docs/_build,./docs/_static'
+skip = './docs/_build,./docs/_static,./taxonomy.yaml'
 ignore-words-list = 'fom'
