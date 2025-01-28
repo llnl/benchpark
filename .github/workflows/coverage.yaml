@@ -1,0 +1,24 @@
+name: Run a Set of Tests to Collect Code Coverage for Benchpark
+on:
+  workflow_call:
+
+jobs:
+  run_unit_tests:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Benchpark
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Add needed Python libs
+        run: |
+          pip install -r ./requirements.txt
+      
+      - name: Run unit tests with coverage
+        run: |
+          ./bin/benchpark unit-test --cov=./ --cov-report=xml --durations=20 -ra
+          
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@13ce06b
+        env:
+          CODECOV_TOKEN: ${{ }}
+        
