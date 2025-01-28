@@ -57,21 +57,23 @@ def main():
         print(get_version())
         return 0
 
+    exit_code = 0
     if args.subcommand in actions:
         action = actions[args.subcommand]
         if supports_unknown_args(action):
-            action(args, unknown_args)
+            exit_code = action(args, unknown_args)
         elif unknown_args:
             raise argparse.ArgumentTypeError(
                 f"benchpark {args.subcommand} has no option(s) {unknown_args}"
             )
         else:
-            action(args)
+            exit_code = action(args)
     else:
         print(
             "Invalid subcommand ({args.subcommand}) - must choose one of: "
             + " ".join(actions.keys())
         )
+    return exit_code
 
 
 def supports_unknown_args(command):
@@ -316,4 +318,6 @@ def benchpark_tags_handler(args):
 
 
 if __name__ == "__main__":
-    main()
+    exit_code = main()
+    if exit_code is not None and isinstance(exit_code, int):
+        sys.exit(exit_code)
