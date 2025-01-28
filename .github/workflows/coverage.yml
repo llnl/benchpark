@@ -19,6 +19,13 @@ jobs:
           
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@13ce06b
+        if: false  # Temporarily disable this step until Codecov side of this is available
         env:
-          CODECOV_TOKEN: ${{ }}
+          CODECOV_TOKEN: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
+        with:
+          directory: ./coverage/reports
+          files: /home/runner/work/benchpark/benchpark/coverage.xml
+          flags: unittests
+          verbose: true
+          fail_ci_if_error: true
         

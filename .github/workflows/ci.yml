@@ -20,6 +20,7 @@ jobs:
       docs: ${{ steps.filter.outputs.docs }}
       style: ${{ steps.filter.outputs.style }}
       run: ${{ steps.filter.outputs.run }}
+      coverage: ${{ steps.filter.outputs.coverage }}
       license: ${{ steps.filter.outputs.license }}
 
     steps:
@@ -65,6 +66,16 @@ jobs:
               - 'repo/**'
               - 'systems/**'
               - 'var/**'
+            coverage:
+              - '.github/**'
+              - 'bin/**'
+              - 'configs/**'
+              - 'checkout-versions.yaml'
+              - 'experiments/**'
+              - 'lib/**'
+              - 'repo/**'
+              - 'systems/**'
+              - 'var/**'
             license:
               - '.github/**'
               - 'bin/**'
@@ -90,6 +101,11 @@ jobs:
     if: ${{ needs.changes.outputs.run == 'true' }}
     needs: changes
     uses: ./.github/workflows/run.yml
+    
+  coverage:
+    if: ${{ needs.changes.outputs.coverage == 'true' }}
+    needs: changes
+    uses: ./.github/workflows/coverage.yml
 
   license:
     if: ${{ needs.changes.outputs.license == 'true' }}
