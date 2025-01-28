@@ -9,7 +9,7 @@ from benchpark.experiment import Experiment
 from benchpark.scaling import StrongScaling
 from benchpark.scaling import WeakScaling
 from benchpark.openmp import OpenMPExperiment
-from benchpark.expr.builtin.caliper import Caliper
+from benchpark.caliper import Caliper
 
 
 class Hpl(
