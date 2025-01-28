@@ -11,24 +11,36 @@ This guide is intended for those wanting to run a benchmark on a new system,
 such as vendors, system administrators, or application developers. It assumes
 a system specification does not already exist.
 
-System specifications include details like:
+System specifications include two types of information:
 
-- How many CPUs are there per node on the system
-- What pre-installed MPI/GPU libraries are available
+1. Hardware specs in `hardware_description.yaml` (e.g., how many CPU cores the node has)
+2. Software stack specs in `system.py` (e.g., installed compilers and libraries, along with their locations and versions)
 
-A system description is a ``system.py`` file, where Benchpark provides the API
-where you can represent a systems as an object and customize the description with command line arguments.
+.. note:
+  Please replace the steps below with a flow diagram.
+
+To specify a new system:
+
+1. Identify a system in Benchpark with the same hardware.
+2. If a system with the same hardware does not exist, add a new hardware description,
+   as described in Adding System Hardware Specs section.
+3. Identify the same software stack description.  Typically if the same hardware
+  is already used by Benchpark, the same software stack may already be specified
+  if the same vendor software stack is used on this hardware - or, if a software
+  stack of your datacenter is already specified.
+4. If the same software stack description does not exists,
+  determine if there is one that can be parameterized to match yours.
+5. If can't parameterize existing software description, add a new one.
 
 ------------------------------
-Identifying a Similar System
+1. Adding System Hardware Specs
 ------------------------------
 
-The easiest place to start when configuring a new system is to find the closest similar
-one that has an existing configuration already. Existing system configurations are listed
-in the table in :doc:`system-list`.
+We list hardware descriptions of Systems specified in Benchpark
+in the System Catalogue in :doc:`system-list`.
 
 If you are running on a system with an accelerator, find an existing system with the same accelerator vendor,
-and then secondarily, if you can, match the actual accererator.
+and then secondarily, if you can, match the actual accelerator.
 
 1. accelerator.vendor
 2. accelerator.name
@@ -40,47 +52,84 @@ match the following processor specs as closely as you can.
 2. processor.ISA
 3. processor.uArch
 
-For example, if your system has an NVIDIA A100 GPU and an Intel x86 Icelake CPUs, a similar config would share the A100 GPU, and CPU architecture may or may not match.
-Or, if I do not have GPUs and instead have SapphireRapids CPUs, the closest match would be another system with x86_64, Xeon Platinum, SapphireRapids.
+For example, if your system has an NVIDIA A100 GPU and an Intel x86 Icelake CPUs,
+a similar config would share the A100 GPU, and CPU architecture may or may not match.
+Or, if I do not have GPUs and instead have SapphireRapids CPUs, the closest match
+would be another system with x86_64, Xeon Platinum, SapphireRapids.
 
-If there is not an exact match that is okay, steps for customizing are provided below.
+If there is not an exact match, you may add a new directory in the
+`systems/all_hardware_descriptions/system_name` where `system_name` follows the naming convention::
 
--------------------------------------------------
-Editing an Existing System to Match
--------------------------------------------------
+  [INTEGRATOR]-MICROARCHITECTURE[-GPU][-NETWORK]
+
+where::
+
+  INTEGRATOR = COMPANY[_PRODUCTNAME][...]
+
+  MICROARCHITECTURE = CPU Microarchitecture
+
+  GPU = GPU Product Name
+
+  NETWORK = Network Product Name
+
+In the `systems/all_hardware_descriptions/system_name` directory, add a `hardware_description.yaml`
+which follows the yaml format of existing `hardware_description.yaml` files.
+
+------------------------------
+Adding or Parameterizing System Software Stack
+------------------------------
+``system.py`` in Benchpark provides an API to represent a
+system software stack as a command line parameterizable object.
+If none of the available software stack specifications match your system,
+you may add a `new-system` directory in the `systems` directory
+where the `new-system` directory name follows the naming convention::
+
+  SITE-SYSTEMNAME
+
+where::
+
+  SITE = nosite | abbreviated datacenter name
+
+  SYSTEMNAME = the name of the specific system
+
 
 .. note:
   make all these x86 example. Automate the directory structure?
 
-If you want to add support for a new system you can add a class definition
-for that system in a separate directory in ``systems/``.
-The best way is to copy the system.py for the most similar system identified above, and then paste it in a new directory and update it.
-For example the genericx86 system is defined in::
+Next, copy the system.py from the system with the most similar software stack
+into `new-system` directory, and update it to match your system.
+For example, the generic-x86 system software stack is defined in::
 
   $benchpark
   ├── systems
-     ├── genericx86
+     ├── generic-x86
         ├── system.py
 
 
-The System base class defined in ``/lib/benchpark/system.py`` is shown below, some or all of the functions can be overridden to define custom system behavior.
+The System base class defined in ``/lib/benchpark/system.py`` is shown below,
+some or all of the functions can be overridden to define custom system behavior.
 
 .. literalinclude:: ../lib/benchpark/system.py
    :language: python
 
-The main driver for configuring a system is done by defining a subclass for that system in a ``systems/{SYSTEM}/system.py`` file, which inherits from the System base class.
+``systems/{SYSTEM}/system.py`` should inherit from the System base class.
 
-As is, the generic_x86 system subclass should run on most x86_64 systems, but we mostly provide it as a starting point for modifying or testing.
-Potential common changes might be to edit the scheduler or number of cores per node, adding a GPU configuration, or adding other external compilers or packages.
+The generic-x86 system subclass should run on most x86_64 systems,
+but we mostly provide it as a starting point for modifying or testing.
+Potential common changes might be to edit the scheduler or number of cores per node,
+adding a GPU configuration, or adding other external compilers or packages.
 
-To make these changes, we provided an example below, where we start with the generic_x86 system.py, and make a system called Modifiedx86.
+To make these changes, we provided an example below, where we start with the generic-x86
+system.py, and make a system called Modifiedx86.
 
-1. First, make a copy of the system.py file in generic_x86 folder and move it into a new folder, e.g., ``systems/modified_x86/system.py``.
+1. First, make a copy of the system.py file in generic_x86 folder and move it into a new folder,
+   e.g., ``systems/modified_x86/system.py``.
 Then, update the class name to ``Modifiedx86``.::
 
     class Modifiedx86(System):
 
-2. Next, to match our new system, we change the scheduler to slurm and the number of cores per node to 48, and number of GPUs per node to 2.::
+2. Next, to match our new system, we change the scheduler to slurm and the number of
+   cores per node to 48, and number of GPUs per node to 2.::
 
     # this sets basic attributes of our system
     def initialize(self):
@@ -89,8 +138,10 @@ Then, update the class name to ``Modifiedx86``.::
         self.sys_cores_per_node = "48"
         self.sys_gpus_per_node = "2"
 
-3. Let's say the new system's GPUs are NVIDIA, we can add a variant that allows us to specify the version of CUDA we want to use, and the location of those CUDA installations on our system.
-We then add the spack package configuration for our CUDA installations into the ``systems/modified_x86/externals/cuda`` directory (examples in Siera and Tioga systems).
+3. Let's say the new system's GPUs are NVIDIA, we can add a variant that allows us to specify
+   the version of CUDA we want to use, and the location of those CUDA installations on our system.
+   We then add the spack package configuration for our CUDA installations into the
+   ``systems/modified_x86/externals/cuda`` directory (examples in Siera and Tioga systems).
 ::
     # import the variant feature at the top of your system.py
     from benchpark.directives import variant

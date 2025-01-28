@@ -8,9 +8,9 @@
 
 ## Adding/modifying a system (docs: [Adding a System](https://software.llnl.gov/benchpark/add-a-system-config.html))
 
-- [ ] Add/modify `systems/system_name/Create a new directory for the system, add/modify `system.py` file
-- [ ] Add/modify a dry run unit test in `.github/workflows/run.yml`
-- [ ] Add/modify `systems/all_system_definitions/system-hardware/system_definition.yaml which will appear in the [docs catalogue](https://software.llnl.gov/benchpark/system-list.html)
+- [ ] Add/modify `systems/system_name/system.py` file
+- [ ] Add/modify a dry run unit test for `system_name` in `.github/workflows/run.yml`
+- [ ] Add/modify `systems/all_hardware_descriptions/hardware_name/hardware_description.yaml` which will appear in the [docs catalogue](https://software.llnl.gov/benchpark/system-list.html)
 
 ## Adding/modifying a benchmark (docs: [Adding a Benchmark](https://software.llnl.gov/benchpark/add-a-benchmark.html))
 
