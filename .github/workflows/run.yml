@@ -299,41 +299,6 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
             
-      - name: Dry run dynamic gpcnet/mpi-only with dynamic CTS ruby
-        run: |
-          ./bin/benchpark experiment init --dest=gpcnet-mpi gpcnet
-          ./bin/benchpark setup ./gpcnet-mpi ./ruby-system workspace/
-          system_id=$(./bin/benchpark system id ./ruby-system)
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir "workspace/gpcnet-mpi/$system_id/workspace" \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
-      - name: Dry run gpcnet/mpi-only on dynamic Tioga with allocation modifier
-        run: |
-          ./bin/benchpark experiment init --dest=gpcnet-mpi-only2 gpcnet
-          ./bin/benchpark setup gpcnet-mpi-only2 ./tioga-system workspace/
-          system_id=$(./bin/benchpark system id ./tioga-system)
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir "workspace/gpcnet-mpi-only2/$system_id/workspace" \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-            
-      - name: Dry run gpcnet/mpi-only on nosite-x86_64 with allocation modifier
-        run: |
-          ./bin/benchpark experiment init --dest=gpcnet-mpi-only1 gpcnet
-          ./bin/benchpark setup gpcnet-mpi-only1 nosite-x86_64 workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/gpcnet-mpi-only1/nosite-x86_64/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-            
   dynamicdryrunexperiments:
     runs-on: ubuntu-22.04
     steps:
@@ -764,5 +729,32 @@ jobs:
           benchmark_name: kripke
           benchmark_mode: rocm
           benchmark_spec: kripke+rocm caliper=mpi,time
+          system_name: tioga
+          system_spec: llnl-elcapitan rocm=5.5.1 compiler=cce +gtl
+
+      - name: gpcNet/mpi caliper=mpi,time ruby llnl-cluster cluster=ruby compiler=intel
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: gpcnet
+          benchmark_mode: mpi
+          benchmark_spec: gpcnet caliper=mpi,time
+          system_name: ruby
+          system_spec: llnl-cluster cluster=ruby compiler=intel
+
+      - name: gpcNet/mpi caliper=mpi,time lassen llnl-sierra cuda=11-8-0 compiler=clang-ibm
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: gpcnet
+          benchmark_mode: mpi
+          benchmark_spec: gpcnet caliper=mpi,time
+          system_name: lassen
+          system_spec: llnl-sierra cuda=11-8-0 compiler=clang-ibm
+
+      - name: gpcNet/mpi caliper=mpi,time tioga llnl-elcapitan rocm=5.5.1 compiler=cce +gtl
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: gpcnet
+          benchmark_mode: mpi
+          benchmark_spec: gpcnet caliper=mpi,time
           system_name: tioga
           system_spec: llnl-elcapitan rocm=5.5.1 compiler=cce +gtl
