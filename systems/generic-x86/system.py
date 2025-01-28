@@ -8,7 +8,7 @@ import pathlib
 from benchpark.system import System
 
 
-class Genericx86(System):
+class GenericX86(System):
     """This is the generic system class for an x86 system, gcc compiler, mpi.
     It can be easily copied and modified to model other systems."""
 

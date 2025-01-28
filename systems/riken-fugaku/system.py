@@ -9,7 +9,7 @@ from benchpark.directives import variant
 from benchpark.system import System
 
 
-class Fugaku(System):
+class RikenFugaku(System):
 
     variant(
         "compiler",
@@ -34,7 +34,7 @@ class Fugaku(System):
             f.write(self.sw_description())
 
     def external_pkg_configs(self):
-        externals = Fugaku.resource_location / "externals"
+        externals = RikenFugaku.resource_location / "externals"
 
         # Doesn't look like we need to switch MPI based on compiler from old definition, verify this
         selections = [externals / "base" / "00-packages.yaml"]
@@ -42,7 +42,7 @@ class Fugaku(System):
         return selections
 
     def compiler_configs(self):
-        compilers = Fugaku.resource_location / "compilers"
+        compilers = RikenFugaku.resource_location / "compilers"
 
         compiler = self.spec.variants["compiler"][0]
 
