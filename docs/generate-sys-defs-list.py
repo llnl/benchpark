@@ -8,7 +8,8 @@ import yaml
 
 def main():
     sysconfig_yaml_files = glob.glob(
-        "../systems/all_hardware_descriptions/**/hardware_description.yaml", recursive=True
+        "../systems/all_hardware_descriptions/**/hardware_description.yaml",
+        recursive=True,
     )
 
     df_list = []
