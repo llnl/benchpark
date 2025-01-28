@@ -10,10 +10,10 @@ from benchpark.rocm import ROCmExperiment
 from benchpark.cuda import CudaExperiment
 
 class OsuMicroBenchmarks(
-        Experiment,
-        ROCmExperiment,
-        CudaExperiment,
-        ):
+    Experiment,
+    ROCmExperiment,
+    CudaExperiment,
+):
 
     variant(
         "workload",
