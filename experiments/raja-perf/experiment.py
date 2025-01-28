@@ -9,7 +9,7 @@ from benchpark.scaling import StrongScaling
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
-from benchpark.expr.builtin.caliper import Caliper
+from benchpark.caliper import Caliper
 
 
 class RajaPerf(

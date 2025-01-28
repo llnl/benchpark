@@ -117,10 +117,15 @@ system:
     def system_uid(self):
         return _hash_id([str(self.spec)])
 
-    def _merge_config_files(self, schema, selections, dst_path):
+    def _merge_config_files(self, schema, selections, dst_path, override=False):
         data = cfg.read_config_file(selections[0], schema)
         for selection in selections[1:]:
             cfg.merge_yaml(data, cfg.read_config_file(selection, schema))
+
+        if override:
+            for top_level_key, _ in data.items():
+                break
+            top_level_key.override = True
 
         with open(dst_path, "w") as outstream:
             syaml.dump_config(data, outstream)
@@ -151,7 +156,9 @@ system:
         os.makedirs(aux, exist_ok=True)
         aux_compilers = aux / "compilers.yaml"
 
-        self._merge_config_files(compilers_schema.schema, selections, aux_compilers)
+        self._merge_config_files(
+            compilers_schema.schema, selections, aux_compilers, override=True
+        )
 
     def system_specific_variables(self):
         return {}
