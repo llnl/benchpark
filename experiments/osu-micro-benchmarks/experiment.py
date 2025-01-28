@@ -9,6 +9,7 @@ from benchpark.experiment import Experiment
 from benchpark.rocm import ROCmExperiment
 from benchpark.cuda import CudaExperiment
 
+
 class OsuMicroBenchmarks(
     Experiment,
     ROCmExperiment,
