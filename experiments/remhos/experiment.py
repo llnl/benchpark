@@ -7,7 +7,7 @@ from benchpark.error import BenchparkError
 from benchpark.directives import variant
 from benchpark.experiment import Experiment
 from benchpark.scaling import StrongScaling
-from benchpark.expr.builtin.caliper import Caliper
+from benchpark.caliper import Caliper
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
 
