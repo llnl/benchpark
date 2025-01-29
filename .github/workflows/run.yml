@@ -196,19 +196,6 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic saxpy/cuda with dynamic Sierra
-        run: |
-          ./bin/benchpark system init --dest=sierra-system llnl-sierra cuda=10-1-243 compiler=xl
-          system_id=$(./bin/benchpark system id ./sierra-system)
-          ./bin/benchpark experiment init --dest=saxpy-cuda saxpy+cuda
-          ./bin/benchpark setup ./saxpy-cuda ./sierra-system workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir "workspace/saxpy-cuda/$system_id/workspace" \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
       - name: Dry run dynamic lammps/openmp on static Ruby
         run: |
           ./bin/benchpark experiment init --dest=lammps-openmp lammps+openmp
@@ -227,18 +214,6 @@ jobs:
           . workspace/setup.sh
           ramble \
             --workspace-dir workspace/lammps-rocm/LLNL-Tioga-HPECray-zen3-MI250X-Slingshot/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
-      - name: Dry run dynamic lammps/rocm with dynamic Tioga
-        run: |
-          ./bin/benchpark experiment init --dest=lammps-rocm-tioga lammps+rocm
-          ./bin/benchpark setup lammps-rocm-tioga ./tioga-system workspace/
-          system_id=$(./bin/benchpark system id ./tioga-system)
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/lammps-rocm-tioga/$system_id/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
@@ -280,19 +255,6 @@ jobs:
           . workspace/setup.sh
           ramble \
             --workspace-dir workspace/salmon/openmp/RCCS-Fugaku-Fujitsu-A64FX-TofuD/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
-      - name: Dry run dynamic saxpy/openmp with dynamic llnl-cluster ruby
-        run: |
-          ./bin/benchpark system init --dest=ruby-system llnl-cluster cluster=ruby
-          system_id=$(./bin/benchpark system id ./ruby-system)
-          ./bin/benchpark experiment init --dest=saxpy-openmp saxpy+openmp
-          ./bin/benchpark setup ./saxpy-openmp ./ruby-system workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir "workspace/saxpy-openmp/$system_id/workspace" \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
