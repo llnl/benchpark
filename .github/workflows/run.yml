@@ -196,19 +196,6 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic saxpy/rocm with dynamic Tioga
-        run: |
-          ./bin/benchpark system init --dest=tioga-system2 llnl-elcapitan rocm=5.5.1 compiler=cce ~gtl
-          system_id=$(./bin/benchpark system id ./tioga-system2)
-          ./bin/benchpark experiment init --dest=saxpy-rocm2 saxpy+rocm
-          ./bin/benchpark setup ./saxpy-rocm2 ./tioga-system2 workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir "workspace/saxpy-rocm2/$system_id/workspace" \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
       - name: Dry run dynamic saxpy/cuda with dynamic Sierra
         run: |
           ./bin/benchpark system init --dest=sierra-system llnl-sierra cuda=10-1-243 compiler=xl
