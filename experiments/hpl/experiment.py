@@ -7,30 +7,28 @@ from benchpark.error import BenchparkError
 from benchpark.directives import variant
 from benchpark.experiment import Experiment
 from benchpark.scaling import StrongScaling
+from benchpark.scaling import WeakScaling
+from benchpark.openmp import OpenMPExperiment
 from benchpark.caliper import Caliper
-from benchpark.cuda import CudaExperiment
-from benchpark.rocm import ROCmExperiment
 
 
-class Remhos(
+class Hpl(
     Experiment,
     StrongScaling,
+    WeakScaling,
+    OpenMPExperiment,
     Caliper,
-    CudaExperiment,
-    ROCmExperiment,
 ):
 
     variant(
         "workload",
-        default="2d",
-        values=("2d", "3d"),
-        description="2d or 3d run",
+        default="standard",
+        description="workload to use",
     )
 
     variant(
         "version",
-        default="gpu-opt",
-        values=("1.0", "develop", "gpu-fom", "gpu-opt"),
+        default="2.3-caliper",
         description="app version",
     )
 
@@ -39,6 +37,7 @@ class Remhos(
         scaling_modes = {
             "strong": self.spec.satisfies("+strong"),
             "single_node": self.spec.satisfies("+single_node"),
+            "weak": self.spec.satisfies("+weak"),
         }
 
         scaling_mode_enabled = [key for key, value in scaling_modes.items() if value]
@@ -48,40 +47,54 @@ class Remhos(
                 f"Only one type of scaling per experiment is allowed for application package {self.name}"
             )
 
-        n_resources = {"n_nodes": 8}
-        # problem_size = {"epm": 512}
-        device = "n_ranks"
+        # Number of initial nodes
+        num_nodes = {"n_nodes": 1}
+        problem_size = {"Ns": 10000}
 
-        if self.spec.satisfies("+cuda"):
-            self.add_experiment_variable("device", "cuda", True)
-        elif self.spec.satisfies("+rocm"):
-            self.add_experiment_variable("device", "hip", True)
-        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
-            device = "n_gpus"
-        else:
-            self.add_experiment_variable(
-                "n_ranks", "{sys_cores_per_node} * {n_nodes}", True
-            )
-            self.add_experiment_variable("device", "cpu", True)
+        self.add_experiment_variable("N-Grids", 1, False)
+        self.add_experiment_variable("Ps", "4 * {n_nodes}", True)
+        self.add_experiment_variable("Qs", "8", False)
+
+        self.add_experiment_variable("N-Ns", 1, False)
+
+        self.add_experiment_variable("N-NBs", 1, False)
+        self.add_experiment_variable("NBs", 128, False)
+
+        self.add_experiment_variable(
+            "n_ranks", "{sys_cores_per_node} * {n_nodes}", False
+        )
+        self.add_experiment_variable("n_threads_per_proc", ["2"], True)
+
+        self.matrix_experiment_variables("n_threads_per_proc")
 
         if self.spec.satisfies("+single_node"):
-            for pk, pv in n_resources.items():
-                self.add_experiment_variable(device, pv, True)
+            for pk, pv in num_nodes.items():
+                self.add_experiment_variable(pk, pv, True)
+            for pk, pv in problem_size.items():
+                self.add_experiment_variable(pk, pv, True)
 
         elif self.spec.satisfies("+strong"):
             scaled_variables = self.generate_strong_scaling_params(
-                {tuple(n_resources.keys()): list(n_resources.values())},
+                {tuple(num_nodes.keys()): list(num_nodes.values())},
                 int(self.spec.variants["scaling-factor"][0]),
                 int(self.spec.variants["scaling-iterations"][0]),
             )
             for pk, pv in scaled_variables.items():
                 self.add_experiment_variable(pk, pv, True)
+            for pk, pv in problem_size.items():
+                self.add_experiment_variable(pk, pv, True)
+        elif self.spec.satisfies("+weak"):
+            scaled_variables = self.generate_weak_scaling_params(
+                {tuple(num_nodes.keys()): list(num_nodes.values())},
+                {tuple(problem_size.keys()): list(problem_size.values())},
+                int(self.spec.variants["scaling-factor"][0]),
+                int(self.spec.variants["scaling-iterations"][0]),
+            )
             num_resources = scaled_variables["n_nodes"]
-            self.add_experiment_variable(device, num_resources, True)
-        if self.spec.satisfies("+cuda"):
-            self.add_experiment_variable("arch", "CUDA")
-        elif self.spec.satisfies("+rocm"):
-            self.add_experiment_variable("arch", "HIP")
+            self.add_experiment_variable("n_nodes", num_resources, True)
+
+            problem_size = scaled_variables["Ns"]
+            self.add_experiment_variable("Ns", problem_size, True)
 
     def compute_spack_section(self):
         # get package version
@@ -93,22 +106,10 @@ class Remhos(
         system_specs["compiler"] = "default-compiler"
         system_specs["mpi"] = "default-mpi"
         system_specs["blas"] = "blas"
-        system_specs["lapack"] = "lapack"
 
         # set package spack specs
         # empty package_specs value implies external package
         self.add_spack_spec(system_specs["mpi"])
-
-        if self.spec.satisfies("+cuda"):
-            system_specs["cuda_version"] = "{default_cuda_version}"
-            system_specs["cuda_arch"] = "{cuda_arch}"
-        elif self.spec.satisfies("+rocm"):
-            system_specs["rocm_arch"] = "{rocm_arch}"
-
-        # empty package_specs value implies external package
         self.add_spack_spec(system_specs["blas"])
-        self.add_spack_spec(system_specs["lapack"])
 
-        self.add_spack_spec(
-            self.name, [f"remhos@{app_version} +metis", system_specs["compiler"]]
-        )
+        self.add_spack_spec(self.name, [f"hpl@{app_version}", system_specs["compiler"]])

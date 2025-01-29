@@ -7,6 +7,7 @@ from benchpark.directives import variant
 from benchpark.experiment import Experiment
 from benchpark.scaling import StrongScaling
 from benchpark.scaling import WeakScaling
+from benchpark.openmp import OpenMPExperiment
 from benchpark.caliper import Caliper
 
 
@@ -14,6 +15,7 @@ class Hpcg(
     Experiment,
     StrongScaling,
     WeakScaling,
+    OpenMPExperiment,
     Caliper,
 ):
 
@@ -93,5 +95,5 @@ class Hpcg(
         # self.add_spack_spec(system_specs["blas"])
 
         self.add_spack_spec(
-            self.name, [f"hpcg@{app_version} +openmp", system_specs["compiler"]]
+            self.name, [f"hpcg@{app_version}", system_specs["compiler"]]
         )
