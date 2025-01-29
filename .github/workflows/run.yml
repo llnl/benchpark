@@ -730,7 +730,7 @@ jobs:
           benchmark_spec: kripke+rocm caliper=mpi,time
           system_name: tioga
           system_spec: llnl-elcapitan rocm=5.5.1 compiler=cce +gtl
- 
+
       - name: hpl/mpi caliper=mpi,time tioga llnl-elcapitan rocm=5.5.1 compiler=cce +gtl blas=intel-oneapi-mkl
         uses: ./.github/actions/dynamic-dry-run
         with:
