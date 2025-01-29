@@ -757,3 +757,30 @@ jobs:
           benchmark_spec: hpl caliper=mpi,time
           system_name: lassen
           system_spec: llnl-sierra cuda=11-8-0 compiler=clang-ibm
+
+      - name: stream/mpi caliper=mpi,time ruby llnl-cluster cluster=ruby
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: stream
+          benchmark_mode: mpi
+          benchmark_spec: stream caliper=mpi,time
+          system_name: ruby
+          system_spec: llnl-cluster cluster=ruby
+
+      - name: stream/mpi caliper=mpi,time lassen llnl-sierra cuda=11-8-0 compiler=clang-ibm
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: stream
+          benchmark_mode: mpi
+          benchmark_spec: stream caliper=mpi,time
+          system_name: lassen
+          system_spec: llnl-sierra cuda=11-8-0 compiler=clang-ibm
+
+      - name: stream/mpi caliper=mpi,time llnl-elcapitan rocm=5.5.1 compiler=cce
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: stream
+          benchmark_mode: mpi
+          benchmark_spec: stream caliper=mpi,time
+          system_name: tioga
+          system_spec: llnl-elcapitan rocm=5.5.1 compiler=cce
