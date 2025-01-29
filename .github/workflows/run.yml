@@ -239,6 +239,26 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
+      - name: Dry run qws/openmp with allocation modifier on Fugaku
+        run: |
+          ./bin/benchpark setup qws/openmp RCCS-Fugaku-Fujitsu-A64FX-TofuD workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/qws/openmp/RCCS-Fugaku-Fujitsu-A64FX-TofuD/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+            
+      - name: Dry run qws/openmp with allocation modifier on nosite-x86_64
+        run: |
+          ./bin/benchpark setup qws/openmp nosite-x86_64 workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/qws/openmp/nosite-x86_64/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
   dynamicdryrunexperiments:
     runs-on: ubuntu-22.04
     steps:
