@@ -6,7 +6,7 @@
 from benchpark.directives import variant
 from benchpark.experiment import Experiment
 from benchpark.scaling import StrongScaling
-from benchpark.expr.builtin.caliper import Caliper
+from benchpark.caliper import Caliper
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
 
@@ -66,8 +66,8 @@ class Laghos(
         system_specs = {}
         system_specs["compiler"] = "default-compiler"
         system_specs["mpi"] = "default-mpi"
-        system_specs["lapack"] = "default-lapack"
-        system_specs["blas"] = "default-blas"
+        system_specs["lapack"] = "lapack"
+        system_specs["blas"] = "blas"
 
         # set package spack specs
         # empty package_specs value implies external package

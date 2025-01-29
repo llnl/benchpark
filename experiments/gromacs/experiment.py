@@ -93,8 +93,8 @@ class Gromacs(
         system_specs = {}
         system_specs["compiler"] = "default-compiler"
         system_specs["mpi"] = "default-mpi"
-        system_specs["blas"] = "default-blas"
-        system_specs["lapack"] = "default-lapack"
+        system_specs["blas"] = "blas"
+        system_specs["lapack"] = "lapack"
 
         # set package spack specs
         # empty package_specs value implies external package
