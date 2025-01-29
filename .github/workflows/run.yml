@@ -731,6 +731,33 @@ jobs:
           system_name: tioga
           system_spec: llnl-elcapitan rocm=5.5.1 compiler=cce +gtl
 
+      - name: hpl/mpi caliper=mpi,time tioga llnl-elcapitan rocm=5.5.1 compiler=cce +gtl blas=intel-oneapi-mkl
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: hpl
+          benchmark_mode: mpi
+          benchmark_spec: hpl caliper=mpi,time
+          system_name: tioga
+          system_spec: llnl-elcapitan rocm=5.5.1 compiler=cce +gtl blas=intel-oneapi-mkl
+
+      - name: hpl/mpi caliper=mpi,time ruby llnl-cluster cluster=ruby compiler=gcc
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: hpl
+          benchmark_mode: mpi
+          benchmark_spec: hpl caliper=mpi,time
+          system_name: ruby
+          system_spec: llnl-cluster cluster=ruby compiler=gcc
+
+      - name: hpl/mpi caliper=mpi,time lassen llnl-sierra cuda=11-8-0 compiler=clang-ibm blas=essl
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: hpl
+          benchmark_mode: mpi
+          benchmark_spec: hpl caliper=mpi,time
+          system_name: lassen
+          system_spec: llnl-sierra cuda=11-8-0 compiler=clang-ibm blas=essl
+
       - name: stream/mpi caliper=mpi,time ruby llnl-cluster cluster=ruby
         uses: ./.github/actions/dynamic-dry-run
         with:
