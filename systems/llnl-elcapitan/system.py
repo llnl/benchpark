@@ -345,7 +345,8 @@ compilers:
       cxxflags: -g -O2
     operating_system: rhel8
     target: x86_64
-    modules: []
+    modules:
+    - cce/{y}
     environment:
       set:
         RFE_811452_DISABLE: '1'
