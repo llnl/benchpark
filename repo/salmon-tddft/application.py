@@ -14,6 +14,8 @@ class SalmonTddft(ExecutableApplication):
 
     tags = ['mpi','openmp']
 
+    variant("openmp", default=True, description="Enable OpenMP support")
+
     executable('pre-process', 'cp {input_path}/* .', use_mpi=False)
 
     executable('post-process', 'cp -r ./data_for_restart {input_path}', use_mpi=False)

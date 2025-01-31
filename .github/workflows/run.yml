@@ -941,7 +941,7 @@ jobs:
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: salmon-tddft
-          benchmark_mode: mpi
+          benchmark_mode: openmp
           benchmark_spec: salmon-tddft
           system_name: ruby
           system_spec: llnl-cluster cluster=ruby compiler=intel
@@ -950,7 +950,7 @@ jobs:
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: salmon-tddft
-          benchmark_mode: mpi
+          benchmark_mode: openmp
           benchmark_spec: salmon-tddft
           system_name: fugaku
           system_spec: riken-fugaku
