@@ -12,7 +12,7 @@ from benchpark.rocm import ROCmExperiment
 from benchpark.scaling import StrongScaling
 from benchpark.scaling import WeakScaling
 from benchpark.scaling import ThroughputScaling
-from benchpark.expr.builtin.caliper import Caliper
+from benchpark.caliper import Caliper
 
 
 class Amg2023(
@@ -141,21 +141,20 @@ class Amg2023(
         system_specs["compiler"] = "default-compiler"
         system_specs["mpi"] = "default-mpi"
         system_specs["lapack"] = "lapack"
+        system_specs["blas"] = "blas"
+
+        # set package spack specs
+        # empty package_specs value implies external package
+        self.add_spack_spec(system_specs["mpi"])
+
         if self.spec.satisfies("+cuda"):
             system_specs["cuda_version"] = "{default_cuda_version}"
             system_specs["cuda_arch"] = "{cuda_arch}"
-            system_specs["blas"] = "cublas-cuda"
-        if self.spec.satisfies("+rocm"):
+        elif self.spec.satisfies("+rocm"):
             system_specs["rocm_arch"] = "{rocm_arch}"
-            system_specs["blas"] = "blas-rocm"
 
-        # set package spack specs
-        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
-            # empty package_specs value implies external package
-            self.add_spack_spec(system_specs["blas"])
         # empty package_specs value implies external package
-        self.add_spack_spec(system_specs["mpi"])
-        # empty package_specs value implies external package
+        self.add_spack_spec(system_specs["blas"])
         self.add_spack_spec(system_specs["lapack"])
 
         self.add_spack_spec(

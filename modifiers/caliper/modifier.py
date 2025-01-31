@@ -21,7 +21,7 @@ def add_mode(mode_name, mode_option, description):
     )
 
 
-class Caliper(SpackModifier):
+class Caliper(BasicModifier):
     """Define a modifier for Caliper"""
 
     name = "caliper"
