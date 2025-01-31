@@ -1,12 +1,9 @@
-# Copyright 2023 Lawrence Livermore National Security, LLC and other
-# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
-#
-# SPDX-License-Identifier: Apache-2.0
-
 import pathlib
 
+import llnl.util.tty as tty
 from spack.package import *
 import spack.pkg.builtin.cuda
+from llnl.util.filesystem import find_headers
 
 
 class Cuda(spack.pkg.builtin.cuda.Cuda):
@@ -17,14 +14,15 @@ class Cuda(spack.pkg.builtin.cuda.Cuda):
 
     @property
     def headers(self):
-        home = getattr(spec.package, "home")
-        headers = fs.find_headers("*", root=home.include, recursive=True)
+        home = getattr(self.spec.package, "home")
+        headers = find_headers("*", root=home.include, recursive=True)
 
         if self.spec.satisfies("+im-hpc-sdk"):
             prefix = pathlib.Path(self.prefix)
-            version_component = prefix.parent.name  # 12.5
+            version_component = prefix.name  # 12.5
             split_point = prefix.parent.parent
             cufft_base = split_point / "math_libs" / version_component
-            headers = headers + fs.find_headers("cufft.h", root=str(cufft_base), recursive=True)    
-            
+            #tty.debug(f"<---- {prefix}\n\t{split_point}\n\t{cufft_base}")
+            headers = headers + find_headers("cufft", root=str(cufft_base), recursive=True)    
+
         return headers
