@@ -10,6 +10,7 @@ class Cuda(spack.pkg.builtin.cuda.Cuda):
     # Layout of hpc-sdk puts some headers in sibling directories:
     # cuda compiler in /opt/nvidia/hpc_sdk/Linux_aarch64/24.7/cuda/12.5
     # cufft in         /opt/nvidia/hpc_sdk/Linux_aarch64/24.7/math_libs/12.5
+    # In this case, we assume that the external prefix is set to the first path
     variant("im-hpc-sdk", default=False)
 
     @property
@@ -23,6 +24,6 @@ class Cuda(spack.pkg.builtin.cuda.Cuda):
             split_point = prefix.parent.parent
             cufft_base = split_point / "math_libs" / version_component
             #tty.debug(f"<---- {prefix}\n\t{split_point}\n\t{cufft_base}")
-            headers = headers + find_headers("cufft", root=str(cufft_base), recursive=True)    
+            headers = headers + find_headers("cufft", root=str(cufft_base), recursive=True)
 
         return headers
