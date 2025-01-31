@@ -8,8 +8,7 @@ from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 
 
-class Salmon(Experiment, OpenMPExperiment):
-
+class SalmonTddft(Experiment, OpenMPExperiment):
     variant(
         "workload",
         default="gs",
@@ -25,7 +24,6 @@ class Salmon(Experiment, OpenMPExperiment):
     )
 
     def compute_applications_section(self):
-
         self.add_experiment_variable("experiment_setup", "")
 
         if self.spec.satisfies("workload=gs"):
