@@ -37,11 +37,12 @@ class SalmonTddft(Experiment, OpenMPExperiment):
                 "../../gs/salmon_{n_nodes}_{n_ranks}_{n_threads}/data_for_restart/",
             )
 
+        if self.spec.satisfies("+openmp"):
+            self.add_experiment_variable("omp_num_threads", ["12"])
+
         self.add_experiment_variable("n_ranks", "{processes_per_node} * {n_nodes}")
         self.add_experiment_variable("processes_per_node", ["4"])
         self.add_experiment_variable("n_nodes", ["1"], True)
-        self.add_experiment_variable("omp_num_threads", ["12"])
-        self.add_experiment_variable("arch", "OpenMP")
 
     def compute_spack_section(self):
         # get package version
