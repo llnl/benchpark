@@ -33,12 +33,10 @@ class Ad(Experiment):
         # TODO: Get compiler/mpi/package handles directly from system.py
         system_specs = {}
         system_specs["compiler"] = "default-compiler"
-        #system_specs["mpi"] = "default-mpi"
+        # system_specs["mpi"] = "default-mpi"
 
         # set package spack specs
         # empty package_specs value implies external package
-        #self.add_spack_spec(system_specs["mpi"])
+        # self.add_spack_spec(system_specs["mpi"])
 
-        self.add_spack_spec(
-            self.name, [f"ad@{app_version}", system_specs["compiler"]]
-        )
+        self.add_spack_spec(self.name, [f"ad@{app_version}", system_specs["compiler"]])

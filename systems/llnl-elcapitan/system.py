@@ -137,12 +137,12 @@ packages: {}
         compilers = LlnlElcapitan.resource_location / "compilers"
 
         selections = []
-        if self.spec.satisfies("compiler=cce") or self.spec.satisfies("compiler=rocmcc"):
+        if self.spec.satisfies("compiler=cce") or self.spec.satisfies(
+            "compiler=rocmcc"
+        ):
             compiler_cfg_path = self.next_adhoc_cfg()
             with open(compiler_cfg_path, "w") as f:
-                f.write(
-                    self.rocm_cce_compiler_cfg(self.spec.variants["rocm"][0])
-                )
+                f.write(self.rocm_cce_compiler_cfg(self.spec.variants["rocm"][0]))
             selections.append(compiler_cfg_path)
 
         # Note: this is always included for some low-level dependencies
@@ -347,7 +347,7 @@ packages:
 """
         return template.format(
             x=rocm_version,
-            llvm_version=("16.0.0" if rocm_version=="5.5.1" else "18.0.0"),
+            llvm_version=("16.0.0" if rocm_version == "5.5.1" else "18.0.0"),
             blas=self.spec.variants["blas"][0],
             lapack=self.spec.variants["lapack"][0],
         )
@@ -385,7 +385,9 @@ compilers:
     - /opt/cray/pe/gcc-libs
     - /opt/cray/pe/cce/{y}/cce/x86_64/lib
 """
-            return template.format(x=rocm_version, y=cce_version, pmi_version=pmi_version)
+            return template.format(
+                x=rocm_version, y=cce_version, pmi_version=pmi_version
+            )
         else:
             cce_version = "16.0.0"
             template = """\
