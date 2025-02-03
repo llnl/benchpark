@@ -107,7 +107,7 @@ legacy_test_run:
     - ramble --workspace-dir . --disable-progress-bar --disable-logger
       on --executor '{execute_experiment}' --where '{n_nodes} == 1'
     # Analyze Experiments
-    - ramble --workspace-dir . --disable-progress-bar workspace analyze --always-print-foms --format json yaml text
+    - ramble --workspace-dir . --disable-progress-bar workspace analyze --format json yaml text
     # Check Experiment Exit Codes
     - cd -
     - python ./.gitlab/ci/bin/exit-codes ./workspace/${LEGACY_BENCHMARK}/${LEGACY_VARIANT}/${LEGACY_ARCHCONFIG}/workspace/results.latest.json
@@ -155,7 +155,7 @@ test_run:
     - ramble --workspace-dir . --disable-progress-bar --disable-logger
       on --executor '{execute_experiment}' --where '{n_nodes} == 1'
     # Analyze Experiments
-    - ramble --workspace-dir . --disable-progress-bar workspace analyze --always-print-foms --format json yaml text
+    - ramble --workspace-dir . --disable-progress-bar workspace analyze --format json yaml text
     # Check Experiment Exit Codes
     - cd -
     - python ./.gitlab/ci/bin/exit-codes ./workspace/${BENCHMARK}-benchmark/${system_id}/workspace/results.latest.json
