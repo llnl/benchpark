@@ -44,6 +44,7 @@ import benchpark.cmd.system  # noqa: E402
 import benchpark.cmd.experiment  # noqa: E402
 import benchpark.cmd.setup  # noqa: E402
 import benchpark.cmd.unit_test  # noqa: E402
+import benchpark.cmd.info # noqa: E402
 import benchpark.paths  # noqa: E402
 from benchpark.accounting import (  # noqa: E402
     benchpark_experiments,
@@ -231,11 +232,17 @@ def init_commands(subparsers, actions_dict):
     )
     benchpark.cmd.audit.setup_parser(audit_parser)
 
+    info_parser = subparsers.add_parser(
+        "info", help="Get information about Systems and Experiments"
+    )
+    benchpark.cmd.info.setup_parser(info_parser)
+
     actions_dict["system"] = benchpark.cmd.system.command
     actions_dict["experiment"] = benchpark.cmd.experiment.command
     actions_dict["setup"] = benchpark.cmd.setup.command
     actions_dict["unit-test"] = benchpark.cmd.unit_test.command
     actions_dict["audit"] = benchpark.cmd.audit.command
+    actions_dict["info"] = benchpark.cmd.info.command
 
 
 def run_command(command_str, env=None):
