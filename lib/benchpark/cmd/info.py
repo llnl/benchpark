@@ -1,5 +1,3 @@
-import glob
-import sys
 import textwrap
 
 import yaml
@@ -62,14 +60,6 @@ def info_system(args):
         info_system_variants(system_spec)
         info_system_hardware(system_spec)
 
-    # conc_system_spec = system_spec.concretize()
-    # system = conc_system_spec.system
-    # system.initialize()
-
-    # print("\n\n\n\n")
-    # print([i for i in system.__dict__.keys()])
-    # print(system.sw_description())
-
 
 def setup_parser(root_parser):
     info_subparser = root_parser.add_subparsers(dest="info_subcommand")
@@ -92,7 +82,6 @@ def command(args):
         "system": info_system,
     }
     if args.info_subcommand in actions:
-        print(args)
         actions[args.info_subcommand](args)
     else:
         raise ValueError(f"Unknown subcommand for 'info': {args.info_subcommand}")
