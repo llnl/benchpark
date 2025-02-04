@@ -27,10 +27,12 @@ class Affinity:
             modifier_list = []
             if not self.spec.satisfies("affinity=none"):
                 for var in list(self.spec.variants["affinity"]):
-                    affinity_modifier_modes = {}
-                    affinity_modifier_modes["name"] = "affinity"
-                    affinity_modifier_modes["mode"] = var
-                    modifier_list.append(affinity_modifier_modes)
+                    if var != "mpi":
+                        affinity_modifier_modes = {}
+                        affinity_modifier_modes["name"] = "affinity"
+                        affinity_modifier_modes["mode"] = var
+                        modifier_list.append(affinity_modifier_modes)
+                modifier_list.append({"name": "affinity", "mode": "mpi"})
             return modifier_list
 
         def compute_spack_section(self):
