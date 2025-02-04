@@ -328,7 +328,8 @@ compilers:
       ldflags: -ldl
     operating_system: rhel8
     target: x86_64
-    modules: []
+    modules:
+    - cce/{y}
     environment:
       prepend_path:
         LD_LIBRARY_PATH: "/opt/cray/pe/cce/{y}/cce/x86_64/lib:/opt/rocm-{x}/lib"

@@ -6,32 +6,14 @@
 from ramble.modkit import *
 
 
-def set_affinity_mode(mode_name, mode_option, description):
+def add_mode(name, description):
     mode(
-        name=mode_name,
+        name=name,
         description=description,
     )
 
-    env_var_modification(
-        "AFFINITY_MODE",
-        mode_option,
-        method="set",
-        modes=[mode_name],
-    )
-
-
-def append_affinity_mode(mode_name, mode_option, description):
-    mode(
-        name=mode_name,
-        description=description,
-    )
-
-    env_var_modification(
-        "AFFINITY_MODE",
-        mode_option,
-        method="append",
-        separator="; ",
-        modes=[mode_name],
+    variable_modification(
+        "mpi_command", f"affinity.{name} ; ", method="append", modes=[name]
     )
 
 
@@ -46,26 +28,19 @@ class Affinity(BasicModifier):
 
     _default_mode = "mpi"
 
-    append_affinity_mode(
-        mode_name=_default_mode,
-        mode_option=f"affinity.{_default_mode}",
+    add_mode(
+        name="mpi",
         description="Mode for testing thread affinity of each rank in an MPI job",
     )
 
-    set_affinity_mode(
-        mode_name="cuda",
-        mode_option="affinity.cuda",
+    add_mode(
+        name="cuda",
         description="Mode for testing NVIDIA GPU affinity of each rank in an MPI job",
     )
 
-    set_affinity_mode(
-        mode_name="rocm",
-        mode_option="affinity.rocm",
+    add_mode(
+        name="rocm",
         description="Mode for testing AMD GPU affinity of each rank an MPI job",
-    )
-
-    variable_modification(
-        "mpi_command", "${AFFINITY_MODE}; ", method="append", modes=["mpi"]
     )
 
     executable_modifier("affinity")

@@ -18,7 +18,7 @@ class Affinity:
             "cuda",
             "rocm",
         ),
-        multi=True,
+        multi=False,
         description="Build and run the affinity package",
     )
 
@@ -26,13 +26,10 @@ class Affinity:
         def compute_modifiers_section(self):
             modifier_list = []
             if not self.spec.satisfies("affinity=none"):
-                for var in list(self.spec.variants["affinity"]):
-                    if var != "mpi":
-                        affinity_modifier_modes = {}
-                        affinity_modifier_modes["name"] = "affinity"
-                        affinity_modifier_modes["mode"] = var
-                        modifier_list.append(affinity_modifier_modes)
-                modifier_list.append({"name": "affinity", "mode": "mpi"})
+                affinity_modifier_modes = {}
+                affinity_modifier_modes["name"] = "affinity"
+                affinity_modifier_modes["mode"] = self.spec.variants["affinity"][0]
+                modifier_list.append(affinity_modifier_modes)
             return modifier_list
 
         def compute_spack_section(self):
