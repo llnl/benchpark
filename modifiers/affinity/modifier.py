@@ -53,13 +53,13 @@ class Affinity(BasicModifier):
         if executable.mpi:
             pre_exec.append(
                 CommandExecutable(
-                    f"load-affinity",
+                    "load-affinity",
                     template=["spack load affinity"],
                 )
             )
             post_exec.append(
                 CommandExecutable(
-                    f"unload-affinity",
+                    "unload-affinity",
                     template=["spack unload affinity"],
                 )
             )
