@@ -21,9 +21,7 @@ class CaliperMpi(CaliperBase):
 
     env_var_modification(
         "CALI_CONFIG",
-        "spot(output={},profile.mpi,mpi.message.size,mpi.message.count)".format(
-            _cali_datafile
-        ),
+        "spot(output={},profile.mpi,comm.stats)".format(_cali_datafile),
         method="set",
         modes=["mpi"],
     )
