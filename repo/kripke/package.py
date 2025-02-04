@@ -11,8 +11,8 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     transport proxy/mini app.
     """
 
-    homepage = "https://computing.llnl.gov/projects/co-design/kripke"
-    git = "https://github.com/LLNL/Kripke.git"
+    homepage = "https://github.com/gracenansamba/Kripke.git"
+    git = "https://github.com/gracenansamba/Kripke.git"
 
     tags = ["proxy-app"]
 
