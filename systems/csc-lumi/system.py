@@ -26,7 +26,7 @@ class CscLumi(System):
     def initialize(self):
         super().initialize()
 
-        sys_variables= {
+        sys_variables = {
                 "sys_cores_per_node": 64,
                 "sys_gpus_per_node": 8,
                 "sys_mem_per_node": 512,
@@ -48,7 +48,6 @@ class CscLumi(System):
             "rocm_arch": "'gfx90a'",
             "gtl_flag": "''",
         }
-
 
     def external_pkg_configs(self):
         externals = CscLumi.resource_location / "externals"
