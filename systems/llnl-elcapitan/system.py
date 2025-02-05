@@ -70,7 +70,7 @@ class LlnlElcapitan(System):
     def initialize(self):
         super().initialize()
 
-        # TODO: Replace this with lookups into the working set 
+        # TODO: Replace this with lookups into the working set
         self.rocm_version = Version(self.spec.variants["rocm"][0])
         if self.spec.satisfies("compiler=gcc"):
             self.gcc_version = Version("12.2.0")
@@ -82,14 +82,16 @@ class LlnlElcapitan(System):
             else:
                 self.cce_version = Version("16.0.0")
                 self.mpi_version = Version("8.1.26")
-            self.short_cce_version = f"{self.cce_version.major}.{self.cce_version.minor}"
+            self.short_cce_version = (
+                f"{self.cce_version.major}.{self.cce_version.minor}"
+            )
         if self.rocm_version >= Version("6.0.0"):
             self.pmi_version = Version("6.1.15.6")
             self.llvm_version = Version("18.0.1")
         else:
             self.pmi_version = Version("6.1.12")
             self.llvm_version = Version("16.0.0")
-        # TODO: Replace this with lookups into the working set 
+        # TODO: Replace this with lookups into the working set
 
         self.scheduler = "flux"
         attrs = id_to_resources.get(self.spec.variants["cluster"][0])
