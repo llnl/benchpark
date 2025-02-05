@@ -12,7 +12,7 @@ class Ad(ExecutableApplication):
     """AD benchmark"""
     name = "ad"
 
-    tags = ['enzyme']
+    tags = ['mpi','c','c++','automatic-differentiation','compiler-transformation']
 
     executable('c_interface_test', 'c_interface_test', use_mpi=True)
 
