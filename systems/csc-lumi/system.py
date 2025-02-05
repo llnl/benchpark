@@ -27,10 +27,11 @@ class CscLumi(System):
         super().initialize()
 
         sys_variables = {
-                "sys_cores_per_node": 64,
-                "sys_gpus_per_node": 8,
-                "sys_mem_per_node": 512,
-            }
+            "sys_cores_per_node": 64,
+            "sys_gpus_per_node": 8,
+            "sys_mem_per_node": 512,
+        }
+
         self.scheduler = "slurm"
         for k, v in sys_variables.items():
             setattr(self, k, v)
