@@ -178,7 +178,7 @@ compilers:
 
     def rocm_config(self, rocm_version):
         template = """\
-packages: 
+packages:
   comgr:
     buildable: false
     externals:
