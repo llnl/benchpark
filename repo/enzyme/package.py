@@ -11,7 +11,7 @@ class Enzyme(CMakePackage):
 
     git = "https://github.com/jandrej/Enzyme.git"
 
-    tags = ["benchmark"]
+    tags = ["enzyme"]
 
     license("Apache-2.0")
 
