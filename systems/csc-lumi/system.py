@@ -67,7 +67,7 @@ class CscLumi(System):
 
     def compiler_configs(self):
         compilers = CscLumi.resource_location / "compilers"
-        full_versions={
+        full_versions = {
             "cce16": "16.0.1",
             "cce15": "15.0.1",
             "cce14": "14.0.2",
@@ -380,4 +380,3 @@ software:
     mpi-gcc:
       pkg_spec: cray-mpich@8.1%gcc ~gtl
 """
-
