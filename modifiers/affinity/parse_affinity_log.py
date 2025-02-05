@@ -14,7 +14,7 @@ def parse_affinity(affinity_log_file, mode):
         lines = f.readlines()
 
     affinity_map = {"gpus": [], "cores": []}
-    
+
     current_rank = None
     current_node = None
 
@@ -29,22 +29,26 @@ def parse_affinity(affinity_log_file, mode):
         # Match CPU affinity (cores)
         core_match = re.match(r"\s*cores\s*:\s*(\d+)", line)
         if core_match and current_rank is not None:
-            affinity_map["cores"].append({
-                "rank": current_rank,
-                "node": current_node,
-                "cores": int(core_match.group(1))
-            })
+            affinity_map["cores"].append(
+                {
+                    "rank": current_rank,
+                    "node": current_node,
+                    "cores": int(core_match.group(1)),
+                }
+            )
             continue
 
         if mode == "cuda" or mode == "rocm":
             # Match GPU affinity
             gpu_match = re.match(r"\s*gpu\s*\d+\s*:\s*(GPU-\S+)", line)
             if gpu_match and current_rank is not None:
-                affinity_map["gpus"].append({
-                    "rank": current_rank,
-                    "node": current_node,
-                    "gpu_id": gpu_match.group(1)
-                })
+                affinity_map["gpus"].append(
+                    {
+                        "rank": current_rank,
+                        "node": current_node,
+                        "gpu_id": gpu_match.group(1),
+                    }
+                )
                 continue
 
     # Save to JSON file
@@ -52,10 +56,13 @@ def parse_affinity(affinity_log_file, mode):
     with open(output_file, "w") as json_file:
         json.dump(affinity_map, json_file, indent=4)
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="affinity output to JSON")
     parser.add_argument("affinity_log_file", type=str, help="affinity log file (text)")
-    parser.add_argument("mode", choices=["mpi", "cuda", "rocm"], help="Mode: 'mpi', 'cuda' or 'rocm'")
-    
+    parser.add_argument(
+        "mode", choices=["mpi", "cuda", "rocm"], help="Mode: 'mpi', 'cuda' or 'rocm'"
+    )
+
     args = parser.parse_args()
     parse_affinity(args.affinity_log_file, args.mode)

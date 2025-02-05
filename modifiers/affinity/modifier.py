@@ -37,6 +37,7 @@ class Affinity(BasicModifier):
     def affinity(self, executable_name, executable, app_inst=None):
         import os
         from ramble.util.executable import CommandExecutable
+
         affinity_log_file = f"{{experiment_run_dir}}/affinity.{self._usage_mode}.out"
 
         pre_exec = []
