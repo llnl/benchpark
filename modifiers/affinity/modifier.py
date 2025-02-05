@@ -6,17 +6,6 @@
 from ramble.modkit import *
 
 
-def add_mode(name, description):
-    mode(
-        name=name,
-        description=description,
-    )
-
-    variable_modification(
-        "mpi_command", f"affinity.{name} ; ", method="append", modes=[name]
-    )
-
-
 class Affinity(BasicModifier):
     """Define a modifier for printing the thread/gpu affinity for each mpi rank"""
 
@@ -28,17 +17,17 @@ class Affinity(BasicModifier):
 
     _default_mode = "mpi"
 
-    add_mode(
+    mode(
         name="mpi",
         description="Mode for testing thread affinity of each rank in an MPI job",
     )
 
-    add_mode(
+    mode(
         name="cuda",
         description="Mode for testing NVIDIA GPU affinity of each rank in an MPI job",
     )
 
-    add_mode(
+    mode(
         name="rocm",
         description="Mode for testing AMD GPU affinity of each rank an MPI job",
     )
@@ -46,22 +35,44 @@ class Affinity(BasicModifier):
     executable_modifier("affinity")
 
     def affinity(self, executable_name, executable, app_inst=None):
+        import os
         from ramble.util.executable import CommandExecutable
+        affinity_log_file = f"{{experiment_run_dir}}/affinity.{self._usage_mode}.out"
 
         pre_exec = []
         post_exec = []
         if executable.mpi:
             pre_exec.append(
                 CommandExecutable(
-                    "load-affinity",
+                    f"load-affinity-{executable_name}",
                     template=["spack load affinity"],
                 )
             )
+
+            pre_exec.append(
+                CommandExecutable(
+                    f"run-affinity-{executable_name}",
+                    template=[f"affinity.{self._usage_mode}"],
+                    mpi=True,
+                    redirect=affinity_log_file,
+                )
+            )
+
             post_exec.append(
                 CommandExecutable(
-                    "unload-affinity",
+                    f"unload-affinity-{executable_name}",
                     template=["spack unload affinity"],
                 )
             )
 
+            affinity_parser_dir = os.path.dirname(f"{self._file_path}")
+
+            post_exec.append(
+                CommandExecutable(
+                    f"parse-stdout-{executable_name}",
+                    template=[
+                        f"python {affinity_parser_dir}/parse_affinity_log.py {affinity_log_file} {self._usage_mode}"
+                    ],
+                )
+            )
         return pre_exec, post_exec
