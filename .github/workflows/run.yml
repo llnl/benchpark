@@ -799,3 +799,12 @@ jobs:
           benchmark_spec: stream caliper=mpi,time
           system_name: tioga
           system_spec: llnl-elcapitan rocm=5.5.1 compiler=cce
+
+      - name: ad/single-core llnl-elcapitan rocm=6.2.4 compiler=rocmcc
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: ad
+          benchmark_mode: single-core
+          benchmark_spec: ad
+          system_name: tioga
+          system_spec: llnl-elcapitan rocm=6.2.4 compiler=rocmcc
