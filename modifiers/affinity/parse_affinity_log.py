@@ -52,7 +52,7 @@ def parse_affinity(affinity_log_file, mode):
                 continue
 
     # Save to JSON file
-    output_file = Path(affinity_log_file).with_suffix(f".json")
+    output_file = Path(affinity_log_file).with_suffix(".json")
     with open(output_file, "w") as json_file:
         json.dump(affinity_map, json_file, indent=4)
 
