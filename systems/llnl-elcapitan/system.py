@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import pathlib
+from packaging.version import Version
 
 from benchpark.directives import variant
 from benchpark.system import System
@@ -69,6 +70,27 @@ class LlnlElcapitan(System):
     def initialize(self):
         super().initialize()
 
+        # TODO: Replace this with lookups into the working set 
+        self.rocm_version = Version(self.spec.variants["rocm"][0])
+        if self.spec.satisfies("compiler=gcc"):
+            self.gcc_version = Version("12.2.0")
+            self.mpi_version = Version("8.1.26")
+        else:
+            if self.rocm_version >= Version("6.0.0"):
+                self.cce_version = Version("18.0.1")
+                self.mpi_version = Version("8.1.31")
+            else:
+                self.cce_version = Version("16.0.0")
+                self.mpi_version = Version("8.1.26")
+            self.short_cce_version = f"{self.cce_version.major}.{self.cce_version.minor}"
+        if self.rocm_version >= Version("6.0.0"):
+            self.pmi_version = Version("6.1.15.6")
+            self.llvm_version = Version("18.0.1")
+        else:
+            self.pmi_version = Version("6.1.12")
+            self.llvm_version = Version("16.0.0")
+        # TODO: Replace this with lookups into the working set 
+
         self.scheduler = "flux"
         attrs = id_to_resources.get(self.spec.variants["cluster"][0])
         for k, v in attrs.items():
@@ -92,7 +114,7 @@ class LlnlElcapitan(System):
 
         rocm_cfg_path = self.next_adhoc_cfg()
         with open(rocm_cfg_path, "w") as f:
-            f.write(self.rocm_config(self.spec.variants["rocm"][0]))
+            f.write(self.rocm_config())
         selections.append(rocm_cfg_path)
 
         mpi_cfg_path = self.next_adhoc_cfg()
@@ -142,7 +164,7 @@ packages: {}
         ):
             compiler_cfg_path = self.next_adhoc_cfg()
             with open(compiler_cfg_path, "w") as f:
-                f.write(self.rocm_cce_compiler_cfg(self.spec.variants["rocm"][0]))
+                f.write(self.rocm_cce_compiler_cfg())
             selections.append(compiler_cfg_path)
 
         # Note: this is always included for some low-level dependencies
@@ -154,25 +176,18 @@ packages: {}
     def mpi_config(self):
         gtl = self.spec.variants["gtl"][0]
 
-        if self.spec.satisfies("compiler=rocmcc"):
-            cce_version = "18.0.1"
-        else:
-            cce_version = "16.0.0"
-        short_cce_version = ".".join(cce_version.split(".")[:2])
-
         if self.spec.satisfies("compiler=cce"):
-            mpi_version = "8.1.26"
             dont_use_gtl = f"""\
-        gtl_lib_path: /opt/cray/pe/mpich/{mpi_version}/gtl/lib
-        ldflags: "-L/opt/cray/pe/mpich/{mpi_version}/ofi/crayclang/{short_cce_version}/lib -lmpi -L/opt/cray/pe/mpich/{mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{mpi_version}/gtl/lib"
+        gtl_lib_path: /opt/cray/pe/mpich/{self.mpi_version}/gtl/lib
+        ldflags: "-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib"
 """
 
             use_gtl = f"""\
         gtl_cutoff_size: 4096
         fi_cxi_ats: 0
-        gtl_lib_path: /opt/cray/pe/mpich/{mpi_version}/gtl/lib
+        gtl_lib_path: /opt/cray/pe/mpich/{self.mpi_version}/gtl/lib
         gtl_libs: ["libmpi_gtl_hsa"]
-        ldflags: "-L/opt/cray/pe/mpich/{mpi_version}/ofi/crayclang/{short_cce_version}/lib -lmpi -L/opt/cray/pe/mpich/{mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{mpi_version}/gtl/lib -lmpi_gtl_hsa"
+        ldflags: "-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -lmpi_gtl_hsa"
 """
 
             if gtl:
@@ -186,24 +201,23 @@ packages: {}
 packages:
   cray-mpich:
     externals:
-    - spec: cray-mpich@{mpi_version}%cce@{cce_version} {gtl_spec} +wrappers
-      prefix: /opt/cray/pe/mpich/{mpi_version}/ofi/crayclang/{short_cce_version}
+    - spec: cray-mpich@{self.mpi_version}%cce@{self.cce_version} {gtl_spec} +wrappers
+      prefix: /opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}
       extra_attributes:
 {gtl_cfg}
 """
         elif self.spec.satisfies("compiler=rocmcc"):
-            mpi_version = "8.1.31"
             dont_use_gtl = f"""\
-        gtl_lib_path: /opt/cray/pe/mpich/{mpi_version}/gtl/lib
-        ldflags: "-L/opt/cray/pe/mpich/{mpi_version}/ofi/crayclang/{short_cce_version}/lib -lmpi -L/opt/cray/pe/mpich/{mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{mpi_version}/gtl/lib"
+        gtl_lib_path: /opt/cray/pe/mpich/{self.mpi_version}/gtl/lib
+        ldflags: "-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib"
 """
 
             use_gtl = f"""\
         gtl_cutoff_size: 4096
         fi_cxi_ats: 0
-        gtl_lib_path: /opt/cray/pe/mpich/{mpi_version}/gtl/lib
+        gtl_lib_path: /opt/cray/pe/mpich/{self.mpi_version}/gtl/lib
         gtl_libs: ["libmpi_gtl_hsa"]
-        ldflags: "-L/opt/cray/pe/mpich/{mpi_version}/ofi/crayclang/{short_cce_version}/lib -lmpi -L/opt/cray/pe/mpich/{mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{mpi_version}/gtl/lib -lmpi_gtl_hsa"
+        ldflags: "-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -lmpi_gtl_hsa"
 """
 
             if gtl:
@@ -217,188 +231,175 @@ packages:
 packages:
   cray-mpich:
     externals:
-    - spec: cray-mpich@{mpi_version}%cce@{cce_version} {gtl_spec} +wrappers
-      prefix: /opt/cray/pe/mpich/{mpi_version}/ofi/crayclang/{short_cce_version}
+    - spec: cray-mpich@{self.mpi_version}%cce@{self.cce_version} {gtl_spec} +wrappers
+      prefix: /opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}
       extra_attributes:
 {gtl_cfg}
 """
         elif self.spec.satisfies("compiler=gcc"):
-            mpi_version = "8.1.26"
-            return """\
+            return f"""\
 packages:
   cray-mpich:
     externals:
-    - spec: cray-mpich@{mpi_version}%gcc@12.2.0 ~gtl +wrappers
-      prefix: /opt/cray/pe/mpich/{mpi_version}/ofi/gnu/10.3
+    - spec: cray-mpich@{self.mpi_version}%gcc@{self.gcc_version} ~gtl +wrappers
+      prefix: /opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/10.3
       extra_attributes:
-        gtl_lib_path: /opt/cray/pe/mpich/{mpi_version}/gtl/lib
-        ldflags: "-L/opt/cray/pe/mpich/{mpi_version}/ofi/gnu/10.3/lib -lmpi -L/opt/cray/pe/mpich/{mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{mpi_version}/gtl/lib"
+        gtl_lib_path: /opt/cray/pe/mpich/{self.mpi_version}/gtl/lib
+        ldflags: "-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/10.3/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib"
 """
 
-    def rocm_config(self, rocm_version):
-        template = """\
+    def rocm_config(self):
+        return f"""\
 packages:
   blas:
     require:
-      - {blas}
+      - {self.spec.variants["blas"][0]}
   lapack:
     require:
-      - {lapack}
+      - {self.spec.variants["lapack"][0]}
   hipfft:
     externals:
-    - spec: hipfft@{x}
-      prefix: /opt/rocm-{x}
+    - spec: hipfft@{self.rocm_version}
+      prefix: /opt/rocm-{self.rocm_version}
     buildable: false
   rocfft:
     externals:
-    - spec: rocfft@{x}
-      prefix: /opt/rocm-{x}
+    - spec: rocfft@{self.rocm_version}
+      prefix: /opt/rocm-{self.rocm_version}
     buildable: false
   rocprim:
     externals:
-    - spec: rocprim@{x}
-      prefix: /opt/rocm-{x}
+    - spec: rocprim@{self.rocm_version}
+      prefix: /opt/rocm-{self.rocm_version}
     buildable: false
   rocrand:
     externals:
-    - spec: rocrand@{x}
-      prefix: /opt/rocm-{x}
+    - spec: rocrand@{self.rocm_version}
+      prefix: /opt/rocm-{self.rocm_version}
     buildable: false
   rocsparse:
     externals:
-    - spec: rocsparse@{x}
-      prefix: /opt/rocm-{x}
+    - spec: rocsparse@{self.rocm_version}
+      prefix: /opt/rocm-{self.rocm_version}
     buildable: false
   rocthrust:
     externals:
-    - spec: rocthrust@{x}
-      prefix: /opt/rocm-{x}
+    - spec: rocthrust@{self.rocm_version}
+      prefix: /opt/rocm-{self.rocm_version}
     buildable: false
   hip:
     externals:
-    - spec: hip@{x}
-      prefix: /opt/rocm-{x}
+    - spec: hip@{self.rocm_version}
+      prefix: /opt/rocm-{self.rocm_version}
     buildable: false
   hsa-rocr-dev:
     externals:
-    - spec: hsa-rocr-dev@{x}
-      prefix: /opt/rocm-{x}
+    - spec: hsa-rocr-dev@{self.rocm_version}
+      prefix: /opt/rocm-{self.rocm_version}
     buildable: false
   comgr:
     externals:
-    - spec: comgr@{x}
-      prefix: /opt/rocm-{x}/
+    - spec: comgr@{self.rocm_version}
+      prefix: /opt/rocm-{self.rocm_version}/
     buildable: false
   hiprand:
     externals:
-    - spec: hiprand@{x}
-      prefix: /opt/rocm-{x}
+    - spec: hiprand@{self.rocm_version}
+      prefix: /opt/rocm-{self.rocm_version}
     buildable: false
   hipsparse:
     externals:
-    - spec: hipsparse@{x}
-      prefix: /opt/rocm-{x}
+    - spec: hipsparse@{self.rocm_version}
+      prefix: /opt/rocm-{self.rocm_version}
     buildable: false
   hipblas:
     externals:
-    - spec: hipblas@{x}
-      prefix: /opt/rocm-{x}/
+    - spec: hipblas@{self.rocm_version}
+      prefix: /opt/rocm-{self.rocm_version}/
     buildable: false
   hipsolver:
     externals:
-    - spec: hipsolver@{x}
-      prefix: /opt/rocm-{x}/
+    - spec: hipsolver@{self.rocm_version}
+      prefix: /opt/rocm-{self.rocm_version}/
     buildable: false
   hsakmt-roct:
     externals:
-    - spec: hsakmt-roct@{x}
-      prefix: /opt/rocm-{x}/
+    - spec: hsakmt-roct@{self.rocm_version}
+      prefix: /opt/rocm-{self.rocm_version}/
     buildable: false
   roctracer-dev-api:
     externals:
-    - spec: roctracer-dev-api@{x}
-      prefix: /opt/rocm-{x}/
+    - spec: roctracer-dev-api@{self.rocm_version}
+      prefix: /opt/rocm-{self.rocm_version}/
     buildable: false
   rocminfo:
     externals:
-    - spec: rocminfo@{x}
-      prefix: /opt/rocm-{x}/
+    - spec: rocminfo@{self.rocm_version}
+      prefix: /opt/rocm-{self.rocm_version}/
     buildable: false
   llvm:
     externals:
-    - spec: llvm@{llvm_version}
-      prefix: /opt/rocm-{x}/llvm
+    - spec: llvm@{self.llvm_version}
+      prefix: /opt/rocm-{self.rocm_version}/llvm
     buildable: false
   llvm-amdgpu:
     externals:
-    - spec: llvm-amdgpu@{x}
-      prefix: /opt/rocm-{x}/llvm
+    - spec: llvm-amdgpu@{self.rocm_version}
+      prefix: /opt/rocm-{self.rocm_version}/llvm
     buildable: false
   rocblas:
     externals:
-    - spec: rocblas@{x}
-      prefix: /opt/rocm-{x}
+    - spec: rocblas@{self.rocm_version}
+      prefix: /opt/rocm-{self.rocm_version}
     buildable: false
   rocsolver:
     externals:
-    - spec: rocsolver@{x}
-      prefix: /opt/rocm-{x}
+    - spec: rocsolver@{self.rocm_version}
+      prefix: /opt/rocm-{self.rocm_version}
     buildable: false
 """
-        return template.format(
-            x=rocm_version,
-            llvm_version=("16.0.0" if rocm_version == "5.5.1" else "18.0.0"),
-            blas=self.spec.variants["blas"][0],
-            lapack=self.spec.variants["lapack"][0],
-        )
 
-    def rocm_cce_compiler_cfg(self, rocm_version):
+    def rocm_cce_compiler_cfg(self):
         if self.spec.satisfies("compiler=rocmcc"):
-            cce_version = "18.0.1"
-            pmi_version = "6.1.15.6"
-            template = """\
+            return f"""\
 compilers:
 - compiler:
-    spec: rocmcc@{x}
+    spec: rocmcc@{self.rocm_version}
     paths:
-      cc:  /opt/rocm-{x}/bin/amdclang
-      cxx:  /opt/rocm-{x}/bin/amdclang++
-      f77: /opt/rocm-{x}/bin/amdflang
-      fc:  /opt/rocm-{x}/bin/amdflang
+      cc:  /opt/rocm-{self.rocm_version}/bin/amdclang
+      cxx:  /opt/rocm-{self.rocm_version}/bin/amdclang++
+      f77: /opt/rocm-{self.rocm_version}/bin/amdflang
+      fc:  /opt/rocm-{self.rocm_version}/bin/amdflang
     flags:
       cflags: -g -O2
       cxxflags: -g -O2
     operating_system: rhel8
     target: x86_64
     modules:
-    - cce/{y}
+    - cce/{self.cce_version}
     environment:
       set:
         RFE_811452_DISABLE: '1'
       append_path:
         LD_LIBRARY_PATH: /opt/cray/pe/gcc-libs
       prepend_path:
-        LD_LIBRARY_PATH: "/opt/cray/pe/cce/{y}/cce/x86_64/lib:/opt/cray/pe/pmi/{pmi_version}/lib"
-        LIBRARY_PATH: /opt/rocm-{x}/lib
+        LD_LIBRARY_PATH: "/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib"
+        LIBRARY_PATH: /opt/rocm-{self.rocm_version}/lib
     extra_rpaths:
-    - /opt/rocm-{x}/lib
+    - /opt/rocm-{self.rocm_version}/lib
     - /opt/cray/pe/gcc-libs
-    - /opt/cray/pe/cce/{y}/cce/x86_64/lib
+    - /opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib
 """
-            return template.format(
-                x=rocm_version, y=cce_version, pmi_version=pmi_version
-            )
         else:
-            cce_version = "16.0.0"
-            template = """\
+            return f"""\
 compilers:
 - compiler:
-    spec: cce@{y}-rocm{x}
+    spec: cce@{self.cce_version}-rocm{self.rocm_version}
     paths:
-      cc:  /opt/cray/pe/cce/{y}/bin/craycc
-      cxx:  /opt/cray/pe/cce/{y}/bin/crayCC
-      f77:  /opt/cray/pe/cce/{y}/bin/crayftn
-      fc:  /opt/cray/pe/cce/{y}/bin/crayftn
+      cc:  /opt/cray/pe/cce/{self.cce_version}/bin/craycc
+      cxx:  /opt/cray/pe/cce/{self.cce_version}/bin/crayCC
+      f77:  /opt/cray/pe/cce/{self.cce_version}/bin/crayftn
+      fc:  /opt/cray/pe/cce/{self.cce_version}/bin/crayftn
     flags:
       cflags: -g -O2
       cxxflags: -g -O2 -std=c++14
@@ -407,13 +408,12 @@ compilers:
     operating_system: rhel8
     target: x86_64
     modules:
-    - cce/{y}
+    - cce/{self.cce_version}
     environment:
       prepend_path:
-        LD_LIBRARY_PATH: "/opt/cray/pe/cce/{y}/cce/x86_64/lib:/opt/rocm-{x}/lib"
-    extra_rpaths: [/opt/cray/pe/cce/{y}/cce/x86_64/lib/, /opt/cray/pe/gcc-libs/, /opt/rocm-{x}/lib]
+        LD_LIBRARY_PATH: "/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/rocm-{self.rocm_version}/lib"
+    extra_rpaths: [/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib/, /opt/cray/pe/gcc-libs/, /opt/rocm-{self.rocm_version}/lib]
 """
-            return template.format(x=rocm_version, y=cce_version)
 
     def sw_description(self):
         """This is somewhat vestigial: for the Tioga config that is committed
