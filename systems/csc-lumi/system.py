@@ -46,7 +46,7 @@ class CscLumi(System):
     def system_specific_variables(self):
         return {
             "rocm_arch": "'gfx90a'",
-            "gtl_flag": '' '',
+            "gtl_flag": "''",
         }
 
 
@@ -68,33 +68,33 @@ class CscLumi(System):
     def compiler_configs(self):
         compilers = CscLumi.resource_location / "compilers"
         full_versions={
-                "cce16": "16.0.1",
-                "cce15": "15.0.1",
-                "cce14": "14.0.2",
-                "gcc12": "12.2.0",
-                "gcc11": "11.2.0",
+            "cce16": "16.0.1",
+            "cce15": "15.0.1",
+            "cce14": "14.0.2",
+            "gcc12": "12.2.0",
+            "gcc11": "11.2.0",
         }
         selections = []
         if "cce" in self.spec.variants["compiler"][0]:
             compiler_cfg_path = self.next_adhoc_cfg()
             with open(compiler_cfg_path, "w") as f:
                 f.write(
-                    self.cce_compiler_cfg(full_versions.get(self.spec.variants["compiler"][0]))
+                    self.cce_compiler_cfg(
+                        full_versions.get(self.spec.variants["compiler"][0])
+                    )
                 )
             selections.append(compiler_cfg_path)
-        else: 
+        else:
             compiler_cfg_path = self.next_adhoc_cfg()
             with open(compiler_cfg_path, "w") as f:
-                f.write(
-                    self.gcc_compiler_cfg("12.2.0")
-                )
+                f.write(self.gcc_compiler_cfg("12.2.0"))
             selections.append(compiler_cfg_path)
-        selections.append(CscLumi.resource_location / "compilers" / "00-extra-compilers.yaml")
+        selections.append(
+            CscLumi.resource_location / "compilers" / "00-extra-compilers.yaml"
+        )
         compiler_cfg_path = self.next_adhoc_cfg()
         with open(compiler_cfg_path, "w") as f:
-            f.write(
-                self.rocmcc_cfg(self.spec.variants["rocm"][0])
-            )
+            f.write(self.rocmcc_cfg(self.spec.variants["rocm"][0]))
         selections.append(compiler_cfg_path)
 
         return selections
