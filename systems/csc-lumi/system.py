@@ -66,7 +66,6 @@ class CscLumi(System):
         return selections
 
     def compiler_configs(self):
-        compilers = CscLumi.resource_location / "compilers"
         full_versions = {
             "cce16": "16.0.1",
             "cce15": "15.0.1",
@@ -138,7 +137,7 @@ compilers:
         cxx: /opt/cray/pe/cce/{x}/bin/crayCC
         f77: /opt/cray/pe/cce/{x}/bin/crayftn
         fc: /opt/cray/pe/cce/{x}/bin/crayftn
-      #flags: 
+      #flags:
       operating_system: sles15
       target: any
       modules: []
@@ -157,7 +156,7 @@ compilers:
 
     def gcc_compiler_cfg(self, gcc_version):
         template = """\
-compilers:                
+compilers:
   - compiler:
       spec: gcc@{x}
       paths:
@@ -165,7 +164,7 @@ compilers:
         cxx: /opt/cray/pe/gcc/{x}/bin/g++
         f77: /opt/cray/pe/gcc/{x}/bin/gfortran
         fc: /opt/cray/pe/gcc/{x}/bin/gfortran
-      #flags: 
+      #flags:
       operating_system: sles15
       target: any
       modules: []
@@ -179,7 +178,7 @@ compilers:
 
     def rocm_config(self, rocm_version):
         template = """\
-packages:  
+packages: 
   comgr:
     buildable: false
     externals:
