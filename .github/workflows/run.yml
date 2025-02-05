@@ -196,26 +196,6 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run lammps/openmp with static Ruby
-        run: |
-          ./bin/benchpark setup lammps/openmp LLNL-Ruby-icelake-OmniPath workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/lammps/openmp/LLNL-Ruby-icelake-OmniPath/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
-      - name: Dry run lammps/rocm with static Tioga
-        run: |
-          ./bin/benchpark setup lammps/rocm LLNL-Tioga-HPECray-zen3-MI250X-Slingshot workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/lammps/rocm/LLNL-Tioga-HPECray-zen3-MI250X-Slingshot/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
       - name: Dry run dynamic lammps/openmp on static Ruby
         run: |
           ./bin/benchpark experiment init --dest=lammps-openmp lammps+openmp
@@ -238,16 +218,6 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run hpl/openmp with Caliper-topdown modifier on Magma
-        run: |
-          ./bin/benchpark setup hpl/openmp --modifier=caliper-topdown LLNL-Magma-Penguin-icelake-OmniPath workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/hpl/openmp/LLNL-Magma-Penguin-icelake-OmniPath/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
       - name: Dry run dynamic quicksilver-openmp on nosite-x86_64 with allocation modifier
         run: |
           ./bin/benchpark experiment init --dest=quicksilver-openmp quicksilver+openmp +weak~single_node
@@ -258,17 +228,7 @@ jobs:
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
-
-      - name: Dry run phloem/mpi-only on nosite-x86_64 with allocation modifier
-        run: |
-          ./bin/benchpark setup phloem/mpi-only nosite-x86_64 workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/phloem/mpi-only/nosite-x86_64/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
+      
       - name: Dry run salmon/openmp with allocation modifier on Fugaku
         run: |
           ./bin/benchpark setup salmon/openmp RCCS-Fugaku-Fujitsu-A64FX-TofuD workspace/
@@ -288,7 +248,7 @@ jobs:
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
-
+            
       - name: Dry run qws/openmp with allocation modifier on nosite-x86_64
         run: |
           ./bin/benchpark setup qws/openmp nosite-x86_64 workspace/
@@ -298,6 +258,7 @@ jobs:
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
+
   dynamicdryrunexperiments:
     runs-on: ubuntu-22.04
     steps:
@@ -838,3 +799,12 @@ jobs:
           benchmark_spec: stream caliper=mpi,time
           system_name: tioga
           system_spec: llnl-elcapitan rocm=5.5.1 compiler=cce
+
+      - name: ad/single-core llnl-elcapitan rocm=6.2.4 compiler=rocmcc
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: ad
+          benchmark_mode: single-core
+          benchmark_spec: ad
+          system_name: tioga
+          system_spec: llnl-elcapitan rocm=6.2.4 compiler=rocmcc

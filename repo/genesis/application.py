@@ -7,7 +7,7 @@ from ramble.appkit import *
 
 import sys
 
-class Genesis(SpackApplication):
+class Genesis(ExecutableApplication):
     """GENESIS package contains two MD programs (atdyn and spdyn), trajectory
     analysis programs, and other useful tools. GENESIS (GENeralized-Ensemble
     SImulation System) has been developed mainly by Sugita group in RIKEN-CCS.
