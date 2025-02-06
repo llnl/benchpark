@@ -27,7 +27,7 @@ class RikenFugaku(System):
     variant(
         "cluster",
         default="fugaku",
-        values=("fugaku"),
+        values=("fugaku",),
         description="Which cluster to run on",
     )
 
