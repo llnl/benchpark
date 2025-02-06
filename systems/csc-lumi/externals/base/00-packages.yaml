@@ -4,14 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 packages:
-  all:
-    compiler: [gcc@12.2.0]
-    target: [zen2]
-    providers:
-      mpi: [cray-mpich@8.1.27]
-      blas: [openblas,cray-libsci@23.09.1.1]
-      lapack: [openblas,cray-libsci@23.09.1.1]
-      scalapack: [netlib-scalapack,cray-libsci@23.09.1.1]
   mpi:
     buildable: false
   cray-mpich:
