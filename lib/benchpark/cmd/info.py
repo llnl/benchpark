@@ -2,13 +2,19 @@ import subprocess
 import textwrap
 
 import yaml
+import llnl.util.tty.color as color
 import spack.cmd.info as spackinfo
 
 import benchpark.paths
 
 
+def indent():
+    return " " * 4
+
+
 def gen_header(name):
-    print("=" * 20 + f"\n=== {name}\n" + "=" * 20)
+    attr_name = "@*b" + name + "@."
+    color.cprint(f"{attr_name}:")
 
 
 def info_variants(spec_class):
@@ -17,43 +23,69 @@ def info_variants(spec_class):
     all_variants = list(spec_class.variants.values())[0]
     for var in all_variants.values():
         for attr, value in var.__dict__.items():
-            print(f"{attr}: {value}")
+            # print(f"{attr}: {value}")
+            color.cprint(indent() + "@*g" + attr + "@.: " + str(value))
         print()
 
 
 def info_maintainer(spec_class):
     """SystemSpec.system_class or ExperimentSpec.experiment_class"""
     gen_header("Maintainer")
-    print(spec_class.maintainer)
+    mstr = indent()
+    if spec_class.maintainer == "":
+        mstr += "No maintainer"
+    else:
+        mstr += spec_class.maintainer
+    print(mstr)
 
 
 def info_system(args):
     def _info_system_system_site(system_class):
         gen_header("System Site")
-        print(system_class.system_site)
+        print(indent() + system_class.system_site)
 
     def _info_system_hardware(system_class):
+        def _replace_keys_with_colors(data, colors, level=0):
+            if not isinstance(data, dict):
+                return data
+
+            new_data = {}
+            for key, value in data.items():
+                color_prefix = (
+                    colors[level % len(colors)] if level < len(colors) else ""
+                )
+                new_key = color_prefix + key + "@."
+                new_data[new_key] = _replace_keys_with_colors(value, colors, level + 1)
+
+            return new_data
+
         gen_header("Hardware")
         for cluster, resource_dict in system_class.id_to_resources.items():
-            print(f"For cluster {cluster}:")
+            color.cprint(f"{indent()}@*g{cluster}@.:")
             for resource_key, resource_value in resource_dict.items():
-                if isinstance(resource_value, str) and ".yaml" in resource_value:
-                    print(f"\t{resource_key}:")
+                if resource_key == "hardware_key":
                     with open(resource_value, "r") as f:
                         data = yaml.safe_load(f)
-                        print(textwrap.indent(yaml.dump(data), "\t"))
+                        colors = ["@*r", "@*c", "@*m", "@*y"]
+                        data = _replace_keys_with_colors(data, colors)
+                        color.cprint(
+                            textwrap.indent(
+                                yaml.dump(data).replace("'", ""), indent() * 2
+                            )
+                        )
                 else:
-                    print(f"\t{resource_key}: {resource_value}")
+                    resource_key = "@*r" + resource_key + "@."
+                    color.cprint(f"{indent()*2}{resource_key}: {resource_value}")
 
     system_spec = benchpark.spec.SystemSpec(" ".join(args.spec))
     system_class = system_spec.system_class
 
     # Map argument flags to functions
     actions = {
-        "system_site": (_info_system_system_site, [system_class]),
-        "maintainer": (info_maintainer, [system_class]),
-        "variants": (info_variants, [system_class]),
         "hardware": (_info_system_hardware, [system_class]),
+        "maintainer": (info_maintainer, [system_class]),
+        "system_site": (_info_system_system_site, [system_class]),
+        "variants": (info_variants, [system_class]),
     }
 
     # Call functions for enabled options, or all if no flag is set
@@ -71,12 +103,12 @@ def info_system(args):
 def info_experiment(args):
     def _info_url(experiment_class):
         gen_header("URL")
-        print(experiment_class.url)
+        print(indent() + experiment_class.url)
 
     experiment_spec = benchpark.spec.ExperimentSpec(" ".join(args.spec))
     experiment_class = experiment_spec.experiment_class
 
-    #spackinfo.print_variants(experiment_class)
+    # spackinfo.print_variants(experiment_class)
 
     if args.spack:
         subprocess.run(["spack", "info", experiment_class.spack_name])
@@ -86,9 +118,9 @@ def info_experiment(args):
         return
     else:
         actions = {
-            "variants": (info_variants, [experiment_class]),
             "maintainer": (info_maintainer, [experiment_class]),
             "url": (_info_url, [experiment_class]),
+            "variants": (info_variants, [experiment_class]),
         }
 
         # Call functions for enabled options, or all if no flag is set
@@ -126,6 +158,12 @@ def setup_parser(root_parser):
     )
     experiment_parser.add_argument(
         "--url", action="store_true", help="URL for experiment"
+    )
+    experiment_parser.add_argument(
+        "--variants", action="store_true", help="Available experiment variants"
+    )
+    experiment_parser.add_argument(
+        "--maintainer", action="store_true", help="Maintainer"
     )
     experiment_parser.add_argument("spec", nargs="+", help="Experiment spec")
 
