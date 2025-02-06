@@ -5,11 +5,32 @@
 
 import pathlib
 
-from benchpark.directives import variant
+from benchpark.directives import variant, system_site, maintainer
 from benchpark.system import System
+from benchpark.paths import hardware_descriptions
 
 
 class LlnlSierra(System):
+
+    id_to_resources = {
+        "sierra": {
+            "sys_cores_per_node": 44,
+            "sys_gpus_per_node": 4,
+            "hardware_key": str(hardware_descriptions)
+            + "/IBM-power9-V100-Infiniband/hardware_description.yaml",
+        },
+        "lassen": {
+            "sys_cores_per_node": 44,
+            "sys_gpus_per_node": 4,
+            "hardware_key": str(hardware_descriptions)
+            + "/IBM-power9-V100-Infiniband/hardware_description.yaml",
+        },
+    }
+
+    system_site("llnl")
+
+    maintainer("")
+
     variant(
         "cuda",
         default="11-8-0",

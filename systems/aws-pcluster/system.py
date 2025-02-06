@@ -6,31 +6,44 @@
 import pathlib
 
 from benchpark.system import System
-from benchpark.directives import variant
-
-# Taken from https://aws.amazon.com/ec2/instance-types/
-# With boto3, we could determine this dynamically vs. storing a static table
-id_to_resources = {
-    "c4.xlarge": {
-        "sys_cores_per_node": 4,
-        "sys_mem_per_node": 7.5,
-    },
-    "c6g.xlarge": {
-        "sys_cores_per_node": 4,
-        "sys_mem_per_node": 8,
-    },
-    "hpc7a.48xlarge": {
-        "sys_cores_per_node": 96,
-        "sys_mem_per_node": 768,
-    },
-    "hpc6a.48xlarge": {
-        "sys_cores_per_node": 96,
-        "sys_mem_per_node": 384,
-    },
-}
+from benchpark.directives import variant, system_site, maintainer
+from benchpark.paths import hardware_descriptions
 
 
 class AwsPcluster(System):
+    # Taken from https://aws.amazon.com/ec2/instance-types/
+    # With boto3, we could determine this dynamically vs. storing a static table
+    id_to_resources = {
+        "c4.xlarge": {
+            "sys_cores_per_node": 4,
+            "sys_mem_per_node": 7.5,
+            "hardware_key": str(hardware_descriptions)
+            + "/AWS_PCluster-zen-EFA/hardware_description.yaml",
+        },
+        "c6g.xlarge": {
+            "sys_cores_per_node": 4,
+            "sys_mem_per_node": 8,
+            "hardware_key": str(hardware_descriptions)
+            + "/AWS_PCluster-zen-EFA/hardware_description.yaml",
+        },
+        "hpc7a.48xlarge": {
+            "sys_cores_per_node": 96,
+            "sys_mem_per_node": 768,
+            "hardware_key": str(hardware_descriptions)
+            + "/AWS_PCluster-zen-EFA/hardware_description.yaml",
+        },
+        "hpc6a.48xlarge": {
+            "sys_cores_per_node": 96,
+            "sys_mem_per_node": 384,
+            "hardware_key": str(hardware_descriptions)
+            + "/AWS_PCluster-zen-EFA/hardware_description.yaml",
+        },
+    }
+
+    system_site("aws")
+
+    maintainer("")
+
     variant(
         "instance_type",
         values=("c6g.xlarge", "c4.xlarge", "hpc7a.48xlarge", "hpc6a.48xlarge"),
@@ -42,7 +55,7 @@ class AwsPcluster(System):
         super().initialize()
         self.scheduler = "slurm"
         # TODO: for some reason I have to index to get value, even if multi=False
-        attrs = id_to_resources.get(self.spec.variants["instance_type"][0])
+        attrs = self.id_to_resources.get(self.spec.variants["instance_type"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
 

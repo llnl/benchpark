@@ -5,21 +5,30 @@
 
 import pathlib
 
-from benchpark.directives import variant
+from benchpark.directives import variant, system_site, maintainer
 from benchpark.system import System
-
-id_to_resources = {
-    "grace-hopper": {
-        "sys_cores_per_node": 144,
-        "sys_gpus_per_node": 4,
-    },
-    "grace-grace": {
-        "sys_cores_per_node": 144,
-    },
-}
+from benchpark.paths import hardware_descriptions
 
 
 class LanlVenado(System):
+    id_to_resources = {
+        "grace-hopper": {
+            "sys_cores_per_node": 144,
+            "sys_gpus_per_node": 4,
+            "hardware_key": str(hardware_descriptions)
+            + "/HPECray-neoverse-H100-Slingshot/hardware_description.yaml",
+        },
+        "grace-grace": {
+            "sys_cores_per_node": 144,
+            "hardware_key": str(hardware_descriptions)
+            + "/HPECray-neoverse-H100-Slingshot/hardware_description.yaml",
+        },
+    }
+
+    system_site("lanl")
+
+    maintainer("")
+
     variant(
         "cluster",
         default="grace-hopper",
@@ -66,7 +75,7 @@ class LanlVenado(System):
         super().initialize()
 
         self.scheduler = "slurm"
-        attrs = id_to_resources.get(self.spec.variants["cluster"][0])
+        attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
 

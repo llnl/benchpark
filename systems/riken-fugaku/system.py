@@ -5,11 +5,24 @@
 
 import pathlib
 
-from benchpark.directives import variant
+from benchpark.directives import variant, system_site, maintainer
 from benchpark.system import System
+from benchpark.paths import hardware_descriptions
 
 
 class RikenFugaku(System):
+    id_to_resources = {
+        "fugaku": {
+            "sys_cores_per_node": 48,
+            "sys_mem_per_node": 32,
+            "hardware_key": str(hardware_descriptions)
+            + "/Fujitsu-A64FX-TofuD/hardware_description.yaml",
+        },
+    }
+
+    system_site("riken")
+
+    maintainer("")
 
     variant(
         "compiler",
@@ -22,8 +35,9 @@ class RikenFugaku(System):
         super().initialize()
 
         self.scheduler = "pjm"
-        self.sys_cores_per_node = "48"
-        self.sys_mem_per_node = "32"
+        attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
+        for k, v in attrs.items():
+            setattr(self, k, v)
 
     def generate_description(self, output_dir):
         super().generate_description(output_dir)
