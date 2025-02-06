@@ -14,6 +14,11 @@ import subprocess
 import sys
 import yaml
 
+__version__ = "0.1.0"
+if "-V" in sys.argv or "--version" in sys.argv:
+    print(__version__)
+    exit()
+
 import benchpark.cmd.audit
 import benchpark.cmd.system
 import benchpark.cmd.experiment
@@ -25,9 +30,6 @@ from benchpark.accounting import (
     benchpark_modifiers,
     benchpark_systems,
 )
-
-
-__version__ = "0.1.0"
 
 
 def main():
@@ -52,10 +54,6 @@ def main():
     if no_args:
         parser.print_help()
         return 1
-
-    if args.version:
-        print(get_version())
-        return 0
 
     if args.subcommand in actions:
         action = actions[args.subcommand]
@@ -85,11 +83,6 @@ def supports_unknown_args(command):
     varnames = info["__code__"].co_varnames
     argcount = info["__code__"].co_argcount
     return argcount == 2 and varnames[1] == "unknown_args"
-
-
-def get_version():
-    benchpark_version = __version__
-    return benchpark_version
 
 
 def benchpark_list(subparsers, actions_dict):
