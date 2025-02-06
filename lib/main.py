@@ -18,6 +18,26 @@ __version__ = "0.1.0"
 if "-V" in sys.argv or "--version" in sys.argv:
     print(__version__)
     exit()
+helpstr="""usage: main.py [-h] [-V] {list,tags,system,experiment,setup,unit-test,audit} ...
+
+Benchpark
+
+options:
+  -h, --help            show this help message and exit
+  -V, --version         show version number and exit
+
+Subcommands:
+  {list,tags,system,experiment,setup,unit-test,audit}
+    list                List available experiments, systems, and modifiers
+    tags                Tags in Benchpark experiments
+    system              Initialize a system config
+    experiment          Interact with experiments
+    setup               Set up an experiment and prepare it to build/run
+    unit-test           Run benchpark unit tests
+    audit               Look for problems in System/Experiment repos"""
+if "-h" in sys.argv or "--help" in sys.argv:
+    print(helpstr)
+    exit()
 
 import benchpark.cmd.audit
 import benchpark.cmd.system
