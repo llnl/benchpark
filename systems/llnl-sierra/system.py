@@ -34,7 +34,7 @@ class LlnlSierra(System):
     variant(
         "cluster",
         default="lassen",
-        values=( "lassen", "sierra"),
+        values=("lassen", "sierra"),
         description="Which cluster to run on",
     )
 
