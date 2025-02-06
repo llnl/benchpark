@@ -25,6 +25,13 @@ class RikenFugaku(System):
     maintainer("")
 
     variant(
+        "cluster",
+        default="fugaku",
+        values=("fugaku"),
+        description="Which cluster to run on",
+    )
+
+    variant(
         "compiler",
         default="clang",
         values=("clang", "gcc", "fj"),

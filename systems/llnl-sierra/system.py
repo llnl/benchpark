@@ -13,13 +13,13 @@ from benchpark.paths import hardware_descriptions
 class LlnlSierra(System):
 
     id_to_resources = {
-        "sierra": {
+        "lassen": {
             "sys_cores_per_node": 44,
             "sys_gpus_per_node": 4,
             "hardware_key": str(hardware_descriptions)
             + "/IBM-power9-V100-Infiniband/hardware_description.yaml",
         },
-        "lassen": {
+        "sierra": {
             "sys_cores_per_node": 44,
             "sys_gpus_per_node": 4,
             "hardware_key": str(hardware_descriptions)
@@ -30,6 +30,13 @@ class LlnlSierra(System):
     system_site("llnl")
 
     maintainer("")
+
+    variant(
+        "cluster",
+        default="lassen",
+        values=( "lassen", "sierra"),
+        description="Which cluster to run on",
+    )
 
     variant(
         "cuda",
@@ -63,8 +70,9 @@ class LlnlSierra(System):
         super().initialize()
 
         self.scheduler = "lsf"
-        self.sys_cores_per_node = "44"
-        self.sys_gpus_per_node = "4"
+        attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
+        for k, v in attrs.items():
+            setattr(self, k, v)
 
     def generate_description(self, output_dir):
         super().generate_description(output_dir)
