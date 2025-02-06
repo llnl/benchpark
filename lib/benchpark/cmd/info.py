@@ -3,7 +3,6 @@ import textwrap
 
 import yaml
 import llnl.util.tty.color as color
-import spack.cmd.info as spackinfo
 
 import benchpark.paths
 
@@ -23,7 +22,6 @@ def info_variants(spec_class):
     all_variants = list(spec_class.variants.values())[0]
     for var in all_variants.values():
         for attr, value in var.__dict__.items():
-            # print(f"{attr}: {value}")
             color.cprint(indent() + "@*g" + attr + "@.: " + str(value))
         print()
 
@@ -107,8 +105,6 @@ def info_experiment(args):
 
     experiment_spec = benchpark.spec.ExperimentSpec(" ".join(args.spec))
     experiment_class = experiment_spec.experiment_class
-
-    # spackinfo.print_variants(experiment_class)
 
     if args.spack:
         subprocess.run(["spack", "info", experiment_class.spack_name])
