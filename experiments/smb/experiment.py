@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainer
 from benchpark.experiment import Experiment
 from benchpark.scaling import StrongScaling
 
@@ -21,6 +21,14 @@ class Smb(Experiment, StrongScaling):
         default="master",
         description="app version",
     )
+
+    maintainer("")
+
+    url = "https://github.com/sandialabs/SMB"
+
+    spack_name = "smb"
+
+    ramble_name = "smb"
 
     def compute_applications_section(self):
         if self.spec.satisfies("workload=mpi_overhead"):

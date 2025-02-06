@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainer
 from benchpark.experiment import Experiment
 from benchpark.caliper import Caliper
 
@@ -23,6 +23,14 @@ class Stream(
         default="5.10",
         description="app version",
     )
+
+    maintainer("")
+
+    url = "https://www.cs.virginia.edu/stream/ref.html"
+
+    spack_name = "stream"
+
+    ramble_name = "stream"
 
     def compute_applications_section(self):
 

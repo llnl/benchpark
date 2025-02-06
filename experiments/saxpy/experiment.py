@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainer
 from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
@@ -24,6 +24,14 @@ class Saxpy(Experiment, OpenMPExperiment, CudaExperiment, ROCmExperiment, Calipe
         default="1.0.0",
         description="app version",
     )
+
+    maintainer("")
+
+    url = ""
+
+    spack_name = "saxpy"
+
+    ramble_name = "saxpy"
 
     def compute_applications_section(self):
         # GPU tests include some smaller sizes
