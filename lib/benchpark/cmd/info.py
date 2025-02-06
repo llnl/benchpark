@@ -69,6 +69,10 @@ def info_system(args):
 
 
 def info_experiment(args):
+    def _info_url(experiment_class):
+        gen_header("URL")
+        print(experiment_class.url)
+
     experiment_spec = benchpark.spec.ExperimentSpec(" ".join(args.spec))
     experiment_class = experiment_spec.experiment_class
 
@@ -84,6 +88,7 @@ def info_experiment(args):
         actions = {
             "variants": (info_variants, [experiment_class]),
             "maintainer": (info_maintainer, [experiment_class]),
+            "url": (_info_url, [experiment_class]),
         }
 
         # Call functions for enabled options, or all if no flag is set
@@ -118,6 +123,9 @@ def setup_parser(root_parser):
     )
     experiment_parser.add_argument(
         "--ramble", action="store_true", help="Information from Ramble package"
+    )
+    experiment_parser.add_argument(
+        "--url", action="store_true", help="URL for experiment"
     )
     experiment_parser.add_argument("spec", nargs="+", help="Experiment spec")
 
