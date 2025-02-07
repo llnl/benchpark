@@ -39,13 +39,13 @@ if "-h" in sys.argv or "--help" in sys.argv:
     print(helpstr)
     exit()
 
-import benchpark.cmd.audit
-import benchpark.cmd.system
-import benchpark.cmd.experiment
-import benchpark.cmd.setup
-import benchpark.cmd.unit_test
-import benchpark.paths
-from benchpark.accounting import (
+import benchpark.cmd.audit  # noqa: E402
+import benchpark.cmd.system  # noqa: E402
+import benchpark.cmd.experiment  # noqa: E402
+import benchpark.cmd.setup  # noqa: E402
+import benchpark.cmd.unit_test  # noqa: E402
+import benchpark.paths  # noqa: E402
+from benchpark.accounting import (  # noqa: E402
     benchpark_experiments,
     benchpark_modifiers,
     benchpark_systems,
