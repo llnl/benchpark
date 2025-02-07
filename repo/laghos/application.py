@@ -43,6 +43,22 @@ class Laghos(ExecutableApplication):
             description='max number of steps',
             workloads=['triplept'])
 
+    workload_variable('p', default='3',
+                      description='p',
+                      workloads=['problem'])
+
+    workload_variable('rs', default='5',
+                      description='rs',
+                      workloads=['problem'])
+
+    workload_variable('ms', default='500',
+                      description='ms',
+                      workloads=['problem'])
+
+    workload_variable('mesh_path', default='{laghos_path}/data/box01_hex.mesh',
+                      description='mesh path',
+                      workloads=['problem'])
+
     figure_of_merit('Major kernels total time',
                     log_file='{experiment_run_dir}/{experiment_name}.out',
                     fom_regex=r'Major kernels total time \(seconds\):\s+(?P<fom>[0-9]+\.[0-9]*(e^[0-9]*)?)',

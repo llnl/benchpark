@@ -22,13 +22,6 @@ class Mfem(BuiltinMfem):
     depends_on("hiprand", when="+rocm")
     depends_on("hipsparse", when="+rocm")
 
-    version("4.4_comm_cali", branch="comm_cali", submodules=False, git="https://github.com/gracenansamba/mfem.git")
-
-    variant("caliper", default=False, description="Build Caliper support")
-
-    depends_on("caliper", when="+caliper")
-    depends_on("adiak", when="+caliper")
-
     compiler_to_cpe_name = {
         "cce": "cray",
         "gcc": "gnu",
@@ -47,6 +40,20 @@ class Mfem(BuiltinMfem):
     #cal_dir=spec["caliper"].prefix
     #targets.append("CALIPER_DIR=%s" % spec["caliper"].prefix)
     #targets.append("ADIAK_DIR=%s" % spec["adiak"].prefix)
+    variant("caliper", default=False, description="Build Caliper support")
+    def get_make_config_options(self, spec, prefix):
+        def yes_no(varstr):
+            return "YES" if varstr in self.spec else "NO"
+        options = super(Mfem, self).get_make_config_options(spec, prefix)
+        caliper_opt = ["MFEM_USE_CALIPER=%s" % yes_no("+caliper"), ]
+        return options + caliper_opt
+
+    version("4.4_comm_cali", branch="comm_cali", submodules=False, git="https://github.com/gracenansamba/mfem.git")
+
+    variant("caliper", default=False, description="Enable/disable Caliper support")
+    depends_on("caliper", when="+caliper")
+    depends_on("adiak", when="+caliper")
+
     def get_make_config_options(self, spec, prefix):
         def yes_no(varstr):
             return "YES" if varstr in self.spec else "NO"
