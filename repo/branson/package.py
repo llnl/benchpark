@@ -35,6 +35,8 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
 
     variant("openmp", default=False, description="Enable OpenMP support")
     variant("caliper", default=False, description="Enable Caliper monitoring")
+    variant("metis", default=False, description="Enable METIS")
+    variant("viz", default=False, description="Enable VIZ")
     variant("n_groups", default=30, values=int, description="Number of groups")
 
     #depends_on("mpi")
@@ -73,7 +75,10 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
         args.append(f"-DMPI_CXX_COMPILER={spec['mpi'].mpicxx}")
         args.append(f"-DCMAKE_Fortran_COMPILER={spec['mpi'].mpifc}")
 
+        args.append(self.define_from_variant("ENABLE_METIS", "metis"))
         args.append(f"-DMETIS_ROOT_DIR={spec['metis'].prefix}")
+
+        args.append(self.define_from_variant("ENABLE_VIZ", "viz"))
 
         if '+cuda' in spec:
             args.append("-DENABLE_CUDA=ON")
