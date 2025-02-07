@@ -1,18 +1,36 @@
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -9,65 +9,160 @@
+@@ -9,65 +9,184 @@
  # Enbable debug mode by passing -DCMAKE_BUILD_TYPE=Debug to CMake, default is
  # Release
  
 -cmake_minimum_required (VERSION 3.11)
-+cmake_minimum_required(VERSION 3.21)
++cmake_minimum_required(VERSION 3.23)
  
 -option(USE_GPU "user-set flag to compile in GPU code" FALSE)
 +project (BRANSON
 +  VERSION 0.8
 +  DESCRIPTION "Branson can be used to study different algorithms for parallel Monte Carlo transport. Currently it contains particle passing and mesh passing methods for domain decomposition."
 +)
-+
+ 
+-if(DEFINED ENV{CUDADIR}
+-   OR DEFINED ENV{CUDACXX}
+-   OR DEFINED ENV{CUDA_HOME})
+-  if(USE_GPU)
+-    set(GPU_DBS_STRING "CUDA" CACHE STRING "If CUDA is available, this variable is 'CUDA'")
+-    enable_language(CUDA)
+-  endif()
+-elseif(
+-  "$ENV{LOADEDMODULES}" MATCHES "rocmcc"
+-  OR DEFINED ENV{HIPCXX}
+-  OR DEFINED CMAKE_HIP_COMPILER
+-  OR DEFINED ENV{ROCM_PATH})
+-  if(USE_GPU)
+-    set(GPU_DBS_STRING "HIP" CACHE STRING "If HIP is available, this variable is 'HIP'")
+-    #if(CMAKE_HIP_COMPILER MATCHES "CC")
+-    #  set(CMAKE_HIP_FLAGS "-x hip")
+-    #endif()
+-    enable_language(HIP)
 +## Fail if someone tries to config an in-source build.
 +if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
 +   message(FATAL_ERROR "In-source builds are not supported. Please remove "
@@ -28,24 +46,59 @@
 +set(CMAKE_CXX_STANDARD 17)
 +set(CMAKE_CXX_STANDARD_REQUIRED ON)
 +set(CMAKE_CXX_EXTENSIONS OFF)
-+set(CMAKE_BRANSON_CXXFLAGS ${CMAKE_CXX_FLAGS})
++string(REPLACE " " ";" CMAKE_BRANSON_CXXFLAGS "${CMAKE_CXX_FLAGS}")
 +
 +option(ENABLE_CUDA "Use CUDA" FALSE)
 +option(ENABLE_HIP "Use HIP" FALSE)
 +option(ENABLE_CALIPER "Enable Caliper" FALSE)
 +option(ENABLE_OPENMP "Enable OpenMP" FALSE)
++option(ENABLE_METIS "Enable METIS" FALSE)
++option(ENABLE_VIZ "Enable VIZ" FALSE)
 +
 +set(CMAKE_VERBOSE_MAKEFILE ON)
 +
++find_package(MPI REQUIRED)
++list(APPEND branson_deps
++  MPI::MPI_CXX)
++
++##############################################################################
++# OpenMP
++##############################################################################
++if(ENABLE_OPENMP)
++  message(STATUS "Looking for OpenMP...")
++  find_package(OpenMP REQUIRED)
++  if(OpenMP_FOUND)
++    message(STATUS "Looking for openmp......found ${OpenMP_CXX_FLAGS}")
++    set(USE_OPENMP ON)
++    list(APPEND branson_deps
++      OpenMP::OpenMP_CXX
++    )
+   endif()
++else()
++  message(STATUS "Disabling OpenMP...")
++  set(USE_OPENMP OFF)
+ endif()
+ 
+-message("GPU_DBS_STRING: ${GPU_DBS_STRING}")
+-project (BRANSON
+-  VERSION 0.8
+-  DESCRIPTION "Branson can be used to study different algorithms for parallel Monte Carlo transport. Currently it contains particle passing and mesh passing methods for domain decomposition."
+-#  HOMEPAGE URL "https://github.com/lanl/branson" # needs cmake 3.12+
+-  LANGUAGES CXX C ${GPU_DBS_STRING})
+-
+-get_property(_LANGUAGES_ GLOBAL PROPERTY ENABLED_LANGUAGES)
+-
+-message("Languages: ${_LANGUAGES_}")
+-if((_LANGUAGES_ MATCHES CUDA OR _LANGUAGES_ MATCHES HIP) AND USE_GPU)
+-  message("CUDA/HIP module found (CUDA/HIP environment variables set) and USE_GPU is on, making GPU BRANSON")
+-  add_compile_definitions(HAS_GPU)
+-elseif(USE_GPU)
+-  message(FATAL_ERROR "CUDA/HIP module NOT found (CUDA/HIP environment variables set) but USE_GPU is on, reconfigure with USE_GPU off or fix modules")
+-elseif(NOT USE_GPU)
+-  message("GPU mode not requested, making CPU only BRANSON")
 +if(ENABLE_CUDA)
 +  enable_language(CXX)
- 
--if(DEFINED ENV{CUDADIR}
--   OR DEFINED ENV{CUDACXX}
--   OR DEFINED ENV{CUDA_HOME})
--  if(USE_GPU)
--    set(GPU_DBS_STRING "CUDA" CACHE STRING "If CUDA is available, this variable is 'CUDA'")
--    enable_language(CUDA)
++
 +  find_package(CUDAToolkit REQUIRED)
 +  list(APPEND branson_deps
 +    CUDA::cudart)
@@ -58,18 +111,7 @@
 +  if(NOT CMAKE_CUDA_COMPILER)
 +    message(FATAL_ERROR "Unable to find the nvcc compiler. Please use"
 +                        "CMAKE_CUDA_COMPILER to provide the nvcc compiler.")
-   endif()
--elseif(
--  "$ENV{LOADEDMODULES}" MATCHES "rocmcc"
--  OR DEFINED ENV{HIPCXX}
--  OR DEFINED CMAKE_HIP_COMPILER
--  OR DEFINED ENV{ROCM_PATH})
--  if(USE_GPU)
--    set(GPU_DBS_STRING "HIP" CACHE STRING "If HIP is available, this variable is 'HIP'")
--    #if(CMAKE_HIP_COMPILER MATCHES "CC")
--    #  set(CMAKE_HIP_FLAGS "-x hip")
--    #endif()
--    enable_language(HIP)
++  endif()
 +
 +  enable_language(CUDA)
 +  set(CMAKE_CUDA_STANDARD ${CMAKE_CXX_STANDARD})
@@ -93,26 +135,8 @@
 +    else()
 +      set(HIP_PATH $ENV{HIP_PATH} CACHE PATH "Path to which HIP has been installed")
 +    endif()
-   endif()
--endif()
- 
--message("GPU_DBS_STRING: ${GPU_DBS_STRING}")
--project (BRANSON
--  VERSION 0.8
--  DESCRIPTION "Branson can be used to study different algorithms for parallel Monte Carlo transport. Currently it contains particle passing and mesh passing methods for domain decomposition."
--#  HOMEPAGE URL "https://github.com/lanl/branson" # needs cmake 3.12+
--  LANGUAGES CXX C ${GPU_DBS_STRING})
--
--get_property(_LANGUAGES_ GLOBAL PROPERTY ENABLED_LANGUAGES)
--
--message("Languages: ${_LANGUAGES_}")
--if((_LANGUAGES_ MATCHES CUDA OR _LANGUAGES_ MATCHES HIP) AND USE_GPU)
--  message("CUDA/HIP module found (CUDA/HIP environment variables set) and USE_GPU is on, making GPU BRANSON")
--  add_compile_definitions(HAS_GPU)
--elseif(USE_GPU)
--  message(FATAL_ERROR "CUDA/HIP module NOT found (CUDA/HIP environment variables set) but USE_GPU is on, reconfigure with USE_GPU off or fix modules")
--elseif(NOT USE_GPU)
--  message("GPU mode not requested, making CPU only BRANSON")
++  endif()
++
 +  if(NOT DEFINED ROCM_PATH)
 +    if(DEFINED ENV{ROCM_PATH})
 +      set(ROCM_PATH $ENV{ROCM_PATH} CACHE PATH "Path to which ROCM has been installed")
@@ -204,7 +228,7 @@
    message(STATUS
      "HARDCODED NUMBER OF GROUPS NOT SET, DEFAULTING TO ONE GROUP (GRAY)
       use '-DN_GROUPS=<int>' when running cmake to select multigroup.\n")
-@@ -83,28 +178,10 @@ set(ENABLE_VERBOSE_GPU_TRANSPORT ${ENABLE_VERBOSE_GPU_TRANSPORT} CACHE STRING "F
+@@ -83,28 +202,10 @@ set(ENABLE_VERBOSE_GPU_TRANSPORT ${ENABLE_VERBOSE_GPU_TRANSPORT} CACHE STRING "F
  #------------------------------------------------------------------------------#
  # Record the site name
  
@@ -236,7 +260,7 @@
  
  # GCC options for address or undefined sanitizing
  #set(GCC_SANITIZE_COMPILE_FLAGS "-fsanitize=address")
-@@ -113,65 +190,68 @@ endif ()
+@@ -113,135 +214,137 @@ endif ()
  #set(GCC_SANITIZE_LINK_FLAGS "-fsanitize=undefined")
  
  # add compiler flags
@@ -325,26 +349,25 @@
 -  message( STATUS "Compiler Flags (Release): ${CMAKE_CXX_FLAGS_RELEASE}")
 +message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 +message(STATUS "Compiler        : ${CMAKE_CXX_COMPILER}")
++string(REPLACE ";" " " CMAKE_BRANSON_CXXFLAGS_STR "${CMAKE_BRANSON_CXXFLAGS}")
 +if(CMAKE_CONFIGURATION_TYPES)
-+  message(STATUS "Compiler Flags (All)    : ${CMAKE_CXX_FLAGS}")
++  message(STATUS "Compiler Flags (All)    : ${CMAKE_CXX_FLAGS} ${CMAKE_BRANSON_CXXFLAGS_STR}")
 +  message(STATUS "Compiler Flags (Debug)  : ${CMAKE_CXX_FLAGS_DEBUG}")
 +  message(STATUS "Compiler Flags (Release): ${CMAKE_CXX_FLAGS_RELEASE}")
  else()
 -  string( TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPER )
 -  message( STATUS "Compiler Flags  : ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE_UPPER}}")
 +  string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPER)
-+  message(STATUS "Compiler Flags  : ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE_UPPER}}")
++  message(STATUS "Compiler Flags  : ${CMAKE_CXX_FLAGS} ${CMAKE_BRANSON_CXXFLAGS_STR} ${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE_UPPER}}")
  endif()
  message("\n")
  
-@@ -180,68 +260,55 @@ message("\n")
- 
- # set(DMAPP_DYNAMIC -Wl,--whole-archive,-ldmapp,--no-whole-archive)
- 
-+find_package(MPI REQUIRED)
-+list(APPEND branson_deps
-+  MPI::MPI_CXX)
- 
+-#------------------------------------------------------------------------------#
+-# Set up libraries for Cray RMA routines
+-
+-# set(DMAPP_DYNAMIC -Wl,--whole-archive,-ldmapp,--no-whole-archive)
+-
+-
 -#------------------------------------------------------------------------------#
 -# Targets
 -file(GLOB headers *.h)
@@ -355,45 +378,43 @@
 -  MPI::MPI_CXX
 -  MPI::MPI_C
 -  pugixml)
-+list(APPEND branson_deps pugixml)
- 
+-
 -if(OpenMP_FOUND)
 -  set(branson_deps "OpenMP::OpenMP_CXX;${branson_deps}")
+-endif()
+-
+-if(METIS_FOUND)
+-  set( branson_deps "METIS::metis;${branson_deps}")
+-endif()
+-
+-if( VIZ_LIBRARIES_FOUND )
+-  set( branson_deps "Silo::silo;${HDF5_LIBRARIES};${branson_deps}" )
+-endif()
++list(APPEND branson_deps pugixml)
++
++##############################################################################
++# caliper/adiak
++##############################################################################
 +if(ENABLE_CALIPER)
 +  message(STATUS "Looking for caliper...")
 +  find_package(caliper REQUIRED)
 +  if(caliper_FOUND)
-+    message(STATUS "Looking for caliper.....found")
++    message(STATUS "Looking for caliper......found ${caliper_DIR}")
++    list(APPEND branson_deps
++      caliper)
 +  endif()
-+  list(APPEND branson_deps
-+    caliper)
-+  find_package(adiak REQUIRED)
-+  list(APPEND branson_deps
-+    adiak::adiak)
-+else()
-+  add_custom_target(caliper)
- endif()
- 
--if(METIS_FOUND)
--  set( branson_deps "METIS::metis;${branson_deps}")
-+if(ENABLE_OPENMP)
-+  set(USE_OPENMP ON)
-+else()
-+  set(USE_OPENMP OFF)
- endif()
- 
--if( VIZ_LIBRARIES_FOUND )
--  set( branson_deps "Silo::silo;${HDF5_LIBRARIES};${branson_deps}" )
--endif()
-+include(find_tpls)
-+setupTPLs()
  
 -if(caliper_FOUND)
 -  set( branson_deps "caliper;${branson_deps}")
-+if(OpenMP_FOUND)
-+  list(APPEND branson_deps
-+    OpenMP::OpenMP_CXX
-+  )
++  message(STATUS "Looking for adiak...")
++  find_package(adiak REQUIRED)
++  if(adiak_FOUND)
++    message(STATUS "Looking for adiak......found ${adiak_DIR}")
++    list(APPEND branson_deps
++      adiak::adiak)
++  endif()
++else()
++  message(STATUS "Disabling caliper...")
  endif()
  
 -#------------------------------------------------------------------------------#
@@ -414,28 +435,53 @@
 -  message("Setting HIP compiler options")
 -  if(CMAKE_HIP_COMPILER MATCHES "CC")
 -    set(CMAKE_HIP_FLAGS "-x hip")
--  endif()
++##############################################################################
++# metis
++##############################################################################
++if(ENABLE_METIS)
++  message(STATUS "Looking for METIS...")
++  find_package(METIS REQUIRED)
++  if(METIS_FOUND)
++    message(STATUS "Looking for METIS......found ${METIS_LIBRARIES}")
++    list(APPEND branson_deps
++      METIS::metis)
+   endif()
 -  set_target_properties(BRANSON PROPERTIES HIP_ARCHITECTURES "gfx942") # MI300
 -  set_target_properties(BRANSON PROPERTIES HIP_STANDARD 17)
 -  string(APPEND CMAKE_HIP_FLAGS " -g -mllvm=--disable-peephole")
 -  #string(APPEND CMAKE_HIP_FLAGS " --expt-extended-lambda"  )
 -  set_source_files_properties("main.cc" PROPERTIES LANGUAGE HIP)
--else()
+ else()
 -  message("GPU Options: Not a GPU build or GPU_DBS_STRING not recognized")
-+if(METIS_FOUND)
-+  list(APPEND branson_deps
-+    METIS::metis)
++  message(STATUS "Disabling METIS...")
  endif()
  
 -target_link_libraries( BRANSON PRIVATE ${branson_deps} )
 -
 -#------------------------------------------------------------------------------#
 -# Testing
-+if(VIZ_LIBRARIES_FOUND)
-+  list(APPEND branson_deps
-+    Silo::silo
-+    ${HDF5_LIBRARIES}
-+  )
++##############################################################################
++# Silo and HDF5 libraries
++##############################################################################
++if(ENABLE_VIZ)
++  message(STATUS "Looking for HDF5...")
++  find_package(HDF5 REQUIRED)
++  if(HDF5_FOUND)
++    list(GET HDF5_LIBRARIES 0 hdf5lib)
++    message(STATUS "Looking for HDF5..found ${hdf5lib}")
++    unset(hdf5lib)
++    message(STATUS "Looking for Silo...")
++    find_package(Silo REQUIRED)
++    if(Silo_FOUND)
++      message(STATUS "Looking for Silo..found ${Silo_LIBRARY}")
++    endif()
++    list(APPEND branson_deps
++      Silo::silo
++      ${HDF5_LIBRARIES}
++    )
++  endif()
++else ()
++  message(STATUS "Disabling visualization libraries...")
 +endif()
  
 -option( BUILD_TESTING "Should we compile the tests?" ON )
@@ -443,7 +489,7 @@
  if(BUILD_TESTING)
    enable_testing()
    add_subdirectory(test)
-@@ -252,11 +319,38 @@ else()
+@@ -252,11 +355,38 @@ else()
      "Building tests disabled, set BUILD_TESTING=TRUE or don't set BUILD_TESTING to enable test builds")
  endif()
  
