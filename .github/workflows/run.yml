@@ -808,3 +808,39 @@ jobs:
           benchmark_spec: ad
           system_name: tioga
           system_spec: llnl-elcapitan rocm=6.2.4 compiler=rocmcc
+
+      - name: branson/openmp caliper=mpi,time ruby llnl-cluster cluster=ruby compiler=intel
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: branson
+          benchmark_mode: openmp
+          benchmark_spec: branson+openmp caliper=mpi,time
+          system_name: ruby
+          system_spec: llnl-cluster cluster=ruby compiler=intel
+
+      - name: branson/cuda caliper=cuda,time lassen llnl-sierra cuda=11-8-0 compiler=clang-ibm
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: branson
+          benchmark_mode: cuda
+          benchmark_spec: branson+cuda caliper=cuda,time
+          system_name: lassen
+          system_spec: llnl-sierra cuda=11-8-0 compiler=clang-ibm
+
+      - name: branson/cuda caliper=cuda,time venado lanl-venado cuda=12.5 compiler=cce +gtl
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: branson
+          benchmark_mode: cuda
+          benchmark_spec: branson+cuda caliper=cuda,time
+          system_name: venado
+          system_spec: lanl-venado cuda=12.5 compiler=cce +gtl
+
+      - name: branson/rocm caliper=mpi,time tioga llnl-elcapitan rocm=6.2.4 compiler=cce +gtl
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: branson
+          benchmark_mode: rocm
+          benchmark_spec: branson+rocm caliper=mpi,time
+          system_name: tioga
+          system_spec: llnl-elcapitan rocm=6.2.4 compiler=cce +gtl
