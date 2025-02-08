@@ -20,6 +20,9 @@ class RajaPerf(
     OpenMPExperiment,
     Caliper,
 ):
+
+    maintainers("michaelmckinsey1")
+
     variant(
         "workload",
         default="suite",
@@ -32,11 +35,16 @@ class RajaPerf(
         description="app version",
     )
 
-    maintainers("michaelmckinsey1")
+    variant(
+        "total_size",
+        default=1048576,
+        description="total problem size (will be divided by ranks)",
+    )
 
     def compute_applications_section(self):
 
         n_resources = {"n_ranks": 1}
+        total_size = int(self.spec.variants["total_size"][0])
 
         if self.spec.satisfies("+single_node"):
             for pk, pv in n_resources.items():
@@ -57,6 +65,12 @@ class RajaPerf(
             self.add_experiment_variable("n_threads_per_proc", 1, True)
         else:
             self.add_experiment_variable("n_ranks", n_resources, True)
+
+        if isinstance(n_resources, list):
+            size = [int(total_size / res) for res in n_resources]
+        else:
+            size = total_size
+        self.add_experiment_variable("size", size, True)
 
     def compute_package_section(self):
         # get package version
