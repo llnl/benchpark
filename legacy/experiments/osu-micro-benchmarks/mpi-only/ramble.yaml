@@ -34,7 +34,7 @@ ramble:
   software:
     packages:
       osu-micro-benchmarks:
-        pkg_spec: osu-micro-benchmarks
+        pkg_spec: osu-micro-benchmarks@comm_cali +mpi+openmp{modifier_spack_variant}
         compiler: default-compiler
     environments:
       osu-micro-benchmarks:

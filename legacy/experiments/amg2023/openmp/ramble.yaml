@@ -31,23 +31,51 @@ ramble:
                 px: '{p}'
                 py: '{p}'
                 pz: '{p}'
-                nx: ['10', '20', '20']
-                ny: ['10', '10', '20']
-                nz: ['10', '10', '10']
+                nx: ['120', '240', '240']
+                ny: ['120', '120', '240']
+                nz: ['120', '120', '120']
                 n_ranks: '{px}*{py}*{pz}'
                 n_threads_per_proc: '1'
                 omp_num_threads: '{n_threads_per_proc}'
                 env_name: amg2023-omp
-            amg2023_omp_strong_problem1_{n_nodes}_{n_threads_per_proc}_{px}_{py}_{pz}_{nx}_{ny}_{nz}:
+            amg2023_omp_strong_problem1_120_{n_nodes}_{n_threads_per_proc}_{px}_{py}_{pz}_{nx}_{ny}_{nz}:
               variants:
                 package_manager: spack
               variables:
-                px: ['2', '4', '4']
-                py: ['2', '2', '4']
-                pz: ['2', '2', '2']
-                nx: '10'
-                ny: '10'
-                nz: '10'
+                px: ['2', '4', '4', '4', '4', '4']
+                py: ['2', '2', '4', '4', '4', '8']
+                pz: ['2', '2', '2', '4', '8', '8']
+                nx: ['60', '30','30', '30', '30', '30']
+                ny: ['60', '60', '30', '30', '30', '15']
+                nz: ['60', '60', '60', '30', '15', '15']
+                n_ranks: '{px}*{py}*{pz}'
+                n_threads_per_proc: '1'
+                omp_num_threads: '{n_threads_per_proc}'
+                env_name: amg2023-omp
+            amg2023_omp_strong_problem1_160_{n_nodes}_{n_threads_per_proc}_{px}_{py}_{pz}_{nx}_{ny}_{nz}:
+              variants:
+                package_manager: spack
+              variables:
+                px: ['2', '4', '4', '4', '4', '4']
+                py: ['2', '2', '4', '4', '4', '8']
+                pz: ['2', '2', '2', '4', '8', '8']
+                nx: ['80', '40','40', '40', '40', '40']
+                ny: ['80', '80', '40', '40', '40', '20']
+                nz: ['80', '80', '80', '40', '20', '20']
+                n_ranks: '{px}*{py}*{pz}'
+                n_threads_per_proc: '1'
+                omp_num_threads: '{n_threads_per_proc}'
+                env_name: amg2023-omp
+            amg2023_omp_strong_problem1_200_{n_nodes}_{n_threads_per_proc}_{px}_{py}_{pz}_{nx}_{ny}_{nz}:
+              variants:
+                package_manager: spack
+              variables:
+                px: ['2', '4', '4', '4', '4', '4']
+                py: ['2', '2', '4', '4', '4', '8']
+                pz: ['2', '2', '2', '4', '8', '8']
+                nx: ['100', '50','50', '50', '50', '50']
+                ny: ['100', '100', '50', '50', '50', '25']
+                nz: ['100', '100', '100', '50', '25', '25']
                 n_ranks: '{px}*{py}*{pz}'
                 n_threads_per_proc: '1'
                 omp_num_threads: '{n_threads_per_proc}'
@@ -56,12 +84,13 @@ ramble:
               variants:
                 package_manager: spack
               variables:
-                px: ['2', '4', '4']
-                py: ['2', '2', '4']
-                pz: ['2', '2', '2']
-                nx: ['10', '20', '20']
-                ny: ['10', '10', '20']
-                nz: ['10', '10', '10']
+                px: ['4', '8', '8', '8']
+                py: ['4', '4', '8', '8']
+                pz: ['4', '4', '4', '8']
+                nx: ['32', '16', '32', '32']
+                ny: ['32', '32', '16', '32']
+                nz: ['16', '32', '32', '16']
+                n_nodes: ['1', '2', '4', 8]
                 n_ranks: '{px}*{py}*{pz}'
                 n_threads_per_proc: '1'
                 omp_num_threads: '{n_threads_per_proc}'
@@ -76,37 +105,80 @@ ramble:
                 px: '{p}'
                 py: '{p}'
                 pz: '{p}'
-                nx: ['10', '20', '20']
-                ny: ['10', '10', '20']
-                nz: ['10', '10', '10']
+                nx: ['120', '240', '240', '240']
+                ny: ['120', '120', '240', '240']
+                nz: ['120', '120', '120', '240']
                 n_ranks: '{px}*{py}*{pz}'
                 n_threads_per_proc: '1'
                 omp_num_threads: '{n_threads_per_proc}'
                 env_name: amg2023-omp
-            amg2023_omp_strong_problem2_{n_nodes}_{n_threads_per_proc}_{px}_{py}_{pz}_{nx}_{ny}_{nz}:
+            amg2023_omp_strong_problem2_200_{n_nodes}_{n_threads_per_proc}_{px}_{py}_{pz}_{nx}_{ny}_{nz}:
               variants:
                 package_manager: spack
               variables:
-                px: ['2', '4', '4']
-                py: ['2', '2', '4']
-                pz: ['2', '2', '2']
-                nx: '10'
-                ny: '10'
-                nz: '10'
+                px: ['2', '4', '4', '4', '4', '4']
+                py: ['2', '2', '4', '4', '4', '8']
+                pz: ['2', '2', '2', '4', '8', '8']
+                nx: ['100', '50','50', '50', '50', '50']
+                ny: ['100', '100', '50', '50', '50', '25']
+                nz: ['100', '100', '100', '50', '25', '25']
                 n_ranks: '{px}*{py}*{pz}'
                 n_threads_per_proc: '1'
                 omp_num_threads: '{n_threads_per_proc}'
                 env_name: amg2023-omp
-            amg2023_omp_weak_problem2_{n_nodes}_{n_threads_per_proc}_{px}_{py}_{pz}_{nx}_{ny}_{nz}:
+            amg2023_omp_strong_problem2_256_{n_nodes}_{n_threads_per_proc}_{px}_{py}_{pz}_{nx}_{ny}_{nz}:
               variants:
                 package_manager: spack
               variables:
-                px: ['2', '4', '4']
-                py: ['2', '2', '4']
-                pz: ['2', '2', '2']
-                nx: ['10', '20', '20']
-                ny: ['10', '10', '20']
-                nz: ['10', '10', '10']
+                px: ['2', '4', '4', '4', '4', '4']
+                py: ['2', '2', '4', '4', '4', '8']
+                pz: ['2', '2', '2', '4', '8', '8']
+                nx: ['128', '64','64', '64', '64', '64']
+                ny: ['128', '128', '64', '64', '64', '32']
+                nz: ['128', '128', '128', '64', '32', '32']
+                n_ranks: '{px}*{py}*{pz}'
+                n_threads_per_proc: '1'
+                omp_num_threads: '{n_threads_per_proc}'
+                env_name: amg2023-omp
+            amg2023_omp_strong_problem2_320_{n_nodes}_{n_threads_per_proc}_{px}_{py}_{pz}_{nx}_{ny}_{nz}:
+              variants:
+                package_manager: spack
+              variables:
+                px: ['2', '4', '4', '4', '4', '4']
+                py: ['2', '2', '4', '4', '4', '8']
+                pz: ['2', '2', '2', '4', '8', '8']
+                nx: ['160', '80','80', '80', '80', '80']
+                ny: ['160', '160', '80', '80', '80', '40']
+                nz: ['160', '160', '160', '80', '40', '40']
+                n_ranks: '{px}*{py}*{pz}'
+                n_threads_per_proc: '1'
+                omp_num_threads: '{n_threads_per_proc}'
+                env_name: amg2023-omp
+            amg2023_omp_weak_80_problem2_{n_nodes}_{n_threads_per_proc}_{px}_{py}_{pz}_{nx}_{ny}_{nz}:
+              variants:
+                package_manager: spack
+              variables:
+                px: ['2', '4', '4', '4', '4', '4']
+                py: ['2', '2', '4', '4', '4', '8']
+                pz: ['2', '2', '2', '4', '8', '8']
+                nx: '80'
+                ny: '80'
+                nz: '80'
+                n_ranks: '{px}*{py}*{pz}'
+                n_threads_per_proc: '1'
+                omp_num_threads: '{n_threads_per_proc}'
+                arch: 'OpenMP'
+                env_name: amg2023-omp
+            amg2023_omp_weak_60_problem2_{n_nodes}_{n_threads_per_proc}_{px}_{py}_{pz}_{nx}_{ny}_{nz}:
+              variants:
+                package_manager: spack
+              variables:
+                px: ['2', '4', '4', '4', '4', '4']
+                py: ['2', '2', '4', '4', '4', '8']
+                pz: ['2', '2', '2', '4', '8', '8']
+                nx: '60'
+                ny: '60'
+                nz: '60'
                 n_ranks: '{px}*{py}*{pz}'
                 n_threads_per_proc: '1'
                 omp_num_threads: '{n_threads_per_proc}'
@@ -115,7 +187,7 @@ ramble:
   software:
     packages:
       hypre-omp:
-        pkg_spec: hypre@2.31.0 +mpi+openmp+mixedint~fortran{modifier_spack_variant}
+        pkg_spec: hypre@3.1_comm_cali +mpi+openmp+mixedint~fortran{modifier_spack_variant}
         compiler: default-compiler
       amg2023-omp:
         pkg_spec: amg2023@develop +mpi+openmp{modifier_spack_variant}

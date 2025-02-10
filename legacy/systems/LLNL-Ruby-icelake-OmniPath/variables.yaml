@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 variables:
-  timeout: "120"
+  timeout: "240"
   scheduler: "slurm"
   sys_cores_per_node: "56"
   sys_gpus_per_node: 0

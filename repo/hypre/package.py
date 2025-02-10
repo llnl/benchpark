@@ -18,6 +18,7 @@ class Hypre(BuiltinHypre):
         "gcc": "gnu",
     }
 
+    version("3.1_comm_cali", branch="comm_cali", submodules=False, git="https://github.com/gracenansamba/hypre.git")
     def configure_args(self):
         configure_args = super().configure_args()
 
