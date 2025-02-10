@@ -314,6 +314,15 @@ jobs:
           system_name: venado
           system_spec: lanl-venado cuda=12.5 compiler=cce +gtl
 
+      - name: saxpy/openmp lumi csc-lumi
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: saxpy
+          benchmark_mode: openmp
+          benchmark_spec: saxpy+openmp
+          system_name: lumi
+          system_spec: csc-lumi
+
       - name: saxpy/cuda lassen llnl-sierra cuda=11-8-0 compiler=clang-ibm
         uses: ./.github/actions/dynamic-dry-run
         with:
