@@ -367,9 +367,9 @@ software:
     compiler-rocm:
       pkg_spec: "{self.spec.variants["compiler"][0]}"
     blas-rocm:
-       pkg_spec: rocblas@5.6.1
-     blas:
-       pkg_spec: cray-libsci@23
+      pkg_spec: rocblas@5.6.1
+    blas:
+      pkg_spec: cray-libsci@23
     lapack:
       pkg_spec: cray-libsci@23
     mpi-rocm-gtl:
