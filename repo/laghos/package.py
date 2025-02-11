@@ -6,7 +6,7 @@
 from spack.package import *
 
 
-class Laghos(MakefilePackage):
+class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     """Laghos (LAGrangian High-Order Solver) is a CEED miniapp that solves the
     time-dependent Euler equations of compressible gas dynamics in a moving
     Lagrangian frame using unstructured high-order finite element spatial
@@ -24,7 +24,6 @@ class Laghos(MakefilePackage):
 
     version("develop", branch="caliper")
 
-
     variant("metis", default=True, description="Enable/disable METIS support")
     variant("caliper", default=False, description="Enable/disable Caliper support")
     variant("ofast", default=False, description="Enable gcc optimization flags")
@@ -34,22 +33,35 @@ class Laghos(MakefilePackage):
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
 
-<<<<<<< HEAD
-    depends_on("hypre~fortran", when="@develop")
-    depends_on("zlib@1.3.1+optimize+pic+shared", when="@develop")
-    depends_on("mfem@develop^zlib@1.3.1+optimize+pic+shared", when="@develop")
-=======
-  #  depends_on("mfem@develop", when="@develop")
->>>>>>> origin/laghos_comm_cali
+    depends_on("zlib@1.3.1+optimize+pic+shared")
+    #depends_on("zlib@1.3.1+optimize+pic+shared", when="@develop")
+    #depends_on("mfem@develop^zlib@1.3.1+optimize+pic+shared", when="@develop")
     depends_on("mfem@4.2.0:", when="@3.1")
     depends_on("mfem@4.1.0:4.1", when="@3.0")
     # Recommended mfem version for laghos v2.0 is: ^mfem@3.4.1-laghos-v2.0
     depends_on("mfem@3.4.1-laghos-v2.0", when="@2.0")
     # Recommended mfem version for laghos v1.x is: ^mfem@3.3.1-laghos-v1.0
     depends_on("mfem@3.3.1-laghos-v1.0", when="@1.0,1.1")
-    depends_on("mfem@4.4_comm_cali", when="+caliper")
+    depends_on("mfem@4.4_comm_cali+caliper", when="+caliper")
+    depends_on("mfem cxxstd=14")
 
 
+    depends_on("mpi")
+    depends_on("hypre+mpi")
+    depends_on("hypre+cuda+mpi", when="+cuda")
+    depends_on("hypre@2.31.0+mixedint~fortran", when="@develop")
+
+    requires("+cuda", when="^hypre+cuda")
+    for arch in ("none", "50", "60", "70", "80"):
+        depends_on(f"hypre cuda_arch={arch}", when=f"cuda_arch={arch}")
+        depends_on(f"mfem cuda_arch={arch}", when=f"cuda_arch={arch}")
+    depends_on("mfem +cuda+mpi", when="+cuda")
+    depends_on("mfem +rocm+mpi", when="+rocm")
+    depends_on("hypre +rocm +mpi", when="+rocm")
+    requires("+rocm", when="^hypre+rocm")
+    for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
+        depends_on(f"hypre amdgpu_target={target}", when=f"amdgpu_target={target}")
+        depends_on(f"mfem amdgpu_target={target}", when=f"amdgpu_target={target}")
     # Replace MPI_Session
     patch(
         "https://github.com/CEED/Laghos/commit/c800883ab2741c8c3b99486e7d8ddd8e53a7cb95.patch?full_index=1",
