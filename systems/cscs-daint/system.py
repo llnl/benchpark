@@ -7,6 +7,7 @@ import pathlib
 
 from benchpark.directives import variant
 from benchpark.system import System
+from packaging.version import Version
 
 
 class CscsDaint(System):
@@ -14,7 +15,7 @@ class CscsDaint(System):
     variant(
         "compiler",
         default="cce",
-        values=("gcc9", "gcc10", "gcc11", "cce", "intel", "pgi"),
+        values=("gcc9", "gcc10", "gcc11", "cce", "intel", "pgi", "nvhpc"),
         description="Which compiler to use",
     )
     variant(
@@ -27,6 +28,19 @@ class CscsDaint(System):
     def initialize(self):
         super().initialize()
 
+        self.cuda_version = Version(self.spec.variants["cuda"][0])
+
+        full_versions = {
+            "cce": "12.0.3",
+            "gcc9": "9.3.0",
+            "gcc10": "10.3.0",
+            "gcc11": "11.2.0",
+            "intel": "2021.3.0",
+            "nvhpc": "21.3",
+        }
+        for key, value in full_versions.items():
+            if key == self.spec.variants["compiler"][0]:
+                self.compiler_version = Version(value)
         sys_variables = {
             "sys_cores_per_node": 12,
             "sys_gpus_per_node": 1,
@@ -47,7 +61,6 @@ class CscsDaint(System):
 
     def system_specific_variables(self):
         return {
-            "11.2.0": "'11.2.0'",
             "cuda_arch": "'60'",
             "enable_mps": "'/usr/tcetmp/bin/enable_mps'"
         }
@@ -65,65 +78,44 @@ class CscsDaint(System):
 
     def compiler_configs(self):
         compilers = CscsDaint.resource_location / "compilers"
-        selections = []
-        if "cce" in self.spec.variants["compiler"][0]:
-            selections.append(compilers / "02-cce-12-compiler.yaml")
-        elif "gcc9" in self.spec.variants["compiler"][0]:
-            selections.append(compilers  / "01-gcc-9-compiler.yaml")
-        elif "gcc10" in self.spec.variants["compiler"][0]:
-            selections.append(compilers / "03-gcc-10-compiler.yaml")
-        elif "gcc11" in self.spec.variants["compiler"][0]:
-            selections.append(compilers / "04-gcc-11-compiler.yaml")
-        elif "intel" in self.spec.variants["compiler"][0]:
-            selections.append(compilers / "05-intel-compiler.yaml")
-        elif "pgi" in self.spec.variants["compiler"][0]:
-            selections.append(compilers / "06-pgi-compiler.yaml")
+        compiler_map = {
+            "cce": "02-cce-12-compiler.yaml",
+            "gcc9": "01-gcc-9-compiler.yaml",
+            "gcc10": "03-gcc-10-compiler.yaml",
+            "gcc11": "04-gcc-11-compiler.yaml",
+            "intel": "05-intel-compiler.yaml",
+            "pgi": "06-pgi-compiler.yaml",
+            "nvhpc": "00-nvhpc-compiler.yaml",
+    	}
         
+        compiler_variant = self.spec.variants["compiler"][0]
+
+        selections = [
+        compilers / config_file
+        for key, config_file in compiler_map.items()
+        if key in compiler_variant
+    	]
+
         return selections
 
-    def nvhpc_cfg(self, cuda_version):
-        template = """\
-compilers:
-  - compiler:
-    spec: nvhpc@21.3
-    paths:
-      cc: cc
-      cxx: CC
-      f77: ftn
-      fc: ftn
-    flags: {}
-    operating_system: cnl7
-    target: any
-    modules:
-    - PrgEnv-nvidia
-    - nvidia/21.3
-    environment: {}
-    extra_rpaths: [] 
-"""
-        return template.format(x=cuda_version)
 
     def cuda_config(self, cuda_version):
         if cuda_version == "10.2.89":
             return """\
 packages:
-  - spec: cuda@10.2.89
-    prefix: /opt/nvidia/cudatoolkit10.2/10.2.89_3.28-2.1__g52c0314
+  cuda:
+    externals:
+    - spec: cuda@10.2.89
+      prefix: /opt/nvidia/cudatoolkit10.2/10.2.89_3.28-2.1__g52c0314
 """
         else:
-            full_version={
-                "11.0.207": "11.0",
-                "11.1.0": "11.1",
-                "11.2.0": "11.2",
-            }
-            template = """\
+            return """\
 packages:
   cuda:
     externals:
-    - spec: cuda@{x}
-      prefix: /usr/local/cuda-{y}
+    - spec: cuda@{self.cuda_version}
+      prefix: /usr/local/cuda-{self.cuda_version.major}
 """     
-            truncated_version=full_version.get(cuda_version)       
-            return template.format(x=cuda_version, y=truncated_version)
 
     def sw_description(self):
         """This is somewhat vestigial: for the Tioga config that is committed
