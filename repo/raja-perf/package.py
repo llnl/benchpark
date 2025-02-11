@@ -140,6 +140,7 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
     version("0.5.1", tag="v0.5.1", submodules="True")
     version("0.5.0", tag="v0.5.0", submodules="True")
     version("0.4.0", tag="v0.4.0", submodules="True")
+    version("fixcaliconfig", branch="fix/cali_config", submodules="True")
 
     variant("mpi", default=True, description="Enable MPI support")
     variant("openmp", default=True, description="Build OpenMP backend")
