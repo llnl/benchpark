@@ -47,15 +47,15 @@ class RajaPerf(
         description="Multiplier on number of repitions to run each kernel",
     )
 
-    variant(
-        "variants",
-        default="None",
-    )
+    # variant(
+    #     "variants",
+    #     default="None",
+    # )
 
-    variant(
-        "tunings",
-        default="None",
-    )
+    # variant(
+    #     "tunings",
+    #     default="None",
+    # )
 
     def compute_applications_section(self):
 
@@ -91,16 +91,14 @@ class RajaPerf(
 
         self.add_experiment_variable("repfact", self.spec.variants["repfact"][0], True)
 
-        rajaperf_variants = self.spec.variants["variants"][0].replace("-", " ")
-        rajaperf_tunings = self.spec.variants["tunings"][0].replace("-", " ")
-        if rajaperf_variants != "None":
-            execute += " --variants " + rajaperf_variants
-        if rajaperf_tunings != "None":
-            execute += " --tunings " + rajaperf_tunings
+        # rajaperf_variants = self.spec.variants["variants"][0].replace("-", " ")
+        # rajaperf_tunings = self.spec.variants["tunings"][0].replace("-", " ")
+        # if rajaperf_variants != "None":
+        #     execute += " --variants " + rajaperf_variants
+        # if rajaperf_tunings != "None":
+        #     execute += " --tunings " + rajaperf_tunings
 
         self.add_experiment_variable("execute", execute, True)
-        self.add_experiment_variable("variants", self.spec.variants["variants"][0], True)
-        self.add_experiment_variable("tunings", self.spec.variants["tunings"][0], True)
 
     def compute_package_section(self):
         # get package version

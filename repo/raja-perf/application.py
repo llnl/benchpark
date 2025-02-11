@@ -35,9 +35,31 @@ class RajaPerf(ExecutableApplication):
         "sycl",
     ]
 
-    executable("run", "{execute}" + " --size {size}" + " --repfact {repfact}", use_mpi=True)
+    executable(
+        "run",
+        template=["{execute}" + " --size {size}" + " --repfact {repfact}"],
+        use_mpi=True
+    )
+
+    # executable(
+    #     "run",
+    #     template=["{execute}" + " --size {size}" + " --repfact {repfact}" + " {additional_args}"],
+    #     use_mpi=True
+    # )
 
     workload("suite", executables=["run"])
+
+    # workload_variable(
+    #     "additional_args",
+    #     default="--variants {variants} --tunings {tunings}",
+    #     workloads=["suite"],
+    #     description="",
+    # )
+
+    # workload_variable("variants", default="", workloads=["suite"], description="")
+
+    # workload_variable("tunings", default="", workloads=["suite"], description="")
+
 
     figure_of_merit(
         "All tests pass",
