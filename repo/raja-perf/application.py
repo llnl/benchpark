@@ -35,11 +35,9 @@ class RajaPerf(ExecutableApplication):
         "sycl",
     ]
 
-    executable("run", "raja-perf.exe" + " --size {size}", use_mpi=True)
+    executable("run", "{execute}" + " --size {size}" + " --repfact {repfact}", use_mpi=True)
 
     workload("suite", executables=["run"])
-
-    # workload_variable('size', default='1048576', description='Problem size per rank', workloads=['suite'])
 
     figure_of_merit(
         "All tests pass",

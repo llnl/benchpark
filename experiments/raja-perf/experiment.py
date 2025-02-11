@@ -41,10 +41,27 @@ class RajaPerf(
         description="total problem size (will be divided by ranks)",
     )
 
+    variant(
+        "repfact",
+        default=1,
+        description="Multiplier on number of repitions to run each kernel",
+    )
+
+    variant(
+        "variants",
+        default="None",
+    )
+
+    variant(
+        "tunings",
+        default="None",
+    )
+
     def compute_applications_section(self):
 
         n_resources = {"n_ranks": 1}
         total_size = int(self.spec.variants["total_size"][0])
+        execute = "raja-perf.exe"
 
         if self.spec.satisfies("+single_node"):
             for pk, pv in n_resources.items():
@@ -71,6 +88,19 @@ class RajaPerf(
         else:
             size = total_size
         self.add_experiment_variable("size", size, True)
+
+        self.add_experiment_variable("repfact", self.spec.variants["repfact"][0], True)
+
+        rajaperf_variants = self.spec.variants["variants"][0].replace("-", " ")
+        rajaperf_tunings = self.spec.variants["tunings"][0].replace("-", " ")
+        if rajaperf_variants != "None":
+            execute += " --variants " + rajaperf_variants
+        if rajaperf_tunings != "None":
+            execute += " --tunings " + rajaperf_tunings
+
+        self.add_experiment_variable("execute", execute, True)
+        self.add_experiment_variable("variants", self.spec.variants["variants"][0], True)
+        self.add_experiment_variable("tunings", self.spec.variants["tunings"][0], True)
 
     def compute_package_section(self):
         # get package version
