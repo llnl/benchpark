@@ -12,11 +12,12 @@ from benchpark.rocm import ROCmExperiment
 from benchpark.caliper import Caliper
 from benchpark.mpibind import Mpibind
 
+
 class Saxpy(
     Experiment,
     OpenMPExperiment,
     CudaExperiment,
-    ROCmExperiment, 
+    ROCmExperiment,
     Caliper,
     Mpibind,
 ):
