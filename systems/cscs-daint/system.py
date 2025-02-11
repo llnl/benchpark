@@ -86,14 +86,14 @@ class CscsDaint(System):
             "intel": "05-intel-compiler.yaml",
             "pgi": "06-pgi-compiler.yaml",
             "nvhpc": "00-nvhpc-compiler.yaml",
-    	}
-        
+        }
+
         compiler_variant = self.spec.variants["compiler"][0]
 
         selections = [
-        compilers / config_file
-        for key, config_file in compiler_map.items()
-        if key in compiler_variant
+            compilers / config_file
+            for key, config_file in compiler_map.items()
+            if key in compiler_variant
     	]
 
         return selections
@@ -115,7 +115,7 @@ packages:
     externals:
     - spec: cuda@{self.cuda_version}
       prefix: /usr/local/cuda-{self.cuda_version.major}
-"""     
+""" 
 
     def sw_description(self):
         """This is somewhat vestigial: for the Tioga config that is committed
