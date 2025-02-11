@@ -7,7 +7,7 @@ import pathlib
 
 from benchpark.directives import variant
 from benchpark.system import System
-
+from packaging.version import Version
 
 class CscLumi(System):
 
@@ -25,6 +25,20 @@ class CscLumi(System):
 
     def initialize(self):
         super().initialize()
+
+
+        self.rocm_version = Version(self.spec.variants["rocm"][0])
+
+        full_versions = {
+            "cce16": "16.0.1",
+            "cce15": "15.0.1",
+            "cce14": "14.0.2",
+            "gcc12": "12.2.0",
+            "gcc11": "11.2.0",
+        }
+        for key,value in full_versions.items():
+            if key == self.spec.variants["compiler"][0]:
+                self.compiler_version = Version(value)
 
         sys_variables = {
             "sys_cores_per_node": 64,
@@ -56,58 +70,43 @@ class CscLumi(System):
         selections = [externals / "base" / "00-packages.yaml"]
         rocm_cfg_path = self.next_adhoc_cfg()
         with open(rocm_cfg_path, "w") as f:
-            f.write(self.rocm_config(self.spec.variants["rocm"][0]))
+            f.write(self.rocm_config())
         selections.append(rocm_cfg_path)
         if self.spec.satisfies("compiler=cce"):
             selections.append(externals / "libsci" / "01-cce-packages.yaml")
         elif self.spec.satisfies("compiler=gcc"):
             selections.append(externals / "libsci" / "00-gcc-packages.yaml")
-
         return selections
 
     def compiler_configs(self):
-        full_versions = {
-            "cce16": "16.0.1",
-            "cce15": "15.0.1",
-            "cce14": "14.0.2",
-            "gcc12": "12.2.0",
-            "gcc11": "11.2.0",
-        }
         selections = []
         if "cce" in self.spec.variants["compiler"][0]:
             compiler_cfg_path = self.next_adhoc_cfg()
             with open(compiler_cfg_path, "w") as f:
-                f.write(
-                    self.cce_compiler_cfg(
-                        full_versions.get(self.spec.variants["compiler"][0])
-                    )
-                )
+                f.write(self.cce_compiler_cfg())
             selections.append(compiler_cfg_path)
         else:
             compiler_cfg_path = self.next_adhoc_cfg()
             with open(compiler_cfg_path, "w") as f:
-                f.write(self.gcc_compiler_cfg("12.2.0"))
+                f.write(self.gcc_compiler_cfg())
             selections.append(compiler_cfg_path)
-        selections.append(
-            CscLumi.resource_location / "compilers" / "00-extra-compilers.yaml"
-        )
         compiler_cfg_path = self.next_adhoc_cfg()
         with open(compiler_cfg_path, "w") as f:
-            f.write(self.rocmcc_cfg(self.spec.variants["rocm"][0]))
+            f.write(self.rocmcc_cfg())
         selections.append(compiler_cfg_path)
 
         return selections
 
-    def rocmcc_cfg(self, rocm_version):
-        template = """\
+    def rocmcc_cfg(self):
+        return f"""\
 compilers:
   - compiler:
-        spec: rocmcc@{x}
+        spec: rocmcc@{self.rocm_version}
         paths:
-          cc:  /appl/lumi/SW/CrayEnv/EB/rocm/{x}/bin/amdclang
-          cxx: /appl/lumi/SW/CrayEnv/EB/rocm/{x}/bin/amdclang++
-          f77: /appl/lumi/SW/CrayEnv/EB/rocm/{x}/bin/amdflang
-          fc:  /appl/lumi/SW/CrayEnv/EB/rocm/{x}/bin/amdflang
+          cc:  /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/bin/amdclang
+          cxx: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/bin/amdclang++
+          f77: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/bin/amdflang
+          fc:  /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/bin/amdflang
         #flags: " "
         operating_system: sles15
         target: any
@@ -119,24 +118,23 @@ compilers:
             LD_LIBRARY_PATH: /opt/cray/pe/gcc-libs
           prepend_path:
             LD_LIBRARY_PATH: /opt/cray/pe/pmi/6.1.12/lib
-            LIBRARY_PATH:  /appl/lumi/SW/CrayEnv/EB/rocm/5.6.1/lib:/appl/lumi/SW/CrayEnv/EB/rocm/{x}/lib64
+            LIBRARY_PATH:  /appl/lumi/SW/CrayEnv/EB/rocm/5.6.1/lib:/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/lib64
         extra_rpaths:
-        - /appl/lumi/SW/CrayEnv/EB/rocm/{x}/lib
-        - /appl/lumi/SW/CrayEnv/EB/rocm/{x}/lib64
+        - /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/lib
+        - /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/lib64
         - /opt/cray/pe/gcc-libs
 """
-        return template.format(x=rocm_version)
 
-    def cce_compiler_cfg(self, cce_version):
-        template = """\
+    def cce_compiler_cfg(self):
+        return f"""\
 compilers:
   - compiler:
-      spec: cce@{x}
+      spec: cce@{self.compiler_version}
       paths:
-        cc: /opt/cray/pe/cce/{x}/bin/craycc
-        cxx: /opt/cray/pe/cce/{x}/bin/crayCC
-        f77: /opt/cray/pe/cce/{x}/bin/crayftn
-        fc: /opt/cray/pe/cce/{x}/bin/crayftn
+        cc: /opt/cray/pe/cce/{self.compiler_version}/bin/craycc
+        cxx: /opt/cray/pe/cce/{self.compiler_version}/bin/crayCC
+        f77: /opt/cray/pe/cce/{self.compiler_version}/bin/crayftn
+        fc: /opt/cray/pe/cce/{self.compiler_version}/bin/crayftn
       #flags:
       operating_system: sles15
       target: any
@@ -152,18 +150,17 @@ compilers:
       extra_rpaths:
       - /opt/cray/pe/gcc-libs
 """
-        return template.format(x=cce_version)
 
-    def gcc_compiler_cfg(self, gcc_version):
-        template = """\
+    def gcc_compiler_cfg(self):
+        return f"""\
 compilers:
   - compiler:
-      spec: gcc@{x}
+      spec: gcc@{self.compiler_version}
       paths:
-        cc: /opt/cray/pe/gcc/{x}/bin/gcc
-        cxx: /opt/cray/pe/gcc/{x}/bin/g++
-        f77: /opt/cray/pe/gcc/{x}/bin/gfortran
-        fc: /opt/cray/pe/gcc/{x}/bin/gfortran
+        cc: /opt/cray/pe/gcc/{self.compiler_version}/bin/gcc
+        cxx: /opt/cray/pe/gcc/{self.compiler_version}/bin/g++
+        f77: /opt/cray/pe/gcc/{self.compiler_version}/bin/gfortran
+        fc: /opt/cray/pe/gcc/{self.compiler_version}/bin/gfortran
       #flags:
       operating_system: sles15
       target: any
@@ -174,179 +171,177 @@ compilers:
           PKG_CONFIG_PATH: /usr/lib64/pkgconfig
       extra_rpaths: []
 """
-        return template.format(x=gcc_version)
 
-    def rocm_config(self, rocm_version):
-        template = """\
+    def rocm_config(self):
+        return f"""\
 packages:
   comgr:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}
-      spec: comgr@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+      spec: comgr@{self.rocm_version}
   hip:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}/hip
-      spec: hip@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/hip
+      spec: hip@{self.rocm_version}
   hip-rocclr:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}/rocclr
-      spec: hip-rocclr@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/rocclr
+      spec: hip-rocclr@{self.rocm_version}
   hipblas:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}
-      spec: hipblas@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+      spec: hipblas@{self.rocm_version}
   hipcub:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}
-      spec: hipcub@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+      spec: hipcub@{self.rocm_version}
   hipfft:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}
-      spec: hipfft@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+      spec: hipfft@{self.rocm_version}
   hipfort:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}
-      spec: hipfort@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+      spec: hipfort@{self.rocm_version}
   hipify-clang:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}
-      spec: hipify-clang@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+      spec: hipify-clang@{self.rocm_version}
   hipsparse:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}
-      spec: hipsparse@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+      spec: hipsparse@{self.rocm_version}
   hsa-rocr-dev:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}
-      spec: hsa-rocr-dev@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+      spec: hsa-rocr-dev@{self.rocm_version}
   hsakmt-roct:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}
-      spec: hsakmt-roct@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+      spec: hsakmt-roct@{self.rocm_version}
   llvm-amdgpu:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}/llvm
-      spec: llvm-amdgpu@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/llvm
+      spec: llvm-amdgpu@{self.rocm_version}
   rccl:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}
-      spec: rccl@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+      spec: rccl@{self.rocm_version}
   rocalution:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}
-      spec: rocalution@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+      spec: rocalution@{self.rocm_version}
   rocblas:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}
-      spec: rocblas@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+      spec: rocblas@{self.rocm_version}
   rocfft:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}
-      spec: rocfft@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+      spec: rocfft@{self.rocm_version}
     variants: amdgpu_target=auto amdgpu_target_sram_ecc=auto
   rocm-clang-ocl:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}
-      spec: rocm-clang-ocl@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+      spec: rocm-clang-ocl@{self.rocm_version}
   rocm-cmake:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}
-      spec: rocm-cmake@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+      spec: rocm-cmake@{self.rocm_version}
   rocm-device-libs:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}
-      spec: rocm-device-libs@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+      spec: rocm-device-libs@{self.rocm_version}
   rocm-gdb:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}
-      spec: rocm-gdb@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+      spec: rocm-gdb@{self.rocm_version}
   rocm-opencl:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}/opencl
-      spec: rocm-opencl@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/opencl
+      spec: rocm-opencl@{self.rocm_version}
   rocm-opencl-runtime:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}/opencl
-      spec: rocm-opencl-runtime@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/opencl
+      spec: rocm-opencl-runtime@{self.rocm_version}
   rocm-openmp-extras:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}/llvm
-      spec: rocm-openmp-extras@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/llvm
+      spec: rocm-openmp-extras@{self.rocm_version}
   rocm-smi:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}/rocm_smi
-      spec: rocmsmi@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/rocm_smi
+      spec: rocmsmi@{self.rocm_version}
   rocm-smi-lib:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}/rocm_smi
-      spec: rocm-smi-lib@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/rocm_smi
+      spec: rocm-smi-lib@{self.rocm_version}
   rocminfo:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}
-      spec: rocminfo@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+      spec: rocminfo@{self.rocm_version}
   rocprim:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}
-      spec: rocprim@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+      spec: rocprim@{self.rocm_version}
   rocprofiler-dev:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}
-      spec: rocprofiler-dev@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+      spec: rocprofiler-dev@{self.rocm_version}
   rocrand:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}
-      spec: rocrand@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+      spec: rocrand@{self.rocm_version}
   rocsolver:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}
-      spec: rocsolver@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+      spec: rocsolver@{self.rocm_version}
   rocsparse:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}
-      spec: rocsparse@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+      spec: rocsparse@{self.rocm_version}
   rocthrust:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}
-      spec: rocthrust@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+      spec: rocthrust@{self.rocm_version}
   roctracer-dev:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{x}
-      spec: roctracer-dev@{x}
+    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+      spec: roctracer-dev@{self.rocm_version}
 """
-        return template.format(x=rocm_version)
 
     def sw_description(self):
         """This is somewhat vestigial: for the Tioga config that is committed
@@ -367,7 +362,7 @@ software:
     compiler-rocm:
       pkg_spec: "{self.spec.variants["compiler"][0]}"
     blas-rocm:
-      pkg_spec: rocblas@5.6.1
+      pkg_spec: rocblas@{self.rocm_version}
     blas:
       pkg_spec: cray-libsci@23
     lapack:
