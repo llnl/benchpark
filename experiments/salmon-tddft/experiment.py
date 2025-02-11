@@ -52,5 +52,5 @@ class SalmonTddft(Experiment, OpenMPExperiment):
         system_specs["compiler"] = "default-compiler"
 
         self.add_spack_spec(
-            self.name, [f"salmon@{app_version}", system_specs["compiler"]]
+            self.name, [f"salmon-tddft@{app_version}", system_specs["compiler"]]
         )
