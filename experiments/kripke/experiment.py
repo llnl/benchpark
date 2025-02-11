@@ -13,6 +13,7 @@ from benchpark.scaling import StrongScaling
 from benchpark.scaling import WeakScaling
 from benchpark.scaling import ThroughputScaling
 from benchpark.caliper import Caliper
+from benchpark.mpibind import Mpibind
 
 
 class Kripke(
@@ -24,6 +25,7 @@ class Kripke(
     WeakScaling,
     ThroughputScaling,
     Caliper,
+    Mpibind,
 ):
     variant(
         "workload",

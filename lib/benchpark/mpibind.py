@@ -17,6 +17,7 @@ class Mpibind:
             "off",
             "v",
             "vv",
+            "greedy:0",
         ),
         multi=False,
         description="Toggle mpibind and set verbosity",
