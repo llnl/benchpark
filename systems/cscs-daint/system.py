@@ -60,10 +60,7 @@ class CscsDaint(System):
             f.write(self.sw_description())
 
     def system_specific_variables(self):
-        return {
-            "cuda_arch": "'60'",
-            "enable_mps": "'/usr/tcetmp/bin/enable_mps'"
-        }
+        return {"cuda_arch": "'60'", "enable_mps": "'/usr/tcetmp/bin/enable_mps'"}
 
     def external_pkg_configs(self):
         externals = CscsDaint.resource_location / "externals"
@@ -94,10 +91,9 @@ class CscsDaint(System):
             compilers / config_file
             for key, config_file in compiler_map.items()
             if key in compiler_variant
-    	]
+        ]
 
         return selections
-
 
     def cuda_config(self, cuda_version):
         if cuda_version == "10.2.89":
