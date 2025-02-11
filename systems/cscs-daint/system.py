@@ -115,7 +115,7 @@ packages:
     externals:
     - spec: cuda@{self.cuda_version}
       prefix: /usr/local/cuda-{self.cuda_version.major}
-""" 
+"""
 
     def sw_description(self):
         """This is somewhat vestigial: for the Tioga config that is committed
