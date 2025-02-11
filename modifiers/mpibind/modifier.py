@@ -51,13 +51,6 @@ class Mpibind(Allocation, BasicModifier):
         super().inherit_from_application(app)
         base_string = app.variables.get("mpi_command")
         scheduler = app.variables.get("scheduler")
-        handler = {
-            "slurm": "--mpibind=",
-            "flux": "-o mpibind=",
-            "mpi": "--mpibind=",
-            "lsf": "--mpibind=",
-            "pjm": "--mpibind=",
-        }
 
         app.variables["mpi_command"] = self.set_mode(scheduler, base_string)
 
