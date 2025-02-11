@@ -9,6 +9,7 @@ from benchpark.directives import variant
 from benchpark.system import System
 from packaging.version import Version
 
+
 class CscLumi(System):
 
     variant(
@@ -26,7 +27,6 @@ class CscLumi(System):
     def initialize(self):
         super().initialize()
 
-
         self.rocm_version = Version(self.spec.variants["rocm"][0])
 
         full_versions = {
@@ -36,7 +36,7 @@ class CscLumi(System):
             "gcc12": "12.2.0",
             "gcc11": "11.2.0",
         }
-        for key,value in full_versions.items():
+        for key, value in full_versions.items():
             if key == self.spec.variants["compiler"][0]:
                 self.compiler_version = Version(value)
 
