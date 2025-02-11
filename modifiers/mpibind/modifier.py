@@ -1,4 +1,4 @@
-#Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
 # Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: Apache-2.0
@@ -37,13 +37,13 @@ class Mpibind(Allocation, BasicModifier):
         description="Run mpibind in very verbose mode",
     )
     mode(
-            name="greedy:0",
+        name="greedy:0",
         description="Run mpibind in very verbose mode",
     )
 
     modifier_variable(
         "flux",
-        default= False,
+        default=False,
         modes=["all"],
         description="mpibind on default val",
     )
@@ -59,12 +59,12 @@ class Mpibind(Allocation, BasicModifier):
             "lsf": "--mpibind=",
             "pjm": "--mpibind=",
         }
-        
+
         mpi_string = handler.get(scheduler)
         app.variables["mpi_command"] = self.set_mode(scheduler, base_string)
 
     def set_mode(self, scheduler, base_string):
-        
+
         handler = {
             "slurm": "--mpibind=",
             "flux": "-o mpibind=",
@@ -81,8 +81,8 @@ class Mpibind(Allocation, BasicModifier):
                 "off": "off",
                 "greedy:0": "greedy:0",
             }
-            mpi_end = flags.get(self.expander.expand_var(self._usage_mode)) 
+            mpi_end = flags.get(self.expander.expand_var(self._usage_mode))
             return f"{base_string} {mpi_string}{mpi_end}"
         else:
-            mpi_end = self.expander.expand_var(self._usage_mode) 
+            mpi_end = self.expander.expand_var(self._usage_mode)
             return f"{base_string} {mpi_string}{mpi_end}"

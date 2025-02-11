@@ -12,7 +12,14 @@ from benchpark.rocm import ROCmExperiment
 from benchpark.caliper import Caliper
 from benchpark.mpibind import Mpibind
 
-class Saxpy(Experiment, OpenMPExperiment, CudaExperiment, ROCmExperiment, Caliper, Mpibind):
+class Saxpy(
+        Experiment,
+        OpenMPExperiment,
+        CudaExperiment,
+        ROCmExperiment, 
+        Caliper,
+        Mpibind,
+    ):
     variant(
         "workload",
         default="problem",
