@@ -3,7 +3,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from enum import Enum
 from .allocation import Allocation
 from ramble.modkit import *
 
@@ -60,7 +59,6 @@ class Mpibind(Allocation, BasicModifier):
             "pjm": "--mpibind=",
         }
 
-        mpi_string = handler.get(scheduler)
         app.variables["mpi_command"] = self.set_mode(scheduler, base_string)
 
     def set_mode(self, scheduler, base_string):
