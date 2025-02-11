@@ -350,6 +350,15 @@ jobs:
           system_name: fugaku
           system_spec: riken-fugaku
 
+      - name: saxpy/openmp daint cscs-daint
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: saxpy
+          benchmark_mode: openmp
+          benchmark_spec: saxpy+openmp
+          system_name: daint
+          system_spec: cscs-daint
+
       - name: amg2023/openmp caliper=mpi,time generic-x86 generic-x86
         uses: ./.github/actions/dynamic-dry-run
         with:
