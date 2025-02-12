@@ -9,6 +9,7 @@ from benchpark.directives import variant
 from benchpark.system import System
 from packaging.version import Version
 
+
 class CscsEiger(System):
 
     variant(
@@ -16,7 +17,7 @@ class CscsEiger(System):
         default="gcc",
         description="Which compiler to use",
     )
- 
+
     def initialize(self):
         super().initialize()
 
@@ -50,7 +51,7 @@ class CscsEiger(System):
         externals = CscsEiger.resource_location / "externals"
 
         selections = [externals / "00-packages.yaml"]
-        
+
         return selections
 
     def sw_description(self):
