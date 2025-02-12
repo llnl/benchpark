@@ -7,6 +7,7 @@ from ramble.modkit import *
 
 _default_mode = "time"
 
+_cali_datafile = "{experiment_run_dir}/{experiment_name}.cali"
 
 class Caliper(BasicModifier):
     """Define a modifier for Caliper"""
@@ -16,8 +17,6 @@ class Caliper(BasicModifier):
     tags("profiler", "performance-analysis")
 
     maintainers("pearce8")
-
-    _cali_datafile = "{experiment_run_dir}/{experiment_name}.cali"
 
     def determine_cali_config(self):
         if self.app.name != "raja-perf":
