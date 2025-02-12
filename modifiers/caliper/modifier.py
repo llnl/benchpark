@@ -48,7 +48,7 @@ class Caliper(BasicModifier):
             "CALI_CONFIG_MODE",
             mode_option,
             method="append",
-            separator="," if app.name != "raja-perf" else "",
+            separator="," if app.name != "raja-perf" else " ",
             modes=[mode_name],
         )
 
