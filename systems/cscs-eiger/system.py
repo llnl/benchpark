@@ -44,7 +44,7 @@ class CscsEiger(System):
         selections = []
         compilers = CscsEiger.resource_location / "compilers"
         selections.append(compilers / "00-gcc12-compiler.yaml")
-	
+
         return selections
 
     def external_pkg_configs(self):
