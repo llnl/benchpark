@@ -9,6 +9,7 @@ _default_mode = "time"
 
 _cali_datafile = "{experiment_run_dir}/{experiment_name}.cali"
 
+
 class Caliper(BasicModifier):
     """Define a modifier for Caliper"""
 
