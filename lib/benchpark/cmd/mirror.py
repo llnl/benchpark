@@ -6,15 +6,26 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+import os.path
 import shutil
 import sys
+import tempfile
 
-import benchpark.system
-import benchpark.spec
+import benchpark.paths
+from bnechpark.runtime import run_command
+
+def copy_git_repo_exclude_untracked(git_repo_location, dst_archive_path)
+    with tempfile.TemporaryDirectory() as tempdir:
+        file_list = os.path.join(tempdir, "repo_list.txt")
+        with open(file_list, "w") as f:
+            run_command(f"git ls-files -c -m {git_repo_location", output=f)
+
+        run_command("tar -cf {dst_archive_path} -T {file_list}")
 
 
 def mirror_create(args):
-    print("hi")
+    ramble_pip_reqs = os.path.join(benchpark.paths.benchpark_root, "requirements.txt")
+
 
 def setup_parser(root_parser):
     mirror_subparser = root_parser.add_subparsers(dest="system_subcommand")
