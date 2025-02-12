@@ -75,7 +75,7 @@ def info_system(args):
                     resource_key = "@*r" + resource_key + "@."
                     color.cprint(f"{indent()*2}{resource_key}: {resource_value}")
 
-    system_spec = benchpark.spec.SystemSpec(" ".join(args.spec))
+    system_spec = benchpark.spec.SystemSpec(args.name)
     system_class = system_spec.system_class
 
     # Map argument flags to functions
@@ -103,7 +103,7 @@ def info_experiment(args):
         gen_header("URL")
         print(indent() + experiment_class.url)
 
-    experiment_spec = benchpark.spec.ExperimentSpec(" ".join(args.spec))
+    experiment_spec = benchpark.spec.ExperimentSpec(args.name)
     experiment_class = experiment_spec.experiment_class
 
     if args.spack:
@@ -143,7 +143,7 @@ def setup_parser(root_parser):
     )
     system_parser.add_argument("--system-site", action="store_true", help="System site")
     system_parser.add_argument("--maintainer", action="store_true", help="Maintainer")
-    system_parser.add_argument("spec", nargs="+", help="System spec")
+    system_parser.add_argument("name", help="System name")
 
     experiment_parser = info_subparser.add_parser("experiment")
     experiment_parser.add_argument(
@@ -161,7 +161,7 @@ def setup_parser(root_parser):
     experiment_parser.add_argument(
         "--maintainer", action="store_true", help="Maintainer"
     )
-    experiment_parser.add_argument("spec", nargs="+", help="Experiment spec")
+    experiment_parser.add_argument("name", help="Experiment name")
 
 
 def command(args):
