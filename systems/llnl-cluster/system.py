@@ -5,7 +5,7 @@
 
 import pathlib
 
-from benchpark.directives import variant, system_site, maintainer
+from benchpark.directives import variant, maintainer
 from benchpark.system import System
 from benchpark.paths import hardware_descriptions
 
@@ -30,7 +30,7 @@ class LlnlCluster(System):
         },
     }
 
-    system_site("llnl")
+    system_site = "llnl"
 
     maintainer("")
 

@@ -104,20 +104,6 @@ def _make_when_spec(
     return benchpark.spec.Spec(value)
 
 
-@benchpark_directive("system_site")
-def system_site(name: str):
-    """Define the site where the system is located.
-
-    Arguments:
-        name: Name of the site
-    """
-
-    def _execute_system_site(pkg):
-        pkg.system_site = name
-
-    return _execute_system_site
-
-
 @benchpark_directive("maintainer")
 def maintainer(name: str):
     """Define the maintainer of the system.

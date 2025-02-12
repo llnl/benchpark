@@ -5,7 +5,7 @@
 
 import pathlib
 
-from benchpark.directives import variant, system_site, maintainer
+from benchpark.directives import variant, maintainer
 from benchpark.system import System
 from benchpark.paths import hardware_descriptions
 
@@ -20,7 +20,7 @@ class RikenFugaku(System):
         },
     }
 
-    system_site("riken")
+    system_site = "riken"
 
     maintainer("")
 

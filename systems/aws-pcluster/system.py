@@ -6,7 +6,7 @@
 import pathlib
 
 from benchpark.system import System
-from benchpark.directives import variant, system_site, maintainer
+from benchpark.directives import variant, maintainer
 from benchpark.paths import hardware_descriptions
 
 
@@ -40,7 +40,7 @@ class AwsPcluster(System):
         },
     }
 
-    system_site("aws")
+    system_site = "aws"
 
     maintainer("")
 
