@@ -23,7 +23,7 @@ def copy_git_repo_exclude_untracked(git_repo_location, dst_archive_path)
     with tempfile.TemporaryDirectory() as tempdir:
         file_list = os.path.join(tempdir, "repo_list.txt")
         with open(file_list, "w") as f:
-            run_command(f"git ls-files -c -m {git_repo_location", output=f)
+            run_command(f"git ls-files -c -m {git_repo_location", stdout=f)
 
         run_command("tar -cf {dst_archive_path} -T {file_list}")
 
