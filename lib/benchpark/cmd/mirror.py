@@ -30,7 +30,7 @@ def copy_git_repo_exclude_untracked(git_repo_location, dst_archive_path):
         with open(file_list, "w") as f:
             run_command(f"git ls-files -c -m {git_repo_location}", stdout=f)
 
-        run_command("tar -cf {dst_archive_path} -T {file_list}")
+        run_command(f"tar -cf {dst_archive_path} -T {file_list}")
 
 
 _CACHE_MARKER = ".benchpark-mirror-dir"
@@ -71,14 +71,21 @@ def mirror_create(args):
     ramble_workspace_dest = os.path.join(dest, ramble_workspace_relative)
     penultimate = pathlib.Path(*pathlib.Path(ramble_workspace_dest).parts[:-1])
     os.makedirs(penultimate, exist_ok=True)
-    if not os.path.exists(ramble_workspace_dest):
-        shutil.copytree(ramble_workspace, ramble_workspace_dest)
 
-    spack_dest = os.path.join(dest, "spack")
+    def _ignore(path, dir_list):
+        if pathlib.Path(path) == pathlib.Path(ramble_workspace):
+            return ["software"]
+        else:
+            return []
+
+    if not os.path.exists(ramble_workspace_dest):
+        shutil.copytree(ramble_workspace, ramble_workspace_dest, ignore=_ignore)
+
+    spack_dest = os.path.join(dest, "spack") + ".tar"
     if not os.path.exists(spack_dest):
         copy_git_repo_exclude_untracked(spack_instance, spack_dest)
 
-    ramble_dest = os.path.join(dest, "ramble")
+    ramble_dest = os.path.join(dest, "ramble") + ".tar"
     if not os.path.exists(ramble_dest):
         copy_git_repo_exclude_untracked(ramble_instance, ramble_dest)
 
