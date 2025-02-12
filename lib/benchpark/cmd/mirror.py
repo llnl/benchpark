@@ -7,12 +7,13 @@
 
 import os
 import os.path
+import pathlib
 import shutil
 import sys
 import tempfile
 
 import benchpark.paths
-from bnechpark.runtime import run_command
+from benchpark.runtime import run_command
 
 
 def _dry_run_command(cmd, *args, **kwargs):
@@ -23,11 +24,11 @@ def _dry_run_command(cmd, *args, **kwargs):
         print(f"\n\t{kwargs}")
 
 
-def copy_git_repo_exclude_untracked(git_repo_location, dst_archive_path)
+def copy_git_repo_exclude_untracked(git_repo_location, dst_archive_path):
     with tempfile.TemporaryDirectory() as tempdir:
         file_list = os.path.join(tempdir, "repo_list.txt")
         with open(file_list, "w") as f:
-            run_command(f"git ls-files -c -m {git_repo_location", stdout=f)
+            run_command(f"git ls-files -c -m {git_repo_location}", stdout=f)
 
         run_command("tar -cf {dst_archive_path} -T {file_list}")
 
@@ -40,14 +41,14 @@ def mirror_create(args):
         global run_command
         run_command = _dry_run_command
 
-    dest = args.destdir
+    dest = os.path.abspath(args.destdir)
     marker = os.path.join(dest, _CACHE_MARKER)
 
-    ramble_workspace = args.workspace
+    ramble_workspace = os.path.abspath(args.workspace)
     # start with e.g. workspace/kripke/rocm/tioga-system/workspace/
     # want just       workspace/
-    workspace = pathlib.Path(ramble_workspace).parts[:-4]
-    ramble_workspace_relative = pathlib.Path(ramble_workspace).parts[-4:]
+    workspace = pathlib.Path(*pathlib.Path(ramble_workspace).parts[:-4])
+    ramble_workspace_relative = pathlib.Path(*pathlib.Path(ramble_workspace).parts[-4:])
     spack_instance = os.path.join(workspace, "spack")
     ramble_instance = os.path.join(workspace, "ramble")
 
@@ -68,7 +69,7 @@ def mirror_create(args):
     run_command(f"pip download -r {ramble_pip_reqs} -d {cache_storage}")
 
     ramble_workspace_dest = os.path.join(dest, ramble_workspace_relative)
-    penultimate = pathlib.Path(ramble_workspace_dest).parts[:-1]
+    penultimate = pathlib.Path(*pathlib.Path(ramble_workspace_dest).parts[:-1])
     os.makedirs(penultimate, exist_ok=True)
     if not os.path.exists(ramble_workspace_dest):
         shutil.copytree(ramble_workspace, ramble_workspace_dest)
@@ -77,7 +78,7 @@ def mirror_create(args):
     if not os.path.exists(spack_dest):
         copy_git_repo_exclude_untracked(spack_instance, spack_dest)
 
-    ramble_dest = os.path.join(dest, "ramble"):
+    ramble_dest = os.path.join(dest, "ramble")
     if not os.path.exists(ramble_dest):
         copy_git_repo_exclude_untracked(ramble_instance, ramble_dest)
 
@@ -108,7 +109,7 @@ def setup_parser(root_parser):
     mirror_subparser = root_parser.add_subparsers(dest="system_subcommand")
 
     create_parser = mirror_subparser.add_parser("create")
-    create_parser.add_argument("--dry-run", help="For debugging")
+    create_parser.add_argument("--dry-run", action="store_true", default=False, help="For debugging")
     create_parser.add_argument("workspace", help="A benchpark workspace you want to copy")
     create_parser.add_argument("destdir", help="Put all needed resources here")
 
