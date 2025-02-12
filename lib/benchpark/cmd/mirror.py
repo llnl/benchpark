@@ -15,6 +15,10 @@ import benchpark.paths
 from bnechpark.runtime import run_command
 
 
+def _dry_run_command(cmd):
+    print(cmd)
+
+
 def copy_git_repo_exclude_untracked(git_repo_location, dst_archive_path)
     with tempfile.TemporaryDirectory() as tempdir:
         file_list = os.path.join(tempdir, "repo_list.txt")
@@ -28,6 +32,10 @@ _CACHE_MARKER = ".benchpark-mirror-dir"
 
 
 def mirror_create(args):
+    if args.dry_run:
+        global run_command
+        run_command = _dry_run_command
+
     dest = args.destdir
     marker = os.path.join(dest, _CACHE_MARKER)
 
@@ -87,11 +95,16 @@ export SPACK_DISABLE_LOCAL_CONFIG=1
 export _BENCHPARK_INITIALIZED=true
 """)
 
+    ramble_workspace_mirror_dest = os.path.join(dest, "ramble-workspace-mirror")
+    if not os.path.exists(ramble_workspace_mirror_dest):
+        run_command(f"ramble --disable-progress-bar --workspace-dir {ramble_workspace} {ramble_workspace_mirror_dest}")
+
 
 def setup_parser(root_parser):
     mirror_subparser = root_parser.add_subparsers(dest="system_subcommand")
 
     create_parser = mirror_subparser.add_parser("create")
+    create_parser.add_argument("--dry-run", help="For debugging")
     create_parser.add_argument("workspace", help="A benchpark workspace you want to copy")
     create_parser.add_argument("destdir", help="Put all needed resources here")
 
