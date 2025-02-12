@@ -63,7 +63,7 @@ class CscsEiger(System):
         will fail if these variables are not defined though, so for now
         they are still generated (but with more-generic values).
         """
-        return f"""\
+        return """\
 software:
   packages:
     default-compiler:
