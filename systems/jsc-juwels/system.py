@@ -30,7 +30,7 @@ class JscJuwels(System):
             "sys_cores_per_node": 48,
             "timeout": 120,
             "sys_gpus_per_node": 4,
-	    "cuda_arch": '"80"'
+            "cuda_arch": '"80"',
         }
 
         self.scheduler = "slurm"
@@ -65,8 +65,8 @@ class JscJuwels(System):
         cuda_cfg_path = self.next_adhoc_cfg()
         with open(cuda_cfg_path, "w") as f:
             f.write(self.cuda_config())
-        selections.append(cuda_cfg_path) 
-        
+        selections.append(cuda_cfg_path)
+
         return selections
 
     def cuda_config(self):
@@ -97,6 +97,7 @@ packages:
       prefix: /p/software/juwelsbooster/stages/2024/software/CUDA/{self.cuda_version.major}
     buildable: false
 """
+
     def sw_description(self):
         """This is somewhat vestigial: for the Tioga config that is committed
         to the repo, multiple instances of mpi/compilers are stored and
