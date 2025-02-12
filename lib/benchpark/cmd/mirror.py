@@ -15,8 +15,12 @@ import benchpark.paths
 from bnechpark.runtime import run_command
 
 
-def _dry_run_command(cmd):
+def _dry_run_command(cmd, *args, **kwargs):
     print(cmd)
+    if args:
+        print(f"\n\t{args}")
+    if kwargs:
+        print(f"\n\t{kwargs}")
 
 
 def copy_git_repo_exclude_untracked(git_repo_location, dst_archive_path)
