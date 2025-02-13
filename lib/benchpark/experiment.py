@@ -25,6 +25,11 @@ import ramble.language.language_helpers  # noqa
 class ExperimentHelper:
     def __init__(self, exp):
         self.spec = exp.spec
+        self.variables = {}
+        self.env_vars = {
+            "set": {},
+            "append": {},
+        }
 
     def compute_include_section(self):
         return []
@@ -49,6 +54,19 @@ class ExperimentHelper:
 
     def compute_variables_section(self):
         return {}
+
+    def set_environment_variable(self, name, value):
+        self.env_vars["set"][name] = value
+
+    def append_environment_variable(self, name, value):
+        self.env_vars["append"][name] = value
+
+    def compute_config_variables(self):
+        pass
+
+    def compute_config_variables_wrapper(self):
+        self.compute_config_variables()
+        return self.variables, self.env_vars
 
 
 class SingleNode:
@@ -90,6 +108,25 @@ class Experiment(ExperimentSystemBase, SingleNode):
         "benchpark.spec.Spec",
         Dict[str, benchpark.variant.Variant],
     ]
+
+    variant(
+        "extra_spack_specs",
+        default=" ",
+        description="additional spack specs",
+    )
+
+    variant(
+        "package_manager",
+        default="spack",
+        values=("spack", "environment-modules"),
+        description="package manager to use",
+    )
+
+    variant(
+        "append_path",
+        default=" ",
+        description="Append to environment PATH during experiment execution",
+    )
 
     def __init__(self, spec):
         self.spec: "benchpark.spec.ConcreteExperimentSpec" = spec
@@ -137,10 +174,15 @@ class Experiment(ExperimentSystemBase, SingleNode):
 
     def compute_config_section(self):
         # default configs for all experiments
-        return {
+        default_config = {
             "deprecated": True,
-            "spack_flags": {"install": "--add --keep-stage", "concretize": "-U -f"},
         }
+        if self.spec.variants["package_manager"][0] == "spack":
+            default_config["spack_flags"] = {
+                "install": "--add --keep-stage",
+                "concretize": "-U -f",
+            }
+        return default_config
 
     def compute_modifiers_section(self):
         return []
@@ -162,7 +204,10 @@ class Experiment(ExperimentSystemBase, SingleNode):
             self.expr_name.append(f"{{{name}}}")
 
     def set_environment_variable(self, name, values):
-        self.set_env_vars[name] = values
+        self.env_vars["set"][name] = values
+
+    def append_environment_variable(self, name, values):
+        self.env_vars["append"][0]["paths"][name] = values
 
     def zip_experiment_variables(self, name, variable_names):
         self.zips[name] = list(variable_names)
@@ -185,11 +230,24 @@ class Experiment(ExperimentSystemBase, SingleNode):
 
     def compute_applications_section_wrapper(self):
         self.expr_name = []
-        self.set_env_vars = {}
+        self.env_vars = {
+            "set": {},
+            "append": [
+                {
+                    "paths": {},
+                }
+            ],
+        }
         self.variables = {}
         self.zips = {}
         self.matrix = []
         self.excludes = []
+
+        for cls in self.helpers:
+            variables, env_vars = cls.compute_config_variables_wrapper()
+            self.variables |= variables
+            self.env_vars["set"] |= env_vars["set"]
+            self.env_vars["append"][0] |= env_vars["append"]
 
         self.compute_applications_section()
 
@@ -201,7 +259,8 @@ class Experiment(ExperimentSystemBase, SingleNode):
         expr_name_suffix = "_".join(expr_helper_list + self.expr_name)
 
         expr_setup = {
-            "variants": {"package_manager": "spack"},
+            "variants": {"package_manager": self.spec.variants["package_manager"][0]},
+            "env_vars": self.env_vars,
             "variables": self.variables,
             "zips": self.zips,
             "matrix": self.matrix,
@@ -273,6 +332,25 @@ class Experiment(ExperimentSystemBase, SingleNode):
             additional_vars.update(cls.compute_variables_section())
         return additional_vars
 
+    def compute_environment_modules_section(self):
+        # TODO: Using spack section for testing
+        for cls in self.helpers:
+            cls_package_specs = cls.compute_spack_section()
+            if cls_package_specs and "packages" in cls_package_specs:
+                self.package_specs |= cls_package_specs["packages"]
+
+        self.compute_spack_section()
+
+        if "append_path" in self.spec.variants:
+            self.append_environment_variable(
+                "PATH", self.spec.variants["append_path"][0]
+            )
+
+        return {
+            "packages": {k: v for k, v in self.package_specs.items() if v},
+            "environments": {self.name: {"packages": list(self.package_specs.keys())}},
+        }
+
     def compute_ramble_dict(self):
         # This can be overridden by any subclass that needs more flexibility
         ramble_dict = {
@@ -281,7 +359,12 @@ class Experiment(ExperimentSystemBase, SingleNode):
                 "config": self.compute_config_section(),
                 "modifiers": self.compute_modifiers_section_wrapper(),
                 "applications": self.compute_applications_section_wrapper(),
-                "software": self.compute_spack_section_wrapper(),
+                # TODO: this needs a refactor into one function
+                "software": (
+                    self.compute_spack_section_wrapper()
+                    if self.spec.variants["package_manager"][0] == "spack"
+                    else self.compute_environment_modules_section()
+                ),
             }
         }
         # Add any variables from helper classes if necessary
