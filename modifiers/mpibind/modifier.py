@@ -48,7 +48,7 @@ class Mpibind(Allocation, BasicModifier):
         modes=["all"],
         description="mpibind on default val",
     )
-    
+
     executable_modifier("mpibind")
 
     def mpibind(self, executable_name, executable, app_inst=None):
@@ -60,7 +60,9 @@ class Mpibind(Allocation, BasicModifier):
         post_exec.append(
             CommandExecutable(
                 f"parse-stdout-{executable_name}",
-                template=[f"python3 {mpibind_parser_dir}/parse_mpibind_output.py {output_file}"],
+                template=[
+                    f"python3 {mpibind_parser_dir}/parse_mpibind_output.py {output_file}"
+                ],
             )
         )
         return pre_exec, post_exec
@@ -71,7 +73,6 @@ class Mpibind(Allocation, BasicModifier):
         scheduler = app.variables.get("scheduler")
 
         app.variables["mpi_command"] = self.set_mode(scheduler, base_string)
-
 
     def set_mode(self, scheduler, base_string):
 

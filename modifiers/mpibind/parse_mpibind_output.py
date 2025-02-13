@@ -22,15 +22,17 @@ def parse_mpibind(input_file):
         mpibind_match = re.match(r"^mpibind:.*(?:\r?\n|$)", line)
         if mpibind_match:
 
-            pattern = r"task\s+(\d+)\s+nths\s+([\d,]*)\s+gpus\s+([\d,]*)\s+cpus\s+([\d,]*)"
+            pattern = (
+                    r"task\s+(\d+)\s+nths\s+([\d,]*)\s+gpus\s+([\d,]*)\s+cpus\s+([\d,]*)"
+            )
             match = re.search(pattern, line)
             if match:
                 task = match.group(1)  # Task number
                 nths = match.group(2)  # Nths value
                 gpus = match.group(3)  # GPUs value
                 cpus = match.group(4)  # CPUs value
-	
-                task_map["task "+task] = {
+
+                task_map["task " + task] = {
                     "cpus": cpus,
                     "gpus": gpus,
                     "nths": nths,
