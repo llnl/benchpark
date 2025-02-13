@@ -14,7 +14,7 @@ import sys
 import tempfile
 
 import benchpark.paths
-from benchpark.runtime import run_command
+from benchpark.runtime import run_command, working_dir
 
 
 def _dry_run_command(cmd, *args, **kwargs):
@@ -27,8 +27,8 @@ def _dry_run_command(cmd, *args, **kwargs):
 
 def copytree_part_of(basedir, dest, include):
     def _ignore(dirpath, dirlist):
-        if pathlib.path(dirpath) == pathlib.Path(basedir):
-            return sorted(set(dirlist) - inclue)
+        if pathlib.Path(dirpath) == pathlib.Path(basedir):
+            return sorted(set(dirlist) - set(include))
         else:
             return []
 
@@ -36,25 +36,19 @@ def copytree_part_of(basedir, dest, include):
 
 
 def copytree_tracked(basedir, dest):
-    tracked = []
-    untracked = []
-    for entry in os.listdir(basedir):
-        path = os.path.join(basedir, entry)
-        dirargs = []
-        if os.path.isdir(path):
-            dirargs = ["--directory"]
-        cmd = ["git", "ls-files", "--error-unmatch"] + dirargs + ["--", path]
-        retcode = subprocess.run(
-            cmd,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            check=False
-        )
-        if retcode:
-            tracked.append(entry)
-        else:
-            untracked.append(entry)
+    tracked = set()
+    with working_dir(basedir):
+        if not os.path.isdir(os.path.join(basedir, ".git")):
+            raise RuntimeError(f"Not a git repo: {basedir}")
+        with tempfile.TemporaryDirectory() as tempdir:
+            results_path = os.path.join(tempdir, "output.txt")
+            with open(results_path, "w") as f:
+                run_command("git ls-files", stdout=f)
+            with open(results_path, "r") as f:
+                for line in f.readlines():
+                    tracked.add(pathlib.Path(line.strip()).parts[0])
 
+    tracked = sorted(tracked)
     import pdb; pdb.set_trace()
     copytree_part_of(basedir, dest, include=tracked + [".git"])
 
@@ -102,7 +96,8 @@ def mirror_create(args):
 
     cache_storage = os.path.join(dest, "pip-cache")
     ramble_pip_reqs = os.path.join(benchpark.paths.benchpark_root, "requirements.txt")
-    run_command(f"pip download -r {ramble_pip_reqs} -d {cache_storage}")
+    if not os.path.exists(cache_storage):
+        run_command(f"pip download -r {ramble_pip_reqs} -d {cache_storage}")
 
     ramble_workspace_dest = os.path.join(dest, ramble_workspace_relative)
     penultimate = pathlib.Path(*pathlib.Path(ramble_workspace_dest).parts[:-1])
