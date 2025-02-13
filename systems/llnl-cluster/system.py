@@ -96,6 +96,10 @@ software:
       pkg_spec: intel-oneapi-mkl
     lapack:
       pkg_spec: intel-oneapi-mkl
+    default-blas:
+      pkg_spec: intel-oneapi-mkl
+    default-lapack:
+      pkg_spec: intel-oneapi-mkl
     mpi-gcc:
       pkg_spec: mvapich2
     mpi-intel:
