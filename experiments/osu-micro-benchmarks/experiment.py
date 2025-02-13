@@ -98,10 +98,6 @@ class OsuMicroBenchmarks(
 
     url = "https://mvapich.cse.ohio-state.edu/benchmarks/"
 
-    spack_name = "osu-micro-benchmarks"
-
-    ramble_name = "osu-micro-benchmarks"
-
     def compute_applications_section(self):
 
         num_nodes = {"n_nodes": 2}

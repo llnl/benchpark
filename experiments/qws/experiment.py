@@ -26,10 +26,6 @@ class Qws(Experiment, OpenMPExperiment):
 
     url = "https://www.riken.jp/en/research/labs/r-ccs/field_theor/index.html"
 
-    spack_name = "qws"
-
-    ramble_name = "qws"
-
     def compute_applications_section(self):
 
         self.add_experiment_variable("experiment_setup", "")

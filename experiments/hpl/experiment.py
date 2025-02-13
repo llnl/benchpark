@@ -36,10 +36,6 @@ class Hpl(
 
     url = "https://www.netlib.org/benchmark/hpl/"
 
-    spack_name = "hpl"
-
-    ramble_name = "hpl"
-
     def compute_applications_section(self):
         # TODO: Replace with conflicts clause
         scaling_modes = {

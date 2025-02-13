@@ -38,10 +38,6 @@ class Remhos(
 
     url = "https://github.com/CEED/Remhos"
 
-    spack_name = "remhos"
-
-    ramble_name = "remhos"
-
     def compute_applications_section(self):
         # TODO: Replace with conflicts clause
         scaling_modes = {

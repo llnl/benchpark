@@ -26,10 +26,6 @@ class Phloem(Experiment, StrongScaling):
 
     url = "https://github.com/LLNL/phloem"
 
-    spack_name = "phloem"
-
-    ramble_name = "phloem"
-
     def compute_applications_section(self):
         if self.spec.satisfies("workload=sqmr"):
             self.add_experiment_variable(

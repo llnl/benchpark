@@ -36,10 +36,6 @@ class RajaPerf(
 
     url = "http://software.llnl.gov/RAJAPerf/"
 
-    spack_name = "raja-perf"
-
-    ramble_name = "raja-perf"
-
     def compute_applications_section(self):
 
         n_resources = {"n_ranks": 1}

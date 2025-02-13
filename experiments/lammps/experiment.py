@@ -41,10 +41,6 @@ class Lammps(
 
     url = "https://www.lammps.org/"
 
-    spack_name = "lammps"
-
-    ramble_name = "lammps"
-
     def compute_applications_section(self):
         if self.spec.satisfies("+openmp"):
             problem_sizes = {"x": 8, "y": 8, "z": 8}

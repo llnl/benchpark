@@ -31,10 +31,6 @@ class Ior(
 
     url = "https://github.com/hpc/ior"
 
-    spack_name = "ior"
-
-    ramble_name = "ior"
-
     def compute_applications_section(self):
         # TODO: Replace with conflicts clause
         scaling_modes = {

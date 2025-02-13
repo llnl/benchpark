@@ -28,10 +28,6 @@ class Stream(
 
     url = "https://www.cs.virginia.edu/stream/ref.html"
 
-    spack_name = "stream"
-
-    ramble_name = "stream"
-
     def compute_applications_section(self):
 
         array_size = {"s": 650000000}

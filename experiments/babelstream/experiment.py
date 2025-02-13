@@ -35,10 +35,6 @@ class Babelstream(
 
     url = "https://github.com/UoB-HPC/BabelStream"
 
-    spack_name = "babelstream"
-
-    ramble_name = "babelstream"
-
     def compute_applications_section(self):
 
         self.add_experiment_variable("processes_per_node", "1", True)

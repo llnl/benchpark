@@ -27,10 +27,6 @@ class Genesis(Experiment, OpenMPExperiment):
 
     url = "https://www.r-ccs.riken.jp/labs/cbrt/"
 
-    spack_name = "genesis"
-
-    ramble_name = "genesis"
-
     def compute_applications_section(self):
 
         self.add_experiment_variable("experiment_setup", "")

@@ -103,8 +103,31 @@ def info_experiment(args):
         gen_header("URL")
         print(indent() + experiment_class.url)
 
+    def _info_spack_name(experiment_class):
+        gen_header("Spack Name")
+        print(
+            indent()
+            + (
+                experiment_class.spack_name
+                if experiment_class.spack_name
+                else experiment_class.name
+            )
+        )
+
+    def _info_ramble_name(experiment_class):
+        gen_header("Ramble Name")
+        print(
+            indent()
+            + (
+                experiment_class.ramble_name
+                if experiment_class.ramble_name
+                else experiment_class.name
+            )
+        )
+
     experiment_spec = benchpark.spec.ExperimentSpec(args.name)
-    experiment_class = experiment_spec.experiment_class
+    conc = experiment_spec.concretize()
+    experiment_class = conc.experiment
 
     if args.spack:
         subprocess.run(["spack", "info", experiment_class.spack_name])
@@ -115,6 +138,8 @@ def info_experiment(args):
     else:
         actions = {
             "maintainer": (info_maintainer, [experiment_class]),
+            "ramble_name": (_info_ramble_name, [experiment_class]),
+            "spack_name": (_info_spack_name, [experiment_class]),
             "url": (_info_url, [experiment_class]),
             "variants": (info_variants, [experiment_class]),
         }

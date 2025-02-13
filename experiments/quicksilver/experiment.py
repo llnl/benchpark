@@ -32,10 +32,6 @@ class Quicksilver(
 
     url = "https://codesign.llnl.gov/quicksilver.php"
 
-    spack_name = "quicksilver"
-
-    ramble_name = "quicksilver"
-
     def compute_applications_section(self):
         self.add_experiment_variable("n_threads_per_proc", "1")
         self.add_experiment_variable("n_ranks", "{I}*{J}*{K}", True)

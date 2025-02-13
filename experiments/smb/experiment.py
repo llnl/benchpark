@@ -26,10 +26,6 @@ class Smb(Experiment, StrongScaling):
 
     url = "https://github.com/sandialabs/SMB"
 
-    spack_name = "smb"
-
-    ramble_name = "smb"
-
     def compute_applications_section(self):
         if self.spec.satisfies("workload=mpi_overhead"):
             self.add_experiment_variable("n_ranks", "2")

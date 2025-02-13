@@ -29,10 +29,6 @@ class Saxpy(Experiment, OpenMPExperiment, CudaExperiment, ROCmExperiment, Calipe
 
     url = ""
 
-    spack_name = "saxpy"
-
-    ramble_name = "saxpy"
-
     def compute_applications_section(self):
         # GPU tests include some smaller sizes
         n = ["512", "1024"]

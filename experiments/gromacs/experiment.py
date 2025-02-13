@@ -33,10 +33,6 @@ class Gromacs(
 
     url = "https://www.gromacs.org"
 
-    spack_name = "gromacs"
-
-    ramble_name = "gromacs"
-
     # off: turn off GPU-aware MPI
     # on: turn on, but allow groamcs to disable it if GPU-aware MPI is not supported
     # force: turn on and force gromacs to use GPU-aware MPI. May result in error if unsupported

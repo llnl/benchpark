@@ -42,10 +42,6 @@ class Amg2023(
 
     url = "https://github.com/LLNL/AMG2023"
 
-    spack_name = "amg2023"
-
-    ramble_name = "amg2023"
-
     # requires("system+papi", when(caliper=topdown*))
 
     # TODO: Support list of 3-tuples

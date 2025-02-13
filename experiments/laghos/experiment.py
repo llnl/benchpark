@@ -35,10 +35,6 @@ class Laghos(
 
     url = "https://github.com/wdhawkins/laghos"
 
-    spack_name = "laghos"
-
-    ramble_name = "laghos"
-
     def compute_applications_section(self):
 
         # Number of initial nodes

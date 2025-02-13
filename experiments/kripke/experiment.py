@@ -41,10 +41,6 @@ class Kripke(
 
     url = "https://computing.llnl.gov/projects/co-design/kripke"
 
-    spack_name = "kripke"
-
-    ramble_name = "kripke"
-
     def compute_applications_section(self):
         # TODO: Replace with conflicts clause
         scaling_modes = {
