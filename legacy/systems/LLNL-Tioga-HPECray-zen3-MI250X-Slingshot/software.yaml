@@ -23,6 +23,10 @@ software:
       pkg_spec: rocsolver@5.5.1
     lapack:
       pkg_spec: cray-libsci@23
+    default-blas:
+      pkg_spec: rocblas@5.5.1
+    default-lapack:
+      pkg_spec: cray-libsci@23
     mpi-rocm-gtl:
       pkg_spec: cray-mpich@8.1.26%cce@16.0.0 +gtl
     mpi-rocm-no-gtl:
