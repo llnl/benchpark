@@ -17,6 +17,10 @@ software:
       pkg_spec: intel-oneapi-mkl@2022.1.0
     lapack:
       pkg_spec: intel-oneapi-mkl@2022.1.0
+    default-blas:
+      pkg_spec: intel-oneapi-mkl@2022.1.0
+    default-lapack:
+      pkg_spec: intel-oneapi-mkl@2022.1.0
     mpi-gcc:
       pkg_spec: mvapich2@2.3.7-gcc1211
     mpi-intel:
