@@ -23,7 +23,7 @@ def parse_mpibind(input_file):
         if mpibind_match:
 
             pattern = (
-                    r"task\s+(\d+)\s+nths\s+([\d,]*)\s+gpus\s+([\d,]*)\s+cpus\s+([\d,]*)"
+                r"task\s+(\d+)\s+nths\s+([\d,]*)\s+gpus\s+([\d,]*)\s+cpus\s+([\d,]*)"
             )
             match = re.search(pattern, line)
             if match:
