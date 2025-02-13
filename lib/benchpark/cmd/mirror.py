@@ -9,6 +9,7 @@ import os
 import os.path
 import pathlib
 import shutil
+import subprocess
 import sys
 import tempfile
 
@@ -36,20 +37,38 @@ def copytree_part_of(basedir, dest, include):
 
 def copytree_tracked(basedir, dest):
     tracked = []
+    untracked = []
     for entry in os.listdir(basedir):
         path = os.path.join(basedir, entry)
         dirargs = []
         if os.path.isdir(path):
             dirargs = ["--directory"]
         cmd = ["git", "ls-files", "--error-unmatch"] + dirargs + ["--", path]
-        retcode = subprocess.call(" ".join(cmd),
+        retcode = subprocess.run(
+            cmd,
             stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
+            stderr=subprocess.DEVNULL,
+            check=False
         )
         if retcode:
             tracked.append(entry)
+        else:
+            untracked.append(entry)
 
+    import pdb; pdb.set_trace()
     copytree_part_of(basedir, dest, include=tracked + [".git"])
+
+
+def locate_benchpark_workspace_parent_of_ramble_workspace(ramble_workspace_dir):
+    ramble_workspace = pathlib.Path(ramble_workspace_dir)
+    found_parent = None
+    for parent in ramble_workspace.parents:
+        if {"setup.sh", "spack", "ramble"} <= set(os.listdir(parent)):
+            found_parent = parent
+            break
+    if not found_parent:
+        raise RuntimeError(f"Cannot locate Benchpark workspace as a parent of Ramble workspace")
+    return found_parent, ramble_workspace.relative_to(found_parent)
 
 
 _CACHE_MARKER = ".benchpark-mirror-dir"
@@ -64,10 +83,8 @@ def mirror_create(args):
     marker = os.path.join(dest, _CACHE_MARKER)
 
     ramble_workspace = os.path.abspath(args.workspace)
-    # start with e.g. workspace/kripke/rocm/tioga-system/workspace/
-    # want just       workspace/
-    workspace = pathlib.Path(*pathlib.Path(ramble_workspace).parts[:-4])
-    ramble_workspace_relative = pathlib.Path(*pathlib.Path(ramble_workspace).parts[-4:])
+
+    workspace, ramble_workspace_relative = locate_benchpark_workspace_parent_of_ramble_workspace(ramble_workspace)
     spack_instance = os.path.join(workspace, "spack")
     ramble_instance = os.path.join(workspace, "ramble")
 
