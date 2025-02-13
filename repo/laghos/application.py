@@ -31,7 +31,7 @@ class Laghos(ExecutableApplication):
             description='problem number',
             workloads=['triplept'])
         
-    workload_variable('rs', default='5',
+    workload_variable('rs', default='2',
             description='number of serial refinements',
             workloads=['triplept'])
     
@@ -39,7 +39,7 @@ class Laghos(ExecutableApplication):
             description='number of parallel refinements',
             workloads=['triplept'])
     
-    workload_variable('ms', default='500',
+    workload_variable('ms', default='250',
             description='max number of steps',
             workloads=['triplept'])
     workload_variable('device', default='cpu',

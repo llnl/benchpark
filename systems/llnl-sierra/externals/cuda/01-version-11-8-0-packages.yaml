@@ -16,7 +16,7 @@ packages:
     buildable: false
   cuda:
     externals:
-    - spec: cuda@11.8.0
+    - spec: cuda@11.8.0+allow-unsupported-compilers
       prefix: /usr/tce/packages/cuda/cuda-11.8.0
     buildable: false
   cub:

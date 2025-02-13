@@ -1,0 +1,25 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+compilers:
+- compiler:
+    spec: fj@4.10.0
+    modules: []
+    paths:
+      cc: /opt/FJSVxtclanga/tcsds-1.2.38/bin/fcc
+      cxx: /opt/FJSVxtclanga/tcsds-1.2.38/bin/FCC
+      f77: /opt/FJSVxtclanga/tcsds-1.2.38/bin/frt
+      fc: /opt/FJSVxtclanga/tcsds-1.2.38/bin/frt
+    flags: {}
+    operating_system: rhel8
+    target: aarch64
+    environment:
+      set:
+        fcc_ENV: -Nclang
+        FCC_ENV: -Nclang
+      prepend_path:
+        PATH: /opt/FJSVxtclanga/tcsds-1.2.38/bin
+        LD_LIBRARY_PATH: /opt/FJSVxtclanga/tcsds-1.2.38/lib64
+    extra_rpaths: []

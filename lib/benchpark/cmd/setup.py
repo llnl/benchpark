@@ -181,7 +181,9 @@ def command(args):
 
     print(f"Setting up configs for Ramble workspace {ramble_configs_dir}")
 
-    modifier_config_dir = source_dir / "modifiers" / modifier / "configs"
+    legacy_modifier_config_dir = (
+        source_dir / "legacy" / "modifiers" / modifier / "configs"
+    )
     ramble_configs_dir.mkdir(parents=True)
     ramble_logs_dir.mkdir(parents=True)
     ramble_spack_experiment_configs_dir.mkdir(parents=True)
@@ -197,7 +199,7 @@ def command(args):
 
     symlink_tree(configs_src_dir, ramble_configs_dir, include_fn)
     symlink_tree(experiment_src_dir, ramble_configs_dir, include_fn)
-    symlink_tree(modifier_config_dir, ramble_configs_dir, include_fn)
+    symlink_tree(legacy_modifier_config_dir, ramble_configs_dir, include_fn)
     symlink_tree(
         source_dir / "legacy" / "systems" / "common",
         ramble_spack_experiment_configs_dir,
@@ -232,6 +234,7 @@ def command(args):
         ramble(f"repo add --scope=site {source_dir}/repo")
         ramble('config --scope=site add "config:disable_progress_bar:true"')
         ramble(f"repo add -t modifiers --scope=site {source_dir}/modifiers")
+        ramble(f"repo add -t modifiers --scope=site {source_dir}/legacy/modifiers")
         ramble("config --scope=site add \"config:spack:global:args:'-d'\"")
 
     if not initializer_script.exists():
