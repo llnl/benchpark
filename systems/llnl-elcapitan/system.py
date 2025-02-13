@@ -455,4 +455,8 @@ software:
       pkg_spec: intel-oneapi-mkl
     lapack-rocm:
       pkg_spec: rocsolver
+    default-blas:
+      pkg_spec: "{self.spec.variants["blas"][0]}"
+    default-lapack:
+      pkg_spec: "{self.spec.variants["lapack"][0]}"
 """

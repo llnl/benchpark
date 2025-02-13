@@ -105,7 +105,7 @@ class Hpl(
         system_specs = {}
         system_specs["compiler"] = "default-compiler"
         system_specs["mpi"] = "default-mpi"
-        system_specs["blas"] = "blas"
+        system_specs["blas"] = "default-blas"
 
         # set package spack specs
         # empty package_specs value implies external package

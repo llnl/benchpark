@@ -333,4 +333,8 @@ software:
       pkg_spec: "{self.spec.variants["lapack"][0]}"
     lapack-cuda:
       pkg_spec: cusolver
+    default-blas:
+      pkg_spec: "{self.spec.variants["blas"][0]}"
+    default-lapack:
+      pkg_spec: "{self.spec.variants["lapack"][0]}"
 """

@@ -44,4 +44,8 @@ software:
       pkg_spec: openblas
     lapack:
       pkg_spec: openblas
+    default-blas:
+      pkg_spec: openblas
+    default-lapack:
+      pkg_spec: openblas
 """

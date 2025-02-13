@@ -85,4 +85,8 @@ software:
       pkg_spec: fujitsu-ssl2
     lapack:
       pkg_spec: fujitsu-ssl2
+    default-blas:
+      pkg_spec: fujitsu-ssl2
+    default-lapack:
+      pkg_spec: fujitsu-ssl2
 """

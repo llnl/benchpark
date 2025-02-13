@@ -91,4 +91,8 @@ software:
       pkg_spec: lapack@3.4.2
     mpi-gcc:
       pkg_spec: openmpi@4.1.5%gcc@7.3.1
+    default-blas:
+      pkg_spec: blas@3.4.2
+    default-lapack:
+      pkg_spec: lapack@3.4.2
 """
