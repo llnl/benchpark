@@ -41,6 +41,12 @@ Search for available system and experiment specifications in Benchpark.
    * - benchpark tags -t tag workspace
      - Lists all experiments in Benchpark with a given tag
      -
+   * - benchpark info system <system>
+     - Lists all information about a given system
+     -
+   * - benchpark info experiment <experiment>
+     - Lists all information about a given experiment
+     -
 
 Now that you know the existing benchmarks and systems, you can determine your necessary workflow in :doc:`benchpark-workflow`.
 
