@@ -5,6 +5,8 @@
 
 from .allocation import Allocation
 from ramble.modkit import *
+import os
+from ramble.util.executable import CommandExecutable
 
 
 class Mpibind(Allocation, BasicModifier):
@@ -46,6 +48,22 @@ class Mpibind(Allocation, BasicModifier):
         modes=["all"],
         description="mpibind on default val",
     )
+    
+    executable_modifier("mpibind")
+
+    def mpibind(self, executable_name, executable, app_inst=None):
+        pre_exec = []
+        post_exec = []
+        output_file = f"{{experiment_run_dir}}/{{experiment_name}}.out"
+        mpibind_parser_dir = os.path.dirname(f"{self._file_path}")
+
+        post_exec.append(
+            CommandExecutable(
+                f"parse-stdout-{executable_name}",
+                template=[f"python3 {mpibind_parser_dir}/parse_mpibind_output.py {output_file}"],
+            )
+        )
+        return pre_exec, post_exec
 
     def inherit_from_application(self, app):
         super().inherit_from_application(app)
@@ -53,6 +71,7 @@ class Mpibind(Allocation, BasicModifier):
         scheduler = app.variables.get("scheduler")
 
         app.variables["mpi_command"] = self.set_mode(scheduler, base_string)
+
 
     def set_mode(self, scheduler, base_string):
 
