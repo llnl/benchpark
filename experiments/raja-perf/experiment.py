@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainer
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.scaling import StrongScaling
 from benchpark.openmp import OpenMPExperiment
@@ -32,7 +32,7 @@ class RajaPerf(
         description="app version",
     )
 
-    maintainer("")
+    maintainers("michaelmckinsey1")
 
     url = "http://software.llnl.gov/RAJAPerf/"
 

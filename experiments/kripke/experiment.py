@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from benchpark.error import BenchparkError
-from benchpark.directives import variant, maintainer
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
@@ -36,8 +36,6 @@ class Kripke(
         default="develop",
         description="app version",
     )
-
-    maintainer("")
 
     url = "https://computing.llnl.gov/projects/co-design/kripke"
 

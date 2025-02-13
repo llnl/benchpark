@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainer
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.scaling import StrongScaling
@@ -27,8 +27,6 @@ class Quicksilver(
         default="master",
         description="app version",
     )
-
-    maintainer("")
 
     url = "https://codesign.llnl.gov/quicksilver.php"
 

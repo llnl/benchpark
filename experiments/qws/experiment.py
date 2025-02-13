@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainer
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 
@@ -21,8 +21,6 @@ class Qws(Experiment, OpenMPExperiment):
         default="master",
         description="app version",
     )
-
-    maintainer("")
 
     url = "https://www.riken.jp/en/research/labs/r-ccs/field_theor/index.html"
 

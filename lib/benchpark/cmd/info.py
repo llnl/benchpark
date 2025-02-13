@@ -26,21 +26,16 @@ def info_variants(spec_class):
         print()
 
 
-def info_maintainer(spec_class):
+def info_maintainers(spec_class):
     """SystemSpec.system_class or ExperimentSpec.experiment_class"""
-    gen_header("Maintainer")
-    mstr = indent()
-    if spec_class.maintainer == "":
-        mstr += "No maintainer"
-    else:
-        mstr += spec_class.maintainer
-    print(mstr)
+    gen_header("Maintainers")
+    print(indent() + ",".join(spec_class.maintainers))
 
 
 def info_system(args):
     def _info_system_system_site(system_class):
         gen_header("System Site")
-        print(indent() + system_class.system_site)
+        print(indent() + getattr(system_class, "system_site", "None"))
 
     def _info_system_hardware(system_class):
         def _replace_keys_with_colors(data, colors, level=0):
@@ -81,7 +76,7 @@ def info_system(args):
     # Map argument flags to functions
     actions = {
         "hardware": (_info_system_hardware, [system_class]),
-        "maintainer": (info_maintainer, [system_class]),
+        "maintainers": (info_maintainers, [system_class]),
         "system_site": (_info_system_system_site, [system_class]),
         "variants": (info_variants, [system_class]),
     }
@@ -101,7 +96,7 @@ def info_system(args):
 def info_experiment(args):
     def _info_url(experiment_class):
         gen_header("URL")
-        print(indent() + experiment_class.url)
+        print(indent() + getattr(experiment_class, "url", "None"))
 
     def _info_spack_name(experiment_class):
         gen_header("Spack Name")
@@ -137,7 +132,7 @@ def info_experiment(args):
         return
     else:
         actions = {
-            "maintainer": (info_maintainer, [experiment_class]),
+            "maintainers": (info_maintainers, [experiment_class]),
             "ramble_name": (_info_ramble_name, [experiment_class]),
             "spack_name": (_info_spack_name, [experiment_class]),
             "url": (_info_url, [experiment_class]),
@@ -167,7 +162,7 @@ def setup_parser(root_parser):
         "--hardware", action="store_true", help="Hardware descriptions per cluster"
     )
     system_parser.add_argument("--system-site", action="store_true", help="System site")
-    system_parser.add_argument("--maintainer", action="store_true", help="Maintainer")
+    system_parser.add_argument("--maintainers", action="store_true", help="Maintainers")
     system_parser.add_argument("name", help="System name")
 
     experiment_parser = info_subparser.add_parser("experiment")
@@ -184,7 +179,7 @@ def setup_parser(root_parser):
         "--variants", action="store_true", help="Available experiment variants"
     )
     experiment_parser.add_argument(
-        "--maintainer", action="store_true", help="Maintainer"
+        "--maintainers", action="store_true", help="Maintainers"
     )
     experiment_parser.add_argument("name", help="Experiment name")
 

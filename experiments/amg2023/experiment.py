@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from benchpark.error import BenchparkError
-from benchpark.directives import variant, maintainer
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
@@ -37,8 +37,6 @@ class Amg2023(
         default="develop",
         description="app version",
     )
-
-    maintainer("")
 
     url = "https://github.com/LLNL/AMG2023"
 

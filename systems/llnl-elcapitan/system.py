@@ -6,7 +6,7 @@
 import pathlib
 from packaging.version import Version
 
-from benchpark.directives import variant, maintainer
+from benchpark.directives import variant, maintainers
 from benchpark.system import System
 from benchpark.paths import hardware_descriptions
 
@@ -31,8 +31,6 @@ class LlnlElcapitan(System):
     }
 
     system_site = "llnl"
-
-    maintainer("")
 
     variant(
         "cluster",

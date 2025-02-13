@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainer
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
@@ -36,8 +36,6 @@ class Lammps(
         when=("+cuda" or "+rocm"),
         description="Enable GPU-aware MPI",
     )
-
-    maintainer("")
 
     url = "https://www.lammps.org/"
 

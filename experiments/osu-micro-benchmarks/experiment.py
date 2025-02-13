@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainer
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.rocm import ROCmExperiment
 from benchpark.cuda import CudaExperiment
@@ -93,8 +93,6 @@ class OsuMicroBenchmarks(
         multi=True,
         description="workloads available",
     )
-
-    maintainer("")
 
     url = "https://mvapich.cse.ohio-state.edu/benchmarks/"
 

@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainer
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.scaling import StrongScaling
 
@@ -21,8 +21,6 @@ class Smb(Experiment, StrongScaling):
         default="master",
         description="app version",
     )
-
-    maintainer("")
 
     url = "https://github.com/sandialabs/SMB"
 

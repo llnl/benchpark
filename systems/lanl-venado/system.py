@@ -5,7 +5,7 @@
 
 import pathlib
 
-from benchpark.directives import variant, maintainer
+from benchpark.directives import variant, maintainers
 from benchpark.system import System
 from benchpark.paths import hardware_descriptions
 
@@ -26,8 +26,6 @@ class LanlVenado(System):
     }
 
     system_site = "lanl"
-
-    maintainer("")
 
     variant(
         "cluster",

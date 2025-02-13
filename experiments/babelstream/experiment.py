@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainer
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.caliper import Caliper
 from benchpark.cuda import CudaExperiment
@@ -30,8 +30,6 @@ class Babelstream(
         values=("4.0", "develop", "caliper"),
         description="app version",
     )
-
-    maintainer("")
 
     url = "https://github.com/UoB-HPC/BabelStream"
 
