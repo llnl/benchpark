@@ -24,13 +24,32 @@ def _dry_run_command(cmd, *args, **kwargs):
         print(f"\n\t{kwargs}")
 
 
-def copy_git_repo_exclude_untracked(git_repo_location, dst_archive_path):
-    with tempfile.TemporaryDirectory() as tempdir:
-        file_list = os.path.join(tempdir, "repo_list.txt")
-        with open(file_list, "w") as f:
-            run_command(f"git ls-files -c -m {git_repo_location}", stdout=f)
+def copytree_part_of(basedir, dest, include):
+    def _ignore(dirpath, dirlist):
+        if pathlib.path(dirpath) == pathlib.Path(basedir):
+            return sorted(set(dirlist) - inclue)
+        else:
+            return []
 
-        run_command(f"tar -cf {dst_archive_path} -T {file_list}")
+    shutil.copytree(basedir, dest, ignore=_ignore)
+
+
+def copytree_tracked(basedir, dest):
+    tracked = []
+    for entry in os.listdir(basedir):
+        path = os.path.join(basedir, entry)
+        dirargs = []
+        if os.path.isdir(path):
+            dirargs = ["--directory"]
+        cmd = ["git", "ls-files", "--error-unmatch"] + dirargs + ["--", path]
+        retcode = subprocess.call(" ".join(cmd),
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+        if retcode:
+            tracked.append(entry)
+
+    copytree_part_of(basedir, dest, include=tracked + [".git"])
 
 
 _CACHE_MARKER = ".benchpark-mirror-dir"
@@ -81,13 +100,13 @@ def mirror_create(args):
     if not os.path.exists(ramble_workspace_dest):
         shutil.copytree(ramble_workspace, ramble_workspace_dest, ignore=_ignore)
 
-    spack_dest = os.path.join(dest, "spack") + ".tar"
+    spack_dest = os.path.join(dest, "spack")
     if not os.path.exists(spack_dest):
-        copy_git_repo_exclude_untracked(spack_instance, spack_dest)
+        copytree_tracked(spack_instance, spack_dest)
 
-    ramble_dest = os.path.join(dest, "ramble") + ".tar"
+    ramble_dest = os.path.join(dest, "ramble")
     if not os.path.exists(ramble_dest):
-        copy_git_repo_exclude_untracked(ramble_instance, ramble_dest)
+        copytree_tracked(ramble_instance, ramble_dest)
 
     setup_dest = os.path.join(dest, "setup.sh")
     if not os.path.exists(setup_dest):
