@@ -140,7 +140,7 @@ export _BENCHPARK_INITIALIZED=true
 
     ramble_workspace_mirror_dest = os.path.join(dest, "ramble-workspace-mirror")
     if not os.path.exists(ramble_workspace_mirror_dest):
-        run_command(f"ramble --disable-progress-bar --workspace-dir {ramble_workspace} {ramble_workspace_mirror_dest}")
+        run_command(f"ramble --disable-progress-bar --workspace-dir {ramble_workspace} workspace mirror -d file://{ramble_workspace_mirror_dest}")
 
 
 def setup_parser(root_parser):
