@@ -21,7 +21,7 @@ class RajaPerf(ExecutableApplication):
     executable(
         "run",
         "raja-perf.exe"
-        + " --add-to-spot-config '$CALI_CONFIG_MODES'"
+        + " --add-to-spot-config $CALI_CONFIG_MODES"
         + " --outdir {experiment_run_dir}",
         use_mpi=True,
     )
