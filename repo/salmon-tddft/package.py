@@ -43,7 +43,6 @@ class SalmonTddft(CMakePackage):
 
     depends_on("cmake@3.14:", type="build")
     depends_on("mpi", type="link", when="+mpi")
-    depends_on("openmp", type="link", when="+openmp")
     depends_on("scalapack", type="link", when="+scalapack")
     depends_on("eigenexa", type="link", when="+eigenexa")
     depends_on("lapack", type="link")
@@ -68,6 +67,7 @@ class SalmonTddft(CMakePackage):
             define_from_variant("USE_SCALAPACK", "scalapack"),
             define_from_variant("USE_EIGENEXA", "eigenexa"),
             define_from_variant("USE_MPI", "mpi"),
+            define_from_variant("USE_OPENMP", "openmp"),
             define_from_variant("USE_LIBXC", "libxc"),
             define_from_variant("REDUCE_FOR_MANYCORE", "manycore"),
             define_from_variant("CURRENT_PREPROCESSING", "current_processing"),
@@ -105,4 +105,6 @@ class SalmonTddft(CMakePackage):
         if name == "fflags":
             if self.spec.satisfies("%gcc"):
                 flags.append("-ffree-line-length-none")
+            if self.spec.satisfies("%gcc@10:"):
+                flags.append("-fallow-argument-mismatch")
         return (None, None, flags)
