@@ -18,7 +18,13 @@ class RajaPerf(ExecutableApplication):
             'mpi','network-point-to-point','network-latency-bound',
             'c++','raja','cuda','hip','openmp','sycl']
 
-    executable('run', 'raja-perf.exe', use_mpi=True)
+    executable(
+        "run",
+        "raja-perf.exe"
+        + " --add-to-spot-config '$CALI_CONFIG_MODES'"
+        + " --outdir {experiment_run_dir}",
+        use_mpi=True,
+    )
 
     workload('suite', executables=['run'])
 

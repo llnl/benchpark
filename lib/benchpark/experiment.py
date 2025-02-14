@@ -25,6 +25,13 @@ import ramble.language.language_helpers  # noqa
 class ExperimentHelper:
     def __init__(self, exp):
         self.spec = exp.spec
+        self.variables = {}
+        self.env_vars = {
+            "set": {}, 
+            "append": {}, 
+            "prepend": {}, 
+            "unset": [], 
+        }
 
     def compute_include_section(self):
         return []
@@ -34,6 +41,22 @@ class ExperimentHelper:
 
     def compute_modifiers_section(self):
         return []
+
+    def add_experiment_variable(self, name, value):
+        self.variables[name] = value
+
+    def set_environment_variable(self, name, value):
+        self.env_vars["set"][name] = value
+
+    def unset_environment_variable(self, name):
+        self.env_vars["unset"].append(name)
+
+    def compute_config_variables(self):
+        pass
+
+    def compute_config_variables_wrapper(self):
+        self.compute_config_variables()
+        return self.variables, self.env_vars
 
     def compute_applications_section(self):
         return {}
@@ -145,7 +168,7 @@ class Experiment(ExperimentSystemBase, SingleNode):
             self.expr_name.append(f"{{{name}}}")
 
     def set_environment_variable(self, name, values):
-        self.set_env_vars[name] = values
+        self.env_vars["set"][name] = values
 
     def zip_experiment_variables(self, name, variable_names):
         self.zips[name] = list(variable_names)
@@ -168,11 +191,24 @@ class Experiment(ExperimentSystemBase, SingleNode):
 
     def compute_applications_section_wrapper(self):
         self.expr_name = []
-        self.set_env_vars = {}
+        self.env_vars = {
+            "set": {}, 
+            "append": {}, 
+            "prepend": {}, 
+            "unset": [], 
+        }
         self.variables = {}
         self.zips = {}
         self.matrix = []
         self.excludes = []
+
+        for cls in self.helpers:
+            variables, env_vars = cls.compute_config_variables_wrapper()
+            self.variables |= variables
+            self.env_vars["set"] |= env_vars["set"]
+            self.env_vars["append"] |= env_vars["append"]
+            self.env_vars["prepend"] |= env_vars["prepend"]
+            self.env_vars["unset"] += env_vars["unset"]
 
         self.compute_applications_section()
 
@@ -185,6 +221,7 @@ class Experiment(ExperimentSystemBase, SingleNode):
 
         expr_setup = {
             "variants": {"package_manager": "spack"},
+            "env_vars": self.env_vars,
             "variables": self.variables,
             "zips": self.zips,
             "matrix": self.matrix,
