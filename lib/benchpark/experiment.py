@@ -27,10 +27,10 @@ class ExperimentHelper:
         self.spec = exp.spec
         self.variables = {}
         self.env_vars = {
-            "set": {}, 
-            "append": {}, 
-            "prepend": {}, 
-            "unset": [], 
+            "set": {},
+            "append": {},
+            "prepend": {},
+            "unset": [],
         }
 
     def compute_include_section(self):
@@ -192,10 +192,10 @@ class Experiment(ExperimentSystemBase, SingleNode):
     def compute_applications_section_wrapper(self):
         self.expr_name = []
         self.env_vars = {
-            "set": {}, 
-            "append": {}, 
-            "prepend": {}, 
-            "unset": [], 
+            "set": {},
+            "append": {},
+            "prepend": {},
+            "unset": [],
         }
         self.variables = {}
         self.zips = {}

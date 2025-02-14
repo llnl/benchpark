@@ -28,13 +28,13 @@ class Caliper:
 
     class Helper(ExperimentHelper):
         caliper_modes = {
-          "time": "time.exclusive", # Platform-independent collection of time (default mode)
-          "mpi": "profile.mpi", # Profile MPI functions
-          "cuda": "profile.cuda", # Profile CUDA API functions
-          "topdown-counters-all": "topdown-counters.all", # Raw counter values for Intel top-down analysis (all levels)
-          "topdown-counters-toplevel": "topdown-counters.toplevel", # Raw counter values for Intel top-down analysis (top level)
-          "topdown-all": "topdown.all", # Top-down analysis for Intel CPUs (all levels)
-          "topdown-toplevel": "topdown.toplevel", # Top-down analysis for Intel CPUs (top level)
+            "time": "time.exclusive",  # Platform-independent collection of time (default mode)
+            "mpi": "profile.mpi",  # Profile MPI functions
+            "cuda": "profile.cuda",  # Profile CUDA API functions
+            "topdown-counters-all": "topdown-counters.all",  # Raw counter values for Intel top-down analysis (all levels)
+            "topdown-counters-toplevel": "topdown-counters.toplevel",  # Raw counter values for Intel top-down analysis (top level)
+            "topdown-all": "topdown.all",  # Top-down analysis for Intel CPUs (all levels)
+            "topdown-toplevel": "topdown.toplevel",  # Top-down analysis for Intel CPUs (top level)
         }
 
         def compute_modifiers_section(self):
@@ -45,10 +45,17 @@ class Caliper:
 
         def compute_config_variables(self):
             if not self.spec.satisfies("caliper=none"):
-                modes = [Caliper.Helper.caliper_modes[m] for m in list(self.spec.variants["caliper"])]
-                self.add_experiment_variable("_cali_datafile", "{experiment_run_dir}/{experiment_name}.cali")
-                self.set_environment_variable("CALI_CONFIG_MODES", ' '.join(modes))
-                self.set_environment_variable("CALI_CONFIG", f"spot(output={{_cali_datafile}},{','.join(modes)})")
+                modes = [
+                    Caliper.Helper.caliper_modes[m]
+                    for m in list(self.spec.variants["caliper"])
+                ]
+                self.add_experiment_variable(
+                    "_cali_datafile", "{experiment_run_dir}/{experiment_name}.cali"
+                )
+                self.set_environment_variable("CALI_CONFIG_MODES", " ".join(modes))
+                self.set_environment_variable(
+                    "CALI_CONFIG", f"spot(output={{_cali_datafile}},{','.join(modes)})"
+                )
 
         def compute_spack_section(self):
             # set package versions

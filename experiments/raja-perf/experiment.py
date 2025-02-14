@@ -35,7 +35,7 @@ class RajaPerf(
 
     def compute_applications_section(self):
         if not self.spec.satisfies("caliper=none"):
-          Caliper.Helper.unset_environment_variable(self, "CALI_CONFIG")
+            Caliper.Helper.unset_environment_variable(self, "CALI_CONFIG")
 
         n_resources = {"n_ranks": 1}
 
