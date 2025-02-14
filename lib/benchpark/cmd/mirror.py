@@ -49,7 +49,6 @@ def copytree_tracked(basedir, dest):
                     tracked.add(pathlib.Path(line.strip()).parts[0])
 
     tracked = sorted(tracked)
-    import pdb; pdb.set_trace()
     copytree_part_of(basedir, dest, include=tracked + [".git"])
 
 
