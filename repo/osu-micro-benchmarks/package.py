@@ -15,4 +15,15 @@ class OsuMicroBenchmarks(BuiltinOsu, ROCmPackage):
         args = super().configure_args()
         if self.spec.satisfies("+rocm"):
             args.extend([f"LDFLAGS={self.spec['mpi'].libs.ld_flags}"]) 
+            print(self.spec['mpi'])
         return args
+
+    def setup_run_environment(self, env):
+        mpidir = join_path(self.prefix.libexec, "osu-micro-benchmarks", "mpi")
+        env.prepend_path("PATH", join_path(mpidir, "startup"))
+        env.prepend_path("PATH", join_path(mpidir, "pt2pt"))
+        env.prepend_path("PATH", join_path(mpidir, "one-sided"))
+        env.prepend_path("PATH", join_path(mpidir, "collective"))
+        if self.spec.satisfies("+rocm"):
+            if self.spec.satisfies("^cray-mpich+gtl"):
+                env.prepend_path("LOCAL_RANK", self.spec['mpi'].extra_attributes['gtl_flags'])
