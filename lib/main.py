@@ -232,9 +232,7 @@ def init_commands(subparsers, actions_dict):
     )
     benchpark.cmd.audit.setup_parser(audit_parser)
 
-    mirror_parser = subparsers.add_parser(
-        "mirror", help="Copy a benchpark workspace"
-    )
+    mirror_parser = subparsers.add_parser("mirror", help="Copy a benchpark workspace")
     benchpark.cmd.mirror.setup_parser(mirror_parser)
 
     actions_dict["system"] = benchpark.cmd.system.command

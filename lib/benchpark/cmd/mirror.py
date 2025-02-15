@@ -60,7 +60,9 @@ def locate_benchpark_workspace_parent_of_ramble_workspace(ramble_workspace_dir):
             found_parent = parent
             break
     if not found_parent:
-        raise RuntimeError(f"Cannot locate Benchpark workspace as a parent of Ramble workspace")
+        raise RuntimeError(
+            f"Cannot locate Benchpark workspace as a parent of Ramble workspace"
+        )
     return found_parent, ramble_workspace.relative_to(found_parent)
 
 
@@ -77,7 +79,9 @@ def mirror_create(args):
 
     ramble_workspace = os.path.abspath(args.workspace)
 
-    workspace, ramble_workspace_relative = locate_benchpark_workspace_parent_of_ramble_workspace(ramble_workspace)
+    workspace, ramble_workspace_relative = (
+        locate_benchpark_workspace_parent_of_ramble_workspace(ramble_workspace)
+    )
     spack_instance = os.path.join(workspace, "spack")
     ramble_instance = os.path.join(workspace, "ramble")
 
@@ -91,7 +95,9 @@ def mirror_create(args):
     elif not os.path.isdir(dest):
         raise RuntimeError(f"{dest} is not a directory")
     elif not os.path.exists(marker):
-        raise RuntimeError(f"{dest} was not created by `benchpark mirror` (no {marker})")
+        raise RuntimeError(
+            f"{dest} was not created by `benchpark mirror` (no {marker})"
+        )
 
     cache_storage = os.path.join(dest, "pip-cache")
     ramble_pip_reqs = os.path.join(benchpark.paths.benchpark_root, "requirements.txt")
@@ -122,7 +128,8 @@ def mirror_create(args):
     setup_dest = os.path.join(dest, "setup.sh")
     if not os.path.exists(setup_dest):
         with open(setup_dest, "w", encoding="utf-8") as f:
-            f.write("""\
+            f.write(
+                """\
 if [ -n "${_BENCHPARK_INITIALIZED:-}" ]; then
     return 0
 fi
@@ -135,20 +142,28 @@ this_script_dir=$(dirname "${BASH_SOURCE[0]}")
 export SPACK_DISABLE_LOCAL_CONFIG=1
 
 export _BENCHPARK_INITIALIZED=true
-""")
+"""
+            )
 
     ramble_workspace_mirror_dest = os.path.join(dest, "ramble-workspace-mirror")
     if not os.path.exists(ramble_workspace_mirror_dest):
-        run_command(f"ramble --disable-progress-bar --workspace-dir {ramble_workspace} workspace mirror -d file://{ramble_workspace_mirror_dest}")
+        run_command(
+            f"ramble --disable-progress-bar --workspace-dir {ramble_workspace} workspace mirror -d file://{ramble_workspace_mirror_dest}"
+        )
 
 
 def setup_parser(root_parser):
     mirror_subparser = root_parser.add_subparsers(dest="system_subcommand")
 
     create_parser = mirror_subparser.add_parser("create")
-    create_parser.add_argument("--dry-run", action="store_true", default=False, help="For debugging")
-    create_parser.add_argument("workspace", help="A benchpark workspace you want to copy")
+    create_parser.add_argument(
+        "--dry-run", action="store_true", default=False, help="For debugging"
+    )
+    create_parser.add_argument(
+        "workspace", help="A benchpark workspace you want to copy"
+    )
     create_parser.add_argument("destdir", help="Put all needed resources here")
+
 
 def command(args):
     actions = {
