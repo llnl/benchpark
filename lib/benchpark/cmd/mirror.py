@@ -122,12 +122,12 @@ def mirror_create(args):
     setup_dest = os.path.join(dest, "setup.sh")
     if not os.path.exists(setup_dest):
         with open(setup_dest, "w", encoding="utf-8") as f:
-            f.write("""
+            f.write("""\
 if [ -n "${_BENCHPARK_INITIALIZED:-}" ]; then
     return 0
 fi
 
-this_script_dir=$(dirname "$0")
+this_script_dir=$(dirname "${BASH_SOURCE[0]}")
 
 . $this_script_dir/spack/share/spack/setup-env.sh
 . $this_script_dir/ramble/share/ramble/setup-env.sh
