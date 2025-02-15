@@ -9,8 +9,6 @@ import os
 import os.path
 import pathlib
 import shutil
-import subprocess
-import sys
 import tempfile
 
 import benchpark.paths
@@ -61,7 +59,7 @@ def locate_benchpark_workspace_parent_of_ramble_workspace(ramble_workspace_dir):
             break
     if not found_parent:
         raise RuntimeError(
-            f"Cannot locate Benchpark workspace as a parent of Ramble workspace"
+            "Cannot locate Benchpark workspace as a parent of Ramble workspace"
         )
     return found_parent, ramble_workspace.relative_to(found_parent)
 
