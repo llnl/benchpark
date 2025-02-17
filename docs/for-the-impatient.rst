@@ -15,9 +15,9 @@ You need git and Python 3.8+::
    benchpark --version
    pip install -r requirements.txt
 
-----------------------------
-Set up a Benchpark workspace
-----------------------------
+--------------------------------
+Setting up a Benchpark workspace
+--------------------------------
 
 ::
 
@@ -34,23 +34,18 @@ where:
 
    . <experiments_root>/setup.sh
 
---------------------
-Build the Experiment
---------------------
+------------------------------------
+Building the Experiment in Benchpark
+------------------------------------
 
 ::
 
    cd <experiments_root>/<Benchmark/ProgrammingModel>/<System>/workspace
    ramble --disable-progress-bar --workspace-dir . workspace setup
 
-    bp setup ${BPEXPR} ${BPSITE} ${WORKSPACE_DIR}
-    . ${WORKSPACE_DIR}/setup.sh
-    ramble -P -D ${WORKSPACE_DIR}/${BPEXPR}/${BPSITE}/workspace workspace setup
-    ramble -P -D ${WORKSPACE_DIR}/${BPEXPR}/${BPSITE}/workspace on
-
-------------------
-Run the Experiment
-------------------
+-----------------------------------
+Running the Experiment in Benchpark
+-----------------------------------
 
 To run all of the experiments in the workspace::
 
@@ -60,20 +55,20 @@ To run a single experiment in the workspace, invoke the ``execute_experiment`` s
 (e.g., ``$workspace/experiments/amg2023/problem1/amg2023_cuda11.8.0_problem1_1_8_2_2_2_10_10_10/execute_experiment``).
 
 
--------------------
-Analyze Experiments 
--------------------
+----------------------------------
+Analyzing Experiments in Benchpark
+----------------------------------
 
 Once the experiments completed running, the command::
 
   ramble --disable-progress-bar --workspace-dir . workspace analyze 
 
 can be used to analyze figures of merit and evaluate 
-`success/failure <https://ramble.readthedocs.io/en/latest/success_criteria.html#success-criteria>`
+`success/failure <https://ramble.readthedocs.io/en/latest/success_criteria.html#success-criteria>`_ 
 of the experiments. Ramble generates a file with summary of the results in ``$workspace``.
 
 If the benchmark you are running is instrumented with 
-`Caliper<https://github.com/llnl/caliper>`_,
-you can use the Caliper modifier :ref:`modifiers`
+`Caliper <https://github.com/llnl/caliper>`_,
+you can use the Caliper modifier (see :doc:`modifiers`)
 to collect detailed measurements you can later analyze with 
-`Thicket<https://github.com/llnl/thicket>`_.
+`Thicket <https://github.com/llnl/thicket>`_.
