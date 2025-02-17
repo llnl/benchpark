@@ -1,0 +1,18 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+variables:
+  gtl_flag: ''  # to be overwritten by tests that need GTL
+  cuda_arch: '60'
+  default_cuda_version: '11.8.0'
+  timeout: "120"
+  scheduler: "slurm"
+  sys_cores_per_node: "36"
+  sys_gpus_per_node: "2"
+  max_request: "1000"  # n_ranks/n_nodes cannot exceed this
+  n_ranks: '1000001'  # placeholder value
+  n_nodes: '1000001'  # placeholder value
+  batch_submit: "placeholder"
+  mpi_command: "placeholder"

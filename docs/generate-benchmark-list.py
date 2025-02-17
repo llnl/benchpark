@@ -18,7 +18,7 @@ def construct_tag_groups(tag_groups, tag_dicts, dictionary):
 
 
 def benchpark_benchmarks(benchmarks):
-    experiments_dir = "../experiments"
+    experiments_dir = "../legacy/experiments"
     for x in os.listdir(experiments_dir):
         benchmarks.append(f"{x}")
     return benchmarks
@@ -28,7 +28,7 @@ def main(workspace):
     benchmarks = list()
     benchpark_benchmarks(benchmarks)
 
-    f = "../tags.yaml"
+    f = "../taxonomy.yaml"
     with open(f, "r") as stream:
         try:
             data = yaml.safe_load(stream)
@@ -54,7 +54,11 @@ def main(workspace):
     for bmark in benchmarks:
         # call benchpark tags -a bmark workspace
         cmd = ["../bin/benchpark", "tags", "-a", bmark, workspace]
-        byte_data = subprocess.run(cmd, capture_output=True, check=True)
+        try:
+            byte_data = subprocess.run(cmd, capture_output=True, check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"Failed cmd: {cmd}\nOutput: {e.stdout}\nError: {e.stderr}")
+            raise
         tags = str(byte_data.stdout, "utf-8")
         tags = (
             tags.replace("[", "")

@@ -1,0 +1,22 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+variables:
+  timeout: "120"
+  scheduler: "pjm"
+  sys_cores_per_node: "48"
+  sys_mem_per_node: "32"
+  extra_cmd_opts: "-z value3"
+  extra_batch_opts: |
+    -x PJM_LLIO_GFSCACHE="/vol0002:/vol0003:/vol0004:/vol0005:/vol0006"
+    -y value2
+  post_exec_cmds: |
+    for F in $(ls -1v fjmpioutdir/bmexe.*); do cat $F >> {log_file}; done
+    echo "done"
+  max_request: "1000"  # n_ranks/n_nodes cannot exceed this
+  n_ranks: '1000001'  # placeholder value
+  n_nodes: '1000001'  # placeholder value
+  batch_submit: "placeholder"
+  mpi_command: "placeholder"

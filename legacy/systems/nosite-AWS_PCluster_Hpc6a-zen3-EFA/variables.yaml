@@ -1,0 +1,14 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+variables:
+  batch_time: '02:00'
+  mpi_command: 'srun -N {n_nodes} -n {n_ranks} --mpi=pmix --export=ALL,FI_EFA_USE_DEVICE_RDMA=1,FI_PROVIDER="efa",OMPI_MCA_mtl_base_verbose=100'
+  batch_submit: 'sbatch {execute_experiment}'
+  batch_nodes: '#SBATCH -N {n_nodes}'
+  batch_ranks: '#SBATCH -n {n_ranks}'
+  batch_timeout: '#SBATCH -t {batch_time}:00'
+  sys_cpus_per_node: 96
+  sys_gpus_per_node: 0

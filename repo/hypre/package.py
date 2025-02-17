@@ -21,6 +21,12 @@ class Hypre(BuiltinHypre):
     def configure_args(self):
         configure_args = super().configure_args()
 
+        if (self.compiler.fc and 'xlf' in self.compiler.fc) or (self.compiler.f77 and 'xlf' in self.compiler.f77):
+          if not "+fortran" in self.spec:        
+            configure_args.append("--with-fmangle=no-underscores")
+            configure_args.append("--with-fmangle-blas=no-underscores") 
+            configure_args.append("--with-fmangle-lapack=no-underscores")
+
         if self.spec["blas"].satisfies("rocblas"):
             configure_args.append("--enable-rocblas")
         if self.spec.satisfies("^cray-mpich+gtl"):
@@ -48,3 +54,5 @@ class Hypre(BuiltinHypre):
             if spec.satisfies("+openmp"):
                 libsci_name += "_mp"
             env.append_flags("LDFLAGS", f"-L{spec['lapack'].prefix}/lib -l{libsci_name}")
+        if "+cuda" in self.spec:
+            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")

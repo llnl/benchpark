@@ -1,0 +1,20 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+variables:
+  default_cuda_version: '11.2.0'
+  cuda_arch: '60'
+  enable_mps: '/usr/tcetmp/bin/enable_mps'
+  timeout: '120'
+  scheduler: "slurm"
+  # This describes the XC50 compute nodes: https://www.cscs.ch/computers/piz-daint
+  sys_cores_per_node: "12"
+  sys_gpus_per_node: "1"
+  sys_mem_per_node: "64"
+  max_request: "1000"  # n_ranks/n_nodes cannot exceed this
+  n_ranks: '1000001'  # placeholder value
+  n_nodes: '1000001'  # placeholder value
+  batch_submit: "placeholder"
+  mpi_command: "placeholder"

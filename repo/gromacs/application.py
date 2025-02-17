@@ -8,7 +8,7 @@ from ramble.appkit import *
 from ramble.expander import Expander
 
 
-class Gromacs(SpackApplication):
+class Gromacs(ExecutableApplication):
     '''Define a Gromacs application'''
     name = 'gromacs'
 
@@ -16,9 +16,9 @@ class Gromacs(SpackApplication):
 
     tags('molecular-dynamics')
 
-    default_compiler('gcc9', spack_spec='gcc@9.3.0')
-    software_spec('impi2018', spack_spec='intel-mpi@2018.4.274')
-    software_spec('gromacs', spack_spec='gromacs@2023.3', compiler='gcc12')
+    define_compiler('gcc9', pkg_spec='gcc@9.3.0', package_manager='spack*')
+    software_spec('impi2018', pkg_spec='intel-mpi@2018.4.274', package_manager='spack*')
+    software_spec('gromacs', pkg_spec='gromacs@2023.3', compiler='gcc12', package_manager='spack*')
 
     executable('pre-process', 'gmx_mpi grompp ' +
                '-f {input_path}/{type}.mdp ' +

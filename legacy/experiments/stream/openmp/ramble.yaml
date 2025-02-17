@@ -1,0 +1,57 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+ramble:
+  include:
+  - ./configs/software.yaml
+  - ./configs/variables.yaml
+  - ./configs/modifier.yaml
+
+  config:
+    deprecated: true
+    spack_flags:
+      install: '--add --keep-stage'
+      concretize: '-U -f'
+
+  variables:
+    n: ['35', '35', '35', '35']
+    s: ['32000000', '64000000', '128000000', '256000000']
+    o: ['0', '0', '0', '0']
+
+  modifiers:
+  - name: allocation
+
+  applications:
+    stream:
+      workloads:
+        stream:
+          env_vars:
+            set:
+              OMP_NUM_THREADS: '{n_threads_per_proc}'
+          variables:
+            n_ranks: '1'
+          experiments:
+            stream_{s}_{o}_{n}_{n_threads_per_proc}:
+              variants:
+                package_manager: spack
+              variables:
+                env_name: 'stream'
+                processes_per_node: '1'
+                n_nodes: '1'
+                n_threads_per_proc: ['16', '32']
+              matrix:
+                - n_threads_per_proc
+
+  software:
+    packages:
+      stream:
+        pkg_spec: stream@5.10-caliper{modifier_spack_variant}
+        compiler: default-compiler
+    environments:
+      stream:
+        packages:
+        - default-mpi
+        - stream
+        - '{modifier_package_name}'

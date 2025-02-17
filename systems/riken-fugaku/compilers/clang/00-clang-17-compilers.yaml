@@ -1,0 +1,25 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+compilers:
+- compiler:
+    spec: clang@17.0.2
+    paths:
+      cc: /vol0004/apps/oss/llvm-v17.0.2/compute_node/bin/clang
+      cxx: /vol0004/apps/oss/llvm-v17.0.2/compute_node/bin/clang++
+      f77: /vol0004/apps/oss/llvm-v17.0.2/compute_node/bin/flang
+      fc: /vol0004/apps/oss/llvm-v17.0.2/compute_node/bin/flang
+    #flags:
+    #  cflags: {"-msve-vector-bits=scalable"}
+    #  cxxflags: {"-msve-vector-bits=scalable"}
+    #  fflags: {"-msve-vector-bits=scalable"}
+    #  ldflags: {"-fuse-ld=lld"}
+    environment:
+      append_path:
+        LD_LIBRARY_PATH: /opt/FJSVxtclanga/tcsds-1.2.38/lib64
+    operating_system: rhel8
+    target: aarch64
+    modules: []
+    extra_rpaths: []

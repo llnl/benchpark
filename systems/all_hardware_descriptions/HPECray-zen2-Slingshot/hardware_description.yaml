@@ -1,0 +1,32 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+system_definition:
+  name: HPECray-zen2-Slingshot
+  integrator:
+    vendor: HPECray
+    name:
+  processor:
+    vendor: AMD
+    name: EPYC-7742
+    ISA: x86_64
+    uArch: zen2
+  accelerator:
+    vendor:
+    name:
+    ISA:
+    uArch:
+  interconnect:
+    vendor: HPECray
+    name: Slingshot
+  systems-tested:
+    cscs-eiger:
+      os: HPECrayOS
+      scheduler: slurm
+      compiler: gcc
+      runtime:
+      mpi: cray-mpich
+  top500-system-instances:
+    - Eiger (CSCS) <https://www.top500.org/system/177824>

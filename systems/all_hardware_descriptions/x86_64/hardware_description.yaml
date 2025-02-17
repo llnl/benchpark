@@ -1,0 +1,32 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+system_definition:
+  name: x86_64
+  integrator:
+    vendor:
+    name:
+  processor:
+    vendor:
+    name:
+    ISA: x86_64
+    uArch:
+  accelerator:
+    vendor:
+    name:
+    ISA:
+    uArch:
+  interconnect:
+    vendor:
+    name:
+  systems-tested:
+    any:
+      os:
+      scheduler:
+      compiler:
+      runtime:
+      mpi:
+  top500-system-instances:
+    -

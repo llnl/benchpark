@@ -1,0 +1,20 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+variables:
+  gtl_flag: ''  # to be overwritten by tests that need GTL
+  rocm_arch: 'gfx90a'
+  timeout: '120'
+  scheduler: "slurm"
+  # This describes the LUMI-G partition: https://docs.lumi-supercomputer.eu/hardware/lumig/
+  sys_cores_per_node: "64"
+  sys_gpus_per_node: "8"
+  sys_mem_per_node: "512"
+  max_request: "1000"  # n_ranks/n_nodes cannot exceed this
+  n_ranks: '1000001'  # placeholder value
+  n_nodes: '1000001'  # placeholder value
+  batch_submit: "placeholder"
+  mpi_command: "placeholder"
+

@@ -8,7 +8,7 @@ import yaml
 
 def main():
     sysconfig_yaml_files = glob.glob(
-        "../configs/**/system_definition.yaml", recursive=True
+        "../legacy/systems/**/system_definition.yaml", recursive=True
     )
 
     df_list = []
@@ -45,30 +45,18 @@ def main():
         list_of_strings.append(", ".join(item for item in i if item))
     df.loc[:, "system_definition.top500-system-instances"] = list_of_strings
 
-    # Set index to be system names
-    df.set_index("system_definition.name", inplace=True)
-    df.index.name = ""  # remove system_definition.name from cell
-    df_tpose = df.T
-
     # Remove system_definition from all field names
     # (e.g., system_definition.system-tested.description)
-    df_tpose["fielddesc"] = df_tpose.index
-    df_tpose[["first", ""]] = df_tpose["fielddesc"].str.split(".", n=1, expand=True)
-
-    # Add ** to either side of field names for bold rendering in RST
-    df_tpose[""] = "**" + df_tpose[""] + "**"
-
-    # Drop temporary columns
-    df_tpose.drop(["first", "fielddesc"], axis=1, inplace=True)
+    df.columns = df.columns.str.removeprefix("system_definition.")
 
     # Replace NaN with empty string
-    df_tpose.fillna("", inplace=True)
+    df.fillna("", inplace=True)
 
     # Set index to be field names
-    df_tpose.set_index([""], inplace=True)
+    df.set_index("name", inplace=True)
 
     # Write out current system definitions to CSV format
-    df_tpose.to_csv("current-system-definitions.csv")
+    df.to_csv("current-system-definitions.csv")
 
 
 if __name__ == "__main__":

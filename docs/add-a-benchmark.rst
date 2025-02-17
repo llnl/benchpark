@@ -7,27 +7,27 @@
 Adding a Benchmark
 ==================
 
-The following system-independent specification is required for each benchmark: 
+This guide is intended for application developers who want to add a benchmark so that it can be run with Benchpark.
 
-- ``package.py`` is a Spack specification that defines how to build and install the benchmark.
-- ``application.py`` is a Ramble specification that defines the benchmark input and parameters.
+Create a New Benchmark
+------------------------
 
-By default, Benchpark will use the benchmark specifications provided in the Spack and Ramble repos.
+The following system-independent specification is required for each ${Benchmark1} in ``benchpark/repo/${Benchmark1}``:
 
-benchpark/repo
---------------
-If  you are working on a benchmark that is not (yet) available in Spack and/or Ramble,
-or you would like to override the benchmark specifications available in Spack and/or Ramble,
-you can add the following specification in the ``benchpark/repo``::
+- ``package.py`` is a Spack specification that defines how to build and install ${Benchmark1}.
+- ``application.py`` is a Ramble specification that defines the ${Benchmark1} input and parameters.
 
-  benchpark
-  └── repo 
-     ├── ${BENCHMARK1} 
-     │  ├── application.py 
-     │  └── package.py 
-     └── repo.yaml 
+During ``benchpark setup`` the user selects ${Benchmark1} to run as the following::
 
-where ``application.py`` is a Ramble specification for the benchmark,
-``package.py`` is a Spack specification for the benchmark, and
-``repo.yaml`` points at those two files, indicating to Benchpark
-to use them instead of the specifications that may be available in Spack and/or Ramble repos.
+     benchpark setup </output/path/to/experiments_root> </output/path/to/system_root> </output/path/to/workspace> 
+
+By default, Benchpark will use ${Benchmark1} specifications (``application.py`` and ``package.py``)
+provided in the Spack and Ramble repos.
+It is possible to overwrite the benchmark specifications provided in the Spack and Ramble repos;
+see :doc:`FAQ` for details.
+
+
+Validate a Benchmark 
+------------------------
+
+Now that the benchmark has been created/updated you need to configure at least one experiment, and then validate it, see :doc:`add-an-experiment`.

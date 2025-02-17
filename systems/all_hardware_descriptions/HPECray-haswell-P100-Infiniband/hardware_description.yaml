@@ -1,0 +1,32 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+system_definition:
+  name: HPECray-haswell-P100-Infiniband
+  integrator:
+    vendor: HPECray
+    name:
+  processor:
+    vendor: Intel
+    name: Xeon-E5-2650v3
+    ISA: x86_64
+    uArch: haswell
+  accelerator:
+    vendor: NVIDIA
+    name: P100
+    ISA: PTX
+    uArch: sm_60
+  interconnect:
+    vendor: HPECray
+    name: Aries
+  systems-tested:
+    cscs-daint:
+      os: HPECrayOS
+      scheduler: slurm
+      compiler: cce
+      runtime: cuda
+      mpi: cray-mpich
+  top500-system-instances:
+    - Piz Daint (CSCS) <https://www.top500.org/system/177824>
