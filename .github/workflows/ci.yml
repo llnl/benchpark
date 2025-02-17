@@ -64,6 +64,7 @@ jobs:
               - 'experiments/**'
               - 'lib/**'
               - 'repo/**'
+              - 'requirements.txt'
               - 'systems/**'
               - 'var/**'
             coverage:

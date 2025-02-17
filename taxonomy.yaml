@@ -103,6 +103,8 @@ benchpark-tags:
   - ai-inference
   - ai-training
   - ale # arbitrary lagrangian-eulerian
+  - automatic-differentiation
+  - compiler-transformation
   - compression
   - conjugate-gradient
   - dense-linear-algebra

@@ -14,20 +14,42 @@ import subprocess
 import sys
 import yaml
 
-import benchpark.cmd.audit
-import benchpark.cmd.system
-import benchpark.cmd.experiment
-import benchpark.cmd.setup
-import benchpark.cmd.unit_test
-import benchpark.paths
-from benchpark.accounting import (
+__version__ = "0.1.0"
+if "-V" in sys.argv or "--version" in sys.argv:
+    print(__version__)
+    exit()
+helpstr = """usage: main.py [-h] [-V] {list,tags,system,experiment,setup,unit-test,audit} ...
+
+Benchpark
+
+options:
+  -h, --help            show this help message and exit
+  -V, --version         show version number and exit
+
+Subcommands:
+  {list,tags,system,experiment,setup,unit-test,audit}
+    list                List available experiments, systems, and modifiers
+    tags                Tags in Benchpark experiments
+    system              Initialize a system config
+    experiment          Interact with experiments
+    setup               Set up an experiment and prepare it to build/run
+    unit-test           Run benchpark unit tests
+    audit               Look for problems in System/Experiment repos"""
+if "-h" in sys.argv or "--help" in sys.argv:
+    print(helpstr)
+    exit()
+
+import benchpark.cmd.audit  # noqa: E402
+import benchpark.cmd.system  # noqa: E402
+import benchpark.cmd.experiment  # noqa: E402
+import benchpark.cmd.setup  # noqa: E402
+import benchpark.cmd.unit_test  # noqa: E402
+import benchpark.paths  # noqa: E402
+from benchpark.accounting import (  # noqa: E402
     benchpark_experiments,
     benchpark_modifiers,
     benchpark_systems,
 )
-
-
-__version__ = "0.1.0"
 
 
 def main():
@@ -58,6 +80,7 @@ def main():
         return 0
 
     exit_code = 0
+
     if args.subcommand in actions:
         action = actions[args.subcommand]
         if supports_unknown_args(action):
@@ -87,11 +110,6 @@ def supports_unknown_args(command):
     varnames = info["__code__"].co_varnames
     argcount = info["__code__"].co_argcount
     return argcount == 2 and varnames[1] == "unknown_args"
-
-
-def get_version():
-    benchpark_version = __version__
-    return benchpark_version
 
 
 def benchpark_list(subparsers, actions_dict):
