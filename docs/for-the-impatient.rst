@@ -3,9 +3,9 @@
 
    SPDX-License-Identifier: Apache-2.0
 
-=================================
-Prerequisites
-=================================
+=================
+For the Impatient
+=================
 
 You need git and Python 3.8+::
 
@@ -15,9 +15,9 @@ You need git and Python 3.8+::
    benchpark --version
    pip install -r requirements.txt
 
-=================================
+----------------------------
 Set up a Benchpark workspace
-=================================
+----------------------------
 
 ::
 
@@ -34,10 +34,9 @@ where:
 
    . <experiments_root>/setup.sh
 
-
-==============================
+--------------------
 Build the Experiment
-==============================
+--------------------
 
 ::
 
@@ -49,9 +48,9 @@ Build the Experiment
     ramble -P -D ${WORKSPACE_DIR}/${BPEXPR}/${BPSITE}/workspace workspace setup
     ramble -P -D ${WORKSPACE_DIR}/${BPEXPR}/${BPSITE}/workspace on
 
-==============================
+------------------
 Run the Experiment
-==============================
+------------------
 
 To run all of the experiments in the workspace::
 
@@ -61,9 +60,9 @@ To run a single experiment in the workspace, invoke the ``execute_experiment`` s
 (e.g., ``$workspace/experiments/amg2023/problem1/amg2023_cuda11.8.0_problem1_1_8_2_2_2_10_10_10/execute_experiment``).
 
 
-==================================
-Analyzing Experiments 
-==================================
+-------------------
+Analyze Experiments 
+-------------------
 
 Once the experiments completed running, the command::
 
