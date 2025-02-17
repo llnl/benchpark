@@ -4,7 +4,7 @@
    SPDX-License-Identifier: Apache-2.0
 
 =====================================
-Build an Experiment in Benchpark
+Building an Experiment in Benchpark
 =====================================
 
 ``benchpark setup`` has set up the directory structure for your experiment.
