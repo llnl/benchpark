@@ -58,7 +58,7 @@ benchpark_directive = DirectiveMeta.directive
 
 
 def _make_when_spec(
-    value: Optional[Union["benchpark.spec.Spec", str, bool]]
+    value: Optional[Union["benchpark.spec.Spec", str, bool]],
 ) -> Optional["benchpark.spec.Spec"]:
     """Create a ``Spec`` that indicates when a directive should be applied.
 
