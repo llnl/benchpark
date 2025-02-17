@@ -3,51 +3,46 @@
 
    SPDX-License-Identifier: Apache-2.0
 
-==============================
+=================================
 Prerequisites
-==============================
+=================================
 
-Python 3.9.12 or greater
+You need git and Python 3.8+::
 
-The pip install command will give a warning to include your
-``${HOME}/.local/bin directory`` in your ``PATH`` (if you needed
-to install additional packages, and if that's where you put them).
+   git clone https://github.com/LLNL/benchpark.git
+   cd benchpark
+   . setup-env.sh
+   benchpark --version
+   pip install -r requirements.txt
 
-
-==============================
-Environment
-==============================
-
-
-::
-
-    export PATH=${HOME}/.local/bin:${PATH}
-    export BPROOT=${PWD}/benchpark
-    export PATH=${BPROOT}/bin:${PATH}
-    export WORKSPACE_DIR=${PWD}/workspace
-    export SPACK_DISABLE_LOCAL_CONFIG=1
-    export BPSITE=nosite-x86_64
-    export BPEXPR=saxpy/openmp
-    alias bp="benchpark"
-
-
-==============================
-One-time Setup
-==============================
+=================================
+Set up a Benchpark workspace
+=================================
 
 ::
 
-    mkdir ${WORKSPACE_DIR}
-    cd ${BPROOT}/..
-    git clone git@github.com:LLNL/benchpark.git
-    cd benchpark
-    pip install -r requirements.txt
+    benchpark system init --dest=</output/path/to/system_def_dir> <SystemName> compiler=<Compiler>
+    benchpark experiment init --dest=</output/path/to/experiment_def_dir> <Benchmark> +/~<Boolean Variant> <String Variant>=<value>
+    benchpark setup </output/path/to/experiment_def> </output/path/to/system_def> </output/path/to/workspace>
+
+where:
+
+- ``<Benchmark>``: amg2023 | saxpy | etc. (predefined choices in :doc:`benchmark-list`)
+- ``<System>``: Cts | Tioga | etc. (predefined systems in :doc:`system-list`)
+
+``benchpark setup`` will output instructions to follow::
+
+   . <experiments_root>/setup.sh
+
 
 ==============================
-Smoke test
+Build the Experiment
 ==============================
 
 ::
+
+   cd <experiments_root>/<Benchmark/ProgrammingModel>/<System>/workspace
+   ramble --disable-progress-bar --workspace-dir . workspace setup
 
     bp setup ${BPEXPR} ${BPSITE} ${WORKSPACE_DIR}
     . ${WORKSPACE_DIR}/setup.sh
@@ -55,64 +50,31 @@ Smoke test
     ramble -P -D ${WORKSPACE_DIR}/${BPEXPR}/${BPSITE}/workspace on
 
 ==============================
-Script
+Run the Experiment
 ==============================
 
-::
+To run all of the experiments in the workspace::
 
-    #!/bin/bash
-    export TAG=`date +"%F_%T"`
+   ramble --disable-progress-bar --workspace-dir . on
 
-    # Where are we?
-    export MACHINE=poodle
+To run a single experiment in the workspace, invoke the ``execute_experiment`` script for the specific experiment
+(e.g., ``$workspace/experiments/amg2023/problem1/amg2023_cuda11.8.0_problem1_1_8_2_2_2_10_10_10/execute_experiment``).
 
-    # Set up directory structure
-    export TOPDIR=/dev/shm/bp
-    export TMPDIR=/dev/shm/bp/tmp
-    export RESULTS_DIR=${HOME}/w/${MACHINE}/bp/results
 
-    echo "Starting..." `date`                                                       2>>${RESULTS_DIR}/bp_stderr_${TAG} 1>>${RESULTS_DIR}/bp_stdout_${TAG}
-    echo "[bp_test.sh] MACHINE="${MACHINE}                                          2>>${RESULTS_DIR}/bp_stderr_${TAG} 1>>${RESULTS_DIR}/bp_stdout_${TAG}
-    echo "[bp_test.sh] TOPDIR="${TOPDIR}                                            2>>${RESULTS_DIR}/bp_stderr_${TAG} 1>>${RESULTS_DIR}/bp_stdout_${TAG}
-    echo "[bp_test.sh] RESULTS_DIR="${RESULTS_DIR}                                  2>>${RESULTS_DIR}/bp_stderr_${TAG} 1>>${RESULTS_DIR}/bp_stdout_${TAG}
+==================================
+Analyzing Experiments 
+==================================
 
-    mkdir -p ${TOPDIR}
-    mkdir -p ${TMPDIR}
-    mkdir -p ${RESULTS_DIR}
+Once the experiments completed running, the command::
 
-    # Modify path
-    export PATH=${HOME}/.local/bin:${PATH}
-    export PATH=${TOPDIR}/benchpark/bin:${PATH}
-    echo "[bp_test.sh] PATH="${PATH}                                                2>>${RESULTS_DIR}/bp_stderr_${TAG} 1>>${RESULTS_DIR}/bp_stdout_${TAG}
+  ramble --disable-progress-bar --workspace-dir . workspace analyze 
 
-    # Set up software environment
-    echo "[bp_test.sh] module load python/3.11.5"                                   2>>${RESULTS_DIR}/bp_stderr_${TAG} 1>>${RESULTS_DIR}/bp_stdout_${TAG}
-    #module load python/3.11.5                                                       2>>${RESULTS_DIR}/bp_stderr_${TAG} 1>>${RESULTS_DIR}/bp_stdout_${TAG}
-    module load python/3.10.8
+can be used to analyze figures of merit and evaluate 
+`success/failure <https://ramble.readthedocs.io/en/latest/success_criteria.html#success-criteria>`
+of the experiments. Ramble generates a file with summary of the results in ``$workspace``.
 
-    # Set up benchpark parameters
-    export BPSITE=nosite-x86_64
-    export BPEXPR=saxpy/openmp
-    export WORKSPACE_DIR=${TOPDIR}/workspace
-    echo "[bp_test.sh] BPSITE="${BPEXPR}                                            2>>${RESULTS_DIR}/bp_stderr_${TAG} 1>>${RESULTS_DIR}/bp_stdout_${TAG}
-    echo "[bp_test.sh] BPEXPR="${BPEXPR}                                            2>>${RESULTS_DIR}/bp_stderr_${TAG} 1>>${RESULTS_DIR}/bp_stdout_${TAG}
-    echo "[bp_test.sh] WORKSPACE_DIR="${WORKSPACE_DIR}                              2>>${RESULTS_DIR}/bp_stderr_${TAG} 1>>${RESULTS_DIR}/bp_stdout_${TAG}
-    mkdir -p ${WORKSPACE_DIR}
-
-    # spack rituals
-    export SPACK_DISABLE_LOCAL_CONFIG=1
-    echo "[bp_test.sh] SPACK_DISABLE_LOCAL_CONFIG="${SPACK_DISABLE_LOCAL_CONFIG}    2>>${RESULTS_DIR}/bp_stderr_${TAG} 1>>${RESULTS_DIR}/bp_stdout_${TAG}
-
-    # and we're off....
-    cd ${TOPDIR}
-    git clone git@github.com:LLNL/benchpark.git                                     2>>${RESULTS_DIR}/bp_stderr_${TAG} 1>>${RESULTS_DIR}/bp_stdout_${TAG}
-    cd ./benchpark
-    pip install -r requirements.txt                                                 2>>${RESULTS_DIR}/bp_stderr_${TAG} 1>>${RESULTS_DIR}/bp_stdout_${TAG}
-
-    benchpark setup ${BPEXPR} ${BPSITE} ${WORKSPACE_DIR}                            2>>${RESULTS_DIR}/bp_stderr_${TAG} 1>>${RESULTS_DIR}/bp_stdout_${TAG}
-    . ${WORKSPACE_DIR}/setup.sh                                                     2>>${RESULTS_DIR}/bp_stderr_${TAG} 1>>${RESULTS_DIR}/bp_stdout_${TAG}
-    ramble -P -D ${WORKSPACE_DIR}/${BPEXPR}/${BPSITE}/workspace workspace setup     2>>${RESULTS_DIR}/bp_stderr_${TAG} 1>>${RESULTS_DIR}/bp_stdout_${TAG}
-    #ramble -P -D ${WORKSPACE_DIR}/${BPEXPR}/${BPSITE}/workspace on
-    echo "Completed" `date`                                                         2>>${RESULTS_DIR}/bp_stderr_${TAG} 1>>${RESULTS_DIR}/bp_stdout_${TAG}
-    cd ${RESULTS_DIR}
-
+If the benchmark you are running is instrumented with 
+`Caliper<https://github.com/llnl/caliper>`_,
+you can use the Caliper modifier :ref:`modifiers`
+to collect detailed measurements you can later analyze with 
+`Thicket<https://github.com/llnl/thicket>`_.
