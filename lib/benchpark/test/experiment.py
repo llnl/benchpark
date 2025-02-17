@@ -79,5 +79,7 @@ def test_default_modifiers_section():
     modifiers_section = experiment.compute_modifiers_section()
 
     assert modifiers_section == [
-        {"name": "allocation",},
+        {
+            "name": "allocation",
+        },
     ]
