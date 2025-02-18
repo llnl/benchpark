@@ -25,7 +25,7 @@ class Saxpy(Experiment, OpenMPExperiment, CudaExperiment, ROCmExperiment, Calipe
         description="app version",
     )
 
-    url = ""
+    maintainers("rfhaque")
 
     def compute_applications_section(self):
         # GPU tests include some smaller sizes
