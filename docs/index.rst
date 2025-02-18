@@ -9,6 +9,7 @@
    :maxdepth: 1
    :caption: Basics
 
+   for-the-impatient
    getting-started
    basic-usage
    benchpark-workflow

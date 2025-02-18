@@ -1,0 +1,32 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+system_definition:
+  name: Piz Daint
+  site: CSCS
+  system: HPECray-haswell-P100-Infiniband
+  integrator:
+    vendor: HPECray
+    name:
+  processor:
+    vendor: Intel
+    name: Xeon-E5-2650v3
+    ISA: x86_64
+    uArch: haswell
+  accelerator:
+    vendor: NVIDIA
+    name: P100
+    ISA: PTX
+    uArch: sm_60
+  interconnect:
+    vendor: HPECray
+    name: Aries
+  system-tested:
+    site: CSCS
+    name: daint
+    installation-year: 2017
+    description: top500 <https://www.top500.org/system/177824>
+  top500-system-instances:
+    - Piz Daint (CSCS)
