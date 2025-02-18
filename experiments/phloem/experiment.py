@@ -22,6 +22,7 @@ class Phloem(Experiment, StrongScaling):
         description="app version",
     )
 
+    maintainers("nhanford")
     url = "https://github.com/LLNL/phloem"
 
     def compute_applications_section(self):
