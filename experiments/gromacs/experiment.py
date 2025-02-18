@@ -29,6 +29,7 @@ class Gromacs(
         description="app version",
     )
 
+    maintainers("pszi1ard")
     url = "https://www.gromacs.org"
 
     # off: turn off GPU-aware MPI
