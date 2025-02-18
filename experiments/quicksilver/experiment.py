@@ -28,6 +28,7 @@ class Quicksilver(
         description="app version",
     )
 
+    maintainers("rfhaque")
     url = "https://codesign.llnl.gov/quicksilver.php"
 
     def compute_applications_section(self):
