@@ -22,6 +22,7 @@ class Qws(Experiment, OpenMPExperiment):
         description="app version",
     )
 
+    maintainers("jdomke", "SBA0486")
     url = "https://www.riken.jp/en/research/labs/r-ccs/field_theor/index.html"
 
     def compute_applications_section(self):
