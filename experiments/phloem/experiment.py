@@ -23,7 +23,6 @@ class Phloem(Experiment, StrongScaling):
     )
 
     maintainers("nhanford")
-    url = "https://github.com/LLNL/phloem"
 
     def compute_applications_section(self):
         if self.spec.satisfies("workload=sqmr"):

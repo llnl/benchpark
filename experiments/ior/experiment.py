@@ -28,7 +28,6 @@ class Ior(
     )
 
     maintainers("hariharan-devarajan")
-    url = "https://github.com/hpc/ior"
 
     def compute_applications_section(self):
         # TODO: Replace with conflicts clause

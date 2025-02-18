@@ -25,7 +25,7 @@ class Stream(
     )
 
     maintainers("daboehme","rfhaque")
-    url = "https://www.cs.virginia.edu/stream/ref.html"
+
 
     def compute_applications_section(self):
 

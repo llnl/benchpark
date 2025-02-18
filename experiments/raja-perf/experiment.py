@@ -34,8 +34,6 @@ class RajaPerf(
 
     maintainers("michaelmckinsey1")
 
-    url = "http://software.llnl.gov/RAJAPerf/"
-
     def compute_applications_section(self):
 
         n_resources = {"n_ranks": 1}

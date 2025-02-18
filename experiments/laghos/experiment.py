@@ -32,7 +32,6 @@ class Laghos(
     )
 
     maintainers("wdhawkins")
-    url = "https://github.com/wdhawkins/laghos"
 
     def compute_applications_section(self):
 

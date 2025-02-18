@@ -40,7 +40,6 @@ class Amg2023(
 
     maintainers("pearce8")
 
-    url = "https://github.com/LLNL/AMG2023"
 
     # requires("system+papi", when(caliper=topdown*))
 

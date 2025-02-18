@@ -23,7 +23,7 @@ class Smb(Experiment, StrongScaling):
     )
 
     maintainers("nhanford")
-    url = "https://github.com/sandialabs/SMB"
+
 
     def compute_applications_section(self):
         if self.spec.satisfies("workload=mpi_overhead"):

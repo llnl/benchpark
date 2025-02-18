@@ -38,7 +38,6 @@ class Lammps(
     )
 
     maintainers("simongdg", "rfhaque")
-    url = "https://www.lammps.org/"
 
     def compute_applications_section(self):
         if self.spec.satisfies("+openmp"):

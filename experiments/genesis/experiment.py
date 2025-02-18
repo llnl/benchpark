@@ -24,7 +24,6 @@ class Genesis(Experiment, OpenMPExperiment):
     )
 
     maintainers("jdomke", "SBA0486")
-    url = "https://www.r-ccs.riken.jp/labs/cbrt/"
 
     def compute_applications_section(self):
 

@@ -94,10 +94,6 @@ def info_system(args):
 
 
 def info_experiment(args):
-    def _info_url(experiment_class):
-        gen_header("URL")
-        print(indent() + getattr(experiment_class, "url", "None"))
-
     def _info_spack_name(experiment_class):
         gen_header("Spack Name")
         print(
@@ -135,7 +131,6 @@ def info_experiment(args):
             "maintainers": (info_maintainers, [experiment_class]),
             "ramble_name": (_info_ramble_name, [experiment_class]),
             "spack_name": (_info_spack_name, [experiment_class]),
-            "url": (_info_url, [experiment_class]),
             "variants": (info_variants, [experiment_class]),
         }
 
@@ -171,9 +166,6 @@ def setup_parser(root_parser):
     )
     experiment_parser.add_argument(
         "--ramble", action="store_true", help="Information from Ramble package"
-    )
-    experiment_parser.add_argument(
-        "--url", action="store_true", help="URL for experiment"
     )
     experiment_parser.add_argument(
         "--variants", action="store_true", help="Available experiment variants"

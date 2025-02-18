@@ -95,7 +95,6 @@ class OsuMicroBenchmarks(
     )
 
     maintainers("nhanford")
-    url = "https://mvapich.cse.ohio-state.edu/benchmarks/"
 
     def compute_applications_section(self):
 

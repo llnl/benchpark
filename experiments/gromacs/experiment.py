@@ -30,7 +30,6 @@ class Gromacs(
     )
 
     maintainers("pszi1ard")
-    url = "https://www.gromacs.org"
 
     # off: turn off GPU-aware MPI
     # on: turn on, but allow groamcs to disable it if GPU-aware MPI is not supported

@@ -29,7 +29,6 @@ class Quicksilver(
     )
 
     maintainers("rfhaque")
-    url = "https://codesign.llnl.gov/quicksilver.php"
 
     def compute_applications_section(self):
         self.add_experiment_variable("n_threads_per_proc", "1")
