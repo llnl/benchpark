@@ -37,6 +37,7 @@ class Kripke(
         description="app version",
     )
 
+    maintainers("pearce8")
     url = "https://computing.llnl.gov/projects/co-design/kripke"
 
     def compute_applications_section(self):
