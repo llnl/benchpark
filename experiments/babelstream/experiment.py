@@ -31,6 +31,7 @@ class Babelstream(
         description="app version",
     )
 
+    maintainers("daboehme")
     url = "https://github.com/UoB-HPC/BabelStream"
 
     def compute_applications_section(self):
