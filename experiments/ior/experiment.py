@@ -27,6 +27,7 @@ class Ior(
         description="app version",
     )
 
+    maintainers("hariharan-devarajan")
     url = "https://github.com/hpc/ior"
 
     def compute_applications_section(self):
