@@ -34,6 +34,7 @@ class Remhos(
         description="app version",
     )
 
+    maintainers("rfhaque")
     url = "https://github.com/CEED/Remhos"
 
     def compute_applications_section(self):
