@@ -125,10 +125,10 @@ def info_experiment(args):
     experiment_class = conc.experiment
 
     if args.spack:
-        subprocess.run(["spack", "info", experiment_class.spack_name])
+        subprocess.run(["spack", "info", experiment_class.spack_name if experiment_class.spack_name else experiment_class.name])
         return
     elif args.ramble:
-        subprocess.run(["ramble", "info", experiment_class.ramble_name])
+        subprocess.run(["ramble", "info", experiment_class.ramble_name if experiment_class.ramble_name else experiment_class.name])
         return
     else:
         actions = {
