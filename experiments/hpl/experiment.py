@@ -32,6 +32,7 @@ class Hpl(
         description="app version",
     )
 
+    maintainers("daboehme")
     url = "https://www.netlib.org/benchmark/hpl/"
 
     def compute_applications_section(self):
