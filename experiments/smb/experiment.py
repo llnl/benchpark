@@ -22,6 +22,7 @@ class Smb(Experiment, StrongScaling):
         description="app version",
     )
 
+    maintainers("nhanford")
     url = "https://github.com/sandialabs/SMB"
 
     def compute_applications_section(self):
