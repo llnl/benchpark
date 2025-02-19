@@ -13,6 +13,9 @@ from benchpark.paths import hardware_descriptions
 class AwsPcluster(System):
     # Taken from https://aws.amazon.com/ec2/instance-types/
     # With boto3, we could determine this dynamically vs. storing a static table
+
+    maintainers("wdhawkins")
+    
     id_to_resources = {
         "c4.xlarge": {
             "sys_cores_per_node": 4,
@@ -50,8 +53,6 @@ class AwsPcluster(System):
         default="c4.xlarge",
         description="AWS instance type",
     )
-
-    maintainers("wdhawkins")
 
     def initialize(self):
         super().initialize()
