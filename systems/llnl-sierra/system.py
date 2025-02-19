@@ -19,22 +19,10 @@ class LlnlSierra(System):
             "hardware_key": str(hardware_descriptions)
             + "/IBM-power9-V100-Infiniband/hardware_description.yaml",
         },
-        "sierra": {
-            "sys_cores_per_node": 44,
-            "sys_gpus_per_node": 4,
-            "hardware_key": str(hardware_descriptions)
-            + "/IBM-power9-V100-Infiniband/hardware_description.yaml",
-        },
     }
+    id_to_resources["sierra"] = id_to_resources["lassen"]
 
     system_site = "llnl"
-
-    variant(
-        "cluster",
-        default="lassen",
-        values=("lassen", "sierra"),
-        description="Which cluster to run on",
-    )
 
     variant(
         "cuda",
@@ -68,7 +56,7 @@ class LlnlSierra(System):
         super().initialize()
 
         self.scheduler = "lsf"
-        attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
+        attrs = self.id_to_resources.get("lassen")
         for k, v in attrs.items():
             setattr(self, k, v)
 

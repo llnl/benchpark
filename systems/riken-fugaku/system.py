@@ -23,13 +23,6 @@ class RikenFugaku(System):
     system_site = "riken"
 
     variant(
-        "cluster",
-        default="fugaku",
-        values=("fugaku",),
-        description="Which cluster to run on",
-    )
-
-    variant(
         "compiler",
         default="clang",
         values=("clang", "gcc", "fj"),
@@ -40,7 +33,7 @@ class RikenFugaku(System):
         super().initialize()
 
         self.scheduler = "pjm"
-        attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
+        attrs = self.id_to_resources.get("fugaku")
         for k, v in attrs.items():
             setattr(self, k, v)
 
