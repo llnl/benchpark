@@ -7,10 +7,10 @@ google-api-core # for gcs fetch error .exceptions
 coverage
 pre-commit
 graphlib-backport;python_version<"3.9"
-urllib3==1.26.18;python_version<="3.6"
+urllib3==1.26.19;python_version<="3.6"
 protobuf;python_version>"3.6"
-protobuf==3.19.4;python_version<="3.6"
-pyarrow==3.0.0;python_version<="3.6"
+protobuf==3.19.5;python_version<="3.6"
+pyarrow==14.0.1;python_version<="3.6"
 google-cloud-bigquery
 tqdm
 deprecation

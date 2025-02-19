@@ -1,0 +1,32 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+system_definition:
+  name: JUWELS-Booster
+  site: JSC
+  system: JUWELS-Booster-rome-A100-Infiniband
+  integrator:
+    vendor: Atos
+    name: XH2000
+  processor: 
+    vendor: AMD
+    name: EPYC-Zen2
+    ISA: x86_64
+    uArch: zen2
+  accelerator:
+    vendor: NVIDIA
+    name: A100
+    ISA: PTX
+    uArch: sm_80
+  interconnect:
+    vendor: Mellanox
+    name: Infiniband
+  system-tested:
+    site: JSC
+    name: JUWELS-Booster
+    installation-year: 2020
+    description: top500 <https://www.top500.org/system/179894/>
+  top500-system-instances:
+    - JUWELS Booster (JSC)
