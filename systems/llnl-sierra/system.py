@@ -12,6 +12,8 @@ from benchpark.paths import hardware_descriptions
 
 class LlnlSierra(System):
 
+    maintainers("pearce8","nhanford","rfhaque")
+
     id_to_resources = {
         "lassen": {
             "sys_cores_per_node": 44,
