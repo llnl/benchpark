@@ -33,7 +33,7 @@ class Kripke(
 
     variant(
         "version",
-        default="develop",
+        default="comm_cali",
         description="app version",
     )
     
@@ -54,6 +54,23 @@ class Kripke(
         description="caliper mode",
     )
 
+    variant(
+        "caliper",
+        default="none",
+        values=(
+            "none",
+            "time",
+            "mpi",
+            "cuda",
+            "topdown-counters-all",
+            "topdown-counters-toplevel",
+            "topdown-all",
+            "topdown-toplevel",
+        ),
+        multi=True,
+        description="caliper mode",
+    )
+        
     def compute_applications_section(self):
         # TODO: Replace with conflicts clause
         scaling_modes = {
