@@ -51,6 +51,8 @@ class AwsPcluster(System):
         description="AWS instance type",
     )
 
+    maintainers("wdhawkins")
+
     def initialize(self):
         super().initialize()
         self.scheduler = "slurm"
