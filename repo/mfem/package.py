@@ -22,8 +22,6 @@ class Mfem(BuiltinMfem):
     depends_on("hiprand", when="+rocm")
     depends_on("hipsparse", when="+rocm")
 
-    version("4.4_comm_cali", branch="comm_cali", submodules=False, git="https://github.com/gracenansamba/mfem.git")
-
     variant("caliper", default=False, description="Build Caliper support")
 
     depends_on("caliper", when="+caliper")
