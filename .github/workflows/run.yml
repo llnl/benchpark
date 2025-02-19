@@ -834,6 +834,7 @@ jobs:
           benchmark_mode: single-core
           benchmark_spec: ad
           system_name: tioga
+          system_spec: llnl-elcapitan rocm=6.2.4 compiler=rocmcc
           
       - name: osu-micro-benchmarks/mpi ruby llnl-cluster cluster=ruby compiler=intel
         uses: ./.github/actions/dynamic-dry-run
