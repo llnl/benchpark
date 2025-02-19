@@ -8,7 +8,7 @@ import sys
 from ramble.appkit import *
 
 
-class SalmonTddft(SpackApplication):
+class SalmonTddft(ExecutableApplication):
     """Salmon-tddft benchmark"""
     name = "salmon-tddft"
 

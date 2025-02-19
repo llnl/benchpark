@@ -1,0 +1,14 @@
+compilers:
+- compiler:
+    spec: gcc@12.3.0
+    paths:
+      cc: /usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/bin/gcc
+      cxx: /usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/bin/g++
+      f77: /usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/bin/gfortran
+      fc: /usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/bin/gfortran
+    flags: {}
+    operating_system: sles15
+    target: aarch64
+    modules: []
+    environment: {}
+    extra_rpaths: []

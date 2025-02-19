@@ -12,7 +12,7 @@ from benchpark.rocm import ROCmExperiment
 from benchpark.scaling import StrongScaling
 from benchpark.scaling import WeakScaling
 from benchpark.scaling import ThroughputScaling
-from benchpark.expr.builtin.caliper import Caliper
+from benchpark.caliper import Caliper
 
 
 class Amg2023(
@@ -164,8 +164,8 @@ class Amg2023(
         system_specs = {}
         system_specs["compiler"] = "default-compiler"
         system_specs["mpi"] = "default-mpi"
-        system_specs["lapack"] = "default-lapack"
-        system_specs["blas"] = "default-blas"
+        system_specs["lapack"] = "lapack"
+        system_specs["blas"] = "blas"
 
         # set package spack specs
         # empty package_specs value implies external package
