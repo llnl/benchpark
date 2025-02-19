@@ -108,7 +108,11 @@ def mirror_create(args):
 
     def _ignore(path, dir_list):
         if pathlib.Path(path) == pathlib.Path(ramble_workspace):
-            return ["software"]
+            # The ramble workspace contains a copy of the experiment binaries
+            # in 'software/', and also puts dynamically generated logs for
+            # workspace commands in 'logs/' (if the latter is not removed,
+            # it generates an error on the destination)
+            return ["software", "logs"]
         else:
             return []
 
