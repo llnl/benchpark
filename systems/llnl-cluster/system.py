@@ -12,6 +12,8 @@ from benchpark.paths import hardware_descriptions
 
 class LlnlCluster(System):
 
+    maintainers("nhanford","rfhaque")
+
     id_to_resources = {
         "ruby": {
             "sys_cores_per_node": 56,
