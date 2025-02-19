@@ -13,6 +13,8 @@ from benchpark.paths import hardware_descriptions
 
 class LlnlElcapitan(System):
 
+    maintainers("pearce8","nhanford","rfhaque")
+
     id_to_resources = {
         "tioga": {
             "rocm_arch": "gfx90a",
