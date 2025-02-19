@@ -33,10 +33,6 @@ def info_maintainers(spec_class):
 
 
 def info_system(args):
-    def _info_system_system_site(system_class):
-        gen_header("System Site")
-        print(indent() + getattr(system_class, "system_site", "None"))
-
     def _info_system_hardware(system_class):
         def _replace_keys_with_colors(data, colors, level=0):
             if not isinstance(data, dict):
@@ -77,7 +73,6 @@ def info_system(args):
     actions = {
         "hardware": (_info_system_hardware, [system_class]),
         "maintainers": (info_maintainers, [system_class]),
-        "system_site": (_info_system_system_site, [system_class]),
         "variants": (info_variants, [system_class]),
     }
 

@@ -15,22 +15,23 @@ class LlnlCluster(System):
     id_to_resources = {
         "ruby": {
             "sys_cores_per_node": 56,
+            "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/Supermicro-icelake-OmniPath/hardware_description.yaml",
         },
         "magma": {
             "sys_cores_per_node": 96,
+            "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/Penguin-icelake-OmniPath/hardware_description.yaml",
         },
         "dane": {
             "sys_cores_per_node": 112,
+            "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/DELL-sapphirerapids-OmniPath/hardware_description.yaml",
         },
     }
-
-    system_site = "llnl"
 
     variant(
         "cluster",

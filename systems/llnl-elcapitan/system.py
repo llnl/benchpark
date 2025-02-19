@@ -18,6 +18,7 @@ class LlnlElcapitan(System):
             "rocm_arch": "gfx90a",
             "sys_cores_per_node": 64,
             "sys_gpus_per_node": 8,
+            "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/HPECray-zen3-MI250X-Slingshot/hardware_description.yaml",
         },
@@ -25,12 +26,11 @@ class LlnlElcapitan(System):
             "rocm_arch": "gfx940",
             "sys_cores_per_node": 128,
             "sys_gpus_per_node": 4,
+            "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/HPECray-zen4-MI300A-Slingshot/hardware_description.yaml",
         },
     }
-
-    system_site = "llnl"
 
     variant(
         "cluster",

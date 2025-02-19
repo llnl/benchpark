@@ -15,17 +15,17 @@ class LanlVenado(System):
         "grace-hopper": {
             "sys_cores_per_node": 144,
             "sys_gpus_per_node": 4,
+            "system_site": "lanl",
             "hardware_key": str(hardware_descriptions)
             + "/HPECray-neoverse-H100-Slingshot/hardware_description.yaml",
         },
         "grace-grace": {
             "sys_cores_per_node": 144,
+            "system_site": "lanl",
             "hardware_key": str(hardware_descriptions)
             + "/HPECray-neoverse-H100-Slingshot/hardware_description.yaml",
         },
     }
-
-    system_site = "lanl"
 
     variant(
         "cluster",

@@ -15,12 +15,11 @@ class RikenFugaku(System):
         "fugaku": {
             "sys_cores_per_node": 48,
             "sys_mem_per_node": 32,
+            "system_site": "riken",
             "hardware_key": str(hardware_descriptions)
             + "/Fujitsu-A64FX-TofuD/hardware_description.yaml",
         },
     }
-
-    system_site = "riken"
 
     variant(
         "compiler",

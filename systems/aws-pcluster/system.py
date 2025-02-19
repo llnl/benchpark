@@ -17,30 +17,32 @@ class AwsPcluster(System):
         "c4.xlarge": {
             "sys_cores_per_node": 4,
             "sys_mem_per_node": 7.5,
+            "system_site": "aws",
             "hardware_key": str(hardware_descriptions)
             + "/AWS_PCluster-zen-EFA/hardware_description.yaml",
         },
         "c6g.xlarge": {
             "sys_cores_per_node": 4,
             "sys_mem_per_node": 8,
+            "system_site": "aws",
             "hardware_key": str(hardware_descriptions)
             + "/AWS_PCluster-zen-EFA/hardware_description.yaml",
         },
         "hpc7a.48xlarge": {
             "sys_cores_per_node": 96,
             "sys_mem_per_node": 768,
+            "system_site": "aws",
             "hardware_key": str(hardware_descriptions)
             + "/AWS_PCluster-zen-EFA/hardware_description.yaml",
         },
         "hpc6a.48xlarge": {
             "sys_cores_per_node": 96,
             "sys_mem_per_node": 384,
+            "system_site": "aws",
             "hardware_key": str(hardware_descriptions)
             + "/AWS_PCluster-zen-EFA/hardware_description.yaml",
         },
     }
-
-    system_site = "aws"
 
     variant(
         "instance_type",

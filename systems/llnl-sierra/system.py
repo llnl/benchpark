@@ -16,13 +16,12 @@ class LlnlSierra(System):
         "lassen": {
             "sys_cores_per_node": 44,
             "sys_gpus_per_node": 4,
+            "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/IBM-power9-V100-Infiniband/hardware_description.yaml",
         },
     }
     id_to_resources["sierra"] = id_to_resources["lassen"]
-
-    system_site = "llnl"
 
     variant(
         "cuda",
