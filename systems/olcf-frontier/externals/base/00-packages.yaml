@@ -1,0 +1,90 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+packages:
+  mpi:
+    buildable: false
+  blas:
+    buildable: false
+  lapack:
+    buildable: false
+  slurm:
+    externals:
+    - spec: slurm@24.05.3
+      prefix: /usr
+    buildable: false
+
+  ### Cray packages --------------------------------------------------------------------------------
+
+  cray-dyninst:
+    buildable: false
+    externals:
+    - spec: cray-dyninst@12.3.4
+      modules:
+      - cray-dyninst/12.3.4
+
+  cray-fftw:
+    buildable: false
+    externals:
+    - spec: cray-fftw@3.3.10.9
+      modules:
+      - cray-fftw/3.3.10.9
+
+  cray-hdf5:
+    buildable: false
+    externals:
+    - spec: cray-hdf5@1.12.2.11
+      modules:
+      - cray-hdf5/1.12.2.11
+
+  cray-hdf5-parallel:
+    buildable: false
+    externals:
+    - spec: cray-hdf5-parallel@1.12.2.11
+      modules:
+      - cray-hdf5-parallel/1.12.2.11
+
+  cray-mrnet:
+    buildable: false
+    externals:
+    - spec: cray-mrnet@5.1.4
+      modules:
+      - cray-mrnet/5.1.4
+
+  cray-libsci:
+    buildable: false
+    externals:
+    - spec: cray-libsci@24.11.0 %gcc
+      prefix: /opt/cray/pe/libsci/24.11.0/gnu/13.2/x86_64
+    - spec: cray-libsci@24.11.0 %rocmcc
+      prefix: /opt/cray/pe/libsci/24.11.0/amd/6.0/x86_64
+    - spec: cray-libsci@24.11.0 %cce
+      prefix: /opt/cray/pe/libsci/24.11.0/cray/17.0/x86_64
+
+  cray-mpich:
+    buildable: false
+    externals:
+    - spec: cray-mpich@8.1.31 %gcc
+      prefix: /opt/cray/pe/mpich/8.1.31/ofi/gnu/12.3
+    - spec: cray-mpich@8.1.31 %rocmcc
+      prefix: /opt/cray/pe/mpich/8.1.31/ofi/amd/6.0
+    - spec: cray-mpich@8.1.31 %cce
+      prefix: /opt/cray/pe/mpich/8.1.31/ofi/cray/17.0
+
+  cray-pmi:
+    buildable: false
+    externals:
+    - spec: cray-pmi@6.1.15
+      modules:
+      - cray-pmi/6.1.15
+
+  libfabric:
+    buildable: true
+    externals:
+    - spec: libfabric@1.22.0
+      modules:
+      - libfabric/1.22.0
+
+
