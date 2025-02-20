@@ -33,7 +33,7 @@ class Kripke(
 
     variant(
         "version",
-        default="develop",
+        default="comm_cali",
         description="app version",
     )
     

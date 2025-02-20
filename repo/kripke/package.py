@@ -54,6 +54,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     variant("caliper", default=False, description="Build with Caliper support enabled.")
     
     depends_on('chai@2024.02', when='@develop')
+    depends_on('chai@2024.02', when='@comm_cali')
     depends_on("caliper@master", when="+caliper")
     depends_on("chai+mpi", when="+mpi")
     depends_on("adiak@0.4:", when="+caliper")
