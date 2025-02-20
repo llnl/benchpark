@@ -70,10 +70,6 @@ class OlcfFrontier(System):
         with open(rocm_cfg_path, "w") as f:
             f.write(self.rocm_config())
         selections.append(rocm_cfg_path)
-        if self.spec.satisfies("compiler=cce"):
-            selections.append(externals / "libsci" / "01-cce-packages.yaml")
-        elif self.spec.satisfies("compiler=gcc"):
-            selections.append(externals / "libsci" / "00-gcc-packages.yaml")
         return selections
 
     def compiler_configs(self):
