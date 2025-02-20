@@ -7,26 +7,31 @@ import os
 
 import benchpark.paths
 
+exclude_exper = ["repo.yaml"]
+
 
 def benchpark_experiments():
     source_dir = benchpark.paths.benchpark_root
     experiments = []
-    experiments_dir = source_dir / "legacy" / "experiments"
-    for x in os.listdir(experiments_dir):
-        for y in os.listdir(experiments_dir / x):
-            experiments.append(f"{x}/{y}")
+    experiments_dir = source_dir / "experiments"
+    for x in sorted(os.listdir(experiments_dir)):
+        if x not in exclude_exper:
+            experiment_spec = benchpark.spec.ExperimentSpec(x)
+            conc = experiment_spec.concretize()
+            experiment_class = conc.experiment
+            for h in experiment_class.__dict__["helpers"]:
+                exp_name = str(h).split(".")[2]
+                experiments.append(f"{x}/{exp_name}")
     return experiments
 
 
 def benchpark_modifiers():
     source_dir = benchpark.paths.benchpark_root
     modifiers = []
-    for x in os.listdir(source_dir / "modifiers"):
-        modifiers.append(x)
-
-    modifiers += [
-        x for x in os.listdir(source_dir / "legacy" / "modifiers") if x not in modifiers
-    ]
+    exclude = ["modifier_repo.yaml"]
+    for x in sorted(os.listdir(source_dir / "modifiers")):
+        if x not in exclude:
+            modifiers.append(x)
 
     return modifiers
 
@@ -34,9 +39,20 @@ def benchpark_modifiers():
 def benchpark_systems():
     source_dir = benchpark.paths.benchpark_root
     systems = []
-    for x in os.listdir(source_dir / "legacy" / "systems"):
+    exclude = ["x86_64"]
+    for x in sorted(os.listdir(source_dir / "systems" / "all_hardware_descriptions")):
         if not (
-            os.path.isfile(os.path.join(source_dir / "configs", x)) or x == "common"
+            os.path.isfile(os.path.join(source_dir / "configs", x)) or x in exclude
         ):
             systems.append(x)
     return systems
+
+
+def benchpark_benchmarks():
+    source_dir = benchpark.paths.benchpark_root
+    benchmarks = []
+    experiments_dir = source_dir / "experiments"
+    for x in sorted(os.listdir(experiments_dir)):
+        if x not in exclude_exper:
+            benchmarks.append(f"{x}")
+    return benchmarks

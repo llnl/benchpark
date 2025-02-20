@@ -49,6 +49,7 @@ from benchpark.accounting import (  # noqa: E402
     benchpark_experiments,
     benchpark_modifiers,
     benchpark_systems,
+    benchpark_benchmarks,
 )
 
 
@@ -111,15 +112,6 @@ def benchpark_list(subparsers, actions_dict):
     )
     list_parser.add_argument("sublist", nargs="?")
     actions_dict["list"] = benchpark_list_handler
-
-
-def benchpark_benchmarks():
-    source_dir = benchpark.paths.benchpark_root
-    benchmarks = []
-    experiments_dir = source_dir / "legacy" / "experiments"
-    for x in os.listdir(experiments_dir):
-        benchmarks.append(f"{x}")
-    return benchmarks
 
 
 def benchpark_get_tags():
