@@ -31,7 +31,7 @@ Search for available system and experiment specifications in Benchpark.
      - :doc:`system-list`
    * - benchmark list benchmarks
      - Lists all benchmarks specified in Benchpark
-     -
+     - :doc:`benchmark-list`
    * - benchpark tags workspace
      - Lists all tags specified in Benchpark
      -
