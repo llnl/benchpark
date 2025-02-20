@@ -844,3 +844,21 @@ jobs:
           benchmark_spec: ad
           system_name: tioga
           system_spec: llnl-elcapitan rocm=6.2.4 compiler=rocmcc
+
+      - name: md-test/mpi llnl-elcapitan
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: md-test
+          benchmark_mode: mpi
+          benchmark_spec: md-test
+          system_name: tioga
+          system_spec: llnl-elcapitan
+
+      - name: md-test/mpi ruby llnl-cluster
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: md-test
+          benchmark_mode: mpi
+          benchmark_spec: md-test
+          system_name: ruby
+          system_spec: llnl-cluster cluster=ruby
