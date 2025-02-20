@@ -58,4 +58,6 @@ class MdTest(
         self.add_spack_spec(system_specs["mpi"])
 
         self.add_spack_spec("ior", ["ior@3.3.0", system_specs["compiler"]])
-        self.add_spack_spec(self.name, [f"mdtest@{app_version}", system_specs["compiler"]])
+        self.add_spack_spec(
+            self.name, [f"mdtest@{app_version}", system_specs["compiler"]]
+        )
