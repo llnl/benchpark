@@ -29,4 +29,4 @@ system_definition:
       runtime:
       mpi: mvapich
   top500-system-instances:
-    - Ruby (LLNL) <https://www.top500.org/system/179866>
+    - Ruby <https://www.top500.org/system/179866>

@@ -36,6 +36,6 @@ system_definition:
       runtime: rocm
       mpi: cray-mpich
   top500-system-instances:
-    - Frontier (ORNL)  <https://www.top500.org/system/180047>
-    - Lumi     (CSC)   <https://www.top500.org/system/180048>
-    - Tioga    (LLNL)  <https://www.top500.org/system/180052>
+    - Frontier <https://www.top500.org/system/180047>
+    - Lumi     <https://www.top500.org/system/180048>
+    - Tioga    <https://www.top500.org/system/180052>

@@ -30,4 +30,4 @@ system_definition:
       mpi: cray-mpich
       installation-year: 2017
   top500-system-instances:
-    - Piz Daint (CSCS) <https://www.top500.org/system/177824>
+    - Piz Daint <https://www.top500.org/system/177824>

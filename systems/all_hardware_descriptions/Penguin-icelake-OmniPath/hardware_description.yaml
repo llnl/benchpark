@@ -29,4 +29,4 @@ system_definition:
       runtime:
       mpi: mvapich
   top500-system-instances:
-    - Magma (LLNL) <https://www.top500.org/system/179774>
+    - Magma <https://www.top500.org/system/179774>

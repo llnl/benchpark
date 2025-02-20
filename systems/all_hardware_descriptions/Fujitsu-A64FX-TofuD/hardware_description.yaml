@@ -29,4 +29,4 @@ system_definition:
       runtime:
       mpi: fujitsu-mpi
   top500-system-instances:
-    - Fugaku (R-CCS) <https://www.top500.org/system/179807/>
+    - Fugaku <https://www.top500.org/system/179807/>

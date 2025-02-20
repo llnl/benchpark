@@ -29,6 +29,6 @@ system_definition:
       runtime: rocm
       mpi: cray-mpich
   top500-system-instances:
-    - El Capitan (LLNL) <https://www.top500.org/system/180307>
-    - Tuolumne   (LLNL) <https://www.top500.org/system/180308>
-    - rzAdams    (LLNL) <https://www.top500.org/system/180284>
+    - El Capitan <https://www.top500.org/system/180307>
+    - Tuolumne   <https://www.top500.org/system/180308>
+    - rzAdams    <https://www.top500.org/system/180284>
