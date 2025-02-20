@@ -8,9 +8,21 @@ import pathlib
 from benchpark.directives import variant
 from benchpark.system import System
 from packaging.version import Version
+from benchpark.paths import hardware_descriptions
 
 
 class CscsDaint(System):
+
+    id_to_resources = {
+        "daint": {
+            "sys_cores_per_node": 12,
+            "sys_gpus_per_node": 1,
+            "sys_mem_per_node": 64,
+            "system_site": "cscs",
+            "hardware_key": str(hardware_descriptions)
+            + "/CSCS-Daint-HPECray-haswell-P100-Infiniband/hardware_description.yaml"
+        }
+    }
 
     variant(
         "compiler",
@@ -41,14 +53,10 @@ class CscsDaint(System):
         for key, value in full_versions.items():
             if key == self.spec.variants["compiler"][0]:
                 self.compiler_version = Version(value)
-        sys_variables = {
-            "sys_cores_per_node": 12,
-            "sys_gpus_per_node": 1,
-            "sys_mem_per_node": 64,
-        }
 
         self.scheduler = "slurm"
-        for k, v in sys_variables.items():
+        attrs = self.id_to_resources.get("daint")
+        for k, v in attrs.items():
             setattr(self, k, v)
 
     def generate_description(self, output_dir):

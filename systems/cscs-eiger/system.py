@@ -8,9 +8,20 @@ from benchpark.directives import variant
 
 from benchpark.system import System
 from packaging.version import Version
+from benchpark.paths import hardware_descriptions
 
 
 class CscsEiger(System):
+
+    id_to_resources = {
+        "eiger": {
+            "sys_cores_per_node": 128,
+            "timeout": 30,
+            "system_site": "cscs",
+            "hardware_key": str(hardware_descriptions)
+            + "/CSCS-Eiger-HPECray-zen2-Slingshot/hardware_description.yaml"
+        }
+    }
 
     variant(
         "compiler",
@@ -23,13 +34,9 @@ class CscsEiger(System):
 
         self.gcc_version = Version("12.3.0")
 
-        sys_variables = {
-            "sys_cores_per_node": 128,
-            "timeout": 30,
-        }
-
         self.scheduler = "slurm"
-        for k, v in sys_variables.items():
+        attrs = self.id_to_resources.get("eiger")
+        for k, v in attrs.items():
             setattr(self, k, v)
 
     def generate_description(self, output_dir):
