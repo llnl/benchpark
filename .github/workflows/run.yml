@@ -232,6 +232,7 @@ jobs:
       - name: Dry run qws/openmp with allocation modifier on Fugaku
         run: |
           ./bin/benchpark experiment init --dest=qws/openmp qws+openmp
+          ./bin/benchpark system init --dest=riken-fugaku riken-fugaku
           ./bin/benchpark setup qws/openmp riken-fugaku workspace/
           . workspace/setup.sh
           ramble \
