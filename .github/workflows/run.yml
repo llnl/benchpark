@@ -15,9 +15,9 @@ jobs:
 
       - name: Build Saxpy Workspace
         run: |
-          ./bin/benchpark experiment init --dest=saxpy saxpy+openmp
+          ./bin/benchpark experiment init --dest=saxpy/openmp saxpy+openmp
           ./bin/benchpark system init --dest=generic-x86 generic-x86
-          ./bin/benchpark setup saxpy generic-x86 workspace/
+          ./bin/benchpark setup saxpy/openmp generic-x86 workspace/
 
       - name: Setup Ramble & Spack
         run: |
