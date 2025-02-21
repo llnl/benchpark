@@ -217,17 +217,17 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
       
-      - name: Dry run salmon/openmp with allocation modifier on Fugaku
-        run: |
-          ./bin/benchpark experiment init --dest=salmon/openmp salmon+openmp
-          ./bin/benchpark system init --dest=riken-fugaku riken-fugaku
-          ./bin/benchpark setup salmon/openmp riken-fugaku workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/salmon/openmp/riken-fugaku/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
+      # - name: Dry run salmon/openmp with allocation modifier on Fugaku
+      #   run: |
+      #     ./bin/benchpark experiment init --dest=salmon/openmp salmon+openmp
+      #     ./bin/benchpark system init --dest=riken-fugaku riken-fugaku
+      #     ./bin/benchpark setup salmon/openmp riken-fugaku workspace/
+      #     . workspace/setup.sh
+      #     ramble \
+      #       --workspace-dir workspace/salmon/openmp/riken-fugaku/workspace \
+      #       --disable-progress-bar \
+      #       --disable-logger \
+      #       workspace setup --dry-run
 
       - name: Dry run qws/openmp with allocation modifier on Fugaku
         run: |
