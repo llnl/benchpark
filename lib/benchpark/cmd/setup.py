@@ -85,10 +85,8 @@ def command(args):
     debug_print(f"specified system = {system_id}")
     debug_print(f"specified modifier = {modifier}")
 
-    experiment_src_dir = (
-        benchpark.paths.benchpark_root / "experiments" / str(experiment_id)
-    )
-    configs_src_dir = benchpark.paths.benchpark_root / "systems" / str(system_id)
+    experiment_src_dir = benchpark.paths.benchpark_root / str(experiment_id)
+    configs_src_dir = benchpark.paths.benchpark_root / str(system_id)
     workspace_dir = experiments_root / str(experiment_id) / str(system_id)
 
     if workspace_dir.exists():
