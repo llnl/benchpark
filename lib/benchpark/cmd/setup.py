@@ -53,12 +53,6 @@ def setup_parser(root_parser):
         type=str,
         help="Where to install packages and store results for the experiments. Benchpark expects to manage this directory, and it should be empty/nonexistent the first time you run benchpark setup experiments.",
     )
-    root_parser.add_argument(
-        "--modifier",
-        type=str,
-        default="none",
-        help="The modifier to apply to the experiment (default none)",
-    )
 
 
 def command(args):
@@ -75,7 +69,6 @@ def command(args):
     """
 
     experiments_root = pathlib.Path(os.path.abspath(args.experiments_root))
-    modifier = args.modifier
     experiment_id = args.experiment
     system_id = args.system
     source_dir = benchpark.paths.benchpark_root
@@ -83,7 +76,6 @@ def command(args):
     debug_print(f"source_dir = {source_dir}")
     debug_print(f"specified experiment = {experiment_id}")
     debug_print(f"specified system = {system_id}")
-    debug_print(f"specified modifier = {modifier}")
 
     experiment_src_dir = benchpark.paths.benchpark_root / str(experiment_id)
     configs_src_dir = benchpark.paths.benchpark_root / str(system_id)
@@ -110,9 +102,6 @@ def command(args):
 
     print(f"Setting up configs for Ramble workspace {ramble_configs_dir}")
 
-    modifier_config_dir = (
-        source_dir / str(experiment_id)
-    )
     ramble_configs_dir.mkdir(parents=True)
     ramble_logs_dir.mkdir(parents=True)
     ramble_spack_experiment_configs_dir.mkdir(parents=True)
@@ -128,7 +117,6 @@ def command(args):
 
     symlink_tree(configs_src_dir, ramble_configs_dir, include_fn)
     symlink_tree(experiment_src_dir, ramble_configs_dir, include_fn)
-    symlink_tree(modifier_config_dir, ramble_configs_dir, include_fn)
     symlink_tree(
         source_dir / "legacy" / "systems" / "common",
         ramble_spack_experiment_configs_dir,
