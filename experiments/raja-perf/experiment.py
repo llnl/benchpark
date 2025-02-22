@@ -47,6 +47,12 @@ class RajaPerf(
         description="Multiplier on number of repitions to run each kernel",
     )
 
+    variant(
+        "n_ranks",
+        default=1,
+        description="Number of ranks before scaling."
+    )
+
     # variant(
     #     "variants",
     #     default="None",
@@ -59,15 +65,11 @@ class RajaPerf(
 
     def compute_applications_section(self):
 
-        n_resources = {"n_ranks": 1}
+        n_resources = int(self.spec.variants["n_ranks"][0])
         total_size = int(self.spec.variants["total_size"][0])
         execute = "raja-perf.exe"
 
-        if self.spec.satisfies("+single_node"):
-            for pk, pv in n_resources.items():
-                n_resources = pv
-
-        elif self.spec.satisfies("+strong"):
+        if self.spec.satisfies("+strong"):
             scaled_variables = self.generate_strong_scaling_params(
                 {tuple(n_resources.keys()): list(n_resources.values())},
                 int(self.spec.variants["scaling-factor"][0]),
