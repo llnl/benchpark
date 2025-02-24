@@ -1,3 +1,4 @@
+import os
 import subprocess
 import textwrap
 
@@ -65,6 +66,31 @@ def info_system(args):
                 else:
                     resource_key = "@*r" + resource_key + "@."
                     color.cprint(f"{indent()*2}{resource_key}: {resource_value}")
+
+    def _handle_query(query):
+        key, value = query.split("=", 1)
+        exclude = {"all_hardware_descriptions", "repo.yaml", "generic-x86"}
+        all_system_specs = []
+        for d in set(os.listdir(benchpark.paths.benchpark_root / "systems")) - exclude:
+            all_system_specs.append(benchpark.spec.SystemSpec(d))
+
+        matching_systems = []
+        for spec in all_system_specs:
+            resources = spec.system_class.id_to_resources
+            for cluster, resource_dict in resources.items():
+                if str(resource_dict.get(key)) == value:
+                    matching_systems.append((spec.name, cluster))
+
+        if matching_systems:
+            gen_header(query)
+            for system_name, cluster in matching_systems:
+                color.cprint(f"{indent()}@*g{system_name}@.: {cluster}")
+        else:
+            print("No matching systems found.")
+
+    if args.query:
+        _handle_query(args.query)
+        return
 
     system_spec = benchpark.spec.SystemSpec(args.name)
     system_class = system_spec.system_class
@@ -153,7 +179,10 @@ def setup_parser(root_parser):
     )
     system_parser.add_argument("--system-site", action="store_true", help="System site")
     system_parser.add_argument("--maintainers", action="store_true", help="Maintainers")
-    system_parser.add_argument("name", help="System name")
+    system_parser.add_argument(
+        "--query", type=str, help="Query systems with key-value pairs (e.g., key=value)"
+    )
+    system_parser.add_argument("name", help="System name", nargs="?")
 
     experiment_parser = info_subparser.add_parser("experiment")
     experiment_parser.add_argument(
