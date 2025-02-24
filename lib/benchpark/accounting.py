@@ -14,14 +14,16 @@ def benchpark_experiments():
     source_dir = benchpark.paths.benchpark_root
     experiments = []
     experiments_dir = source_dir / "experiments"
+    exclude_variants = ["Caliper"]
     for x in sorted(os.listdir(experiments_dir)):
         if x not in exclude_exper:
             experiment_spec = benchpark.spec.ExperimentSpec(x)
             conc = experiment_spec.concretize()
             experiment_class = conc.experiment
             for h in experiment_class.__dict__["helpers"]:
-                exp_name = str(h).split(".")[2]
-                experiments.append(f"{x}/{exp_name}")
+                variant = str(h).split(".")[2]
+                if variant not in exclude_variants:
+                    experiments.append(f"{x}/{variant}")
     return experiments
 
 
