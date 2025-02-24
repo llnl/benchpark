@@ -459,15 +459,6 @@ jobs:
           system_name: ruby
           system_spec: llnl-cluster cluster=ruby compiler=intel
 
-      - name: osu-micro-benchmarks/mpi ruby llnl-cluster cluster=ruby compiler=intel
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: osu-micro-benchmarks
-          benchmark_mode: mpi
-          benchmark_spec: osu-micro-benchmarks workload=all
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby compiler=intel
-
       - name: laghos/mpi caliper=mpi,time ruby llnl-cluster cluster=ruby compiler=intel
         uses: ./.github/actions/dynamic-dry-run
         with:
@@ -836,3 +827,21 @@ jobs:
           benchmark_spec: ad
           system_name: tioga
           system_spec: llnl-elcapitan rocm=6.2.4 compiler=rocmcc
+          
+      - name: osu-micro-benchmarks/mpi ruby llnl-cluster cluster=ruby compiler=intel
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: osu-micro-benchmarks
+          benchmark_mode: mpi
+          benchmark_spec: osu-micro-benchmarks workload=all
+          system_name: ruby
+          system_spec: llnl-cluster cluster=ruby compiler=intel
+
+      - name: osu-micro-benchmarks/rocm tioga llnl-elcapitan cluster=tioga compiler=cce +gtl
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: osu-micro-benchmarks
+          benchmark_mode: rocm
+          benchmark_spec: osu-micro-benchmarks+rocm workload=all
+          system_name: tioga
+          system_spec: llnl-elcapitan cluster=tioga compiler=cce +gtl
