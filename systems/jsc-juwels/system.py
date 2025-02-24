@@ -21,7 +21,7 @@ class JscJuwels(System):
             "cuda_arch": '"80"',
             "system_site": "jsc",
             "hardware_key": str(hardware_descriptions)
-            + "/JSC-JUWELS-Booster-rome-A100-Infiniband/hardware_description.yaml"
+            + "/Atos-rome-A100-Infiniband/hardware_description.yaml"
         }
     }
 

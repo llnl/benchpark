@@ -19,7 +19,7 @@ class CscsEiger(System):
             "timeout": 30,
             "system_site": "cscs",
             "hardware_key": str(hardware_descriptions)
-            + "/CSCS-Eiger-HPECray-zen2-Slingshot/hardware_description.yaml"
+            + "/HPECray-zen2-Slingshot/hardware_description.yaml"
         }
     }
 
