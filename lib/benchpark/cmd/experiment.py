@@ -27,7 +27,7 @@ def experiment_init(args):
         raise ValueError("Must specify one of: --dest, --basedir")
 
     try:
-        os.mkdir(destdir)
+        os.makedirs(destdir)
         experiment.write_ramble_dict(f"{destdir}/ramble.yaml")
     except FileExistsError:
         print(f"Abort: experiment description dir already exists ({destdir})")

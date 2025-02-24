@@ -185,6 +185,7 @@ packages: {}
 """
 
             use_gtl = f"""\
+        gtl_flags: $MV2_COMM_WORLD_LOCAL_RANK
         gtl_cutoff_size: 4096
         fi_cxi_ats: 0
         gtl_lib_path: /opt/cray/pe/mpich/{self.mpi_version}/gtl/lib
