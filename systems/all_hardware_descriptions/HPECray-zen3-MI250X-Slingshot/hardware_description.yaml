@@ -28,6 +28,7 @@ system_definition:
       compiler: cce
       runtime: rocm
       mpi: cray-mpich
+      installation-year: 2023
     llnl-elcapitan:
       os: TOSS
       scheduler: flux
