@@ -41,11 +41,9 @@ def benchpark_modifiers():
 def benchpark_systems():
     source_dir = benchpark.paths.benchpark_root
     systems = []
-    exclude = ["x86_64"]
-    for x in sorted(os.listdir(source_dir / "systems" / "all_hardware_descriptions")):
-        if not (
-            os.path.isfile(os.path.join(source_dir / "configs", x)) or x in exclude
-        ):
+    exclude = ["all_hardware_descriptions", "repo.yaml"]
+    for x in sorted(os.listdir(source_dir / "systems")):
+        if x not in exclude:
             systems.append(x)
     return systems
 
