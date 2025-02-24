@@ -29,4 +29,6 @@ system_definition:
       runtime: gpu
       mpi: intelmpi
   top500-system-instances:
-    - Grace <https://www.top500.org/system/179905>
+    Grace:
+      benchpark_system:
+      top500: <https://www.top500.org/system/179905>

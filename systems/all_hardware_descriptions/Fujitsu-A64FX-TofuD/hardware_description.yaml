@@ -29,4 +29,6 @@ system_definition:
       runtime:
       mpi: fujitsu-mpi
   top500-system-instances:
-    - Fugaku <https://www.top500.org/system/179807/>
+    Fugaku:
+      benchpark_system: riken-fugaku
+      top500: <https://www.top500.org/system/179807/>

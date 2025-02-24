@@ -30,4 +30,6 @@ system_definition:
       mpi: cray-mpich
       installation-year: 2017
   top500-system-instances:
-    - Eiger <https://www.top500.org/system/177824>
+    Eiger:
+      benchpark_system: cscs-eiger
+      top500: <https://www.top500.org/system/177824>

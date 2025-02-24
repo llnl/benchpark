@@ -29,6 +29,12 @@ system_definition:
       runtime: cuda
       mpi: spectrum-mpi
   top500-system-instances:
-    - Summit <https://www.top500.org/system/179397>
-    - Sierra <https://www.top500.org/system/179398>
-    - Lassen <https://www.top500.org/system/179567>
+    Summit:
+      benchpark_system:
+      top500: <https://www.top500.org/system/179397>
+    Sierra:
+      benchpark_system: llnl-sierra
+      top500: <https://www.top500.org/system/179398>
+    Lassen:
+      benchpark_system: llnl-sierra
+      top500: <https://www.top500.org/system/179567>

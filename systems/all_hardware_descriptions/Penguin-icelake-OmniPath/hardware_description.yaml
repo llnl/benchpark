@@ -29,4 +29,6 @@ system_definition:
       runtime:
       mpi: mvapich
   top500-system-instances:
-    - Magma <https://www.top500.org/system/179774>
+    Magma:
+      benchpark_system: llnl-cluster
+      top500: <https://www.top500.org/system/179774>
