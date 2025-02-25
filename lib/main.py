@@ -44,7 +44,7 @@ import benchpark.cmd.system  # noqa: E402
 import benchpark.cmd.experiment  # noqa: E402
 import benchpark.cmd.setup  # noqa: E402
 import benchpark.cmd.unit_test  # noqa: E402
-import benchpark.cmd.info # noqa: E402
+import benchpark.cmd.info  # noqa: E402
 import benchpark.paths  # noqa: E402
 from benchpark.accounting import (  # noqa: E402
     benchpark_experiments,
