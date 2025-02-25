@@ -25,11 +25,9 @@ Creating experiment ramble.yaml:
 ---------------------------
 
 Parameters could include: version, scaling, etc.
-If all experiment-based variables are the same, create one ramble.yaml
+If all experiment-based variables are the same, create one ramble.yaml. We are also enabling the caliper modifier, allowing us to track performance through annotations in the source code.
 
-``benchpark experiment init --dest=quicksilver  quicksilver caliper=mpi +weak ~single_node``
-
-If setting caliper modifier:
+``benchpark experiment init --dest=quicksilver  quicksilver caliper=mpi +weak +openmp ~single_node``
 
 
 Note: to create multiple duplicate experiments, change the experiment name ({experiment1}, {experiment2}). 
