@@ -15,8 +15,10 @@ Building Multiple Binaries:
 ---------------------------
 
 Separate System Descriptions
-Parameters could include: compiler, mpi, etc. 
+Parameters could include: compiler, mpi, etc.
+
 ``benchpark system init --dest=ruby-gcc  llnl-cluster cluster=ruby compiler=gcc``
+
 ``benchpark system init --dest=ruby-intel  llnl-cluster cluster=ruby compiler=intel``
 
 Creating experiment ramble.yaml:
@@ -24,6 +26,7 @@ Creating experiment ramble.yaml:
 
 Parameters could include: version, scaling, etc.
 If all experiment-based variables are the same, create one ramble.yaml
+
 ``benchpark experiment init --dest=quicksilver  quicksilver caliper=mpi``
 
 If setting caliper modifier:
@@ -37,11 +40,14 @@ Running multiple experiments:
 
 Now that both the system and experiment parameters have been defined, we can setup each experiment directory. 
 This step will install the binary, and create the execute_experiment shell script.
+
 ``benchpark setup quicksilver ruby-gcc workspace``
+
 ``benchpark setup quicksilver ruby-intel workspace``
 
 
 ``ramble -P -D workspace/quicksilver/ruby-gcc/workspace workspace setup``
+
 ``ramble -P -D workspace/quicksilver/ruby-intel/workspace workspace setup``
 
 generates an execute_experiment shell script for each run, and installs the benchmark along with all dependencies
@@ -67,6 +73,7 @@ Running Experiments
 -------------------
 
 ``ramble -P -D workspace/quicksilver/ruby-gcc/workspace on``
+
 ``ramble -P -D workspace/quicksilver/ruby-intel/workspace on``
 
 Collecting Data with Caliper
