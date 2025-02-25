@@ -41,14 +41,14 @@ Running multiple experiments:
 Now that both the system and experiment parameters have been defined, we can setup each experiment directory. 
 This step will install the binary, and create the execute_experiment shell script.
 
-``benchpark setup quicksilver ruby-gcc workspace``
+``benchpark setup quicksilver ruby-gcc workspace
 
-``benchpark setup quicksilver ruby-intel workspace``
+benchpark setup quicksilver ruby-intel workspace``
 
 
-``ramble -P -D workspace/quicksilver/ruby-gcc/workspace workspace setup``
+``ramble -P -D workspace/quicksilver/ruby-gcc/workspace workspace setup
 
-``ramble -P -D workspace/quicksilver/ruby-intel/workspace workspace setup``
+ramble -P -D workspace/quicksilver/ruby-intel/workspace workspace setup``
 
 generates an execute_experiment shell script for each run, and installs the benchmark along with all dependencies
 
