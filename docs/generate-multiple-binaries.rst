@@ -27,7 +27,7 @@ Creating experiment ramble.yaml:
 Parameters could include: version, scaling, etc.
 If all experiment-based variables are the same, create one ramble.yaml
 
-``benchpark experiment init --dest=quicksilver  quicksilver caliper=mpi``
+``benchpark experiment init --dest=quicksilver  quicksilver caliper=mpi +weak ~single_node``
 
 If setting caliper modifier:
 
@@ -50,7 +50,26 @@ Now, we generate an execute_experiment shell script for each run, and install th
   ramble -P -D workspace/quicksilver/ruby-gcc/workspace workspace setup
   ramble -P -D workspace/quicksilver/ruby-intel/workspace workspace setup
 
+Completing these steps will result in the following structure:
 
+   experiments_root/
+        ramble/
+        spack/
+        quicksilver/
+        	ruby-gcc/
+            	workspace/
+					experiments/
+						....
+						execute_experiment
+            ruby-intel/
+                workspace/
+					experiments/
+						....
+						execute_experiment
+
+
+
+ 
 Verifying build details, differences between builds
 ---------------------------------------------------
 
@@ -71,11 +90,14 @@ This can also be done in a single command by the altdiff command built into benc
 Running Experiments
 -------------------
 
-To run each binary independently, run the following commands:::
+To run each binary on different nodes, run the following commands::
 
   ramble -P -D workspace/quicksilver/ruby-gcc/workspace on
-
   ramble -P -D workspace/quicksilver/ruby-intel/workspace on
+
+However, we can manually combine each ``execute_experiment`` file into a single script, allowing us to run both binaries on the same node
+
+
 
 Collecting Data with Caliper
 ----------------------------
