@@ -50,7 +50,7 @@ Now, we generate an execute_experiment shell script for each run, and install th
   ramble -P -D workspace/quicksilver/ruby-gcc/workspace workspace setup
   ramble -P -D workspace/quicksilver/ruby-intel/workspace workspace setup
 
-Completing these steps will result in the following structure:
+Completing these steps will result in the following structure::
 
    experiments_root/
         ramble/
@@ -58,14 +58,14 @@ Completing these steps will result in the following structure:
         quicksilver/
         	ruby-gcc/
             	workspace/
-					experiments/
-						....
-						execute_experiment
+                    experiments/
+                        ..../
+                        execute_experiment
             ruby-intel/
                 workspace/
-					experiments/
-						....
-						execute_experiment
+                    experiments/
+                    ..../
+                    execute_experiment
 
 
 
