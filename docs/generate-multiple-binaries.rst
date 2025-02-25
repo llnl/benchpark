@@ -39,16 +39,17 @@ Running multiple experiments:
 ---------------------------
 
 Now that both the system and experiment parameters have been defined, we can setup each experiment directory. 
-This step will install the binary, and create the execute_experiment shell script.
+This step will install the binary, and create the execute_experiment shell script::
 
-``benchpark setup quicksilver ruby-gcc workspace
-benchpark setup quicksilver ruby-intel workspace``
+  benchpark setup quicksilver ruby-gcc workspace
+  benchpark setup quicksilver ruby-intel workspace
 
+  
+Now, we generate an execute_experiment shell script for each run, and install the benchmark along with all dependencies::
 
-``ramble -P -D workspace/quicksilver/ruby-gcc/workspace workspace setup
-ramble -P -D workspace/quicksilver/ruby-intel/workspace workspace setup``
+  ramble -P -D workspace/quicksilver/ruby-gcc/workspace workspace setup
+  ramble -P -D workspace/quicksilver/ruby-intel/workspace workspace setup
 
-generates an execute_experiment shell script for each run, and installs the benchmark along with all dependencies
 
 Verifying build details, differences between builds
 ---------------------------------------------------
@@ -70,9 +71,11 @@ This can also be done in a single command by the altdiff command built into benc
 Running Experiments
 -------------------
 
-``ramble -P -D workspace/quicksilver/ruby-gcc/workspace on``
+To run each binary independently, run the following commands:::
 
-``ramble -P -D workspace/quicksilver/ruby-intel/workspace on``
+  ramble -P -D workspace/quicksilver/ruby-gcc/workspace on
+
+  ramble -P -D workspace/quicksilver/ruby-intel/workspace on
 
 Collecting Data with Caliper
 ----------------------------
