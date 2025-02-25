@@ -20,7 +20,7 @@ class CscsDaint(System):
             "sys_mem_per_node": 64,
             "system_site": "cscs",
             "hardware_key": str(hardware_descriptions)
-            + "/HPECray-haswell-P100-Infiniband/hardware_description.yaml"
+            + "/HPECray-haswell-P100-Infiniband/hardware_description.yaml",
         }
     }
 

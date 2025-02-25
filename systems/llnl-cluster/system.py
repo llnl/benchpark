@@ -12,7 +12,7 @@ from benchpark.paths import hardware_descriptions
 
 class LlnlCluster(System):
 
-    maintainers("nhanford","rfhaque")
+    maintainers("nhanford", "rfhaque")
 
     id_to_resources = {
         "ruby": {

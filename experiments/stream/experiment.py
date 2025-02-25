@@ -24,8 +24,7 @@ class Stream(
         description="app version",
     )
 
-    maintainers("daboehme","rfhaque")
-
+    maintainers("daboehme", "rfhaque")
 
     def compute_applications_section(self):
 

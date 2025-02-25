@@ -40,7 +40,6 @@ class Amg2023(
 
     maintainers("pearce8")
 
-
     # requires("system+papi", when(caliper=topdown*))
 
     # TODO: Support list of 3-tuples

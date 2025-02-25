@@ -20,7 +20,7 @@ class CscLumi(System):
             "sys_mem_per_node": 512,
             "system_site": "csc",
             "hardware_key": str(hardware_descriptions)
-            + "/HPECray-zen3-MI250X-Slingshot/hardware_description.yaml"
+            + "/HPECray-zen3-MI250X-Slingshot/hardware_description.yaml",
         }
     }
 

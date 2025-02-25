@@ -24,7 +24,6 @@ class Smb(Experiment, StrongScaling):
 
     maintainers("nhanford")
 
-
     def compute_applications_section(self):
         if self.spec.satisfies("workload=mpi_overhead"):
             self.add_experiment_variable("n_ranks", "2")

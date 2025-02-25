@@ -12,8 +12,8 @@ from benchpark.paths import hardware_descriptions
 
 class LanlVenado(System):
 
-    maintainers("rfhaque","gshipman")
-    
+    maintainers("rfhaque", "gshipman")
+
     id_to_resources = {
         "grace-hopper": {
             "sys_cores_per_node": 144,

@@ -13,7 +13,7 @@ from benchpark.paths import hardware_descriptions
 class RikenFugaku(System):
 
     maintainers("jdomke", "SBA0486")
-    
+
     id_to_resources = {
         "fugaku": {
             "sys_cores_per_node": 48,

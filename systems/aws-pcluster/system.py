@@ -15,7 +15,7 @@ class AwsPcluster(System):
     # With boto3, we could determine this dynamically vs. storing a static table
 
     maintainers("wdhawkins")
-    
+
     id_to_resources = {
         "c4.xlarge": {
             "sys_cores_per_node": 4,
