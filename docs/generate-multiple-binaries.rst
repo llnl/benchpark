@@ -116,7 +116,7 @@ This can also be done in a single command by the altdiff command built into benc
 
 ``spack-python  lib/scripts/altdiff.py quicksilver/{hash1}  quicksilver/{hash2}``
 
-the output will look like this:
+the output will look something like this, with difference highlighted in red. Asterisks have been placed around all highlighted sections::
 
 quicksilver@master **%gcc@=12.1.1** build_system=makefile~cuda+mpi+openmp arch=linux-rhel8-sapphirerapids
 
