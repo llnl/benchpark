@@ -79,12 +79,14 @@ Benchpark offers two ways to double check that each binary has built according t
 ``spack find -L quicksilver``
 
 This returns the following output::
+
    -- linux-rhel8-sapphirerapids / gcc@12.1.1 ----------------------
    fubnce7wzgjxhkim2cylijt4cbpfhxi6 quicksilver@master
 
    -- linux-rhel8-sapphirerapids / intel@2021.6.0-classic ----------
    qwev4yodp2joikf2oxvlo224ksjcqve3 quicksilver@master
-   ==> 2 installed packages 
+   ==> 2 installed packages
+
 This output shows each installed binary, along with their associated hashes. We can use these hashes to independently double-check the details of each build.
 
 
