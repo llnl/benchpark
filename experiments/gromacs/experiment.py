@@ -86,7 +86,7 @@ class Gromacs(
         for k, v in other_input_variables.items():
             self.add_experiment_variable(k, v)
 
-    def compute_spack_section(self):
+    def compute_package_section(self, pkg_manager):
         # get package version
         app_version = self.spec.variants["version"][0]
 
@@ -98,24 +98,27 @@ class Gromacs(
         system_specs["blas"] = "blas"
         system_specs["lapack"] = "lapack"
 
-        # set package spack specs
-        # empty package_specs value implies external package
-        self.add_spack_spec(system_specs["mpi"])
-        # empty package_specs value implies external package
-        self.add_spack_spec(system_specs["blas"])
-        # empty package_specs value implies external package
-        self.add_spack_spec(system_specs["lapack"])
+        if pkg_manager == "spack":
+            # set package spack specs
+            # empty package_specs value implies external package
+            self.add_spack_spec(system_specs["mpi"])
+            # empty package_specs value implies external package
+            self.add_spack_spec(system_specs["blas"])
+            # empty package_specs value implies external package
+            self.add_spack_spec(system_specs["lapack"])
 
-        spack_specs = "+mpi~hwloc"
-        spack_specs += "+sycl" if self.spec.satisfies("+rocm") else "~sycl"
+            spack_specs = "+mpi~hwloc"
+            spack_specs += "+sycl" if self.spec.satisfies("+rocm") else "~sycl"
 
-        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
-            spack_specs += f" gpu-aware-mpi={self.spec.variants['gpu-aware-mpi'][0]} "
-            spack_specs += " ~double "
-        else:
-            spack_specs += " gpu-aware-mpi=off "
+            if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+                spack_specs += (
+                    f" gpu-aware-mpi={self.spec.variants['gpu-aware-mpi'][0]} "
+                )
+                spack_specs += " ~double "
+            else:
+                spack_specs += " gpu-aware-mpi=off "
 
-        self.add_spack_spec(
-            self.name,
-            [f"gromacs@{app_version} {spack_specs}", system_specs["compiler"]],
-        )
+            self.add_spack_spec(
+                self.name,
+                [f"gromacs@{app_version} {spack_specs}", system_specs["compiler"]],
+            )

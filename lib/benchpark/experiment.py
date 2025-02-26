@@ -43,7 +43,7 @@ class ExperimentHelper:
     def compute_applications_section(self):
         return {}
 
-    def compute_spack_section(self):
+    def compute_package_section(self, pkg_manager):
         return {}
 
     def get_helper_name_prefix(self):
@@ -108,12 +108,6 @@ class Experiment(ExperimentSystemBase, SingleNode):
         "benchpark.spec.Spec",
         Dict[str, benchpark.variant.Variant],
     ]
-
-    variant(
-        "extra_spack_specs",
-        default=" ",
-        description="additional spack specs",
-    )
 
     variant(
         "package_manager",
@@ -291,31 +285,40 @@ class Experiment(ExperimentSystemBase, SingleNode):
         else:
             self.package_specs[package_name] = {}
 
-    def compute_spack_section(self):
+    def compute_package_section(self, pkg_manager):
         raise NotImplementedError(
-            "Each experiment must implement compute_spack_section"
+            "Each experiment must implement compute_package_section"
         )
 
-    def compute_spack_section_wrapper(self):
+    def compute_package_section_wrapper(self):
+        pkg_manager = self.spec.variants["package_manager"][0]
+
         for cls in self.helpers:
-            cls_package_specs = cls.compute_spack_section()
+            cls_package_specs = cls.compute_package_section(pkg_manager)
             if cls_package_specs and "packages" in cls_package_specs:
                 self.package_specs |= cls_package_specs["packages"]
 
-        self.compute_spack_section()
+        self.compute_package_section(pkg_manager)
 
-        if self.name not in self.package_specs:
-            raise BenchparkError(
-                f"Spack section must be defined for application package {self.name}"
-            )
+        if pkg_manager == "spack":
+            if self.name not in self.package_specs:
+                raise BenchparkError(
+                    f"Package section must be defined for application package {self.name}"
+                )
 
-        spack_variants = list(
-            filter(
-                lambda v: v is not None,
-                (cls.get_spack_variants() for cls in self.helpers),
+            spack_variants = list(
+                filter(
+                    lambda v: v is not None,
+                    (cls.get_spack_variants() for cls in self.helpers),
+                )
             )
-        )
-        self.package_specs[self.name]["pkg_spec"] += " ".join(spack_variants).strip()
+            self.package_specs[self.name]["pkg_spec"] += " ".join(spack_variants).strip()
+
+        elif pkg_manager == "environment-modules":
+            if "append_path" in self.spec.variants:
+                self.append_environment_variable(
+                    "PATH", self.spec.variants["append_path"][0]
+                )
 
         return {
             "packages": {k: v for k, v in self.package_specs.items() if v},
@@ -332,25 +335,6 @@ class Experiment(ExperimentSystemBase, SingleNode):
             additional_vars.update(cls.compute_variables_section())
         return additional_vars
 
-    def compute_environment_modules_section(self):
-        # TODO: Using spack section for testing
-        for cls in self.helpers:
-            cls_package_specs = cls.compute_spack_section()
-            if cls_package_specs and "packages" in cls_package_specs:
-                self.package_specs |= cls_package_specs["packages"]
-
-        self.compute_spack_section()
-
-        if "append_path" in self.spec.variants:
-            self.append_environment_variable(
-                "PATH", self.spec.variants["append_path"][0]
-            )
-
-        return {
-            "packages": {k: v for k, v in self.package_specs.items() if v},
-            "environments": {self.name: {"packages": list(self.package_specs.keys())}},
-        }
-
     def compute_ramble_dict(self):
         # This can be overridden by any subclass that needs more flexibility
         ramble_dict = {
@@ -359,12 +343,7 @@ class Experiment(ExperimentSystemBase, SingleNode):
                 "config": self.compute_config_section(),
                 "modifiers": self.compute_modifiers_section_wrapper(),
                 "applications": self.compute_applications_section_wrapper(),
-                # TODO: this needs a refactor into one function
-                "software": (
-                    self.compute_spack_section_wrapper()
-                    if self.spec.variants["package_manager"][0] == "spack"
-                    else self.compute_environment_modules_section()
-                ),
+                "software": self.compute_package_section_wrapper(),
             }
         }
         # Add any variables from helper classes if necessary

@@ -184,8 +184,8 @@ if [ -n "${{_BENCHPARK_INITIALIZED:-}}" ]; then
     return 0
 fi
 
-. {per_workspace_setup.ramble_location}/share/ramble/setup-env.sh
 {pkg_str}
+. {per_workspace_setup.ramble_location}/share/ramble/setup-env.sh
 
 export _BENCHPARK_INITIALIZED=true
 """

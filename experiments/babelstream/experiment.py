@@ -53,7 +53,7 @@ class Babelstream(
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_experiment_variable("n_gpus", n_resources, True)
 
-    def compute_spack_section(self):
+    def compute_package_section(self, pkg_manager):
         # get package version
         app_version = self.spec.variants["version"][0]
 
@@ -68,8 +68,9 @@ class Babelstream(
         if self.spec.satisfies("+rocm"):
             system_specs["rocm_arch"] = "{rocm_arch}"
 
-        # set package spack specs
-        self.add_spack_spec(system_specs["mpi"])
-        self.add_spack_spec(
-            self.name, [f"babelstream@{app_version}", system_specs["compiler"]]
-        )
+        if pkg_manager == "spack":
+            # set package spack specs
+            self.add_spack_spec(system_specs["mpi"])
+            self.add_spack_spec(
+                self.name, [f"babelstream@{app_version}", system_specs["compiler"]]
+            )

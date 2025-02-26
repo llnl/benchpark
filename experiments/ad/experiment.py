@@ -24,7 +24,7 @@ class Ad(Experiment):
         self.add_experiment_variable("n_ranks", 1, True)
         self.add_experiment_variable("n_threads_per_proc", 1, True)
 
-    def compute_spack_section(self):
+    def compute_package_section(self, pkg_manager):
         # get package version
         app_version = self.spec.variants["version"][0]
 
@@ -34,8 +34,10 @@ class Ad(Experiment):
         system_specs["compiler"] = "default-compiler"
         # system_specs["mpi"] = "default-mpi"
 
-        # set package spack specs
-        # empty package_specs value implies external package
-        # self.add_spack_spec(system_specs["mpi"])
-
-        self.add_spack_spec(self.name, [f"ad@{app_version}", system_specs["compiler"]])
+        if pkg_manager == "spack":
+            # set package spack specs
+            # empty package_specs value implies external package
+            # self.add_spack_spec(system_specs["mpi"])
+            self.add_spack_spec(
+                self.name, [f"ad@{app_version}", system_specs["compiler"]]
+            )
