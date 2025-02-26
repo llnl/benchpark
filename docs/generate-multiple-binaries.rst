@@ -9,9 +9,9 @@ Comparing two Experiments Within Benchpark
 ==========================================
 
 This tutorial will guide you through the process of building and comparing distinct binaries of the same benchmark. 
-As an example, we will be using an experiment comparing two builds of the quicksilver benchmark, compiled with the ``gcc`` and ``intel`` compiler variants on LLNL's Ruby cluster.i
+As an example, we will be using an experiment comparing two builds of the quicksilver benchmark, compiled with the ``gcc`` and ``intel`` compiler variants on LLNL's Ruby cluster.
 
-An example script to complete all experiment setup is loacted at ``examples/multiple-binaries/daneSetup.sh``
+An example script to complete all experiment setup is located at ``examples/multiple-binaries/daneSetup.sh``
 
 Building Multiple Binaries:
 ---------------------------
@@ -31,12 +31,12 @@ Create the experiment description
 Parameters could include: version, scaling, etc.
 
 In this example, we are only changing the compiler. Because all experiment variables will be the same, we only need to generate a single experiment description.
-In this command we are intializing a quicksilver experiment in the quicksilver directory. We are doing weak scaling with openMP, and measuring MPI metrics with Caliper. 
+This command initializes a quicksilver experiment configuration in the ``quicksilver`` directory. We are doing weak scaling with openMP, and measuring MPI metrics with Caliper. 
 
 ``benchpark experiment init --dest=quicksilver  quicksilver caliper=mpi +weak +openmp ~single_node``
 
 
-Note: Running a benchmark repeatedly will overwrite the existing output. A way to keep prevent this is to create multiple duplicate experiments, change the experiment name ({experiment1}, {experiment2}). 
+Note: Running a benchmark repeatedly will overwrite the existing output. A way to keep prevent this is to create multiple duplicate experiments, changing the experiment name ({experiment1}, {experiment2}). 
 
 Running multiple experiments:
 ---------------------------
