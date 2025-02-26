@@ -112,11 +112,11 @@ Each spec will generate a dependency tree, showing which variants and compilers 
 
 Notice that each dependency tree differs in the compilers used (gcc@12.1.1 vs. intel@2021.6.0)
 
-This can also be done in a single command by the altdiff command built into benchmark, highlighting all differences in red.
+This can also be done in a single command by the altdiff command built into benchmark
 
 ``spack-python  lib/scripts/altdiff.py quicksilver/{hash1}  quicksilver/{hash2}``
 
-the output will look something like this, with difference highlighted in red. Asterisks have been placed around all highlighted sections::
+the output will look something like this, with the difference between the specs highlighted in red. Asterisks have been placed around all highlighted sections::
 
     quicksilver@master **%gcc@=12.1.1** build_system=makefile~cuda+mpi+openmp arch=linux-rhel8-sapphirerapids
     **-> [gcc-runtime]**
