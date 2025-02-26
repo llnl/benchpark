@@ -84,13 +84,21 @@ In this case, we can check the quicksilver spec, along with its dependencies by 
 
 ``spack spec quicksilver/{hash}``
 
-Each spec will generate a dependency tree, showing which variants and compilers were used for each compiler. ::
+Each spec will generate a dependency tree, showing which variants and compilers were used for each compiler. The output from both commands is below ::
     
    [+]  quicksilver@master%gcc@12.1.1~cuda+mpi+openmp build_system=makefile arch=linux-rhel8-sapphirerapids
    [+]      ^gcc-runtime@12.1.1%gcc@12.1.1 build_system=generic arch=linux-rhel8-sapphirerapids
    [e]      ^glibc@2.28%gcc@12.1.1 build_system=autotools arch=linux-rhel8-sapphirerapids
    [e]      ^gmake@4.2.1%gcc@12.1.1~guile build_system=generic patches=ca60bd9,fe5b60d arch=linux-rhel8-sapphirerapids
    [e]      ^mvapich2@2.3.7-gcc1211%gcc@12.1.1~alloca~cuda~debug~hwloc_graphics~hwlocv2+regcache+wrapperrpath build_system=autotools ch3_rank_bits=32 fabrics=mrail file_systems=auto patches=d98d8e7 process_managers=auto threads=multiple arch=linux-rhel8-sapphirerapids 
+
+
+   [+]  quicksilver@master%intel@2021.6.0-classic~cuda+mpi+openmp build_system=makefile arch=linux-rhel8-sapphirerapids
+   [e]      ^glibc@2.28%intel@2021.6.0-classic build_system=autotools arch=linux-rhel8-sapphirerapids
+   [e]      ^gmake@4.2.1%intel@2021.6.0-classic~guile build_system=generic patches=ca60bd9,fe5b60d arch=linux-rhel8-sapphirerapids
+   [e]      ^mvapich2@2.3.7-intel202160classic%intel@2021.6.0-classic~alloca~cuda~debug~hwloc_graphics~hwlocv2+regcache+wrapperrpath build_system=autotools ch3_rank_bits=32 fabrics=mrail file_systems=auto patches=d98d8e7 process_managers=auto threads=multiple arch=linux-rhel8-sapphirerapids
+
+Notice that each dependency tree differs in the compilers used (gcc@12.1.1 vs. intel@2021.6.0)
 
 This can also be done in a single command by the altdiff command built into benchmark, highlighting all differences in red.
 
