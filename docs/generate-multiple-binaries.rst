@@ -88,9 +88,8 @@ This can also be done in a single command by the altdiff command built into benc
 
 ``spack-python  lib/scripts/altdiff.py quicksilver/{hash1}  quicksilver/{hash2}``
 
-the output will look like this:
+the output will look like this::
 
-.. raw:: html
    quicksilver@master<span style="color: red;">%gcc@=12.1.1</span> build_system=makefile~cuda+mpi+openmp arch=linux-rhel8-sapphirerapids
    -> [gcc-runtime]
      gcc-runtime
