@@ -28,7 +28,8 @@ Creating experiment ramble.yaml:
 Create the experiment description
 Parameters could include: version, scaling, etc.
 
-In this command we are intializing a quicksilver experiment in the quicksilver directory, we are doing weak scaling with openMP, and measuring MPI metrics with Caliper.
+In this example, we are only changing the compiler. Because all experiment variables will be the same, we only need to generate a single experiment description.
+In this command we are intializing a quicksilver experiment in the quicksilver directory. We are doing weak scaling with openMP, and measuring MPI metrics with Caliper. 
 
 ``benchpark experiment init --dest=quicksilver  quicksilver caliper=mpi +weak +openmp ~single_node``
 
@@ -146,4 +147,4 @@ To read the caliper output, run ``cali-query -t {experiment_name}.cali``
 
 To further analyze the caliper data, it is also possible to generate a call tree using Thicket
 
-For more information on Caliper and Thicket, refer to <https://software.llnl.gov/Caliper/> and <https://thicket.readthedocs.io/en/latest/>
+For more information on Caliper and Thicket, refer to https://software.llnl.gov/Caliper/ and https://thicket.readthedocs.io/en/latest/
