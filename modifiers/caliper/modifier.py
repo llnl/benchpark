@@ -101,6 +101,8 @@ class Caliper(BasicModifier):
         for key, val in experiment_metadata.items():
             cali_metadata[key] = app_inst.expander.expand_var(val)
 
+        # # additional metadata
+        # addtl_metadata = app_inst.expander.expand_var_name()
         # Write to the Caliper metadata file    
         cali_metadata_file = self.expander.expand_var(self._caliper_metadata_file) 
         with open(cali_metadata_file, "w") as f: 

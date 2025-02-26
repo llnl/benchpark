@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-
+import re
 from benchpark.directives import variant
 from benchpark.experiment import ExperimentHelper
 
@@ -108,8 +108,19 @@ class Caliper:
             """ Add Caliper metadata variables for the ramble.yaml """    
             if not self.spec.satisfies("caliper=none"):
                 metadata_dict = {"application_name": "{application_name}", 
-                    "experiment_name": "{experiment_name}", 
-                    "workload_name": "{workload_name}"}
+                                 "experiment_name": "{experiment_name}",
+                                 "n_nodes": "{n_nodes}",
+                                 "n_ranks": "{n_ranks}",
+                                 "n_threads_per_proc": "{n_threads_per_proc}"}
+                for variant_spec in re.findall("(?:\'.*?\'|\S)+", str(self.spec.variants)):
+                    values = variant_spec.split("=")
+                    if len(values) == 1:
+                        metadata_dict["benchpark_spec"] = values
+                    elif len(values) == 2:
+                        metadata_dict[values[0]] = values[1]
+                    else:
+                        # log a warning that the spec may not be parsed correctly?
+                        pass    
                 return {
                 "caliper_metadata": metadata_dict
                 }
