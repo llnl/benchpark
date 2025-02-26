@@ -10,6 +10,7 @@ from benchpark.scaling import StrongScaling
 from benchpark.scaling import WeakScaling
 from benchpark.caliper import Caliper
 
+
 class Quicksilver(
     Experiment,
     OpenMPExperiment,
