@@ -9,7 +9,9 @@ Comparing two Experiments Within Benchpark
 ==========================================
 
 This tutorial will guide you through the process of building and comparing distinct binaries of the same benchmark. 
-As an example, we will be using an experiment comparing two builds of the quicksilver benchmark, compiled with the ``gcc`` and ``intel`` compiler variants on LLNL's Ruby cluster.
+As an example, we will be using an experiment comparing two builds of the quicksilver benchmark, compiled with the ``gcc`` and ``intel`` compiler variants on LLNL's Ruby cluster.i
+
+An example script to complete all experiment setup is loacted at ``examples/multiple-binaries/daneSetup.sh``
 
 Building Multiple Binaries:
 ---------------------------
@@ -131,7 +133,7 @@ To run each binary on different nodes, run the following commands::
   ramble -P -D workspace/quicksilver/ruby-gcc/workspace on
   ramble -P -D workspace/quicksilver/ruby-intel/workspace on
 
-However, we can manually combine each ``execute_experiment`` file into a single script, allowing us to run both binaries on the same node
+However, we can manually combine each ``execute_experiment`` file into a single script, allowing us to run both binaries on the same node. An example script for this is available at ``examples/multiple_binaries/combine_executable.py``
 
 Collecting FOMs
 ---------------
