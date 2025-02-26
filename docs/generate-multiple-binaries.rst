@@ -116,13 +116,13 @@ This can also be done in a single command by the altdiff command built into benc
 
 ``spack-python  lib/scripts/altdiff.py quicksilver/{hash1}  quicksilver/{hash2}``
 
-the output will look like this:
+the output will look like this::
 
-   quicksilver@master<span style="color: red;">%gcc@=12.1.1</span> build_system=makefile~cuda+mpi+openmp arch=linux-rhel8-sapphirerapids
-   -> [gcc-runtime]
-     gcc-runtime
-       glibc@2.28%gcc@=12.1.1 build_system=autotools arch=linux-rhel8-sapphirerapids
-     mvapich2@2.3.7-gcc1211%gcc@=12.1.1~alloca build_system=autotools ch3_rank_bits=32~cuda~debug fabrics=mrail file_systems=auto~hwloc_graphics~hwlocv2 patches=d98d8e7 process_managers=auto+regcache threads=multiple+wrapperrpath arch=linux-rhel8-sapphirerapids 
+   quicksilver@master**%gcc@=12.1.1** build_system=makefile~cuda+mpi+openmp arch=linux-rhel8-sapphirerapids
+   **-> [gcc-runtime]
+     gcc-runtime**
+       glibc@2.28**%gcc@=12.1.1** build_system=autotools arch=linux-rhel8-sapphirerapids
+     mvapich2**@2.3.7-gcc1211%gcc@=12.1.1**~alloca build_system=autotools ch3_rank_bits=32~cuda~debug fabrics=mrail file_systems=auto~hwloc_graphics~hwlocv2 patches=d98d8e7 process_managers=auto+regcache threads=multiple+wrapperrpath arch=linux-rhel8-sapphirerapids 
 
 
 Running Experiments
