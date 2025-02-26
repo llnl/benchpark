@@ -27,13 +27,13 @@ Creating experiment ramble.yaml:
 
 Create the experiment description
 Parameters could include: version, scaling, etc.
-If all experiment-based variables are the same, create one ramble.yaml. We are also enabling the caliper modifier, allowing us to track performance through annotations in the source code.
+
+In this command we are intializing a quicksilver experiment in the quicksilver directory, we are doing weak scaling with openMP, and measuring MPI metrics with Caliper.
 
 ``benchpark experiment init --dest=quicksilver  quicksilver caliper=mpi +weak +openmp ~single_node``
 
 
-Note: to create multiple duplicate experiments, change the experiment name ({experiment1}, {experiment2}). 
-Functionality to combine runs into a single job script is in progress, but not currently available. 
+Note: Running a benchmark repeatedly will overwrite the existing output. A way to keep prevent this is to create multiple duplicate experiments, change the experiment name ({experiment1}, {experiment2}). 
 
 Running multiple experiments:
 ---------------------------
@@ -77,7 +77,14 @@ Benchpark offers two ways to double check that each binary has built according t
 
 ``spack find -L quicksilver``
 
-Returns all unique builds of a benchmark, along with their associated hashes. We can use these hashes to independently double-check the details of each build.
+This returns the following output::
+   -- linux-rhel8-sapphirerapids / gcc@12.1.1 ----------------------
+   fubnce7wzgjxhkim2cylijt4cbpfhxi6 quicksilver@master
+
+   -- linux-rhel8-sapphirerapids / intel@2021.6.0-classic ----------
+   qwev4yodp2joikf2oxvlo224ksjcqve3 quicksilver@master
+   ==> 2 installed packages 
+This output shows each installed binary, along with their associated hashes. We can use these hashes to independently double-check the details of each build.
 
 
 In this case, we can check the quicksilver spec, along with its dependencies by running spack spec for each binary
