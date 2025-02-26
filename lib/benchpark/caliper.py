@@ -40,7 +40,7 @@ class Caliper:
                 modifier_list.append({"name": "caliper", "mode": "time"})
             return modifier_list
 
-        def compute_spack_section(self):
+        def compute_package_section(self, pkg_manager):
             # set package versions
             caliper_version = "master"
 
