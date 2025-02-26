@@ -56,7 +56,7 @@ Completing these steps will result in the following structure::
         ramble/
         spack/
         quicksilver/
-        	ruby-gcc/
+            ruby-gcc/
             	workspace/
                     experiments/
                         ..../
@@ -73,11 +73,12 @@ Completing these steps will result in the following structure::
 Verifying build details, differences between builds
 ---------------------------------------------------
 
+Benchpark offers two ways to double check that each binary has built according to the specifications:
+
 ``spack find -L quicksilver``
 
 Returns all unique builds of a benchmark, along with their associated hashes. We can use these hashes to independently double-check the details of each build.
 
-Benchpark offers two ways to double check that each binary has built according to the specifications:
 
 In this case, we can check the quicksilver spec, along with its dependencies by running spack spec for each binary
 
@@ -86,6 +87,14 @@ In this case, we can check the quicksilver spec, along with its dependencies by 
 This can also be done in a single command by the altdiff command built into benchmark, highlighting all differences in red.
 
 ``spack-python  lib/scripts/altdiff.py quicksilver/{hash1}  quicksilver/{hash2}``
+
+the output will look like this::
+   quicksilver@master<span style="color: red;">%gcc@=12.1.1</span> build_system=makefile~cuda+mpi+openmp arch=linux-rhel8-sapphirerapids
+   -> [gcc-runtime]
+    gcc-runtime
+      glibc@2.28%gcc@=12.1.1 build_system=autotools arch=linux-rhel8-sapphirerapids
+    mvapich2@2.3.7-gcc1211%gcc@=12.1.1~alloca build_system=autotools ch3_rank_bits=32~cuda~debug fabrics=mrail file_systems=auto~hwloc_graphics~hwlocv2 patches=d98d8e7 process_managers=auto+regcache threads=multiple+wrapperrpath arch=linux-rhel8-sapphirerapids 
+
 
 Running Experiments
 -------------------
@@ -97,12 +106,20 @@ To run each binary on different nodes, run the following commands::
 
 However, we can manually combine each ``execute_experiment`` file into a single script, allowing us to run both binaries on the same node
 
+Collecting FOMs
+---------------
+Most benchmarks within benchpark generate a figure of merit, which can be easily extracted to measure performance at a glance.
+This can be done by running::
 
+    ramble -P -D workspace/quicksilver/ruby-gcc/workspace workspace analyze
+    ramble -P -D workspace/quicksilver/ruby-intel/workspace workspace analyze 
 
 Collecting Data with Caliper
 ----------------------------
+Enabling the Caliper modifier gives us a much more detailed picture about any performance differences, beyond looking at runtimes we can generate a profile to see which functions are contributing to a performance difference.
 
-When the caliper modifier is enabled, benchpark generates a .cali file within the experiments directory
-This .cali file can be read in by thicket, and used to graph performance data
+To read the caliper output, run ``cali-query -t {experiment_name}.cali``
 
-Need to include: example graph
+To further analyze the caliper data, it is also possible to generate a call tree using Thicket
+
+For more information on Caliper and Thicket, refer to <https://software.llnl.gov/Caliper/> and <https://thicket.readthedocs.io/en/latest/>
