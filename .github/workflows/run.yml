@@ -711,6 +711,33 @@ jobs:
           system_name: tioga
           system_spec: llnl-elcapitan rocm=5.5.1 compiler=cce +gtl
 
+      - name: gpcNet/mpi ruby llnl-cluster cluster=ruby compiler=intel
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: gpcnet
+          benchmark_mode: mpi
+          benchmark_spec: gpcnet
+          system_name: ruby
+          system_spec: llnl-cluster cluster=ruby compiler=intel
+
+      - name: gpcNet/mpi lassen llnl-sierra cuda=11-8-0 compiler=clang-ibm
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: gpcnet
+          benchmark_mode: mpi
+          benchmark_spec: gpcnet
+          system_name: lassen
+          system_spec: llnl-sierra cuda=11-8-0 compiler=clang-ibm
+
+      - name: gpcNet/mpi tioga llnl-elcapitan rocm=5.5.1 compiler=cce +gtl
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: gpcnet
+          benchmark_mode: mpi
+          benchmark_spec: gpcnet
+          system_name: tioga
+          system_spec: llnl-elcapitan rocm=5.5.1 compiler=cce +gtl
+
       - name: hpcg/openmp caliper=mpi,time tioga llnl-elcapitan compiler=cce
         uses: ./.github/actions/dynamic-dry-run
         with:
