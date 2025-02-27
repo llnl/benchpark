@@ -94,6 +94,21 @@ class Experiment(ExperimentSystemBase, SingleNode):
         description="additional spack specs",
     )
 
+    variant(
+        "mpibind",
+        default="standard",
+        values=(
+            "standard",
+            "on",
+            "off",
+            "v",
+            "vv",
+            "greedy:0",
+        ),  
+        multi=False,
+        description="Toggle mpibind and set verbosity",
+    )
+
     def __init__(self, spec):
         self.spec: "benchpark.spec.ConcreteExperimentSpec" = spec
         super().__init__()
@@ -130,8 +145,10 @@ class Experiment(ExperimentSystemBase, SingleNode):
 
     def compute_modifiers_section_wrapper(self):
         # by default we use the allocation modifier and no others
-        modifier_list = [{"name": "allocation"}, {"name": "exit-code"}]
+        modifier_list = [{"name": "allocation", "mode": self.spec.variants["mpibind"][0]}, {"name": "exit-code"}]
         modifier_list += self.compute_modifiers_section()
+        if self.spec.variants["mpibind"][0] != "standard":
+            modifier_list.append({"name": "mpibind"})
         for cls in self.helpers:
             modifier_list += cls.compute_modifiers_section()
         return modifier_list

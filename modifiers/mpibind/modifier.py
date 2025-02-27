@@ -3,51 +3,23 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from .allocation import Allocation
+#from .allocation import *
 from ramble.modkit import *
 import os
 from ramble.util.executable import CommandExecutable
 
 
-class Mpibind(Allocation, BasicModifier):
+#class Mpibind(Allocation, BasicModifier):
+class Mpibind(BasicModifier):
     """Define a modifier for printing the thread/gpu affinity for each mpi rank"""
 
     name = "mpibind"
 
     maintainers("knox10")
 
-    _default_mode = "on"
 
-    mode(
-        name="off",
-        description="Turn off mpibind",
-    )
-
-    mode(
-        name="on",
-        description="Turn on mpibind",
-    )
-
-    mode(
-        name="v",
-        description="Run mpibind in verbose mode",
-    )
-
-    mode(
-        name="vv",
-        description="Run mpibind in very verbose mode",
-    )
-    mode(
-        name="greedy:0",
-        description="Run mpibind in very verbose mode",
-    )
-
-    modifier_variable(
-        "flux",
-        default=False,
-        modes=["all"],
-        description="mpibind on default val",
-    )
+    mode("standard", description="Standard execution mode for mpibind")
+    default_mode("standard")
 
     executable_modifier("mpibind")
 
@@ -56,7 +28,6 @@ class Mpibind(Allocation, BasicModifier):
         post_exec = []
         output_file = f"{{experiment_run_dir}}/{{experiment_name}}.out"
         mpibind_parser_dir = os.path.dirname(f"{self._file_path}")
-
         post_exec.append(
             CommandExecutable(
                 f"parse-stdout-{executable_name}",
@@ -66,34 +37,3 @@ class Mpibind(Allocation, BasicModifier):
             )
         )
         return pre_exec, post_exec
-
-    def inherit_from_application(self, app):
-        super().inherit_from_application(app)
-        base_string = app.variables.get("mpi_command")
-        scheduler = app.variables.get("scheduler")
-
-        app.variables["mpi_command"] = self.set_mode(scheduler, base_string)
-
-    def set_mode(self, scheduler, base_string):
-
-        handler = {
-            "slurm": "--mpibind=",
-            "flux": "-o mpibind=",
-            "mpi": "--mpibind=",
-            "lsf": "--mpibind=",
-            "pjm": "--mpibind=",
-        }
-        mpi_string = handler.get(scheduler)
-        if scheduler == "flux":
-            flags = {
-                "v": "verbose:1",
-                "vv": "verbose:2",
-                "on": "on",
-                "off": "off",
-                "greedy:0": "greedy:0",
-            }
-            mpi_end = flags.get(self.expander.expand_var(self._usage_mode))
-            return f"{base_string} {mpi_string}{mpi_end}"
-        else:
-            mpi_end = self.expander.expand_var(self._usage_mode)
-            return f"{base_string} {mpi_string}{mpi_end}"

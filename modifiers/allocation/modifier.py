@@ -230,6 +230,30 @@ class Allocation(BasicModifier):
     # know how many CPUs we want)"
     mode("standard", description="Standard execution mode for allocation")
     default_mode("standard")
+    mode(
+        name="off",
+        description="Turn off mpibind",
+    )   
+
+    mode(
+        name="on",
+        description="Turn on mpibind",
+    )   
+
+    mode(
+        name="v",
+        description="Run mpibind in verbose mode",
+    )   
+
+    mode(
+        name="vv",
+        description="Run mpibind in very verbose mode",
+    )   
+    mode(
+        name="greedy:0",
+        description="Run mpibind in very verbose mode",
+    )
+    depends_on = ["mpibind"]
 
     def inherit_from_application(self, app):
         super().inherit_from_application(app)
@@ -255,6 +279,11 @@ class Allocation(BasicModifier):
                 modification="{n_threads_per_proc}",
                 mode="standard",
             )
+        #mpibind_mode = self.get_mpibind()
+        if self._usage_mode != "standard":
+            scheduler = v.scheduler
+            base_string = app.variables.get("mpi_command")
+            app.variables["mpi_command"] = self.set_mpibind(scheduler, base_string)
 
     def determine_allocation(self, v):
         if not v.n_ranks:
@@ -461,3 +490,31 @@ class Allocation(BasicModifier):
             v.timeout = 120
 
         handler[v.scheduler](v)
+    
+    #def get_mpibind(self):
+        #return mpibind._usage_mode
+
+    def set_mpibind(self, scheduler, base_string):
+        handler = { 
+            "slurm": "--mpibind=",
+            "flux": "-o mpibind=",
+            "mpi": "--mpibind=",
+            "lsf": "--mpibind=",
+            "pjm": "--mpibind=",
+        }   
+        mpi_string = handler.get(scheduler)
+        if scheduler == "flux":
+            flags = { 
+                "v": "verbose:1",
+                "vv": "verbose:2",
+                "on": "on",
+                "off": "off",
+                "greedy:0": "greedy:0",
+            }   
+            mpi_end = flags.get(self._usage_mode)
+            return f"{base_string} {mpi_string}{mpi_end}"
+        else:
+            mpi_end = self._usage_mode
+            return f"{base_string} {mpi_string}{mpi_end}" 
+
+ 

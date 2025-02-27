@@ -7,12 +7,13 @@
 from benchpark.directives import variant
 from benchpark.experiment import ExperimentHelper
 
-
+'''
 class Mpibind:
     variant(
         "mpibind",
-        default="on",
+        default="standard",
         values=(
+            "standard",
             "on",
             "off",
             "v",
@@ -25,10 +26,13 @@ class Mpibind:
 
     class Helper(ExperimentHelper):
         def compute_modifiers_section(self):
-            modifier_list = []
+            modifier_list = [{"name": "mpibind"}]
             if not self.spec.satisfies("mpibind=off"):
                 mpibind_modifier_modes = {}
-                mpibind_modifier_modes["name"] = "mpibind"
+                mpibind_modifier_modes["name"] = "allocation"
                 mpibind_modifier_modes["mode"] = self.spec.variants["mpibind"][0]
-                modifier_list.append(mpibind_modifier_modes)
+                #modifier_list.set()
+                #print(mpibind_modifier_modes)
+                modifier_list[0]["mode"] = mpibind_modifier_modes["mode"]
             return modifier_list
+'''
