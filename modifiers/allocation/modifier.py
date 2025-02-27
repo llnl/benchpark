@@ -251,7 +251,7 @@ class Allocation(BasicModifier):
     )   
     mode(
         name="greedy:0",
-        description="Run mpibind in very verbose mode",
+        description="Run mpibind in very greedy mode",
     )
     depends_on = ["mpibind"]
 
