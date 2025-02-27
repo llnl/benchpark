@@ -58,8 +58,8 @@ class ExperimentHelper:
     def set_environment_variable(self, name, value):
         self.env_vars["set"][name] = value
 
-    def append_environment_variable(self, name, value):
-        self.env_vars["append"][name] = value
+    def append_environment_variable(self, name, value, target="paths"):
+        self.env_vars["append"][0][target][name] = value
 
     def compute_config_variables(self):
         pass
@@ -245,7 +245,7 @@ class Experiment(ExperimentSystemBase, SingleNode):
             variables, env_vars = cls.compute_config_variables_wrapper()
             self.variables |= variables
             self.env_vars["set"] |= env_vars["set"]
-            self.env_vars["append"][0] |= env_vars["append"]
+            self.env_vars["append"][0] |= env_vars["append"][0]
 
         self.compute_applications_section()
 
