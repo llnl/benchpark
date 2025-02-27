@@ -143,29 +143,41 @@ def benchpark_list_handler(args):
     systems = benchpark_systems()
     modifiers = benchpark_modifiers()
 
+    try:
+        import llnl.util.tty.color as color
+        colors = True
+    except ImportError:
+        colors = False
+
+    def _print_helper(name, collection, colors=colors):
+        func = print
+        strs = ["", ""]
+        end = ""
+        if colors:
+            func = color.cprint
+            name = "@*b" + name + "@."
+            strs = ["@*r", "@*c"]
+            end = "@."
+
+        func(name)
+        for item in collection:
+            if "/" in item:
+                item = item.split("/")
+                func(f"    {strs[0]+item[0]+end+'/'+strs[1]+item[1]+end}")
+            else:
+                func(f"    {strs[0]+item+end}")
+
     if sublist is None:
-        print("Experiments:")
-        for experiment in experiments:
-            print(f"\t{experiment}")
-        print("Systems:")
-        for system in systems:
-            print(f"\t{system}")
+        _print_helper("Experiments:", experiments)
+        _print_helper("Systems:", systems)
     elif sublist == "benchmarks":
-        print("Benchmarks:")
-        for benchmark in benchmarks:
-            print(f"\t{benchmark}")
+        _print_helper("Benchmarks:", benchmarks)
     elif sublist == "experiments":
-        print("Experiments:")
-        for experiment in experiments:
-            print(f"\t{experiment}")
+        _print_helper("Experiments:", experiments)
     elif sublist == "systems":
-        print("Systems:")
-        for system in systems:
-            print(f"\t{system}")
+        _print_helper("Systems:", systems)
     elif sublist == "modifiers":
-        print("Modifiers:")
-        for modifier in modifiers:
-            print(f"\t{modifier}")
+        _print_helper("Modifiers:", modifiers)
     else:
         raise ValueError(
             f'Invalid benchpark list "{sublist}" - must choose [experiments], [systems], [modifiers] or leave empty'

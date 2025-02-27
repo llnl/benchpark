@@ -44,11 +44,13 @@ def benchpark_systems():
     exclude = ["all_hardware_descriptions", "repo.yaml"]
     for x in sorted(os.listdir(source_dir / "systems")):
         if x not in exclude:
-            systems.append(x+":")
             system_spec = benchpark.spec.SystemSpec(x)
             system_class = system_spec.system_class
-            for c in system_class.id_to_resources.keys():
-                systems.append("    "+c)
+            if hasattr(system_class, "id_to_resources"):
+                for c in system_class.id_to_resources.keys():
+                    systems.append(x + "/" + c)
+            else:
+                systems.append(x)
     return systems
 
 
