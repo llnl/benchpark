@@ -28,7 +28,7 @@ class ExperimentHelper:
         self.variables = {}
         self.env_vars = {
             "set": {},
-            "append": {},
+            "append": [{"paths": {}, "vars": {}}],
         }
 
     def compute_include_section(self):
@@ -198,10 +198,18 @@ class Experiment(ExperimentSystemBase, SingleNode):
             self.expr_name.append(f"{{{name}}}")
 
     def set_environment_variable(self, name, values):
+        """Set value of environment variable"""
         self.env_vars["set"][name] = values
 
-    def append_environment_variable(self, name, values):
-        self.env_vars["append"][0]["paths"][name] = values
+    def append_environment_variable(self, name, values, target="paths"):
+        """Append to existing environment variable PATH ('paths') or other variable ('vars')
+        Matches expected ramble format. Example:
+        https://ramble.readthedocs.io/en/latest/workspace_config.html#environment-variable-control
+        """
+        if target not in ["paths", "vars"]:
+            raise ValueError("Invalid target specified. Must be 'paths' or 'vars'.")
+
+        self.env_vars["append"][0][target][name] = values
 
     def zip_experiment_variables(self, name, variable_names):
         self.zips[name] = list(variable_names)
@@ -226,11 +234,7 @@ class Experiment(ExperimentSystemBase, SingleNode):
         self.expr_name = []
         self.env_vars = {
             "set": {},
-            "append": [
-                {
-                    "paths": {},
-                }
-            ],
+            "append": [{"paths": {}, "vars": {}}],
         }
         self.variables = {}
         self.zips = {}
