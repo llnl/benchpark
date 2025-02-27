@@ -145,6 +145,7 @@ def benchpark_list_handler(args):
 
     try:
         import llnl.util.tty.color as color
+
         colors = True
     except ImportError:
         colors = False
