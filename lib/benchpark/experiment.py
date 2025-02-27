@@ -150,8 +150,6 @@ class Experiment(ExperimentSystemBase, SingleNode):
             {"name": "exit-code"},
         ]
         modifier_list += self.compute_modifiers_section()
-        if self.spec.variants["mpibind"][0] != "standard":
-            modifier_list.append({"name": "mpibind"})
         for cls in self.helpers:
             modifier_list += cls.compute_modifiers_section()
         return modifier_list

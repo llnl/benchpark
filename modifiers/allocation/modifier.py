@@ -6,6 +6,8 @@
 import math
 from enum import Enum
 from ramble.modkit import *
+import os
+from ramble.util.executable import CommandExecutable
 
 
 class AllocOpt(Enum):
@@ -512,3 +514,20 @@ class Allocation(BasicModifier):
         else:
             mpi_end = self._usage_mode
             return f"{base_string} {mpi_string}{mpi_end}"
+
+    executable_modifier("mpibind")
+
+    def mpibind(self, executable_name, executable, app_inst=None):
+        pre_exec = []
+        post_exec = []
+        output_file = "{experiment_run_dir}/{experiment_name}.out"
+        mpibind_parser_dir = os.path.dirname(f"{self._file_path}")
+        post_exec.append(
+            CommandExecutable(
+                f"parse-stdout-{executable_name}",
+                template=[
+                    f"python3 {mpibind_parser_dir}/parse_mpibind_output.py {output_file}"
+                ],  
+            )   
+        )   
+        return pre_exec, post_exec
