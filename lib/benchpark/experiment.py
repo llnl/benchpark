@@ -56,9 +56,14 @@ class ExperimentHelper:
         return {}
 
     def set_environment_variable(self, name, value):
+        """Set value of environment variable"""
         self.env_vars["set"][name] = value
 
     def append_environment_variable(self, name, value, target="paths"):
+        """Append to existing environment variable PATH ('paths') or other variable ('vars')
+        Matches expected ramble format. Example:
+        https://ramble.readthedocs.io/en/latest/workspace_config.html#environment-variable-control
+        """
         self.env_vars["append"][0][target][name] = value
 
     def compute_config_variables(self):
