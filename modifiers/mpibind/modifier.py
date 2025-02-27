@@ -23,7 +23,7 @@ class Mpibind(BasicModifier):
     def mpibind(self, executable_name, executable, app_inst=None):
         pre_exec = []
         post_exec = []
-        output_file = f"{{experiment_run_dir}}/{{experiment_name}}.out"
+        output_file = "{{experiment_run_dir}}/{{experiment_name}}.out"
         mpibind_parser_dir = os.path.dirname(f"{self._file_path}")
         post_exec.append(
             CommandExecutable(

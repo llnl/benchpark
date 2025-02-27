@@ -6,7 +6,6 @@
 import json
 import re
 import argparse
-from pathlib import Path
 
 
 def parse_mpibind(input_file):
