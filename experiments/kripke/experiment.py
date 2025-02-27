@@ -78,10 +78,10 @@ class Kripke(
         }
 
         # Number of processes in each dimension
-        num_procs = {"npx": 2, "npy": 2, "npz": 2}
+        num_procs = {"npx": 4, "npy": 4, "npz": 4}
 
         # Number of zones in each dimension, per process
-        problem_sizes = {"nzx": 128, "nzy": 128, "nzz": 128}
+        problem_sizes = {"nzx": 16, "nzy": 32, "nzz": 32}
 
         for k, v in input_variables.items():
             self.add_experiment_variable(k, v, True)
