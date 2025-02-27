@@ -10,7 +10,6 @@ from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
 from benchpark.caliper import Caliper
-#from benchpark.allocation import Allocation
 
 
 class Saxpy(

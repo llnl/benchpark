@@ -3,13 +3,11 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-#from .allocation import *
 from ramble.modkit import *
 import os
 from ramble.util.executable import CommandExecutable
 
 
-#class Mpibind(Allocation, BasicModifier):
 class Mpibind(BasicModifier):
     """Define a modifier for printing the thread/gpu affinity for each mpi rank"""
 

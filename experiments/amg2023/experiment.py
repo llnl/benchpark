@@ -15,6 +15,7 @@ from benchpark.scaling import ThroughputScaling
 from benchpark.caliper import Caliper
 from benchpark.mpibind import Mpibind
 
+
 class Amg2023(
     Experiment,
     OpenMPExperiment,
