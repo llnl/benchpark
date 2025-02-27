@@ -488,7 +488,7 @@ class Allocation(BasicModifier):
         if not v.timeout:
             v.timeout = 120
 
-        handler[v.scheduler](v) 
+        handler[v.scheduler](v)
 
     def set_mpibind(self, scheduler, base_string):
         handler = {
