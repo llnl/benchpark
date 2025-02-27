@@ -104,7 +104,7 @@ class Experiment(ExperimentSystemBase, SingleNode):
             "v",
             "vv",
             "greedy:0",
-        ), 
+        ),
         multi=False,
         description="Toggle mpibind and set verbosity",
     )
@@ -146,7 +146,7 @@ class Experiment(ExperimentSystemBase, SingleNode):
     def compute_modifiers_section_wrapper(self):
         # by default we use the allocation modifier and no others
         modifier_list = [
-            {"name": "allocation", "mode": self.spec.variants["mpibind"][0]}, 
+            {"name": "allocation", "mode": self.spec.variants["mpibind"][0]},
             {"name": "exit-code"},
         ]
         modifier_list += self.compute_modifiers_section()

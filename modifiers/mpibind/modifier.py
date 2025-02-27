@@ -15,7 +15,6 @@ class Mpibind(BasicModifier):
 
     maintainers("knox10")
 
-
     mode("standard", description="Standard execution mode for mpibind")
     default_mode("standard")
 

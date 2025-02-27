@@ -233,22 +233,22 @@ class Allocation(BasicModifier):
     mode(
         name="off",
         description="Turn off mpibind",
-    )   
+    )
 
     mode(
         name="on",
         description="Turn on mpibind",
-    )   
+    )
 
     mode(
         name="v",
         description="Run mpibind in verbose mode",
-    )   
+    )
 
     mode(
         name="vv",
         description="Run mpibind in very verbose mode",
-    )   
+    )
     mode(
         name="greedy:0",
         description="Run mpibind in very greedy mode",
@@ -279,7 +279,6 @@ class Allocation(BasicModifier):
                 modification="{n_threads_per_proc}",
                 mode="standard",
             )
-        #mpibind_mode = self.get_mpibind()
         if self._usage_mode != "standard":
             scheduler = v.scheduler
             base_string = app.variables.get("mpi_command")
@@ -491,30 +490,26 @@ class Allocation(BasicModifier):
 
         handler[v.scheduler](v)
     
-    #def get_mpibind(self):
-        #return mpibind._usage_mode
 
     def set_mpibind(self, scheduler, base_string):
-        handler = { 
+        handler = {
             "slurm": "--mpibind=",
             "flux": "-o mpibind=",
             "mpi": "--mpibind=",
             "lsf": "--mpibind=",
             "pjm": "--mpibind=",
-        }   
+        }
         mpi_string = handler.get(scheduler)
         if scheduler == "flux":
-            flags = { 
+            flags = {
                 "v": "verbose:1",
                 "vv": "verbose:2",
                 "on": "on",
                 "off": "off",
                 "greedy:0": "greedy:0",
-            }   
+            }
             mpi_end = flags.get(self._usage_mode)
             return f"{base_string} {mpi_string}{mpi_end}"
         else:
             mpi_end = self._usage_mode
-            return f"{base_string} {mpi_string}{mpi_end}" 
-
- 
+            return f"{base_string} {mpi_string}{mpi_end}"
