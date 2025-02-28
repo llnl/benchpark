@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
@@ -28,6 +28,8 @@ class Gromacs(
         values=("2024", "2023.3"),
         description="app version",
     )
+
+    maintainers("pszi1ard")
 
     # off: turn off GPU-aware MPI
     # on: turn on, but allow groamcs to disable it if GPU-aware MPI is not supported

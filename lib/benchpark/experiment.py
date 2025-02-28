@@ -98,6 +98,8 @@ class Experiment(ExperimentSystemBase, SingleNode):
         self.spec: "benchpark.spec.ConcreteExperimentSpec" = spec
         super().__init__()
         self.helpers = []
+        self._spack_name = None
+        self._ramble_name = None
 
         for cls in self.__class__.mro()[1:]:
             if cls is not Experiment and cls is not object:
@@ -113,6 +115,24 @@ class Experiment(ExperimentSystemBase, SingleNode):
             raise BenchparkError(f"No workload variant defined for package {self.name}")
 
         self.package_specs = {}
+
+    @property
+    def spack_name(self):
+        """The name of the spack package that is used to build this benchmark"""
+        return self._spack_name
+
+    @spack_name.setter
+    def spack_name(self, value: str):
+        self._spack_name = value
+
+    @property
+    def ramble_name(self):
+        """The name of the ramble application associated with this benchmark"""
+        return self._ramble_name
+
+    @ramble_name.setter
+    def ramble_name(self, value: str):
+        self._ramble_name = value
 
     def compute_include_section(self):
         # include the config directory

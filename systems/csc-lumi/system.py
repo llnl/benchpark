@@ -8,9 +8,21 @@ import pathlib
 from benchpark.directives import variant
 from benchpark.system import System
 from packaging.version import Version
+from benchpark.paths import hardware_descriptions
 
 
 class CscLumi(System):
+
+    id_to_resources = {
+        "lumi": {
+            "sys_cores_per_node": 64,
+            "sys_gpus_per_node": 8,
+            "sys_mem_per_node": 512,
+            "system_site": "csc",
+            "hardware_key": str(hardware_descriptions)
+            + "/HPECray-zen3-MI250X-Slingshot/hardware_description.yaml",
+        }
+    }
 
     variant(
         "compiler",
@@ -40,14 +52,9 @@ class CscLumi(System):
             if key == self.spec.variants["compiler"][0]:
                 self.compiler_version = Version(value)
 
-        sys_variables = {
-            "sys_cores_per_node": 64,
-            "sys_gpus_per_node": 8,
-            "sys_mem_per_node": 512,
-        }
-
         self.scheduler = "slurm"
-        for k, v in sys_variables.items():
+        attrs = self.id_to_resources.get("lumi")
+        for k, v in attrs.items():
             setattr(self, k, v)
 
     def generate_description(self, output_dir):
