@@ -28,5 +28,6 @@ system_definition:
       compiler: gcc
       runtime: cuda
       mpi: openmpi
+      installation-year: 2020
   top500-system-instances:
     - JUWELS Booster (JSC) <https://www.top500.org/system/179894>
