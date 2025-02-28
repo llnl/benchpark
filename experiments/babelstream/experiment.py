@@ -70,7 +70,7 @@ class Babelstream(
         self.add_spack_spec(system_specs["mpi"])
         if self.spec.satisfies("+openmp"):
             self.add_spack_spec(
-                self.name, [f"babelstream@+omp{app_version}", system_specs["compiler"]]
+                self.name, [f"babelstream@{app_version}+omp", system_specs["compiler"]]
             )
         else:
             self.add_spack_spec(
