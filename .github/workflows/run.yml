@@ -72,7 +72,7 @@ jobs:
 
       - name: Upload Workspace Archive as CI Artifact
         if: always()
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1
         with:
           name: workspace-archive
           path: './workspace/saxpy/openmp/generic-x86/workspace/archive/**'
@@ -711,6 +711,33 @@ jobs:
           system_name: tioga
           system_spec: llnl-elcapitan rocm=5.5.1 compiler=cce +gtl
 
+      - name: gpcNet/mpi ruby llnl-cluster cluster=ruby compiler=intel
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: gpcnet
+          benchmark_mode: mpi
+          benchmark_spec: gpcnet
+          system_name: ruby
+          system_spec: llnl-cluster cluster=ruby compiler=intel
+
+      - name: gpcNet/mpi lassen llnl-sierra cuda=11-8-0 compiler=clang-ibm
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: gpcnet
+          benchmark_mode: mpi
+          benchmark_spec: gpcnet
+          system_name: lassen
+          system_spec: llnl-sierra cuda=11-8-0 compiler=clang-ibm
+
+      - name: gpcNet/mpi tioga llnl-elcapitan rocm=5.5.1 compiler=cce +gtl
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: gpcnet
+          benchmark_mode: mpi
+          benchmark_spec: gpcnet
+          system_name: tioga
+          system_spec: llnl-elcapitan rocm=5.5.1 compiler=cce +gtl
+
       - name: hpcg/openmp caliper=mpi,time tioga llnl-elcapitan compiler=cce
         uses: ./.github/actions/dynamic-dry-run
         with:
@@ -863,3 +890,16 @@ jobs:
           benchmark_spec: osu-micro-benchmarks+rocm workload=all
           system_name: tioga
           system_spec: llnl-elcapitan cluster=tioga compiler=cce +gtl
+  pytest:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Benchpark
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Add needed Python libs
+        run: |
+          pip install -r ./requirements.txt
+
+      - name: Run
+        run: |
+          ./bin/benchpark unit-test

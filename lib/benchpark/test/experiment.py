@@ -12,10 +12,19 @@ def test_write_yaml(monkeypatch, tmpdir):
     spec = benchpark.spec.ExperimentSpec("saxpy").concretize()
     experiment = spec.experiment
 
-    section_names = ["include", "config", "modifiers", "applications", "spack"]
+    section_names = ["include", "config"]
+    section_wrapper_names = ["modifiers", "applications", "spack"]
 
-    for name in section_names:
-        monkeypatch.setattr(experiment, f"compute_{name}_section", lambda: True)
+    for name in section_names + section_wrapper_names:
+        monkeypatch.setattr(
+            experiment,
+            (
+                f"compute_{name}_section"
+                if name in section_names
+                else f"compute_{name}_section_wrapper"
+            ),
+            lambda: True,
+        )
 
     experiment_path = tmpdir.join("experiment_test")
     experiment.write_ramble_dict(experiment_path)
@@ -23,27 +32,41 @@ def test_write_yaml(monkeypatch, tmpdir):
     with open(experiment_path, "r") as f:
         output = yaml.safe_load(f)
 
-    assert output == {
+    check_dict = {
         "ramble": {
-            "software" if name == "spack" else name: True for name in section_names
+            "software" if name == "spack" else name: True
+            for name in section_names
+            + section_wrapper_names  # spack wrapper adds key as "software"
         }
     }
+
+    assert output == check_dict
 
 
 def test_compute_ramble_dict(monkeypatch):
     spec = benchpark.spec.ExperimentSpec("saxpy").concretize()
     experiment = spec.experiment
 
-    section_names = ["include", "config", "modifiers", "applications", "spack"]
+    section_names = ["include", "config"]
+    section_wrapper_names = ["modifiers", "applications", "spack"]
 
-    for name in section_names:
-        monkeypatch.setattr(experiment, f"compute_{name}_section", lambda: True)
+    for name in section_names + section_wrapper_names:
+        monkeypatch.setattr(
+            experiment,
+            (
+                f"compute_{name}_section"
+                if name in section_names
+                else f"compute_{name}_section_wrapper"
+            ),
+            lambda: True,
+        )
 
     ramble_dict = experiment.compute_ramble_dict()
 
     assert ramble_dict == {
         "ramble": {
-            "software" if name == "spack" else name: True for name in section_names
+            "software" if name == "spack" else name: True
+            for name in section_names + section_wrapper_names
         }
     }
 
@@ -76,6 +99,6 @@ def test_default_modifiers_section():
     spec = benchpark.spec.ExperimentSpec("saxpy").concretize()
     experiment = benchpark.experiment.Experiment(spec)
 
-    modifiers_section = experiment.compute_modifiers_section()
+    modifiers_section = experiment.compute_modifiers_section_wrapper()
 
-    assert modifiers_section == [{"name": "allocation"}]
+    assert modifiers_section == [{"name": "allocation"}, {"name": "exit-code"}]
