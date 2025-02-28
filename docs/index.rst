@@ -28,6 +28,7 @@
 
    example-workflow
    llnl-tutorial
+   generate-multiple-binaries
 
 .. toctree::
    :maxdepth: 1
