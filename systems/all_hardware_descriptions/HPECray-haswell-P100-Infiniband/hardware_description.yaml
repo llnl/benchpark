@@ -28,5 +28,6 @@ system_definition:
       compiler: cce
       runtime: cuda
       mpi: cray-mpich
+      installation-year: 2017
   top500-system-instances:
     - Piz Daint (CSCS) <https://www.top500.org/system/177824>
