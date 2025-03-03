@@ -140,7 +140,7 @@ class Amg2023(
         # get system config options
         # TODO: Get compiler/mpi/package handles directly from system.py
         system_specs = {}
-        system_specs["compiler"] = "default-compiler"
+        # system_specs["compiler"] = "default-compiler"
         # system_specs["mpi"] = "default-mpi"
         # system_specs["lapack"] = "lapack"
         # system_specs["blas"] = "blas"
@@ -161,10 +161,8 @@ class Amg2023(
         # self.add_spack_spec(system_specs["blas"])
         # self.add_spack_spec(system_specs["lapack"])
 
-        # empty package_specs value implies external package
-        self.add_package_spec(system_specs["blas"])
-        self.add_package_spec(system_specs["lapack"])
+        # self.add_spack_spec(
+        #    self.name, [f"amg2023@{app_version} +mpi", system_specs["compiler"]]
+        # )
 
-        self.add_package_spec(
-            self.name, [f"amg2023@{app_version} +mpi", system_specs["compiler"]]
-        )
+        self.add_spack_spec(self.name, [f"amg2023@{app_version} +mpi"])
