@@ -141,9 +141,13 @@ class Amg2023(
         # TODO: Get compiler/mpi/package handles directly from system.py
         system_specs = {}
         system_specs["compiler"] = "default-compiler"
-        system_specs["mpi"] = "default-mpi"
-        system_specs["lapack"] = "lapack"
+        # system_specs["mpi"] = "default-mpi"
+        # system_specs["lapack"] = "lapack"
         # system_specs["blas"] = "blas"
+
+        # set package spack specs
+        # empty package_specs value implies external package
+        # self.add_spack_spec(system_specs["mpi"])
 
         if self.spec.satisfies("+cuda"):
             system_specs["cuda_version"] = "{default_cuda_version}"
@@ -155,7 +159,7 @@ class Amg2023(
         # empty package_specs value implies external package
         self.add_package_spec(system_specs["mpi"])
         # self.add_spack_spec(system_specs["blas"])
-        self.add_spack_spec(system_specs["lapack"])
+        # self.add_spack_spec(system_specs["lapack"])
 
         # empty package_specs value implies external package
         self.add_package_spec(system_specs["blas"])
