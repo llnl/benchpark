@@ -143,7 +143,7 @@ class Amg2023(
         system_specs["compiler"] = "default-compiler"
         system_specs["mpi"] = "default-mpi"
         system_specs["lapack"] = "lapack"
-        system_specs["blas"] = "blas"
+        # system_specs["blas"] = "blas"
 
         if self.spec.satisfies("+cuda"):
             system_specs["cuda_version"] = "{default_cuda_version}"
