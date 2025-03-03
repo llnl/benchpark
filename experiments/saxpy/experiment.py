@@ -50,12 +50,16 @@ class Saxpy(Experiment, OpenMPExperiment, CudaExperiment, ROCmExperiment, Calipe
         # Does not need to happen before merge, separate task
         # TODO: Get compiler/mpi/package handles directly from system.py
         system_specs = {}
-        system_specs["compiler"] = "default-compiler"
-        system_specs["mpi"] = "default-mpi"
+        # system_specs["compiler"] = "default-compiler"
+        # system_specs["mpi"] = "default-mpi"
 
         # empty package_specs value implies external package
-        self.add_package_spec(system_specs["mpi"])
+        #self.add_spack_spec(system_specs["mpi"])
 
-        self.add_package_spec(
-            self.name, [f"saxpy@{app_version}", system_specs["compiler"]]
+        #self.add_spack_spec(
+        #    self.name, [f"saxpy@{app_version}", system_specs["compiler"]]
+        #)
+
+        self.add_spack_spec(
+            self.name, [f"saxpy@{app_version}"]
         )
