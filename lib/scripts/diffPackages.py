@@ -89,7 +89,7 @@ def main():
             # Check if there is no diff
             if not diff_list:
                 color.cprint(
-                    f"    @*gNo differences found. '{benchpark_package_path}' can be upstreamed to '{spack_package_path}'@."
+                    f"    @*gNo differences found. We can safely delete '{benchpark_package_path}' in favor of spack upstream@."
                 )
 
             # Use difflib.ndiff to compare the lines
