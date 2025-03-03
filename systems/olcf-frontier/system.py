@@ -14,8 +14,8 @@ class OlcfFrontier(System):
 
     variant(
         "compiler",
-        default="cce18.0.1",
-        values=("gcc13", "cce18.0.1", "amd6.2.4"),
+        default="cce@18.0.1",
+        values=("gcc@13", "cce@18.0.1", "amd@6.2.4"),
         description="Which compiler to use",
     )
     variant(
@@ -30,9 +30,9 @@ class OlcfFrontier(System):
         self.rocm_version = Version(self.spec.variants["rocm"][0])
 
         full_versions = {
-            "cce18.0.1": "18.0.1",
-            "amd6.2.4": "6.2.4",
-            "gcc13": "13"
+            "cce@18.0.1": "18.0.1",
+            "amd@6.2.4": "6.2.4",
+            "gcc@13": "13"
         }
         for key, value in full_versions.items():
             if key == self.spec.variants["compiler"][0]:
@@ -267,87 +267,87 @@ packages:
   rocm-clang-ocl:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+    - prefix: /opt/rocm-{self.rocm_version}
       spec: rocm-clang-ocl@{self.rocm_version}
   rocm-cmake:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+    - prefix: /opt/rocm-{self.rocm_version}
       spec: rocm-cmake@{self.rocm_version}
   rocm-device-libs:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+    - prefix: /opt/rocm-{self.rocm_version}
       spec: rocm-device-libs@{self.rocm_version}
   rocm-gdb:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+    - prefix: /opt/rocm-{self.rocm_version}
       spec: rocm-gdb@{self.rocm_version}
   rocm-opencl:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/opencl
+    - prefix: /opt/rocm-{self.rocm_version}/opencl
       spec: rocm-opencl@{self.rocm_version}
   rocm-opencl-runtime:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/opencl
+    - prefix: /opt/rocm-{self.rocm_version}/opencl
       spec: rocm-opencl-runtime@{self.rocm_version}
   rocm-openmp-extras:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/llvm
+    - prefix: /opt/rocm-{self.rocm_version}/llvm
       spec: rocm-openmp-extras@{self.rocm_version}
   rocm-smi:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/rocm_smi
+    - prefix: /opt/rocm-{self.rocm_version}/rocm_smi
       spec: rocmsmi@{self.rocm_version}
   rocm-smi-lib:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/rocm_smi
+    - prefix: /opt/rocm-{self.rocm_version}/rocm_smi
       spec: rocm-smi-lib@{self.rocm_version}
   rocminfo:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+    - prefix: /opt/rocm-{self.rocm_version}
       spec: rocminfo@{self.rocm_version}
   rocprim:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+    - prefix: /opt/rocm-{self.rocm_version}
       spec: rocprim@{self.rocm_version}
   rocprofiler-dev:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+    - prefix: /opt/rocm-{self.rocm_version}
       spec: rocprofiler-dev@{self.rocm_version}
   rocrand:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+    - prefix: /opt/rocm-{self.rocm_version}
       spec: rocrand@{self.rocm_version}
   rocsolver:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+    - prefix: /opt/rocm-{self.rocm_version}
       spec: rocsolver@{self.rocm_version}
   rocsparse:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+    - prefix: /opt/rocm-{self.rocm_version}
       spec: rocsparse@{self.rocm_version}
   rocthrust:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+    - prefix: /opt/rocm-{self.rocm_version}
       spec: rocthrust@{self.rocm_version}
   roctracer-dev:
     buildable: false
     externals:
-    - prefix: /appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}
+    - prefix: /opt/rocm-{self.rocm_version}
       spec: roctracer-dev@{self.rocm_version}
 """
 
