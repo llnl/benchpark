@@ -154,6 +154,8 @@ class Amg2023(
         # set package spack specs
         # empty package_specs value implies external package
         self.add_package_spec(system_specs["mpi"])
+        # self.add_spack_spec(system_specs["blas"])
+        self.add_spack_spec(system_specs["lapack"])
 
         # empty package_specs value implies external package
         self.add_package_spec(system_specs["blas"])
