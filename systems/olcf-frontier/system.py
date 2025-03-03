@@ -103,13 +103,10 @@ compilers:
         fc:  /opt/rocm-{self.rocm_version}/bin/amdflang
       operating_system: sles15
       target: any
-      modules: []
       environment:
         set:
           RFE_811452_DISABLE: '1'
           GCC_X86_64: /usr
-        append_path: {}
-        prepend_path: {}
       extra_rpaths:
       - /opt/rocm-{self.rocm_version}/lib
       modules:
@@ -123,7 +120,6 @@ compilers:
       - cray-pmi/6.1.15
       - libfabric
       - xpmem
-
 """
 
     def cce_compiler_cfg(self):
@@ -145,7 +141,7 @@ compilers:
           GCC_X86_64: /usr
           CRAYLIBS_X86_64: /opt/cray/pe/cce/{self.compiler_version}/cce/x86_64/lib
         prepend_path:
-        - LD_LIBRARY_PATH: /usr/lib64/gcc/x86_64-suse-linux/13
+          LD_LIBRARY_PATH: /usr/lib64/gcc/x86_64-suse-linux/13
       extra_rpaths:
       - /usr/lib64/gcc/x86_64-suse-linux/13
       modules:
@@ -173,8 +169,6 @@ compilers:
         fc: /usr/bin/gfortran-{self.compiler_version}
       operating_system: sles15
       target: any
-      environment:
-        prepend_path: {}
       extra_rpaths: []
       modules:
       - PrgEnv-gnu/8.6.0
@@ -202,11 +196,8 @@ packages:
     externals:
     - prefix: /opt/rocm-{self.rocm_version}
       spec: hip@{self.rocm_version}
-    extra_attributes:
-        compilers:
-          hip: /opt/rocm-{self.rocm_version}/bin/hipcc --verbose
-        modules:
-        - rocm/{self.rocm_version}
+      modules:
+      - rocm/{self.rocm_version}
   hip-rocclr:
     buildable: false
     externals:
