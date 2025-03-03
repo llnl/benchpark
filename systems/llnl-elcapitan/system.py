@@ -153,7 +153,7 @@ class LlnlElcapitan(System):
 packages:
   all:
     require:
-    - one_of: ["%cce", "%gcc"]
+    - one_of: ["%cce", "%gcc"]  # this line makes spack use cce to build where possible, gcc otherwise
 """
         elif compiler == "gcc":
             return """\
