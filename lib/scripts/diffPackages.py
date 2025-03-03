@@ -17,6 +17,11 @@ parser.add_argument(
     help="Specify the spack version in the format 'vX.Y.Z', e.g., 'v0.23.1'.",
 )
 parser.add_argument("--print-diff", action="store_true", help="Print file diff")
+parser.add_argument(
+    "--packages",
+    nargs="+",  # Allows one or more package names
+    help="Specify one or more packages to compare. If not provided, all packages will be compared.",
+)
 args = parser.parse_args()
 
 print(f"Comparing benchpark packages to packages in spack {args.spack_tag}")
@@ -33,7 +38,15 @@ def main():
     spack_dir = "spack/var/spack/repos/builtin/packages/"
     benchpark_dir = str(benchpark.paths.benchpark_root) + "/repo/"
 
-    for package in sorted(os.listdir(benchpark_dir)):
+    # Get the list of packages to process
+    if args.packages:
+        # Use only the specified packages
+        packages_to_compare = args.packages
+    else:
+        # Process all packages if --packages is not provided
+        packages_to_compare = sorted(os.listdir(benchpark_dir))
+
+    for package in packages_to_compare:
         if package not in ["repo.yaml"]:
             spack_package_path = spack_dir + package + "/package.py"
             benchpark_package_path = benchpark_dir + package + "/package.py"
