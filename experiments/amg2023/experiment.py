@@ -85,7 +85,7 @@ class Amg2023(
             )
 
         # Number of processes in each dimension
-        num_procs = {"px": 4, "py": 4, "pz": 4}
+        num_procs = {"px": 2, "py": 2, "pz": 2}
 
         # Per-process size (in zones) in each dimension
         problem_sizes = {"nx": 32, "ny": 32, "nz": 16}
