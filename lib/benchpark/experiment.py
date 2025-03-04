@@ -112,6 +112,7 @@ class Experiment(ExperimentSystemBase, SingleNode):
             raise BenchparkError(f"No workload variant defined for package {self.name}")
 
         self.package_specs = {}
+        self.additional_vars = {}
 
     @property
     def spack_name(self):
@@ -268,11 +269,8 @@ class Experiment(ExperimentSystemBase, SingleNode):
 
     def compute_variables_section_wrapper(self):
         # For each helper class compute any additional variables
-        additional_vars = {}
         for cls in self.helpers:
-            additional_vars = cls.compute_variables_section()
-
-        return additional_vars
+            self.additional_vars.update(cls.compute_variables_section())
 
     def compute_ramble_dict(self):
         # This can be overridden by any subclass that needs more flexibility
@@ -286,9 +284,9 @@ class Experiment(ExperimentSystemBase, SingleNode):
             }
         }
         # Add any variables from helper classes if necessary
-        additional_vars = self.compute_variables_section_wrapper()
-        if additional_vars:
-            ramble_dict["ramble"].update({"variables": additional_vars})
+        self.compute_variables_section_wrapper()
+        if self.additional_vars:
+            ramble_dict["ramble"].update({"variables": self.additional_vars})
 
         return ramble_dict
 
