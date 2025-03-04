@@ -285,7 +285,7 @@ class Experiment(ExperimentSystemBase, SingleNode):
                 "software": self.compute_spack_section_wrapper(),
             }
         }
-        # Add any variables from helper classes such as Caliper
+        # Add any variables from helper classes if necessary
         additional_vars = self.compute_variables_section_wrapper()
         if additional_vars:
             ramble_dict["ramble"].update({"variables": additional_vars})

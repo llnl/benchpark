@@ -90,7 +90,7 @@ def test_compute_ramble_dict_caliper(monkeypatch):
         )
 
     ramble_dict = experiment.compute_ramble_dict()
-    
+
     assert ramble_dict == {
         "ramble": {
             "software" if name == "spack" else name: True
