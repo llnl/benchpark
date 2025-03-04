@@ -136,7 +136,7 @@ class LlnlCluster(System):
         }
 
         if self.spec.satisfies("compiler=gcc"):
-            selections = selections | {
+            selections |= {
                 "packages": selections["packages"]
                 | {
                     "mpi": {
@@ -154,7 +154,7 @@ class LlnlCluster(System):
                 }
             }
         elif self.spec.satisfies("compiler=intel"):
-            selections = selections | {
+            selections |= {
                 "packages": selections["packages"]
                 | {
                     "mpi": {
