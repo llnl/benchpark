@@ -5,6 +5,7 @@ import os
 import subprocess
 import yaml
 import sys
+from pprint import pprint
 
 from deepdiff import DeepDiff
 
@@ -48,7 +49,7 @@ def compare_yaml(file1, file2):
     data2 = normalize_types(load_yaml(file2))
 
     if data1 is None or data2 is None:
-        print("\t\tComparison aborted due to file loading errors.")
+        color.cprint("\t\t@*rComparison aborted due to file loading errors.@.")
         return
 
     # Use DeepDiff to find differences
@@ -66,7 +67,7 @@ def compare_yaml(file1, file2):
         color.cprint(
             f"\t\t@*rThe YAML files {file1} and {file2} are different. Here are the differences:@."
         )
-        print("\t\t\t" + str(diff))
+        pprint(diff)
 
 
 if __name__ == "__main__":
@@ -87,7 +88,7 @@ if __name__ == "__main__":
 
     sysd = {
         "aws-pcluster": ["c6g.xlarge", "c4.xlarge", "hpc7a.48xlarge", "hpc6a.48xlarge"],
-        # "csc-lumi": None,
+        "csc-lumi": None,
         "llnl-cluster": ["ruby"],
     }
 
@@ -131,7 +132,8 @@ if __name__ == "__main__":
     # Compare the YAML files
     for system in sysd.keys():
         color.cprint("@*y" + system + "@.")
-        for cluster in sysd[system]:
+        iterable = sysd[system] if sysd[system] else [system]
+        for cluster in iterable:
             for root, dirs, files in os.walk(f"benchpark-legacy/{cluster}"):
                 loc = "/".join(root.split("/")[1:])
                 for file in files:
