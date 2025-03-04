@@ -78,7 +78,6 @@ class System(ExperimentSystemBase):
         self.spec: "benchpark.spec.ConcreteSystemSpec" = spec
         super().__init__()
 
-    def initialize(self):
         self.external_resources = None
 
         self.sys_cores_per_node = None
@@ -90,45 +89,40 @@ class System(ExperimentSystemBase):
 
         self.required = ["sys_cores_per_node", "scheduler", "timeout"]
 
-    def generate_description(self, output_dir):
-        self.initialize()
-        output_dir = pathlib.Path(output_dir)
+    def compute_system_id(self):
+        return {
+            "system": {
+                "name": self.__class__.__name__,
+                "spec": str(self.spec),
+                "config-hash": self.system_uid(),
+            }
+        }
 
-        variables_yaml = output_dir / "variables.yaml"
-        with open(variables_yaml, "w") as f:
-            f.write(self.variables_yaml())
+    # def generate_description(self, output_dir):
+    #     output_dir = pathlib.Path(output_dir)
 
-        self.external_packages(output_dir)
-        self.compiler_description(output_dir)
+    #     variables_yaml = output_dir / "variables.yaml"
+    #     with open(variables_yaml, "w") as f:
+    #         f.write(self.variables_yaml())
 
-        spec_hash = self.system_uid()
-
-        system_id_path = output_dir / "system_id.yaml"
-        with open(system_id_path, "w") as f:
-            f.write(
-                f"""\
-system:
-  name: {self.__class__.__name__}
-  spec: {str(self.spec)}
-  config-hash: {spec_hash}
-"""
-            )
+    #     self.external_packages(output_dir)
+    #     self.compiler_description(output_dir)
 
     def system_uid(self):
         return _hash_id([str(self.spec)])
 
-    def _merge_config_files(self, schema, selections, dst_path, override=False):
-        data = cfg.read_config_file(selections[0], schema)
-        for selection in selections[1:]:
-            cfg.merge_yaml(data, cfg.read_config_file(selection, schema))
+    # def _merge_config_files(self, schema, selections, dst_path, override=False):
+    #     data = cfg.read_config_file(selections[0], schema)
+    #     for selection in selections[1:]:
+    #         cfg.merge_yaml(data, cfg.read_config_file(selection, schema))
 
-        if override:
-            for top_level_key, _ in data.items():
-                break
-            top_level_key.override = True
+    #     if override:
+    #         for top_level_key, _ in data.items():
+    #             break
+    #         top_level_key.override = True
 
-        with open(dst_path, "w") as outstream:
-            syaml.dump_config(data, outstream)
+    #     with open(dst_path, "w") as outstream:
+    #         syaml.dump_config(data, outstream)
 
     def external_pkg_configs(self):
         return None
@@ -136,34 +130,25 @@ system:
     def compiler_configs(self):
         return None
 
-    def external_packages(self, output_dir):
-        selections = self.external_pkg_configs()
-        if not selections:
-            return
-
-        aux = output_dir / "auxiliary_software_files"
-        os.makedirs(aux, exist_ok=True)
-        aux_packages = aux / "packages.yaml"
-
-        self._merge_config_files(packages_schema.schema, selections, aux_packages)
-
-    def compiler_description(self, output_dir):
-        selections = self.compiler_configs()
-        if not selections:
-            return
-
-        aux = output_dir / "auxiliary_software_files"
-        os.makedirs(aux, exist_ok=True)
-        aux_compilers = aux / "compilers.yaml"
-
-        self._merge_config_files(
-            compilers_schema.schema, selections, aux_compilers, override=True
-        )
-
     def system_specific_variables(self):
         return {}
 
-    def variables_yaml(self):
+    def compute_packages_section(self):
+        selections = self.external_pkg_configs()
+        return selections
+
+        # self._merge_config_files(packages_schema.schema, selections, aux_packages)
+
+    def compute_compilers_section(self):
+        selections = self.compiler_configs()
+
+        return selections
+
+        # self._merge_config_files(
+        #     compilers_schema.schema, selections, aux_compilers, override=True
+        # )
+
+    def compute_variables_section(self):
         for attr in self.required:
             if not getattr(self, attr, None):
                 raise ValueError(f"Missing required info: {attr}")
@@ -183,37 +168,47 @@ system:
         if extra_variables:
             extras_as_cfg = f"\n{indent}".join(extra_variables)
 
-        return f"""\
-# SPDX-License-Identifier: Apache-2.0
+        return {
+            "variables": {
+                "timeout": self.timeout,
+                "scheduler": self.scheduler,
+                "sys_cores_per_node": self.sys_cores_per_node,
+                "extras_as_cfg": extras_as_cfg,
+                "max_request": "1000",
+                "n_ranks": "1000001",
+                "n_nodes": "1000001",
+                "batch_submit": "placeholder",
+                "mpi_command": "placeholder",
+            }
+        }
 
-variables:
-  timeout: "{self.timeout}"
-  scheduler: "{self.scheduler}"
-  sys_cores_per_node: "{self.sys_cores_per_node}"
-  {extras_as_cfg}
-  max_request: "1000"  # n_ranks/n_nodes cannot exceed this
-  n_ranks: '1000001'  # placeholder value
-  n_nodes: '1000001'  # placeholder value
-  batch_submit: "placeholder"
-  mpi_command: "placeholder"
-"""
+    def compute_software_section(self):
+        return NotImplementedError(
+            "Each system must implement compute_externals_section"
+        )
 
-    def _adhoc_cfgs(self):
-        if not getattr(self, "_tmp_cfgs", None):
-            self._tmp_cfgs = tempfile.mkdtemp()
-            self._adhoc_cfg_idx = 0
-        return self._tmp_cfgs
+    def compute_dict(self):
+        # This can be overridden by any subclass that needs more flexibility
+        return {
+            "system_id": self.compute_system_id(),
+            "variables": self.compute_variables_section(),
+            "software": self.compute_software_section(),
+            "auxiliary_software_files": {
+                "compilers": self.compute_compilers_section(),
+                "packages": self.compute_packages_section(),
+            },
+        }
 
-    def next_adhoc_cfg(self):
-        basedir = self._adhoc_cfgs()
-        self._adhoc_cfg_idx += 1
-        return os.path.join(basedir, str(self._adhoc_cfg_idx))
+    def write_system_dict(self, destdir):
+        def _write_key_file(destdir, key, sys_dict):
+            with open(f"{destdir}/{key}.yaml", "w") as f:
+                yaml.dump(sys_dict[key], f)
 
-
-def unique_dir_for_description(system_dir):
-    system_id_path = os.path.join(system_dir, "system_id.yaml")
-    with open(system_id_path, "r") as f:
-        data = yaml.safe_load(f)
-    name = data["system"]["name"]
-    spec_hash = data["system"]["config-hash"]
-    return f"{name}-{spec_hash[:7]}"
+        system_dict = self.compute_dict()
+        for key in system_dict.keys():
+            if key == "auxiliary_software_files":
+                os.makedirs(destdir + "/" + key)
+                for k in system_dict[key]:
+                    _write_key_file(destdir + "/" + key, k, system_dict[key])
+            else:
+                _write_key_file(destdir, key, system_dict)

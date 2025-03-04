@@ -14,15 +14,12 @@ import benchpark.spec
 
 
 def system_init(args):
-    system_spec = benchpark.spec.SystemSpec(" ".join(args.spec))
-    system_spec = system_spec.concretize()
-
+    system_spec = benchpark.spec.SystemSpec(" ".join(args.spec)).concretize()
     system = system_spec.system
-    system.initialize()
 
     if args.basedir:
         base = args.basedir
-        sysdir = system.system_uid()
+        sysdir = str(hash(system_spec))
         destdir = os.path.join(base, sysdir)
     elif args.dest:
         destdir = args.dest
@@ -31,7 +28,7 @@ def system_init(args):
 
     try:
         os.mkdir(destdir)
-        system.generate_description(destdir)
+        system.write_system_dict(destdir)
     except FileExistsError:
         print(f"Abort: system description dir already exists ({destdir})")
         sys.exit(1)
@@ -43,10 +40,6 @@ def system_init(args):
 
 def system_list(args):
     raise NotImplementedError("'benchpark system list' is not available")
-
-
-def system_id(args):
-    print(benchpark.system.unique_dir_for_description(args.system_dir))
 
 
 def setup_parser(root_parser):
@@ -70,7 +63,6 @@ def command(args):
     actions = {
         "init": system_init,
         "list": system_list,
-        "id": system_id,
     }
     if args.system_subcommand in actions:
         actions[args.system_subcommand](args)
