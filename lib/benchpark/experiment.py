@@ -266,6 +266,14 @@ class Experiment(ExperimentSystemBase, SingleNode):
     def compute_variables_section(self):
         return {}
 
+    def compute_variables_section_wrapper(self):
+        # For each helper class compute any additional variables
+        additional_vars = {}
+        for cls in self.helpers:
+            additional_vars = cls.compute_variables_section()
+
+        return additional_vars
+
     def compute_ramble_dict(self):
         # This can be overridden by any subclass that needs more flexibility
         ramble_dict = {
@@ -277,12 +285,10 @@ class Experiment(ExperimentSystemBase, SingleNode):
                 "software": self.compute_spack_section_wrapper(),
             }
         }
-        # Add any variables from helper classes
-        self.additional_vars = {}
-        for cls in self.helpers:
-            self.additional_vars = cls.compute_variables_section()
-            if self.additional_vars:
-                ramble_dict["ramble"].update({"variables": self.additional_vars})
+        # Add any variables from helper classes such as Caliper
+        additional_vars = self.compute_variables_section_wrapper()
+        if additional_vars:
+            ramble_dict["ramble"].update({"variables": additional_vars})
 
         return ramble_dict
 
