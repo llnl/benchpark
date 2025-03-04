@@ -34,10 +34,15 @@ def compare_yaml(file1, file2):
     def normalize_types(data):
         """fix to compare strings to int '56' == 56 for yaml purposes"""
         if isinstance(data, dict):
-            return {
+            tdict = {
                 (k if k != "compilers:" else "compilers"): normalize_types(v)
                 for k, v in data.items()
             }  # Fix for way "'compilers':": is generated in old yaml
+            tdict = {k: v for k, v in tdict.items() if (isinstance(v, str) and (
+                "{self.cuda_version.major}" not in v and
+                "{self.cuda_version}" not in v)
+            )} # Hacky check for errors in original yaml
+            return tdict
         elif isinstance(data, list):
             return [normalize_types(v) for v in data]
         elif isinstance(data, str) and data.isdigit():
@@ -89,6 +94,7 @@ if __name__ == "__main__":
     sysd = {
         "aws-pcluster": ["c6g.xlarge", "c4.xlarge", "hpc7a.48xlarge", "hpc6a.48xlarge"],
         "csc-lumi": None,
+        "cscs-daint": None,
         "llnl-cluster": ["ruby"],
     }
 
