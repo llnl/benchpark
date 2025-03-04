@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import re
+import warnings
 from benchpark.directives import variant
 from benchpark.experiment import ExperimentHelper
 
@@ -112,15 +112,14 @@ class Caliper:
                                  "n_nodes": "{n_nodes}",
                                  "n_ranks": "{n_ranks}",
                                  "n_threads_per_proc": "{n_threads_per_proc}"}
-                for variant_spec in re.findall("(?:\'.*?\'|\S)+", str(self.spec.variants)):
+                for variant_spec in str.split(str(self.spec.variants)):
                     values = variant_spec.split("=")
                     if len(values) == 1:
                         metadata_dict["benchpark_spec"] = values
                     elif len(values) == 2:
                         metadata_dict[values[0]] = values[1]
                     else:
-                        # log a warning that the spec may not be parsed correctly?
-                        pass    
+                        warnings.warn("Possible incorrect values sent to Caliper as metadata")   
                 return {
                 "caliper_metadata": metadata_dict
                 }

@@ -90,12 +90,6 @@ class Experiment(ExperimentSystemBase, SingleNode):
         Dict[str, benchpark.variant.Variant],
     ]
 
-    variant(
-        "extra_spack_specs",
-        default=" ",
-        description="additional spack specs",
-    )
-
     def __init__(self, spec):
         self.spec: "benchpark.spec.ConcreteExperimentSpec" = spec
         super().__init__()
@@ -262,7 +256,8 @@ class Experiment(ExperimentSystemBase, SingleNode):
             )
         )
         self.package_specs[self.name]["pkg_spec"] += " ".join(
-            spack_variants + list(self.spec.variants["extra_spack_specs"])
+            spack_variants
+            
         ).strip()
 
         return {
