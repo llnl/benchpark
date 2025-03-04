@@ -153,33 +153,28 @@ class System(ExperimentSystemBase):
             if not getattr(self, attr, None):
                 raise ValueError(f"Missing required info: {attr}")
 
-        optionals = list()
+        optionals = {}
         for opt in ["sys_gpus_per_node", "sys_mem_per_node", "queue"]:
             if getattr(self, opt, None):
-                optionals.append(f"{opt}: {getattr(self, opt)}")
+                optionals[opt] = getattr(self, opt)
 
-        system_specific = list()
+        system_specific = {}
         for k, v in self.system_specific_variables().items():
-            system_specific.append(f"{k}: {v}")
+            system_specific[k] = v
 
-        extra_variables = optionals + system_specific
-        indent = " " * 2
-        extras_as_cfg = ""
-        if extra_variables:
-            extras_as_cfg = f"\n{indent}".join(extra_variables)
+        extra_variables = optionals | system_specific
 
         return {
             "variables": {
                 "timeout": self.timeout,
                 "scheduler": self.scheduler,
                 "sys_cores_per_node": self.sys_cores_per_node,
-                "extras_as_cfg": extras_as_cfg,
                 "max_request": "1000",
                 "n_ranks": "1000001",
                 "n_nodes": "1000001",
                 "batch_submit": "placeholder",
                 "mpi_command": "placeholder",
-            }
+            } | extra_variables
         }
 
     def compute_software_section(self):
