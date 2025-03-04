@@ -105,13 +105,16 @@ class Caliper:
             return "~caliper" if self.spec.satisfies("caliper=none") else "+caliper"
 
         def compute_variables_section(self):
-            """ Add Caliper metadata variables for the ramble.yaml """    
+            """Add Caliper metadata variables for the ramble.yaml"""
             if not self.spec.satisfies("caliper=none"):
-                metadata_dict = {"application_name": "{application_name}", 
-                                 "experiment_name": "{experiment_name}",
-                                 "n_nodes": "{n_nodes}",
-                                 "n_ranks": "{n_ranks}",
-                                 "n_threads_per_proc": "{n_threads_per_proc}"}
+                metadata_dict = {
+                    "application_name": "{application_name}",
+                    "experiment_name": "{experiment_name}",
+                    "n_nodes": "{n_nodes}",
+                    "n_ranks": "{n_ranks}",
+                    "n_threads_per_proc": "{n_threads_per_proc}",
+                }
+                # parse the spec for more metadata
                 for variant_spec in str.split(str(self.spec.variants)):
                     values = variant_spec.split("=")
                     if len(values) == 1:
@@ -119,9 +122,9 @@ class Caliper:
                     elif len(values) == 2:
                         metadata_dict[values[0]] = values[1]
                     else:
-                        warnings.warn("Possible incorrect values sent to Caliper as metadata")   
-                return {
-                "caliper_metadata": metadata_dict
-                }
+                        warnings.warn(
+                            "Possible incorrect values sent to Caliper as metadata"
+                        )
+                return {"caliper_metadata": metadata_dict}
             else:
                 return {}

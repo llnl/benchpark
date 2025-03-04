@@ -50,6 +50,7 @@ class ExperimentHelper:
     def compute_variables_section(self):
         return {}
 
+
 class SingleNode:
     variant(
         "single_node",
@@ -255,16 +256,13 @@ class Experiment(ExperimentSystemBase, SingleNode):
                 (cls.get_spack_variants() for cls in self.helpers),
             )
         )
-        self.package_specs[self.name]["pkg_spec"] += " ".join(
-            spack_variants
-            
-        ).strip()
+        self.package_specs[self.name]["pkg_spec"] += " ".join(spack_variants).strip()
 
         return {
             "packages": {k: v for k, v in self.package_specs.items() if v},
             "environments": {self.name: {"packages": list(self.package_specs.keys())}},
         }
-    
+
     def compute_variables_section(self):
         return {}
 
