@@ -10,18 +10,6 @@ from benchpark.system import System
 from packaging.version import Version
 from benchpark.paths import hardware_descriptions
 
-def deep_merge(dict1, dict2):
-    """
-    Recursively deep merge dict2 into dict1.
-    """
-    for key, value in dict2.items():
-        if key in dict1 and isinstance(dict1[key], dict) and isinstance(value, dict):
-            # If both values are dictionaries, merge them recursively
-            deep_merge(dict1[key], value)
-        else:
-            # Otherwise, overwrite or add the key/value from dict2 to dict1
-            dict1[key] = value
-    return dict1
 
 class CscLumi(System):
 
@@ -134,7 +122,7 @@ class CscLumi(System):
             }
         }
 
-        selections = deep_merge(selections, self.rocm_config())
+        selections["packages"] |= self.rocm_config()["packages"]
 
         if self.spec.satisfies("compiler=cce"):
             selections |= {
