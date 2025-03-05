@@ -95,7 +95,11 @@ if __name__ == "__main__":
         "aws-pcluster": ["c6g.xlarge", "c4.xlarge", "hpc7a.48xlarge", "hpc6a.48xlarge"],
         "csc-lumi": None,
         "cscs-daint": None,
-        "llnl-cluster": ["ruby"],
+        "cscs-eiger": None,
+        "generic-x86": None,
+        "jsc-juwels": None,
+        "lanl-venado": ["grace-hopper", "grace-grace"],
+        "llnl-cluster": ["ruby", "magma", "dane"],
     }
 
     for name, tag in bp.items():
