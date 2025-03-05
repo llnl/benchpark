@@ -78,7 +78,7 @@ class Kripke(
         }
 
         # Number of processes in each dimension
-        num_procs = {"npx": 4, "npy": 4, "npz": 4}
+        num_procs = {"npx": 2, "npy": 2, "npz": 2}
 
         # Number of zones in each dimension, per process
         problem_sizes = {"nzx": 16, "nzy": 32, "nzz": 32}
