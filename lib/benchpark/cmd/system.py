@@ -42,6 +42,14 @@ def system_list(args):
     raise NotImplementedError("'benchpark system list' is not available")
 
 
+def system_id(args):
+    temp_sys = benchpark.system.System(args.system_dir)
+    data = temp_sys.compute_system_id()
+    name = data["system"]["name"]
+    spec_hash = data["system"]["config-hash"]
+    return f"{name}-{spec_hash[:7]}"
+
+
 def setup_parser(root_parser):
     system_subparser = root_parser.add_subparsers(dest="system_subcommand")
 
@@ -63,6 +71,7 @@ def command(args):
     actions = {
         "init": system_init,
         "list": system_list,
+        "id": system_id,
     }
     if args.system_subcommand in actions:
         actions[args.system_subcommand](args)
