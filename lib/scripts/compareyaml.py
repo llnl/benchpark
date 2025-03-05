@@ -98,8 +98,10 @@ if __name__ == "__main__":
         "cscs-eiger": None,
         "generic-x86": None,
         "jsc-juwels": None,
-        "lanl-venado": ["grace-hopper", "grace-grace"],
+        #"lanl-venado": ["grace-hopper", "grace-grace"],
         "llnl-cluster": ["ruby", "magma", "dane"],
+        "llnl-elcapitan": ["tioga", "elcapitan"],
+        "llnl-sierra": None,
     }
 
     for name, tag in bp.items():
