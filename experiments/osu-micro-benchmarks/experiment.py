@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.rocm import ROCmExperiment
 from benchpark.cuda import CudaExperiment
@@ -93,6 +93,8 @@ class OsuMicroBenchmarks(
         multi=True,
         description="workloads available",
     )
+
+    maintainers("nhanford")
 
     def compute_applications_section(self):
 

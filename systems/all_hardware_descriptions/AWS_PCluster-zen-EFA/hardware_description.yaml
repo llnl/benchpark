@@ -28,5 +28,4 @@ system_definition:
       compiler: gcc
       runtime:
       mpi: openmpi
-  top500-system-instances:
-    - instance-types <https://aws.amazon.com/ec2/instance-types>
+  instance-types: <https://aws.amazon.com/ec2/instance-types>

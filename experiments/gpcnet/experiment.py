@@ -3,17 +3,17 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainers
+from benchpark.directives import variant
 from benchpark.experiment import Experiment
 from benchpark.scaling import StrongScaling
 
 
-class Phloem(Experiment, StrongScaling):
+class Gpcnet(Experiment, StrongScaling):
     variant(
         "workload",
-        default="sqmr",
-        values=("sqmr", "mpiBench", "mpiGraph"),
-        description="sqmr, mpiBench, or mpiGraph",
+        default="network_test",
+        values=("network_test", "network_load_test"),
+        description="network_test or network_load_test",
     )
 
     variant(
@@ -22,19 +22,15 @@ class Phloem(Experiment, StrongScaling):
         description="app version",
     )
 
-    maintainers("nhanford")
-
     def compute_applications_section(self):
-        if self.spec.satisfies("workload=sqmr"):
-            self.add_experiment_variable(
-                "n_ranks", "{num_cores}*{num_nbors}+{num_cores}"
-            )
-            self.add_experiment_variable("num_cores", "4")
-            self.add_experiment_variable("num_nbors", "{num_cores}")
-        elif self.spec.satisfies("workload=mpiBench"):
-            self.add_experiment_variable("n_ranks", "2")
-        elif self.spec.satisfies("workload=mpiGraph"):
-            self.add_experiment_variable("n_ranks", "2")
+        # TODO: Replace with conflicts clause
+        self.add_experiment_variable(
+            "n_ranks", "{n_nodes}*{sys_cores_per_node}//2", True
+        )
+        if self.spec.satisfies("workload=network_test"):
+            self.add_experiment_variable("n_nodes", ["2", "4"])
+        elif self.spec.satisfies("workload=network_load_test"):
+            self.add_experiment_variable("n_nodes", "10")
 
     def compute_spack_section(self):
         # get package version
@@ -50,5 +46,5 @@ class Phloem(Experiment, StrongScaling):
         self.add_spack_spec(system_specs["mpi"])
 
         self.add_spack_spec(
-            self.name, [f"phloem@{app_version} +mpi", system_specs["compiler"]]
+            self.name, [f"gpcnet@{app_version} +mpi", system_specs["compiler"]]
         )
