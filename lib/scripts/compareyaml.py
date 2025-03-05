@@ -1,6 +1,5 @@
 # Usage: benchpark-python compareyaml.py
 
-import argparse
 import os
 import subprocess
 import yaml
