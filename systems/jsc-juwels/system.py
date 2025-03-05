@@ -180,7 +180,7 @@ class JscJuwels(System):
                             "spec": f"cuda@{self.cuda_version}",
                             "prefix": f"/p/software/juwelsbooster/stages/2024/software/CUDA/{self.cuda_version.major}",
                             "modules": [
-                                f"Stages/2024",
+                                "Stages/2024",
                                 f"CUDA/{self.cuda_version.major}",
                                 f"NVHPC/23.7-CUDA-{self.cuda_version.major}",
                             ],
