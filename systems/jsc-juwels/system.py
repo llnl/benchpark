@@ -8,9 +8,22 @@ from benchpark.directives import variant
 
 from benchpark.system import System
 from packaging.version import Version
+from benchpark.paths import hardware_descriptions
 
 
 class JscJuwels(System):
+
+    id_to_resources = {
+        "juwels": {
+            "sys_cores_per_node": 48,
+            "timeout": 120,
+            "sys_gpus_per_node": 4,
+            "cuda_arch": '"80"',
+            "system_site": "jsc",
+            "hardware_key": str(hardware_descriptions)
+            + "/Atos-rome-A100-Infiniband/hardware_description.yaml",
+        }
+    }
 
     variant(
         "compiler",
@@ -26,15 +39,10 @@ class JscJuwels(System):
         if self.spec.satisfies("compiler=gcc"):
             self.gcc_version = Version("12.3.0")
             self.nvhpc_version = Version("23.7")
-        sys_variables = {
-            "sys_cores_per_node": 48,
-            "timeout": 120,
-            "sys_gpus_per_node": 4,
-            "cuda_arch": '"80"',
-        }
 
         self.scheduler = "slurm"
-        for k, v in sys_variables.items():
+        attrs = self.id_to_resources.get("juwels")
+        for k, v in attrs.items():
             setattr(self, k, v)
 
     def generate_description(self, output_dir):

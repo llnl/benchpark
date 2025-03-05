@@ -5,11 +5,26 @@
 
 import pathlib
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.system import System
+from benchpark.paths import hardware_descriptions
 
 
 class LlnlSierra(System):
+
+    maintainers("pearce8", "nhanford", "rfhaque")
+
+    id_to_resources = {
+        "lassen": {
+            "sys_cores_per_node": 44,
+            "sys_gpus_per_node": 4,
+            "system_site": "llnl",
+            "hardware_key": str(hardware_descriptions)
+            + "/IBM-power9-V100-Infiniband/hardware_description.yaml",
+        },
+    }
+    id_to_resources["sierra"] = id_to_resources["lassen"]
+
     variant(
         "cuda",
         default="11-8-0",
@@ -42,8 +57,9 @@ class LlnlSierra(System):
         super().initialize()
 
         self.scheduler = "lsf"
-        self.sys_cores_per_node = "44"
-        self.sys_gpus_per_node = "4"
+        attrs = self.id_to_resources.get("lassen")
+        for k, v in attrs.items():
+            setattr(self, k, v)
 
     def generate_description(self, output_dir):
         super().generate_description(output_dir)

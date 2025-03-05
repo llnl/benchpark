@@ -5,23 +5,35 @@
 
 import pathlib
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.system import System
-
-id_to_resources = {
-    "ruby": {
-        "sys_cores_per_node": 56,
-    },
-    "magma": {
-        "sys_cores_per_node": 96,
-    },
-    "dane": {
-        "sys_cores_per_node": 112,
-    },
-}
+from benchpark.paths import hardware_descriptions
 
 
 class LlnlCluster(System):
+
+    maintainers("nhanford", "rfhaque")
+
+    id_to_resources = {
+        "ruby": {
+            "sys_cores_per_node": 56,
+            "system_site": "llnl",
+            "hardware_key": str(hardware_descriptions)
+            + "/Supermicro-icelake-OmniPath/hardware_description.yaml",
+        },
+        "magma": {
+            "sys_cores_per_node": 96,
+            "system_site": "llnl",
+            "hardware_key": str(hardware_descriptions)
+            + "/Penguin-icelake-OmniPath/hardware_description.yaml",
+        },
+        "dane": {
+            "sys_cores_per_node": 112,
+            "system_site": "llnl",
+            "hardware_key": str(hardware_descriptions)
+            + "/DELL-sapphirerapids-OmniPath/hardware_description.yaml",
+        },
+    }
 
     variant(
         "cluster",
@@ -41,7 +53,7 @@ class LlnlCluster(System):
         super().initialize()
 
         self.scheduler = "slurm"
-        attrs = id_to_resources.get(self.spec.variants["cluster"][0])
+        attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
 
