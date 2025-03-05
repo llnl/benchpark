@@ -37,23 +37,6 @@ class Amg2023(
         default="develop",
         description="app version",
     )
-    
-    variant(
-        "caliper",
-        default="none",
-        values=(
-            "none",
-            "time",
-            "mpi",
-            "cuda",
-            "topdown-counters-all",
-            "topdown-counters-toplevel",
-            "topdown-all",
-            "topdown-toplevel",
-        ),
-        multi=True,
-        description="caliper mode",
-    )
 
     maintainers("pearce8")
 
