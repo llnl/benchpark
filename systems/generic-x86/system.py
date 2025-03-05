@@ -18,7 +18,7 @@ class GenericX86(System):
         self.scheduler = "mpi"
         setattr(self, "sys_cores_per_node", 1)
 
-    def sw_description(self):
+    def compute_software_section(self):
         """This is somewhat vestigial, and maybe deleted later. The experiments
         will fail if these variables are not defined though, so for now
         they are still generated (but with more-generic values).
