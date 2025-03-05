@@ -174,7 +174,8 @@ class System(ExperimentSystemBase):
                 "n_nodes": "1000001",
                 "batch_submit": "placeholder",
                 "mpi_command": "placeholder",
-            } | extra_variables
+            }
+            | extra_variables
         }
 
     def compute_software_section(self):

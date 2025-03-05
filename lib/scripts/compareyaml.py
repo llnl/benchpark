@@ -1,4 +1,4 @@
-# Usage: benchpark-python compareyaml.py 
+# Usage: benchpark-python compareyaml.py
 
 import argparse
 import os
@@ -38,10 +38,17 @@ def compare_yaml(file1, file2):
                 (k if k != "compilers:" else "compilers"): normalize_types(v)
                 for k, v in data.items()
             }  # Fix for way "'compilers':": is generated in old yaml
-            tdict = {k: v for k, v in tdict.items() if (isinstance(v, str) and (
-                "{self.cuda_version.major}" not in v and
-                "{self.cuda_version}" not in v)
-            )} # Hacky check for errors in original yaml
+            tdict = {
+                k: v
+                for k, v in tdict.items()
+                if (
+                    isinstance(v, str)
+                    and (
+                        "{self.cuda_version.major}" not in v
+                        and "{self.cuda_version}" not in v
+                    )
+                )
+            }  # Hacky check for errors in original yaml
             return tdict
         elif isinstance(data, list):
             return [normalize_types(v) for v in data]
@@ -87,7 +94,7 @@ if __name__ == "__main__":
     # args = parser.parse_args()
 
     bp = {
-        "benchpark-legacy": "6d06ea8cbf6ffd494b30ece1a2e924fd48dd7018", # develop from 3/4/25
+        "benchpark-legacy": "6d06ea8cbf6ffd494b30ece1a2e924fd48dd7018",  # develop from 3/4/25
         "benchpark-new": "refactor/systems-i654",
     }
 
@@ -98,10 +105,11 @@ if __name__ == "__main__":
         "cscs-eiger": None,
         "generic-x86": None,
         "jsc-juwels": None,
-        #"lanl-venado": ["grace-hopper", "grace-grace"],
+        # "lanl-venado": ["grace-hopper", "grace-grace"],
         "llnl-cluster": ["ruby", "magma", "dane"],
         "llnl-elcapitan": ["tioga", "elcapitan"],
         "llnl-sierra": None,
+        "riken-fugaku": None,
     }
 
     for name, tag in bp.items():

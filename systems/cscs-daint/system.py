@@ -65,7 +65,8 @@ class CscsDaint(System):
     def compute_packages_section(self):
         selections = self.cuda_config(self.cuda_version)
         return selections | {
-            "packages": selections["packages"] | {
+            "packages": selections["packages"]
+            | {
                 "all": {
                     "providers": {
                         "mpi": ["cray-mpich"],

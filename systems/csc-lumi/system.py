@@ -404,7 +404,7 @@ class CscLumi(System):
                             "spec": f"rocfft@{self.rocm_version}",
                         }
                     ],
-                    "variants": "amdgpu_target=auto amdgpu_target_sram_ecc=auto"
+                    "variants": "amdgpu_target=auto amdgpu_target_sram_ecc=auto",
                 },
                 "rocm-clang-ocl": {
                     "buildable": False,
