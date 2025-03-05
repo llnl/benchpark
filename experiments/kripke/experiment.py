@@ -33,8 +33,25 @@ class Kripke(
 
     variant(
         "version",
-        default="develop",
+        default="comm_cali",
         description="app version",
+    )
+    
+    variant(
+        "caliper",
+        default="none",
+        values=(
+            "none",
+            "time",
+            "mpi",
+            "cuda",
+            "topdown-counters-all",
+            "topdown-counters-toplevel",
+            "topdown-all",
+            "topdown-toplevel",
+        ),
+        multi=True,
+        description="caliper mode",
     )
 
     maintainers("pearce8")
@@ -63,10 +80,10 @@ class Kripke(
         }
 
         # Number of processes in each dimension
-        num_procs = {"npx": 2, "npy": 2, "npz": 1}
+        num_procs = {"npx": 2, "npy": 2, "npz": 2}
 
         # Number of zones in each dimension, per process
-        problem_sizes = {"nzx": 64, "nzy": 64, "nzz": 32}
+        problem_sizes = {"nzx": 16, "nzy": 32, "nzz": 32}
 
         for k, v in input_variables.items():
             self.add_experiment_variable(k, v, True)
@@ -92,6 +109,12 @@ class Kripke(
             for nk, nv in scaled_variables.items():
                 self.add_experiment_variable(nk, nv, True)
         elif self.spec.satisfies("+strong"):
+            # Number of processes in each dimension
+            num_procs = {"npx": 2, "npy": 2, "npz": 1}
+
+            # Number of zones in each dimension, per process
+            problem_sizes = {"nzx": 64, "nzy": 64, "nzz": 32}
+
             scaled_variables = self.generate_strong_scaling_params(
                 {tuple(num_procs.keys()): list(num_procs.values())},
                 int(self.spec.variants["scaling-factor"][0]),

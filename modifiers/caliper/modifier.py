@@ -42,7 +42,7 @@ class Caliper(BasicModifier):
 
     env_var_modification(
         "CALI_CONFIG",
-        "spot(output={}{})".format(_cali_datafile, "${CALI_CONFIG_MODE}"),
+        "spot(output={},profile.mpi,comm.stats)".format(_cali_datafile, "${CALI_CONFIG_MODE}"),
         method="set",
         modes=[_default_mode],
     )
