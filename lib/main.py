@@ -7,9 +7,8 @@
 
 import argparse
 import inspect
-import os
-import pathlib
 import shlex
+import shutil
 import subprocess
 import sys
 import yaml
@@ -270,11 +269,6 @@ def run_command(command_str, env=None):
 def benchpark_tags(subparsers, actions_dict):
     create_parser = subparsers.add_parser("tags", help="Tags in Benchpark experiments")
     create_parser.add_argument(
-        "experiments_root",
-        type=str,
-        help="The experiments_root you specified during Benchpark setup.",
-    )
-    create_parser.add_argument(
         "-a",
         "--application",
         action="store",
@@ -311,9 +305,21 @@ def benchpark_tags_handler(args):
     """
     Filter ramble tags by benchpark benchmarks
     """
-    experiments_root = pathlib.Path(os.path.abspath(args.experiments_root))
-    ramble_location = experiments_root / "ramble"
-    ramble_exe = ramble_location / "bin" / "ramble"
+    # Check if the "ramble" command exists
+    ramble_path = shutil.which("ramble")
+    if ramble_path is None:
+        print('"ramble" command not found. Generating Ramble...')
+        targs = argparse.Namespace(
+            experiment="experiments/ad/",
+            system="systems/llnl-cluster/",
+            experiments_root="tmp/tags",
+        )
+        benchpark.cmd.setup.command(targs)
+    else:
+        print(f'"ramble" command found at: {ramble_path}.')
+
+    ramble_location = "tmp/tags/ramble"
+    ramble_exe = ramble_location + "/bin/ramble"
     benchmarks = benchpark_benchmarks()
 
     if args.tag:
