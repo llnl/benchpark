@@ -41,9 +41,9 @@ def benchpark_modifiers():
 def benchpark_systems():
     source_dir = benchpark.paths.benchpark_root
     systems = []
-    exclude = ["all_hardware_descriptions", "repo.yaml"]
+    exclude = ["all_hardware_descriptions", "common", "repo.yaml"]
     for x in sorted(os.listdir(source_dir / "systems")):
-        if x not in exclude:
+        if x not in exclude and "system.py" in os.listdir(source_dir / "systems" / x):
             system_spec = benchpark.spec.SystemSpec(x)
             system_class = system_spec.system_class
             if hasattr(system_class, "id_to_resources"):
