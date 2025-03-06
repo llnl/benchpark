@@ -23,6 +23,7 @@ jobs:
       run: ${{ steps.filter.outputs.run }}
       coverage: ${{ steps.filter.outputs.coverage }}
       license: ${{ steps.filter.outputs.license }}
+      diffpackages: ${{ steps.filter.outputs.diffpackages }}
 
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # @v2
@@ -96,6 +97,8 @@ jobs:
               - 'repo/**'
               - 'systems/**'
               - 'var/**'
+            diffpackages:
+              - 'repo/**/package.py'
 
   docs:
     if: ${{ needs.changes.outputs.docs == 'true' }}
@@ -126,6 +129,11 @@ jobs:
     if: ${{ needs.changes.outputs.license == 'true' }}
     needs: changes
     uses: ./.github/workflows/license.yml
+
+  diffpackages:
+    if: ${{ needs.changes.outputs.diffpackages == 'true' }}
+    needs: changes
+    uses: ./.github/workflows/diffpackages.yml
 
   all:
     needs:

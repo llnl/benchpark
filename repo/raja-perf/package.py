@@ -360,3 +360,7 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
     def cmake_args(self):
         options = [f"-DMPI_CXX_LINK_FLAGS='{self.spec['mpi'].libs.ld_flags}'"]
         return options
+
+
+def _test_func():
+    pass

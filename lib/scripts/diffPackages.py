@@ -7,6 +7,8 @@ import itertools
 
 import benchpark.paths
 
+EXIT_CODE=0
+
 parser = argparse.ArgumentParser(
     description="Script to compare packages in benchpark against upstream spack packages.",
     usage="benchpark-python diffPackages.py [OPTIONS]",
@@ -35,6 +37,7 @@ import llnl.util.tty.color as color  # noqa: E402
 
 
 def main():
+    global EXIT_CODE
     spack_dir = "spack/var/spack/repos/builtin/packages/"
     benchpark_dir = str(benchpark.paths.benchpark_root) + "/repo/"
 
@@ -91,6 +94,7 @@ def main():
                 color.cprint(
                     f"    @*gNo differences found. We can safely delete '{benchpark_package_path}' in favor of spack upstream@."
                 )
+                EXIT_CODE=1
 
             # Use difflib.ndiff to compare the lines
             dc3 = difflib.ndiff(spack_lines, benchpark_lines)
@@ -103,6 +107,8 @@ def main():
             if args.print_diff:
                 # Print the differences
                 print("\n".join(dc))
+
+    return EXIT_CODE
 
 
 if __name__ == "__main__":
