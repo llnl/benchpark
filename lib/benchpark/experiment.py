@@ -321,7 +321,9 @@ class Experiment(ExperimentSystemBase, SingleNode):
                     (cls.get_spack_variants() for cls in self.helpers),
                 )
             )
-            self.package_specs[self.name]["pkg_spec"] += " ".join(spack_variants).strip()
+            self.package_specs[self.name]["pkg_spec"] += " ".join(
+                spack_variants
+            ).strip()
 
         elif pkg_manager == "environment-modules":
             if "append_path" in self.spec.variants:
