@@ -423,12 +423,12 @@ jobs:
           system_name: ruby
           system_spec: llnl-cluster cluster=ruby compiler=intel
 
-      - name: qws/openmp ruby llnl-cluster cluster=ruby compiler=intel
+      - name: qws/openmp caliper=mpi,time ruby llnl-cluster cluster=ruby compiler=intel
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: qws
           benchmark_mode: openmp
-          benchmark_spec: qws+openmp
+          benchmark_spec: qws+openmp caliper=mpi,time
           system_name: ruby
           system_spec: llnl-cluster cluster=ruby compiler=intel
 
