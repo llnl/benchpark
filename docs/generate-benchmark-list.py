@@ -2,9 +2,12 @@
 
 import pandas as pd
 import yaml
-import os
 import sys
 import subprocess
+
+sys.path.append("../lib/")
+import benchpark.accounting  # noqa: E402
+import benchpark.paths  # noqa: E402
 
 
 def construct_tag_groups(tag_groups, tag_dicts, dictionary):
@@ -17,16 +20,8 @@ def construct_tag_groups(tag_groups, tag_dicts, dictionary):
             print("ERROR in construct_tag_groups")
 
 
-def benchpark_benchmarks(benchmarks):
-    experiments_dir = "../legacy/experiments"
-    for x in os.listdir(experiments_dir):
-        benchmarks.append(f"{x}")
-    return benchmarks
-
-
-def main(workspace):
-    benchmarks = list()
-    benchpark_benchmarks(benchmarks)
+def main():
+    benchmarks = benchpark.accounting.benchpark_benchmarks()
 
     f = "../taxonomy.yaml"
     with open(f, "r") as stream:
@@ -53,7 +48,7 @@ def main(workspace):
 
     for bmark in benchmarks:
         # call benchpark tags -a bmark workspace
-        cmd = ["../bin/benchpark", "tags", "-a", bmark, workspace]
+        cmd = ["../bin/benchpark", "tags", "-a", bmark]
         try:
             byte_data = subprocess.run(cmd, capture_output=True, check=True)
         except subprocess.CalledProcessError as e:
@@ -85,10 +80,4 @@ def main(workspace):
 
 
 if __name__ == "__main__":
-    try:
-        workspace = sys.argv[1]
-    except IndexError:
-        print("Usage: " + os.path.basename(__file__) + " <workspace>")
-        sys.exit(1)
-
-    main(workspace)
+    main()
