@@ -308,18 +308,15 @@ def benchpark_tags_handler(args):
     # Check if the "ramble" command exists
     ramble_path = shutil.which("ramble")
     if ramble_path is None:
-        print('"ramble" command not found. Generating Ramble...')
-        targs = argparse.Namespace(
-            experiment="experiments/ad/",
-            system="systems/llnl-cluster/",
-            experiments_root="tmp/tags",
-        )
-        benchpark.cmd.setup.command(targs)
+        ramble, setup = benchpark.runtime.RuntimeResources(
+            "tmp"
+        ).ramble_first_time_setup()
+        source_dir = benchpark.paths.benchpark_root
+        ramble(f"repo add --scope=site {source_dir}/repo")
     else:
         print(f'"ramble" command found at: {ramble_path}.')
 
-    ramble_location = "tmp/tags/ramble"
-    ramble_exe = ramble_location + "/bin/ramble"
+    ramble_exe = "tmp/ramble/bin/ramble"
     benchmarks = benchpark_benchmarks()
 
     if args.tag:

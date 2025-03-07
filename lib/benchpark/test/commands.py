@@ -5,13 +5,10 @@
 
 import subprocess
 
+
 def test_list():
     subprocess.run(["benchpark", "list"], check=True)
 
+
 def test_tags():
-    subprocess.run([
-        "benchpark",
-        "tags",
-        "-a",
-        "ad"
-    ], check=True)
+    subprocess.run(["benchpark", "tags", "-a", "ad"], check=True)
