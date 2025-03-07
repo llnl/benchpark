@@ -24,7 +24,7 @@ class Ad(Experiment):
         self.add_experiment_variable("n_ranks", 1, True)
         self.add_experiment_variable("n_threads_per_proc", 1, True)
 
-    def compute_package_section(self, pkg_manager):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
 

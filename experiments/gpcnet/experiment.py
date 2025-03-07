@@ -32,7 +32,7 @@ class Gpcnet(Experiment, StrongScaling):
         elif self.spec.satisfies("workload=network_load_test"):
             self.add_experiment_variable("n_nodes", "10")
 
-    def compute_package_section(self, pkg_manager):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
 

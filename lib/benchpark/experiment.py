@@ -43,7 +43,7 @@ class ExperimentHelper:
     def compute_applications_section(self):
         return {}
 
-    def compute_package_section(self, pkg_manager):
+    def compute_package_section(self):
         return {}
 
     def get_helper_name_prefix(self):
@@ -294,7 +294,7 @@ class Experiment(ExperimentSystemBase, SingleNode):
         else:
             self.package_specs[package_name] = {}
 
-    def compute_package_section(self, pkg_manager):
+    def compute_package_section(self):
         raise NotImplementedError(
             "Each experiment must implement compute_package_section"
         )
@@ -303,18 +303,18 @@ class Experiment(ExperimentSystemBase, SingleNode):
         pkg_manager = self.spec.variants["package_manager"][0]
 
         for cls in self.helpers:
-            cls_package_specs = cls.compute_package_section(pkg_manager)
+            cls_package_specs = cls.compute_package_section()
             if cls_package_specs and "packages" in cls_package_specs:
                 self.package_specs |= cls_package_specs["packages"]
 
-        self.compute_package_section(pkg_manager)
+        self.compute_package_section()
+
+        if self.name not in self.package_specs:
+            raise BenchparkError(
+                f"Package section must be defined for application package {self.name}"
+            )
 
         if pkg_manager == "spack":
-            if self.name not in self.package_specs:
-                raise BenchparkError(
-                    f"Package section must be defined for application package {self.name}"
-                )
-
             spack_variants = list(
                 filter(
                     lambda v: v is not None,

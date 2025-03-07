@@ -136,7 +136,7 @@ class Kripke(
         elif self.spec.satisfies("+rocm"):
             self.add_experiment_variable("arch", "HIP")
 
-    def compute_package_section(self, pkg_manager):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
 

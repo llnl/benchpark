@@ -48,7 +48,7 @@ class Genesis(Experiment, OpenMPExperiment):
             self.add_experiment_variable("omp_num_threads", ["12"])
             self.add_experiment_variable("arch", "OpenMP")
 
-    def compute_package_section(self, pkg_manager):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
 

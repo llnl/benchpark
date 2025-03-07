@@ -86,7 +86,7 @@ class Gromacs(
         for k, v in other_input_variables.items():
             self.add_experiment_variable(k, v)
 
-    def compute_package_section(self, pkg_manager):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
 

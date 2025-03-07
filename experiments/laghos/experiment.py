@@ -59,7 +59,7 @@ class Laghos(
             num_resources = scaled_variables["n_nodes"]
             self.add_experiment_variable(device, num_resources, True)
 
-    def compute_package_section(self, pkg_manager):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
 

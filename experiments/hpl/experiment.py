@@ -98,7 +98,7 @@ class Hpl(
             problem_size = scaled_variables["Ns"]
             self.add_experiment_variable("Ns", problem_size, True)
 
-    def compute_package_section(self, pkg_manager):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
 

@@ -112,7 +112,7 @@ class OsuMicroBenchmarks(
             for pk, pv in num_nodes.items():
                 self.add_experiment_variable("n_gpus", pv, True)
 
-    def compute_package_section(self, pkg_manager):
+    def compute_package_section(self):
         system_specs = {}
         if self.spec.satisfies("+cuda"):
             system_specs["cuda_version"] = "{default_cuda_version}"

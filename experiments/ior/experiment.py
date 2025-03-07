@@ -78,7 +78,7 @@ class Ior(
             "n_ranks", "{sys_cores_per_node} * {n_nodes}", True
         )
 
-    def compute_package_section(self, pkg_manager):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
 

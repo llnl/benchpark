@@ -12,7 +12,7 @@ class CudaExperiment:
     variant("cuda", default=False, description="Build and run with CUDA")
 
     class Helper(ExperimentHelper):
-        def compute_package_section(self, pkg_manager):
+        def compute_package_section(self):
             # get system config options
             # TODO: Get compiler/mpi/package handles directly from system.py
             system_specs = {}

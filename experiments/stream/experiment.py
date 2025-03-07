@@ -41,7 +41,7 @@ class Stream(
         for pk, pv in array_size.items():
             self.add_experiment_variable(pk, pv, True)
 
-    def compute_package_section(self, pkg_manager):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
 
