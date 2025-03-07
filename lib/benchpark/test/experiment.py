@@ -71,6 +71,34 @@ def test_compute_ramble_dict(monkeypatch):
     }
 
 
+def test_compute_ramble_dict_caliper(monkeypatch):
+    spec = benchpark.spec.ExperimentSpec("saxpy caliper=time").concretize()
+    experiment = spec.experiment
+
+    section_names = ["include", "config"]
+    section_wrapper_names = ["modifiers", "applications", "spack", "variables"]
+
+    for name in section_names + section_wrapper_names:
+        monkeypatch.setattr(
+            experiment,
+            (
+                f"compute_{name}_section"
+                if name in section_names
+                else f"compute_{name}_section_wrapper"
+            ),
+            lambda: True,
+        )
+
+    ramble_dict = experiment.compute_ramble_dict()
+
+    assert ramble_dict == {
+        "ramble": {
+            "software" if name == "spack" else name: True
+            for name in section_names + section_wrapper_names
+        }
+    }
+
+
 def test_default_include_section():
     spec = benchpark.spec.ExperimentSpec("saxpy").concretize()
     experiment = benchpark.experiment.Experiment(spec)
