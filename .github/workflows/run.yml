@@ -890,6 +890,15 @@ jobs:
           benchmark_spec: osu-micro-benchmarks+rocm workload=all
           system_name: tioga
           system_spec: llnl-elcapitan cluster=tioga compiler=cce +gtl
+
+      - name: saxpy/rocm olcf-frontier compiler=cce
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: saxpy
+          benchmark_mode: rocm
+          benchmark_spec: saxpy+rocm
+          system_name: olcf-frontier
+          system_spec: olcf-frontier compiler=cce
   pytest:
     runs-on: ubuntu-22.04
     steps:

@@ -14,8 +14,8 @@ class OlcfFrontier(System):
 
     variant(
         "compiler",
-        default="cce@18.0.1",
-        values=("gcc@13", "cce@18.0.1", "amd@6.2.4"),
+        default="cce",
+        values=("gcc", "cce", "amd"),
         description="Which compiler to use",
     )
     variant(
@@ -30,9 +30,9 @@ class OlcfFrontier(System):
         self.rocm_version = Version(self.spec.variants["rocm"][0])
 
         full_versions = {
-            "cce@18.0.1": "18.0.1",
-            "amd@6.2.4": "6.2.4",
-            "gcc@13": "13"
+            "cce": "18.0.1",
+            "amd": "6.2.4",
+            "gcc": "13"
         }
         for key, value in full_versions.items():
             if key == self.spec.variants["compiler"][0]:
