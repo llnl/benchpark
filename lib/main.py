@@ -8,7 +8,6 @@
 import argparse
 import inspect
 import shlex
-import shutil
 import subprocess
 import sys
 import yaml
@@ -305,18 +304,9 @@ def benchpark_tags_handler(args):
     """
     Filter ramble tags by benchpark benchmarks
     """
-    # Check if the "ramble" command exists
-    ramble_path = shutil.which("ramble")
-    if ramble_path is None:
-        ramble, setup = benchpark.runtime.RuntimeResources(
-            "tmp"
-        ).ramble_first_time_setup()
-        source_dir = benchpark.paths.benchpark_root
-        ramble(f"repo add --scope=site {source_dir}/repo")
-    else:
-        print(f'"ramble" command found at: {ramble_path}.')
-
-    ramble_exe = "tmp/ramble/bin/ramble"
+    source_dir = benchpark.paths.benchpark_root
+    ramble_exe = benchpark.paths.benchpark_home / "ramble/bin/ramble"
+    subprocess.run([ramble_exe, "repo", "add", "--scope=site", f"{source_dir}/repo"])
     benchmarks = benchpark_benchmarks()
 
     if args.tag:

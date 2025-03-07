@@ -5,10 +5,17 @@
 
 import subprocess
 
+import benchpark.paths
+
 
 def test_list():
-    subprocess.run(["benchpark", "list"], check=True)
+    subprocess.run(
+        [benchpark.paths.benchpark_root / "bin/benchpark", "list"], check=True
+    )
 
 
 def test_tags():
-    subprocess.run(["benchpark", "tags", "-a", "ad"], check=True)
+    subprocess.run(
+        [benchpark.paths.benchpark_root / "bin/benchpark", "tags", "-a", "ad"],
+        check=True,
+    )

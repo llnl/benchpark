@@ -2,8 +2,6 @@
 
 import pandas as pd
 import yaml
-import os
-import shutil
 import sys
 import subprocess
 
@@ -71,10 +69,6 @@ def main():
                     print("appending", t, "at key", k)
                     tags_taggroups[bmark][k].append(t)
         main[bmark] = tags_taggroups[bmark]
-
-    check_dir = "tmp"
-    if os.path.isdir(check_dir):
-        shutil.rmtree(check_dir)
 
     df = pd.DataFrame(main)
     df.to_csv("benchmark-list.csv")
