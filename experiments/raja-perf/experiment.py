@@ -72,9 +72,8 @@ class RajaPerf(
         if self.spec.satisfies("+rocm"):
             system_specs["rocm_arch"] = "{rocm_arch}"
 
-        if pkg_manager == "spack":
-            self.add_spack_spec(system_specs["mpi"])
+        self.add_package_spec(system_specs["mpi"])
 
-            self.add_spack_spec(
-                self.name, [f"raja-perf@{app_version}", system_specs["compiler"]]
-            )
+        self.add_package_spec(
+            self.name, [f"raja-perf@{app_version}", system_specs["compiler"]]
+        )

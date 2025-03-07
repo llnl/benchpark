@@ -285,7 +285,7 @@ class Experiment(ExperimentSystemBase, SingleNode):
             }
         }
 
-    def add_spack_spec(self, package_name, spec=None):
+    def add_package_spec(self, package_name, spec=None):
         if spec:
             self.package_specs[package_name] = {
                 "pkg_spec": spec[0],

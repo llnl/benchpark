@@ -89,12 +89,11 @@ class Hpcg(
         system_specs["compiler"] = "default-compiler"
         system_specs["mpi"] = "default-mpi"
 
-        if pkg_manager == "spack":
-            # set package spack specs
-            # empty package_specs value implies external package
-            self.add_spack_spec(system_specs["mpi"])
-            # self.add_spack_spec(system_specs["blas"])
+        # set package spack specs
+        # empty package_specs value implies external package
+        self.add_package_spec(system_specs["mpi"])
+        # self.add_package_spec(system_specs["blas"])
 
-            self.add_spack_spec(
-                self.name, [f"hpcg@{app_version}", system_specs["compiler"]]
-            )
+        self.add_package_spec(
+            self.name, [f"hpcg@{app_version}", system_specs["compiler"]]
+        )

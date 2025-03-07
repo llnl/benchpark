@@ -151,11 +151,10 @@ class Kripke(
         if self.spec.satisfies("+rocm"):
             system_specs["rocm_arch"] = "{rocm_arch}"
 
-        if pkg_manager == "spack":
-            # set package spack specs
-            # empty package_specs value implies external package
-            self.add_spack_spec(system_specs["mpi"])
+        # set package spack specs
+        # empty package_specs value implies external package
+        self.add_package_spec(system_specs["mpi"])
 
-            self.add_spack_spec(
-                self.name, [f"kripke@{app_version} +mpi", system_specs["compiler"]]
-            )
+        self.add_package_spec(
+            self.name, [f"kripke@{app_version} +mpi", system_specs["compiler"]]
+        )

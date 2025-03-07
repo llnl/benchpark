@@ -68,9 +68,8 @@ class Babelstream(
         if self.spec.satisfies("+rocm"):
             system_specs["rocm_arch"] = "{rocm_arch}"
 
-        if pkg_manager == "spack":
-            # set package spack specs
-            self.add_spack_spec(system_specs["mpi"])
-            self.add_spack_spec(
-                self.name, [f"babelstream@{app_version}", system_specs["compiler"]]
-            )
+        # set package spack specs
+        self.add_package_spec(system_specs["mpi"])
+        self.add_package_spec(
+            self.name, [f"babelstream@{app_version}", system_specs["compiler"]]
+        )

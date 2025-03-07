@@ -53,11 +53,10 @@ class MdTest(
         system_specs["compiler"] = "default-compiler"
         system_specs["mpi"] = "default-mpi"
 
-        if pkg_manager == "spack":
-            # set package spack specs
-            self.add_spack_spec(system_specs["mpi"])
+        # set package spack specs
+        self.add_package_spec(system_specs["mpi"])
 
-            self.add_spack_spec("ior", ["ior@3.3.0", system_specs["compiler"]])
-            self.add_spack_spec(
-                self.name, [f"mdtest@{app_version}", system_specs["compiler"]]
-            )
+        self.add_package_spec("ior", ["ior@3.3.0", system_specs["compiler"]])
+        self.add_package_spec(
+            self.name, [f"mdtest@{app_version}", system_specs["compiler"]]
+        )

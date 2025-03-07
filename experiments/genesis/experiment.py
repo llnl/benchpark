@@ -57,15 +57,14 @@ class Genesis(Experiment, OpenMPExperiment):
         system_specs["mpi"] = "default-mpi"
         system_specs["lapack"] = "lapack"
 
-        if pkg_manager == "spack":
-            # if package_spec left empty spack will use external
-            self.add_spack_spec(system_specs["mpi"])
-            self.add_spack_spec(system_specs["lapack"])
+        # if package_spec left empty spack will use external
+        self.add_package_spec(system_specs["mpi"])
+        self.add_package_spec(system_specs["lapack"])
 
-            self.add_spack_spec(
-                self.name, [f"genesis@{app_version} +mpi", system_specs["compiler"]]
-            )
-            self.add_spack_spec(
-                system_specs["lapack"],
-                [system_specs["lapack"], system_specs["compiler"]],
-            )
+        self.add_package_spec(
+            self.name, [f"genesis@{app_version} +mpi", system_specs["compiler"]]
+        )
+        self.add_package_spec(
+            system_specs["lapack"],
+            [system_specs["lapack"], system_specs["compiler"]],
+        )

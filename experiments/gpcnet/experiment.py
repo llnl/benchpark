@@ -42,10 +42,9 @@ class Gpcnet(Experiment, StrongScaling):
         system_specs["compiler"] = "default-compiler"
         system_specs["mpi"] = "default-mpi"
 
-        if pkg_manager == "spack":
-            # empty package_specs value implies external package
-            self.add_spack_spec(system_specs["mpi"])
+        # empty package_specs value implies external package
+        self.add_package_spec(system_specs["mpi"])
 
-            self.add_spack_spec(
-                self.name, [f"gpcnet@{app_version} +mpi", system_specs["compiler"]]
-            )
+        self.add_package_spec(
+            self.name, [f"gpcnet@{app_version} +mpi", system_specs["compiler"]]
+        )
