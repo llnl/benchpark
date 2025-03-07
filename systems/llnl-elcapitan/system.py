@@ -6,24 +6,33 @@
 import pathlib
 from packaging.version import Version
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.system import System
-
-id_to_resources = {
-    "tioga": {
-        "rocm_arch": "gfx90a",
-        "sys_cores_per_node": 64,
-        "sys_gpus_per_node": 8,
-    },
-    "elcapitan": {
-        "rocm_arch": "gfx940",
-        "sys_cores_per_node": 128,
-        "sys_gpus_per_node": 4,
-    },
-}
+from benchpark.paths import hardware_descriptions
 
 
 class LlnlElcapitan(System):
+
+    maintainers("pearce8", "nhanford", "rfhaque")
+
+    id_to_resources = {
+        "tioga": {
+            "rocm_arch": "gfx90a",
+            "sys_cores_per_node": 64,
+            "sys_gpus_per_node": 8,
+            "system_site": "llnl",
+            "hardware_key": str(hardware_descriptions)
+            + "/HPECray-zen3-MI250X-Slingshot/hardware_description.yaml",
+        },
+        "elcapitan": {
+            "rocm_arch": "gfx940",
+            "sys_cores_per_node": 128,
+            "sys_gpus_per_node": 4,
+            "system_site": "llnl",
+            "hardware_key": str(hardware_descriptions)
+            + "/HPECray-zen4-MI300A-Slingshot/hardware_description.yaml",
+        },
+    }
 
     variant(
         "cluster",
@@ -94,7 +103,7 @@ class LlnlElcapitan(System):
         # TODO: Replace this with lookups into the working set
 
         self.scheduler = "flux"
-        attrs = id_to_resources.get(self.spec.variants["cluster"][0])
+        attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
 
@@ -185,6 +194,7 @@ packages: {}
 """
 
             use_gtl = f"""\
+        gtl_flags: $MV2_COMM_WORLD_LOCAL_RANK
         gtl_cutoff_size: 4096
         fi_cxi_ats: 0
         gtl_lib_path: /opt/cray/pe/mpich/{self.mpi_version}/gtl/lib

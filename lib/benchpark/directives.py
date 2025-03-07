@@ -104,6 +104,20 @@ def _make_when_spec(
     return benchpark.spec.Spec(value)
 
 
+@benchpark_directive("maintainers")
+def maintainers(*names: str):
+    """Define the maintainers of the system/experiment.
+
+    Arguments:
+        names: GitHub usernames for the maintainers
+    """
+
+    def _execute_maintainers(pkg):
+        pkg.maintainers = names
+
+    return _execute_maintainers
+
+
 @benchpark_directive("variants")
 def variant(
     name: str,

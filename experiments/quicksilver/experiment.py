@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.scaling import StrongScaling
@@ -27,6 +27,8 @@ class Quicksilver(
         default="master",
         description="app version",
     )
+
+    maintainers("rfhaque")
 
     def compute_applications_section(self):
         self.add_experiment_variable("n_threads_per_proc", "1")
