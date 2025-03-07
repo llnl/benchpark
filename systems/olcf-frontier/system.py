@@ -29,11 +29,7 @@ class OlcfFrontier(System):
 
         self.rocm_version = Version(self.spec.variants["rocm"][0])
 
-        full_versions = {
-            "cce": "18.0.1",
-            "amd": "6.2.4",
-            "gcc": "13"
-        }
+        full_versions = {"cce": "18.0.1", "amd": "6.2.4", "gcc": "13"}
         for key, value in full_versions.items():
             if key == self.spec.variants["compiler"][0]:
                 self.compiler_version = Version(value)
