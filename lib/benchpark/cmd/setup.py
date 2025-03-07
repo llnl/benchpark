@@ -118,7 +118,7 @@ def command(args):
     symlink_tree(configs_src_dir, ramble_configs_dir, include_fn)
     symlink_tree(experiment_src_dir, ramble_configs_dir, include_fn)
     symlink_tree(
-        source_dir / "legacy" / "systems" / "common",
+        source_dir / "systems" / "common",
         ramble_spack_experiment_configs_dir,
         include_fn,
     )

@@ -902,4 +902,4 @@ jobs:
 
       - name: Run
         run: |
-          ./bin/benchpark unit-test
+          python -m pytest
