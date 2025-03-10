@@ -125,8 +125,8 @@ def command(args):
 
     template_name = "execute_experiment.tpl"
     experiment_template_options = [
-        configs_src_dir + "/" + template_name,
-        experiment_src_dir + "/" + template_name,
+        configs_src_dir / template_name,
+        experiment_src_dir / template_name,
         source_dir / "common-resources" / template_name,
     ]
     for choice_template in experiment_template_options:
