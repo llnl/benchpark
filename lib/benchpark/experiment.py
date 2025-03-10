@@ -289,7 +289,6 @@ class Experiment(ExperimentSystemBase, SingleNode):
         if spec:
             self.package_specs[package_name] = {
                 "pkg_spec": spec[0],
-                # "compiler": spec[1],
             }
         else:
             self.package_specs[package_name] = {}
