@@ -6,9 +6,9 @@
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
+from benchpark.caliper import Caliper
 
-
-class Qws(Experiment, OpenMPExperiment):
+class Qws(Experiment, OpenMPExperiment, Caliper):
 
     variant(
         "workload",
