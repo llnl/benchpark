@@ -142,7 +142,8 @@ def command(args):
     initializer_script = experiments_root / "setup.sh"
 
     per_workspace_setup = RuntimeResources(
-        pathlib.Path(os.path.abspath(benchpark.paths.benchpark_home))
+        pathlib.Path(os.path.abspath(benchpark.paths.benchpark_home)),
+        source_dir
     )
 
     # Parse experiment YAML for package_manager
@@ -172,11 +173,6 @@ export SPACK_DISABLE_LOCAL_CONFIG=1
 """
 
     ramble, first_time_ramble = per_workspace_setup.ramble_first_time_setup()
-    if first_time_ramble:
-        ramble(f"repo add --scope=site {source_dir}/repo")
-        ramble('config --scope=site add "config:disable_progress_bar:true"')
-        ramble(f"repo add -t modifiers --scope=site {source_dir}/modifiers")
-        ramble("config --scope=site add \"config:spack:global:args:'-d'\"")
 
     if not initializer_script.exists():
         with open(initializer_script, "w") as f:

@@ -68,9 +68,10 @@ class Command:
 
 
 class RuntimeResources:
-    def __init__(self, dest):
+    def __init__(self, dest, source_dir):
         self.root = benchpark.paths.benchpark_root
         self.dest = pathlib.Path(dest)
+        self.source_dir = source_dir
 
         checkout_versions_location = self.root / "checkout-versions.yaml"
         with open(checkout_versions_location, "r") as yaml_file:
@@ -119,19 +120,20 @@ class RuntimeResources:
         debug_print(f"Done cloning Spack ({self.spack_location})")
 
     def _ramble(self):
-        first_time = False
+        ramble = Command(self.ramble_location / "bin" / "ramble", env={})
         if not self.ramble_location.exists():
-            first_time = True
             self._install_ramble()
-        return Command(self.ramble_location / "bin" / "ramble", env={}), first_time
+            ramble(f"repo add --scope=site {self.source_dir}/repo")
+            ramble('config --scope=site add "config:disable_progress_bar:true"')
+            ramble(f"repo add -t modifiers --scope=site {self.source_dir}/modifiers")
+            ramble("config --scope=site add \"config:spack:global:args:'-d'\"")
+        return ramble
 
     def _spack(self):
         env = {"SPACK_DISABLE_LOCAL_CONFIG": "1"}
         spack = Command(self.spack_location / "bin" / "spack", env)
         spack_cache_location = self.spack_location / "misc-cache"
-        first_time = False
         if not self.spack_location.exists():
-            first_time = True
             self._install_spack()
             spack(
                 "config",
@@ -139,11 +141,12 @@ class RuntimeResources:
                 "add",
                 f"config:misc_cache:{spack_cache_location}",
             )
+            spack("repo", "add", "--scope=site", f"{self.source_dir}/repo")
         else:
             with working_dir(self.spack_location):
                 run_command("git fetch --all")
                 run_command(f"git checkout {self.spack_commit}")
-        return spack, first_time
+        return spack
 
     def spack_first_time_setup(self):
         return self._spack()
