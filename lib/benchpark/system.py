@@ -18,7 +18,9 @@ from typing import Dict, Tuple
 import benchpark.spec
 import benchpark.variant
 
-bootstrapper = RuntimeResources(benchpark.paths.benchpark_home)  # noqa
+bootstrapper = RuntimeResources(
+    benchpark.paths.benchpark_home, benchpark.paths.benchpark_root
+)  # noqa
 bootstrapper.bootstrap()  # noqa
 
 import ramble.config as cfg  # noqa

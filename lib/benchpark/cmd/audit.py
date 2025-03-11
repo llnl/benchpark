@@ -14,7 +14,9 @@ import benchpark.repo
 import benchpark.system as system
 from benchpark.runtime import RuntimeResources
 
-bootstrapper = RuntimeResources(benchpark.paths.benchpark_home)  # noqa
+bootstrapper = RuntimeResources(
+    benchpark.paths.benchpark_home, benchpark.paths.benchpark_root
+)  # noqa
 bootstrapper.bootstrap()  # noqa
 
 import ramble.config as cfg  # noqa
