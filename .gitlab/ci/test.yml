@@ -75,10 +75,8 @@ test_run:
     - |
         if [ "$HOST" == "tioga" ]; then
             ./bin/benchpark system init --dest=tioga-system ${ARCHCONFIG} ~gtl
-            system_id=$(./bin/benchpark system id ./tioga-system)
         else
             ./bin/benchpark system init --dest=$HOST-system ${ARCHCONFIG} cluster=$HOST
-            system_id=$(./bin/benchpark system id ./$HOST-system)
         fi
     # Initialize Experiment
     - ./bin/benchpark experiment init --dest=${BENCHMARK}-benchmark ${BENCHMARK}+${VARIANT}
@@ -87,7 +85,7 @@ test_run:
     # Setup Ramble & Spack
     - . workspace/setup.sh
     # Setup Workspace
-    - cd ./workspace/${BENCHMARK}-benchmark/${system_id}/workspace/
+    - cd ./workspace/${BENCHMARK}-benchmark/$HOST-system/workspace/
     - ramble --workspace-dir . --disable-progress-bar --disable-logger workspace setup
     # Run Experiments
     - ramble --workspace-dir . --disable-progress-bar --disable-logger
@@ -96,4 +94,4 @@ test_run:
     - ramble --workspace-dir . --disable-progress-bar workspace analyze --format json yaml text
     # Check Experiment Exit Codes
     - cd -
-    - python ./.gitlab/ci/bin/exit-codes ./workspace/${BENCHMARK}-benchmark/${system_id}/workspace/results.latest.json
+    - python ./.gitlab/ci/bin/exit-codes ./workspace/${BENCHMARK}-benchmark/${HOST}-system/workspace/results.latest.json
