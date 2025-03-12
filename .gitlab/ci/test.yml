@@ -80,7 +80,7 @@ test_run:
         if [ "$HOST" == "tioga" ]; then
             EXTRA_ARGS="~gtl"
         fi
-        ./bin/benchpark system init --dest=$HOST-system ${ARCHCONFIG} cluster=$HOST $EXTRA_ARGS
+        ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} cluster=$HOST $EXTRA_ARGS
     # Initialize Experiment
     - ./bin/benchpark experiment init --dest=${BENCHMARK}-benchmark ${BENCHMARK}+${VARIANT}
     # Build Workspace
@@ -88,7 +88,7 @@ test_run:
     # Setup Ramble & Spack
     - . workspace/setup.sh
     # Setup Workspace
-    - cd ./workspace/${BENCHMARK}-benchmark/$HOST-system/workspace/
+    - cd ./workspace/${BENCHMARK}-benchmark/${HOST}-system/workspace/
     - ramble --workspace-dir . --disable-progress-bar --disable-logger workspace setup
     # Run Experiments
     - ramble --workspace-dir . --disable-progress-bar --disable-logger
