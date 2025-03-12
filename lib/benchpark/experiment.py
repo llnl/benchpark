@@ -47,6 +47,9 @@ class ExperimentHelper:
     def get_spack_variants(self):
         return None
 
+    def compute_variables_section(self):
+        return {}
+
 
 class SingleNode:
     variant(
@@ -88,16 +91,12 @@ class Experiment(ExperimentSystemBase, SingleNode):
         Dict[str, benchpark.variant.Variant],
     ]
 
-    variant(
-        "extra_spack_specs",
-        default=" ",
-        description="additional spack specs",
-    )
-
     def __init__(self, spec):
         self.spec: "benchpark.spec.ConcreteExperimentSpec" = spec
         super().__init__()
         self.helpers = []
+        self._spack_name = None
+        self._ramble_name = None
 
         for cls in self.__class__.mro()[1:]:
             if cls is not Experiment and cls is not object:
@@ -113,6 +112,24 @@ class Experiment(ExperimentSystemBase, SingleNode):
             raise BenchparkError(f"No workload variant defined for package {self.name}")
 
         self.package_specs = {}
+
+    @property
+    def spack_name(self):
+        """The name of the spack package that is used to build this benchmark"""
+        return self._spack_name
+
+    @spack_name.setter
+    def spack_name(self, value: str):
+        self._spack_name = value
+
+    @property
+    def ramble_name(self):
+        """The name of the ramble application associated with this benchmark"""
+        return self._ramble_name
+
+    @ramble_name.setter
+    def ramble_name(self, value: str):
+        self._ramble_name = value
 
     def compute_include_section(self):
         # include the config directory
@@ -239,18 +256,26 @@ class Experiment(ExperimentSystemBase, SingleNode):
                 (cls.get_spack_variants() for cls in self.helpers),
             )
         )
-        self.package_specs[self.name]["pkg_spec"] += " ".join(
-            spack_variants + list(self.spec.variants["extra_spack_specs"])
-        ).strip()
+        self.package_specs[self.name]["pkg_spec"] += " ".join(spack_variants).strip()
 
         return {
             "packages": {k: v for k, v in self.package_specs.items() if v},
             "environments": {self.name: {"packages": list(self.package_specs.keys())}},
         }
 
+    def compute_variables_section(self):
+        return {}
+
+    def compute_variables_section_wrapper(self):
+        # For each helper class compute any additional variables
+        additional_vars = {}
+        for cls in self.helpers:
+            additional_vars.update(cls.compute_variables_section())
+        return additional_vars
+
     def compute_ramble_dict(self):
         # This can be overridden by any subclass that needs more flexibility
-        return {
+        ramble_dict = {
             "ramble": {
                 "include": self.compute_include_section(),
                 "config": self.compute_config_section(),
@@ -259,6 +284,12 @@ class Experiment(ExperimentSystemBase, SingleNode):
                 "software": self.compute_spack_section_wrapper(),
             }
         }
+        # Add any variables from helper classes if necessary
+        additional_vars = self.compute_variables_section_wrapper()
+        if additional_vars:
+            ramble_dict["ramble"].update({"variables": additional_vars})
+
+        return ramble_dict
 
     def write_ramble_dict(self, filepath):
         ramble_dict = self.compute_ramble_dict()

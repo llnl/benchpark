@@ -29,4 +29,6 @@ system_definition:
       runtime: cuda
       mpi: cray-mpich
   top500-system-instances:
-    - Venado (LANL) <https://www.top500.org/system/180246>
+    Venado:
+      benchpark_system: lanl-venado
+      top500: <https://www.top500.org/system/180246>

@@ -15,7 +15,9 @@ jobs:
 
       - name: Build Saxpy Workspace
         run: |
-          ./bin/benchpark setup saxpy/openmp nosite-x86_64 workspace/
+          ./bin/benchpark experiment init --dest=saxpy/openmp saxpy+openmp
+          ./bin/benchpark system init --dest=generic-x86 generic-x86
+          ./bin/benchpark setup saxpy/openmp generic-x86 workspace/
 
       - name: Setup Ramble & Spack
         run: |
@@ -29,7 +31,7 @@ jobs:
           echo "PATH=$PATH" >> "$GITHUB_ENV"
 
       - name: Setup Saxpy Workspace
-        working-directory: ./workspace/saxpy/openmp/nosite-x86_64/workspace/
+        working-directory: ./workspace/saxpy/openmp/generic-x86/workspace/
         run: |
           ramble \
             --workspace-dir . \
@@ -39,7 +41,7 @@ jobs:
             workspace setup
 
       - name: Run Saxpy Experiments
-        working-directory: ./workspace/saxpy/openmp/nosite-x86_64/workspace/
+        working-directory: ./workspace/saxpy/openmp/generic-x86/workspace/
         run: |
           ramble \
             --workspace-dir . \
@@ -50,7 +52,7 @@ jobs:
             --where '{n_nodes} == 1'
 
       - name: Analyze Saxpy Results
-        working-directory: ./workspace/saxpy/openmp/nosite-x86_64/workspace/
+        working-directory: ./workspace/saxpy/openmp/generic-x86/workspace/
         run: |
           ramble \
             --workspace-dir . \
@@ -59,7 +61,7 @@ jobs:
             workspace analyze
 
       - name: Archive Experiment Workspace
-        working-directory: ./workspace/saxpy/openmp/nosite-x86_64/workspace/
+        working-directory: ./workspace/saxpy/openmp/generic-x86/workspace/
         if: always()
         run: |
           ramble \
@@ -70,10 +72,10 @@ jobs:
 
       - name: Upload Workspace Archive as CI Artifact
         if: always()
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1
         with:
           name: workspace-archive
-          path: './workspace/saxpy/openmp/nosite-x86_64/workspace/archive/**'
+          path: './workspace/saxpy/openmp/generic-x86/workspace/archive/**'
 
       - name: Upload Binaries to CI Cache
         if: github.ref == 'refs/heads/develop'
@@ -102,159 +104,149 @@ jobs:
 
       - name: Dry run amg2023/openmp on Dane with allocation modifier
         run: |
-          ./bin/benchpark setup amg2023/openmp LLNL-Dane-DELL-sapphirerapids-OmniPath workspace/
+          ./bin/benchpark experiment init --dest=amg2023/openmp amg2023+openmp
+          ./bin/benchpark system init --dest=dane llnl-cluster cluster=dane
+          ./bin/benchpark setup amg2023/openmp dane workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/amg2023/openmp/LLNL-Dane-DELL-sapphirerapids-OmniPath/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
-      - name: Dry run dynamic amg2023-openmp on Dane with allocation modifier
-        run: |
-          ./bin/benchpark experiment init --dest=amg2023-openmp amg2023+openmp
-          ./bin/benchpark setup ./amg2023-openmp LLNL-Dane-DELL-sapphirerapids-OmniPath workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/amg2023-openmp/LLNL-Dane-DELL-sapphirerapids-OmniPath/workspace \
+            --workspace-dir workspace/amg2023/openmp/dane/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
 
       - name: Dry run amg2023/cuda on Sierra with allocation modifier
         run: |
-          ./bin/benchpark setup amg2023/cuda LLNL-Sierra-IBM-power9-V100-Infiniband workspace/
+          ./bin/benchpark experiment init --dest=amg2023/cuda amg2023+cuda
+          ./bin/benchpark system init --dest=llnl-sierra llnl-sierra
+          ./bin/benchpark setup amg2023/cuda llnl-sierra workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/amg2023/cuda/LLNL-Sierra-IBM-power9-V100-Infiniband/workspace \
+            --workspace-dir workspace/amg2023/cuda/llnl-sierra/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run amg2023/cuda on Pascal with allocation modifier
+      - name: Dry run dynamic kripke/openmp on generic-x86 with allocation modifier
         run: |
-          ./bin/benchpark setup amg2023/cuda LLNL-Pascal-Penguin-broadwell-P100-OmniPath workspace/
+          ./bin/benchpark experiment init --dest=kripke/openmp kripke+openmp caliper=mpi,time
+          ./bin/benchpark system init --dest=generic-x86 generic-x86
+          ./bin/benchpark setup ./kripke/openmp generic-x86 workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/amg2023/cuda/LLNL-Pascal-Penguin-broadwell-P100-OmniPath/workspace \
+            --workspace-dir workspace/kripke/openmp/generic-x86/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic kripke-openmp on nosite-x86_64 with allocation modifier
+      - name: Dry run dynamic kripke/rocm on Tioga with allocation modifier
         run: |
-          ./bin/benchpark experiment init --dest=kripke-openmp kripke+openmp caliper=mpi,time
-          ./bin/benchpark setup ./kripke-openmp nosite-x86_64 workspace/
+          ./bin/benchpark experiment init --dest=kripke/rocm kripke+rocm
+          ./bin/benchpark system init --dest=tioga llnl-elcapitan cluster=tioga
+          ./bin/benchpark setup ./kripke/rocm tioga workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/kripke-openmp/nosite-x86_64/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
-      - name: Dry run dynamic kripke-rocm on LLNL-Tioga-HPECray-zen3-MI250X-Slingshot with allocation modifier
-        run: |
-          ./bin/benchpark experiment init --dest=kripke-rocm kripke+rocm
-          ./bin/benchpark setup ./kripke-openmp LLNL-Tioga-HPECray-zen3-MI250X-Slingshot workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/kripke-openmp/LLNL-Tioga-HPECray-zen3-MI250X-Slingshot/workspace \
+            --workspace-dir workspace/kripke/rocm/tioga/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
 
       - name: Dry run kripke/cuda on Sierra with allocation modifier
         run: |
-          ./bin/benchpark setup kripke/cuda LLNL-Sierra-IBM-power9-V100-Infiniband workspace/
+          ./bin/benchpark experiment init --dest=kripke/cuda kripke+cuda
+          ./bin/benchpark setup kripke/cuda llnl-sierra workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/kripke/cuda/LLNL-Sierra-IBM-power9-V100-Infiniband/workspace \
+            --workspace-dir workspace/kripke/cuda/llnl-sierra/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
 
       - name: Dry run kripke/rocm on dynamic Tioga with allocation modifier
         run: |
-          ./bin/benchpark system init --dest=tioga-system llnl-elcapitan rocm=5.5.1 compiler=cce ~gtl
-          ./bin/benchpark setup kripke/rocm ./tioga-system workspace/
-          system_id=$(./bin/benchpark system id ./tioga-system)
+          ./bin/benchpark system init --dest=tioga/rocm5.5.1-cce llnl-elcapitan rocm=5.5.1 compiler=cce ~gtl
+          ./bin/benchpark setup kripke/rocm ./tioga/rocm5.5.1-cce workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir "workspace/kripke/rocm/$system_id/workspace" \
+            --workspace-dir "workspace/kripke/rocm/tioga/rocm5.5.1-cce/workspace" \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
 
       - name: Dry run dynamic saxpy/rocm with static Tioga
         run: |
-          ./bin/benchpark experiment init --dest=saxpy-rocm saxpy+rocm
-          ./bin/benchpark setup ./saxpy-rocm LLNL-Tioga-HPECray-zen3-MI250X-Slingshot workspace/
+          ./bin/benchpark experiment init --dest=saxpy/rocm saxpy+rocm
+          ./bin/benchpark setup ./saxpy/rocm tioga workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/saxpy-rocm/LLNL-Tioga-HPECray-zen3-MI250X-Slingshot/workspace \
+            --workspace-dir workspace/saxpy/rocm/tioga/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
 
       - name: Dry run dynamic lammps/openmp on static Ruby
         run: |
-          ./bin/benchpark experiment init --dest=lammps-openmp lammps+openmp
-          ./bin/benchpark setup ./lammps-openmp LLNL-Ruby-icelake-OmniPath workspace/
+          ./bin/benchpark experiment init --dest=lammps/openmp lammps+openmp
+          ./bin/benchpark system init --dest=ruby llnl-cluster cluster=ruby
+          ./bin/benchpark setup ./lammps/openmp ruby workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/lammps-openmp/LLNL-Ruby-icelake-OmniPath/workspace \
+            --workspace-dir workspace/lammps/openmp/ruby/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
 
       - name: Dry run dynamic lammps/rocm on static Tioga 
         run: |
-          ./bin/benchpark experiment init --dest=lammps-rocm lammps+rocm
-          ./bin/benchpark setup ./lammps-rocm LLNL-Tioga-HPECray-zen3-MI250X-Slingshot workspace/
+          ./bin/benchpark experiment init --dest=lammps/rocm lammps+rocm
+          ./bin/benchpark setup ./lammps/rocm tioga workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/lammps-rocm/LLNL-Tioga-HPECray-zen3-MI250X-Slingshot/workspace \
+            --workspace-dir workspace/lammps/rocm/tioga/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run dynamic quicksilver-openmp on nosite-x86_64 with allocation modifier
+      - name: Dry run dynamic quicksilver/openmp on generic-x86 with allocation modifier
         run: |
-          ./bin/benchpark experiment init --dest=quicksilver-openmp quicksilver+openmp +weak~single_node
-          ./bin/benchpark setup ./quicksilver-openmp nosite-x86_64 workspace/
+          ./bin/benchpark experiment init --dest=quicksilver/openmp quicksilver+openmp +weak~single_node
+          ./bin/benchpark setup ./quicksilver/openmp generic-x86 workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/quicksilver-openmp/nosite-x86_64/workspace \
+            --workspace-dir workspace/quicksilver/openmp/generic-x86/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
       
-      - name: Dry run salmon/openmp with allocation modifier on Fugaku
-        run: |
-          ./bin/benchpark setup salmon/openmp RCCS-Fugaku-Fujitsu-A64FX-TofuD workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/salmon/openmp/RCCS-Fugaku-Fujitsu-A64FX-TofuD/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
+      # - name: Dry run salmon/openmp with allocation modifier on Fugaku
+      #   run: |
+      #     ./bin/benchpark experiment init --dest=salmon/openmp salmon+openmp
+      #     ./bin/benchpark system init --dest=riken-fugaku riken-fugaku
+      #     ./bin/benchpark setup salmon/openmp riken-fugaku workspace/
+      #     . workspace/setup.sh
+      #     ramble \
+      #       --workspace-dir workspace/salmon/openmp/riken-fugaku/workspace \
+      #       --disable-progress-bar \
+      #       --disable-logger \
+      #       workspace setup --dry-run
 
       - name: Dry run qws/openmp with allocation modifier on Fugaku
         run: |
-          ./bin/benchpark setup qws/openmp RCCS-Fugaku-Fujitsu-A64FX-TofuD workspace/
+          ./bin/benchpark experiment init --dest=qws/openmp qws+openmp
+          ./bin/benchpark system init --dest=riken-fugaku riken-fugaku
+          ./bin/benchpark setup qws/openmp riken-fugaku workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/qws/openmp/RCCS-Fugaku-Fujitsu-A64FX-TofuD/workspace \
+            --workspace-dir workspace/qws/openmp/riken-fugaku/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
             
-      - name: Dry run qws/openmp with allocation modifier on nosite-x86_64
+      - name: Dry run qws/openmp with allocation modifier on generic-x86
         run: |
-          ./bin/benchpark setup qws/openmp nosite-x86_64 workspace/
+          ./bin/benchpark setup qws/openmp generic-x86 workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/qws/openmp/nosite-x86_64/workspace \
+            --workspace-dir workspace/qws/openmp/generic-x86/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
@@ -359,6 +351,24 @@ jobs:
           system_name: fugaku
           system_spec: riken-fugaku
 
+      - name: saxpy/openmp juwels jsc-juwels
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: saxpy
+          benchmark_mode: openmp
+          benchmark_spec: saxpy+openmp
+          system_name: juwels
+          system_spec: jsc-juwels  
+
+      - name: saxpy/openmp eiger cscs-eiger
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: saxpy
+          benchmark_mode: openmp
+          benchmark_spec: saxpy+openmp
+          system_name: eiger
+          system_spec: cscs-eiger
+
       - name: saxpy/openmp daint cscs-daint
         uses: ./.github/actions/dynamic-dry-run
         with:
@@ -446,15 +456,6 @@ jobs:
           benchmark_name: phloem
           benchmark_mode: mpi
           benchmark_spec: phloem
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby compiler=intel
-
-      - name: osu-micro-benchmarks/mpi ruby llnl-cluster cluster=ruby compiler=intel
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: osu-micro-benchmarks
-          benchmark_mode: mpi
-          benchmark_spec: osu-micro-benchmarks workload=all
           system_name: ruby
           system_spec: llnl-cluster cluster=ruby compiler=intel
 
@@ -710,6 +711,33 @@ jobs:
           system_name: tioga
           system_spec: llnl-elcapitan rocm=5.5.1 compiler=cce +gtl
 
+      - name: gpcNet/mpi ruby llnl-cluster cluster=ruby compiler=intel
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: gpcnet
+          benchmark_mode: mpi
+          benchmark_spec: gpcnet
+          system_name: ruby
+          system_spec: llnl-cluster cluster=ruby compiler=intel
+
+      - name: gpcNet/mpi lassen llnl-sierra cuda=11-8-0 compiler=clang-ibm
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: gpcnet
+          benchmark_mode: mpi
+          benchmark_spec: gpcnet
+          system_name: lassen
+          system_spec: llnl-sierra cuda=11-8-0 compiler=clang-ibm
+
+      - name: gpcNet/mpi tioga llnl-elcapitan rocm=5.5.1 compiler=cce +gtl
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: gpcnet
+          benchmark_mode: mpi
+          benchmark_spec: gpcnet
+          system_name: tioga
+          system_spec: llnl-elcapitan rocm=5.5.1 compiler=cce +gtl
+
       - name: hpcg/openmp caliper=mpi,time tioga llnl-elcapitan compiler=cce
         uses: ./.github/actions/dynamic-dry-run
         with:
@@ -826,3 +854,52 @@ jobs:
           benchmark_spec: ad
           system_name: tioga
           system_spec: llnl-elcapitan rocm=6.2.4 compiler=rocmcc
+
+      - name: md-test/mpi llnl-elcapitan
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: md-test
+          benchmark_mode: mpi
+          benchmark_spec: md-test
+          system_name: tioga
+          system_spec: llnl-elcapitan
+
+      - name: md-test/mpi ruby llnl-cluster
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: md-test
+          benchmark_mode: mpi
+          benchmark_spec: md-test
+          system_name: ruby
+          system_spec: llnl-cluster cluster=ruby
+          
+      - name: osu-micro-benchmarks/mpi ruby llnl-cluster cluster=ruby compiler=intel
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: osu-micro-benchmarks
+          benchmark_mode: mpi
+          benchmark_spec: osu-micro-benchmarks workload=all
+          system_name: ruby
+          system_spec: llnl-cluster cluster=ruby compiler=intel
+
+      - name: osu-micro-benchmarks/rocm tioga llnl-elcapitan cluster=tioga compiler=cce +gtl
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: osu-micro-benchmarks
+          benchmark_mode: rocm
+          benchmark_spec: osu-micro-benchmarks+rocm workload=all
+          system_name: tioga
+          system_spec: llnl-elcapitan cluster=tioga compiler=cce +gtl
+  pytest:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Benchpark
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Add needed Python libs
+        run: |
+          pip install -r ./requirements.txt
+
+      - name: Run
+        run: |
+          python -m pytest

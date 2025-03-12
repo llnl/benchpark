@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from benchpark.error import BenchparkError
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.scaling import StrongScaling
 from benchpark.caliper import Caliper
@@ -33,6 +33,8 @@ class Remhos(
         values=("1.0", "develop", "gpu-fom", "gpu-opt"),
         description="app version",
     )
+
+    maintainers("rfhaque")
 
     def compute_applications_section(self):
         # TODO: Replace with conflicts clause
