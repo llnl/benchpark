@@ -84,7 +84,7 @@ class RuntimeResources:
 
     def bootstrap(self):
         if not self.ramble_location.exists():
-            self._install_ramble()
+            self._ramble()
         else:
             with working_dir(self.ramble_location):
                 run_command("git fetch --all")
@@ -101,7 +101,7 @@ class RuntimeResources:
         # The reason for this oddity is that spack modules will compete with the internal
         # spack modules from ramble
         if not self.spack_location.exists():
-            self._install_spack()
+            self._spack()
 
     def _install_ramble(self):
         print(f"Cloning Ramble to {self.ramble_location}")
