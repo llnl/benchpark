@@ -26,31 +26,6 @@
         VARIANT:
           - openmp
 
-.legacy_test_clusters: &legacy_test_clusters
-  parallel:
-    matrix:
-      - LEGACY_HOST: tioga
-        LEGACY_ARCHCONFIG: LLNL-Tioga-HPECray-zen3-MI250X-Slingshot
-        SCHEDULER_PARAMETERS: -N 1 -t 1h
-        LEGACY_BENCHMARK:
-          - saxpy
-        LEGACY_VARIANT:
-          - openmp
-      - LEGACY_HOST: dane
-        LEGACY_ARCHCONFIG: LLNL-Dane-DELL-sapphirerapids-OmniPath
-        SCHEDULER_PARAMETERS: -N 1 -t 01:00:00
-        LEGACY_BENCHMARK:
-          - saxpy
-        LEGACY_VARIANT:
-          - openmp
-      - LEGACY_HOST: ruby
-        LEGACY_ARCHCONFIG: LLNL-Ruby-icelake-OmniPath
-        SCHEDULER_PARAMETERS: -N 1 -t 01:00:00
-        LEGACY_BENCHMARK:
-          - saxpy
-        LEGACY_VARIANT:
-          - openmp
-
 .push_status: &push_status
     - |
       curl -X POST --url "https://api.github.com/repos/llnl/${CI_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
@@ -74,43 +49,6 @@
 workflow:
   auto_cancel:
     on_new_commit: conservative
-
-legacy_test_run:
-  resource_group: $LEGACY_HOST
-  stage: test
-  tags:
-    - $LEGACY_HOST
-    - batch
-  <<: *legacy_test_clusters
-  <<: *report_status
-  rules:
-    - changes:
-        - .gitlab-ci.yml
-        - .gitlab/ci/*
-        - experiments/**
-        - systems/$LEGACY_ARCHCONFIG/**
-        - repo/$LEGACY_BENCHMARK/**
-        - modifiers/**
-        - var/**
-        - lib/**
-  script:
-    # Activate Virtual Environment
-    - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
-    # Build Saxpy Workspace
-    - ./bin/benchpark setup ${LEGACY_BENCHMARK}/${LEGACY_VARIANT} ${LEGACY_ARCHCONFIG} workspace/
-    # Setup Ramble & Spack
-    - . workspace/setup.sh
-    # Setup Saxpy Workspace
-    - cd ./workspace/${LEGACY_BENCHMARK}/${LEGACY_VARIANT}/${LEGACY_ARCHCONFIG}/workspace/
-    - ramble --workspace-dir . --disable-progress-bar --disable-logger workspace setup
-    # Run Saxpy Experiments
-    - ramble --workspace-dir . --disable-progress-bar --disable-logger
-      on --executor '{execute_experiment}' --where '{n_nodes} == 1'
-    # Analyze Experiments
-    - ramble --workspace-dir . --disable-progress-bar workspace analyze --format json yaml text
-    # Check Experiment Exit Codes
-    - cd -
-    - python ./.gitlab/ci/bin/exit-codes ./workspace/${LEGACY_BENCHMARK}/${LEGACY_VARIANT}/${LEGACY_ARCHCONFIG}/workspace/results.latest.json
 
 test_run:
   resource_group: $HOST
