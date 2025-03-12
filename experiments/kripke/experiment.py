@@ -139,22 +139,4 @@ class Kripke(
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-
-        # get system config options
-        # TODO: Get compiler/mpi/package handles directly from system.py
-        system_specs = {}
-        system_specs["compiler"] = "default-compiler"
-        system_specs["mpi"] = "default-mpi"
-        if self.spec.satisfies("+cuda"):
-            system_specs["cuda_version"] = "{default_cuda_version}"
-            system_specs["cuda_arch"] = "{cuda_arch}"
-        if self.spec.satisfies("+rocm"):
-            system_specs["rocm_arch"] = "{rocm_arch}"
-
-        # set package spack specs
-        # empty package_specs value implies external package
-        self.add_package_spec(system_specs["mpi"])
-
-        self.add_package_spec(
-            self.name, [f"kripke@{app_version} +mpi", system_specs["compiler"]]
-        )
+        self.add_spack_spec(self.name, [f"kripke@{app_version} +mpi"])

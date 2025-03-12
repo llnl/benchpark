@@ -112,19 +112,5 @@ class OsuMicroBenchmarks(
             for pk, pv in num_nodes.items():
                 self.add_experiment_variable("n_gpus", pv, True)
 
-    def compute_package_section(self):
-        system_specs = {}
-        if self.spec.satisfies("+cuda"):
-            system_specs["cuda_version"] = "{default_cuda_version}"
-            system_specs["cuda_arch"] = "{cuda_arch}"
-        elif self.spec.satisfies("+rocm"):
-            system_specs["rocm_arch"] = "{rocm_arch}"
-
-        system_specs["compiler"] = "default-compiler"
-        system_specs["mpi"] = "default-mpi"
-
-        self.add_package_spec(system_specs["mpi"])
-
-        self.add_package_spec(
-            self.name, ["osu-micro-benchmarks", system_specs["compiler"]]
-        )
+    def compute_spack_section(self):
+        self.add_spack_spec(self.name, ["osu-micro-benchmarks"])

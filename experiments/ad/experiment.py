@@ -27,6 +27,7 @@ class Ad(Experiment):
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
+<<<<<<< HEAD
 
         # get system config options
         # TODO: Get compiler/mpi/package handles directly from system.py
@@ -40,3 +41,6 @@ class Ad(Experiment):
         self.add_package_spec(
             self.name, [f"ad@{app_version}", system_specs["compiler"]]
         )
+=======
+        self.add_spack_spec(self.name, [f"ad@{app_version}"])
+>>>>>>> 678cefb (Update other experiments)
