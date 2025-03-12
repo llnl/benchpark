@@ -142,8 +142,7 @@ def command(args):
     initializer_script = experiments_root / "setup.sh"
 
     per_workspace_setup = RuntimeResources(
-        pathlib.Path(os.path.abspath(benchpark.paths.benchpark_home)),
-        source_dir
+        pathlib.Path(os.path.abspath(benchpark.paths.benchpark_home)), source_dir
     )
 
     # Parse experiment YAML for package_manager
