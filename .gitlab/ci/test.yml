@@ -5,6 +5,7 @@
         ARCHCONFIG: llnl-elcapitan
         SCHEDULER_PARAMETERS: -N 1 -t 1h
         BENCHMARK:
+          - amg2023
           - kripke
           - saxpy
         VARIANT:
@@ -13,6 +14,7 @@
         ARCHCONFIG: llnl-cluster
         SCHEDULER_PARAMETERS: -N 1 -t 01:00:00
         BENCHMARK:
+          - amg2023
           - kripke
           - saxpy
         VARIANT:
@@ -21,6 +23,7 @@
         ARCHCONFIG: llnl-cluster
         SCHEDULER_PARAMETERS: -N 1 -t 01:00:00
         BENCHMARK:
+          - amg2023
           - kripke
           - saxpy
         VARIANT:
@@ -73,11 +76,11 @@ test_run:
     - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
     # Initialize System
     - |
+        EXTRA_ARGS=""
         if [ "$HOST" == "tioga" ]; then
-            ./bin/benchpark system init --dest=tioga-system ${ARCHCONFIG} ~gtl
-        else
-            ./bin/benchpark system init --dest=$HOST-system ${ARCHCONFIG} cluster=$HOST
+            EXTRA_ARGS="~gtl"
         fi
+        ./bin/benchpark system init --dest=$HOST-system ${ARCHCONFIG} cluster=$HOST $EXTRA_ARGS
     # Initialize Experiment
     - ./bin/benchpark experiment init --dest=${BENCHMARK}-benchmark ${BENCHMARK}+${VARIANT}
     # Build Workspace
