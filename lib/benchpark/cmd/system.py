@@ -7,11 +7,17 @@
 
 import os
 import shutil
+import subprocess
 import sys
+import yaml
+from pprint import pprint
+
+from deepdiff import DeepDiff
 
 import benchpark.system
 import benchpark.spec
-
+import benchpark.paths
+import llnl.util.tty.color as color
 
 def system_init(args):
     system_spec = benchpark.spec.SystemSpec(" ".join(args.spec)).concretize()
@@ -50,6 +56,38 @@ def system_id(args):
     return f"{name}-{spec_hash[:7]}"
 
 
+def system_update(args):
+    system_spec = benchpark.spec.SystemSpec(" ".join(args.spec)).concretize()
+    system = system_spec.system
+
+    packages = system.compute_packages_section()["packages"]
+    pkg_list = list(packages.keys())
+    subprocess.run([benchpark.paths.benchpark_home / "spack/bin/spack", "external", "find", "--not-buildable"] + [pkg for pkg in pkg_list])
+
+    with open(benchpark.paths.benchpark_home / "../.spack/packages.yaml", "r") as file:
+        new_packages = yaml.safe_load(file)["packages"]
+
+    # Use DeepDiff to find differences
+    diff = DeepDiff(
+        packages,
+        new_packages,
+        verbose_level=1,
+        ignore_type_in_groups=[(int, str)],
+        ignore_string_type_changes=True,
+    )
+
+    if not diff:
+        color.cprint(f"\t\t@*gNo packages to update.@.")
+    else:
+        color.cprint(
+            f"\t\t@*rThe Packages are different. Here are the differences:@."
+        )
+        pprint(diff)
+        color.cprint(
+            f"\t\t@*rHere are all of the new packages:@."
+        )
+        pprint(new_packages)
+
 def setup_parser(root_parser):
     system_subparser = root_parser.add_subparsers(dest="system_subcommand")
 
@@ -66,12 +104,16 @@ def setup_parser(root_parser):
     id_parser = system_subparser.add_parser("id")
     id_parser.add_argument("system_dir")
 
+    update_parser = system_subparser.add_parser("update", help='Check packages using "spack external find" for current system against the definitions in benchpark.')
+    update_parser.add_argument("spec", nargs="+", help="System spec")
+
 
 def command(args):
     actions = {
         "init": system_init,
         "list": system_list,
         "id": system_id,
+        "update": system_update,
     }
     if args.system_subcommand in actions:
         actions[args.system_subcommand](args)
