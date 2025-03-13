@@ -75,10 +75,6 @@ def main():
         parser.print_help()
         return 1
 
-    if args.version:
-        print(get_version())
-        return 0
-
     exit_code = 0
 
     if args.subcommand in actions:
