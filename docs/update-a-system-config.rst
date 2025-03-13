@@ -7,12 +7,12 @@
 Updating a System
 =====================
 
-If a system already exists, its external package defintions can be updated from the output of `benchpark system external`::
+If a system already exists, its external package definitions can be updated from the output of `benchpark system external`::
 
   [ruby]$ benchpark system external llnl-cluster cluster=ruby
 
   $ benchpark system external llnl-cluster
-  == The following specs have been detected on this system and added to /g/g20/mckinsey/.spack/packages.yaml
+  ==> The following specs have been detected on this system and added to /g/g20/mckinsey/.spack/packages.yaml
   cmake@3.23.1  cmake@3.26.5  gmake@4.2.1  hwloc@2.11.2  python@2.7.18  python@2.7.18  python@3.6.8  python@3.9.12  python@3.10.8  python@3.12.8  tar@1.30
                   The Packages are different. Here are the differences:
   {'dictionary_item_added': ["root['gmake']['buildable']"],
