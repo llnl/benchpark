@@ -12,14 +12,14 @@ jobs:
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
-      
+
       - name: Run unit tests with coverage
         run: |
           ./bin/benchpark unit-test --cov=./ --cov-report=xml --durations=20 -ra
-          
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@13ce06bfc6bbe3ecf90edbbf1bc32fe5978ca1d3
-        if: false  # Temporarily disable this step until Codecov side of this is available
+        if: true
         env:
           CODECOV_TOKEN: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
         with:
@@ -28,4 +28,3 @@ jobs:
           flags: unittests
           verbose: true
           fail_ci_if_error: true
-        
