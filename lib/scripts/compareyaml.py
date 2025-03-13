@@ -1,5 +1,6 @@
 # Usage: benchpark-python compareyaml.py
 
+import argparse
 import os
 import subprocess
 import yaml
@@ -81,22 +82,53 @@ def compare_yaml(file1, file2):
         pprint(diff)
 
 
-if __name__ == "__main__":
-    # # Set up argument parser
-    # parser = argparse.ArgumentParser(
-    #     description="Compare two YAML files for differences."
-    # )
-    # parser.add_argument("file1", help="Path to the first YAML file")
-    # parser.add_argument("file2", help="Path to the second YAML file")
+def main():
+    parser = argparse.ArgumentParser(
+        description="Compare YAMLs generated from 'system init' between two different commits of Benchpark.\n(check if the output of system init was changed between commits)."
+    )
+    parser.add_argument(
+        "-o",
+        "--old",
+        type=str,
+        default="6d06ea8cbf6ffd494b30ece1a2e924fd48dd7018",  # develop from 3/4/25
+        help="Commit hash or branch name for the old version of Benchpark (default: 6d06ea8cbf6ffd494b30ece1a2e924fd48dd7018).",
+    )
+    parser.add_argument(
+        "-n",
+        "--new",
+        type=str,
+        default="refactor/systems-i654",
+        help="Commit hash or branch name for the new version of Benchpark (default: refactor/systems-i654).",
+    )
+    parser.add_argument(
+        "-s",
+        "--systems",
+        type=str,
+        nargs="*",
+        default=[
+            "aws-pcluster",
+            "csc-lumi",
+            "cscs-daint",
+            "cscs-eiger",
+            "generic-x86",
+            "jsc-juwels",
+            "llnl-cluster",
+            "llnl-elcapitan",
+            "llnl-sierra",
+            "riken-fugaku",
+        ],
+        help="List of systems to include for comparison (default: all systems).",
+    )
 
-    # # Parse arguments
-    # args = parser.parse_args()
+    args = parser.parse_args()
 
+    # Use the arguments provided by the user or the defaults
     bp = {
-        "benchpark-legacy": "6d06ea8cbf6ffd494b30ece1a2e924fd48dd7018",  # develop from 3/4/25
-        "benchpark-new": "refactor/systems-i654",
+        "benchpark-old": args.old,
+        "benchpark-new": args.new,
     }
 
+    # Define the sysd dictionary
     sysd = {
         "aws-pcluster": ["c6g.xlarge", "c4.xlarge", "hpc7a.48xlarge", "hpc6a.48xlarge"],
         "csc-lumi": None,
@@ -110,6 +142,9 @@ if __name__ == "__main__":
         "llnl-sierra": None,
         "riken-fugaku": None,
     }
+
+    # Filter sysd keys based on the provided systems argument
+    sysd = {key: sysd[key] for key in args.systems if key in sysd}
 
     for name, tag in bp.items():
 
@@ -153,11 +188,15 @@ if __name__ == "__main__":
         color.cprint("@*y" + system + "@.")
         iterable = sysd[system] if sysd[system] else [system]
         for cluster in iterable:
-            for root, dirs, files in os.walk(f"benchpark-legacy/{cluster}"):
+            for root, dirs, files in os.walk(f"benchpark-old/{cluster}"):
                 loc = "/".join(root.split("/")[1:])
                 for file in files:
                     color.cprint("\t@*b" + loc + "/" + file + "@.")
                     compare_yaml(
-                        f"benchpark-legacy/{loc}/{file}",
+                        f"benchpark-old/{loc}/{file}",
                         f"benchpark-new/{loc}/{file}",
                     )
+
+
+if __name__ == "__main__":
+    main()
