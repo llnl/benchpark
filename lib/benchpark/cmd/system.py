@@ -73,7 +73,7 @@ def system_external(args):
         ) as file:
             new_packages = yaml.safe_load(file)["packages"]
 
-        color.cprint(f"@*rHere are all of the new packages:@.")
+        color.cprint("@*rHere are all of the new packages:@.")
         pprint(new_packages)
         return
 
@@ -105,11 +105,11 @@ def system_external(args):
     )
 
     if not diff:
-        color.cprint(f"@*gNo new packages.@.")
+        color.cprint("@*gNo new packages.@.")
     else:
-        color.cprint(f"@*rThe Packages are different. Here are the differences:@.")
+        color.cprint("@*rThe Packages are different. Here are the differences:@.")
         pprint(diff)
-        color.cprint(f"@*rHere are all of the new packages:@.")
+        color.cprint("@*rHere are all of the new packages:@.")
         pprint(new_packages)
 
 
