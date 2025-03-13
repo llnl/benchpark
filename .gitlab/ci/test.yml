@@ -3,52 +3,30 @@
     matrix:
       - HOST: tioga
         ARCHCONFIG: llnl-elcapitan
-        SCHEDULER_PARAMETERS: -N 1 -t 1h
+        SCHEDULER_PARAMETERS: -N 1 -t 10m
         BENCHMARK:
+          - amg2023
           - kripke
           - saxpy
         VARIANT:
           - rocm
       - HOST: dane
         ARCHCONFIG: llnl-cluster
-        SCHEDULER_PARAMETERS: -N 1 -t 01:00:00
+        SCHEDULER_PARAMETERS: -N 1 -t 00:10:00
         BENCHMARK:
+          - amg2023
           - kripke
           - saxpy
         VARIANT:
           - openmp
       - HOST: ruby
         ARCHCONFIG: llnl-cluster
-        SCHEDULER_PARAMETERS: -N 1 -t 01:00:00
+        SCHEDULER_PARAMETERS: -N 1 -t 00:10:00
         BENCHMARK:
+          - amg2023
           - kripke
           - saxpy
         VARIANT:
-          - openmp
-
-.legacy_test_clusters: &legacy_test_clusters
-  parallel:
-    matrix:
-      - LEGACY_HOST: tioga
-        LEGACY_ARCHCONFIG: LLNL-Tioga-HPECray-zen3-MI250X-Slingshot
-        SCHEDULER_PARAMETERS: -N 1 -t 1h
-        LEGACY_BENCHMARK:
-          - saxpy
-        LEGACY_VARIANT:
-          - openmp
-      - LEGACY_HOST: dane
-        LEGACY_ARCHCONFIG: LLNL-Dane-DELL-sapphirerapids-OmniPath
-        SCHEDULER_PARAMETERS: -N 1 -t 01:00:00
-        LEGACY_BENCHMARK:
-          - saxpy
-        LEGACY_VARIANT:
-          - openmp
-      - LEGACY_HOST: ruby
-        LEGACY_ARCHCONFIG: LLNL-Ruby-icelake-OmniPath
-        SCHEDULER_PARAMETERS: -N 1 -t 01:00:00
-        LEGACY_BENCHMARK:
-          - saxpy
-        LEGACY_VARIANT:
           - openmp
 
 .push_status: &push_status
@@ -75,43 +53,6 @@ workflow:
   auto_cancel:
     on_new_commit: conservative
 
-legacy_test_run:
-  resource_group: $LEGACY_HOST
-  stage: test
-  tags:
-    - $LEGACY_HOST
-    - batch
-  <<: *legacy_test_clusters
-  <<: *report_status
-  rules:
-    - changes:
-        - .gitlab-ci.yml
-        - .gitlab/ci/*
-        - experiments/**
-        - systems/$LEGACY_ARCHCONFIG/**
-        - repo/$LEGACY_BENCHMARK/**
-        - modifiers/**
-        - var/**
-        - lib/**
-  script:
-    # Activate Virtual Environment
-    - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
-    # Build Saxpy Workspace
-    - ./bin/benchpark setup ${LEGACY_BENCHMARK}/${LEGACY_VARIANT} ${LEGACY_ARCHCONFIG} workspace/
-    # Setup Ramble & Spack
-    - . workspace/setup.sh
-    # Setup Saxpy Workspace
-    - cd ./workspace/${LEGACY_BENCHMARK}/${LEGACY_VARIANT}/${LEGACY_ARCHCONFIG}/workspace/
-    - ramble --workspace-dir . --disable-progress-bar --disable-logger workspace setup
-    # Run Saxpy Experiments
-    - ramble --workspace-dir . --disable-progress-bar --disable-logger
-      on --executor '{execute_experiment}' --where '{n_nodes} == 1'
-    # Analyze Experiments
-    - ramble --workspace-dir . --disable-progress-bar workspace analyze --format json yaml text
-    # Check Experiment Exit Codes
-    - cd -
-    - python ./.gitlab/ci/bin/exit-codes ./workspace/${LEGACY_BENCHMARK}/${LEGACY_VARIANT}/${LEGACY_ARCHCONFIG}/workspace/results.latest.json
-
 test_run:
   resource_group: $HOST
   stage: test
@@ -135,13 +76,11 @@ test_run:
     - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
     # Initialize System
     - |
+        EXTRA_ARGS=""
         if [ "$HOST" == "tioga" ]; then
-            ./bin/benchpark system init --dest=tioga-system ${ARCHCONFIG} ~gtl
-            system_id=$(./bin/benchpark system id ./tioga-system)
-        else
-            ./bin/benchpark system init --dest=$HOST-system ${ARCHCONFIG} cluster=$HOST
-            system_id=$(./bin/benchpark system id ./$HOST-system)
+            EXTRA_ARGS="~gtl"
         fi
+        ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} cluster=$HOST $EXTRA_ARGS
     # Initialize Experiment
     - ./bin/benchpark experiment init --dest=${BENCHMARK}-benchmark ${BENCHMARK}+${VARIANT}
     # Build Workspace
@@ -149,7 +88,7 @@ test_run:
     # Setup Ramble & Spack
     - . workspace/setup.sh
     # Setup Workspace
-    - cd ./workspace/${BENCHMARK}-benchmark/${system_id}/workspace/
+    - cd ./workspace/${BENCHMARK}-benchmark/${HOST}-system/workspace/
     - ramble --workspace-dir . --disable-progress-bar --disable-logger workspace setup
     # Run Experiments
     - ramble --workspace-dir . --disable-progress-bar --disable-logger
@@ -158,4 +97,4 @@ test_run:
     - ramble --workspace-dir . --disable-progress-bar workspace analyze --format json yaml text
     # Check Experiment Exit Codes
     - cd -
-    - python ./.gitlab/ci/bin/exit-codes ./workspace/${BENCHMARK}-benchmark/${system_id}/workspace/results.latest.json
+    - python ./.gitlab/ci/bin/exit-codes ./workspace/${BENCHMARK}-benchmark/${HOST}-system/workspace/results.latest.json
