@@ -48,6 +48,7 @@
    add-a-benchmark
    add-an-experiment
    add-a-dryrun
+   update-a-system-config
 
 .. toctree::
    :maxdepth: 2
