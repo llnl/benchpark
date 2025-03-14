@@ -107,6 +107,8 @@ jobs:
     if: ${{ needs.changes.outputs.coverage == 'true' }}
     needs: changes
     uses: ./.github/workflows/coverage.yml
+    secrets:
+      BENCHPARK_CODECOV_TOKEN: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
 
   license:
     if: ${{ needs.changes.outputs.license == 'true' }}

@@ -1,6 +1,9 @@
 name: Run a Set of Tests to Collect Code Coverage for Benchpark
 on:
   workflow_call:
+    secrets:
+      BENCHPARK_CODECOV_TOKEN:
+        required: true
 
 jobs:
   run_unit_tests:
