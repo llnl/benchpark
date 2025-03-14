@@ -20,9 +20,6 @@ jobs:
         run: |
           ./bin/benchpark unit-test --cov=./ --cov-branch --cov-report=xml --durations=20 -ra
 
-      # uses: codecov/codecov-action@13ce06bfc6bbe3ecf90edbbf1bc32fe5978ca1d3
-      # env:
-      #   CODECOV_TOKEN: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5.4.0
         if: true

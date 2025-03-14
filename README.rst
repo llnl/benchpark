@@ -9,6 +9,9 @@
         </picture>
       </h2>
     </div>
+    
+.. image:: https://codecov.io/gh/llnl/benchpark/graph/badge.svg?token=BKYKTSQ8DK 
+ :target: https://codecov.io/gh/llnl/benchpark
 
 Overview
 --------
