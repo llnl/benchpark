@@ -3,7 +3,7 @@
     matrix:
       - HOST: tioga
         ARCHCONFIG: llnl-elcapitan
-        SCHEDULER_PARAMETERS: -N 1 -t 10m
+        SCHEDULER_PARAMETERS: -N 1 -t 20m
         BENCHMARK:
           - amg2023
           - kripke
@@ -12,7 +12,7 @@
           - rocm
       - HOST: dane
         ARCHCONFIG: llnl-cluster
-        SCHEDULER_PARAMETERS: -N 1 -t 00:10:00
+        SCHEDULER_PARAMETERS: -N 1 -t 00:20:00
         BENCHMARK:
           - amg2023
           - kripke
@@ -21,7 +21,7 @@
           - openmp
       - HOST: ruby
         ARCHCONFIG: llnl-cluster
-        SCHEDULER_PARAMETERS: -N 1 -t 00:10:00
+        SCHEDULER_PARAMETERS: -N 1 -t 00:20:00
         BENCHMARK:
           - amg2023
           - kripke
