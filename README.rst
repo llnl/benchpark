@@ -83,3 +83,10 @@ Benchpark is released under the Apache 2.0 w/ LLVM Exception license. For more d
 the `LICENSE <https://github.com/LLNL/benchpark/blob/develop/LICENSE>`_ file.
 
 LLNL-CODE-850629
+
+QR Code
+-------
+.. image:: benchpark-QRcode.png
+   :alt: Benchpark QR Code
+   :width: 300px
+   :align: center
