@@ -13,6 +13,9 @@
 .. image:: https://codecov.io/gh/llnl/benchpark/graph/badge.svg?token=BKYKTSQ8DK 
  :target: https://codecov.io/gh/llnl/benchpark
 
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/psf/black
+
 Overview
 --------
 You can find detailed documentation at `software.llnl.gov/benchpark
