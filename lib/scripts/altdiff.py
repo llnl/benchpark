@@ -125,7 +125,8 @@ def diff_specs(spec_a, spec_b, truncate=False):
             ArchComparator(spec, truncate),
             DepsComparator(spec, nl_cb),
         ]
-
+    
+    diff=False
     for depth, dep_spec in traverse.traverse_tree(
         [spec_a], deptype=("link", "run"), depth_first=True
     ):
@@ -141,19 +142,37 @@ def diff_specs(spec_a, spec_b, truncate=False):
                 c.compare(spec_b[node.name])
         else:
             highlight(node.name)
+            diff=True
         print()  # New line
+    return diff
 
 
 def main():
     env = ev.active_environment()
 
-    parser = argparse.ArgumentParser(description="diff two specs")
+    parser = argparse.ArgumentParser(description="""Diff two specs. 
+(spack-python altdiff.py spec1 spec2)
+
+Example usage:
+
+    $ spack spec --yaml dray+mpi > dray-mpi.yaml
+    $ spack spec --yaml dray~mpi > dray-nompi.yaml
+    $ spack-python lib/scripts/altdiff.py --truncate ./dray-mpi.yaml ./dray-nompi.yaml 
+""",
+formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument(
         "-t",
         "--truncate",
         action="store_true",
         help="don't show most details unless they are different",
+    )
+    parser.add_argument(
+        "-d",
+        "--diffprint",
+        action="store_true",
+        default=True,
+        help="Print if the two specs are different or the same."
     )
 
     parser.add_argument("specs", nargs=argparse.REMAINDER, help="two specs to compare")
@@ -172,8 +191,9 @@ def main():
     if len(specs) != 2:
         raise Exception("Need two specs")
 
-    diff_specs(specs[0], specs[1], truncate=args.truncate)
-
+    diff = diff_specs(specs[0], specs[1], truncate=args.truncate)
+    if args.diffprint:
+        print(f"DifferentSpecs={diff}")
 
 if __name__ == "__main__":
     main()
