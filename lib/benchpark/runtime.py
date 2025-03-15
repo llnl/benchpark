@@ -86,6 +86,7 @@ class RuntimeResources:
             self._install_ramble()
         else:
             with working_dir(self.ramble_location):
+                run_command(f"git fetch --all")
                 run_command(f"git checkout {self.ramble_commit}")
         ramble_lib_path = self.ramble_location / "lib" / "ramble"
         externals = str(ramble_lib_path / "external")
@@ -140,6 +141,7 @@ class RuntimeResources:
             )
         else:
             with working_dir(self.spack_location):
+                run_command(f"git fetch --all")
                 run_command(f"git checkout {self.spack_commit}")
         return spack, first_time
 
