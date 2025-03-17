@@ -43,7 +43,7 @@ class MdTest(
             for k, v in scaled_variables.items():
                 self.add_experiment_variable(k, v, True)
 
-    def compute_spack_section(self):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
 
@@ -54,9 +54,9 @@ class MdTest(
         system_specs["mpi"] = "default-mpi"
 
         # set package spack specs
-        self.add_spack_spec(system_specs["mpi"])
+        self.add_package_spec(system_specs["mpi"])
 
-        self.add_spack_spec("ior", ["ior@3.3.0", system_specs["compiler"]])
-        self.add_spack_spec(
+        self.add_package_spec("ior", ["ior@3.3.0", system_specs["compiler"]])
+        self.add_package_spec(
             self.name, [f"mdtest@{app_version}", system_specs["compiler"]]
         )

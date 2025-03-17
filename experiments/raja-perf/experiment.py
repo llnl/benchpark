@@ -58,7 +58,7 @@ class RajaPerf(
         else:
             self.add_experiment_variable("n_ranks", n_resources, True)
 
-    def compute_spack_section(self):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
 
@@ -72,8 +72,8 @@ class RajaPerf(
         if self.spec.satisfies("+rocm"):
             system_specs["rocm_arch"] = "{rocm_arch}"
 
-        self.add_spack_spec(system_specs["mpi"])
+        self.add_package_spec(system_specs["mpi"])
 
-        self.add_spack_spec(
+        self.add_package_spec(
             self.name, [f"raja-perf@{app_version}", system_specs["compiler"]]
         )

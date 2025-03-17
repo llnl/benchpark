@@ -47,7 +47,7 @@ class Qws(Experiment, OpenMPExperiment):
             self.add_experiment_variable("omp_num_threads", ["48"])
             self.add_experiment_variable("arch", "OpenMP")
 
-    def compute_spack_section(self):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
 
@@ -56,8 +56,8 @@ class Qws(Experiment, OpenMPExperiment):
         system_specs["mpi"] = "default-mpi"
 
         # if package_spec left empty spack will use external
-        self.add_spack_spec(system_specs["mpi"])
+        self.add_package_spec(system_specs["mpi"])
 
-        self.add_spack_spec(
+        self.add_package_spec(
             self.name, [f"qws@{app_version} +mpi", system_specs["compiler"]]
         )
