@@ -62,4 +62,4 @@ class Laghos(
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-        self.add_spack_spec(self.name, [f"laghos@{app_version} +metis"])
+        self.add_package_spec(self.name, [f"laghos@{app_version} +metis"])

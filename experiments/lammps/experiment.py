@@ -94,7 +94,7 @@ class Lammps(
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-        self.add_spack_spec(
+        self.add_package_spec(
             self.name,
             [
                 f"lammps@{app_version} +mpi+opt+manybody+molecule+kspace+rigid+kokkos+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth+reaxff lammps_sizes=bigbig "

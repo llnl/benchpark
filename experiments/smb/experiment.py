@@ -39,4 +39,4 @@ class Smb(Experiment, StrongScaling):
         spec_string = f"smb@{app_version} +mpi"
         if self.spec.satisfies("workload=rma_mt"):
             spec_string += "+rma"
-        self.add_spack_spec(self.name, [spec_string])
+        self.add_package_spec(self.name, [spec_string])

@@ -45,4 +45,4 @@ class Saxpy(Experiment, OpenMPExperiment, CudaExperiment, ROCmExperiment, Calipe
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-        self.add_spack_spec(self.name, [f"saxpy@{app_version}"])
+        self.add_package_spec(self.name, [f"saxpy@{app_version}"])

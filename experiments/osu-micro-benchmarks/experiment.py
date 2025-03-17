@@ -113,4 +113,4 @@ class OsuMicroBenchmarks(
                 self.add_experiment_variable("n_gpus", pv, True)
 
     def compute_spack_section(self):
-        self.add_spack_spec(self.name, ["osu-micro-benchmarks"])
+        self.add_package_spec(self.name, ["osu-micro-benchmarks"])
