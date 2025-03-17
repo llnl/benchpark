@@ -36,7 +36,7 @@ class Phloem(Experiment, StrongScaling):
         elif self.spec.satisfies("workload=mpiGraph"):
             self.add_experiment_variable("n_ranks", "2")
 
-    def compute_spack_section(self):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
 
@@ -47,8 +47,8 @@ class Phloem(Experiment, StrongScaling):
         system_specs["mpi"] = "default-mpi"
 
         # empty package_specs value implies external package
-        self.add_spack_spec(system_specs["mpi"])
+        self.add_package_spec(system_specs["mpi"])
 
-        self.add_spack_spec(
+        self.add_package_spec(
             self.name, [f"phloem@{app_version} +mpi", system_specs["compiler"]]
         )

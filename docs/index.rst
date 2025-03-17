@@ -39,6 +39,7 @@
    analyze-experiment
    modifiers
    set-of-experiments
+   run-binary
 
 .. toctree::
    :maxdepth: 1
