@@ -14,7 +14,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="""Compare YAMLs generated from 'system init' between two different commits of Benchpark.
         (check if the output of system init was changed between commits).
-        
+
         Usage: benchpark-python diffExperimentBuilds.py""",
         formatter_class=argparse.RawTextHelpFormatter,
     )
@@ -143,7 +143,7 @@ def main():
         new_file = f"./benchpark-new-{exper}.yaml"
 
         # Path to the Spack setup script
-        spack_setup_script = f"benchpark-old/wkp/spack/share/spack/setup-env.sh"
+        spack_setup_script = "benchpark-old/wkp/spack/share/spack/setup-env.sh"
         # Define the ramble command
         cmd = f"benchpark-old/wkp/spack/bin/spack-python altdiff.py -t {old_file} {new_file}"
         # Combine sourcing the script and running the command
