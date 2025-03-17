@@ -8,7 +8,7 @@ software:
     default-compiler:
       pkg_spec: cce@16.0.0-rocm5.5.1
     default-mpi:
-      pkg_spec: cray-mpich@8.1.26%cce@16.0.0 ~gtl
+      pkg_spec: cray-mpich@8.1.26 ~gtl %cce@16.0.0
     compiler-rocm:
       pkg_spec: cce@16.0.0-rocm5.5.1
     compiler-amdclang:
@@ -24,10 +24,10 @@ software:
     lapack:
       pkg_spec: cray-libsci@23
     mpi-rocm-gtl:
-      pkg_spec: cray-mpich@8.1.26%cce@16.0.0 +gtl
+      pkg_spec: cray-mpich@8.1.26 +gtl %cce@16.0.0
     mpi-rocm-no-gtl:
-      pkg_spec: cray-mpich@8.1.26%cce@16.0.0 ~gtl
+      pkg_spec: cray-mpich@8.1.26 ~gtl %cce@16.0.0
     mpi-gcc:
-      pkg_spec: cray-mpich@8.1.26%gcc@12.2.0 ~gtl
+      pkg_spec: cray-mpich@8.1.26 ~gtl %gcc@12.2.0
     fftw:
       pkg_spec: intel-oneapi-mkl@2023.2.0 

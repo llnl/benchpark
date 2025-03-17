@@ -18,7 +18,7 @@ packages:
     version: [1.12]
   python:
     externals:
-      - spec: "python@3.11.6%fj@4.10.0 arch=linux-rhel8-a64fx"
+      - spec: "python@3.11.6 arch=linux-rhel8-a64fx %fj@4.10.0"
         prefix: /vol0004/apps/oss/spack-v0.21/opt/spack/linux-rhel8-a64fx/fj-4.10.0/python-3.11.6-qbmpmn2uxu4oe3qoawxbizp7awqlgkcq
   openssh:
     permissions:
@@ -26,20 +26,20 @@ packages:
   fujitsu-mpi:
     buildable: False
     externals:
-      - spec: "fujitsu-mpi@4.10.0%clang@17.0.2 arch=linux-rhel8-a64fx"
+      - spec: "fujitsu-mpi@4.10.0 arch=linux-rhel8-a64fx %clang@17.0.2"
         prefix: /opt/FJSVxtclanga/tcsds-mpi-1.2.38
-      - spec: "fujitsu-mpi@4.10.0%fj@4.10.0 arch=linux-rhel8-a64fx"
+      - spec: "fujitsu-mpi@4.10.0 arch=linux-rhel8-a64fx %fj@4.10.0"
         prefix: /opt/FJSVxtclanga/tcsds-mpi-1.2.38
-      - spec: "fujitsu-mpi@4.10.0%gcc@13.2.0 arch=linux-rhel8-a64fx"
+      - spec: "fujitsu-mpi@4.10.0 arch=linux-rhel8-a64fx %gcc@13.2.0"
         prefix: /vol0004/apps/oss/mpigcc/fjmpi-gcc12
   fujitsu-ssl2:
     buildable: False
     externals:
-      - spec: "fujitsu-ssl2@4.10.0%clang@17.0.2 arch=linux-rhel8-a64fx"
+      - spec: "fujitsu-ssl2@4.10.0 arch=linux-rhel8-a64fx %clang@17.0.2"
         prefix: /vol0004/apps/oss/llvm-v17.0.2/compute_node
-      - spec: "fujitsu-ssl2@4.10.0%fj@4.10.0 arch=linux-rhel8-a64fx"
+      - spec: "fujitsu-ssl2@4.10.0 arch=linux-rhel8-a64fx %fj@4.10.0"
         prefix: /opt/FJSVxtclanga/tcsds-ssl2-1.2.38
-      - spec: "fujitsu-ssl2@4.10.0%gcc@13.2.0 arch=linux-rhel8-a64fx"
+      - spec: "fujitsu-ssl2@4.10.0 arch=linux-rhel8-a64fx %gcc@13.2.0"
         prefix: /opt/FJSVxtclanga/tcsds-ssl2-1.2.38
   rist-fftw:
     buildable: False

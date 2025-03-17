@@ -296,7 +296,7 @@ packages:
   cray-mpich:
     buildable: false
     externals:
-    - spec: cray-mpich@8.1.26%cce@16.0.0 +gtl +wrappers
+    - spec: cray-mpich@8.1.26 +gtl +wrappers %cce@16.0.0
       prefix: /opt/cray/pe/mpich/8.1.26/ofi/crayclang/16.0
       extra_attributes:
         gtl_cutoff_size: 4096
@@ -304,12 +304,12 @@ packages:
         gtl_lib_path: /opt/cray/pe/mpich/8.1.26/gtl/lib
         gtl_libs: ["libmpi_gtl_hsa"]
         ldflags: "-L/opt/cray/pe/mpich/8.1.26/ofi/crayclang/16.0/lib -lmpi -L/opt/cray/pe/mpich/8.1.26/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/8.1.26/gtl/lib -lmpi_gtl_hsa"
-    - spec: cray-mpich@8.1.26%cce@16.0.0 ~gtl +wrappers
+    - spec: cray-mpich@8.1.26 ~gtl +wrappers %cce@16.0.0
       prefix: /opt/cray/pe/mpich/8.1.26/ofi/crayclang/16.0
       extra_attributes:
         gtl_lib_path: /opt/cray/pe/mpich/8.1.26/gtl/lib
         ldflags: "-L/opt/cray/pe/mpich/8.1.26/ofi/crayclang/16.0/lib -lmpi -L/opt/cray/pe/mpich/8.1.26/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/8.1.26/gtl/lib"
-    - spec: cray-mpich@8.1.26%gcc@12.2.0 ~gtl +wrappers
+    - spec: cray-mpich@8.1.26 ~gtl +wrappers %gcc@12.2.0
       prefix: /opt/cray/pe/mpich/8.1.26/ofi/gnu/10.3
       extra_attributes:
         gtl_lib_path: /opt/cray/pe/mpich/8.1.26/gtl/lib
