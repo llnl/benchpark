@@ -57,16 +57,13 @@ def main():
 
     args = parser.parse_args()
 
+    old_name = f"benchpark-old-{args.arch}"
+    new_name = f"benchpark-new-{args.arch}"
     # Use the arguments provided by the user or the defaults
     bp = {
-        "benchpark-old": args.old,
-        "benchpark-new": args.new,
+        old_name: args.old,
+        new_name: args.new,
     }
-
-    # sysd = {
-    #     "ruby": "llnl-cluster"
-    #     "lassen": "llnl-"
-    # }
 
     experiments_dict = {
         "cpu": {
@@ -182,13 +179,13 @@ def main():
                 yaml_file.write(spec_result.stdout)
 
     for exper in experiments.keys():
-        old_file = f"./benchpark-old-{exper}.yaml"
-        new_file = f"./benchpark-new-{exper}.yaml"
+        old_file = f"./{old_name}-{exper}.yaml"
+        new_file = f"./{new_name}-{exper}.yaml"
 
         # Path to the Spack setup script
-        spack_setup_script = "benchpark-old/wkp/spack/share/spack/setup-env.sh"
+        spack_setup_script = f"{old_name}/wkp/spack/share/spack/setup-env.sh"
         # Define the ramble command
-        cmd = f"benchpark-old/wkp/spack/bin/spack-python altdiff.py -t {old_file} {new_file}"
+        cmd = f"{old_name}/wkp/spack/bin/spack-python altdiff.py -t {old_file} {new_file}"
         # Combine sourcing the script and running the command
         diff = subprocess.run(
             f"bash -c 'source {spack_setup_script} && {cmd}'",
