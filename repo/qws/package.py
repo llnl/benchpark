@@ -51,18 +51,23 @@ class Qws(MakefilePackage):
         if "+caliper" in spec:
             maincc = join_path(self.stage.source_path, "main.cc")
             filter_file(r"^profiler.*=.*", "profiler =caliper", makefile)
+            filter_file(r"^clang.*=.*", "clang =1", makefile)
             filter_file(r"^ifeq \(\$\(profiler\),timing\)", "ifeq ($(profiler),caliper)\n  CFLAGS += -DUSE_CALIPER -I$(CALIPER_DIR)/include\n  LDFLAGS += -L$(CALIPER_DIR)/lib64 -lcaliper -Wl,-rpath,$(CALIPER_DIR)/lib64\nendif\nifeq ($(profiler),timing)", makefile)
             filter_file(r"^main\:\$\(OBJS\) \$\(MAIN\) \$\(LDFLAGS\)", "main:$(OBJS) $(MAIN)", makefile)
         #    filter_file(r"^#include <random>", "#include <random>\n#include <caliper/cali.h>", maincc)
         #    filter_file(r"\s+mt = std\:\:mt19937\(12345\);", f"mt = std::mt19937(12345);\n\n  CALI_MARK_BEGIN(\"main\");", maincc)
         #    filter_file(r"\s+PROF_FINALIZE", f"  PROF_FINALIZE;\n  CALI_MARK_END(\"main\")", maincc)
+            qwscc = join_path(self.stage.source_path, "qws.cc")
+            filter_file(r"^\#include \"timing.h\"", "extern \"C\"{\n#include \"timing.h\"\n}", qwscc)
+            
             profiler = join_path(self.stage.source_path, "profiler.h")
             filter_file("\_FAPP","USE_CALIPER", profiler)
-            filter_file(r"^\#include \<fj_tool\/fapp.h\>", "#include <caliper/cali.h>", profiler)
-            filter_file(r"^\#define PROF_START\(a\)     fapp_start\(a,1,0\);", "#define PROF_START(a)     CALI_MARK_BEGIN(a);", profiler)
-            filter_file(r"^\#define PROF_STOP\(a\)      fapp_stop\(a,1,0\);", "#define PROF_STOP(a)     CALI_MARK_END(a);", profiler)
-            filter_file(r"^\#define PROF_START_SRL\(a\) fapp_start\(a,1,0\);", "#define PROF_START_SRL(a)     CALI_MARK_BEGIN(a);", profiler)
-            filter_file(r"^\#define PROF_STOP_SRL\(a\)  fapp_stop\(a,1,0\);", "#define PROF_STOP_SRL(a)     CALI_MARK_END(a);", profiler)
+            
+            filter_file(r"^\#include \<fj_tool\/fapp.h\>", "extern void cali_begin_region(const char*); extern void cali_end_region(const char*);", profiler)
+            filter_file(r"^\#define PROF_START\(a\)     fapp_start\(a,1,0\);", "#define PROF_START(a)     cali_begin_region(a);", profiler)
+            filter_file(r"^\#define PROF_STOP\(a\)      fapp_stop\(a,1,0\);", "#define PROF_STOP(a)     cali_end_region(a);", profiler)
+            filter_file(r"^\#define PROF_START_SRL\(a\) fapp_start\(a,1,0\);", "#define PROF_START_SRL(a)     cali_begin_region(a);", profiler)
+            filter_file(r"^\#define PROF_STOP_SRL\(a\)  fapp_stop\(a,1,0\);", "#define PROF_STOP_SRL(a)     cali_end_region(a);", profiler)
 
     @property
     def build_targets(self):
