@@ -20,6 +20,7 @@ jobs:
       docs: ${{ steps.filter.outputs.docs }}
       style: ${{ steps.filter.outputs.style }}
       run: ${{ steps.filter.outputs.run }}
+      coverage: ${{ steps.filter.outputs.coverage }}
       license: ${{ steps.filter.outputs.license }}
 
     steps:
@@ -63,6 +64,17 @@ jobs:
               - 'experiments/**'
               - 'lib/**'
               - 'repo/**'
+              - 'requirements.txt'
+              - 'systems/**'
+              - 'var/**'
+            coverage:
+              - '.github/**'
+              - 'bin/**'
+              - 'configs/**'
+              - 'checkout-versions.yaml'
+              - 'experiments/**'
+              - 'lib/**'
+              - 'repo/**'
               - 'systems/**'
               - 'var/**'
             license:
@@ -90,6 +102,16 @@ jobs:
     if: ${{ needs.changes.outputs.run == 'true' }}
     needs: changes
     uses: ./.github/workflows/run.yml
+    
+  coverage:
+    if: ${{ needs.changes.outputs.coverage == 'true' }}
+    needs: changes
+    uses: ./.github/workflows/coverage.yml
+    # 'workflow_call' actions do not get access to secrets
+    # normally. So, we add this (plus the corresponding)
+    # settings in coverage.yml to pass the token on
+    secrets:
+      BENCHPARK_CODECOV_TOKEN: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
 
   license:
     if: ${{ needs.changes.outputs.license == 'true' }}

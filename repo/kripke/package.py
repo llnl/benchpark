@@ -107,6 +107,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
                 "-DRAJA_DIR=%s" % self.spec["raja"].prefix,
                 "-Dchai_DIR=%s" % self.spec["chai"].prefix,
                 "-DENABLE_CHAI=ON",
+                "-DMPI_CXX_LINK_FLAGS='%s'" % self.spec['mpi'].libs.ld_flags,
             ]
         )
 

@@ -1,0 +1,42 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+from benchpark.directives import variant
+from benchpark.experiment import Experiment
+
+
+class Ad(Experiment):
+    variant(
+        "workload",
+        default="ad",
+        description="ad",
+    )
+
+    variant(
+        "version",
+        default="main",
+        description="app version",
+    )
+
+    def compute_applications_section(self):
+        self.add_experiment_variable("n_ranks", 1, True)
+        self.add_experiment_variable("n_threads_per_proc", 1, True)
+
+    def compute_package_section(self):
+        # get package version
+        app_version = self.spec.variants["version"][0]
+
+        # get system config options
+        # TODO: Get compiler/mpi/package handles directly from system.py
+        system_specs = {}
+        system_specs["compiler"] = "default-compiler"
+        # system_specs["mpi"] = "default-mpi"
+
+        # set package spack specs
+        # empty package_specs value implies external package
+        # self.add_package_spec(system_specs["mpi"])
+        self.add_package_spec(
+            self.name, [f"ad@{app_version}", system_specs["compiler"]]
+        )

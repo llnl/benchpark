@@ -58,7 +58,7 @@ benchpark_directive = DirectiveMeta.directive
 
 
 def _make_when_spec(
-    value: Optional[Union["benchpark.spec.Spec", str, bool]]
+    value: Optional[Union["benchpark.spec.Spec", str, bool]],
 ) -> Optional["benchpark.spec.Spec"]:
     """Create a ``Spec`` that indicates when a directive should be applied.
 
@@ -102,6 +102,20 @@ def _make_when_spec(
 
     # This is conditional on the spec
     return benchpark.spec.Spec(value)
+
+
+@benchpark_directive("maintainers")
+def maintainers(*names: str):
+    """Define the maintainers of the system/experiment.
+
+    Arguments:
+        names: GitHub usernames for the maintainers
+    """
+
+    def _execute_maintainers(pkg):
+        pkg.maintainers = names
+
+    return _execute_maintainers
 
 
 @benchpark_directive("variants")
