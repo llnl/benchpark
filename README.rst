@@ -14,7 +14,7 @@
     :target: https://codecov.io/gh/llnl/benchpark
 
 .. image:: https://github.com/llnl/benchpark/workflows/ci/badge.svg
-    :target: https://github.com/llnl/benchpark/actions/workflows/ci.yaml
+    :target: https://github.com/LLNL/benchpark/actions/workflows/ci.yml
 
 .. image:: https://github.com/LLNL/benchpark/actions/workflows/run.yml/badge.svg
     :target: https://github.com/LLNL/benchpark/actions/workflows/run.yml
