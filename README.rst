@@ -20,7 +20,7 @@
     :target: https://github.com/LLNL/benchpark/actions/workflows/run.yml
 
 .. image:: https://github.com/llnl/benchpark/workflows/nightly/badge.svg
-    :target: https://github.com/llnl/benchpark/actions/workflows/nightly.yaml
+    :target: https://github.com/LLNL/benchpark/actions/workflows/nightly.yml
 
 .. image:: https://github.com/LLNL/benchpark/actions/workflows/docs.yml/badge.svg
     :target: https://github.com/LLNL/benchpark/actions/workflows/docs.yml
