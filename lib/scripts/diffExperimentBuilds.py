@@ -36,8 +36,23 @@ def main():
         "-s",
         "--system",
         type=str,
-        default="ruby",
-        help="System being ran on",
+        required=True,
+        help="System being ran on. ex: 'llnl-cluster'",
+    )
+    parser.add_argument(
+        "-c",
+        "--cluster",
+        type=str,
+        default=None,
+        required=True,
+        help="cluster variant if applicable. ex: 'ruby'",
+    )
+    parser.add_argument(
+        "-a",
+        "--arch",
+        type=str,
+        required=True,
+        help="Architecture for experiment set. choose from: ('cpu', 'cuda', 'rocm')",
     )
 
     args = parser.parse_args()
@@ -48,13 +63,43 @@ def main():
         "benchpark-new": args.new,
     }
 
-    sysd = {"ruby": "llnl-cluster"}
+    # sysd = {
+    #     "ruby": "llnl-cluster"
+    #     "lassen": "llnl-"
+    # }
 
-    experiments = {
-        # "saxpy": "+openmp",
-        # "amg2023": "+openmp",
-        "lammps": ""
+    experiments_dict = {
+        "cpu": {
+            #####"ad": "",
+            "amg2023": "+openmp",
+            #####"babelstream": "",
+            "genesis": "+openmp",
+            "gpcnet": "",
+            #####"gromacs": "",
+            "hpcg": "",
+            "hpl": "",
+            "ior": "",
+            "kripke": "+openmp",
+            #####"laghos": "",
+            "lammps": "",
+            "md-test": "",
+            "osu-micro-benchmarks": "",
+            "phloem": "",
+            #####"quicksilver": "",
+            "qws": "+openmp",
+            "raja-perf": "",
+            #####"remhos": "",
+            "saxpy": "+openmp",
+            "smb": "",
+            "stream": "",
+        },
+        "cuda": {},
+        "rocm": {},
     }
+    experiments = experiments_dict[args.arch]
+
+    system = args.system
+    cluster = args.cluster
 
     for name, tag in bp.items():
 
@@ -65,22 +110,20 @@ def main():
         subprocess.run(["git", "checkout", tag], cwd=name)
 
         for exper, spec in experiments.items():
-            system = sysd[args.system]
-            cluster = args.system
             var = "cluster"
             if os.path.isdir(f"{name}/{cluster}"):
                 shutil.rmtree(f"{name}/{cluster}")
-            subprocess.run(
-                [
-                    "python",
-                    f"{name}/lib/main.py",
-                    "system",
-                    "init",
-                    f"--dest={name}/{cluster}",
-                    system,
-                    f"{var}={cluster}",
-                ]
-            )
+            sys_list = [
+                "python",
+                f"{name}/lib/main.py",
+                "system",
+                "init",
+                f"--dest={name}/{cluster}",
+                system,
+            ]
+            if cluster:
+                sys_list.append(f"{var}={cluster}")
+            subprocess.run(sys_list)
             if os.path.isdir(f"{name}/{exper}"):
                 shutil.rmtree(f"{name}/{exper}")
             subprocess.run(
