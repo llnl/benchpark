@@ -43,8 +43,8 @@ class LlnlElcapitan(System):
 
     variant(
         "rocm",
-        default="5.5.1",
-        values=("5.4.3", "5.5.1", "6.2.4"),
+        default="6.2.4",
+        values=("5.7.1", "6.2.4", "6.3.1"),
         description="ROCm version",
     )
 

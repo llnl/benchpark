@@ -84,6 +84,10 @@ class RuntimeResources:
     def bootstrap(self):
         if not self.ramble_location.exists():
             self._install_ramble()
+        else:
+            with working_dir(self.ramble_location):
+                run_command("git fetch --all")
+                run_command(f"git checkout {self.ramble_commit}")
         ramble_lib_path = self.ramble_location / "lib" / "ramble"
         externals = str(ramble_lib_path / "external")
         if externals not in sys.path:
@@ -135,6 +139,10 @@ class RuntimeResources:
                 "add",
                 f"config:misc_cache:{spack_cache_location}",
             )
+        else:
+            with working_dir(self.spack_location):
+                run_command("git fetch --all")
+                run_command(f"git checkout {self.spack_commit}")
         return spack, first_time
 
     def spack_first_time_setup(self):
