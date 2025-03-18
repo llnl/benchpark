@@ -19,6 +19,7 @@ class Enzyme(CMakePackage):
 
     version("patch-1", branch="patch-1")
 
+    requires("one_of", "llvm", "intel-oneapi-mkl")
     depends_on("llvm@18:")
 
     root_cmakelists_dir = "enzyme"
