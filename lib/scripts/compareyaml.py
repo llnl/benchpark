@@ -34,27 +34,27 @@ def compare_yaml(file1, file2):
     def normalize_types(data):
         """fix to compare strings to int '56' == 56 for yaml purposes"""
         if isinstance(data, dict):
+            # Fix specific keys and recursively normalize values
             tdict = {
                 (k if k != "compilers:" else "compilers"): normalize_types(v)
                 for k, v in data.items()
-            }  # Fix for way "'compilers':": is generated in old yaml
+            }
+            # Filter out problematic entries
             tdict = {
                 k: v
                 for k, v in tdict.items()
-                if (
+                if not (
                     isinstance(v, str)
-                    and (
-                        "{self.cuda_version.major}" not in v
-                        and "{self.cuda_version}" not in v
-                    )
+                    and ("{self.cuda_version.major}" in v or "{self.cuda_version}" in v)
                 )
-            }  # Hacky check for errors in original yaml
+            }
             return tdict
         elif isinstance(data, list):
             return [normalize_types(v) for v in data]
         elif isinstance(data, str) and data.isdigit():
             return int(data)  # Convert numeric strings to integers
         else:
+            # Return other types as-is
             return data
 
     data1 = normalize_types(load_yaml(file1))
@@ -62,6 +62,9 @@ def compare_yaml(file1, file2):
 
     if data1 is None or data2 is None:
         color.cprint("\t\t@*rComparison aborted due to file loading errors.@.")
+        return
+    elif data1 == {} and data2 == {}:
+        color.cprint("\t\t@*rDictionaries empty, aborting.@.")
         return
 
     # Use DeepDiff to find differences
