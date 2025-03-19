@@ -68,10 +68,7 @@ def main():
         nargs="*",
         default="",
     )
-    parser.add_argument(
-        "--run-experiment",
-        action="store_true"
-    )
+    parser.add_argument("--run-experiment", action="store_true")
 
     args = parser.parse_args()
 
