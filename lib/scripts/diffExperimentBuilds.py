@@ -232,7 +232,7 @@ def main():
         new_file = f"./{new_name}-{exper}.yaml"
 
         # Path to the Spack setup script
-        spack_setup_script = f"{old_name}/wkp/spack/share/spack/setup-env.sh"
+        spack_setup_script = f"{name}/wkp/setup.sh"
         # Define the ramble command
         cmd = (
             f"{old_name}/wkp/spack/bin/spack-python altdiff.py -t {old_file} {new_file}"
