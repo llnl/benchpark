@@ -93,15 +93,15 @@ def main():
         "-o",
         "--old",
         type=str,
-        default="6d06ea8cbf6ffd494b30ece1a2e924fd48dd7018",  # develop from 3/4/25
-        help="Commit hash or branch name for the old version of Benchpark (default: 6d06ea8cbf6ffd494b30ece1a2e924fd48dd7018).",
+        default="develop",
+        help="Commit hash or branch name for the old version of Benchpark (default: develop).",
     )
     parser.add_argument(
         "-n",
         "--new",
         type=str,
-        default="refactor/systems-i654",
-        help="Commit hash or branch name for the new version of Benchpark (default: refactor/systems-i654).",
+        required=True,
+        help="Commit hash or branch name for the new version of Benchpark.",
     )
     parser.add_argument(
         "-s",
@@ -115,6 +115,7 @@ def main():
             "cscs-eiger",
             "generic-x86",
             "jsc-juwels",
+            #"lanl-venado",
             "llnl-cluster",
             "llnl-elcapitan",
             "llnl-sierra",
@@ -139,7 +140,7 @@ def main():
         "cscs-eiger": None,
         "generic-x86": None,
         "jsc-juwels": None,
-        # "lanl-venado": ["grace-hopper", "grace-grace"],
+        "lanl-venado": ["grace-hopper", "grace-grace"],
         "llnl-cluster": ["ruby", "magma", "dane"],
         "llnl-elcapitan": ["tioga", "elcapitan"],
         "llnl-sierra": None,
@@ -174,8 +175,7 @@ def main():
                 if system == "aws-pcluster":
                     var = "instance_type"
                 for cluster in sysd[system]:
-                    subprocess.run(
-                        [
+                    spec_list = [
                             "python",
                             f"{name}/lib/main.py",
                             "system",
@@ -184,6 +184,8 @@ def main():
                             system,
                             f"{var}={cluster}",
                         ]
+                    subprocess.run(
+                        spec_list
                     )
 
     # Compare the YAML files
