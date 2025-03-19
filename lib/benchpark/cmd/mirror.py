@@ -37,11 +37,20 @@ def copytree_part_of(basedir, dest, include):
 
 
 def collect_abspaths(cmd):
+    """Given a command like "spack config get...", this runs that command,
+    loads the output into a yaml object and assumes this yaml is organized
+    like a dictionary with one key where the value is a list (this format
+    applies to several config sections in Spack and Ramble). It then examines
+    the entries of the list to find absolute paths.
+    """
     out, err = run_command(cmd)
     data = yaml.safe_load(StringIO(out))
-    import pdb; pdb.set_trace()
-    print('hi')
-    return []
+    (_, vals), = data.items()
+    abspaths = []
+    for val in vals:
+        if os.path.exists(val) and os.path.isabs(val):
+            abspaths.append(val)
+    return abspaths
 
 
 def copytree_tracked(basedir, dest):
