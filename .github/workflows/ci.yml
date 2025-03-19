@@ -34,6 +34,10 @@ jobs:
       - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
         id: filter
         with:
+          # For merge group events, compare against the target branch (main)
+          base: ${{ github.event_name == 'merge_group' && github.event.merge_group.base_ref || '' }}
+          # For merge group events, use the merge group head ref
+          ref: ${{ github.event_name == 'merge_group' && github.event.merge_group.head_sha || github.ref }}
           filters: |
             docs:
               - '.github/**'
@@ -103,7 +107,7 @@ jobs:
     if: ${{ needs.changes.outputs.run == 'true' }}
     needs: changes
     uses: ./.github/workflows/run.yml
-    
+
   coverage:
     if: ${{ needs.changes.outputs.coverage == 'true' }}
     needs: changes
