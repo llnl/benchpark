@@ -15,14 +15,17 @@ def main():
         description="""Compare YAMLs generated from 'system init' between two different commits of Benchpark.
         (check if the output of system init was changed between commits).
 
-        Usage: benchpark-python diffExperimentBuilds.py""",
+        Examples: 
+            - benchpark-python diffExperimentBuilds.py -s llnl-cluster -c ruby -a cpu
+            - benchpark-python diffExperimentBuilds.py -s llnl-sierra -a cuda
+            - benchpark-python diffExperimentBuilds.py -s llnl-elcapitan -c tioga -a rocm""",
         formatter_class=argparse.RawTextHelpFormatter,
     )
     parser.add_argument(
         "-o",
         "--old",
         type=str,
-        default="develop",  # develop from 3/4/25
+        default="develop",
         help="Commit hash or branch name for the old version of Benchpark (default: develop).",
     )
     parser.add_argument(
@@ -44,7 +47,6 @@ def main():
         "--cluster",
         type=str,
         default=None,
-        required=True,
         help="cluster variant if applicable. ex: 'ruby'",
     )
     parser.add_argument(
@@ -67,7 +69,6 @@ def main():
 
     experiments_dict = {
         "cpu": {
-            #####"ad": "",
             "amg2023": "+openmp",
             #####"babelstream": "",
             "genesis": "+openmp",
@@ -79,7 +80,7 @@ def main():
             "kripke": "+openmp",
             #####"laghos": "",
             "lammps": "",
-            "md-test": "",
+            #####"md-test": "",
             "osu-micro-benchmarks": "",
             "phloem": "",
             #####"quicksilver": "",
@@ -90,8 +91,30 @@ def main():
             "smb": "",
             "stream": "",
         },
-        "cuda": {},
-        "rocm": {},
+        "cuda": {
+            ###### "amg2023": "+cuda", # broken dev
+            ###### "babelstream": "+cuda",
+            ######"gromacs": "+cuda",
+            "kripke": "+cuda",
+            "laghos": "+cuda",
+            "lammps": "+cuda",
+            "osu-micro-benchmarks": "+cuda",
+            "raja-perf": "+cuda",
+            "remhos": "+cuda",
+            "saxpy": "+cuda",
+        },
+        "rocm": {
+            "amg2023": "+rocm",
+            "babelstream": "+rocm",
+            #####"gromacs": "+rocm", # didn't work develop
+            "kripke": "+rocm",
+            #####"laghos": "+rocm", # dev
+            "lammps": "+rocm",
+            #####"osu-micro-benchmarks": "+rocm", # didnt work dev
+            "raja-perf": "+rocm",
+            ####"remhos": "+rocm",
+            "saxpy": "+rocm",
+        },
     }
     experiments = experiments_dict[args.arch]
 
@@ -99,11 +122,10 @@ def main():
     cluster = args.cluster
 
     for name, tag in bp.items():
-
-        if name not in os.listdir(os.getcwd()):
-            subprocess.run(
-                ["git", "clone", "https://github.com/LLNL/benchpark.git", name]
-            )
+        if name in os.listdir(os.getcwd()):
+            print(f"Removing {name}...")
+            shutil.rmtree(name)
+        subprocess.run(["git", "clone", "https://github.com/LLNL/benchpark.git", name])
         subprocess.run(["git", "checkout", tag], cwd=name)
 
         for exper, spec in experiments.items():
@@ -185,24 +207,30 @@ def main():
         # Path to the Spack setup script
         spack_setup_script = f"{old_name}/wkp/spack/share/spack/setup-env.sh"
         # Define the ramble command
-        cmd = f"{old_name}/wkp/spack/bin/spack-python altdiff.py -t {old_file} {new_file}"
-        # Combine sourcing the script and running the command
-        diff = subprocess.run(
-            f"bash -c 'source {spack_setup_script} && {cmd}'",
-            shell=True,
-            check=True,
-            text=True,
-            stdout=subprocess.PIPE,
+        cmd = (
+            f"{old_name}/wkp/spack/bin/spack-python altdiff.py -t {old_file} {new_file}"
         )
+        # Combine sourcing the script and running the command
+        try:
+            diff = subprocess.run(
+                f"bash -c 'source {spack_setup_script} && {cmd}'",
+                shell=True,
+                check=True,
+                text=True,
+                stdout=subprocess.PIPE,
+            )
 
-        diff_str = diff.stdout
-        if "DifferentSpecs=True" in diff_str:
-            color.cprint(f"@*rThe specs for {exper} are different.@.")
-        elif "DifferentSpecs=False" in diff_str:
-            color.cprint(f"@*gThe specs for {exper} are the same.@.")
-        else:
-            raise ValueError("Expected value in output")
-        print(diff_str)
+            diff_str = diff.stdout
+
+            if "DifferentSpecs=True" in diff_str:
+                color.cprint(f"@*rThe specs for {exper} are different.@.")
+            elif "DifferentSpecs=False" in diff_str:
+                color.cprint(f"@*gThe specs for {exper} are the same.@.")
+            else:
+                raise ValueError("Expected value in output")
+            print(diff_str)
+        except:
+            color.cprint(f"@*oThe specs for {exper} could not be compared.@.")
 
 
 if __name__ == "__main__":
