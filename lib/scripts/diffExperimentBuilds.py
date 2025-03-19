@@ -92,15 +92,15 @@ def main():
             "stream": "",
         },
         "cuda": {
-            ###### "amg2023": "+cuda", # broken dev
-            ###### "babelstream": "+cuda",
-            ######"gromacs": "+cuda",
+            ##"amg2023": "+cuda", # broken dev
+            "babelstream": "+cuda",
+            ##"gromacs": "+cuda",
             "kripke": "+cuda",
-            "laghos": "+cuda",
+            ###"laghos": "+cuda",
             "lammps": "+cuda",
             "osu-micro-benchmarks": "+cuda",
             "raja-perf": "+cuda",
-            "remhos": "+cuda",
+            ##"remhos": "+cuda",
             "saxpy": "+cuda",
         },
         "rocm": {
