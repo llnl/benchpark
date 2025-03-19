@@ -102,12 +102,12 @@ jobs:
           ./bin/benchpark experiment init --dest=saxpy/binary saxpy+openmp package_manager="environment-modules" append_path="$SAXPY_PATH"
           ./bin/benchpark setup saxpy/openmp generic-x86 workspace-binary/
 
-          ./workspace-binary/ramble/bin/ramble \
+          ramble \
             --disable-progress-bar \
             --workspace-dir \
             /home/runner/work/benchpark/benchpark/workspace-binary/saxpy/openmp/generic-x86/workspace \
             workspace setup
-          ./workspace-binary/ramble/bin/ramble \
+          ramble \
             --disable-progress-bar \
             --workspace-dir \
             /home/runner/work/benchpark/benchpark/workspace-binary/saxpy/openmp/generic-x86/workspace \
