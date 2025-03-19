@@ -15,7 +15,7 @@ def main():
         description="""Compare YAMLs generated from 'system init' between two different commits of Benchpark.
         (check if the output of system init was changed between commits).
 
-        Examples: 
+        Examples:
             - benchpark-python diffExperimentBuilds.py -s llnl-cluster -c ruby -a cpu
             - benchpark-python diffExperimentBuilds.py -s llnl-sierra -a cuda
             - benchpark-python diffExperimentBuilds.py -s llnl-elcapitan -c tioga -a rocm""",
@@ -70,49 +70,49 @@ def main():
     experiments_dict = {
         "cpu": {
             "amg2023": "+openmp",
-            #####"babelstream": "",
+            # "babelstream": "",
             "genesis": "+openmp",
             "gpcnet": "",
-            #####"gromacs": "",
+            # "gromacs": "",
             "hpcg": "",
             "hpl": "",
             "ior": "",
             "kripke": "+openmp",
-            #####"laghos": "",
+            # "laghos": "",
             "lammps": "",
-            #####"md-test": "",
+            # "md-test": "",
             "osu-micro-benchmarks": "",
             "phloem": "",
-            #####"quicksilver": "",
+            # "quicksilver": "",
             "qws": "+openmp",
             "raja-perf": "",
-            #####"remhos": "",
+            # "remhos": "",
             "saxpy": "+openmp",
             "smb": "",
             "stream": "",
         },
         "cuda": {
-            ##"amg2023": "+cuda", # broken dev
+            # "amg2023": "+cuda", # broken dev
             "babelstream": "+cuda",
-            ##"gromacs": "+cuda",
+            # "gromacs": "+cuda",
             "kripke": "+cuda",
-            ###"laghos": "+cuda",
+            # "laghos": "+cuda",
             "lammps": "+cuda",
             "osu-micro-benchmarks": "+cuda",
             "raja-perf": "+cuda",
-            ##"remhos": "+cuda",
+            # "remhos": "+cuda",
             "saxpy": "+cuda",
         },
         "rocm": {
             "amg2023": "+rocm",
             "babelstream": "+rocm",
-            #####"gromacs": "+rocm", # didn't work develop
+            # "gromacs": "+rocm", # didn't work develop
             "kripke": "+rocm",
-            #####"laghos": "+rocm", # dev
+            # "laghos": "+rocm", # dev
             "lammps": "+rocm",
-            #####"osu-micro-benchmarks": "+rocm", # didnt work dev
+            # "osu-micro-benchmarks": "+rocm", # didn't work dev
             "raja-perf": "+rocm",
-            ####"remhos": "+rocm",
+            # "remhos": "+rocm",
             "saxpy": "+rocm",
         },
     }
@@ -229,8 +229,8 @@ def main():
             else:
                 raise ValueError("Expected value in output")
             print(diff_str)
-        except:
-            color.cprint(f"@*oThe specs for {exper} could not be compared.@.")
+        except:  # noqa
+            color.cprint("@*o" + f"The specs for {exper} could not be compared.@.")
 
 
 if __name__ == "__main__":
