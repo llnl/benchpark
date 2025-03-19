@@ -161,9 +161,7 @@ def command(args):
 
     pkg_str = ""
     if pkg_manager == "spack":
-        spack, first_time_spack = per_workspace_setup.spack_first_time_setup()
-        if first_time_spack:
-            spack("repo", "add", "--scope=site", f"{source_dir}/repo")
+        per_workspace_setup.spack_first_time_setup()
 
         pkg_str = f"""\
 . {per_workspace_setup.spack_location}/share/spack/setup-env.sh
@@ -171,7 +169,7 @@ def command(args):
 export SPACK_DISABLE_LOCAL_CONFIG=1
 """
 
-    ramble, first_time_ramble = per_workspace_setup.ramble_first_time_setup()
+    per_workspace_setup.ramble_first_time_setup()
 
     if not initializer_script.exists():
         with open(initializer_script, "w") as f:
