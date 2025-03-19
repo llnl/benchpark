@@ -190,7 +190,7 @@ def main():
                 ]
             )
             # Path to the Spack setup script
-            spack_setup_script = f"{name}/wkp/spack/share/spack/setup-env.sh"
+            spack_setup_script = f"{name}/wkp/setup.sh"
             # Define the ramble command
             ramble_command = f"{name}/wkp/ramble/bin/ramble --workspace-dir {name}/wkp/{name}/{exper}/{name}/{cluster}/workspace workspace setup"
             # Combine sourcing the script and running the command
