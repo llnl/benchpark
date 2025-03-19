@@ -115,7 +115,7 @@ def main():
             "cscs-eiger",
             "generic-x86",
             "jsc-juwels",
-            #"lanl-venado",
+            # "lanl-venado",
             "llnl-cluster",
             "llnl-elcapitan",
             "llnl-sierra",
@@ -176,17 +176,15 @@ def main():
                     var = "instance_type"
                 for cluster in sysd[system]:
                     spec_list = [
-                            "python",
-                            f"{name}/lib/main.py",
-                            "system",
-                            "init",
-                            f"--dest={name}/{cluster}",
-                            system,
-                            f"{var}={cluster}",
-                        ]
-                    subprocess.run(
-                        spec_list
-                    )
+                        "python",
+                        f"{name}/lib/main.py",
+                        "system",
+                        "init",
+                        f"--dest={name}/{cluster}",
+                        system,
+                        f"{var}={cluster}",
+                    ]
+                    subprocess.run(spec_list)
 
     # Compare the YAML files
     for system in sysd.keys():

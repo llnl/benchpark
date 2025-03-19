@@ -391,15 +391,13 @@ class LlnlSierra(System):
         cuda_ver = self.spec.variants["cuda"][0]
         cfg = mpi_cfgs[(compiler, cuda_ver)]
         selections["packages"] |= {
-            "blas": {
-                "require": [self.spec.variants["blas"][0]]  # Replace dynamically
-            },
+            "blas": {"require": [self.spec.variants["blas"][0]]},  # Replace dynamically
             "lapack": {
                 "require": [self.spec.variants["lapack"][0]]  # Replace dynamically
             },
             "mpi": {
                 "externals": cfg,  # Replace dynamically with the value of `cfg`
-                "buildable": False
+                "buildable": False,
             },
         }
         return selections
