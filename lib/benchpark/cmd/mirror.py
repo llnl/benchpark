@@ -5,11 +5,14 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+from io import StringIO
 import os
 import os.path
 import pathlib
 import shutil
 import tempfile
+
+import ruamel.yaml as yaml
 
 import benchpark.paths
 from benchpark.runtime import run_command, working_dir
@@ -31,6 +34,14 @@ def copytree_part_of(basedir, dest, include):
             return []
 
     shutil.copytree(basedir, dest, ignore=_ignore)
+
+
+def collect_abspaths(cmd):
+    out, err = run_command(cmd)
+    data = yaml.safe_load(StringIO(out))
+    import pdb; pdb.set_trace()
+    print('hi')
+    return []
 
 
 def copytree_tracked(basedir, dest):
@@ -146,6 +157,33 @@ export SPACK_DISABLE_LOCAL_CONFIG=1
 export _BENCHPARK_INITIALIZED=true
 """
             )
+
+    first_time_dest = os.path.join(dest, "first-time.sh")
+    if not os.path.exists(first_time_dest):
+        with open(first_time_dest, "w", encoding="utf-8") as f:
+            f.write(
+                """\
+this_script_dir=$(dirname "${BASH_SOURCE[0]}")
+
+. $this_script_dir/setup.sh
+
+spack config add "config:misc_cache:$this_script_dir/spack-misc-cache"
+"""
+            )
+
+    modifiers_dest = os.path.join(dest, "modifiers")
+    modifiers_src = os.path.join(benchpark.paths.benchpark_root, "modifiers")
+    if not os.path.exists(modifiers_dest):
+        shutil.copytree(modifiers_src, modifiers_dest)
+
+    bp_repo_dest = os.path.join(dest, "repo")
+    bp_repo_src = os.path.join(benchpark.paths.benchpark_root, "repo")
+    if not os.path.exists(bp_repo_dest):
+        shutil.copytree(bp_repo_src, bp_repo_dest)
+
+    paths_to_rewrite = []
+    paths_to_rewrite += collect_abspaths("ramble config get modifier_repos")
+    paths_to_rewrite += collect_abspaths("spack config get repos")
 
     ramble_workspace_mirror_dest = os.path.join(dest, "ramble-workspace-mirror")
     if not os.path.exists(ramble_workspace_mirror_dest):
