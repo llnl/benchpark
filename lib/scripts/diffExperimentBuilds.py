@@ -56,6 +56,22 @@ def main():
         required=True,
         help="Architecture for experiment set. choose from: ('cpu', 'cuda', 'rocm')",
     )
+    parser.add_argument(
+        "--extra-spec",
+        default="",
+        type=str,
+        help="provide additional spec to experiment spec string",
+    )
+    parser.add_argument(
+        "-e",
+        "--experiments",
+        nargs="*",
+        default="",
+    )
+    parser.add_argument(
+        "--run-experiment",
+        action="store_true"
+    )
 
     args = parser.parse_args()
 
@@ -78,7 +94,7 @@ def main():
             "hpl": "",
             "ior": "",
             "kripke": "+openmp",
-            # "laghos": "",
+            "laghos": "",
             "lammps": "",
             # "md-test": "",
             "osu-micro-benchmarks": "",
@@ -116,7 +132,15 @@ def main():
             "saxpy": "+rocm",
         },
     }
-    experiments = experiments_dict[args.arch]
+    if args.experiments == "":
+        experiments = experiments_dict[args.arch]
+    else:
+        experiments = {}
+        for e in args.experiments:
+            if e in experiments_dict[args.arch]:
+                experiments[e] = experiments_dict[args.arch][e]
+            else:
+                raise ValueError(f"Experiment {e} not found")
 
     system = args.system
     cluster = args.cluster
@@ -152,7 +176,7 @@ def main():
                     "experiment",
                     "init",
                     f"--dest={name}/{exper}",
-                    f"{exper}{spec}",
+                    f"{exper}{spec}" + args.extra_spec,
                 ]
             )
             subprocess.run(
@@ -170,8 +194,11 @@ def main():
             # Define the ramble command
             ramble_command = f"{name}/wkp/ramble/bin/ramble --workspace-dir {name}/wkp/{name}/{exper}/{name}/{cluster}/workspace workspace setup"
             # Combine sourcing the script and running the command
+            run_str = f"bash -c 'source {spack_setup_script} && {ramble_command}'"
+            if args.run_experiment:
+                run_str += f" && {name}/wkp/ramble/bin/ramble --workspace-dir {name}/wkp/{name}/{exper}/{name}/{cluster}/workspace on"
             subprocess.run(
-                f"bash -c 'source {spack_setup_script} && {ramble_command}'",
+                run_str,
                 shell=True,
                 check=True,
                 text=True,
