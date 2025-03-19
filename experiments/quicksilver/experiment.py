@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.scaling import StrongScaling
@@ -28,6 +28,8 @@ class Quicksilver(
         description="app version",
     )
 
+    maintainers("rfhaque")
+
     def compute_applications_section(self):
         self.add_experiment_variable("n_threads_per_proc", "1")
         self.add_experiment_variable("n_ranks", "{I}*{J}*{K}", True)
@@ -47,7 +49,7 @@ class Quicksilver(
         self.add_experiment_variable("J", ["2", "2", "2", "4"])
         self.add_experiment_variable("K", ["1", "2", "2", "2"])
 
-    def compute_spack_section(self):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
 
@@ -58,8 +60,8 @@ class Quicksilver(
         system_specs["mpi"] = "default-mpi"
 
         # empty package_specs value implies external package
-        self.add_spack_spec(system_specs["mpi"])
+        self.add_package_spec(system_specs["mpi"])
 
-        self.add_spack_spec(
+        self.add_package_spec(
             self.name, [f"quicksilver@{app_version} +mpi", system_specs["compiler"]]
         )

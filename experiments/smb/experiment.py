@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.scaling import StrongScaling
 
@@ -22,6 +22,8 @@ class Smb(Experiment, StrongScaling):
         description="app version",
     )
 
+    maintainers("nhanford")
+
     def compute_applications_section(self):
         if self.spec.satisfies("workload=mpi_overhead"):
             self.add_experiment_variable("n_ranks", "2")
@@ -31,7 +33,7 @@ class Smb(Experiment, StrongScaling):
             self.add_experiment_variable("n_nodes", "1")
             self.add_experiment_variable("n_ranks", "{n_nodes}*{sys_cores_per_node}")
 
-    def compute_spack_section(self):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
 
@@ -41,5 +43,6 @@ class Smb(Experiment, StrongScaling):
         system_specs = {}
         system_specs["compiler"] = "default-compiler"
         system_specs["mpi"] = "default-mpi"
-        self.add_spack_spec(system_specs["mpi"])
-        self.add_spack_spec(self.name, [spec_string, system_specs["compiler"]])
+
+        self.add_package_spec(system_specs["mpi"])
+        self.add_package_spec(self.name, [spec_string, system_specs["compiler"]])

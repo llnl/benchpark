@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.caliper import Caliper
 
@@ -24,6 +24,8 @@ class Stream(
         description="app version",
     )
 
+    maintainers("daboehme", "rfhaque")
+
     def compute_applications_section(self):
 
         array_size = {"s": 650000000}
@@ -39,7 +41,7 @@ class Stream(
         for pk, pv in array_size.items():
             self.add_experiment_variable(pk, pv, True)
 
-    def compute_spack_section(self):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
 
@@ -50,8 +52,8 @@ class Stream(
         system_specs["mpi"] = "default-mpi"
 
         # set package spack specs
-        self.add_spack_spec(system_specs["mpi"])
+        self.add_package_spec(system_specs["mpi"])
 
-        self.add_spack_spec(
+        self.add_package_spec(
             self.name, [f"stream@{app_version}", system_specs["compiler"]]
         )

@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.rocm import ROCmExperiment
 from benchpark.cuda import CudaExperiment
@@ -94,6 +94,8 @@ class OsuMicroBenchmarks(
         description="workloads available",
     )
 
+    maintainers("nhanford")
+
     def compute_applications_section(self):
 
         num_nodes = {"n_nodes": 2}
@@ -110,7 +112,7 @@ class OsuMicroBenchmarks(
             for pk, pv in num_nodes.items():
                 self.add_experiment_variable("n_gpus", pv, True)
 
-    def compute_spack_section(self):
+    def compute_package_section(self):
         system_specs = {}
         if self.spec.satisfies("+cuda"):
             system_specs["cuda_version"] = "{default_cuda_version}"
@@ -120,8 +122,9 @@ class OsuMicroBenchmarks(
 
         system_specs["compiler"] = "default-compiler"
         system_specs["mpi"] = "default-mpi"
-        self.add_spack_spec(system_specs["mpi"])
 
-        self.add_spack_spec(
+        self.add_package_spec(system_specs["mpi"])
+
+        self.add_package_spec(
             self.name, ["osu-micro-benchmarks", system_specs["compiler"]]
         )
