@@ -13,6 +13,7 @@ from benchpark.accounting import (  # noqa: E402
     benchpark_systems,
 )
 
+
 def _print_helper(name, collection):
     name = "@*b" + name + "@."
     strs = ["@*r", "@*c"]
@@ -34,17 +35,24 @@ def _print_helper(name, collection):
 def list_benchmarks(args):
     _print_helper("Benchmarks:", benchpark_benchmarks())
 
+
 def list_experiments(args):
     _print_helper("Experiments:", benchpark_experiments())
+
 
 def list_systems(args):
     _print_helper("Systems:", benchpark_systems())
 
+
 def list_modifiers(args):
     _print_helper("Modifiers:", benchpark_modifiers())
 
+
 def setup_parser(root_parser):
-    list_subparser = root_parser.add_subparsers(dest="list_subcommand", help="List available experiments, systems, and modifiers")
+    list_subparser = root_parser.add_subparsers(
+        dest="list_subcommand",
+        help="List available experiments, systems, and modifiers",
+    )
 
     benchmarks_parser = list_subparser.add_parser("benchmarks")
 

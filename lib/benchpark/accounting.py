@@ -16,8 +16,8 @@ exp_dict = {
     "StrongScaling": "strong",
     "ThroughputScaling": "throughput",
     "WeakScaling": "weak",
-
 }
+
 
 def benchpark_experiments():
     source_dir = benchpark.paths.benchpark_root
