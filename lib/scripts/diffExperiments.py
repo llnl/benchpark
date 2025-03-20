@@ -73,20 +73,10 @@ def main():
     new_name = f"benchpark-{args.commit_hash2}-{args.programming_model}"
 
     if args.experiments == []:
-        replace_dict = {
-            " ": "",
-            "Experiments:": "",
-            "/": "+",
-            "OpenMPExperiment": "openmp",
-            "CudaExperiment": "cuda",
-            "ROCmExperiment": "rocm",
-        }
         experiments_out = subprocess.run(
             ["benchpark", "list", "experiments"], text=True, capture_output=True
         )
-        experiments = experiments_out.stdout
-        for k, v in replace_dict.items():
-            experiments = experiments.replace(k, v)
+        experiments = experiments_out.stdout.replace(" ", "").replace("Experiments:", "")
         lines = experiments.split("\n")
         experiments = [line for line in lines if args.programming_model in line]
     else:
