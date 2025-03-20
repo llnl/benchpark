@@ -22,6 +22,20 @@ def main():
         formatter_class=argparse.RawTextHelpFormatter,
     )
     parser.add_argument(
+        "-s",
+        "--system",
+        type=str,
+        required=True,
+        help="Name of system.py to use for the experiment. This should be the system the script is being ran on. See 'benchpark list systems'. (e.g. 'llnl-cluster')",
+    )
+    parser.add_argument(
+        "-p",
+        "--programming-model",
+        type=str,
+        required=True,
+        help="Programming model to run experiments. choose from: ('openmp', 'cuda', 'rocm')",
+    )
+    parser.add_argument(
         "--commit-hash1",
         type=str,
         default="develop",
@@ -34,25 +48,11 @@ def main():
         help="Second commit hash or branch name for the newer version of Benchpark",
     )
     parser.add_argument(
-        "-s",
-        "--system",
-        type=str,
-        required=True,
-        help="Name of system.py to use for the experiment. This should be the system the script is being ran on. See 'benchpark list systems'. (e.g. 'llnl-cluster')",
-    )
-    parser.add_argument(
         "-c",
         "--cluster",
         type=str,
         default=None,
         help="System variant if applicable. This should be the cluster the script is being ran on. See 'benchpark list systems'. (e.g. 'ruby' for 'llnl-cluster')",
-    )
-    parser.add_argument(
-        "-p",
-        "--programming-model",
-        type=str,
-        required=True,
-        help="Programming model to run experiments. choose from: ('openmp', 'cuda', 'rocm')",
     )
     parser.add_argument(
         "--extra-spec",
@@ -70,75 +70,49 @@ def main():
 
     args = parser.parse_args()
 
-    old_name = f"benchpark-{args.commit_hash1}-{args.arch}"
-    new_name = f"benchpark-{args.commit_hash2}-{args.arch}"
-    # Use the arguments provided by the user or the defaults
-    bp = {
-        old_name: args.old,
-        new_name: args.new,
-    }
+    old_name = f"benchpark-{args.commit_hash1}-{args.programming_model}"
+    new_name = f"benchpark-{args.commit_hash2}-{args.programming_model}"
 
-    experiments_dict = {
-        "default": {
-            "gpcnet": "",
-            "hpcg": "",
-            "hpl": "",
-            "ior": "",
-            "laghos": "",
-            "lammps": "",
-            "md-test": "",
-            "osu-micro-benchmarks": "",
-            "phloem": "",
-            "raja-perf": "",
-            "smb": "",
-            "stream": "",
-        },
-        "openmp": {
-            "amg2023": "+openmp",
-            "genesis": "+openmp",
-            "gromacs": "+openmp",
-            "kripke": "+openmp",
-            "qws": "+openmp",
-            "saxpy": "+openmp",
-        },
-        "cuda": {
-            "babelstream": "+cuda",
-            "kripke": "+cuda",
-            "lammps": "+cuda",
-            "osu-micro-benchmarks": "+cuda",
-            "raja-perf": "+cuda",
-            "saxpy": "+cuda",
-        },
-        "rocm": {
-            "amg2023": "+rocm",
-            "babelstream": "+rocm",
-            "kripke": "+rocm",
-            "lammps": "+rocm",
-            "raja-perf": "+rocm",
-            "saxpy": "+rocm",
-        },
-    }
     if args.experiments == []:
-        experiments = experiments_dict[args.arch]
+        replace_dict = {
+            " ": "",
+            "Experiments:": "",
+            "/": "+",
+            "OpenMPExperiment": "openmp",
+            "CudaExperiment": "cuda",
+            "ROCmExperiment": "rocm",
+        }
+        experiments_out = subprocess.run(
+            ["benchpark", "list", "experiments"], text=True, capture_output=True
+        )
+        experiments = experiments_out.stdout
+        for k, v in replace_dict.items():
+            experiments = experiments.replace(k, v)
+        lines = experiments.split("\n")
+        experiments = [line for line in lines if args.programming_model in line]
     else:
-        experiments = {}
+        experiments = []
         for e in args.experiments:
-            if e in experiments_dict[args.arch]:
-                experiments[e] = experiments_dict[args.arch][e]
-            else:
-                raise ValueError(f"Experiment {e} not found")
+            experiments.append(e + "+" + args.programming_model)
+
+    print(f"Running these experiments: {experiments}")
 
     system = args.system
     cluster = args.cluster
 
-    for name, tag in bp.items():
+    for name, tag in {
+        old_name: args.commit_hash1,
+        new_name: args.commit_hash2,
+    }.items():
         if name in os.listdir(os.getcwd()):
             print(f"Removing {name}...")
             shutil.rmtree(name)
         subprocess.run(["git", "clone", "https://github.com/LLNL/benchpark.git", name])
         subprocess.run(["git", "checkout", tag], cwd=name)
 
-        for exper, spec in experiments.items():
+        for exper in experiments:
+            exper, spec = exper.split("+")
+            spec = "+" + spec
             var = "cluster"
             if os.path.isdir(f"{name}/{cluster}"):
                 shutil.rmtree(f"{name}/{cluster}")
@@ -214,7 +188,8 @@ def main():
             with open(yaml_file_path, "w") as yaml_file:
                 yaml_file.write(spec_result.stdout)
 
-    for exper in experiments.keys():
+    for exper in experiments:
+        exper = exper.split("+")[0]
         old_file = f"./{old_name}-{exper}.yaml"
         new_file = f"./{new_name}-{exper}.yaml"
 
