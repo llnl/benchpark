@@ -312,8 +312,8 @@ class CscsDaint(System):
                     "cuda": {
                         "externals": [
                             {
-                                "spec": f"cuda@{self.cuda_version}",
-                                "prefix": f"/usr/local/cuda-{self.cuda_version.major}",
+                                "spec": "cuda@{self.cuda_version}",
+                                "prefix": "/usr/local/cuda-{self.cuda_version.major}",
                             }
                         ]
                     }
