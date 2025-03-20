@@ -11,7 +11,8 @@ import benchpark.paths
 def test_list():
     for subcmd in ["experiments", "modifiers", "systems", "benchmarks"]:
         subprocess.run(
-            [benchpark.paths.benchpark_root / "bin/benchpark", "list", subcmd], check=True
+            [benchpark.paths.benchpark_root / "bin/benchpark", "list", subcmd],
+            check=True,
         )
 
 
