@@ -13,8 +13,18 @@ class Scaffold(ExecutableApplication):
 
     tags = ["python"]
 
-    executable("req", "pip install -r requirements.txt")
+    # software_spec("numpy", "numpy==1.26.4", package_manager="pip")
+    # software_spec("tqdm", "tqdm==4.67.1", package_manager="pip")
+    # software_spec("", package_manager="pip")
+    # software_spec("", package_manager="pip")
+    # software_spec("", package_manager="pip")
+    # software_spec("", package_manager="pip")
+    # software_spec("", package_manager="pip")
+    # software_spec("", package_manager="pip")
+
+
+    #executable("req", "pip install -r requirements.txt")
     executable("setup", "python fractal_gen.py --config configs/sweep_default.yml")
     executable("run", "python sweep.py --config configs/sweep_default.yml")
 
-    workload("sweep", executables=["req", "setup", "run"])
+    workload("sweep", executables=["setup", "run"])
