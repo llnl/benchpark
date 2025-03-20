@@ -16,9 +16,9 @@ def main():
         (check if the output of system init was changed between commits).
 
         Examples:
-            - benchpark-python diffExperimentBuilds.py -s llnl-cluster -c ruby -a cpu
-            - benchpark-python diffExperimentBuilds.py -s llnl-sierra -a cuda
-            - benchpark-python diffExperimentBuilds.py -s llnl-elcapitan -c tioga -a rocm""",
+            - benchpark-python diffExperimentBuilds.py -s llnl-cluster -c ruby -p openmp
+            - benchpark-python diffExperimentBuilds.py -s llnl-sierra -p cuda
+            - benchpark-python diffExperimentBuilds.py -s llnl-elcapitan -c tioga -p rocm""",
         formatter_class=argparse.RawTextHelpFormatter,
     )
     parser.add_argument(
