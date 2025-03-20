@@ -66,6 +66,11 @@ def main():
         default=[],
     )
     parser.add_argument("--run-experiment", action="store_true")
+    parser.add_argument(
+        "--rebuild",
+        action="store_true",
+        help="Clear directories and re-build if they exist.",
+    )
 
     args = parser.parse_args()
 
@@ -76,7 +81,9 @@ def main():
         experiments_out = subprocess.run(
             ["benchpark", "list", "experiments"], text=True, capture_output=True
         )
-        experiments = experiments_out.stdout.replace(" ", "").replace("Experiments:", "")
+        experiments = experiments_out.stdout.replace(" ", "").replace(
+            "Experiments:", ""
+        )
         lines = experiments.split("\n")
         experiments = [line for line in lines if args.programming_model in line]
     else:
@@ -89,93 +96,102 @@ def main():
     system = args.system
     cluster = args.cluster
 
-    for name, tag in {
-        old_name: args.commit_hash1,
-        new_name: args.commit_hash2,
-    }.items():
-        if name in os.listdir(os.getcwd()):
-            print(f"Removing {name}...")
-            shutil.rmtree(name)
-        subprocess.run(["git", "clone", "https://github.com/LLNL/benchpark.git", name])
-        subprocess.run(["git", "checkout", tag], cwd=name)
+    if (
+        old_name in os.listdir(os.getcwd())
+        and new_name in os.listdir(os.getcwd())
+        and not args.rebuild
+    ):
+        pass
+    else:
+        for name, tag in {
+            old_name: args.commit_hash1,
+            new_name: args.commit_hash2,
+        }.items():
+            if name in os.listdir(os.getcwd()):
+                print(f"Removing {name}...")
+                shutil.rmtree(name)
+            subprocess.run(
+                ["git", "clone", "https://github.com/LLNL/benchpark.git", name]
+            )
+            subprocess.run(["git", "checkout", tag], cwd=name)
 
-        for exper in experiments:
-            exper, spec = exper.split("+")
-            spec = "+" + spec
-            var = "cluster"
-            if os.path.isdir(f"{name}/{cluster}"):
-                shutil.rmtree(f"{name}/{cluster}")
-            sys_list = [
-                "python",
-                f"{name}/lib/main.py",
-                "system",
-                "init",
-                f"--dest={name}/{cluster}",
-                system,
-            ]
-            if cluster:
-                sys_list.append(f"{var}={cluster}")
-            subprocess.run(sys_list)
-            if os.path.isdir(f"{name}/{exper}"):
-                shutil.rmtree(f"{name}/{exper}")
-            subprocess.run(
-                [
+            for exper in experiments:
+                exper, spec = exper.split("+")
+                spec = "+" + spec
+                var = "cluster"
+                if os.path.isdir(f"{name}/{cluster}"):
+                    shutil.rmtree(f"{name}/{cluster}")
+                sys_list = [
                     "python",
                     f"{name}/lib/main.py",
-                    "experiment",
+                    "system",
                     "init",
-                    f"--dest={name}/{exper}",
-                    f"{exper}{spec}" + args.extra_spec,
+                    f"--dest={name}/{cluster}",
+                    system,
                 ]
-            )
-            subprocess.run(
-                [
-                    "python",
-                    f"{name}/lib/main.py",
-                    "setup",
-                    f"{name}/{exper}",
-                    f"{name}/{cluster}",
-                    f"{name}/wkp",
-                ]
-            )
-            # Path to the Spack setup script
-            spack_setup_script = f"{name}/wkp/setup.sh"
-            # Define the ramble command
-            ramble_command = f"{name}/wkp/ramble/bin/ramble --workspace-dir {name}/wkp/{name}/{exper}/{name}/{cluster}/workspace workspace setup"
-            # Combine sourcing the script and running the command
-            run_str = f"bash -c 'source {spack_setup_script} && {ramble_command}"
-            if args.run_experiment:
-                run_str += f" && {name}/wkp/ramble/bin/ramble --workspace-dir {name}/wkp/{name}/{exper}/{name}/{cluster}/workspace on"
-            run_str += "'"
-            subprocess.run(
-                run_str,
-                shell=True,
-                check=True,
-                text=True,
-            )
-            # Run the `spack find` command to get the hash
-            pkg_hash = subprocess.run(
-                [f"{name}/wkp/spack/bin/spack", "find", "--hash", exper],
-                text=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,  # Capture errors
-            )
-            spec_result = subprocess.run(
-                [
-                    f"{name}/wkp/spack/bin/spack",
-                    "spec",
-                    "--yaml",
-                    pkg_hash.stdout.strip(),
-                ],
-                text=True,
-                stdout=subprocess.PIPE,
-            )
-            # Write the output to a file
-            yaml_file_path = f"{name}-{exper}.yaml"
-            if os.path.isfile(yaml_file_path):
-                os.remove(yaml_file_path)
-            with open(yaml_file_path, "w") as yaml_file:
-                yaml_file.write(spec_result.stdout)
+                if cluster:
+                    sys_list.append(f"{var}={cluster}")
+                subprocess.run(sys_list)
+                if os.path.isdir(f"{name}/{exper}"):
+                    shutil.rmtree(f"{name}/{exper}")
+                subprocess.run(
+                    [
+                        "python",
+                        f"{name}/lib/main.py",
+                        "experiment",
+                        "init",
+                        f"--dest={name}/{exper}",
+                        f"{exper}{spec}" + args.extra_spec,
+                    ]
+                )
+                subprocess.run(
+                    [
+                        "python",
+                        f"{name}/lib/main.py",
+                        "setup",
+                        f"{name}/{exper}",
+                        f"{name}/{cluster}",
+                        f"{name}/wkp",
+                    ]
+                )
+                # Path to the Spack setup script
+                spack_setup_script = f"{name}/wkp/setup.sh"
+                # Define the ramble command
+                ramble_command = f"{name}/wkp/ramble/bin/ramble --workspace-dir {name}/wkp/{name}/{exper}/{name}/{cluster}/workspace workspace setup"
+                # Combine sourcing the script and running the command
+                run_str = f"bash -c 'source {spack_setup_script} && {ramble_command}"
+                if args.run_experiment:
+                    run_str += f" && {name}/wkp/ramble/bin/ramble --workspace-dir {name}/wkp/{name}/{exper}/{name}/{cluster}/workspace on"
+                run_str += "'"
+                subprocess.run(
+                    run_str,
+                    shell=True,
+                    check=True,
+                    text=True,
+                )
+                # Run the `spack find` command to get the hash
+                pkg_hash = subprocess.run(
+                    [f"{name}/wkp/spack/bin/spack", "find", "--hash", exper],
+                    text=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,  # Capture errors
+                )
+                spec_result = subprocess.run(
+                    [
+                        f"{name}/wkp/spack/bin/spack",
+                        "spec",
+                        "--yaml",
+                        pkg_hash.stdout.strip(),
+                    ],
+                    text=True,
+                    stdout=subprocess.PIPE,
+                )
+                # Write the output to a file
+                yaml_file_path = f"{name}-{exper}.yaml"
+                if os.path.isfile(yaml_file_path):
+                    os.remove(yaml_file_path)
+                with open(yaml_file_path, "w") as yaml_file:
+                    yaml_file.write(spec_result.stdout)
 
     for exper in experiments:
         exper = exper.split("+")[0]
@@ -183,7 +199,7 @@ def main():
         new_file = f"./{new_name}-{exper}.yaml"
 
         # Path to the Spack setup script
-        spack_setup_script = f"{name}/wkp/setup.sh"
+        spack_setup_script = f"{old_name}/wkp/setup.sh"
         # Define the ramble command
         cmd = (
             f"{old_name}/wkp/spack/bin/spack-python altdiff.py -t {old_file} {new_file}"
