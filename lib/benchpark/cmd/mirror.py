@@ -5,14 +5,11 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from io import StringIO
 import os
 import os.path
 import pathlib
 import shutil
 import tempfile
-
-import ruamel.yaml as yaml
 
 import benchpark.paths
 from benchpark.runtime import run_command, working_dir
