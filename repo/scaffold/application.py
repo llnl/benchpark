@@ -5,6 +5,7 @@
 
 from ramble.appkit import *
 
+
 class Scaffold(ExecutableApplication):
     """Scaffold benchmark"""
 
@@ -12,4 +13,8 @@ class Scaffold(ExecutableApplication):
 
     tags = ["python"]
 
-    
+    executable("req", "pip install -r requirements.txt")
+    executable("setup", "python fractal_gen.py --config configs/sweep_default.yml")
+    executable("run", "python sweep.py --config configs/sweep_default.yml")
+
+    workload("sweep", executables=["req", "setup", "run"])

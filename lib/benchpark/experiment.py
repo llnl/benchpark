@@ -117,7 +117,7 @@ class Experiment(ExperimentSystemBase, SingleNode):
     variant(
         "package_manager",
         default="spack",
-        values=("spack", "environment-modules", "None"),
+        values=("spack", "environment-modules", "None", "pip"),
         description="package manager to use",
     )
 
@@ -324,6 +324,10 @@ class Experiment(ExperimentSystemBase, SingleNode):
                 spack_variants
             ).strip()
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> ff70d47 (In progress)
         if "append_path" in self.spec.variants:
             self.append_environment_variable(
                 "PATH", self.spec.variants["append_path"][0]
