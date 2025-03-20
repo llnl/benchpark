@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from benchpark.error import BenchparkError
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
@@ -36,6 +36,8 @@ class Kripke(
         default="develop",
         description="app version",
     )
+
+    maintainers("pearce8")
 
     def compute_applications_section(self):
         # TODO: Replace with conflicts clause
@@ -134,7 +136,7 @@ class Kripke(
         elif self.spec.satisfies("+rocm"):
             self.add_experiment_variable("arch", "HIP")
 
-    def compute_spack_section(self):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
 
@@ -151,8 +153,8 @@ class Kripke(
 
         # set package spack specs
         # empty package_specs value implies external package
-        self.add_spack_spec(system_specs["mpi"])
+        self.add_package_spec(system_specs["mpi"])
 
-        self.add_spack_spec(
+        self.add_package_spec(
             self.name, [f"kripke@{app_version} +mpi", system_specs["compiler"]]
         )

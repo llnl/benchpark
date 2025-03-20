@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from benchpark.error import BenchparkError
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
@@ -37,6 +37,8 @@ class Amg2023(
         default="develop",
         description="app version",
     )
+
+    maintainers("pearce8")
 
     # requires("system+papi", when(caliper=topdown*))
 
@@ -131,7 +133,7 @@ class Amg2023(
         elif self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_experiment_variable("n_gpus", n_resources, True)
 
-    def compute_spack_section(self):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
 
@@ -143,20 +145,20 @@ class Amg2023(
         system_specs["lapack"] = "lapack"
         system_specs["blas"] = "blas"
 
-        # set package spack specs
-        # empty package_specs value implies external package
-        self.add_spack_spec(system_specs["mpi"])
-
         if self.spec.satisfies("+cuda"):
             system_specs["cuda_version"] = "{default_cuda_version}"
             system_specs["cuda_arch"] = "{cuda_arch}"
         elif self.spec.satisfies("+rocm"):
             system_specs["rocm_arch"] = "{rocm_arch}"
 
+        # set package spack specs
         # empty package_specs value implies external package
-        self.add_spack_spec(system_specs["blas"])
-        self.add_spack_spec(system_specs["lapack"])
+        self.add_package_spec(system_specs["mpi"])
 
-        self.add_spack_spec(
+        # empty package_specs value implies external package
+        self.add_package_spec(system_specs["blas"])
+        self.add_package_spec(system_specs["lapack"])
+
+        self.add_package_spec(
             self.name, [f"amg2023@{app_version} +mpi", system_specs["compiler"]]
         )
