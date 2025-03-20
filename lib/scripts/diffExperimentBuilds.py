@@ -184,9 +184,10 @@ def main():
             # Define the ramble command
             ramble_command = f"{name}/wkp/ramble/bin/ramble --workspace-dir {name}/wkp/{name}/{exper}/{name}/{cluster}/workspace workspace setup"
             # Combine sourcing the script and running the command
-            run_str = f"bash -c 'source {spack_setup_script} && {ramble_command}'"
+            run_str = f"bash -c 'source {spack_setup_script} && {ramble_command}"
             if args.run_experiment:
                 run_str += f" && {name}/wkp/ramble/bin/ramble --workspace-dir {name}/wkp/{name}/{exper}/{name}/{cluster}/workspace on"
+            run_str += "'"
             subprocess.run(
                 run_str,
                 shell=True,
