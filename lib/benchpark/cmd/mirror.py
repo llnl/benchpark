@@ -148,7 +148,7 @@ if [ -n "${_BENCHPARK_INITIALIZED:-}" ]; then
     return 0
 fi
 
-this_script_dir=$(dirname "${BASH_SOURCE[0]}")
+this_script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 . $this_script_dir/spack/share/spack/setup-env.sh
 . $this_script_dir/ramble/share/ramble/setup-env.sh
@@ -171,7 +171,7 @@ export _BENCHPARK_INITIALIZED=true
         with open(first_time_dest, "w", encoding="utf-8") as f:
             f.write(
                 """\
-this_script_dir=$(dirname "${BASH_SOURCE[0]}")
+this_script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 . $this_script_dir/setup.sh
 
