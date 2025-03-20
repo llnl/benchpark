@@ -22,39 +22,37 @@ def main():
         formatter_class=argparse.RawTextHelpFormatter,
     )
     parser.add_argument(
-        "-o",
-        "--old",
+        "--commit-hash1",
         type=str,
         default="develop",
-        help="Commit hash or branch name for the old version of Benchpark (default: develop).",
+        help="Commit hash or branch name for the version of Benchpark to compare against (default: develop).",
     )
     parser.add_argument(
-        "-n",
-        "--new",
+        "--commit-hash2",
         type=str,
         default="pearce8-patch-3",
-        help="Commit hash or branch name for the new version of Benchpark",
+        help="Second commit hash or branch name for the newer version of Benchpark",
     )
     parser.add_argument(
         "-s",
         "--system",
         type=str,
         required=True,
-        help="System being ran on. ex: 'llnl-cluster'",
+        help="Name of system.py to use for the experiment. This should be the system the script is being ran on. See 'benchpark list systems'. (e.g. 'llnl-cluster')",
     )
     parser.add_argument(
         "-c",
         "--cluster",
         type=str,
         default=None,
-        help="cluster variant if applicable. ex: 'ruby'",
+        help="System variant if applicable. This should be the cluster the script is being ran on. See 'benchpark list systems'. (e.g. 'ruby' for 'llnl-cluster')",
     )
     parser.add_argument(
-        "-a",
-        "--arch",
+        "-p",
+        "--programming-model",
         type=str,
         required=True,
-        help="Architecture for experiment set. choose from: ('cpu', 'cuda', 'rocm')",
+        help="Programming model to run experiments. choose from: ('openmp', 'cuda', 'rocm')",
     )
     parser.add_argument(
         "--extra-spec",
@@ -66,14 +64,14 @@ def main():
         "-e",
         "--experiments",
         nargs="*",
-        default="",
+        default=[],
     )
     parser.add_argument("--run-experiment", action="store_true")
 
     args = parser.parse_args()
 
-    old_name = f"benchpark-old-{args.arch}"
-    new_name = f"benchpark-new-{args.arch}"
+    old_name = f"benchpark-{args.commit_hash1}-{args.arch}"
+    new_name = f"benchpark-{args.commit_hash2}-{args.arch}"
     # Use the arguments provided by the user or the defaults
     bp = {
         old_name: args.old,
@@ -81,25 +79,27 @@ def main():
     }
 
     experiments_dict = {
-        "cpu": {
-            "amg2023": "+openmp",
-            "genesis": "+openmp",
+        "default": {
             "gpcnet": "",
-            "gromacs": "+openmp",
             "hpcg": "",
             "hpl": "",
             "ior": "",
-            "kripke": "+openmp",
             "laghos": "",
             "lammps": "",
             "md-test": "",
             "osu-micro-benchmarks": "",
             "phloem": "",
-            "qws": "+openmp",
             "raja-perf": "",
-            "saxpy": "+openmp",
             "smb": "",
             "stream": "",
+        },
+        "openmp": {
+            "amg2023": "+openmp",
+            "genesis": "+openmp",
+            "gromacs": "+openmp",
+            "kripke": "+openmp",
+            "qws": "+openmp",
+            "saxpy": "+openmp",
         },
         "cuda": {
             "babelstream": "+cuda",
@@ -118,7 +118,7 @@ def main():
             "saxpy": "+rocm",
         },
     }
-    if args.experiments == "":
+    if args.experiments == []:
         experiments = experiments_dict[args.arch]
     else:
         experiments = {}
