@@ -175,6 +175,7 @@ this_script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 . $this_script_dir/setup.sh
 
+spack uninstall -ay
 spack repo add --scope=site $this_script_dir/repo
 spack config add "config:misc_cache:$this_script_dir/spack-misc-cache"
 
