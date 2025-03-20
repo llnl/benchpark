@@ -12,13 +12,12 @@ import llnl.util.tty.color as color  # noqa: E402
 
 def main():
     parser = argparse.ArgumentParser(
-        description="""Compare YAMLs generated from 'system init' between two different commits of Benchpark.
-        (check if the output of system init was changed between commits).
+        description="""Compare experiments between two versions of benchpark. Includes optional functionality to run each experiment.
 
         Examples:
-            - benchpark-python diffExperimentBuilds.py -s llnl-cluster -c ruby -p openmp
-            - benchpark-python diffExperimentBuilds.py -s llnl-sierra -p cuda
-            - benchpark-python diffExperimentBuilds.py -s llnl-elcapitan -c tioga -p rocm""",
+            - benchpark-python diffExperiments.py -s llnl-cluster -c ruby -p openmp
+            - benchpark-python diffExperiments.py -s llnl-sierra -p cuda
+            - benchpark-python diffExperiments.py -s llnl-elcapitan -c tioga -p rocm""",
         formatter_class=argparse.RawTextHelpFormatter,
     )
     parser.add_argument(
