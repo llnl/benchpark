@@ -33,11 +33,13 @@ Some or all of the functions in the Experiment base class can be overridden to d
 compute_package_section
 ~~~~~~~~~~~~~~~~~~~~~~~
 In ``compute_package_section`` add the benchmark's package spec. Required packages for the benchmark should be defined in the ``package.py``. 
+``ADDITIONAL_SPECS`` should be specifications that the exeperiment always uses, such as ``+mpi``, e.g. ``amg2023@{app_version} +mpi``. 
 
 ::
   
   def compute_package_section(self):
-      self.add_package_spec(self.name, [f"BENCHMARK@APP_VERSION [ADDITIONAL_SPECS]"])
+      app_version = self.spec.variants["version"][0]
+      self.add_package_spec(self.name, [f"BENCHMARK@{app_version} [ADDITIONAL_SPECS]"])
 
 .. note: 
   This will change and need updates
