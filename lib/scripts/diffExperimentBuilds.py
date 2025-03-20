@@ -83,23 +83,20 @@ def main():
     experiments_dict = {
         "cpu": {
             "amg2023": "+openmp",
-            # "babelstream": "",
             "genesis": "+openmp",
             "gpcnet": "",
-            # "gromacs": "",
+            "gromacs": "+openmp",
             "hpcg": "",
             "hpl": "",
             "ior": "",
             "kripke": "+openmp",
             "laghos": "",
             "lammps": "",
-            # "md-test": "",
+            "md-test": "",
             "osu-micro-benchmarks": "",
             "phloem": "",
-            # "quicksilver": "",
             "qws": "+openmp",
             "raja-perf": "",
-            # "remhos": "",
             "saxpy": "+openmp",
             "smb": "",
             "stream": "",
@@ -119,13 +116,9 @@ def main():
         "rocm": {
             "amg2023": "+rocm",
             "babelstream": "+rocm",
-            # "gromacs": "+rocm", # didn't work develop
             "kripke": "+rocm",
-            # "laghos": "+rocm", # dev
             "lammps": "+rocm",
-            # "osu-micro-benchmarks": "+rocm", # didn't work dev
             "raja-perf": "+rocm",
-            # "remhos": "+rocm",
             "saxpy": "+rocm",
         },
     }
