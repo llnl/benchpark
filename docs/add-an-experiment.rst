@@ -30,8 +30,20 @@ and package/application repositories, are used to generate a set of concrete Ram
 
 Some or all of the functions in the Experiment base class can be overridden to define custom behavior, such as adding experiment variants. 
 
+compute_package_section
+~~~~~~~~~~~~~~~~~~~~~~~
+In ``compute_package_section`` add the benchmark's package spec. Required packages for the benchmark should be defined in the ``package.py``. 
+
+::
+  
+  def compute_package_section(self):
+      self.add_package_spec(self.name, [f"BENCHMARK@APP_VERSION [ADDITIONAL_SPECS]"])
+
 .. note: 
   This will change and need updates
+
+Variants
+~~~~~~~~
 
 Variants of the experiment can be added to utilize different *ProgrammingModels* used for on-node parallelization,
 e.g., ``benchpark/experiments/amg2023/experiment.py`` can be updated to inherit from different experiments to , which can be
