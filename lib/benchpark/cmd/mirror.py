@@ -38,10 +38,9 @@ def copytree_part_of(basedir, dest, include):
 
 def delete_configs_in(basedir):
     collected = []
-    for d, _, fnames in os.walk(basedir):
-        for fname in fnames:
-            if fname.endswith(".yaml"):
-                collected.append(os.path.join(d, fname))
+    for fname in os.listdir(basedir):
+        if fname.endswith(".yaml"):
+            collected.append(os.path.join(basedir, fname))
     for path in collected:
         run_command(f"rm {path}")
 
@@ -165,8 +164,8 @@ export _BENCHPARK_INITIALIZED=true
     # definitions. Those are generally abspaths and we need to
     # rewrite both. It's easier to do this by reinstantiating the
     # configs from scratch
-    delete_configs_in(os.path.join(spack_dest, "etc"))
-    delete_configs_in(os.path.join(ramble_dest, "etc"))
+    delete_configs_in(os.path.join(spack_dest, "etc", "spack"))
+    delete_configs_in(os.path.join(ramble_dest, "etc", "ramble"))
     first_time_dest = os.path.join(dest, "first-time.sh")
     if not os.path.exists(first_time_dest):
         with open(first_time_dest, "w", encoding="utf-8") as f:
