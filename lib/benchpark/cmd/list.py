@@ -20,11 +20,16 @@ def _print_helper(name, collection):
 
     color.cprint(name)
     for item in collection:
-        if "/" in item:
-            item = item.split("/")
-            color.cprint(f"    {strs[0]+item[0]+end+'/'+strs[1]+item[1]+end}")
-        else:
+        if "/" not in item and "+" not in item:
             color.cprint(f"    {strs[0]+item+end}")
+        else:
+            if "/" in item:
+                char = "/"
+            else:
+                char = "+"
+            item = item.split(char)
+            color.cprint(f"    {strs[0]+item[0]+end+char+strs[1]+item[1]+end}")
+
 
 def list_benchmarks(args):
     _print_helper("Benchmarks:", benchpark_benchmarks())
