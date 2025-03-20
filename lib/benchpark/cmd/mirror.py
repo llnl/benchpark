@@ -53,6 +53,36 @@ def collect_abspaths(cmd):
     return abspaths
 
 
+def collect_yaml_files(basedir):
+    collected = []
+    for d, _, fnames in os.walk(basedir):
+        for fname in fnames:
+            if fname.endswith(".yaml"):
+                collected.append(os.path.join(d, fname))
+    return collected
+
+
+def generate_abspath_map(abspaths, root_map):
+    """This returns sed exprs ordered according to the root_map
+    """
+    sed_exprs = dict()
+    for path_in in abspaths:
+        path = pathlib.Path(path_in)
+        root_match = False
+        for i, parent in enumerate(path.parents):
+            if root_match:
+                break
+            for j, (root, target) in enumerate(root_map.items()):
+                if os.path.samefile(parent, root):
+                    sed_exprs[j] = f"s|{str(parent)}|{target}|g"
+                    root_match = True
+                    break
+
+        if not root_match:
+            raise Exception(f"Abspath {path}: no relocation was found")
+    return list(y for (x, y) in sorted(sed_exprs.items()))
+
+
 def copytree_tracked(basedir, dest):
     tracked = set()
     with working_dir(basedir):
@@ -193,6 +223,23 @@ spack config add "config:misc_cache:$this_script_dir/spack-misc-cache"
     paths_to_rewrite = []
     paths_to_rewrite += collect_abspaths("ramble config get modifier_repos")
     paths_to_rewrite += collect_abspaths("spack config get repos")
+    def root_map(relative_root):
+        # relative root is either "spack" or "ramble"
+        # if we're modifying an e.g. spack config file, then we want to generate
+        # a path relative to $spack
+        return {
+            # Assume workspace may be a subdir of benchpark root, but never the
+            # other way around. I want to sed transform the subdir preferentially
+            # so it appears first in this dict (which is ordered)
+            workspace: os.path.join(f"${relative_root}", ".."),
+            benchpark.paths.benchpark_root: os.path.join(f"${relative_root}", ".."),
+        }
+    spack_seds = generate_abspath_map(paths_to_rewrite, root_map("spack"))
+    spack_cfgs = collect_yaml_files(os.path.join(spack_dest, "etc"))
+
+
+    ramble_seds = generate_abspath_map(paths_to_rewrite, root_map("ramble"))
+    ramble_cfgs = collect_yaml_files(os.path.join(ramble_dest, "etc"))
 
     ramble_workspace_mirror_dest = os.path.join(dest, "ramble-workspace-mirror")
     if not os.path.exists(ramble_workspace_mirror_dest):
