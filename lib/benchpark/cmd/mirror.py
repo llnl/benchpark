@@ -36,51 +36,14 @@ def copytree_part_of(basedir, dest, include):
     shutil.copytree(basedir, dest, ignore=_ignore)
 
 
-def collect_abspaths(cmd):
-    """Given a command like "spack config get...", this runs that command,
-    loads the output into a yaml object and assumes this yaml is organized
-    like a dictionary with one key where the value is a list (this format
-    applies to several config sections in Spack and Ramble). It then examines
-    the entries of the list to find absolute paths.
-    """
-    out, err = run_command(cmd)
-    data = yaml.safe_load(StringIO(out))
-    (_, vals), = data.items()
-    abspaths = []
-    for val in vals:
-        if os.path.exists(val) and os.path.isabs(val):
-            abspaths.append(val)
-    return abspaths
-
-
-def collect_yaml_files(basedir):
+def delete_configs_in(basedir):
     collected = []
     for d, _, fnames in os.walk(basedir):
         for fname in fnames:
             if fname.endswith(".yaml"):
                 collected.append(os.path.join(d, fname))
-    return collected
-
-
-def generate_abspath_map(abspaths, root_map):
-    """This returns sed exprs ordered according to the root_map
-    """
-    sed_exprs = dict()
-    for path_in in abspaths:
-        path = pathlib.Path(path_in)
-        root_match = False
-        for i, parent in enumerate(path.parents):
-            if root_match:
-                break
-            for j, (root, target) in enumerate(root_map.items()):
-                if os.path.samefile(parent, root):
-                    sed_exprs[j] = f"s|{str(parent)}|{target}|g"
-                    root_match = True
-                    break
-
-        if not root_match:
-            raise Exception(f"Abspath {path}: no relocation was found")
-    return list(y for (x, y) in sorted(sed_exprs.items()))
+    for path in collected:
+        run_command(f"rm {path}")
 
 
 def copytree_tracked(basedir, dest):
@@ -197,6 +160,13 @@ export _BENCHPARK_INITIALIZED=true
 """
             )
 
+    # This next section is about "relocating" the references in
+    # Spack/Ramble that refer to Benchpark's additional app/package
+    # definitions. Those are generally abspaths and we need to
+    # rewrite both. It's easier to do this by reinstantiating the
+    # configs from scratch
+    delete_configs_in(os.path.join(spack_dest, "etc"))
+    delete_configs_in(os.path.join(ramble_dest, "etc"))
     first_time_dest = os.path.join(dest, "first-time.sh")
     if not os.path.exists(first_time_dest):
         with open(first_time_dest, "w", encoding="utf-8") as f:
@@ -206,7 +176,13 @@ this_script_dir=$(dirname "${BASH_SOURCE[0]}")
 
 . $this_script_dir/setup.sh
 
+spack repo add --scope=site $this_script_dir/repo
 spack config add "config:misc_cache:$this_script_dir/spack-misc-cache"
+
+ramble repo add --scope=site $this_script_dir/repo
+ramble repo add -t modifiers --scope=site $this_script_dir/modifiers
+ramble config --scope=site add "config:disable_progress_bar:true"
+ramble config --scope=site add \"config:spack:global:args:'-d'\"
 """
             )
 
@@ -219,27 +195,6 @@ spack config add "config:misc_cache:$this_script_dir/spack-misc-cache"
     bp_repo_src = os.path.join(benchpark.paths.benchpark_root, "repo")
     if not os.path.exists(bp_repo_dest):
         shutil.copytree(bp_repo_src, bp_repo_dest)
-
-    paths_to_rewrite = []
-    paths_to_rewrite += collect_abspaths("ramble config get modifier_repos")
-    paths_to_rewrite += collect_abspaths("spack config get repos")
-    def root_map(relative_root):
-        # relative root is either "spack" or "ramble"
-        # if we're modifying an e.g. spack config file, then we want to generate
-        # a path relative to $spack
-        return {
-            # Assume workspace may be a subdir of benchpark root, but never the
-            # other way around. I want to sed transform the subdir preferentially
-            # so it appears first in this dict (which is ordered)
-            workspace: os.path.join(f"${relative_root}", ".."),
-            benchpark.paths.benchpark_root: os.path.join(f"${relative_root}", ".."),
-        }
-    spack_seds = generate_abspath_map(paths_to_rewrite, root_map("spack"))
-    spack_cfgs = collect_yaml_files(os.path.join(spack_dest, "etc"))
-
-
-    ramble_seds = generate_abspath_map(paths_to_rewrite, root_map("ramble"))
-    ramble_cfgs = collect_yaml_files(os.path.join(ramble_dest, "etc"))
 
     ramble_workspace_mirror_dest = os.path.join(dest, "ramble-workspace-mirror")
     if not os.path.exists(ramble_workspace_mirror_dest):
