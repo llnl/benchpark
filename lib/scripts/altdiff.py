@@ -179,7 +179,7 @@ Example usage:
         "-a",
         "--asymmetric",
         action="store_true",
-        help="Only compare spec0 against spec1. Default behavior also compares spec1 against spec0."
+        help="Only compare spec0 against spec1. Default behavior also compares spec1 against spec0.",
     )
 
     parser.add_argument("specs", nargs=argparse.REMAINDER, help="two specs to compare")
