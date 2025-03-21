@@ -54,13 +54,13 @@ def setup_parser(root_parser):
         help="List available experiments, systems, and modifiers",
     )
 
-    benchmarks_parser = list_subparser.add_parser("benchmarks")
+    list_subparser.add_parser("benchmarks")
 
-    experiments_parser = list_subparser.add_parser("experiments")
+    list_subparser.add_parser("experiments")
 
-    systems_parser = list_subparser.add_parser("systems")
+    list_subparser.add_parser("systems")
 
-    modifiers_parser = list_subparser.add_parser("modifiers")
+    list_subparser.add_parser("modifiers")
 
 
 def command(args):
