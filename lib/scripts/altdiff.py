@@ -173,8 +173,13 @@ Example usage:
         "-d",
         "--diffprint",
         action="store_true",
-        default=True,
         help="Print if the two specs are different or the same.",
+    )
+    parser.add_argument(
+        "-a",
+        "--asymmetric",
+        action="store_true",
+        help="Only compare spec0 against spec1. Default behavior also compares spec1 against spec0."
     )
 
     parser.add_argument("specs", nargs=argparse.REMAINDER, help="two specs to compare")
@@ -194,7 +199,11 @@ Example usage:
         raise Exception("Need two specs")
 
     diff = diff_specs(specs[0], specs[1], truncate=args.truncate)
+    diff2 = False
+    if not args.asymmetric:
+        diff2 = diff_specs(specs[1], specs[0], truncate=args.truncate)
     if args.diffprint:
+        diff = diff or diff2
         print(f"DifferentSpecs={diff}")
 
 

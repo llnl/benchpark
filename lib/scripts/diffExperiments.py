@@ -202,7 +202,7 @@ def main():
         spack_setup_script = f"{old_name}/wkp/setup.sh"
         # Define the ramble command
         cmd = (
-            f"{old_name}/wkp/spack/bin/spack-python altdiff.py -t {old_file} {new_file}"
+            f"{old_name}/wkp/spack/bin/spack-python altdiff.py -t -d {old_file} {new_file}"
         )
         # Combine sourcing the script and running the command
         try:
