@@ -15,7 +15,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
 
     tags = ["proxy-app", "ecp-proxy-app"]
 
-    homepage = "https://github.com/wdhawkins/laghos"
+    homepage = "https://github.com/CEED/Laghos"
     git = "https://github.com/wdhawkins/Laghos.git"
 
     maintainers("wdhawkins")
