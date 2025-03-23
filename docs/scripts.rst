@@ -13,33 +13,32 @@ Differentiate Two Spack Specs
 -----------------------------
 ``lib/scripts/altdiff.py``
 
-Diff spack specs (packages and versions). 
-This is helpful to compare if changes made in benchpark result in a different Spack concretization.
+This script enables the user to compare packages and versions of two builds.
 
-.. literalinclude:: ../lib/scripts/altdiff.py
-   :language: python
+TO DO: Directions on how to use the script. Provide an example including output.
 
 
 Compare System Configurations
 -----------------------------
 ``lib/scripts/diffSystems.py``
 
-Compare ``.yaml`` files between two different commits of benchpark, generated from ``system init ...``.
-This is helpful to compare how changes made in ``system.py`` change the resulting system configuration.
+This script enables the user to compare the result of initializing a ``system.py``
+by comparing ``.yaml`` files generated from ``system init ...`` from two commits in benchpark.
 
-.. literalinclude:: ../lib/scripts/diffSystems.py
-   :language: python
+TO DO: Directions on how to use the script. Provide an example including output.
 
 
 Compare Experiment Builds
 -------------------------
 ``lib/scripts/diffExperiments.py``
 
-Compare experiment builts between two versions of benchpark (leverages ``altdiff.py``).
-This is helpful to compare changes to either ``experiment.py`` or ``system.py``, as changes to either may result in a different experiment build.
-This requires the user to specify which ``system`` and ``cluster`` they are running on. For example, running on Ruby::
+This script enables the user to compare the results of initializing an ``experiment.py``
+from ``experiment init ...`` from two commits in benchpark.  experiment builts between two versions of benchpark (leverages ``altdiff.py``).
+
+Question to Michael: why are you mentioning system.py here?  system.py and experiment.py get mapped by ``benchpark setup`` and not before.
+
+TO DO: Directions on how to use the script. Provide an example including output.
+
+For example, running on Ruby::
 
     benchpark-python diffExperiments.py -s llnl-cluster -c ruby -p openmp
-
-.. literalinclude:: ../lib/scripts/diffExperiments.py
-   :language: python
