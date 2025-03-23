@@ -70,7 +70,9 @@ class Laghos(
             for pk, pv in scaled_variables.items():
                 self.add_experiment_variable(pk, pv)
 
-        self.add_experiment_variable(device, f'{n_devices_per_node} * {{scaling_factor}}', True)
+        self.add_experiment_variable(
+            device, f'{n_devices_per_node} * {{scaling_factor}}', True
+        )
 
     def compute_package_section(self):
         # get package version
