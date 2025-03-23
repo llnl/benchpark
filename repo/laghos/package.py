@@ -31,7 +31,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     depends_on("mfem+mpi+metis", when="+metis")
     depends_on("mfem+mpi~metis", when="~metis")
     depends_on("caliper", when="+caliper")
-    depends_on("adiak", when="+caliper")
+    depends_on("adiak~shared", when="+caliper")
 
     depends_on("zlib@1.3.1+optimize+pic+shared")
     #depends_on("zlib@1.3.1+optimize+pic+shared", when="@develop")
@@ -43,6 +43,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     # Recommended mfem version for laghos v1.x is: ^mfem@3.3.1-laghos-v1.0
     depends_on("mfem@3.3.1-laghos-v1.0", when="@1.0,1.1")
     depends_on("mfem@4.4")
+    depends_on("mfem+caliper", when="+caliper")
     depends_on("mfem cxxstd=14")
 
 
@@ -79,6 +80,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         targets.append("TEST_MK=%s" % spec["mfem"].package.test_mk)
         if "+caliper" in self.spec: 
             targets.append("CALIPER_DIR=%s" % spec["caliper"].prefix)
+            targets.append("ADIAK_DIR=%s" % spec["adiak"].prefix)
         if spec.satisfies("@:2.0"):
             targets.append("CXX=%s" % spec["mpi"].mpicxx)
         if "+ofast %gcc" in self.spec:
