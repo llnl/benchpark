@@ -27,7 +27,7 @@ def experiment_init(args):
         raise ValueError("Must specify one of: --dest, --basedir")
 
     try:
-        os.mkdir(destdir)
+        os.makedirs(destdir)
         experiment.write_ramble_dict(f"{destdir}/ramble.yaml")
     except FileExistsError:
         print(f"Abort: experiment description dir already exists ({destdir})")
@@ -36,14 +36,6 @@ def experiment_init(args):
         # If there was a failure, remove any partially-generated resources
         shutil.rmtree(destdir)
         raise
-
-
-def experiment_list(args):
-    experiments = benchpark.repo.all_object_names(
-        benchpark.repo.ObjectTypes.experiments
-    )
-    # TODO: prettier printing
-    print("    ".join(experiments))
 
 
 def setup_parser(root_parser):
@@ -57,13 +49,10 @@ def setup_parser(root_parser):
 
     init_parser.add_argument("spec", nargs="+", help="Experiment spec")
 
-    system_subparser.add_parser("list")
-
 
 def command(args):
     actions = {
         "init": experiment_init,
-        "list": experiment_list,
     }
     if args.experiment_subcommand in actions:
         actions[args.experiment_subcommand](args)
