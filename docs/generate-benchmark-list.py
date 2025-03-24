@@ -71,26 +71,54 @@ def main():
         main_dict[bmark] = tags_taggroups[bmark]
 
     # Get benchmarks that have caliper enabled
-    cali_benchmarks = subprocess.run(["../bin/benchpark", "list", "modifiers", "--name", "caliper", "--experiments", "--no-title"], check=True, capture_output=True)
+    cali_benchmarks = subprocess.run(
+        [
+            "../bin/benchpark",
+            "list",
+            "modifiers",
+            "--name",
+            "caliper",
+            "--experiments",
+            "--no-title",
+        ],
+        check=True,
+        capture_output=True,
+    )
     cali_bm_str = str(cali_benchmarks.stdout, "utf-8")
-    cali_bm = (cali_bm_str.replace(" ", "")
-        .replace("\t", "")
-        .split("\n")
-    )
+    cali_bm = cali_bm_str.replace(" ", "").replace("\t", "").split("\n")
     # Get available programming models for each benchmark
-    pmodels_cmd = subprocess.run(["../bin/benchpark", "list", "experiments", "--experiment", "cuda", "rocm", "openmp", "--no-title"], check=True, capture_output=True)
-    pmodels_str = str(pmodels_cmd.stdout, "utf-8")
-    pmodels = (pmodels_str.replace(" ", "")
-        .replace("\t", "")
-        .split("\n")
+    pmodels_cmd = subprocess.run(
+        [
+            "../bin/benchpark",
+            "list",
+            "experiments",
+            "--experiment",
+            "cuda",
+            "rocm",
+            "openmp",
+            "--no-title",
+        ],
+        check=True,
+        capture_output=True,
     )
+    pmodels_str = str(pmodels_cmd.stdout, "utf-8")
+    pmodels = pmodels_str.replace(" ", "").replace("\t", "").split("\n")
     # Get scaling experiments
-    scaling_cmd = subprocess.run(["../bin/benchpark", "list", "experiments", "--experiment", "weak", "strong", "--no-title"], check=True, capture_output=True)
+    scaling_cmd = subprocess.run(
+        [
+            "../bin/benchpark",
+            "list",
+            "experiments",
+            "--experiment",
+            "weak",
+            "strong",
+            "--no-title",
+        ],
+        check=True,
+        capture_output=True,
+    )
     scaling_str = str(scaling_cmd.stdout, "utf-8")
-    scaling = (scaling_str.replace(" ", "")
-        .replace("\t", "")
-        .split("\n")
-    ) 
+    scaling = scaling_str.replace(" ", "").replace("\t", "").split("\n")
     for bmark in benchmarks:
         if bmark in cali_bm:
             main_dict[bmark]["instrumented-caliper"] = True
@@ -108,7 +136,6 @@ def main():
             for expr in scaling:
                 if bmark in expr:
                     main_dict[bmark]["scaling-experiments"].append(expr.split("+")[1])
-
 
     df = pd.DataFrame(main_dict)
     df.to_csv("benchmark-list.csv")
