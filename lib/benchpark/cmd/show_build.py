@@ -5,12 +5,33 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import os
+import os.path
+
 import benchpark.paths
 from benchpark.runtime import run_command, working_dir
 
 
+def _find_env_root(basedir):
+    for root, _, fnames in os.walk(basedir):
+        if "spack.yaml" in fnames:
+            return root
+    raise Exception(f"Could not find spack.yaml in {basedir}")
+
+
 def show_build_dump(args):
-    print("hi")
+    env_root = _find_env_root(args.workspace)
+
+    determine_exp = os.path.join(benchpark.paths.benchpark_root, "lib", "scripts", "determine-exp.py")
+    out, err = run_command(f"spack -e {env_root} python {determine_exp}")
+    experiment_name = out.strip()
+
+    print(f"<--- Found: {out}")
+    return    
+
+    logs_out = os.path.join(destdir, "build.log")
+    with open(logs_out, "w") as f:
+        run_command(f"spack -e {env_root} logs {experiment_name}", stdout=f)
 
 
 def setup_parser(root_parser):
