@@ -8,10 +8,6 @@ import subprocess
 import benchpark.paths
 
 
-import subprocess
-import benchpark.paths
-
-
 def test_list():
     for subcmd in ["experiments", "modifiers", "systems", "benchmarks"]:
         # Test with title (default behavior)
@@ -55,7 +51,7 @@ def test_list():
         text=True,
     )
     assert "+cuda" in check_cuda.stdout
-    assert not "+rocm" in check_cuda.stdout
+    assert "+rocm" not in check_cuda.stdout
 
 
 def test_tags():
