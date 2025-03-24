@@ -9,9 +9,11 @@ import benchpark.paths
 
 
 def test_list():
-    subprocess.run(
-        [benchpark.paths.benchpark_root / "bin/benchpark", "list"], check=True
-    )
+    for subcmd in ["experiments", "modifiers", "systems", "benchmarks"]:
+        subprocess.run(
+            [benchpark.paths.benchpark_root / "bin/benchpark", "list", subcmd],
+            check=True,
+        )
 
 
 def test_tags():
