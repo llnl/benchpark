@@ -15,4 +15,4 @@ class Lammps(LammpsBase):
             'fft','particles','nbody','spatial-discretization',
             'large-scale','multi-node','single-node','sub-node',
             'mpi','network-collectives','network-point-to-point',
-            'c++','python','kokkos','cuda','rocm','openmp','vectorization']
+            'c++','python','kokkos','vectorization']
