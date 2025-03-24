@@ -21,20 +21,35 @@ def test_list():
             capture_output=True,
             text=True,
         )
-        assert f"{subcmd.capitalize()}:" in result_with_title.stdout, f"Title missing for {subcmd} in output with title"
+        assert (
+            f"{subcmd.capitalize()}:" in result_with_title.stdout
+        ), f"Title missing for {subcmd} in output with title"
 
         # Test without title (--no-title flag)
         result_no_title = subprocess.run(
-            [benchpark.paths.benchpark_root / "bin/benchpark", "list", subcmd, "--no-title"],
+            [
+                benchpark.paths.benchpark_root / "bin/benchpark",
+                "list",
+                subcmd,
+                "--no-title",
+            ],
             check=True,
             capture_output=True,
             text=True,
         )
-        assert f"{subcmd.capitalize()}:" not in result_no_title.stdout, f"Title found for {subcmd} in output without title"
+        assert (
+            f"{subcmd.capitalize()}:" not in result_no_title.stdout
+        ), f"Title found for {subcmd} in output without title"
 
     # Check filtering
     check_cuda = subprocess.run(
-        [benchpark.paths.benchpark_root / "bin/benchpark", "list", "experiments", "--experiment", "cuda"],
+        [
+            benchpark.paths.benchpark_root / "bin/benchpark",
+            "list",
+            "experiments",
+            "--experiment",
+            "cuda",
+        ],
         check=True,
         capture_output=True,
         text=True,

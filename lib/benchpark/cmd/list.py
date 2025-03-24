@@ -50,7 +50,11 @@ def list_benchmarks(args):
 
 
 def list_experiments(args):
-    _print_helper("Experiments:" if not args.no_title else None, benchpark_experiments(), filter=args.experiment)
+    _print_helper(
+        "Experiments:" if not args.no_title else None,
+        benchpark_experiments(),
+        filter=args.experiment,
+    )
 
 
 def list_systems(args):
@@ -58,7 +62,19 @@ def list_systems(args):
 
 
 def list_modifiers(args):
-    _print_helper("Modifiers:" if not args.no_title else None, benchpark_modifiers())
+    modifiers = benchpark_modifiers() if not args.name else [args.name]
+    if args.experiments:
+        collection = []
+        all_experiments = benchpark_experiments(exclude_variants=[])
+        for modifier in modifiers:
+            collection.append(modifier)
+            exprs = [e.split("+")[0] for e in all_experiments if modifier in e]
+            for benchmark in benchpark_benchmarks():
+                if any([benchmark == e for e in exprs]):
+                    collection.append("\t" + "@*c" + benchmark + "@.")
+        _print_helper("Modifiers:" if not args.no_title else None, collection)
+    else:
+        _print_helper("Modifiers:" if not args.no_title else None, modifiers)
 
 
 def setup_parser(root_parser):
@@ -75,7 +91,11 @@ def setup_parser(root_parser):
 
     experiments_parser = list_subparser.add_parser("experiments")
     experiments_parser.add_argument(
-        "--experiment", "-e", type=str, default=None, help="Filter experiments containing a specific substring (e.g., 'cuda')."
+        "--experiment",
+        "-e",
+        type=str,
+        default=None,
+        help="Filter experiments containing a specific substring (e.g., 'cuda').",
     )
     experiments_parser.add_argument(
         "--no-title", action="store_true", help="Turn off printing title in output."
@@ -89,6 +109,15 @@ def setup_parser(root_parser):
     modifiers_parser = list_subparser.add_parser("modifiers")
     modifiers_parser.add_argument(
         "--no-title", action="store_true", help="Turn off printing title in output."
+    )
+    modifiers_parser.add_argument(
+        "--experiments",
+        "-e",
+        action="store_true",
+        help="See experiments for modifier, if applicable.",
+    )
+    modifiers_parser.add_argument(
+        "--name", default=None, type=str, help="Optional modifier name"
     )
 
 
