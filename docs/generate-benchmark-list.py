@@ -38,7 +38,7 @@ def main():
         else:
             print("ERROR in top level construct_tag_groups")
 
-    main = dict()
+    main_dict = dict()
 
     tags_taggroups = {}
     for bmark in benchmarks:
@@ -68,9 +68,21 @@ def main():
                 if t in v:
                     print("appending", t, "at key", k)
                     tags_taggroups[bmark][k].append(t)
-        main[bmark] = tags_taggroups[bmark]
+        main_dict[bmark] = tags_taggroups[bmark]
 
-    df = pd.DataFrame(main)
+    cali_benchmarks = subprocess.run(["../bin/benchpark", "list", "modifiers", "--experiments", "--name", "caliper", "--no-title"], check=True, capture_output=True)
+    cali_bm_str = str(cali_benchmarks.stdout, "utf-8")
+    cali_bm = (cali_bm_str.replace(" ", "")
+        .replace("\t", "")
+        .split("\n")
+    )
+    for bmark in benchmarks:
+        if bmark in cali_bm:
+            main_dict[bmark]["instrumented-caliper"] = True
+        else:
+            main_dict[bmark]["instrumented-caliper"] = False
+
+    df = pd.DataFrame(main_dict)
     df.to_csv("benchmark-list.csv")
 
     #################
