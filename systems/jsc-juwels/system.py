@@ -17,7 +17,7 @@ class JscJuwels(System):
             "sys_cores_per_node": 48,
             "timeout": 120,
             "sys_gpus_per_node": 4,
-            "cuda_arch": '"80"',
+            "cuda_arch": "80",
             "system_site": "jsc",
             "hardware_key": str(hardware_descriptions)
             + "/Atos-rome-A100-Infiniband/hardware_description.yaml",
@@ -105,9 +105,9 @@ class JscJuwels(System):
                             "spec": "cmake@3.26.3",
                             "prefix": "/p/software/juwelsbooster/stages/2024/software/CMake/3.26.3-GCCcore-12.3.0",
                             "modules": ["Stages/2024", "CMake"],
+                            "buildable": False,
                         }
                     ],
-                    "buildable": False,
                 },
                 "gmake": {
                     "externals": [{"spec": "gmake@4.2.1", "prefix": "/usr"}],
@@ -177,12 +177,12 @@ class JscJuwels(System):
                     "buildable": False,
                     "externals": [
                         {
-                            "spec": f"cuda@{self.cuda_version}",
-                            "prefix": f"/p/software/juwelsbooster/stages/2024/software/CUDA/{self.cuda_version.major}",
+                            "spec": "cuda@{self.cuda_version}",
+                            "prefix": "/p/software/juwelsbooster/stages/2024/software/CUDA/{self.cuda_version.major}",
                             "modules": [
                                 "Stages/2024",
-                                f"CUDA/{self.cuda_version.major}",
-                                f"NVHPC/23.7-CUDA-{self.cuda_version.major}",
+                                "CUDA/{self.cuda_version.major}",
+                                "NVHPC/23.7-CUDA-{self.cuda_version.major}",
                             ],
                         }
                     ],
@@ -190,8 +190,8 @@ class JscJuwels(System):
                 "curand": {
                     "externals": [
                         {
-                            "spec": f"curand@{self.cuda_version}",
-                            "prefix": f"/p/software/juwelsbooster/stages/2024/software/CUDA/{self.cuda_version.major}",
+                            "spec": "curand@{self.cuda_version}",
+                            "prefix": "/p/software/juwelsbooster/stages/2024/software/CUDA/{self.cuda_version.major}",
                         }
                     ],
                     "buildable": False,
@@ -199,8 +199,8 @@ class JscJuwels(System):
                 "cusparse": {
                     "externals": [
                         {
-                            "spec": f"cusparse@{self.cuda_version}",
-                            "prefix": f"/p/software/juwelsbooster/stages/2024/software/CUDA/{self.cuda_version.major}",
+                            "spec": "cusparse@{self.cuda_version}",
+                            "prefix": "/p/software/juwelsbooster/stages/2024/software/CUDA/{self.cuda_version.major}",
                         }
                     ],
                     "buildable": False,
@@ -208,8 +208,8 @@ class JscJuwels(System):
                 "cublas": {
                     "externals": [
                         {
-                            "spec": f"cublas@{self.cuda_version}",
-                            "prefix": f"/p/software/juwelsbooster/stages/2024/software/CUDA/{self.cuda_version.major}",
+                            "spec": "cublas@{self.cuda_version}",
+                            "prefix": "/p/software/juwelsbooster/stages/2024/software/CUDA/{self.cuda_version.major}",
                         }
                     ],
                     "buildable": False,
