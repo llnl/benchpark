@@ -21,7 +21,7 @@ def _print_helper(name, collection, filter=None):
         name (str): The title to display above the collection. If None, no title is displayed.
         collection (list of str): A list of strings to display. Items can optionally contain
                                   special characters (e.g., '/' or '+') for additional formatting.
-        filter (str, optional): A substring to filter the items in the collection.
+        filter (list, optional): A substring to filter the items in the collection.
                                 Only items containing this substring will be displayed.
                                 If None, all items in the collection are displayed.
     """
@@ -34,7 +34,7 @@ def _print_helper(name, collection, filter=None):
 
     # Compute filtering
     if filter:
-        collection = [item for item in collection if filter in item]
+        collection = [item for item in collection if any([f in item for f in filter])]
 
     for item in collection:
         if "/" not in item and "+" not in item:
@@ -94,6 +94,7 @@ def setup_parser(root_parser):
         "--experiment",
         "-e",
         type=str,
+        nargs="*",
         default=None,
         help="Filter experiments containing a specific substring (e.g., 'cuda').",
     )

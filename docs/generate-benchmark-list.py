@@ -70,9 +70,17 @@ def main():
                     tags_taggroups[bmark][k].append(t)
         main_dict[bmark] = tags_taggroups[bmark]
 
-    cali_benchmarks = subprocess.run(["../bin/benchpark", "list", "modifiers", "--experiments", "--name", "caliper", "--no-title"], check=True, capture_output=True)
+    # Get benchmarks that have caliper enabled
+    cali_benchmarks = subprocess.run(["../bin/benchpark", "list", "modifiers", "--name", "caliper", "--experiments", "--no-title"], check=True, capture_output=True)
     cali_bm_str = str(cali_benchmarks.stdout, "utf-8")
     cali_bm = (cali_bm_str.replace(" ", "")
+        .replace("\t", "")
+        .split("\n")
+    )
+    # Get available programming models for each benchmark
+    pmodels_cmd = subprocess.run(["../bin/benchpark", "list", "experiments", "--experiment", "cuda", "rocm", "openmp", "--no-title"], check=True, capture_output=True)
+    pmodels_str = str(pmodels_cmd.stdout, "utf-8")
+    pmodels = (pmodels_str.replace(" ", "")
         .replace("\t", "")
         .split("\n")
     )
@@ -81,6 +89,14 @@ def main():
             main_dict[bmark]["instrumented-caliper"] = True
         else:
             main_dict[bmark]["instrumented-caliper"] = False
+    for bmark in benchmarks:
+        main_dict[bmark]["programming-model"] = []
+    for bmark in benchmarks:
+        if any([bmark in p for p in pmodels]):
+            for expr in pmodels:
+                if bmark in expr:
+                    main_dict[bmark]["programming-model"].append(expr.split("+")[1])
+
 
     df = pd.DataFrame(main_dict)
     df.to_csv("benchmark-list.csv")
