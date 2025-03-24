@@ -92,7 +92,7 @@ jobs:
             --unsigned \
             --update-index ci-buildcache \
             $(spack find --format '/{hash}')
-
+      
       - name: Test Execution Using Binary
         run: |
           OUTPUT=$(spack find --paths saxpy)
@@ -240,17 +240,17 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
       
-      # - name: Dry run salmon/openmp with allocation modifier on Fugaku
-      #   run: |
-      #     ./bin/benchpark experiment init --dest=salmon/openmp salmon+openmp
-      #     ./bin/benchpark system init --dest=riken-fugaku riken-fugaku
-      #     ./bin/benchpark setup salmon/openmp riken-fugaku workspace/
-      #     . workspace/setup.sh
-      #     ramble \
-      #       --workspace-dir workspace/salmon/openmp/riken-fugaku/workspace \
-      #       --disable-progress-bar \
-      #       --disable-logger \
-      #       workspace setup --dry-run
+      - name: Dry run salmon/openmp with allocation modifier on Fugaku
+        run: |
+          ./bin/benchpark experiment init --dest=salmon/openmp salmon-tddft+openmp
+          ./bin/benchpark system init --dest=riken-fugaku riken-fugaku
+          ./bin/benchpark setup salmon/openmp riken-fugaku workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/salmon/openmp/riken-fugaku/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
 
       - name: Dry run qws/openmp with allocation modifier on Fugaku
         run: |
@@ -887,7 +887,6 @@ jobs:
           system_name: tioga
           system_spec: llnl-elcapitan rocm=6.2.4 compiler=rocmcc
 
-<<<<<<< HEAD
       - name: md-test/mpi llnl-elcapitan
         uses: ./.github/actions/dynamic-dry-run
         with:
@@ -923,21 +922,8 @@ jobs:
           benchmark_spec: osu-micro-benchmarks+rocm workload=all
           system_name: tioga
           system_spec: llnl-elcapitan cluster=tioga compiler=cce +gtl
-  pytest:
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout Benchpark
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
-      - name: Add needed Python libs
-        run: |
-          pip install -r ./requirements.txt
-
-      - name: Run
-        run: |
-          python -m pytest
-=======
-      - name: salmon ruby llnl-cluster cluster=ruby compiler=intel
+      - name: salmon/openmp ruby llnl-cluster cluster=ruby compiler=intel
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: salmon-tddft
@@ -954,4 +940,16 @@ jobs:
           benchmark_spec: salmon-tddft
           system_name: fugaku
           system_spec: riken-fugaku
->>>>>>> 177e6331 (add dynamic dry runs on ruby and fugaku)
+  pytest:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Benchpark
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Add needed Python libs
+        run: |
+          pip install -r ./requirements.txt
+
+      - name: Run
+        run: |
+          python -m pytest

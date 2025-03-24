@@ -7,7 +7,7 @@
 +option_set(USE_FJMPI               "Use FUJITSU MPI"         OFF)
  
  ## Optimization for stencil compitations
- option_set(USE_OPT_DOMAIN_IS_POW2          "Enable whether the opimization assumes that a stencil domain size is power of two" OFF)
+ option_set(USE_OPT_DOMAIN_IS_POW2          "Enable whether the optimization assumes that a stencil domain size is power of two" OFF)
 --- spack-src.org/src/config.h.in       2020-07-21 12:08:53.000000000 +0900
 +++ spack-src/src/config.h.in   2020-12-23 11:48:48.384061907 +0900
 @@ -15,6 +15,7 @@

@@ -43,13 +43,13 @@ class SalmonTddft(Experiment, OpenMPExperiment):
         self.add_experiment_variable("processes_per_node", ["4"])
         self.add_experiment_variable("n_nodes", ["1"], True)
 
-    def compute_spack_section(self):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
 
         system_specs = {}
         system_specs["compiler"] = "default-compiler"
 
-        self.add_spack_spec(
+        self.add_package_spec(
             self.name, [f"salmon-tddft@{app_version}", system_specs["compiler"]]
         )
