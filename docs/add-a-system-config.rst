@@ -132,17 +132,17 @@ Then, update the class name to ``Modifiedx86``.::
    cores per node to 48, and number of GPUs per node to 2.::
 
     # this sets basic attributes of our system
-    def initialize(self):
-        super().initialize()
+    def __init__(self, spec):
+        super().__init__(spec)
         self.scheduler = "slurm"
         self.sys_cores_per_node = "48"
         self.sys_gpus_per_node = "2"
 
 3. Let's say the new system's GPUs are NVIDIA, we can add a variant that allows us to specify
    the version of CUDA we want to use, and the location of those CUDA installations on our system.
-   We then add the spack package configuration for our CUDA installations into the
-   ``systems/modified_x86/externals/cuda`` directory (examples in Siera and Tioga systems).
+   We then add the spack package configuration for our CUDA installations into the `compute_packages_section`.
 ::
+
     # import the variant feature at the top of your system.py
     from benchpark.directives import variant
 
@@ -159,39 +159,82 @@ Then, update the class name to ``Modifiedx86``.::
         return {"cuda_arch": "70"}
 
     # define the external package locations
-    def external_pkg_configs(self):
-        externals = Modifiedx86.resource_location / "externals"
-
-        cuda_ver = self.spec.variants["cuda"][0]
-
-        selections = []
-        if cuda_ver == "10-1-243":
-            selections.append(externals / "cuda" / "00-version-10-1-243-packages.yaml")
-        elif cuda_ver == "11-8-0":
-            selections.append(externals / "cuda" / "01-version-11-8-0-packages.yaml")
+    def compute_packages_section(self):
+        selections = {
+            "packages": {
+                "elfutils": {
+                    "externals": [{"spec": "elfutils@0.176", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "papi": {
+                    "buildable": False,
+                    "externals": [{"spec": "papi@5.2.0.0", "prefix": "/usr"}],
+                },
+            }
+        }
+        if self.spec.satisfies("cuda=10-1-243"):
+            selections["packages"] |= {
+                "cusparse": {
+                    "externals": [
+                        {
+                            "spec": "cusparse@10.1.243",
+                            "prefix": "/usr/tce/packages/cuda/cuda-10.1.243",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cuda": {
+                    "externals": [
+                        {
+                            "spec": "cuda@10.1.243+allow-unsupported-compilers",
+                            "prefix": "/usr/tce/packages/cuda/cuda-10.1.243",
+                        }
+                    ],
+                    "buildable": False,
+                },
+            }
+        elif self.spec.satisfies("cuda=11-8-0"):
+            selections["packages"] |= {
+                "cusparse": {
+                    "externals": [
+                        {
+                            "spec": "cusparse@11.8.0",
+                            "prefix": "/usr/tce/packages/cuda/cuda-11.8.0",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cuda": {
+                    "externals": [
+                        {
+                            "spec": "cuda@11.8.0+allow-unsupported-compilers",
+                            "prefix": "/usr/tce/packages/cuda/cuda-11.8.0",
+                        }
+                    ],
+                    "buildable": False,
+                },
+            }
 
         return selections
 
+External packages can be found via `benchpark system external --new_system {mysite}-{mysystem}`.
 Note, if your externals are *not* installed via Spack, read `Spack documentation on modules <https://spack.readthedocs.io/en/latest/packages_yaml.html#external-packages>`_.
 
 4. Next, add any of the packages that can be managed by spack, such as blas/cublas pointing to the correct version,
 this will generate the software configurations for spack (``software.yaml``). The actual version will be rendered by Ramble when it is built.
 ::
-  def sw_description(self):
-        return """\
-  software:
-    packages:
-      default-compiler:
-        pkg_spec: gcc
-      compiler-gcc:
-        pkg_spec: gcc
-      default-mpi:
-        pkg_spec: openmpi
-      blas:
-        pkg_spec: cublas@{default_cuda_version}
-      cublas-cuda:
-        pkg_spec: cublas@{default_cuda_version}
-  """
+  def compute_software_section(self):
+    return {
+        "software": {
+            "packages": {
+                "default-compiler": {"pkg_spec": "gcc"},
+                "compiler-gcc": {"pkg_spec": "gcc"},
+                "default-mpi": {"pkg_spec": "openmpi"},
+                "blas": {"pkg_spec": "openblas"},
+                "lapack": {"pkg_spec": "openblas"},
+            }
+        }
+    }
 
 5. The full system.py class for the modified_x86 system should now look like:
 ::
@@ -209,55 +252,86 @@ this will generate the software configurations for spack (``software.yaml``). Th
             description="CUDA version",
         )
 
-        def initialize(self):
-            super().initialize()
+        def __init__(self):
+            super().__init__()
 
             self.scheduler = "slurm"
             setattr(self, "sys_cores_per_node", 48)
             self.sys_gpus_per_node = "2"
 
-        def generate_description(self, output_dir):
-            super().generate_description(output_dir)
-
-            sw_description = pathlib.Path(output_dir) / "software.yaml"
-
-            with open(sw_description, "w") as f:
-                f.write(self.sw_description())
-
         def system_specific_variables(self):
             return {"cuda_arch": "70"}
 
-        def external_pkg_configs(self):
-            externals = Modifiedx86.resource_location / "externals"
+        def compute_packages_section(self):
+          selections = {
+              "packages": {
+                  "elfutils": {
+                      "externals": [{"spec": "elfutils@0.176", "prefix": "/usr"}],
+                      "buildable": False,
+                  },
+                  "papi": {
+                      "buildable": False,
+                      "externals": [{"spec": "papi@5.2.0.0", "prefix": "/usr"}],
+                  },
+              }
+          }
+          if self.spec.satisfies("cuda=10-1-243"):
+              selections["packages"] |= {
+                  "cusparse": {
+                      "externals": [
+                          {
+                              "spec": "cusparse@10.1.243",
+                              "prefix": "/usr/tce/packages/cuda/cuda-10.1.243",
+                          }
+                      ],
+                      "buildable": False,
+                  },
+                  "cuda": {
+                      "externals": [
+                          {
+                              "spec": "cuda@10.1.243+allow-unsupported-compilers",
+                              "prefix": "/usr/tce/packages/cuda/cuda-10.1.243",
+                          }
+                      ],
+                      "buildable": False,
+                  },
+              }
+          elif self.spec.satisfies("cuda=11-8-0"):
+              selections["packages"] |= {
+                  "cusparse": {
+                      "externals": [
+                          {
+                              "spec": "cusparse@11.8.0",
+                              "prefix": "/usr/tce/packages/cuda/cuda-11.8.0",
+                          }
+                      ],
+                      "buildable": False,
+                  },
+                  "cuda": {
+                      "externals": [
+                          {
+                              "spec": "cuda@11.8.0+allow-unsupported-compilers",
+                              "prefix": "/usr/tce/packages/cuda/cuda-11.8.0",
+                          }
+                      ],
+                      "buildable": False,
+                  },
+              }
 
-            cuda_ver = self.spec.variants["cuda"][0]
+          return selections
 
-            selections = []
-            if cuda_ver == "10-1-243":
-                selections.append(externals / "cuda" / "00-version-10-1-243-packages.yaml")
-            elif cuda_ver == "11-8-0":
-                selections.append(externals / "cuda" / "01-version-11-8-0-packages.yaml")
-
-            return selections
-
-        def sw_description(self):
-            """This is somewhat vestigial, and maybe deleted later. The experiments
-            will fail if these variables are not defined though, so for now
-            they are still generated (but with more-generic values).
-            """
-            return """\
-      software:
-        packages:
-          default-compiler:
-            pkg_spec: gcc
-          compiler-gcc:
-            pkg_spec: gcc
-          default-mpi:
-            pkg_spec: openmpi
-          blas:
-            pkg_spec: cublas@{default_cuda_version}
-          cublas-cuda:
-            pkg_spec: cublas@{default_cuda_version}
+        def compute_software_section(self):
+          return {
+              "software": {
+                  "packages": {
+                      "default-compiler": {"pkg_spec": "gcc"},
+                      "compiler-gcc": {"pkg_spec": "gcc"},
+                      "default-mpi": {"pkg_spec": "openmpi"},
+                      "blas": {"pkg_spec": "openblas"},
+                      "lapack": {"pkg_spec": "openblas"},
+                  }
+              }
+          }
     """
 
 Once the modified system subclass is written, run:

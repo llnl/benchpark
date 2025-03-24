@@ -16,7 +16,7 @@ __version__ = "0.1.0"
 if "-V" in sys.argv or "--version" in sys.argv:
     print(__version__)
     exit()
-helpstr = """usage: main.py [-h] [-V] {list,tags,system,experiment,setup,unit-test,audit} ...
+helpstr = """usage: main.py [-h] [-V] {tags,system,experiment,setup,unit-test,audit,info,list} ...
 
 Benchpark
 
@@ -25,15 +25,16 @@ options:
   -V, --version         show version number and exit
 
 Subcommands:
-  {list,tags,system,experiment,setup,unit-test,audit}
-    list                List available experiments, systems, and modifiers
+  {tags,system,experiment,setup,unit-test,audit,info,list}
     tags                Tags in Benchpark experiments
     system              Initialize a system config
     experiment          Interact with experiments
     setup               Set up an experiment and prepare it to build/run
     unit-test           Run benchpark unit tests
-    audit               Look for problems in System/Experiment repos"""
-if "-h" in sys.argv or "--help" in sys.argv:
+    audit               Look for problems in System/Experiment repos
+    info                Get information about Systems and Experiments
+    list                List experiments, systems, benchmarks, and modifiers"""
+if "-h" == sys.argv[1] or "--help" == sys.argv[1]:
     print(helpstr)
     exit()
 
@@ -43,13 +44,9 @@ import benchpark.cmd.experiment  # noqa: E402
 import benchpark.cmd.setup  # noqa: E402
 import benchpark.cmd.unit_test  # noqa: E402
 import benchpark.cmd.info  # noqa: E402
+import benchpark.cmd.list  # noqa: E402
 import benchpark.paths  # noqa: E402
-from benchpark.accounting import (  # noqa: E402
-    benchpark_experiments,
-    benchpark_modifiers,
-    benchpark_systems,
-    benchpark_benchmarks,
-)
+from benchpark.accounting import benchpark_benchmarks  # noqa: E402
 
 
 def main():
@@ -64,7 +61,6 @@ def main():
     subparsers = parser.add_subparsers(title="Subcommands", dest="subcommand")
 
     actions = {}
-    benchpark_list(subparsers, actions)
     benchpark_tags(subparsers, actions)
     init_commands(subparsers, actions)
 
@@ -75,21 +71,24 @@ def main():
         parser.print_help()
         return 1
 
+    exit_code = 0
+
     if args.subcommand in actions:
         action = actions[args.subcommand]
         if supports_unknown_args(action):
-            action(args, unknown_args)
+            exit_code = action(args, unknown_args)
         elif unknown_args:
             raise argparse.ArgumentTypeError(
                 f"benchpark {args.subcommand} has no option(s) {unknown_args}"
             )
         else:
-            action(args)
+            exit_code = action(args)
     else:
         print(
             "Invalid subcommand ({args.subcommand}) - must choose one of: "
             + " ".join(actions.keys())
         )
+    return exit_code
 
 
 def supports_unknown_args(command):
@@ -103,14 +102,6 @@ def supports_unknown_args(command):
     varnames = info["__code__"].co_varnames
     argcount = info["__code__"].co_argcount
     return argcount == 2 and varnames[1] == "unknown_args"
-
-
-def benchpark_list(subparsers, actions_dict):
-    list_parser = subparsers.add_parser(
-        "list", help="List available experiments, systems, and modifiers"
-    )
-    list_parser.add_argument("sublist", nargs="?")
-    actions_dict["list"] = benchpark_list_handler
 
 
 def benchpark_get_tags():
@@ -133,55 +124,6 @@ def benchpark_get_tags():
             print("ERROR file does not contain benchpark-tags")
 
     return tags
-
-
-def benchpark_list_handler(args):
-    sublist = args.sublist
-    benchmarks = benchpark_benchmarks()
-    experiments = benchpark_experiments()
-    systems = benchpark_systems()
-    modifiers = benchpark_modifiers()
-
-    try:
-        import llnl.util.tty.color as color
-
-        colors = True
-    except ImportError:
-        colors = False
-
-    def _print_helper(name, collection, colors=colors):
-        func = print
-        strs = ["", ""]
-        end = ""
-        if colors:
-            func = color.cprint
-            name = "@*b" + name + "@."
-            strs = ["@*r", "@*c"]
-            end = "@."
-
-        func(name)
-        for item in collection:
-            if "/" in item:
-                item = item.split("/")
-                func(f"    {strs[0]+item[0]+end+'/'+strs[1]+item[1]+end}")
-            else:
-                func(f"    {strs[0]+item+end}")
-
-    if sublist is None:
-        _print_helper("Experiments:", experiments)
-        _print_helper("Systems:", systems)
-    elif sublist == "benchmarks":
-        _print_helper("Benchmarks:", benchmarks)
-    elif sublist == "experiments":
-        _print_helper("Experiments:", experiments)
-    elif sublist == "systems":
-        _print_helper("Systems:", systems)
-    elif sublist == "modifiers":
-        _print_helper("Modifiers:", modifiers)
-    else:
-        raise ValueError(
-            f'Invalid benchpark list "{sublist}" - must choose [experiments], [systems], [modifiers] or leave empty'
-        )
 
 
 def benchpark_check_benchmark(arg_str):
@@ -240,12 +182,18 @@ def init_commands(subparsers, actions_dict):
     )
     benchpark.cmd.info.setup_parser(info_parser)
 
+    list_parser = subparsers.add_parser(
+        "list", help="List experiments, systems, benchmarks, and modifiers"
+    )
+    benchpark.cmd.list.setup_parser(list_parser)
+
     actions_dict["system"] = benchpark.cmd.system.command
     actions_dict["experiment"] = benchpark.cmd.experiment.command
     actions_dict["setup"] = benchpark.cmd.setup.command
     actions_dict["unit-test"] = benchpark.cmd.unit_test.command
     actions_dict["audit"] = benchpark.cmd.audit.command
     actions_dict["info"] = benchpark.cmd.info.command
+    actions_dict["list"] = benchpark.cmd.list.command
 
 
 def run_command(command_str, env=None):
@@ -334,4 +282,6 @@ def benchpark_tags_handler(args):
 
 
 if __name__ == "__main__":
-    main()
+    exit_code = main()
+    if exit_code is not None and isinstance(exit_code, int):
+        sys.exit(exit_code)

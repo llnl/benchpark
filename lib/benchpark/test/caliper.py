@@ -23,8 +23,10 @@ def test_compute_variables_section_caliper(monkeypatch):
             "n_nodes": "{n_nodes}",
             "n_ranks": "{n_ranks}",
             "n_threads_per_proc": "{n_threads_per_proc}",
-            "benchpark_spec": ["~cuda~openmp~rocm+single_node"],
+            "benchpark_spec": ["'"],
+            "append_path": "'",
             "caliper": "time",
+            "package_manager": "spack",
             "version": "1.0.0",
             "workload": "problem",
         }

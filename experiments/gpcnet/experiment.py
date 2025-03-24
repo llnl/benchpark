@@ -32,19 +32,7 @@ class Gpcnet(Experiment, StrongScaling):
         elif self.spec.satisfies("workload=network_load_test"):
             self.add_experiment_variable("n_nodes", "10")
 
-    def compute_spack_section(self):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-
-        # get system config options
-        # TODO: Get compiler/mpi/package handles directly from system.py
-        system_specs = {}
-        system_specs["compiler"] = "default-compiler"
-        system_specs["mpi"] = "default-mpi"
-
-        # empty package_specs value implies external package
-        self.add_spack_spec(system_specs["mpi"])
-
-        self.add_spack_spec(
-            self.name, [f"gpcnet@{app_version} +mpi", system_specs["compiler"]]
-        )
+        self.add_package_spec(self.name, [f"gpcnet@{app_version} +mpi"])

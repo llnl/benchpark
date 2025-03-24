@@ -49,19 +49,7 @@ class Quicksilver(
         self.add_experiment_variable("J", ["2", "2", "2", "4"])
         self.add_experiment_variable("K", ["1", "2", "2", "2"])
 
-    def compute_spack_section(self):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-
-        # TODO: express that we need certain variables from system
-        # Does not need to happen before merge, separate task
-        system_specs = {}
-        system_specs["compiler"] = "default-compiler"
-        system_specs["mpi"] = "default-mpi"
-
-        # empty package_specs value implies external package
-        self.add_spack_spec(system_specs["mpi"])
-
-        self.add_spack_spec(
-            self.name, [f"quicksilver@{app_version} +mpi", system_specs["compiler"]]
-        )
+        self.add_package_spec(self.name, [f"quicksilver@{app_version} +mpi"])

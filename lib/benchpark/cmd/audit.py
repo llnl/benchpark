@@ -29,7 +29,7 @@ def setup_parser(subparser):
 
 
 def audit_experiment(exp_cls):
-    required_methods = ["compute_applications_section", "compute_spack_section"]
+    required_methods = ["compute_applications_section", "compute_package_section"]
 
     if exp_cls.__name__ == "Caliper":
         # Caliper is an abstract class, and is never directly instantiated
