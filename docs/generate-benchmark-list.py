@@ -84,6 +84,13 @@ def main():
         .replace("\t", "")
         .split("\n")
     )
+    # Get scaling experiments
+    scaling_cmd = subprocess.run(["../bin/benchpark", "list", "experiments", "--experiment", "weak", "strong", "--no-title"], check=True, capture_output=True)
+    scaling_str = str(scaling_cmd.stdout, "utf-8")
+    scaling = (scaling_str.replace(" ", "")
+        .replace("\t", "")
+        .split("\n")
+    ) 
     for bmark in benchmarks:
         if bmark in cali_bm:
             main_dict[bmark]["instrumented-caliper"] = True
@@ -91,11 +98,16 @@ def main():
             main_dict[bmark]["instrumented-caliper"] = False
     for bmark in benchmarks:
         main_dict[bmark]["programming-model"] = []
+        main_dict[bmark]["scaling-experiments"] = []
     for bmark in benchmarks:
         if any([bmark in p for p in pmodels]):
             for expr in pmodels:
                 if bmark in expr:
                     main_dict[bmark]["programming-model"].append(expr.split("+")[1])
+        if any([bmark in s for s in scaling]):
+            for expr in scaling:
+                if bmark in expr:
+                    main_dict[bmark]["scaling-experiments"].append(expr.split("+")[1])
 
 
     df = pd.DataFrame(main_dict)
