@@ -26,10 +26,9 @@ def show_build_dump(args):
     out, err = run_command(f"spack -e {env_root} python {determine_exp}")
     experiment_name = out.strip()
 
-    print(f"<--- Found: {out}")
-    return    
-
-    logs_out = os.path.join(destdir, "build.log")
+    logs_out = os.path.join(args.destdir, f"build-{experiment_name}.log")
+    if os.path.exists(logs_out):
+        raise Exception(f"Output file already exists: {logs_out}")
     with open(logs_out, "w") as f:
         run_command(f"spack -e {env_root} logs {experiment_name}", stdout=f)
 
