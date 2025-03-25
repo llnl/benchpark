@@ -1,16 +1,7 @@
 name: Dynamic dry run template
 
 inputs:
-  benchmark_name:
-    required: true
-    type: string
-  benchmark_mode:
-    required: true
-    type: string
   benchmark_spec:
-    required: true
-    type: string
-  system_name:
     required: true
     type: string
   system_spec:
@@ -20,15 +11,12 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: "${{ inputs.benchmark_name }}/${{ inputs.benchmark_mode }} ${{ inputs.system_name }} ${{ inputs.system_spec }}"
+    - name: "${{ inputs.benchmark_spec }} ${{ inputs.system_spec }}"
       shell: bash 
       run: |
         timestamp=$(date +%s)
-        bn="${{ inputs.benchmark_name }}"
-        bm="${{ inputs.benchmark_mode }}"
-        benchmark="$bn-$bm-$timestamp"
-        sn="${{ inputs.system_name }}"
-        system="$sn-$timestamp"
+        benchmark="b-$timestamp"
+        system="s-$timestamp"
         ./bin/benchpark system init --dest=$system ${{ inputs.system_spec }}
         ./bin/benchpark experiment init --dest=$benchmark ${{ inputs.benchmark_spec }}
         ./bin/benchpark setup ./$benchmark ./$system workspace/
