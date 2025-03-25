@@ -23,7 +23,7 @@ def benchpark_experiments():
     source_dir = benchpark.paths.benchpark_root
     experiments = []
     experiments_dir = source_dir / "experiments"
-    exclude_variants = ["Caliper"]
+    exclude_variants = ["Caliper", "Affinity"]
     for x in sorted(os.listdir(experiments_dir)):
         if x not in exclude_exper:
             experiment_spec = benchpark.spec.ExperimentSpec(x)
