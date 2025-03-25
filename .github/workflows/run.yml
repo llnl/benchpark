@@ -240,18 +240,6 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
       
-      - name: Dry run salmon/openmp with allocation modifier on Fugaku
-        run: |
-          ./bin/benchpark experiment init --dest=salmon/openmp salmon-tddft+openmp
-          ./bin/benchpark system init --dest=riken-fugaku riken-fugaku
-          ./bin/benchpark setup salmon/openmp riken-fugaku workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/salmon/openmp/riken-fugaku/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-
       - name: Dry run qws/openmp with allocation modifier on Fugaku
         run: |
           ./bin/benchpark experiment init --dest=qws/openmp qws+openmp
@@ -274,15 +262,28 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
 
-      - name: Dry run salmon/openmp with allocation modifier on x86
+      - name: Dry run salmon/openmp with allocation modifier on generic-x86
         run: |
-          ./bin/benchpark setup salmon/openmp nosite-x86_64 workspace/
+          ./bin/benchpark setup salmon/openmp generic-x86 workspace/
           . workspace/setup.sh
           ramble \
-            --workspace-dir workspace/salmon/openmp/nosite-x86_64/workspace \
+            --workspace-dir workspace/salmon/openmp/generic-x86/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
+
+      - name: Dry run salmon/openmp with allocation modifier on Fugaku
+        run: |
+          ./bin/benchpark experiment init --dest=salmon/openmp salmon-tddft+openmp
+          ./bin/benchpark system init --dest=riken-fugaku riken-fugaku
+          ./bin/benchpark setup salmon/openmp riken-fugaku workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/salmon/openmp/riken-fugaku/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
   dynamicdryrunexperiments:
     runs-on: ubuntu-22.04
     steps:
