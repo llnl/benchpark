@@ -47,6 +47,4 @@ class SalmonTddft(Experiment, OpenMPExperiment):
         # get package version
         app_version = self.spec.variants["version"][0]
 
-        self.add_package_spec(
-            self.name, [f"salmon-tddft@{app_version}"]
-        )
+        self.add_package_spec(self.name, [f"salmon-tddft@{app_version}"])
