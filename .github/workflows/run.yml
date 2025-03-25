@@ -264,6 +264,7 @@ jobs:
 
       - name: Dry run salmon/openmp with allocation modifier on generic-x86
         run: |
+          ./bin/benchpark experiment init --dest=salmon/openmp salmon-tddft+openmp
           ./bin/benchpark setup salmon/openmp generic-x86 workspace/
           . workspace/setup.sh
           ramble \
