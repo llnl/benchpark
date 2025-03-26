@@ -108,6 +108,7 @@ def main():
                 # Print the differences
                 print("\n".join(dc))
 
+    print(f"EXIT_CODE: {EXIT_CODE}")
     return EXIT_CODE
 
 
