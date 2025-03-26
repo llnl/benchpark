@@ -12,7 +12,7 @@ class SalmonTddft(ExecutableApplication):
     """Salmon-tddft benchmark"""
     name = "salmon-tddft"
 
-    tags = ['mpi','openmp']
+    tags = ['mpi']
 
     executable('pre-process', 'cp {input_path}/* .', use_mpi=False)
 

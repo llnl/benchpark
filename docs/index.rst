@@ -11,7 +11,7 @@
 
    for-the-impatient
    getting-started
-   basic-usage
+   benchpark-commands
    benchpark-workflow
    FAQ
 
