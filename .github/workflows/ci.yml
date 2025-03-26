@@ -107,7 +107,7 @@ jobs:
         id: get_modified_repo_dirs
         run: |
           # Get the modified directories under 'repo/'
-          MODIFIED_REPO_DIRS=$(git diff --name-only develop | grep 'repo/' | xargs -n1 dirname | sed 's|^repo/||')
+          MODIFIED_REPO_DIRS=$(git diff --name-only develop | grep 'repo/' | xargs -n1 dirname | sed 's|^repo/||' | tr '\n' ' ')
 
           # Debugging: Print the modified directories
           echo "Modified directories: $MODIFIED_REPO_DIRS"
