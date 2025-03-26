@@ -7,7 +7,7 @@ import itertools
 
 import benchpark.paths
 
-EXIT_CODE=0
+EXIT_CODE = 0
 
 parser = argparse.ArgumentParser(
     description="Script to compare packages in benchpark against upstream spack packages.",
@@ -94,7 +94,7 @@ def main():
                 color.cprint(
                     f"    @*gNo differences found. We can safely delete '{benchpark_package_path}' in favor of spack upstream@."
                 )
-                EXIT_CODE=1
+                EXIT_CODE = 1
 
             # Use difflib.ndiff to compare the lines
             dc3 = difflib.ndiff(spack_lines, benchpark_lines)
@@ -113,4 +113,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    exit_code = main()
+    sys.exit(EXIT_CODE)

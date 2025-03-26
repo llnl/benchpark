@@ -24,10 +24,10 @@ jobs:
       coverage: ${{ steps.filter.outputs.coverage }}
       license: ${{ steps.filter.outputs.license }}
       diffpackages: ${{ steps.filter.outputs.diffpackages }}
+      modified_repo_dirs: ${{ steps.get_modified_repo_dirs.outputs.modified_repo_dirs }}
 
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # @v2
-        if: ${{ github.event_name == 'push' || github.event_name == 'merge_group' }}
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
 
@@ -100,6 +100,21 @@ jobs:
             diffpackages:
               - 'repo/**/package.py'
 
+      - name: Fetch develop branch
+        run: git fetch origin develop:develop
+
+      - name: Get modified directories in repo/
+        id: get_modified_repo_dirs
+        run: |
+          # Get the modified directories under 'repo/'
+          MODIFIED_REPO_DIRS=$(git diff --name-only develop | grep 'repo/' | xargs -n1 dirname | sed 's|^repo/||')
+
+          # Debugging: Print the modified directories
+          echo "Modified directories: $MODIFIED_REPO_DIRS"
+
+          # Output the modified directories as a GitHub Actions output
+          echo "modified_repo_dirs=$MODIFIED_REPO_DIRS" >> $GITHUB_OUTPUT
+
   docs:
     if: ${{ needs.changes.outputs.docs == 'true' }}
     needs: changes
@@ -119,9 +134,6 @@ jobs:
     if: ${{ needs.changes.outputs.coverage == 'true' }}
     needs: changes
     uses: ./.github/workflows/coverage.yml
-    # 'workflow_call' actions do not get access to secrets
-    # normally. So, we add this (plus the corresponding)
-    # settings in coverage.yml to pass the token on
     secrets:
       BENCHPARK_CODECOV_TOKEN: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
 
@@ -134,6 +146,8 @@ jobs:
     if: ${{ needs.changes.outputs.diffpackages == 'true' }}
     needs: changes
     uses: ./.github/workflows/diffpackages.yml
+    with:
+      modified_repo_dirs: ${{ needs.changes.outputs.modified_repo_dirs }}
 
   all:
     needs:
@@ -143,14 +157,15 @@ jobs:
       - run
       - coverage
       - license
+      - diffpackages
     if: always()
     runs-on: ubuntu-latest
     steps:
-    - name: Status summary
-      run: |
-        if [[ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
-          echo "One or more required jobs failed or were cancelled"
-          exit 1
-        else
-          echo "All jobs completed successfully"
-        fi
+      - name: Status summary
+        run: |
+          if [[ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
+            echo "One or more required jobs failed or were cancelled"
+            exit 1
+          else
+            echo "All jobs completed successfully"
+          fi
