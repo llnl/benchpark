@@ -23,8 +23,9 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5.4.0
         if: true
+        env:
+          CODECOV_TOKEN: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
         with:
-          token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
           directory: ./coverage/reports
           files: /home/runner/work/benchpark/benchpark/coverage.xml
           flags: unittests
