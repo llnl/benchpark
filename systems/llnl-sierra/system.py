@@ -89,8 +89,8 @@ class LlnlSierra(System):
                 "cmake": {
                     "externals": [
                         {
-                            "spec": "cmake@3.29.2",
-                            "prefix": "/usr/tce/packages/cmake/cmake-3.29.2",
+                            "spec": "cmake@3.23.1",
+                            "prefix": "/usr/tce/packages/cmake/cmake-3.23.1",
                         }
                     ],
                     "buildable": False,
