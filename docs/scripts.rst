@@ -19,6 +19,9 @@ Given two yaml package specs (use ``spack spec --yaml``), the script outputs whi
 .. note::
    If you are trying to compare benchpark benchmarks, try using ``diffExperimentBuilds.py``.
 
+Example: dray with/without MPI
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 In this example, we see the difference of ``dray`` built with and without ``mpi``.
 The difference between the specs ``dray+mpi`` and ``dray~mpi`` is indicated in the output by ``-> [openmpi]`` and the console output highlights the package differences in red.
 
@@ -50,6 +53,9 @@ This script is helpful when it is unclear if changes made to ``system.py`` will 
 Stages that occur during this script:
    - ``benchpark system init``
 
+Example: Identical System
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
 In this example, we compare the ``llnl-sierra/system.py`` on the ``develop`` branch against the ``develop`` branch.
 As we expect, the generated system configuraiton files are identical, since no changes were made to the system.py
 
@@ -68,6 +74,9 @@ As we expect, the generated system configuraiton files are identical, since no c
                 The YAML files benchpark-old/llnl-sierra/auxiliary_software_files/packages.yaml and benchpark-new/llnl-sierra/auxiliary_software_files/packages.yaml are identical.
         llnl-sierra/auxiliary_software_files/compilers.yaml
                 The YAML files benchpark-old/llnl-sierra/auxiliary_software_files/compilers.yaml and benchpark-new/llnl-sierra/auxiliary_software_files/compilers.yaml are identical.
+
+Example: Different CMake Version 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In another example, we have modified the ``cmake`` package version from ``3.29.2`` to ``3.23.1``. 
 
@@ -126,6 +135,9 @@ Stages that occur during this script:
 .. note::
    This script *must* be ran on the target system and cluster to work correctly.
 
+Example: amg2023~mpi
+~~~~~~~~~~~~~~~~~~~~
+
 For example, we can compare the builds for different benchpark branches of ``amg2023`` on the ``ruby`` cluster.
 ``myBranch`` is a branch of benchpark where we have configured ``~mpi``.
 
@@ -163,3 +175,29 @@ For example, we can compare the builds for different benchpark branches of ``amg
          hypre~mpi
             openblas
       DifferentSpecs=True
+
+Compare Benchpark Packages Against Spack
+----------------------------------------
+``lib/scripts/diffPackages.py``
+
+This script is used to check if packages (``package.py``) in ``benchpark/repo/`` can be deleted. 
+We can delete the benchpark ``package.py`` if it is the exact same as the ``package.py`` in ``spack/var/spack/repos/builtin/packages/``.
+This script runs in the benchpark CI and will fail if a package should be deleted in benchpark.
+
+Example: amg2023 and raja-perf
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In this example, we made ``benchpark/repo/amg2023/package.py`` the same as the spack ``amg2023/package.py`` and equivalently 
+``benchpark/repo/raja-perf/package.py`` the same as spack ``raja-perf/package.py``.
+
+.. code-block:: console
+
+   $ benchpark-python diffPackages.py --packages amg2023 raja-perf
+
+   Comparing benchpark packages to packages in spack develop
+   amg2023
+      No differences found. Please delete 'benchpark/repo/amg2023/package.py' (use spack upstream)
+      0 different lines
+   raja-perf
+      No differences found. Please delete 'benchpark/repo/raja-perf/package.py' (use spack upstream)
+      0 different lines
