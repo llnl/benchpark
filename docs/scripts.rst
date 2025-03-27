@@ -48,7 +48,7 @@ by comparing ``.yaml`` files generated from ``system init ...``.
 This script is helpful when it is unclear if changes made to ``system.py`` will affect the resulting system configuration.
 
 Stages that occur during this script:
-- ``benchpark system init``
+   - ``benchpark system init``
 
 In this example, we compare the ``llnl-sierra/system.py`` on the ``develop`` branch against the ``develop`` branch.
 As we expect, the generated system configuraiton files are identical, since no changes were made to the system.py
@@ -117,16 +117,17 @@ This script builds the benchmarks that are available for the specified ``program
 and compares the differences (leveraging ``diffSpecs.py``) for two different versions of benchpark. 
 
 Stages that occur during this script:
-- ``benchpark experiment init``
-- ``benchpark system init``
-- ``benchpark setup``
-- ``ramble workspace setup``
-- ``ramble on`` (optional) 
+   - ``benchpark experiment init``
+   - ``benchpark system init``
+   - ``benchpark setup``
+   - ``ramble workspace setup``
+   - ``ramble on`` (optional) 
 
 .. note::
    This script *must* be ran on the target system and cluster to work correctly.
 
 For example, we can compare the builds for different benchpark branches of ``amg2023`` on the ``ruby`` cluster.
+``myBranch`` is a branch of benchpark where we have configured ``~mpi``.
 
 .. code-block:: console
 
@@ -152,17 +153,13 @@ For example, we can compare the builds for different benchpark branches of ``amg
    ==>     log file: /usr/WS1/mckinsey/benchpark/lib/scripts/benchpark-myBranch-openmp/wkp/benchpark-myBranch-openmp/amg2023/benchpark-myBranch-openmp/ruby/workspace/logs/setup.2025-03-27_13.28.29/amg2023.problem1.amg2023_problem1_single_node_openmp_caliper_none_2_2_2_80_80_80_8_1.out
    ==>   Returning to log file: /usr/WS1/mckinsey/benchpark/lib/scripts/benchpark-myBranch-openmp/wkp/benchpark-myBranch-openmp/amg2023/benchpark-myBranch-openmp/ruby/workspace/logs/setup.2025-03-27_13.28.29.out
 
-   The specs for amg2023 are the same.
-      amg2023 [develop]
-      gcc-runtime
-         glibc
-      hypre
-         intel-oneapi-mkl
-         mvapich2
-      amg2023 [myBranch]
-      gcc-runtime
-         glibc
-      hypre
-         intel-oneapi-mkl
-         mvapich2
-      DifferentSpecs=False
+   The specs for amg2023 are different.
+      amg2023+mpi [develop]
+      -> [openmpi]
+         hypre+mpi
+            openblas
+            openmpi
+      amg2023~mpi [myBranch]
+         hypre~mpi
+            openblas
+      DifferentSpecs=True
