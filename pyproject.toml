@@ -29,7 +29,7 @@ force-exclude = '''
     '/lib/benchpark/test_repo/(/.*)?$'
   | /lib/benchpark/test_repo(/.*)?$
   | lib/benchpark/test_repo
-  | '/bin/benchpark-python -i'
+  | '/bin/benchpark-python'
   | \.github
 )/
 '''
