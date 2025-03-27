@@ -65,7 +65,7 @@ def main():
         "--benchmarks",
         nargs="*",
         default=[],
-        help="Subselect benchmarks to run (e.g. amg2023)"
+        help="Subselect benchmarks to run (e.g. amg2023)",
     )
     parser.add_argument("--run-experiment", action="store_true")
     parser.add_argument(
