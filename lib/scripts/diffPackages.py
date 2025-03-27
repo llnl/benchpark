@@ -44,7 +44,9 @@ def main():
     # Get the list of packages to process
     if args.packages:
         # Use only the specified packages
-        packages_to_compare = args.packages
+        packages_to_compare = []
+        for item in args.packages:
+            packages_to_compare.extend(item.strip().split())
     else:
         # Process all packages if --packages is not provided
         packages_to_compare = sorted(os.listdir(benchpark_dir))
