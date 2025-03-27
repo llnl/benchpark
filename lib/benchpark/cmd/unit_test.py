@@ -221,7 +221,7 @@ def command(args, unknown_args):
                 "--dist",
                 "loadfile",
                 "--tx",
-                f"{args.numprocesses}*popen//python=benchpark-tmpconfig benchpark-python",
+                f"{args.numprocesses}*popen//python=benchpark-tmpconfig benchpark-python -i",
             ]
         )
 
