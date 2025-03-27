@@ -60,3 +60,4 @@ html_css_files = [
 html_logo = "_static/images/benchpark-dark.svg"
 html_theme = "sphinx_rtd_theme"
 html_theme_options = {"logo_only": True}
+pygments_style = "sphinx"
