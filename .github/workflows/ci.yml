@@ -101,12 +101,12 @@ jobs:
             diffpackages:
               - 'repo/**/package.py'
 
-      - name: Fetch develop branch
-        run: git fetch origin develop:develop
-
       - name: Get modified directories in repo/
         id: get_modified_repo_dirs
         run: |
+          # Fetch develop branch
+          git fetch origin develop:develop
+
           # Get the modified directories under 'repo/'
           MODIFIED_REPO_DIRS=$(git diff --name-only develop | grep 'repo/' | xargs -n1 dirname | sed 's|^repo/||' | tr '\n' ' ')
 
