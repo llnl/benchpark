@@ -28,6 +28,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        if: ${{ github.event_name == 'push' || github.event_name == 'merge_group' }}
         with:
           fetch-depth: 0
 
@@ -99,6 +100,9 @@ jobs:
               - 'var/**'
             diffpackages:
               - 'repo/**/package.py'
+
+      - name: test event
+        run: echo "Event name ${{ github.event_name }}"
 
       - name: Fetch develop branch
         run: git fetch origin develop:develop
