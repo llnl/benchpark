@@ -1,6 +1,7 @@
-# Copyright Spack Project Developers. See COPYRIGHT file for details.
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 #
-# SPDX-License-Identifier: (Apache-2.0 OR MIT)
+# SPDX-License-Identifier: Apache-2.0
 
 from spack.package import *
 
@@ -9,7 +10,7 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     """AMG2023 is a parallel algebraic multigrid solver for linear systems
     arising from problems on unstructured grids. The driver provided here
     builds linear systems for various 3-dimensional problems. It requires
-    an installation of hypre-2.27.0 or higher.
+    an installation of hypre-2.31.0 or higher.
     """
 
     tags = ["benchmark"]
@@ -19,8 +20,6 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     license("Apache-2.0")
 
     version("develop", branch="main")
-
-    depends_on("c", type="build")  # generated
 
     variant("mpi", default=True, description="Enable MPI support")
     variant("openmp", default=False, description="Enable OpenMP support")
@@ -32,11 +31,22 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
     depends_on("hypre+caliper", when="+caliper")
-    depends_on("hypre@2.27.0:")
+    depends_on("hypre@2.31.0:")
+    depends_on("hypre+mixedint~fortran")
+
     depends_on("hypre+cuda", when="+cuda")
     requires("+cuda", when="^hypre+cuda")
+    for arch in ("none", "50", "60", "70", "80", "90"):
+        depends_on(f"hypre cuda_arch={arch}", when=f"cuda_arch={arch}")
+
     depends_on("hypre+rocm", when="+rocm")
     requires("+rocm", when="^hypre+rocm")
+    for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
+        depends_on(f"hypre amdgpu_target={target}", when=f"amdgpu_target={target}")
+
+    def setup_build_environment(self, env):
+        if "+cuda" in self.spec:
+            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
 
     def cmake_args(self):
         cmake_options = []
