@@ -172,4 +172,4 @@ For more information on Caliper and Thicket, refer to https://software.llnl.gov/
 
 .. Note::
 
-  An example bash script that automates the building and running of this analysis on the LLNL ``Dane`` cluster is located at ``lib/scripts/compareExperimentRuns.sh``
+  An example bash script that automates the building and running of this analysis on the LLNL ``Dane`` cluster is located at ``examples/compareExperimentRuns.sh``
