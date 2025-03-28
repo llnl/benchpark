@@ -11,7 +11,9 @@ Comparing two Experiments Within Benchpark
 This tutorial will guide you through the process of building and comparing distinct binaries of the same benchmark. 
 As an example, we will be using an experiment comparing two builds of the quicksilver benchmark, compiled with the ``gcc`` and ``intel`` compiler variants on LLNL's Ruby cluster.
 
-An example script to complete all experiment setup is located at ``examples/multiple-binaries/daneSetup.sh``
+.. Note::
+
+  An example bash script to perform the described experiment setup on the LLNL ``Dane`` cluster is located at ``examples/multiple-binaries/setupDane.sh``
 
 Building Multiple Binaries:
 ---------------------------
