@@ -1,5 +1,5 @@
 #!/bin/bash
-# Run from benchpark root '. examples/multiple_binaries/setupDane.sh'
+# Run from benchpark root '. lib/scripts/compareExperimentRuns.sh'
 
 compilers=("gcc12" "intel")
 optParams=("O2")
