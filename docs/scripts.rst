@@ -39,3 +39,28 @@ The difference between the specs ``dray+mpi`` and ``dray~mpi`` is indicated in t
 .. note::
    If ``spack-python`` is not already in your environment, you can use the benchpark bootstrapped spack using ``. ~/.benchpark/spack/share/spack/setup-env.sh``.
    This is helpful if you are running into the error ``bash: spack-python: command not found``.
+
+Example: Installed packages
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you want to compare already installed packages, provide the hashes
+
+.. code-block:: console
+
+   $ spack find -L quicksilver
+
+   -- linux-rhel8-sapphirerapids / gcc@12.1.1 ----------------------
+   fubnce7wzgjxhkim2cylijt4cbpfhxi6 quicksilver@master
+
+   -- linux-rhel8-sapphirerapids / intel@2021.6.0-classic ----------
+   qwev4yodp2joikf2oxvlo224ksjcqve3 quicksilver@master
+   ==> 2 installed packages
+
+   $ spack-python lib/scripts/diffSpecs.py quicksilver/fubnce7wzgjxhkim2cylijt4cbpfhxi6 quicksilver/qwev4yodp2joikf2oxvlo224ksjcqve3
+
+   quicksilver@master %gcc@=12.1.1 build_system=makefile~cuda+mpi+openmp arch=linux-rhel8-sapphirerapids
+   -> [gcc-runtime]
+   gcc-runtime
+   glibc@2.28 %gcc@=12.1.1 build_system=autotools arch=linux-rhel8-sapphirerapids
+   mvapich2 @2.3.7-gcc1211%gcc@=12.1.1 ~alloca build_system=autotools ch3_rank_bits=32~cuda~debug fabrics=mrail file_systems=auto~hwloc_graphics~hwlocv2 patches=d98d8e7 process_managers=auto+regcache threads=multiple+wrapperrpath arch=linux-rhel8-sapphirerapids
+   
