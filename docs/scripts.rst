@@ -47,7 +47,7 @@ Compare System Configurations
 ``lib/scripts/diffSystems.py``
 
 This script enables the user to compare changes to a ``system.py`` between commits
-by comparing ``.yaml`` files generated from ``system init ...``.
+by comparing ``.yaml`` files generated from ``benchpark system init ...``.
 This script is helpful when it is unclear if changes made to ``system.py`` will affect the resulting system configuration.
 
 Stages that occur during this script:
@@ -117,6 +117,33 @@ The script will appropriately identify the change to the package version:
 
 .. note::
    This script *does not* need to be ran on the target system to work correctly, e.g. the above example for ``llnl-sierra`` can be ran from your local machine.
+
+Compare Experiment Configurations
+---------------------------------
+``lib/scripts/diffExperiments.py``
+
+This script enables the user to compare changes to a ``experiment.py`` between commits
+by comparing ``.yaml`` files generated from ``benchpark experiment init ...``.
+This script is helpful when it is unclear if changes made to ``experiment.py`` will affect the resulting experiment configuration.
+
+Stages that occur during this script:
+   - ``benchpark experiment init``
+
+Example: Change n_ranks in Saxpy
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In this example, we modify the ``saxpy+openmp`` experiment to see how the script identifies the differences.
+On the branch ``myBranch``, we change ``self.add_experiment_variable("n_ranks", "8")`` to ``self.add_experiment_variable("n_ranks", "4")``. 
+
+.. code-block:: console
+
+   $ benchpark-python diffExperiments.py -n myBranch -e saxpy+openmp
+
+   saxpy+openmp
+         saxpy/openmp/ramble.yaml
+                  The YAML files benchpark-old/saxpy/openmp/ramble.yaml and benchpark-new/saxpy/openmp/ramble.yaml are different. Here are the differences:
+                     {'values_changed': {"root['ramble']['applications']['saxpy']['workloads']['problem']['experiments']['saxpy_problem_single_node_openmp_caliper_none_{n_nodes}_{n_threads_per_proc}_{n}']['variables']['n_ranks']": {'new_value': 4,
+                                                                                                                                                                                                                                       'old_value': 8}}}
 
 Compare Experiment Builds
 -------------------------
