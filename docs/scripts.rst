@@ -57,7 +57,7 @@ Example: Identical System
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In this example, we compare the ``llnl-sierra/system.py`` on the ``develop`` branch against the ``develop`` branch.
-As we expect, the generated system configuraiton files are identical, since no changes were made to the system.py
+As we expect, the generated system configuration files are identical, since no changes were made to the system.py
 
 .. code-block:: console
 

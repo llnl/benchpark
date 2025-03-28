@@ -61,7 +61,9 @@ Example usage:
 
     if args.experiments == []:
         experiments_out = subprocess.run(
-            ["benchpark", "list", "experiments", "--no-title"], text=True, capture_output=True
+            ["benchpark", "list", "experiments", "--no-title"],
+            text=True,
+            capture_output=True,
         )
         experiments = experiments_out.stdout.replace(" ", "")
         experiments = experiments.split("\n")
@@ -92,7 +94,7 @@ Example usage:
     # Compare the YAML files
     for experiment in experiments:
         color.cprint("@*y" + experiment + "@.")
-        loc = '/'.join(experiment.split('+'))
+        loc = "/".join(experiment.split("+"))
         file = "ramble.yaml"
         color.cprint("\t@*b" + loc + "/" + file + "@.")
         compare_yaml(

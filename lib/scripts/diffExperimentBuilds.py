@@ -81,7 +81,9 @@ def main():
 
     if args.benchmarks == []:
         experiments_out = subprocess.run(
-            ["benchpark", "list", "experiments", "--no-title"], text=True, capture_output=True
+            ["benchpark", "list", "experiments", "--no-title"],
+            text=True,
+            capture_output=True,
         )
         experiments = experiments_out.stdout.replace(" ", "")
         lines = experiments.split("\n")
