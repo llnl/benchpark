@@ -36,7 +36,9 @@ This command initializes a quicksilver experiment configuration in the ``quicksi
 ``benchpark experiment init --dest=quicksilver  quicksilver caliper=mpi +weak +openmp ~single_node``
 
 
-Note: Running a benchmark repeatedly will overwrite the existing output. A way to prevent this is to create multiple duplicate experiments, changing the experiment name ({experiment1}, {experiment2}). 
+.. Note::
+
+  Running a benchmark repeatedly will overwrite the existing output. A way to prevent this is to create multiple duplicate experiments, changing the experiment name ({experiment1}, {experiment2}).
 
 Running multiple experiments:
 ---------------------------
