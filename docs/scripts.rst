@@ -39,7 +39,7 @@ The difference between the specs ``dray+mpi`` and ``dray~mpi`` is indicated in t
    ...
 
 .. note::
-   If ``spack-python`` is not already in your environment, you can use the benchpark bootstrapped spack using ``. . ~/.benchpark/spack/share/spack/setup-env.sh``.
+   If ``spack-python`` is not already in your environment, you can use the benchpark bootstrapped spack using ``. ~/.benchpark/spack/share/spack/setup-env.sh``.
    This is helpful if you are running into the error ``bash: spack-python: command not found``. 
 
 Compare System Configurations
