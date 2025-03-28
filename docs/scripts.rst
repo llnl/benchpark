@@ -203,6 +203,8 @@ For example, we can compare the builds for different benchpark branches of ``amg
             openblas
       DifferentSpecs=True
 
+Optionally the experiments can be ran using the ``--run-experiment`` argument.
+
 Compare Benchpark Packages Against Spack
 ----------------------------------------
 ``lib/scripts/diffPackages.py``
