@@ -11,10 +11,6 @@ Comparing two Experiments Within Benchpark
 This tutorial will guide you through the process of building and comparing distinct binaries of the same benchmark. 
 As an example, we will be using an experiment comparing two builds of the quicksilver benchmark, compiled with the ``gcc`` and ``intel`` compiler variants on LLNL's Ruby cluster.
 
-.. Note::
-
-  An example bash script to perform the described experiment setup on the LLNL ``Dane`` cluster is located at ``examples/multiple-binaries/setupDane.sh``
-
 Building Multiple Binaries:
 ---------------------------
 
@@ -40,7 +36,7 @@ This command initializes a quicksilver experiment configuration in the ``quicksi
 
 .. Note::
 
-  Running a benchmark repeatedly will overwrite the existing output. A way to prevent this is to create multiple duplicate experiments, changing the experiment name ({experiment1}, {experiment2}).
+  Running a benchmark repeatedly will overwrite the existing output. A way to prevent this is to create multiple duplicate experiments, changing the experiment name (``--dest=quicksilver``, ``--dest=quicksilver2``).
 
 Running multiple experiments:
 ---------------------------
@@ -58,8 +54,8 @@ Now, we generate an execute_experiment shell script for each run, and install th
 
 .. code-block:: console
 
-  $ ramble -P -D workspace/quicksilver/ruby-gcc/workspace workspace setup
-  $ ramble -P -D workspace/quicksilver/ruby-intel/workspace workspace setup
+  $ ramble --workspace-dir workspace/quicksilver/ruby-gcc/workspace workspace setup
+  $ ramble --workspace-dir workspace/quicksilver/ruby-intel/workspace workspace setup
 
 Completing these steps will result in the following structure
 
@@ -149,8 +145,8 @@ To run each binary on different nodes, run the following commands
 
 .. code-block:: console
 
-  ramble -P -D workspace/quicksilver/ruby-gcc/workspace on
-  ramble -P -D workspace/quicksilver/ruby-intel/workspace on
+  ramble --workspace-dir workspace/quicksilver/ruby-gcc/workspace on
+  ramble --workspace-dir workspace/quicksilver/ruby-intel/workspace on
 
 However, we can manually combine each ``execute_experiment`` file into a single script, allowing us to run both binaries on the same node. An example script for this is available at ``examples/multiple_binaries/combine_executable.py``
 
@@ -161,8 +157,8 @@ This can be done by running
 
 .. code-block:: console
 
-    ramble -P -D workspace/quicksilver/ruby-gcc/workspace workspace analyze
-    ramble -P -D workspace/quicksilver/ruby-intel/workspace workspace analyze 
+    ramble --workspace-dir workspace/quicksilver/ruby-gcc/workspace workspace analyze
+    ramble --workspace-dir workspace/quicksilver/ruby-intel/workspace workspace analyze 
 
 Collecting Data with Caliper
 ----------------------------
@@ -173,3 +169,7 @@ To read the caliper output, run ``cali-query -t {experiment_name}.cali``
 To further analyze the caliper data, it is also possible to generate a call tree using Thicket
 
 For more information on Caliper and Thicket, refer to https://software.llnl.gov/Caliper/ and https://thicket.readthedocs.io/en/latest/
+
+.. Note::
+
+  An example bash script to perform similar analysis on the LLNL ``Dane`` cluster is located at ``lib/scripts/compareExperimentRuns.sh``
