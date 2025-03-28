@@ -40,7 +40,6 @@
    modifiers
    set-of-experiments
    run-binary
-   scripts
 
 .. toctree::
    :maxdepth: 1
