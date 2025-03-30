@@ -40,7 +40,6 @@
    modifiers
    set-of-experiments
    run-binary
-   scripts
 
 .. toctree::
    :maxdepth: 1
@@ -51,6 +50,7 @@
    add-an-experiment
    add-a-dryrun
    update-a-system-config
+   developer-scripts
 
 .. toctree::
    :maxdepth: 2
