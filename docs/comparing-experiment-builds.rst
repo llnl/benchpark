@@ -11,7 +11,7 @@ Comparing two Experiments Within Benchpark
 This tutorial will guide you through the process of building and comparing distinct binaries of the same benchmark. 
 As an example, we will be using an experiment comparing two builds of the quicksilver benchmark, compiled with the ``gcc`` and ``intel`` compiler variants on LLNL's Ruby cluster.
 
-Building Multiple Binaries:
+Building Multiple Binaries
 ---------------------------
 
 Create separate system instances.
@@ -22,8 +22,8 @@ In this case, we are changing the compiler variant
 
 ``benchpark system init --dest=ruby-intel  llnl-cluster cluster=ruby compiler=intel``
 
-Creating experiment ramble.yaml:
----------------------------
+Creating experiment ramble.yaml
+-------------------------------
 
 Create the experiment description
 Parameters could include: version, scaling, etc.
@@ -38,8 +38,8 @@ This command initializes a quicksilver experiment configuration in the ``quicksi
 
   Running a benchmark repeatedly will overwrite the existing output. A way to prevent this is to create multiple duplicate experiments, changing the experiment name (``--dest=quicksilver``, ``--dest=quicksilver2``).
 
-Running multiple experiments:
----------------------------
+Running multiple experiments
+----------------------------
 
 Now that both the system and experiment parameters have been defined, we can setup each experiment directory. 
 This step will install the binary, and create the execute_experiment shell script
@@ -125,51 +125,69 @@ This can also be done in a single command by the ``diffSpecs.py`` script (see :d
 
 ``spack-python  lib/scripts/diffSpecs.py quicksilver/{hash1}  quicksilver/{hash2}``
 
-the output will look something like this, with the difference between the specs highlighted in red. Asterisks have been placed around all highlighted sections
+.. Note::
+
+  ``spack-python`` is required to import the spack libraries needed for this script. It will automatically be added to your ``$PATH`` when you run ``benchpark setup ...``.
+
+The output shows the quicksilver build tree twice: the first hash compared to the 
+second hash, followed by the second hash compared to the first hash. 
+The first quicksilver spec tree highlights
+additional specs present in ``quicksilver/fubnce7`` and not the other hash, e.g. ``gcc-runtime``.
+Specs that are in both trees are white with the version differences between the specs highlighted in red, e.g. ``glibc``.
 
 .. code-block:: console
 
-  $ spack-python lib/scripts/diffSpecs.py quicksilver/fubnce7wzgjxhkim2cylijt4cbpfhxi6  quicksilver/qwev4yodp2joikf2oxvlo224ksjcqve3
+  $ spack-python lib/scripts/diffSpecs.py --truncate quicksilver/fubnce7wzgjxhkim2cylijt4cbpfhxi6 quicksilver/qwev4yodp2joikf2oxvlo224ksjcqve3
 
-    quicksilver@master **%gcc@=12.1.1** build_system=makefile~cuda+mpi+openmp arch=linux-rhel8-sapphirerapids
-    **-> [gcc-runtime]**
-    **gcc-runtime**
-    glibc@2.28 **%gcc@=12.1.1** build_system=autotools arch=linux-rhel8-sapphirerapids
-    mvapich2 **@2.3.7-gcc1211%gcc@=12.1.1** ~alloca build_system=autotools ch3_rank_bits=32~cuda~debug fabrics=mrail file_systems=auto~hwloc_graphics~hwlocv2 patches=d98d8e7 process_managers=auto+regcache threads=multiple+wrapperrpath arch=linux-rhel8-sapphirerapids 
+.. image:: /_static/images/quicksilver-diffspecs.png
+  :align: center
 
 
 Running Experiments
 -------------------
 
-To run each binary on different nodes, run the following commands
+To launch the experiments in separate job allocations, run the following commands:
 
 .. code-block:: console
 
   ramble --workspace-dir workspace/quicksilver/ruby-gcc/workspace on
   ramble --workspace-dir workspace/quicksilver/ruby-intel/workspace on
 
-However, we can manually combine each ``execute_experiment`` file into a single script, allowing us to run both binaries on the same node. An example script for this is available at ``examples/multiple_binaries/combine_executable.py``
-
 Collecting FOMs
 ---------------
-Most benchmarks within benchpark generate a figure of merit, which can be easily extracted to measure performance at a glance.
-This can be done by running
+Most benchmarks within benchpark generate a figure of merit, which is a measure of performance.
+We can analyze the figure of merit by running the following:
 
 .. code-block:: console
 
     ramble --workspace-dir workspace/quicksilver/ruby-gcc/workspace workspace analyze
     ramble --workspace-dir workspace/quicksilver/ruby-intel/workspace workspace analyze 
 
-Collecting Data with Caliper
-----------------------------
-Enabling the Caliper modifier gives us a much more detailed picture about any performance differences, beyond looking at runtimes we can generate a profile to see which functions are contributing to a performance difference.
-
-To read the caliper output, run ``cali-query -t {experiment_name}.cali``
-
-To further analyze the caliper data, it is also possible to generate a call tree using Thicket
-
-For more information on Caliper and Thicket, refer to https://software.llnl.gov/Caliper/ and https://thicket.readthedocs.io/en/latest/
-
 .. Note::
 
-  An example bash script that automates the building and running of this analysis on the LLNL ``Dane`` cluster is located at ``examples/compareExperimentRuns.sh``
+  An example bash script that automates the building and running of this analysis on the LLNL ``Dane`` cluster is located at ``benchpark/docs/examples/compare_experiment_builds/compareExperimentBuilds.sh``.
+
+Analyzing Caliper Data with Thicket
+-----------------------------------
+Enabling the Caliper modifier (see :doc:`modifiers`) gives us a much more detailed picture about any performance differences, beyond looking at runtimes we can 
+generate a calltree profile to see which functions are contributing to a performance difference.
+
+The Caliper ``.cali`` files are automatically generated in the experiment directory. To further analyze the caliper data, Thicket can be used to view the calltree and generate plots:
+
+.. code-block:: python
+
+  import thicket as th
+
+  tk = th.Thicket.from_caliperreader([
+    "experiment_name1.cali"
+  ])
+
+  print(tk.tree(metric_column="time"))
+
+  tk.metadata.plot(
+    x="mpi.world.size",
+    y="FOM",
+    kind="scatter"
+  )
+
+For more information on Caliper and Thicket, refer to https://software.llnl.gov/Caliper/ and https://thicket.readthedocs.io/en/latest/, 
