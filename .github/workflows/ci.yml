@@ -105,7 +105,7 @@ jobs:
         id: get_modified_repo_dirs
         run: |
           # Fetch develop branch
-          git fetch origin develop:develop
+          git fetch --update-head-ok origin develop:develop
 
           # Get the modified directories under 'repo/'
           MODIFIED_REPO_DIRS=$(git diff --name-only develop | grep 'repo/' | xargs -n1 dirname | sed 's|^repo/||' | tr '\n' ' ')
