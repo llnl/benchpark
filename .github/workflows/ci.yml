@@ -23,10 +23,12 @@ jobs:
       run: ${{ steps.filter.outputs.run }}
       coverage: ${{ steps.filter.outputs.coverage }}
       license: ${{ steps.filter.outputs.license }}
+      diffpackages: ${{ steps.filter.outputs.diffpackages }}
+      modified_repo_dirs: ${{ steps.get_modified_repo_dirs.outputs.modified_repo_dirs }}
 
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # @v2
-        if: ${{ github.event_name == 'push' }}
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        if: ${{ github.event_name == 'push' || github.event_name == 'merge_group' || github.event_name == 'pull_request' }}
         with:
           fetch-depth: 0
 
@@ -34,6 +36,10 @@ jobs:
       - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
         id: filter
         with:
+          # For merge group events, compare against the target branch (main)
+          base: ${{ github.event_name == 'merge_group' && github.event.merge_group.base_ref || '' }}
+          # For merge group events, use the merge group head ref
+          ref: ${{ github.event_name == 'merge_group' && github.event.merge_group.head_sha || github.ref }}
           filters: |
             docs:
               - '.github/**'
@@ -47,6 +53,7 @@ jobs:
               - 'var/**'
               - 'README.rst'
               - 'tags.yaml'
+              - 'pyproject.toml'
             style:
               - '.github/**'
               - 'bin/**'
@@ -57,6 +64,8 @@ jobs:
               - 'repo/**'
               - 'systems/**'
               - 'var/**'
+              - 'pyproject.toml'
+              - '.flake8'
             run:
               - '.github/**'
               - 'bin/**'
@@ -78,6 +87,7 @@ jobs:
               - 'repo/**'
               - 'systems/**'
               - 'var/**'
+              - 'pyproject.toml'
             license:
               - '.github/**'
               - 'bin/**'
@@ -88,6 +98,23 @@ jobs:
               - 'repo/**'
               - 'systems/**'
               - 'var/**'
+            diffpackages:
+              - 'repo/**/package.py'
+
+      - name: Get modified directories in repo/
+        id: get_modified_repo_dirs
+        run: |
+          # Fetch develop branch
+          git fetch --update-head-ok origin develop:develop
+
+          # Get the modified directories under 'repo/'
+          MODIFIED_REPO_DIRS=$(git diff --name-only develop | grep 'repo/' | xargs -n1 dirname | sed 's|^repo/||' | tr '\n' ' ')
+
+          # Debugging: Print the modified directories
+          echo "Modified directories: $MODIFIED_REPO_DIRS"
+
+          # Output the modified directories as a GitHub Actions output
+          echo "modified_repo_dirs=$MODIFIED_REPO_DIRS" >> $GITHUB_OUTPUT
 
   docs:
     if: ${{ needs.changes.outputs.docs == 'true' }}
@@ -103,7 +130,7 @@ jobs:
     if: ${{ needs.changes.outputs.run == 'true' }}
     needs: changes
     uses: ./.github/workflows/run.yml
-    
+
   coverage:
     if: ${{ needs.changes.outputs.coverage == 'true' }}
     needs: changes
@@ -118,3 +145,31 @@ jobs:
     if: ${{ needs.changes.outputs.license == 'true' }}
     needs: changes
     uses: ./.github/workflows/license.yml
+
+  diffpackages:
+    if: ${{ needs.changes.outputs.diffpackages == 'true' }}
+    needs: changes
+    uses: ./.github/workflows/diffpackages.yml
+    with:
+      modified_repo_dirs: ${{ needs.changes.outputs.modified_repo_dirs }}
+
+  all:
+    needs:
+      - changes
+      - docs
+      - style
+      - run
+      - coverage
+      - license
+      - diffpackages
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+    - name: Status summary
+      run: |
+        if [[ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
+          echo "One or more required jobs failed or were cancelled"
+          exit 1
+        else
+          echo "All jobs completed successfully"
+        fi

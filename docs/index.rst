@@ -11,7 +11,7 @@
 
    for-the-impatient
    getting-started
-   basic-usage
+   benchpark-commands
    benchpark-workflow
    FAQ
 
@@ -52,6 +52,7 @@
    add-an-experiment
    add-a-dryrun
    update-a-system-config
+   developer-scripts
 
 .. toctree::
    :maxdepth: 2
