@@ -21,7 +21,7 @@ do
             do
                 echo $i $j $scale
                 # Setup specific experiment
-                benchpark experiment init --dest=quicksilver$i$j$scale$runNum quicksilver +$scale +openmp ~single_node
+                benchpark experiment init --dest=quicksilver$i$j$scale$runNum quicksilver +$scale +openmp ~single_node caliper=mpi
                 if [ "$i" == "gcc12" ]; then
                     benchpark setup quicksilver$i$j$scale$runNum daneGCC workspace
                     . workspace/setup.sh
