@@ -3,8 +3,9 @@
 
    SPDX-License-Identifier: Apache-2.0
 
+====================
 Compare System Specs
---------------------
+====================
 ``lib/scripts/diffSystemSpecs.py``
 
 This script enables the user to compare changes to a ``system.py`` between commits
