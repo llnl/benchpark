@@ -7,6 +7,8 @@
 
 import os
 import os.path
+import re
+import shutil
 
 import benchpark.paths
 from benchpark.runtime import run_command, working_dir
@@ -19,6 +21,19 @@ def _find_env_root(basedir):
     raise Exception(f"Could not find spack.yaml in {basedir}")
 
 
+def extract_build_commands(log_file):
+    extracted = []
+    with open(log_file, "r", encoding="utf-8") as f:
+        for line in f.readlines():
+            match = re.match(r"^==>\s*\[.*\]\s*(\S.*)", line)
+            if not match:
+                continue
+            extract = match.group(1)
+            if any(x in extract for x in ["cmake", "configure", "make"]):
+                extracted.append(extract)
+    return extracted
+
+
 def show_build_dump(args):
     env_root = _find_env_root(args.workspace)
 
@@ -27,10 +42,24 @@ def show_build_dump(args):
     experiment_name = out.strip()
 
     logs_out = os.path.join(args.destdir, f"build-{experiment_name}.log")
-    if os.path.exists(logs_out):
-        raise Exception(f"Output file already exists: {logs_out}")
-    with open(logs_out, "w") as f:
-        run_command(f"spack -e {env_root} logs {experiment_name}", stdout=f)
+    if not os.path.exists(logs_out):
+        with open(logs_out, "w") as f:
+            run_command(f"spack -e {env_root} logs {experiment_name}", stdout=f)
+
+    build_cmds = extract_build_commands(logs_out)
+    cmds_out = os.path.join(args.destdir, "extracted-commands.txt")
+    if not os.path.exists(cmds_out):
+        with open(cmds_out, "w", encoding="utf-8") as f:
+            for cmd in build_cmds:
+                f.write(f"{cmd}\n")
+
+    # Spack also stores env vars for the build in the install dir, copy them
+    out, err = run_command(f"spack -e {env_root} location -i {experiment_name}")
+    install_location = out.strip()
+    env_vars_path = os.path.join(install_location, ".spack", "spack-build-env.txt")
+    env_vars_out = os.path.join(args.destdir, os.path.basename(env_vars_path))
+    if not os.path.exists(env_vars_out):
+        shutil.copy(env_vars_path, env_vars_out)
 
 
 def setup_parser(root_parser):
