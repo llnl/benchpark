@@ -11,7 +11,7 @@ import re
 import shutil
 
 import benchpark.paths
-from benchpark.runtime import run_command, working_dir
+from benchpark.runtime import run_command
 
 
 def _find_env_root(basedir):
