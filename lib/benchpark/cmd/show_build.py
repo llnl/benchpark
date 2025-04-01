@@ -37,7 +37,9 @@ def extract_build_commands(log_file):
 def show_build_dump(args):
     env_root = _find_env_root(args.workspace)
 
-    determine_exp = os.path.join(benchpark.paths.benchpark_root, "lib", "scripts", "determine-exp.py")
+    determine_exp = os.path.join(
+        benchpark.paths.benchpark_root, "lib", "scripts", "determine-exp.py"
+    )
     out, err = run_command(f"spack -e {env_root} python {determine_exp}")
     experiment_name = out.strip()
 
@@ -67,7 +69,8 @@ def setup_parser(root_parser):
 
     dump_parser = show_build_subparser.add_parser("dump")
     dump_parser.add_argument(
-        "workspace", help="A Ramble workspace you want to want to generate build instructions for"
+        "workspace",
+        help="A Ramble workspace you want to want to generate build instructions for"
     )
     dump_parser.add_argument("destdir", help="Put all needed resources here")
 
@@ -79,4 +82,6 @@ def command(args):
     if args.show_build_subcommand in actions:
         actions[args.show_build_subcommand](args)
     else:
-        raise ValueError(f"Unknown subcommand for 'show-build': {args.show_build_subcommand}")
+        raise ValueError(
+            f"Unknown subcommand for 'show-build': {args.show_build_subcommand}"
+        )
