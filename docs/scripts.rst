@@ -1,0 +1,66 @@
+.. Copyright 2023 Lawrence Livermore National Security, LLC and other
+   Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+
+   SPDX-License-Identifier: Apache-2.0
+
+======================
+Benchpark User Scripts
+======================
+
+Compare Spack Build Dependency Trees
+------------------------------------
+``lib/scripts/diffSpecs.py``
+
+This script enables the user to compare packages and versions of two spack builds.
+Given two yaml package specs (use ``spack spec --yaml``), the script outputs which components of the packages are different.
+
+.. note::
+   If you are trying to compare benchpark benchmarks, try using ``diffExperimentBuilds.py``.
+
+Example: dray with/without MPI
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In this example, we see the difference of ``dray`` built with and without ``mpi``.
+The difference between the specs ``dray+mpi`` and ``dray~mpi`` is indicated in the output by ``-> [openmpi]`` and the console output highlights the package differences in red.
+
+.. code-block:: console
+
+   $ spack spec --yaml dray+mpi > dray-mpi.yaml
+   $ spack spec --yaml dray~mpi > dray-nompi.yaml
+   $ spack-python lib/scripts/diffSpecs.py ./dray-mpi.yaml ./dray-nompi.yaml
+
+   dray@0.1.8%apple-clang@=16.0.0+blt_find_mpi build_system=generic~cuda~logging+mpi+openmp+shared~stats+test+utils arch=darwin-macos-m1
+   -> [openmpi]
+      apcomp@0.0.4%apple-clang@=16.0.0+blt_find_mpi build_system=generic+mpi+openmp+shared arch=darwin-macos-m1
+      -> [openmpi]
+         llvm-openmp@18.1.0%apple-clang@=16.0.0 build_system=cmake build_type=Release generator=make~ipo+multicompat arch=darwin-macos-m1
+   ...
+
+.. note::
+   If ``spack-python`` is not already in your environment, you can use the benchpark bootstrapped spack using ``. ~/.benchpark/spack/share/spack/setup-env.sh``.
+   This is helpful if you are running into the error ``bash: spack-python: command not found``.
+
+Example: Installed packages
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you want to compare already installed packages, provide the hashes
+
+.. code-block:: console
+
+   $ spack find -L quicksilver
+
+   -- linux-rhel8-sapphirerapids / gcc@12.1.1 ----------------------
+   fubnce7wzgjxhkim2cylijt4cbpfhxi6 quicksilver@master
+
+   -- linux-rhel8-sapphirerapids / intel@2021.6.0-classic ----------
+   qwev4yodp2joikf2oxvlo224ksjcqve3 quicksilver@master
+   ==> 2 installed packages
+
+   $ spack-python lib/scripts/diffSpecs.py quicksilver/fubnce7wzgjxhkim2cylijt4cbpfhxi6 quicksilver/qwev4yodp2joikf2oxvlo224ksjcqve3
+
+   quicksilver@master %gcc@=12.1.1 build_system=makefile~cuda+mpi+openmp arch=linux-rhel8-sapphirerapids
+   -> [gcc-runtime]
+   gcc-runtime
+   glibc@2.28 %gcc@=12.1.1 build_system=autotools arch=linux-rhel8-sapphirerapids
+   mvapich2 @2.3.7-gcc1211%gcc@=12.1.1 ~alloca build_system=autotools ch3_rank_bits=32~cuda~debug fabrics=mrail file_systems=auto~hwloc_graphics~hwlocv2 patches=d98d8e7 process_managers=auto+regcache threads=multiple+wrapperrpath arch=linux-rhel8-sapphirerapids
+   

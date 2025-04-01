@@ -28,6 +28,7 @@
 
    example-workflow
    llnl-tutorial
+   comparing-experiment-builds
 
 .. toctree::
    :maxdepth: 1
@@ -40,6 +41,7 @@
    modifiers
    set-of-experiments
    run-binary
+   scripts
 
 .. toctree::
    :maxdepth: 1
