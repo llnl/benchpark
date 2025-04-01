@@ -36,9 +36,9 @@ by ``-> [openmpi]`` and the console output highlights the package differences in
    (Image output is truncated)
 
 
-.. note::
-   If ``spack-python`` is not already in your environment, you can use the benchpark bootstrapped spack using ``. ~/.benchpark/spack/share/spack/setup-env.sh``.
-   This is helpful if you are running into the error ``bash: spack-python: command not found``.
+.. Note::
+
+  ``spack-python`` is required to import the spack libraries needed for this script. It will automatically be added to your ``$PATH`` when you run ``benchpark setup ...``.
 
 Example: Installed packages
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
