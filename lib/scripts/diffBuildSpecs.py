@@ -151,14 +151,14 @@ def main():
     env = ev.active_environment()
 
     parser = argparse.ArgumentParser(
-        description="""Diff two specs.
-(spack-python diffSpecs.py spec1 spec2)
+        description="""Diff two build specs.
+(spack-python diffBuildSpecs.py spec1 spec2)
 
 Example usage:
 
     $ spack spec --yaml dray+mpi > dray-mpi.yaml
     $ spack spec --yaml dray~mpi > dray-nompi.yaml
-    $ spack-python lib/scripts/diffSpecs.py --truncate ./dray-mpi.yaml ./dray-nompi.yaml
+    $ spack-python lib/scripts/diffBuildSpecs.py --truncate ./dray-mpi.yaml ./dray-nompi.yaml
 """,
         formatter_class=argparse.RawTextHelpFormatter,
     )
