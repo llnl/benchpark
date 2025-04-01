@@ -70,7 +70,7 @@ def setup_parser(root_parser):
     dump_parser = show_build_subparser.add_parser("dump")
     dump_parser.add_argument(
         "workspace",
-        help="A Ramble workspace you want to want to generate build instructions for"
+        help="A Ramble workspace you want to want to generate build instructions for",
     )
     dump_parser.add_argument("destdir", help="Put all needed resources here")
 
