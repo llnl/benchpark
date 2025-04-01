@@ -121,9 +121,9 @@ Each spec will generate a dependency tree, showing which variants and compilers 
 
 Notice that each dependency tree differs in the compilers used (gcc\@12.1.1 vs. intel\@2021.6.0)
 
-This can also be done in a single command by the ``diffSpecs.py`` script (see :doc:`scripts`).
+This can also be done in a single command by the ``diffBuildSpecs.py`` script (see :doc:`scripts`).
 
-``spack-python  lib/scripts/diffSpecs.py quicksilver/{hash1}  quicksilver/{hash2}``
+``spack-python  lib/scripts/diffBuildSpecs.py quicksilver/{hash1}  quicksilver/{hash2}``
 
 .. Note::
 
@@ -137,7 +137,7 @@ Specs that are in both trees are white with the version differences between the 
 
 .. code-block:: console
 
-  $ spack-python lib/scripts/diffSpecs.py --truncate quicksilver/fubnce7wzgjxhkim2cylijt4cbpfhxi6 quicksilver/qwev4yodp2joikf2oxvlo224ksjcqve3
+  $ spack-python lib/scripts/diffBuildSpecs.py --truncate quicksilver/fubnce7wzgjxhkim2cylijt4cbpfhxi6 quicksilver/qwev4yodp2joikf2oxvlo224ksjcqve3
 
 .. image:: /_static/images/quicksilver-diffspecs.png
   :align: center
