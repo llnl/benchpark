@@ -30,12 +30,11 @@ by ``-> [openmpi]`` and the console output highlights the package differences in
    $ spack spec --yaml dray~mpi > dray-nompi.yaml
    $ spack-python lib/scripts/diffBuildSpecs.py ./dray-mpi.yaml ./dray-nompi.yaml
 
-   dray@0.1.8%apple-clang@=16.0.0+blt_find_mpi build_system=generic~cuda~logging+mpi+openmp+shared~stats+test+utils arch=darwin-macos-m1
-   -> [openmpi]
-      apcomp@0.0.4%apple-clang@=16.0.0+blt_find_mpi build_system=generic+mpi+openmp+shared arch=darwin-macos-m1
-      -> [openmpi]
-         llvm-openmp@18.1.0%apple-clang@=16.0.0 build_system=cmake build_type=Release generator=make~ipo+multicompat arch=darwin-macos-m1
-   ...
+.. figure:: /_static/images/dray-diffspecs.png
+   :align: center
+
+   (Image output is truncated)
+
 
 .. note::
    If ``spack-python`` is not already in your environment, you can use the benchpark bootstrapped spack using ``. ~/.benchpark/spack/share/spack/setup-env.sh``.
@@ -59,9 +58,5 @@ If you want to compare already installed packages, provide the hashes
 
    $ spack-python lib/scripts/diffBuildSpecs.py quicksilver/fubnce7wzgjxhkim2cylijt4cbpfhxi6 quicksilver/qwev4yodp2joikf2oxvlo224ksjcqve3
 
-   quicksilver@master %gcc@=12.1.1 build_system=makefile~cuda+mpi+openmp arch=linux-rhel8-sapphirerapids
-   -> [gcc-runtime]
-   gcc-runtime
-   glibc@2.28 %gcc@=12.1.1 build_system=autotools arch=linux-rhel8-sapphirerapids
-   mvapich2 @2.3.7-gcc1211%gcc@=12.1.1 ~alloca build_system=autotools ch3_rank_bits=32~cuda~debug fabrics=mrail file_systems=auto~hwloc_graphics~hwlocv2 patches=d98d8e7 process_managers=auto+regcache threads=multiple+wrapperrpath arch=linux-rhel8-sapphirerapids
-   
+.. figure:: /_static/images/quicksilver-diffspecs.png
+   :align: center
