@@ -126,6 +126,7 @@ def diff_specs(spec_a, spec_b, truncate=False):
             DepsComparator(spec, nl_cb),
         ]
 
+    diff = False
     for depth, dep_spec in traverse.traverse_tree(
         [spec_a], deptype=("link", "run"), depth_first=True
     ):
@@ -141,19 +142,44 @@ def diff_specs(spec_a, spec_b, truncate=False):
                 c.compare(spec_b[node.name])
         else:
             highlight(node.name)
+            diff = True
         print()  # New line
+    return diff
 
 
 def main():
     env = ev.active_environment()
 
-    parser = argparse.ArgumentParser(description="diff two specs")
+    parser = argparse.ArgumentParser(
+        description="""Diff two specs.
+(spack-python diffSpecs.py spec1 spec2)
+
+Example usage:
+
+    $ spack spec --yaml dray+mpi > dray-mpi.yaml
+    $ spack spec --yaml dray~mpi > dray-nompi.yaml
+    $ spack-python lib/scripts/diffSpecs.py --truncate ./dray-mpi.yaml ./dray-nompi.yaml
+""",
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
 
     parser.add_argument(
         "-t",
         "--truncate",
         action="store_true",
         help="don't show most details unless they are different",
+    )
+    parser.add_argument(
+        "-d",
+        "--diffprint",
+        action="store_true",
+        help="Print if the two specs are different or the same.",
+    )
+    parser.add_argument(
+        "-a",
+        "--asymmetric",
+        action="store_true",
+        help="Only compare spec0 against spec1. Default behavior also compares spec1 against spec0.",
     )
 
     parser.add_argument("specs", nargs=argparse.REMAINDER, help="two specs to compare")
@@ -172,7 +198,13 @@ def main():
     if len(specs) != 2:
         raise Exception("Need two specs")
 
-    diff_specs(specs[0], specs[1], truncate=args.truncate)
+    diff = diff_specs(specs[0], specs[1], truncate=args.truncate)
+    diff2 = False
+    if not args.asymmetric:
+        diff2 = diff_specs(specs[1], specs[0], truncate=args.truncate)
+    if args.diffprint:
+        diff = diff or diff2
+        print(f"DifferentSpecs={diff}")
 
 
 if __name__ == "__main__":
