@@ -30,7 +30,6 @@ class Quicksilver(MakefilePackage):
     variant("caliper", default=False, description="Build with Caliper support")
 
     depends_on("mpi", when="+mpi")
-
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
 
