@@ -45,12 +45,12 @@
 .. toctree::
    :maxdepth: 1
    :caption: Benchpark Utils
+
    diffBuildSpecs
    diffExperimentBuilds
    diffExperimentSpecs
    diffPackageCommits
    diffSystemSpecs
-
    scripts
    developer-scripts
 
