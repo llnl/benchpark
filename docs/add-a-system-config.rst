@@ -24,7 +24,7 @@ To specify a new system:
 1. Identify a system in Benchpark with the same hardware.
 2. If a system with the same hardware does not exist, add a new hardware description, as described in Adding System Hardware Specs section.
 3. Identify the same software stack description.  Typically if the same hardware is already used by Benchpark, the same software stack may already be specified if the same vendor software stack is used on this hardware - or, if a software stack of your datacenter is already specified.
-4. If the same software stack description does not exists, determine if there is one that can be parameterized to match yours.
+4. If the same software stack description does not exist, determine if there is one that can be parameterized to match yours.
 5. If can't parameterize existing software description, add a new one.
 
 ------------------------------
