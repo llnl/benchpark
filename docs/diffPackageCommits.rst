@@ -3,12 +3,16 @@
 
    SPDX-License-Identifier: Apache-2.0
 
-Compare Benchpark Packages Against Spack
-----------------------------------------
+=======================
+Compare Package Commits
+=======================
 ``lib/scripts/diffPackageCommits.py``
 
-This script is used to check if packages (``package.py``) in ``benchpark/repo/`` can be deleted. 
-We can delete the benchpark ``package.py`` if it is the exact same as the ``package.py`` in ``spack/var/spack/repos/builtin/packages/``.
+Compare a commit of a Spack package in Benchpark/repo with the package upstreamed to Spack.
+If the comparison of the ``package.py`` in ``benchpark/repo/`` is identical to 
+the ``package.py`` in ``spack/var/spack/repos/builtin/packages/``,
+``package.py`` in ``benchpark/repo/`` can be safely deleted without changing
+how the benchmark is built; this scenario occurs if ``package.py`` has been upstreamed to Spack.
 This script runs in the benchpark CI and will fail if a package should be deleted in benchpark.
 
 Example: amg2023 and raja-perf
