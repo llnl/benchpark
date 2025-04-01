@@ -11,7 +11,7 @@
 
    for-the-impatient
    getting-started
-   basic-usage
+   benchpark-commands
    benchpark-workflow
    FAQ
 
@@ -28,6 +28,7 @@
 
    example-workflow
    llnl-tutorial
+   comparing-experiment-builds
 
 .. toctree::
    :maxdepth: 1
@@ -39,6 +40,8 @@
    analyze-experiment
    modifiers
    set-of-experiments
+   run-binary
+   scripts
 
 .. toctree::
    :maxdepth: 1
@@ -48,6 +51,8 @@
    add-a-benchmark
    add-an-experiment
    add-a-dryrun
+   update-a-system-config
+   developer-scripts
 
 .. toctree::
    :maxdepth: 2

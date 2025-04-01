@@ -19,7 +19,7 @@ class Stream(ExecutableApplication):
     tags = ['synthetic',
             'large-scale','multi-node','single-node','sub-node',
             'high-memory-bandwidth','regular-memory-access',
-            'mpi','c','fortran','openmp']
+            'mpi','c','fortran']
 
     software_spec('stream',
                   pkg_spec='stream@5.10 +openmp cflags="-O3 -DSTREAM_ARRAY_SIZE=80000000 -DNTIMES=20"',
