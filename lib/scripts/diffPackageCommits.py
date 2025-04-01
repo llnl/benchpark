@@ -11,7 +11,7 @@ EXIT_CODE = 0
 
 parser = argparse.ArgumentParser(
     description="Script to compare packages in benchpark against upstream spack packages.",
-    usage="benchpark-python diffPackages.py [OPTIONS]",
+    usage="benchpark-python diffPackageCommits.py [OPTIONS]",
 )
 parser.add_argument(
     "--spack-tag",

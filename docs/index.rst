@@ -32,7 +32,7 @@
 
 .. toctree::
    :maxdepth: 1
-   :caption: Running Benchpark
+   :caption: Using Benchpark
 
    benchpark-setup
    build-experiment
@@ -41,7 +41,18 @@
    modifiers
    set-of-experiments
    run-binary
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Benchpark Utils
+
+   diffBuildSpecs
+   diffExperimentBuilds
+   diffExperimentSpecs
+   diffPackageCommits
+   diffSystemSpecs
    scripts
+   developer-scripts
 
 .. toctree::
    :maxdepth: 1
@@ -52,7 +63,6 @@
    add-an-experiment
    add-a-dryrun
    update-a-system-config
-   developer-scripts
 
 .. toctree::
    :maxdepth: 2
