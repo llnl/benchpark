@@ -13,18 +13,22 @@ class Scaffold(ExecutableApplication):
 
     tags = ["python"]
 
-    # software_spec("numpy", "numpy==1.26.4", package_manager="pip")
-    # software_spec("tqdm", "tqdm==4.67.1", package_manager="pip")
-    # software_spec("", package_manager="pip")
-    # software_spec("", package_manager="pip")
-    # software_spec("", package_manager="pip")
-    # software_spec("", package_manager="pip")
-    # software_spec("", package_manager="pip")
-    # software_spec("", package_manager="pip")
+    executable(
+        "modules",
+        "ml load rocm/6.2.1 rocmcc/6.2.1-cce-18.0.1a-magic",
+    )
+    executable(
+        "build",
+        "pip install {package_path} --extra-index-url https://download.pytorch.org/whl/rocm6.2",
+        output_capture=OUTPUT_CAPTURE.ALL,
+    )
+    executable(
+        "config",
+        "scaffold fractal_gen.py --config {package_path}ScaFFold/configs/benchmark_default.yml",
+    )
+    executable(
+        "run",
+        "scaffold sweep.py --config {package_path}ScaFFold/configs/benchmark_default.yml",
+    )
 
-
-    #executable("req", "pip install -r requirements.txt")
-    executable("setup", "python fractal_gen.py --config configs/sweep_default.yml")
-    executable("run", "python sweep.py --config configs/sweep_default.yml")
-
-    workload("sweep", executables=["setup", "run"])
+    workload("sweep", executables=["modules", "build", "config", "run"])
