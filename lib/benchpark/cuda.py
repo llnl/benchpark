@@ -4,11 +4,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.directives import variant
+from benchpark.directives import requires, variant
 from benchpark.experiment import ExperimentHelper
 
 
 class CudaExperiment:
+    requires("cuda")
     variant("cuda", default=False, description="Build and run with CUDA")
 
     class Helper(ExperimentHelper):
