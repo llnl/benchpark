@@ -138,7 +138,7 @@ def requires(*runtimes: str):
         runtimes: openmp, cuda, rocm
     """
 
-    def _execute_provides(pkg):
+    def _execute_requires(pkg):
         pkg.requires = runtimes
 
     return _execute_requires
