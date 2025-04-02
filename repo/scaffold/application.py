@@ -24,11 +24,11 @@ class Scaffold(ExecutableApplication):
     )
     executable(
         "config",
-        "scaffold fractal_gen.py --config {package_path}ScaFFold/configs/benchmark_default.yml",
+        "scaffold generate_fractals --config {package_path}ScaFFold/configs/benchmark_default.yml",
     )
     executable(
         "run",
-        "scaffold sweep.py --config {package_path}ScaFFold/configs/benchmark_default.yml",
+        "scaffold benchmark --config {package_path}ScaFFold/configs/benchmark_default.yml",
     )
 
     workload("sweep", executables=["modules", "build", "config", "run"])
