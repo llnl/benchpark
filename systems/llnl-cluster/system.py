@@ -6,10 +6,11 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.system import System
+from benchpark.openmpsystem import OpenMPSystem
 from benchpark.paths import hardware_descriptions
 
 
-class LlnlCluster(System):
+class LlnlCluster(System,OpenMPSystem):
 
     maintainers("nhanford", "rfhaque")
 

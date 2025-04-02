@@ -6,10 +6,12 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.system import System
+from benchpark.cudasystem import CudaSystem
+from benchpark.openmpsystem import OpenMPSystem
 from benchpark.paths import hardware_descriptions
 
 
-class LlnlSierra(System):
+class LlnlSierra(System,CudaSystem,OpenMPSystem):
 
     maintainers("pearce8", "nhanford", "rfhaque")
 
