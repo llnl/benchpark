@@ -117,6 +117,7 @@ def maintainers(*names: str):
 
     return _execute_maintainers
 
+
 @benchpark_directive("provides")
 def provides(*runtimes: str):
     """Define what runtime the system provides.
@@ -129,6 +130,7 @@ def provides(*runtimes: str):
         pkg.provides = runtimes
 
     return _execute_provides
+
 
 @benchpark_directive("requires")
 def requires(*runtimes: str):
