@@ -23,6 +23,60 @@ class Scaling:
         description="Number of experiments to be generated",
     )
 
+    def scale_variables(self, input_vars):
+        if not input_vars:
+            return
+
+        scaled_variable = input_vars[0]
+        if not isinstance(scaled_variable, dict):
+            raise BenchparkError(
+                f"Input vars must be a dictionary of type str->int"
+            )
+        else:
+            num_dims = len(scaled_variable)
+        start_dim_key = min(scaled_variable, key=scaled_variable.get)
+        start_dim = list(scaled_variable.keys()).index(start_dim_key)
+
+        for var in input_vars:
+            if len(var) != num_dims:
+                raise BenchparkError(
+                    f"Number of variable dimensions {len(var)} does not match the total number of dimensions {num_dims}"
+                )
+
+        scaling_vectors = self.setup_scaling_vectors(num_dims, start_dim)
+
+        variables = {}
+
+        for var in input_vars:
+            for sv, (vk, vv) in zip(scaling_vectors, var.items()):
+               variables[vk] = f"{{{sv}}}*{vv}"
+
+        return variables
+
+    def setup_scaling_vectors(self, num_dims, start_dim):
+        scaling_vectors = { f"sf{n}" : [1] for n in range(num_dims) }
+        values = [1] * num_dims
+
+        if start_dim:
+            if start_dim >= num_dims:
+                raise BenchparkError(
+                    f"Start dim for scaling {start_dim} cannot be greater than the total number of dimensions {num_dims}"
+                )
+
+        num_exprs = int(self.spec.variants["scaling-iterations"][0]) - 1
+        scaling_factor = int(self.spec.variants["scaling-factor"][0])
+
+        for itr in range(num_exprs):
+            idx = (start_dim + itr) % num_dims
+            values[idx] *= scaling_factor
+            for i in range(num_dims):
+                scaling_vectors[f"sf{i}"].append(values[i])
+
+        for p, sv in scaling_vectors.items():
+            self.add_experiment_variable(p, sv)
+
+        return list(scaling_vectors.keys())
+
     # input parameters:
     # 1. input_variables: dictionary with key value pairs of type str: int or tuple(str): list(int)
     # For the value in input_variables corresponding to scaling_variable,
@@ -160,6 +214,11 @@ class StrongScaling(Scaling):
         description="Strong scaling",
     )
 
+    def compute_strong_scaling_expr_config(self):
+        raise NotImplementedError(
+            "Experiment must provide a strong scaling configuration"
+        )
+
     def generate_strong_scaling_params(
         self, resource_variable, scaling_factor, num_exprs
     ):
@@ -178,6 +237,11 @@ class WeakScaling(Scaling):
         default=False,
         description="Weak scaling",
     )
+
+    def compute_weak_scaling_expr_config(self):
+        raise NotImplementedError(
+            "Experiment must provide a weak scaling configuration"
+        )
 
     def generate_weak_scaling_params(
         self, resource_variable, problem_size_variables, scaling_factor, num_exprs
@@ -201,6 +265,11 @@ class ThroughputScaling(Scaling):
         default=False,
         description="Throughput scaling",
     )
+
+    def compute_throughput_scaling_expr_config(self):
+        raise NotImplementedError(
+            "Experiment must provide a throughput scaling configuration"
+        )
 
     def generate_throughput_scaling_params(
         self, problem_size_variables, scaling_factor, num_exprs

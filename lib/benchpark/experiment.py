@@ -25,7 +25,7 @@ import ramble.language.language_helpers  # noqa
 class ExperimentHelper:
     def __init__(self, exp):
         self.spec = exp.spec
-        self.variables = {}
+        self._variables = {}
         self.env_vars = {
             "set": {},
             "append": [{"paths": {}, "vars": {}}],
@@ -71,22 +71,10 @@ class ExperimentHelper:
 
     def compute_config_variables_wrapper(self):
         self.compute_config_variables()
-        return self.variables, self.env_vars
+        return self._variables, self.env_vars
 
 
-class SingleNode:
-    variant(
-        "single_node",
-        default=True,
-        description="Single node execution mode",
-    )
-
-    class Helper(ExperimentHelper):
-        def get_helper_name_prefix(self):
-            return "single_node" if self.spec.satisfies("+single_node") else ""
-
-
-class Experiment(ExperimentSystemBase, SingleNode):
+class Experiment(ExperimentSystemBase):
     """This is the superclass for all benchpark experiments.
 
     ***The Experiment class***
@@ -134,6 +122,11 @@ class Experiment(ExperimentSystemBase, SingleNode):
         self._spack_name = None
         self._ramble_name = None
 
+        if not hasattr(self, "compute_default_expr_config"):
+            raise NotImplementedError(
+                "Experiment must provide a default configuration using the compute_default_expr_config method"
+            )
+
         for cls in self.__class__.mro()[1:]:
             if cls is not Experiment and cls is not object:
                 if hasattr(cls, "Helper"):
@@ -141,6 +134,16 @@ class Experiment(ExperimentSystemBase, SingleNode):
                     self.helpers.append(helper_instance)
 
         self.name = self.spec.name
+
+        # TODO: Replace with conflicts clause
+        if([
+            self.spec.satisfies("+strong"),
+            self.spec.satisfies("+weak"),
+            self.spec.satisfies("+throughput"),
+        ].count(True) > 1):
+            raise BenchparkError(
+                f"Only one type of scaling mode per experiment is allowed for application package {self.name}"
+            )
 
         if "workload" in self.spec.variants:
             self.workload = self.spec.variants["workload"]
@@ -198,7 +201,7 @@ class Experiment(ExperimentSystemBase, SingleNode):
         self.expr_name = [prefix] + self.expr_name
 
     def add_experiment_variable(self, name, values, use_in_expr_name=False):
-        self.variables[name] = values
+        self._variables[name] = values
         if use_in_expr_name:
             self.expr_name.append(f"{{{name}}}")
 
@@ -241,16 +244,25 @@ class Experiment(ExperimentSystemBase, SingleNode):
             "set": {},
             "append": [{"paths": {}, "vars": {}}],
         }
-        self.variables = {}
+        self._variables = {}
         self.zips = {}
         self.matrix = []
         self.excludes = []
 
         for cls in self.helpers:
             variables, env_vars = cls.compute_config_variables_wrapper()
-            self.variables |= variables
+            self._variables |= variables
             self.env_vars["set"] |= env_vars["set"]
             self.env_vars["append"][0] |= env_vars["append"][0]
+
+        if self.spec.satisfies("+strong"):
+            self.compute_strong_scaling_expr_config()
+        elif self.spec.satisfies("+weak"):
+            self.compute_weak_scaling_expr_config()
+        elif self.spec.satisfies("+throughput"):
+            self.compute_throughput_scaling_expr_config()
+        else:
+            self.compute_default_expr_config()
 
         self.compute_applications_section()
 
@@ -264,7 +276,7 @@ class Experiment(ExperimentSystemBase, SingleNode):
         expr_setup = {
             "variants": {"package_manager": self.spec.variants["package_manager"][0]},
             "env_vars": self.env_vars,
-            "variables": self.variables,
+            "variables": self._variables,
             "zips": self.zips,
             "matrix": self.matrix,
             "exclude": ({"where": self.excludes} if self.excludes else {}),
