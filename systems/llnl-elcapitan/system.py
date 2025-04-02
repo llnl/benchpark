@@ -71,7 +71,7 @@ class LlnlElcapitan(System):
     variant(
         "blas",
         default="intel-oneapi-mkl",
-        values=("intel-oneapi-mkl", "rocblas"),
+        values=("intel-oneapi-mkl", "rocblas", "hipblas"),
         description="Which blas to use",
     )
 
@@ -670,17 +670,8 @@ class LlnlElcapitan(System):
                         "pkg_spec": f"{self.spec.variants['compiler'][0]}"
                     },
                     "default-mpi": {"pkg_spec": "cray-mpich"},
-                    "compiler-rocm": {"pkg_spec": "cce"},
-                    "compiler-amdclang": {"pkg_spec": "clang"},
-                    "compiler-gcc": {"pkg_spec": "gcc"},
-                    "mpi-rocm-gtl": {"pkg_spec": "cray-mpich+gtl"},
-                    "mpi-rocm-no-gtl": {"pkg_spec": "cray-mpich~gtl"},
-                    "mpi-gcc": {"pkg_spec": "cray-mpich~gtl"},
                     "blas": {"pkg_spec": f"{self.spec.variants['blas'][0]}"},
-                    "blas-rocm": {"pkg_spec": "rocblas"},
                     "lapack": {"pkg_spec": f"{self.spec.variants['lapack'][0]}"},
-                    "lapack-oneapi": {"pkg_spec": "intel-oneapi-mkl"},
-                    "lapack-rocm": {"pkg_spec": "rocsolver"},
                 }
             }
         }

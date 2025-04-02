@@ -55,5 +55,14 @@ class Mfem(BuiltinMfem):
             options.append("MFEM_USE_ADIAK=%s" % yes_no("+adiak"))
             options.append("ADIAK_DIR=%s" % self.spec["adiak"].prefix)
 
+        if "^hipblas" in self.spec:
+            hipblas = self.spec["hipblas"]
+            hip_headers += hipblas.headers
+            hip_libs += hipblas.libs
+            if hip_headers:
+                options += ["HIP_OPT=%s" % hip_headers.cpp_flags]
+            if hip_libs:
+                options += ["HIP_LIB=%s" % ld_flags_from_library_list(hip_libs)]
+
         return options
 
