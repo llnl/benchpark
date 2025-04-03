@@ -136,11 +136,11 @@ class Experiment(ExperimentSystemBase):
         self.name = self.spec.name
 
         # TODO: Replace with conflicts clause
-        if([
+        if [
             self.spec.satisfies("+strong"),
             self.spec.satisfies("+weak"),
             self.spec.satisfies("+throughput"),
-        ].count(True) > 1):
+        ].count(True) > 1:
             raise BenchparkError(
                 f"Only one type of scaling mode per experiment is allowed for application package {self.name}"
             )

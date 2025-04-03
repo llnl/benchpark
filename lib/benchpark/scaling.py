@@ -29,9 +29,7 @@ class Scaling:
 
         scaled_variable = input_vars[0]
         if not isinstance(scaled_variable, dict):
-            raise BenchparkError(
-                f"Input vars must be a dictionary of type str->int"
-            )
+            raise BenchparkError(f"Input vars must be a dictionary of type str->int")
         else:
             num_dims = len(scaled_variable)
         start_dim_key = min(scaled_variable, key=scaled_variable.get)
@@ -49,12 +47,12 @@ class Scaling:
 
         for var in input_vars:
             for sv, (vk, vv) in zip(scaling_vectors, var.items()):
-               variables[vk] = f"{{{sv}}}*{vv}"
+                variables[vk] = f"{{{sv}}}*{vv}"
 
         return variables
 
     def setup_scaling_vectors(self, num_dims, start_dim):
-        scaling_vectors = { f"sf{n}" : [1] for n in range(num_dims) }
+        scaling_vectors = {f"sf{n}": [1] for n in range(num_dims)}
         values = [1] * num_dims
 
         if start_dim:

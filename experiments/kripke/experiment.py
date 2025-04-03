@@ -42,11 +42,9 @@ class Kripke(
     def initialize_expr_variables(self):
         expr_vars = {
             # Number of processes in each dimension
-            'num_procs' : {"npx": 2, "npy": 2, "npz": 1},
-
+            "num_procs": {"npx": 2, "npy": 2, "npz": 1},
             # Number of zones in each dimension, per process
-            'problem_sizes' : {"nzx": 64, "nzy": 64, "nzz": 32},
-
+            "problem_sizes": {"nzx": 64, "nzy": 64, "nzz": 32},
             "ngroups": 64,
             "gs": 1,
             "nquad": 128,
@@ -58,17 +56,23 @@ class Kripke(
 
     def compute_strong_scaling_expr_config(self):
         expr_vars = self.initialize_expr_variables()
-        variables = self.scale_variables([expr_vars["num_procs"]]) | expr_vars["problem_sizes"]
+        variables = (
+            self.scale_variables([expr_vars["num_procs"]]) | expr_vars["problem_sizes"]
+        )
         self.add_expr_variables(expr_vars, variables)
 
     def compute_weak_scaling_expr_config(self):
         expr_vars = self.initialize_expr_variables()
-        variables = self.scale_variables([expr_vars["num_procs"], expr_vars["problem_sizes"]])
+        variables = self.scale_variables(
+            [expr_vars["num_procs"], expr_vars["problem_sizes"]]
+        )
         self.add_expr_variables(expr_vars, variables)
 
     def compute_throughput_scaling_expr_config(self):
         expr_vars = self.initialize_expr_variables()
-        variables = self.scale_variables([expr_vars["problem_sizes"]]) | expr_vars["num_procs"]
+        variables = (
+            self.scale_variables([expr_vars["problem_sizes"]]) | expr_vars["num_procs"]
+        )
         self.add_expr_variables(expr_vars, variables)
 
     def compute_default_expr_config(self):
@@ -80,7 +84,7 @@ class Kripke(
         for k, v in variables.items():
             self.add_experiment_variable(k, v, True)
 
-        exclude_keys = ['num_procs', 'problem_sizes']
+        exclude_keys = ["num_procs", "problem_sizes"]
         for k, v in expr_vars.items():
             if k not in exclude_keys:
                 self.add_experiment_variable(k, v, True)
@@ -98,7 +102,6 @@ class Kripke(
                 self.add_experiment_variable("n_threads_per_proc", 1, True)
                 self.add_experiment_variable("arch", "OpenMP")
             self.add_experiment_variable("n_ranks", n_resources, True)
-
 
     def compute_applications_section(self):
         pass

@@ -57,27 +57,32 @@ class Amg2023(
     def initialize_expr_variables(self):
         expr_vars = {
             # Number of processes in each dimension
-            "num_procs" : {"px": 2, "py": 2, "pz": 2},
-
+            "num_procs": {"px": 2, "py": 2, "pz": 2},
             # Per-process size (in zones) in each dimension
-            "problem_sizes" : {"nx": 80, "ny": 80, "nz": 80},
+            "problem_sizes": {"nx": 80, "ny": 80, "nz": 80},
         }
 
         return expr_vars
 
     def compute_strong_scaling_expr_config(self):
         expr_vars = self.initialize_expr_variables()
-        variables = self.scale_variables([expr_vars["num_procs"]]) | expr_vars["problem_sizes"]
+        variables = (
+            self.scale_variables([expr_vars["num_procs"]]) | expr_vars["problem_sizes"]
+        )
         self.add_expr_variables(expr_vars, variables)
 
     def compute_weak_scaling_expr_config(self):
         expr_vars = self.initialize_expr_variables()
-        variables = self.scale_variables([expr_vars["num_procs"], expr_vars["problem_sizes"]])
+        variables = self.scale_variables(
+            [expr_vars["num_procs"], expr_vars["problem_sizes"]]
+        )
         self.add_expr_variables(expr_vars, variables)
 
     def compute_throughput_scaling_expr_config(self):
         expr_vars = self.initialize_expr_variables()
-        variables = self.scale_variables([expr_vars["problem_sizes"]]) | expr_vars["num_procs"]
+        variables = (
+            self.scale_variables([expr_vars["problem_sizes"]]) | expr_vars["num_procs"]
+        )
         self.add_expr_variables(expr_vars, variables)
 
     def compute_default_expr_config(self):
