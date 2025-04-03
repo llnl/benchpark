@@ -266,6 +266,11 @@ class Experiment(ExperimentSystemBase):
 
         self.compute_applications_section()
 
+        # Ramble constraint
+        required_vars = ["n_ranks", "n_gpus", "n_nodes"]
+        if not any(var in self._variables for var in required_vars):
+            raise BenchparkError(f"Must specify one of: {required_vars}")
+
         expr_helper_list = []
         for cls in self.helpers:
             helper_prefix = cls.get_helper_name_prefix()
