@@ -7,6 +7,7 @@ from packaging.version import Version
 
 from benchpark.directives import variant, maintainers
 from benchpark.system import System
+from benchpark.rocmsystem import ROCmSystem
 from benchpark.paths import hardware_descriptions
 
 
