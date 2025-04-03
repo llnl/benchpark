@@ -180,6 +180,28 @@ jobs:
           benchmark_spec: ${{ matrix.benchmark_spec }}
           system_spec: ${{ matrix.system_spec }}
 
+  dynamic-dry-run-othersystems:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Benchpark
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Add needed Python libs
+        run: |
+          pip install -r ./requirements.txt
+
+      - name: aws-pcluster/c4.xlarge
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_spec: saxpy+openmp
+          system_spec: aws-pcluster instance_type=c4.xlarge
+
+      - name: aws-pcluster/c6g.xlarge
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_spec: saxpy+openmp
+          system_spec: aws-pcluster instance_type=c6g.xlarge
+
   saxpy:
     runs-on: ubuntu-22.04
     steps:
