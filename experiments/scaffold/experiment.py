@@ -32,6 +32,7 @@ class Scaffold(Experiment, ROCmExperiment):
         self.add_experiment_variable(
             "package_path", self.spec.variants["scaffold_path"][0], False
         )
+        self.add_experiment_variable("timeout", 720, True)
 
     def compute_package_section(self):
         app_version = self.spec.variants["version"][0]
