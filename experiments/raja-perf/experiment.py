@@ -34,28 +34,38 @@ class RajaPerf(
 
     maintainers("michaelmckinsey1")
 
+    def initialize_expr_variables(self):
+        return {"num_procs": {"np": 1}}
+
+    def compute_strong_scaling_expr_config(self):
+        expr_vars = self.initialize_expr_variables()
+        variables = self.scale_variables([expr_vars["num_procs"]])
+        self.add_expr_variables(expr_vars, variables)
+
+    def compute_default_expr_config(self):
+        expr_vars = self.initialize_expr_variables()
+        variables = expr_vars["num_procs"]
+        self.add_expr_variables(expr_vars, variables)
+
     def compute_applications_section(self):
+        pass
 
-        n_resources = {"n_ranks": 1}
+    def add_expr_variables(self, expr_vars, variables):
+        for k, v in variables.items():
+            self.add_experiment_variable(k, v, True)
 
-        if self.spec.satisfies("+single_node"):
-            for pk, pv in n_resources.items():
-                n_resources = pv
+        exclude_keys = ["num_procs"]
+        for k, v in expr_vars.items():
+            if k not in exclude_keys:
+                self.add_experiment_variable(k, v, True)
 
-        elif self.spec.satisfies("+strong"):
-            scaled_variables = self.generate_strong_scaling_params(
-                {tuple(n_resources.keys()): list(n_resources.values())},
-                int(self.spec.variants["scaling-factor"][0]),
-                int(self.spec.variants["scaling-iterations"][0]),
-            )
-            n_resources = scaled_variables["n_ranks"]
+        n_resources = " * ".join(f"{{{k}}}" for k in expr_vars["num_procs"])
 
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_experiment_variable("n_gpus", n_resources, True)
-        elif self.spec.satisfies("+openmp"):
-            self.add_experiment_variable("n_ranks", n_resources, True)
-            self.add_experiment_variable("n_threads_per_proc", 1, True)
         else:
+            if self.spec.satisfies("+openmp"):
+                self.add_experiment_variable("n_threads_per_proc", 1, True)
             self.add_experiment_variable("n_ranks", n_resources, True)
 
     def compute_package_section(self):
