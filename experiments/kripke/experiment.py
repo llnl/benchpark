@@ -87,16 +87,18 @@ class Kripke(
 
         n_resources = " * ".join(f"{{{k}}}" for k in expr_vars["num_procs"])
 
-        if self.spec.satisfies("+openmp"):
-            self.add_experiment_variable("n_ranks", n_resources, True)
-            self.add_experiment_variable("n_threads_per_proc", 1, True)
-            self.add_experiment_variable("arch", "OpenMP")
-        elif self.spec.satisfies("+cuda"):
+        if self.spec.satisfies("+cuda"):
             self.add_experiment_variable("n_gpus", n_resources, True)
             self.add_experiment_variable("arch", "CUDA")
         elif self.spec.satisfies("+rocm"):
             self.add_experiment_variable("n_gpus", n_resources, True)
             self.add_experiment_variable("arch", "HIP")
+        else:
+            if self.spec.satisfies("+openmp"):
+                self.add_experiment_variable("n_threads_per_proc", 1, True)
+                self.add_experiment_variable("arch", "OpenMP")
+            self.add_experiment_variable("n_ranks", n_resources, True)
+
 
     def compute_applications_section(self):
         pass
