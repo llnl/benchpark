@@ -1238,6 +1238,8 @@ class Mfem(Package, CudaPackage, ROCmPackage):
         if install_em:
             install_tree("data", join_path(prefix_share, "data"))
 
+        install(f"{self.stage.source_path}/fem/qinterp/det.cpp", f"{prefix.include}/mfem/fem/qinterp")
+
     examples_src_dir = "examples"
     examples_data_dir = "data"
 
