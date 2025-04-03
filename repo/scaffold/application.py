@@ -28,7 +28,7 @@ class Scaffold(ExecutableApplication):
     )
     executable(
         "run",
-        "scaffold benchmark --config {package_path}ScaFFold/configs/benchmark_default.yml",
+        "scaffold benchmark --interactive --config {package_path}ScaFFold/configs/benchmark_default.yml",
     )
 
     workload("sweep", executables=["modules", "build", "config", "run"])
