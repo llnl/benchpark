@@ -9,4 +9,3 @@ from benchpark.directives import provides
 
 class OpenMPSystem:
     provides("openmp")
-

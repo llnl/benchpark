@@ -11,7 +11,7 @@ from benchpark.openmpsystem import OpenMPSystem
 from benchpark.paths import hardware_descriptions
 
 
-class LlnlSierra(System,CudaSystem,OpenMPSystem):
+class LlnlSierra(System, CudaSystem, OpenMPSystem):
 
     maintainers("pearce8", "nhanford", "rfhaque")
 

@@ -22,7 +22,7 @@ sys_dict = {
     "OpenMPSystem": "openmp",
     "CudaSystem": "cuda",
     "ROCmSystem": "rocm",
-}    
+}
 non_experiments = ["Caliper"]
 
 

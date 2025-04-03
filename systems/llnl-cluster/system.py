@@ -10,7 +10,7 @@ from benchpark.openmpsystem import OpenMPSystem
 from benchpark.paths import hardware_descriptions
 
 
-class LlnlCluster(System,OpenMPSystem):
+class LlnlCluster(System, OpenMPSystem):
 
     maintainers("nhanford", "rfhaque")
 
