@@ -1,4 +1,3 @@
----
 ignore-branches-not-a-pr:
   stage: .pre
   tags: [shell, oslic]

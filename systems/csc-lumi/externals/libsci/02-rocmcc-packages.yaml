@@ -1,4 +1,3 @@
----
 packages:
   cray-libsci:
     - spec: cray-libsci@23.09.1.1%rocmcc

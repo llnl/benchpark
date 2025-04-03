@@ -1,4 +1,3 @@
----
 name: Dynamic dry run template
 inputs:
   benchmark_name:

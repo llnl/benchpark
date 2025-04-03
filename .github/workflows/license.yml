@@ -1,4 +1,3 @@
----
 name: License Checks
 on:
   workflow_call:

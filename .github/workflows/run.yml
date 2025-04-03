@@ -1,4 +1,3 @@
----
 name: Run Benchpark and Simple Benchmark Suite
 on:
   workflow_call:

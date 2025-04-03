@@ -1,4 +1,3 @@
----
 name: Linting & Style Checks
 on:
   workflow_call:

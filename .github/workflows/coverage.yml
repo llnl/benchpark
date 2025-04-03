@@ -1,4 +1,3 @@
----
 name: Run a Set of Tests to Collect Code Coverage for Benchpark
 on:
   workflow_call:

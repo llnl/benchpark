@@ -63,3 +63,4 @@ ignore-words-list = 'fom'
 [tool.yamlfix]
 line-length = 88
 allow_duplicate_keys = true
+explicit_start = false

@@ -1,4 +1,3 @@
----
 .test_clusters: &test_clusters
   parallel:
     matrix:

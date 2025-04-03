@@ -1,4 +1,3 @@
----
 name: Build & Deploy docs site to GitHub Pages
 on:
   workflow_call:
