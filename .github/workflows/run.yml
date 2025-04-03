@@ -47,7 +47,7 @@ jobs:
           echo "Single Node Matrix: ${{ steps.generate-matrix.outputs.single_node }}"
           echo "Throughput Matrix: ${{ steps.generate-matrix.outputs.throughput }}"
 
-  dynamic-dry-run-openmp:
+  testallonce-openmp:
     needs: generate-matrix
     runs-on: ubuntu-22.04
     strategy:
@@ -66,7 +66,7 @@ jobs:
           benchmark_spec: ${{ matrix.benchmark_spec }}
           system_spec: ${{ matrix.system_spec }}
 
-  dynamic-dry-run-cuda:
+  testallonce-cuda:
     needs: generate-matrix
     runs-on: ubuntu-22.04
     strategy:
@@ -85,7 +85,7 @@ jobs:
           benchmark_spec: ${{ matrix.benchmark_spec }}
           system_spec: ${{ matrix.system_spec }}
 
-  dynamic-dry-run-rocm:
+  testallonce-rocm:
     needs: generate-matrix
     runs-on: ubuntu-22.04
     strategy:
@@ -104,7 +104,7 @@ jobs:
           benchmark_spec: ${{ matrix.benchmark_spec }}
           system_spec: ${{ matrix.system_spec }}
 
-  dynamic-dry-run-weak:
+  testallonce-weak:
     needs: generate-matrix
     runs-on: ubuntu-22.04
     strategy:
@@ -123,7 +123,7 @@ jobs:
           benchmark_spec: ${{ matrix.benchmark_spec }}
           system_spec: ${{ matrix.system_spec }}
 
-  dynamic-dry-run-strong:
+  testallonce-strong:
     needs: generate-matrix
     runs-on: ubuntu-22.04
     strategy:
@@ -142,7 +142,7 @@ jobs:
           benchmark_spec: ${{ matrix.benchmark_spec }}
           system_spec: ${{ matrix.system_spec }}
 
-  dynamic-dry-run-single-node:
+  testallonce-single-node:
     needs: generate-matrix
     runs-on: ubuntu-22.04
     strategy:
@@ -161,7 +161,7 @@ jobs:
           benchmark_spec: ${{ matrix.benchmark_spec }}
           system_spec: ${{ matrix.system_spec }}
 
-  dynamic-dry-run-throughput:
+  testallonce-throughput:
     needs: generate-matrix
     runs-on: ubuntu-22.04
     strategy:
@@ -180,7 +180,7 @@ jobs:
           benchmark_spec: ${{ matrix.benchmark_spec }}
           system_spec: ${{ matrix.system_spec }}
 
-  dynamic-dry-run-othersystems:
+  manual-test-each-system:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout Benchpark
@@ -190,17 +190,71 @@ jobs:
         run: |
           pip install -r ./requirements.txt
 
-      - name: aws-pcluster/c4.xlarge
+      - name: aws-pcluster
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_spec: saxpy+openmp
-          system_spec: aws-pcluster instance_type=c4.xlarge
+          system_spec: aws-pcluster
 
-      - name: aws-pcluster/c6g.xlarge
+      - name: csc-lumi
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_spec: saxpy+openmp
-          system_spec: aws-pcluster instance_type=c6g.xlarge
+          system_spec: csc-lumi
+
+      - name: cscs-daint
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_spec: saxpy+openmp
+          system_spec: cscs-daint
+
+      - name: cscs-eiger
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_spec: saxpy+openmp
+          system_spec: cscs-eiger
+
+      - name: generic-x86
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_spec: saxpy+openmp
+          system_spec: generic-x86
+
+      - name: jsc-juwels
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_spec: saxpy+openmp
+          system_spec: jsc-juwels
+
+      - name: lanl-venado
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_spec: saxpy+openmp
+          system_spec: lanl-venado
+
+      - name: llnl-cluster
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_spec: saxpy+openmp
+          system_spec: llnl-cluster
+
+      - name: llnl-elcapitan
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_spec: saxpy+rocm
+          system_spec: llnl-elcapitan
+
+      - name: llnl-sierra
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_spec: saxpy+cuda
+          system_spec: llnl-sierra
+
+      - name: riken-fugaku
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_spec: saxpy+openmp
+          system_spec: riken-fugaku
 
   saxpy:
     runs-on: ubuntu-22.04
