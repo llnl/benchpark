@@ -22,7 +22,8 @@ class Scaffold(Experiment, ROCmExperiment):
     variant(
         "scaffold_path",
         default=" ",
-    )  # Path to cloned repo, since it is private.
+        description="Path to local repository of ScaFFold (i.e. git clone), since it is private."
+    )
 
     variant("version", default="develop", description="app version")
 
@@ -35,5 +36,10 @@ class Scaffold(Experiment, ROCmExperiment):
         self.add_experiment_variable("timeout", 720, True)
 
     def compute_package_section(self):
-        #app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, ["--extra-index-url https://download.pytorch.org/whl/rocm6.2\n{package_path}"])
+        # Spec written into requirements.txt for pip install
+        self.add_package_spec(
+            self.name,
+            [
+                "--extra-index-url https://download.pytorch.org/whl/rocm6.2\n{package_path}"
+            ],
+        )
