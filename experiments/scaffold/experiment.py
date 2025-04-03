@@ -22,7 +22,7 @@ class Scaffold(Experiment, ROCmExperiment):
     variant(
         "scaffold_path",
         default=" ",
-        description="Path to local repository of ScaFFold (i.e. git clone), since it is private."
+        description="Path to local repository of ScaFFold (i.e. git clone), since it is private.",
     )
 
     variant("version", default="develop", description="app version")
