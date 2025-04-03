@@ -22,6 +22,6 @@ class ROCmSystem:
     # How to make sure the derived classes overwrite this?
     def system_specific_variables(self):
         return {
-            "rocm_arch": gfx90a,
+            "rocm_arch": "gfx90a",
             "default_rocm_version": self.spec.variants["rocm"][0].replace("-", "."),
         }
