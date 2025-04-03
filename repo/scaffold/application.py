@@ -3,6 +3,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import os
+
 from ramble.appkit import *
 
 
@@ -13,15 +15,10 @@ class Scaffold(ExecutableApplication):
 
     tags = ["python"]
 
-    executable(
-        "modules",
-        "ml load rocm/6.2.1 rocmcc/6.2.1-cce-18.0.1a-magic",
-    )
-    executable(
-        "build",
-        "pip install {package_path} --extra-index-url https://download.pytorch.org/whl/rocm6.2",
-        output_capture=OUTPUT_CAPTURE.ALL,
-    )
+    os.system("ml load rocm/6.2.1 rocmcc/6.2.1-cce-18.0.1a-magic")
+
+    software_spec("scaffold", None)
+
     executable(
         "config",
         "scaffold generate_fractals --config {package_path}ScaFFold/configs/benchmark_default.yml",
@@ -31,4 +28,4 @@ class Scaffold(ExecutableApplication):
         "scaffold benchmark --interactive --config {package_path}ScaFFold/configs/benchmark_default.yml",
     )
 
-    workload("sweep", executables=["modules", "build", "config", "run"])
+    workload("sweep", executables=["config", "run"])
