@@ -1,7 +1,6 @@
-# Copyright 2023 Lawrence Livermore National Security, LLC and other
-# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+# Copyright Spack Project Developers. See COPYRIGHT file for details.
 #
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
 import os
 import shutil
@@ -230,7 +229,6 @@ class Mfem(Package, CudaPackage, ROCmPackage):
         multi=False,
         description="C++ language standard",
     )
-    variant("caliper", default=False, description="Build Caliper support")
 
     conflicts("+shared", when="@:3.3.2")
     conflicts("~static~shared")
@@ -286,16 +284,11 @@ class Mfem(Package, CudaPackage, ROCmPackage):
     depends_on("hipsparse", when="@4.4.0:+rocm")
     depends_on("hipblas", when="@4.4.0:+rocm")
 
-    depends_on("caliper", when="+caliper")
-    depends_on("adiak", when="+caliper")
-
     with when("+mpi"):
         depends_on("hypre")
         depends_on("hypre@2.10.0:2.13", when="@:3.3")
         depends_on("hypre@:2.20.0", when="@3.4:4.2")
         depends_on("hypre@:2.23.0", when="@4.3.0")
-
-    requires("+caliper", when="^hypre+caliper")
 
     # If hypre is built with +cuda, propagate cuda_arch
     requires("^hypre@2.22.1:", when="+mpi+cuda ^hypre+cuda")
@@ -1176,12 +1169,6 @@ class Mfem(Package, CudaPackage, ROCmPackage):
                 "MUMPS_OPT=%s" % " ".join(mumps_opt),
                 "MUMPS_LIB=%s" % ld_flags_from_library_list(mumps.libs),
             ]
-
-        options.append("MFEM_USE_CALIPER=%s" % yes_no("+caliper"))
-        if "+caliper" in self.spec: 
-            options.append("CALIPER_DIR=%s" % self.spec["caliper"].prefix)
-            options.append("MFEM_USE_ADIAK=%s" % yes_no("+adiak"))
-            options.append("ADIAK_DIR=%s" % self.spec["adiak"].prefix)
 
         return options
 
