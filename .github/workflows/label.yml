@@ -1,3 +1,4 @@
+---
 #-----------------------------------------------------------------------
 # DO NOT modify unless you really know what you are doing.
 #
@@ -8,9 +9,7 @@
 name: label
 on:
   pull_request_target:
-    branches:
-      - develop
-
+    branches: [develop]
 jobs:
   pr:
     runs-on: ubuntu-22.04
