@@ -10,7 +10,7 @@ from benchpark.system import System
 from benchpark.paths import hardware_descriptions
 
 
-class LlnlElcapitan(System):
+class LlnlElcapitan(System, ROCmSystem):
 
     maintainers("pearce8", "nhanford", "rfhaque")
 
