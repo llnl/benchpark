@@ -51,10 +51,18 @@ class Quicksilver(MakefilePackage):
 
         if "+mpi" in spec:
             targets.append("CXX={0}".format(spec["mpi"].mpicxx))
+            mpi_lib_dirs = self.spec['mpi'].libs.directories
+            ld_library_path = ':'.join(mpi_lib_dirs + ["$LD_LIBRARY_PATH"])
+            targets.append(f"LD_LIBRARY_PATH={ld_library_path}")
+            ld_flags = self.spec['mpi'].libs.ld_flags
         else:
+            ld_flags = ""
             targets.append("CXX={0}".format(spack_cxx))
 
         caliper_flag = "-DUSE_CALIPER -DUSE_ADIAK" 
+        if "+caliper" in self.spec:
+            ld_flags += " " + self.spec['caliper'].libs.ld_flags
+            ld_flags += " " + self.spec['adiak'].libs.ld_flags
 
         if "+openmp+mpi" in spec:
             targets.append("CPPFLAGS=-DHAVE_MPI -DHAVE_OPENMP {0} {1}".format(caliper_flag, self.compiler.openmp_flag))
@@ -64,7 +72,8 @@ class Quicksilver(MakefilePackage):
             targets.append("CPPFLAGS=-DHAVE_MPI {0}".format(caliper_flag))
         if "+openmp" in self.spec:
             if "~caliper" in self.spec:
-                targets.append("LDFLAGS={0}".format(self.compiler.openmp_flag))
+                ld_flags += " " + self.compiler.openmp_flag
+        targets.append("LDFLAGS={0}".format(ld_flags))
 
         return targets
 
