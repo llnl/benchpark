@@ -43,15 +43,7 @@ class Laghos(
 
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             device = "n_gpus"
-        if self.spec.satisfies("+single_node"):
-            for pk, pv in n_resources.items():
-                if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
-                    self.add_experiment_variable(device, pv, True)
-                else:
-                    self.add_experiment_variable(
-                        device, "{sys_cores_per_node} * {n_nodes}", True
-                    )
-        elif self.spec.satisfies("+strong"):
+        if self.spec.satisfies("+strong"):
             scaled_variables = self.generate_strong_scaling_params(
                 {tuple(n_resources.keys()): list(n_resources.values())},
                 int(self.spec.variants["scaling-factor"][0]),
@@ -66,6 +58,14 @@ class Laghos(
                 self.add_experiment_variable(
                     device, "{sys_cores_per_node} * {n_nodes}", True
                 )
+        else:
+            for pk, pv in n_resources.items():
+                if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+                    self.add_experiment_variable(device, pv, True)
+                else:
+                    self.add_experiment_variable(
+                        device, "{sys_cores_per_node} * {n_nodes}", True
+                    )
 
     def compute_package_section(self):
         # get package version
