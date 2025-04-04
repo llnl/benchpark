@@ -13,13 +13,6 @@ import os
 subprocess.call(
     [
         "make",
-        "legacysystemconfigs",
-    ]
-)
-
-subprocess.call(
-    [
-        "make",
         "systemconfigs",
     ]
 )
