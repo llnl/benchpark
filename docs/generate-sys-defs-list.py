@@ -34,7 +34,7 @@ def main():
         combined_dict = {}
         for col in merge_cols:
             if isinstance(row[col], dict):  # Check if the value is a dictionary
-                combined_dict.update(row[col])  # Merge the dictionary
+                combined_dict.update({col.split(".")[-1]: row[col]})  # Merge the dictionary
         return combined_dict
 
     df["systems-tested"] = df.apply(
@@ -45,15 +45,15 @@ def main():
     )
     df = df.drop(columns=systested_columns_to_merge + top500_cols_to_merge)
 
-    df = pd.concat(
-        [
-            df.reset_index(),
-            pd.json_normalize(df["systems-tested"]).reset_index(),
-            pd.json_normalize(df["top500-system-instances"]).reset_index(),
-        ],
-        axis="columns",
-    )
-    df = df.drop(columns=["index", "systems-tested", "top500-system-instances"])
+    # df = pd.concat(
+    #     [
+    #         df.reset_index(),
+    #         pd.json_normalize(df["systems-tested"]).reset_index(),
+    #         pd.json_normalize(df["top500-system-instances"]).reset_index(),
+    #     ],
+    #     axis="columns",
+    # )
+    #df = df.drop(columns=["index", "systems-tested", "top500-system-instances"])
 
     # Remove system_definition from all field names
     # (e.g., system_definition.system-tested.description)
