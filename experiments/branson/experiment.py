@@ -97,12 +97,15 @@ class Branson(
         )
 
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
-            self.add_experiment_variable("n_ranks", "{n_nodes}*{sys_gpus_per_node}", True)
+            self.add_experiment_variable(
+                "n_ranks", "{n_nodes}*{sys_gpus_per_node}", True
+            )
         else:
             if self.spec.satisfies("+openmp"):
                 self.add_experiment_variable("n_threads_per_proc", 1, True)
-            self.add_experiment_variable("n_ranks", "{n_nodes}*{sys_cores_per_node}", True)
-
+            self.add_experiment_variable(
+                "n_ranks", "{n_nodes}*{sys_cores_per_node}", True
+            )
 
     def compute_package_section(self):
         # get package version
@@ -111,5 +114,5 @@ class Branson(
             self.name,
             [
                 f"branson@{app_version} +metis n_groups={self.spec.variants['n_groups'][0]} ",
-            ]
+            ],
         )
