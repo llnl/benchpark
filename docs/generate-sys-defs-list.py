@@ -34,7 +34,9 @@ def main():
         combined_dict = {}
         for col in merge_cols:
             if isinstance(row[col], dict):  # Check if the value is a dictionary
-                combined_dict.update({col.split(".")[-1]: row[col]})  # Merge the dictionary
+                combined_dict.update(
+                    {col.split(".")[-1]: row[col]}
+                )  # Merge the dictionary
         return combined_dict
 
     df["systems-tested"] = df.apply(
