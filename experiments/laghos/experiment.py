@@ -63,6 +63,8 @@ class Laghos(
                 if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
                     self.add_experiment_variable(device, pv, True)
                 else:
+                    for pk, pv in n_resources.items():
+                        self.add_experiment_variable(pk, pv, True)
                     self.add_experiment_variable(
                         device, "{sys_cores_per_node} * {n_nodes}", True
                     )
