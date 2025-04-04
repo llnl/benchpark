@@ -45,16 +45,6 @@ def main():
     )
     df = df.drop(columns=systested_columns_to_merge + top500_cols_to_merge)
 
-    # df = pd.concat(
-    #     [
-    #         df.reset_index(),
-    #         pd.json_normalize(df["systems-tested"]).reset_index(),
-    #         pd.json_normalize(df["top500-system-instances"]).reset_index(),
-    #     ],
-    #     axis="columns",
-    # )
-    #df = df.drop(columns=["index", "systems-tested", "top500-system-instances"])
-
     # Remove system_definition from all field names
     # (e.g., system_definition.system-tested.description)
     df.columns = df.columns.str.removeprefix("system_definition.")
