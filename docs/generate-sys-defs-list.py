@@ -25,24 +25,35 @@ def main():
 
     df = pd.concat(df_list)
 
-    systested_columns_to_merge = [col for col in df.columns if 'systems-tested' in col]
-    top500_cols_to_merge = [col for col in df.columns if 'top500-system-instances' in col]
-    def merge_dicts(row,merge_cols):
+    systested_columns_to_merge = [col for col in df.columns if "systems-tested" in col]
+    top500_cols_to_merge = [
+        col for col in df.columns if "top500-system-instances" in col
+    ]
+
+    def merge_dicts(row, merge_cols):
         combined_dict = {}
         for col in merge_cols:
             if isinstance(row[col], dict):  # Check if the value is a dictionary
                 combined_dict.update(row[col])  # Merge the dictionary
         return combined_dict
-    df['systems-tested'] = df.apply(lambda row: merge_dicts(row, systested_columns_to_merge), axis=1)
-    df['top500-system-instances'] = df.apply(lambda row: merge_dicts(row, top500_cols_to_merge), axis=1)
-    df = df.drop(columns=systested_columns_to_merge+top500_cols_to_merge)
 
-    df = pd.concat([
-        df.reset_index(),
-        pd.json_normalize(df['systems-tested']).reset_index(),
-        pd.json_normalize(df['top500-system-instances']).reset_index()
-    ],axis="columns")
-    df = df.drop(columns=["index","systems-tested","top500-system-instances"])
+    df["systems-tested"] = df.apply(
+        lambda row: merge_dicts(row, systested_columns_to_merge), axis=1
+    )
+    df["top500-system-instances"] = df.apply(
+        lambda row: merge_dicts(row, top500_cols_to_merge), axis=1
+    )
+    df = df.drop(columns=systested_columns_to_merge + top500_cols_to_merge)
+
+    df = pd.concat(
+        [
+            df.reset_index(),
+            pd.json_normalize(df["systems-tested"]).reset_index(),
+            pd.json_normalize(df["top500-system-instances"]).reset_index(),
+        ],
+        axis="columns",
+    )
+    df = df.drop(columns=["index", "systems-tested", "top500-system-instances"])
 
     # Remove system_definition from all field names
     # (e.g., system_definition.system-tested.description)
