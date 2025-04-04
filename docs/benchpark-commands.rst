@@ -50,11 +50,42 @@ Search for available system and experiment specifications in Benchpark.
      - Lists all information about a given experiment
      -
 
-Now that you know the existing benchmarks and systems, you can determine your necessary workflow in :doc:`benchpark-workflow`.
-
-
 Benchpark also has a help menu::
 
     $ benchpark --help
 
 .. program-output:: ../bin/benchpark --help
+
+
+``benchpark list``
+------------------
+
+.. program-output:: ../bin/benchpark list -h
+
+The ``benchpark list`` command is used to search the available benchmarks, systems, modifiers, and experiments in Benchpark.
+
+.. program-output:: ../bin/benchpark list benchmarks
+  :ellipsis: 10
+
+.. program-output:: ../bin/benchpark list systems
+  :ellipsis: 10
+
+.. program-output:: ../bin/benchpark list modifiers
+
+.. program-output:: ../bin/benchpark list experiments
+  :ellipsis: 10
+
+Additionally, this command can be used to search for experiments with one or more programming models::
+
+  $ benchpark list experiments --experiment openmp rocm
+
+.. program-output:: ../bin/benchpark list experiments --experiment openmp rocm
+
+Or search which experiments have the Caliper modifier (see :doc:`modifiers`) available::
+  
+  $ benchpark list modifiers --name caliper --experiments
+
+.. program-output:: ../bin/benchpark list modifiers --name caliper --experiments
+
+
+Now that you know the existing benchmarks and systems, you can determine your necessary workflow in :doc:`benchpark-workflow`.

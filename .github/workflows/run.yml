@@ -72,7 +72,7 @@ jobs:
 
       - name: Upload Workspace Archive as CI Artifact
         if: always()
-        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: workspace-archive
           path: './workspace/saxpy/openmp/generic-x86/workspace/archive/**'
@@ -240,18 +240,6 @@ jobs:
             --disable-logger \
             workspace setup --dry-run
       
-      # - name: Dry run salmon/openmp with allocation modifier on Fugaku
-      #   run: |
-      #     ./bin/benchpark experiment init --dest=salmon/openmp salmon+openmp
-      #     ./bin/benchpark system init --dest=riken-fugaku riken-fugaku
-      #     ./bin/benchpark setup salmon/openmp riken-fugaku workspace/
-      #     . workspace/setup.sh
-      #     ramble \
-      #       --workspace-dir workspace/salmon/openmp/riken-fugaku/workspace \
-      #       --disable-progress-bar \
-      #       --disable-logger \
-      #       workspace setup --dry-run
-
       - name: Dry run qws/openmp with allocation modifier on Fugaku
         run: |
           ./bin/benchpark experiment init --dest=qws/openmp qws+openmp
@@ -270,6 +258,27 @@ jobs:
           . workspace/setup.sh
           ramble \
             --workspace-dir workspace/qws/openmp/generic-x86/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run salmon/openmp with allocation modifier on generic-x86
+        run: |
+          ./bin/benchpark experiment init --dest=salmon/openmp salmon-tddft+openmp
+          ./bin/benchpark setup salmon/openmp generic-x86 workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/salmon/openmp/generic-x86/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+
+      - name: Dry run salmon/openmp with allocation modifier on Fugaku
+        run: |
+          ./bin/benchpark setup salmon/openmp riken-fugaku workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/salmon/openmp/riken-fugaku/workspace \
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
@@ -913,6 +922,24 @@ jobs:
           benchmark_spec: osu-micro-benchmarks+rocm workload=all
           system_name: tioga
           system_spec: llnl-elcapitan cluster=tioga compiler=cce +gtl
+
+      - name: salmon/openmp ruby llnl-cluster cluster=ruby compiler=intel
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: salmon-tddft
+          benchmark_mode: openmp
+          benchmark_spec: salmon-tddft
+          system_name: ruby
+          system_spec: llnl-cluster cluster=ruby compiler=intel
+
+      - name: salmon fugaku riken-fugaku
+        uses: ./.github/actions/dynamic-dry-run
+        with:
+          benchmark_name: salmon-tddft
+          benchmark_mode: openmp
+          benchmark_spec: salmon-tddft
+          system_name: fugaku
+          system_spec: riken-fugaku
   pytest:
     runs-on: ubuntu-22.04
     steps:

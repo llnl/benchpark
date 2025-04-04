@@ -12,7 +12,7 @@ software:
       compiler: default-compiler
     compiler-clang:
       pkg_spec: clang@{default_llvm_version}
-    compiler-fj:
+    compiler-fortran:
       pkg_spec: fj@{default_fj_version}
     compiler-gcc:
       pkg_spec: gcc@{default_gnu_version}
