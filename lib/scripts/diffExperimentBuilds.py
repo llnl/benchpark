@@ -15,9 +15,10 @@ def main():
         description="""Compare experiments between two versions of benchpark. Includes optional functionality to run each experiment.
 
         Examples:
-            - benchpark-python diffExperiments.py -s llnl-cluster -c ruby -p openmp
-            - benchpark-python diffExperiments.py -s llnl-sierra -p cuda
-            - benchpark-python diffExperiments.py -s llnl-elcapitan -c tioga -p rocm""",
+            - benchpark-python diffExperimentBuilds.py -s llnl-cluster -c ruby -p openmp --commit-hash2 develop
+            - benchpark-python diffExperimentBuilds.py -s llnl-sierra -p cuda --commit-hash2 develop
+            - benchpark-python diffExperimentBuilds.py -s llnl-elcapitan -c tioga -p rocm --commit-hash2 develop
+""",
         formatter_class=argparse.RawTextHelpFormatter,
     )
     parser.add_argument(
@@ -43,7 +44,7 @@ def main():
     parser.add_argument(
         "--commit-hash2",
         type=str,
-        default="pearce8-patch-3",
+        required=True,
         help="Second commit hash or branch name for the newer version of Benchpark",
     )
     parser.add_argument(
@@ -60,10 +61,11 @@ def main():
         help="provide additional spec to experiment spec string",
     )
     parser.add_argument(
-        "-e",
-        "--experiments",
+        "-b",
+        "--benchmarks",
         nargs="*",
         default=[],
+        help="Subselect benchmarks to run (e.g. amg2023)",
     )
     parser.add_argument("--run-experiment", action="store_true")
     parser.add_argument(
@@ -77,18 +79,18 @@ def main():
     old_name = f"benchpark-{args.commit_hash1}-{args.programming_model}"
     new_name = f"benchpark-{args.commit_hash2}-{args.programming_model}"
 
-    if args.experiments == []:
+    if args.benchmarks == []:
         experiments_out = subprocess.run(
-            ["benchpark", "list", "experiments"], text=True, capture_output=True
+            ["benchpark", "list", "experiments", "--no-title"],
+            text=True,
+            capture_output=True,
         )
-        experiments = experiments_out.stdout.replace(" ", "").replace(
-            "Experiments:", ""
-        )
+        experiments = experiments_out.stdout.replace(" ", "")
         lines = experiments.split("\n")
         experiments = [line for line in lines if args.programming_model in line]
     else:
         experiments = []
-        for e in args.experiments:
+        for e in args.benchmarks:
             experiments.append(e + "+" + args.programming_model)
 
     print(f"Running these experiments: {experiments}")
@@ -201,7 +203,7 @@ def main():
         # Path to the Spack setup script
         spack_setup_script = f"{old_name}/wkp/setup.sh"
         # Define the ramble command
-        cmd = f"{old_name}/wkp/spack/bin/spack-python altdiff.py -t -d {old_file} {new_file}"
+        cmd = f"{old_name}/wkp/spack/bin/spack-python diffSpecs.py -t -d {old_file} {new_file}"
         # Combine sourcing the script and running the command
         try:
             diff = subprocess.run(

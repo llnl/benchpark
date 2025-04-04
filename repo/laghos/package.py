@@ -35,17 +35,17 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
 
     depends_on("zlib@1.3.1+optimize+pic+shared")
     #depends_on("zlib@1.3.1+optimize+pic+shared", when="@develop")
-    #depends_on("mfem@develop^zlib@1.3.1+optimize+pic+shared", when="@develop")
     depends_on("mfem@4.2.0:", when="@3.1")
     depends_on("mfem@4.1.0:4.1", when="@3.0")
     # Recommended mfem version for laghos v2.0 is: ^mfem@3.4.1-laghos-v2.0
     depends_on("mfem@3.4.1-laghos-v2.0", when="@2.0")
     # Recommended mfem version for laghos v1.x is: ^mfem@3.3.1-laghos-v1.0
     depends_on("mfem@3.3.1-laghos-v1.0", when="@1.0,1.1")
-    depends_on("mfem@4.4")
+    depends_on("mfem@4.4", when="@develop")
     depends_on("mfem+caliper", when="+caliper")
     depends_on("mfem cxxstd=14")
 
+    requires("^[virtuals=zlib-api] zlib")
 
     depends_on("mpi")
     depends_on("hypre+mpi")
