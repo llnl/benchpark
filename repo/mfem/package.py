@@ -14,6 +14,8 @@ class Mfem(BuiltinMfem):
     # depends_on("rocblas", when="+rocm")
     # depends_on("rocsolver", when="+rocm")
 
+    version("4.4_comm_cali", branch="comm_cali", submodules=False, git="https://github.com/gracenansamba/mfem.git")
+
     requires("+rocm", when="^rocblas")
     requires("+rocm", when="^rocsolver")
     requires("+caliper", when="^hypre+caliper")

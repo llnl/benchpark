@@ -17,3 +17,5 @@ software:
       pkg_spec: blas
     lapack:
       pkg_spec: lapack
+    compiler-fortran:
+      pkg_spec: gcc

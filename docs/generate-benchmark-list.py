@@ -2,9 +2,12 @@
 
 import pandas as pd
 import yaml
-import os
 import sys
 import subprocess
+
+sys.path.append("../lib/")
+import benchpark.accounting  # noqa: E402
+import benchpark.paths  # noqa: E402
 
 
 def construct_tag_groups(tag_groups, tag_dicts, dictionary):
@@ -17,16 +20,8 @@ def construct_tag_groups(tag_groups, tag_dicts, dictionary):
             print("ERROR in construct_tag_groups")
 
 
-def benchpark_benchmarks(benchmarks):
-    experiments_dir = "../legacy/experiments"
-    for x in os.listdir(experiments_dir):
-        benchmarks.append(f"{x}")
-    return benchmarks
-
-
-def main(workspace):
-    benchmarks = list()
-    benchpark_benchmarks(benchmarks)
+def main():
+    benchmarks = benchpark.accounting.benchpark_benchmarks()
 
     f = "../taxonomy.yaml"
     with open(f, "r") as stream:
@@ -43,7 +38,7 @@ def main(workspace):
         else:
             print("ERROR in top level construct_tag_groups")
 
-    main = dict()
+    main_dict = dict()
 
     tags_taggroups = {}
     for bmark in benchmarks:
@@ -53,7 +48,7 @@ def main(workspace):
 
     for bmark in benchmarks:
         # call benchpark tags -a bmark workspace
-        cmd = ["../bin/benchpark", "tags", "-a", bmark, workspace]
+        cmd = ["../bin/benchpark", "tags", "-a", bmark]
         try:
             byte_data = subprocess.run(cmd, capture_output=True, check=True)
         except subprocess.CalledProcessError as e:
@@ -73,9 +68,76 @@ def main(workspace):
                 if t in v:
                     print("appending", t, "at key", k)
                     tags_taggroups[bmark][k].append(t)
-        main[bmark] = tags_taggroups[bmark]
+        main_dict[bmark] = tags_taggroups[bmark]
 
-    df = pd.DataFrame(main)
+    # Get benchmarks that have caliper enabled
+    cali_benchmarks = subprocess.run(
+        [
+            "../bin/benchpark",
+            "list",
+            "modifiers",
+            "--name",
+            "caliper",
+            "--experiments",
+            "--no-title",
+        ],
+        check=True,
+        capture_output=True,
+    )
+    cali_bm_str = str(cali_benchmarks.stdout, "utf-8")
+    cali_bm = cali_bm_str.replace(" ", "").replace("\t", "").split("\n")
+    # Get available programming models for each benchmark
+    pmodels_cmd = subprocess.run(
+        [
+            "../bin/benchpark",
+            "list",
+            "experiments",
+            "--experiment",
+            "cuda",
+            "rocm",
+            "openmp",
+            "--no-title",
+        ],
+        check=True,
+        capture_output=True,
+    )
+    pmodels_str = str(pmodels_cmd.stdout, "utf-8")
+    pmodels = pmodels_str.replace(" ", "").replace("\t", "").split("\n")
+    # Get scaling experiments
+    scaling_cmd = subprocess.run(
+        [
+            "../bin/benchpark",
+            "list",
+            "experiments",
+            "--experiment",
+            "weak",
+            "strong",
+            "--no-title",
+        ],
+        check=True,
+        capture_output=True,
+    )
+    scaling_str = str(scaling_cmd.stdout, "utf-8")
+    scaling = scaling_str.replace(" ", "").replace("\t", "").split("\n")
+    for bmark in benchmarks:
+        if bmark in cali_bm:
+            main_dict[bmark]["instrumented-caliper"] = True
+        else:
+            main_dict[bmark]["instrumented-caliper"] = False
+    for bmark in benchmarks:
+        main_dict[bmark]["programming-model"] = []
+        main_dict[bmark]["scaling-experiments"] = []
+    for bmark in benchmarks:
+        if any([bmark in p for p in pmodels]):
+            for expr in pmodels:
+                if bmark in expr:
+                    main_dict[bmark]["programming-model"].append(expr.split("+")[1])
+        if any([bmark in s for s in scaling]):
+            for expr in scaling:
+                if bmark in expr:
+                    main_dict[bmark]["scaling-experiments"].append(expr.split("+")[1])
+
+    df = pd.DataFrame(main_dict)
     df.to_csv("benchmark-list.csv")
 
     #################
@@ -85,10 +147,4 @@ def main(workspace):
 
 
 if __name__ == "__main__":
-    try:
-        workspace = sys.argv[1]
-    except IndexError:
-        print("Usage: " + os.path.basename(__file__) + " <workspace>")
-        sys.exit(1)
-
-    main(workspace)
+    main()
