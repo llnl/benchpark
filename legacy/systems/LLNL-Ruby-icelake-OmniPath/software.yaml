@@ -13,6 +13,8 @@ software:
       pkg_spec: gcc@12.1.1
     compiler-intel:
       pkg_spec: intel@2021.6.0-classic
+    compiler-fortran:
+      pkg_spec: intel@2021.6.0-classic
     blas:
       pkg_spec: intel-oneapi-mkl@2022.1.0
     lapack:

@@ -94,6 +94,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
         spec = self.spec
         if "+cuda" in spec:
             env.set("CUDAHOSTCXX", self.spec["mpi"].mpicxx)
+            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
 
     def cmake_args(self):
         spec = self.spec
@@ -107,6 +108,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
                 "-DRAJA_DIR=%s" % self.spec["raja"].prefix,
                 "-Dchai_DIR=%s" % self.spec["chai"].prefix,
                 "-DENABLE_CHAI=ON",
+                "-DMPI_CXX_LINK_FLAGS='%s'" % self.spec['mpi'].libs.ld_flags,
             ]
         )
 

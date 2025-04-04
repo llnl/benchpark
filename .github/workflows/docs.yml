@@ -10,7 +10,7 @@ jobs:
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
     - name: Setup Python
-      uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38
+      uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55
       with:
         python-version: '3.11'
         cache: 'pip'
@@ -24,7 +24,9 @@ jobs:
       run: |
         pip install -r .github/workflows/requirements/docs.txt
         # create a dummy workspace to get a working ramble
-        bin/benchpark setup saxpy/openmp nosite-x86_64 /tmp/workspace
+        bin/benchpark experiment init --dest=saxpy saxpy
+        bin/benchpark system init --dest=generic-x86 generic-x86
+        bin/benchpark setup saxpy generic-x86 /tmp/workspace
         # this is gross and we should better setup ramble for people or make it a Spack package
         pip install -r /tmp/workspace/ramble/requirements.txt
 
