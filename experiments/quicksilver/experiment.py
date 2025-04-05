@@ -8,6 +8,7 @@ from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.scaling import StrongScaling
 from benchpark.scaling import WeakScaling
+from benchpark.caliper import Caliper
 
 
 class Quicksilver(
@@ -15,6 +16,7 @@ class Quicksilver(
     OpenMPExperiment,
     StrongScaling,
     WeakScaling,
+    Caliper,
 ):
     variant(
         "workload",
@@ -24,7 +26,8 @@ class Quicksilver(
 
     variant(
         "version",
-        default="master",
+        default="caliper",
+        values=("master", "caliper"),
         description="app version",
     )
 

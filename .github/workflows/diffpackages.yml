@@ -18,4 +18,4 @@ jobs:
 
       - name: Check Packages Against Spack
         run: |
-          ./bin/benchpark-python lib/scripts/diffPackages.py --packages "${{ inputs.modified_repo_dirs }}"
+          ./bin/benchpark-python lib/scripts/diffPackageCommits.py --packages "${{ inputs.modified_repo_dirs }}"
