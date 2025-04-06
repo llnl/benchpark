@@ -136,11 +136,11 @@ class Experiment(ExperimentSystemBase):
         self.name = self.spec.name
 
         # TODO: Replace with conflicts clause
-        if([
+        if [
             self.spec.satisfies("+strong"),
             self.spec.satisfies("+weak"),
             self.spec.satisfies("+throughput"),
-        ].count(True) > 1):
+        ].count(True) > 1:
             raise BenchparkError(
                 f"Only one type of scaling mode per experiment is allowed for application package {self.name}"
             )
@@ -265,6 +265,11 @@ class Experiment(ExperimentSystemBase):
             self.compute_default_expr_config()
 
         self.compute_applications_section()
+
+        # Ramble constraint
+        required_vars = ["n_ranks", "n_gpus", "n_nodes"]
+        if not any(var in self._variables for var in required_vars):
+            raise BenchparkError(f"Must specify one of: {required_vars}")
 
         expr_helper_list = []
         for cls in self.helpers:

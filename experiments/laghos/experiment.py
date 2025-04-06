@@ -35,11 +35,11 @@ class Laghos(
 
     def initialize_expr_variables(self):
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
-            device_config = { "n_gpus" : "{sys_gpus_per_node}" }
+            device_config = {"n_gpus": "{sys_gpus_per_node}"}
         else:
-            device_config = { "n_ranks" : "{sys_cores_per_node}" }
+            device_config = {"n_ranks": "{sys_cores_per_node}"}
 
-        return { "device_config" : device_config }
+        return {"device_config": device_config}
 
     def compute_strong_scaling_expr_config(self):
         # The total number of resources for this experiment is calculated as:
