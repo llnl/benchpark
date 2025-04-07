@@ -1,5 +1,4 @@
 name: Dynamic dry run template
-
 inputs:
   benchmark_name:
     required: true
@@ -16,13 +15,13 @@ inputs:
   system_spec:
     required: true
     type: string
-
 runs:
-  using: "composite"
+  using: composite
   steps:
-    - name: "${{ inputs.benchmark_name }}/${{ inputs.benchmark_mode }} ${{ inputs.system_name }} ${{ inputs.system_spec }}"
-      shell: bash 
-      run: |
+    - name: ${{ inputs.benchmark_name }}/${{ inputs.benchmark_mode }} ${{ inputs.system_name }}
+        ${{ inputs.system_spec }}
+      shell: bash
+      run: |-
         timestamp=$(date +%s)
         bn="${{ inputs.benchmark_name }}"
         bm="${{ inputs.benchmark_mode }}"
