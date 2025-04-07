@@ -6,11 +6,12 @@
 
 from benchpark.directives import variant
 from benchpark.system import System
+from benchpark.rocmsystem import ROCmSystem
 from packaging.version import Version
 from benchpark.paths import hardware_descriptions
 
 
-class CscLumi(System):
+class CscLumi(System, ROCmSystem):
 
     id_to_resources = {
         "lumi": {

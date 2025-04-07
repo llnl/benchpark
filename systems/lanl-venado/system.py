@@ -6,10 +6,12 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.system import System
+from benchpark.openmpsystem import OpenMPSystem
+from benchpark.cudasystem import CudaSystem
 from benchpark.paths import hardware_descriptions
 
 
-class LanlVenado(System):
+class LanlVenado(System, OpenMPSystem, CudaSystem):
 
     maintainers("rfhaque", "gshipman")
 

@@ -6,10 +6,11 @@
 
 from benchpark.system import System
 from benchpark.directives import variant, maintainers
+from benchpark.openmpsystem import OpenMPSystem
 from benchpark.paths import hardware_descriptions
 
 
-class AwsPcluster(System):
+class AwsPcluster(System, OpenMPSystem):
     # Taken from https://aws.amazon.com/ec2/instance-types/
     # With boto3, we could determine this dynamically vs. storing a static table
 

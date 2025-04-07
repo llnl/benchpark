@@ -6,11 +6,12 @@
 from benchpark.directives import variant
 
 from benchpark.system import System
+from benchpark.openmpsystem import OpenMPSystem
 from packaging.version import Version
 from benchpark.paths import hardware_descriptions
 
 
-class CscsEiger(System):
+class CscsEiger(System, OpenMPSystem):
 
     id_to_resources = {
         "eiger": {

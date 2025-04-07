@@ -5,9 +5,9 @@
 
 
 from benchpark.system import System
+from benchpark.openmpsystem import OpenMPSystem
 
-
-class GenericX86(System):
+class GenericX86(System, OpenMP):
     """This is the generic system class for an x86 system, gcc compiler, mpi.
     It can be easily copied and modified to model other systems."""
 

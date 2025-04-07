@@ -6,11 +6,12 @@
 from benchpark.directives import variant
 
 from benchpark.system import System
+from benchpark.cudasystem import CudaSystem
 from packaging.version import Version
 from benchpark.paths import hardware_descriptions
 
 
-class JscJuwels(System):
+class JscJuwels(System, CudaSystem):
 
     id_to_resources = {
         "juwels": {
