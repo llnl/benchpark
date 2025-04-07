@@ -69,9 +69,3 @@
    :caption: API Docs
 
    Benchpark API Docs <source/benchpark>
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Legacy Workflow
-
-   legacy-getting-started
