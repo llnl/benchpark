@@ -12,9 +12,15 @@ from benchpark.rocm import ROCmExperiment
 from benchpark.scaling import StrongScaling
 from benchpark.scaling import WeakScaling
 from benchpark.scaling import ThroughputScaling
+from benchpark.domaindecomposition import GlobalDomains
 from benchpark.caliper import Caliper
 
 
+@GlobalDomains(
+strong_scaling_policy="default",
+weak_scaling_policy="default",
+throughput_scaling_policy="default",
+)
 class Kripke(
     Experiment,
     OpenMPExperiment,
@@ -40,7 +46,7 @@ class Kripke(
     maintainers("pearce8")
 
     def initialize_expr_variables(self):
-        expr_vars = {
+        expr_input_vars = {
             # Number of processes in each dimension
             "num_procs": {"npx": 2, "npy": 2, "npz": 1},
             # Number of zones in each dimension, per process
@@ -52,44 +58,47 @@ class Kripke(
             "lorder": 4,
         }
 
-        return expr_vars
+        return expr_input_vars
 
     def compute_strong_scaling_expr_config(self):
-        expr_vars = self.initialize_expr_variables()
-        variables = (
-            self.scale_variables([expr_vars["num_procs"]]) | expr_vars["problem_sizes"]
+        expr_input_vars = self.initialize_expr_variables()
+        result = (
+            self.apply_strong_scaling_policy({"num_procs" : expr_input_vars["num_procs"]}) | expr_input_vars["problem_sizes"]
         )
-        self.add_expr_variables(expr_vars, variables)
+        self.add_expr_variables(expr_input_vars, result)
 
     def compute_weak_scaling_expr_config(self):
-        expr_vars = self.initialize_expr_variables()
-        variables = self.scale_variables(
-            [expr_vars["num_procs"], expr_vars["problem_sizes"]]
+        expr_input_vars = self.initialize_expr_variables()
+        result = (
+            self.apply_weak_scaling_policy({
+                "num_procs" : expr_input_vars["num_procs"], 
+                "problem_sizes" : expr_input_vars["problem_sizes"], 
+            })
         )
-        self.add_expr_variables(expr_vars, variables)
+        self.add_expr_variables(expr_input_vars, result)
 
     def compute_throughput_scaling_expr_config(self):
-        expr_vars = self.initialize_expr_variables()
-        variables = (
-            self.scale_variables([expr_vars["problem_sizes"]]) | expr_vars["num_procs"]
+        expr_input_vars = self.initialize_expr_variables()
+        result = (
+            self.apply_throughput_scaling_policy({"problem_sizes" : expr_input_vars["problem_sizes"]}) | expr_input_vars["num_procs"]
         )
-        self.add_expr_variables(expr_vars, variables)
+        self.add_expr_variables(expr_input_vars, result)
 
     def compute_default_expr_config(self):
-        expr_vars = self.initialize_expr_variables()
-        variables = expr_vars["num_procs"] | expr_vars["problem_sizes"]
-        self.add_expr_variables(expr_vars, variables)
+        expr_input_vars = self.initialize_expr_variables()
+        variables = expr_input_vars["num_procs"] | expr_input_vars["problem_sizes"]
+        self.add_expr_variables(expr_input_vars, variables)
 
-    def add_expr_variables(self, expr_vars, variables):
+    def add_expr_variables(self, expr_input_vars, variables):
         for k, v in variables.items():
             self.add_experiment_variable(k, v, True)
 
         exclude_keys = ["num_procs", "problem_sizes"]
-        for k, v in expr_vars.items():
+        for k, v in expr_input_vars.items():
             if k not in exclude_keys:
                 self.add_experiment_variable(k, v, True)
 
-        n_resources = " * ".join(f"{{{k}}}" for k in expr_vars["num_procs"])
+        n_resources = " * ".join(f"{{{k}}}" for k in expr_input_vars["num_procs"])
 
         if self.spec.satisfies("+cuda"):
             self.add_experiment_variable("n_gpus", n_resources, True)
