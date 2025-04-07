@@ -16,9 +16,12 @@ class Scaffold(ExecutableApplication):
     tags = ["python"]
 
     os.system("ml load rocm/6.2.1 rocmcc/6.2.1-cce-18.0.1a-magic")
-
     software_spec("scaffold", None)
 
+    executable(
+        "modules",
+        "export LD_LIBRARY_PATH=/opt/cray/pe/cce/18.0.1/cce/x86_64/lib:$LD_LIBRARY_PATH",
+    )
     executable(
         "config",
         "scaffold generate_fractals --config {package_path}ScaFFold/configs/benchmark_default.yml",
@@ -28,4 +31,4 @@ class Scaffold(ExecutableApplication):
         "scaffold benchmark --interactive --config {package_path}ScaFFold/configs/benchmark_default.yml",
     )
 
-    workload("sweep", executables=["config", "run"])
+    workload("sweep", executables=["modules", "config", "run"])
