@@ -34,7 +34,7 @@ class PerProcessDomains:
                 num_procs = input_vars["num_procs"]
                 problem_sizes = input_vars["problem_sizes"]
 
-                if not isinstance(num_procs, dict):
+                if not isinstance(num_procs, dict) and not isinstance(problem_sizes, dict):
                     raise BenchparkError(f"Input vars must be a dictionary of type str->int")
                 else:
                     num_dims = len(num_procs)
@@ -188,6 +188,51 @@ Failed problem_sizes: {next_prob_sizes_list}
                         result["problem_sizes"][k].append(next_problem_sizes_list[i])
 
                 return result
+        elif self.throughput_scaling_policy == "useminprocdimension":
+            def apply_throughput_scaling_policy(self, input_vars):
+                """
+                Scales the problem throughput increasing the per process size starting with the
+                minimum process dimension
+                There are no changes to the number of processes
+                """
+
+                if not input_vars:
+                    return {}
+
+                num_procs = input_vars["num_procs"]
+                problem_sizes = input_vars["problem_sizes"]
+
+                if not isinstance(num_procs, dict) and not isinstance(problem_sizes, dict):
+                    raise BenchparkError(f"Input vars must be a dictionary of type str->int")
+                else:
+                    num_dims = len(num_procs)
+
+                if len(problem_sizes) != num_dims:
+                    raise BenchparkError(
+                        f"problem_sizes dimensions {len(problem_sizes)} do not match num_procs dimensions {num_dims}"
+                    )
+
+                start_dim_key = min(num_procs, key=num_procs.get)
+                start_dim = list(num_procs.keys()).index(start_dim_key)
+
+                num_exprs = int(self.spec.variants["scaling-iterations"][0]) - 1
+                scaling_factor = int(self.spec.variants["scaling-factor"][0])
+
+                problem_sizes_keys = list(input_vars["problem_sizes"].keys())
+
+                result = {
+                    "problem_sizes" : {k: [v] for k, v in problem_sizes.items()},
+                }
+
+                for itr in range(num_exprs):
+                    idx = (start_dim + itr) % num_dims
+                    curr_problem_sizes_list = [result["problem_sizes"][k][-1] for k in problem_sizes_keys]
+                    next_problem_sizes_list = curr_problem_sizes_list[:]
+                    next_problem_sizes_list[idx] *= scaling_factor
+                    for i, k in enumerate(problem_sizes_keys):
+                        result["problem_sizes"][k].append(next_problem_sizes_list[i])
+
+                return result
         elif self.throughput_scaling_policy == "custom":
             if 'custom_throughput_scaling_policy_impl' not in cls.__dict__:
                 raise TypeError(f"Class '{cls.__name__}' must define 'custom_throughput_scaling_policy_impl(input_vars)' method when throughput_scaling_policy = 'custom'")
@@ -277,7 +322,7 @@ class GlobalDomains:
                 num_procs = input_vars["num_procs"]
                 problem_sizes = input_vars["problem_sizes"]
 
-                if not isinstance(num_procs, dict):
+                if not isinstance(num_procs, dict) and not isinstance(problem_sizes, dict):
                     raise BenchparkError(f"Input vars must be a dictionary of type str->int")
                 else:
                     num_dims = len(num_procs)
@@ -348,6 +393,51 @@ class GlobalDomains:
 
                 start_dim_key = min(problem_sizes, key=problem_sizes.get)
                 start_dim = list(problem_sizes.keys()).index(start_dim_key)
+
+                num_exprs = int(self.spec.variants["scaling-iterations"][0]) - 1
+                scaling_factor = int(self.spec.variants["scaling-factor"][0])
+
+                problem_sizes_keys = list(input_vars["problem_sizes"].keys())
+
+                result = {
+                    "problem_sizes" : {k: [v] for k, v in problem_sizes.items()},
+                }
+
+                for itr in range(num_exprs):
+                    idx = (start_dim + itr) % num_dims
+                    curr_problem_sizes_list = [result["problem_sizes"][k][-1] for k in problem_sizes_keys]
+                    next_problem_sizes_list = curr_problem_sizes_list[:]
+                    next_problem_sizes_list[idx] *= scaling_factor
+                    for i, k in enumerate(problem_sizes_keys):
+                        result["problem_sizes"][k].append(next_problem_sizes_list[i])
+
+                return result
+        elif self.throughput_scaling_policy == "useminprocdimension":
+            def apply_throughput_scaling_policy(self, input_vars):
+                """
+                Scales the problem throughput increasing the per process size starting with the
+                minimum process dimension
+                There are no changes to the number of processes
+                """
+
+                if not input_vars:
+                    return {}
+
+                num_procs = input_vars["num_procs"]
+                problem_sizes = input_vars["problem_sizes"]
+
+                if not isinstance(num_procs, dict) and not isinstance(problem_sizes, dict):
+                    raise BenchparkError(f"Input vars must be a dictionary of type str->int")
+                else:
+                    num_dims = len(num_procs)
+
+                if len(problem_sizes) != num_dims:
+                    raise BenchparkError(
+                        f"problem_sizes dimensions {len(problem_sizes)} do not match num_procs dimensions {num_dims}"
+                    )
+
+                start_dim_key = min(num_procs, key=num_procs.get)
+                start_dim = list(num_procs.keys()).index(start_dim_key)
 
                 num_exprs = int(self.spec.variants["scaling-iterations"][0]) - 1
                 scaling_factor = int(self.spec.variants["scaling-factor"][0])
