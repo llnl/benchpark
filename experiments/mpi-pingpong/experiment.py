@@ -14,7 +14,7 @@ class MpiPingpong(Experiment):
         default="pingpong",
     )
 
-    maintainers("michaelmckinsey1")
+    maintainers("stephanielam3211")
 
     def compute_applications_section(self):
 
