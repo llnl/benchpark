@@ -8,7 +8,7 @@ from spack.package import *
 
 class MpiPingpong(CMakePackage):
 
-    git = "https://github.com/stephanielam3211/benchmark.git"
+    version("main", branch="main", submodules="True")
 
     variant("caliper", default=False, description="Enable Caliper/Adiak support")
 

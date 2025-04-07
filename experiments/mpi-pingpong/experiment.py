@@ -11,7 +11,7 @@ class MpiPingpong(Experiment):
 
     variant(
         "workload",
-        default="pingpong",
+        default="run",
     )
 
     maintainers("stephanielam3211")
@@ -28,4 +28,4 @@ class MpiPingpong(Experiment):
             self.add_experiment_variable(pk, pv, True)
 
     def compute_package_section(self):
-        self.add_package_spec(self.name, ["mpipingpong"])
+        self.add_package_spec(self.name, ["mpi-pingpong@main"])
