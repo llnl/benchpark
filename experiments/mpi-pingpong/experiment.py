@@ -21,7 +21,8 @@ class MpiPingpong(Experiment, Caliper):
 
         expr_vars = {
             "n_ranks": 2,
-            "iterations": 10
+            "iterations": 10,
+            "msg_size": 10
             # TODO: other expr vars?
         }
 
