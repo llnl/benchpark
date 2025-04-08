@@ -8,7 +8,9 @@ from spack.package import *
 
 class MpiPingpong(CMakePackage):
 
-    version("main", branch="main", submodules="True")
+    git = "/usr/WS1/mckinsey/benchpark/mpi-pingpong/"
+
+    version("main", branch="main")
 
     variant("caliper", default=False, description="Enable Caliper/Adiak support")
 
@@ -16,7 +18,16 @@ class MpiPingpong(CMakePackage):
     depends_on("adiak", when="+caliper")    
 
     def cmake_args(self):
-        args = [
-            "-DUSE_CALIPER"
-        ]
+        if self.spec.satisfies("+caliper"):
+            args = [
+                "-DUSE_CALIPER=ON"
+            ]
+        else:
+            args = [
+                "-DUSE_CALIPER=OFF"
+            ]
         return args
+
+    def install(self, spec, prefix):
+        mkdirp(prefix.bin)
+        install(join_path(self.build_directory, "pingpong"), prefix.bin)

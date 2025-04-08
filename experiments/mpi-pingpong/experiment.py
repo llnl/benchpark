@@ -5,9 +5,10 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.caliper import Caliper
 
 
-class MpiPingpong(Experiment):
+class MpiPingpong(Experiment, Caliper):
 
     variant(
         "workload",
