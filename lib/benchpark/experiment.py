@@ -105,7 +105,7 @@ class Experiment(ExperimentSystemBase):
     variant(
         "package_manager",
         default="spack",
-        values=("spack", "environment-modules"),
+        values=("spack", "environment-modules", "None"),
         description="package manager to use",
     )
 
@@ -341,11 +341,10 @@ class Experiment(ExperimentSystemBase):
                 spack_variants
             ).strip()
 
-        elif pkg_manager == "environment-modules":
-            if "append_path" in self.spec.variants:
-                self.append_environment_variable(
-                    "PATH", self.spec.variants["append_path"][0]
-                )
+        if "append_path" in self.spec.variants:
+            self.append_environment_variable(
+                "PATH", self.spec.variants["append_path"][0]
+            )
 
         return {
             "packages": {k: v for k, v in self.package_specs.items() if v},
