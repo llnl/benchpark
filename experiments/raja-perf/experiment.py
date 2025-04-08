@@ -48,12 +48,6 @@ class RajaPerf(
     )
 
     variant(
-        "n_ranks",
-        default=1,
-        description="Number of ranks before scaling."
-    )
-
-    variant(
         "variants",
         default="None",
     )
@@ -65,7 +59,7 @@ class RajaPerf(
 
     def compute_applications_section(self):
 
-        n_resources = int(self.spec.variants["n_ranks"][0])
+        n_resources = {"n_ranks": 1}
         total_size = int(self.spec.variants["total_size"][0])
         execute = "raja-perf.exe"
 
