@@ -25,7 +25,7 @@ class LlnlElcapitan(System):
         },
         "elcapitan": {
             "rocm_arch": "gfx940",
-            "sys_cores_per_node": 128,
+            "sys_cores_per_node": 96,
             "sys_gpus_per_node": 4,
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
