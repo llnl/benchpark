@@ -126,6 +126,7 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
     homepage = "http://software.llnl.gov/RAJAPerf/"
     git      = "https://github.com/LLNL/RAJAPerf.git"
 
+    version("fixcali_config", branch="fix/cali_config", submodules="True")
     version("develop", branch="develop", submodules="True")
     version("main",  branch="main",  submodules="True")
     version("2024.07.0", tag="v2024.07.0", submodules="True")
