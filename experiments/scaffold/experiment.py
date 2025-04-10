@@ -25,6 +25,12 @@ class Scaffold(Experiment, ROCmExperiment):
         description="Path to local repository of ScaFFold (i.e. git clone), since it is private.",
     )
 
+    variant(
+        "config",
+        default="benchmark_default",
+        values=("benchmark_default", "compute_scaling_study", "sweep_viz", "volsize_scaling_study")
+    )
+
     variant("version", default="develop", description="app version")
 
     def compute_applications_section(self):
@@ -33,6 +39,7 @@ class Scaffold(Experiment, ROCmExperiment):
         self.add_experiment_variable(
             "package_path", self.spec.variants["scaffold_path"][0], False
         )
+        self.add_experiment_variable("config", self.spec.variants["config"][0], True)
         self.add_experiment_variable("timeout", 720, True)
 
     def compute_package_section(self):

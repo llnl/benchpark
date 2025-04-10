@@ -24,11 +24,11 @@ class Scaffold(ExecutableApplication):
     )
     executable(
         "config",
-        "scaffold generate_fractals --config {package_path}ScaFFold/configs/benchmark_default.yml",
+        "scaffold generate_fractals --config {package_path}ScaFFold/configs/{config}.yml",
     )
     executable(
         "run",
-        "scaffold benchmark --interactive --config {package_path}ScaFFold/configs/benchmark_default.yml",
+        "scaffold benchmark --interactive --config {package_path}ScaFFold/configs/{config}.yml",
     )
 
     workload("sweep", executables=["modules", "config", "run"])
