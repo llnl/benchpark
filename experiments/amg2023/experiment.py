@@ -15,7 +15,6 @@ from benchpark.scaling import ThroughputScaling
 from benchpark.caliper import Caliper
 
 
-# Touch this file to trigger checks
 class Amg2023(
     Experiment,
     OpenMPExperiment,

@@ -10,7 +10,6 @@ from benchpark.system import System
 from benchpark.paths import hardware_descriptions
 
 
-# Touch this file to trigger checks
 class LlnlElcapitan(System):
 
     maintainers("pearce8", "nhanford", "rfhaque")
