@@ -36,9 +36,9 @@ class RajaPerf(
     )
 
     variant(
-        "total_size",
+        "per_process_problem_size",
         default=1048576,
-        description="total problem size (will be divided by ranks)",
+        description="per-process problem size",
     )
 
     variant(
@@ -60,7 +60,7 @@ class RajaPerf(
     def compute_applications_section(self):
 
         n_resources = {"n_ranks": 1}
-        total_size = int(self.spec.variants["total_size"][0])
+        per_proc_size = int(self.spec.variants["per_process_problem_size"][0])
         execute = "raja-perf.exe"
 
         if self.spec.satisfies("+strong"):
@@ -70,6 +70,11 @@ class RajaPerf(
                 int(self.spec.variants["scaling-iterations"][0]),
             )
             n_resources = scaled_variables["n_ranks"]
+            if isinstance(n_resources, list):
+                size = [int(per_proc_size / res) for res in n_resources]
+            else:
+                size = per_proc_size
+            self.add_experiment_variable("size", size, True)
 
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_experiment_variable("n_gpus", n_resources, True)
@@ -79,25 +84,17 @@ class RajaPerf(
         else:
             self.add_experiment_variable("n_ranks", n_resources, True)
 
-        if isinstance(n_resources, list):
-            size = [int(total_size / res) for res in n_resources]
-        else:
-            size = total_size
-        self.add_experiment_variable("size", size, True)
-
         self.add_experiment_variable("repfact", self.spec.variants["repfact"][0], True)
 
         variants = self.spec.variants["variants"][0].replace("-", " ")
         if variants == "None":
             variants = ""
-        self.add_experiment_variable("variants", variants, True)
+        self.add_experiment_variable("variants", variants, False)
 
         tunings = self.spec.variants["tunings"][0].replace("-", " ")
         if tunings == "None":
             tunings = ""
-        self.add_experiment_variable("tunings", tunings, True)
-
-        self.add_experiment_variable("execute", execute, True)
+        self.add_experiment_variable("tunings", tunings, False)
 
     def compute_package_section(self):
         # get package version

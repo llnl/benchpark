@@ -37,7 +37,7 @@ class RajaPerf(ExecutableApplication):
 
     executable(
         "run",
-        template=["{execute}" + " --size {size}" + " --repfact {repfact}" + " --variants {variants}" + " --tunings {tunings}"],
+        template=["raja-perf.exe" + " --size {size}" + " --repfact {repfact}" + " --variants {variants}" + " --tunings {tunings}"],
         use_mpi=True
     )
 
