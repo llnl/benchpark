@@ -175,6 +175,7 @@ this_script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 spack uninstall -ay
 spack repo add --scope=site $this_script_dir/repo
 spack config add "config:misc_cache:$this_script_dir/spack-misc-cache"
+spack bootstrap add --trust local-sources "$this_script_dir/spack-bootstrap-mirror/metadata/sources/"
 
 ramble repo add --scope=site $this_script_dir/repo
 ramble repo add -t modifiers --scope=site $this_script_dir/modifiers
