@@ -193,6 +193,12 @@ ramble config --scope=site add \"config:spack:global:args:'-d'\"
     if not os.path.exists(bp_repo_dest):
         shutil.copytree(bp_repo_src, bp_repo_dest)
 
+    spack_bootstrap_mirror_dest = os.path.join(dest, "spack-bootstrap-mirror")
+    if not os.path.exists(spack_bootstrap_mirror_dest):
+        run_command(
+            f"spack bootstrap mirror {spack_bootstrap_mirror_dest}"
+        )
+
     ramble_workspace_mirror_dest = os.path.join(dest, "ramble-workspace-mirror")
     if not os.path.exists(ramble_workspace_mirror_dest):
         run_command(
