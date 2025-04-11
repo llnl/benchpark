@@ -8,3 +8,6 @@ spack:
   view: true
   concretizer:
     unify: true
+  config:
+    install_tree:
+      root: $spack/o

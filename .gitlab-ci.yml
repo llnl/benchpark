@@ -6,9 +6,8 @@ variables:
 # Override the pattern describing branches that will skip the "draft PR filter
 # test".  Add protected branches here. See default value in
 # preliminary-ignore-draft-pr.yml.
-  ALWAYS_RUN_PATTERN: "^develop$|^master$|^v[0-9.]*$|^releases/$"
+  ALWAYS_RUN_PATTERN: ^develop$|^master$|^v[0-9.]*$|^releases/$
   CUSTOM_CI_BUILDS_DIR: "/usr/workspace/benchpark/gitlab_ci/${CI_PIPELINE_ID}"
-
 default:
   id_tokens:
     SITE_ID_TOKEN:
