@@ -58,7 +58,7 @@ def setup_parser(root_parser):
     root_parser.add_argument(
         "--run-ramble",
         action="store_true",
-        help="Automatically run the ramble commands that are printed to stdout after setup."
+        help="Automatically run the ramble commands that are printed to stdout after setup.",
     )
 
 
@@ -215,4 +215,4 @@ Further steps are needed to build the experiments (ramble --disable-progress-bar
 ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} workspace setup
 ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} on
 """
-            )
+                )
