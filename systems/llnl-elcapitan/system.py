@@ -25,8 +25,8 @@ class LlnlElcapitan(System, ROCmSystem):
             + "/HPECray-zen3-MI250X-Slingshot/hardware_description.yaml",
         },
         "elcapitan": {
-            "rocm_arch": "gfx940",
-            "sys_cores_per_node": 128,
+            "rocm_arch": "gfx942",
+            "sys_cores_per_node": 96,
             "sys_gpus_per_node": 4,
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
