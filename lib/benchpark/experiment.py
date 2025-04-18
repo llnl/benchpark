@@ -252,7 +252,14 @@ class Experiment(ExperimentSystemBase, SingleNode):
             self.env_vars["set"] |= env_vars["set"]
             self.env_vars["append"][0] |= env_vars["append"][0]
 
+        self.setup_expr_input_variables()
+
+        if not self.spec.satisfies("scaling=off"):
+            self.variables |= self.scale()
+
         self.compute_applications_section()
+
+        self.check_output_variables()
 
         expr_helper_list = []
         for cls in self.helpers:
