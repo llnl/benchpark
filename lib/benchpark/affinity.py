@@ -32,7 +32,7 @@ class Affinity:
                 modifier_list.append(affinity_modifier_modes)
             return modifier_list
 
-        def compute_spack_section(self):
+        def compute_package_section(self):
             # set package versions
             affinity_version = "master"
 
