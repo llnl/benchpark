@@ -284,7 +284,7 @@ class Experiment(ExperimentSystemBase):
 
         self.compute_applications_section()
 
-        self.check_output_variables()
+        self.finalize_experiment_setup()
 
         for var in self.expr_vars.values():
             for dim in var.dims():

@@ -177,18 +177,13 @@ New size: {new_global_prob_size}
 
         return result
 
-    def check_output_variables(self):
-        if not hasattr(self, 'expr_vars'):
-            raise AttributeError("Missing 'expr_vars' attribute in self.")
-
-        required_keys = ['nprocs', 'process_problem_size', 'total_problem_size']
-        for key in required_keys:
-            if key not in self.expr_vars:
-                raise AttributeError(f"'expr_vars' dictionary is missing required key '{key}'.")
+    @requires_experiment_variables("nprocs", "process_problem_size", "total_problem_size")
+    def finalize_experiment_setup(self):
+        pass
 
     setattr(ScalingType, 'strong_scale', strong_scale)
     setattr(ScalingType, 'weak_scale', weak_scale)
-    setattr(ScalingType, 'check_output_variables', check_output_variables)
+    setattr(ScalingType, 'finalize_experiment_setup', finalize_experiment_setup)
 
     return ScalingType
 
