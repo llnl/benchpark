@@ -9,6 +9,7 @@ import yaml  # TODO: some way to ensure yaml available
 from benchpark.error import BenchparkError
 from benchpark.directives import ExperimentSystemBase
 from benchpark.directives import variant
+from benchpark.variables import VariableDict
 import benchpark.spec
 import benchpark.paths
 import benchpark.repo
@@ -25,7 +26,7 @@ import ramble.language.language_helpers  # noqa
 class ExperimentHelper:
     def __init__(self, exp):
         self.spec = exp.spec
-        self.variables = {}
+        self._expr_vars = VariableDict()
         self.env_vars = {
             "set": {},
             "append": [{"paths": {}, "vars": {}}],
@@ -71,22 +72,31 @@ class ExperimentHelper:
 
     def compute_config_variables_wrapper(self):
         self.compute_config_variables()
-        return self.variables, self.env_vars
+        return self._expr_vars, self.env_vars
 
 
-class SingleNode:
-    variant(
-        "single_node",
-        default=True,
-        description="Single node execution mode",
-    )
+def requires_experiment_variables(*attrs):
+    def decorator(method):
+        def wrapper(self, *args, **kwargs):
+            missing = [attr for attr in attrs if not hasattr(self.expr_vars, attr)]
+            if missing:
+                raise AttributeError(f"Missing required input variable(s): {', '.join(missing)}")
+            return method(self, *args, **kwargs)
+        return wrapper
+    return decorator
 
-    class Helper(ExperimentHelper):
-        def get_helper_name_prefix(self):
-            return "single_node" if self.spec.satisfies("+single_node") else ""
+
+def requires_method(method_name):
+    def decorator(init_func):
+        def wrapper(self, *args, **kwargs):
+            if not hasattr(self, method_name) or not callable(getattr(self, method_name)):
+                raise TypeError(f"Class {self.__class__.__name__} must define a '{method_name}' method.")
+            return init_func(self, *args, **kwargs)
+        return wrapper
+    return decorator
 
 
-class Experiment(ExperimentSystemBase, SingleNode):
+class Experiment(ExperimentSystemBase):
     """This is the superclass for all benchpark experiments.
 
     ***The Experiment class***
@@ -127,12 +137,14 @@ class Experiment(ExperimentSystemBase, SingleNode):
         description="Append to environment PATH during experiment execution",
     )
 
+    @requires_method("setup_default_experiment")
     def __init__(self, spec):
         self.spec: "benchpark.spec.ConcreteExperimentSpec" = spec
         super().__init__()
         self.helpers = []
         self._spack_name = None
         self._ramble_name = None
+        self._expr_vars = VariableDict()
 
         for cls in self.__class__.mro()[1:]:
             if cls is not Experiment and cls is not object:
@@ -167,6 +179,11 @@ class Experiment(ExperimentSystemBase, SingleNode):
     def ramble_name(self, value: str):
         self._ramble_name = value
 
+    @property
+    def expr_vars(self):
+        """Dictionary of experiment variables"""
+        return self._expr_vars
+
     def compute_include_section(self):
         # include the config directory
         return ["./configs"]
@@ -195,12 +212,13 @@ class Experiment(ExperimentSystemBase, SingleNode):
         return modifier_list
 
     def add_experiment_name_prefix(self, prefix):
-        self.expr_name = [prefix] + self.expr_name
+        self.expr_var_names = [prefix] + self.expr_var_names
 
-    def add_experiment_variable(self, name, values, use_in_expr_name=False):
-        self.variables[name] = values
-        if use_in_expr_name:
-            self.expr_name.append(f"{{{name}}}")
+    def add_dimensional_variable(self, name, values, use_in_expr_name=False, scalable=False):
+        self.expr_vars.add_dimensional_variable(name, values, use_in_expr_name, scalable)
+
+    def add_scalar_variable(self, name, values, use_in_expr_name=False, scalable=False):
+        self.expr_vars.add_scalar_variable(name, values, use_in_expr_name, scalable)
 
     def set_environment_variable(self, name, values):
         """Set value of environment variable"""
@@ -230,13 +248,18 @@ class Experiment(ExperimentSystemBase, SingleNode):
     def add_experiment_exclude(self, exclude_clause):
         self.excludes.append(exclude_clause)
 
+    def initialize_experiment_variables(self):
+        raise NotImplementedError(
+            "Each experiment must implement initialize_experiment_variables"
+        )
+
     def compute_applications_section(self):
         raise NotImplementedError(
             "Each experiment must implement compute_applications_section"
         )
 
     def compute_applications_section_wrapper(self):
-        self.expr_name = []
+        self.expr_var_names = []
         self.env_vars = {
             "set": {},
             "append": [{"paths": {}, "vars": {}}],
@@ -248,25 +271,36 @@ class Experiment(ExperimentSystemBase, SingleNode):
 
         for cls in self.helpers:
             variables, env_vars = cls.compute_config_variables_wrapper()
-            self.variables |= variables
+            self.expr_vars.extend(variables)
             self.env_vars["set"] |= env_vars["set"]
             self.env_vars["append"][0] |= env_vars["append"][0]
 
-        self.setup_expr_input_variables()
+        self.initialize_experiment_variables()
 
-        if not self.spec.satisfies("scaling=off"):
-            self.variables |= self.scale()
+        if "scaling" in self.spec.variants and not self.spec.satisfies("scaling=off"):
+            self.expr_vars.extend(self.scale())
+        else:
+            self.setup_default_experiment()
 
         self.compute_applications_section()
 
         self.check_output_variables()
+
+        for var in self.expr_vars.values():
+            for dim in var.dims():
+                if var.is_named:
+                    self.expr_var_names.append(f"{{{dim}}}")
+                if len(var[dim]) == 1:
+                    self.variables[dim] = var[dim][0]
+                else:
+                    self.variables[dim] = var[dim]
 
         expr_helper_list = []
         for cls in self.helpers:
             helper_prefix = cls.get_helper_name_prefix()
             if helper_prefix:
                 expr_helper_list.append(helper_prefix)
-        expr_name_suffix = "_".join(expr_helper_list + self.expr_name)
+        expr_name_suffix = "_".join(expr_helper_list + self.expr_var_names)
 
         expr_setup = {
             "variants": {"package_manager": self.spec.variants["package_manager"][0]},

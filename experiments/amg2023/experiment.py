@@ -9,7 +9,7 @@ from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
-from benchpark.new_scaling import NumProcs, ProblemSizes, ScalingMode, UsesPerProcessDomains
+from benchpark.new_scaling import ScalingMode, UsesPerProcessDomains
 from benchpark.caliper import Caliper
 
 
@@ -39,33 +39,24 @@ class Amg2023(
 
     maintainers("pearce8")
 
-    # requires("system+papi", when(caliper=topdown*))
-
-    # TODO: Support list of 3-tuples
-    # variant(
-    #     "p",
-    #     description="value of p",
-    # )
-
-    # TODO: Support list of 3-tuples
-    # variant(
-    #     "n",
-    #     description="value of n",
-    # )
-
-    def setup_expr_input_variables(self):
+    def initialize_experiment_variables(self):
         # Number of processes in each dimension
-        self.num_procs = NumProcs({"px": 2, "py": 2, "pz": 2})
+        self.add_dimensional_variable("num_procs", {"px": 2, "py": 2, "pz": 2}, True, True)
 
         # Per-process size (in zones) in each dimension
-        self.problem_sizes = ProblemSizes({"nx": 80, "ny": 80, "nz": 80})
+        self.add_dimensional_variable("problem_sizes", {"nx": 80, "ny": 80, "nz": 80}, True, True)
+
+    def setup_default_experiment(self):
+        self.add_scalar_variable("nprocs", self.expr_vars.num_procs.prod)
+        self.add_scalar_variable("process_problem_size", self.expr_vars.problem_sizes.prod)
+        self.add_scalar_variable("total_problem_size", [p*n for p, n in zip(self.expr_vars.num_procs.prod, self.expr_vars.problem_sizes.prod)])
 
     def compute_applications_section(self):
         if self.spec.satisfies("+openmp"):
-            self.add_experiment_variable("n_ranks", 'nprocs', True)
-            self.add_experiment_variable("n_threads_per_proc", 1, True)
+            self.add_scalar_variable("n_ranks", '{nprocs}', True)
+            self.add_scalar_variable("n_threads_per_proc", 1, True)
         elif self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
-            self.add_experiment_variable("n_gpus", 'nprocs', True)
+            self.add_scalar_variable("n_gpus", '{nprocs}', True)
 
     def compute_package_section(self):
         # get package version
