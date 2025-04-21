@@ -23,12 +23,8 @@ class Scaffold(ExecutableApplication):
         "export LD_LIBRARY_PATH=/opt/cray/pe/cce/18.0.1/cce/x86_64/lib:$LD_LIBRARY_PATH",
     )
     executable(
-        "config",
-        "scaffold generate_fractals --config {package_path}ScaFFold/configs/{config}.yml",
-    )
-    executable(
         "run",
-        "scaffold benchmark --interactive --config {package_path}ScaFFold/configs/{config}.yml",
+        "SCAFFOLD_REPO_ROOT={package_path} scaffold benchmark --interactive --config {package_path}ScaFFold/configs/{config}.yml",
     )
 
-    workload("sweep", executables=["modules", "config", "run"])
+    workload("sweep", executables=["modules", "run"])
