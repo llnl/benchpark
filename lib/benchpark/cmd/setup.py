@@ -192,8 +192,10 @@ export _BENCHPARK_INITIALIZED=true
 """
             )
 
-    ramble_setup=f"ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} workspace setup"
-    ramble_run=f"ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} on"
+    ramble_setup = f"ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} workspace setup"
+    ramble_run = (
+        f"ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} on"
+    )
 
     instructions = f"""\
 To complete the benchpark setup, do the following:
