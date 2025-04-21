@@ -55,11 +55,6 @@ def setup_parser(root_parser):
         type=str,
         help="Where to install packages and store results for the experiments. Benchpark expects to manage this directory, and it should be empty/nonexistent the first time you run benchpark setup experiments.",
     )
-    root_parser.add_argument(
-        "--run-ramble",
-        action="store_true",
-        help="Automatically run the ramble commands that are printed to stdout after setup.",
-    )
 
 
 def command(args):
@@ -145,7 +140,7 @@ def command(args):
     )
 
     initializer_script = experiments_root / "setup.sh"
-    run_script = experiments_root / "run.sh"
+    run_script = experiments_root / ".latest-experiment.sh"
 
     per_workspace_setup = RuntimeResources(experiments_root)
 
@@ -197,22 +192,18 @@ export _BENCHPARK_INITIALIZED=true
 """
             )
 
+    ramble_setup=f"ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} workspace setup"
+    ramble_run=f"ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} on"
+
     instructions = f"""\
 To complete the benchpark setup, do the following:
 
     . {initializer_script}
 
-Further steps are needed to build the experiments (ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} workspace setup) and run them (ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} on)
+Further steps are needed to build the experiments ({ramble_setup}) and run them ({ramble_run})
 """
     print(instructions)
 
-    if args.run_ramble:
-        print(f"Run . {run_script} to run the above ramble commands automatically")
-        if not run_script.exists():
-            with open(run_script, "w") as f:
-                f.write(
-                    f"""\
-ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} workspace setup
-ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} on
-"""
-                )
+    # Generate shell script to setup and run latest experiment
+    with open(run_script, "w") as f:
+        f.write(f"{ramble_setup}\n{ramble_run}\n")
