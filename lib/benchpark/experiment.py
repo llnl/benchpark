@@ -145,6 +145,7 @@ class Experiment(ExperimentSystemBase):
         self._spack_name = None
         self._ramble_name = None
         self._expr_vars = VariableDict()
+        self._required_vars = []
 
         for cls in self.__class__.mro()[1:]:
             if cls is not Experiment and cls is not object:
@@ -183,6 +184,11 @@ class Experiment(ExperimentSystemBase):
     def expr_vars(self):
         """Dictionary of experiment variables"""
         return self._expr_vars
+
+    @property
+    def required_vars(self):
+        """Dictionary of experiment variables"""
+        return self._required_vars
 
     def compute_include_section(self):
         # include the config directory
@@ -277,14 +283,18 @@ class Experiment(ExperimentSystemBase):
 
         self.initialize_experiment_variables()
 
+        required_variables_setters = set()
+        for cls in type(self).mro():
+            if hasattr(cls, "register_required_variables") and cls.register_required_variables not in required_variables_setters:
+                required_variables_setters.add(cls.register_required_variables)
+                cls.register_required_variables(self)
+
         if "scaling" in self.spec.variants and not self.spec.satisfies("scaling=off"):
             self.expr_vars.extend(self.scale())
         else:
             self.setup_default_experiment()
 
         self.compute_applications_section()
-
-        self.finalize_experiment_setup()
 
         for var in self.expr_vars.values():
             for dim in var.dims():
@@ -294,6 +304,13 @@ class Experiment(ExperimentSystemBase):
                     self.variables[dim] = var[dim][0]
                 else:
                     self.variables[dim] = var[dim]
+
+        missing_vars = []
+        for var in self.required_vars:
+            if var not in self.variables:
+                missing_vars.append(var)
+        if missing_vars:
+            raise AttributeError(f"Missing required experiment variable(s): {', '.join(missing_vars)}")
 
         expr_helper_list = []
         for cls in self.helpers:

@@ -242,19 +242,17 @@ def UsesPerProcessDomains(*modes):
                 return result
             ScalingType.throughput_scale = throughput_scale
 
-    @requires_experiment_variables("nprocs", "process_problem_size", "total_problem_size")
-    def finalize_experiment_setup(self):
-        pass
+    def register_required_variables(self):
+        self.required_vars.extend(["nprocs", "process_problem_size", "total_problem_size"])
 
-    ScalingType.finalize_experiment_setup = finalize_experiment_setup
+    return type(
+        "PerProcessDomainScaling",
+        (ScalingType,),
+        {
+            "register_required_variables": register_required_variables,
+        },
+    )
 
-    @property
-    def scalingtype(self):
-        return ScalingType
-
-    ScalingType.scalingtype = scalingtype
-
-    return ScalingType
 
 def UsesGlobalDomains(*modes):
     ScalingType = Scaling(*modes)
