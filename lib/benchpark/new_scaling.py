@@ -9,6 +9,8 @@ from benchpark.experiment import ExperimentHelper, requires_experiment_variables
 from benchpark.variables import VariableDict
 from enum import Enum
 from functools import reduce
+import warnings
+from benchpark.warning import BenchparkWarning
 
 
 class ScalingMode(Enum):
@@ -116,8 +118,8 @@ def UsesPerProcessDomains(*modes):
             def strong_scale(self):
                 """
                 Strong scales the problem by increasing the number of processes along each dimension in a
-                round-robin manner and decreasing the corresponding per-process size to keep the total problem
-                size constant.
+                round-robin manner, starting with the minimum dimension and decreasing the corresponding
+                per-process size to keep the total problem size constant.
                 Raises an error if scaling down the per-process size does not conserve the global problem size.
                 """
 
@@ -146,7 +148,6 @@ def UsesPerProcessDomains(*modes):
                     problem_sizes.scale_dim(dim, lambda v: v // scaling_factor)
 
                     new_global_prob_size = num_procs.prod[-1] * problem_sizes.prod[-1]
-                    total_problem_size.append(new_global_prob_size)
 
                     if new_global_prob_size != orig_global_prob_size:
                         errMsg = f"""
@@ -168,9 +169,9 @@ def UsesPerProcessDomains(*modes):
             @requires_experiment_variables("num_procs", "problem_sizes")
             def weak_scale(self):
                 """
-                Weak scales the problem by increasing the number of processes along each dimension in a
-                round-robin manner.
-                There are no changes to the per process sizes
+                Weak scales the problem by increasing the number of processes along each dimension,
+                starting with the minimum process dimension, in a round-robin manner.
+                There are no changes to the per process sizes.
                 """
 
                 num_procs = self.expr_vars.num_procs
@@ -208,8 +209,8 @@ def UsesPerProcessDomains(*modes):
             def throughput_scale(self):
                 """
                 Throughput scales the problem by increasing the per process size along each dimension in a
-                round-robin manner starting with the minimum process dimension
-                There are no changes to the number of processes
+                round-robin manner, starting with the minimum process dimension.
+                There are no changes to the number of processes.
                 """
 
                 num_procs = self.expr_vars.num_procs
@@ -257,6 +258,141 @@ def UsesPerProcessDomains(*modes):
 def UsesGlobalDomains(*modes):
     ScalingType = Scaling(*modes)
 
-    setattr(ScalingType, 'strong_scale', strong_scale)
+    for mode in modes:
+        if mode == ScalingMode.Strong:
+            @requires_experiment_variables("num_procs", "problem_sizes")
+            def strong_scale(self):
+                """
+                Strong scales the problem by increasing the number of processes along each dimension,
+                starting with the minimum process dimension, in a round-robin manner.
+                There are no changes to the per process sizes.
+                """
 
-    return ScalingType
+                num_procs = self.expr_vars.num_procs
+                problem_sizes = self.expr_vars.problem_sizes
+
+                if problem_sizes.ndims != num_procs.ndims:
+                    raise BenchparkError(
+                        f"problem_sizes dimensions {problem_sizes.dims} do not match num_procs dimensions {num_procs.dims}"
+                    )
+
+                num_exprs = int(self.spec.variants["scaling-iterations"][0]) - 1
+                scaling_factor = int(self.spec.variants["scaling-factor"][0])
+
+                process_problem_size = [problem_sizes.prod[-1] // num_procs.prod[-1]]
+                if problem_sizes.prod[-1] % num_procs.prod[-1] != 0:
+                    warnings.warn(f"Problem size {problem_sizes.prod[-1]} is not an exact multiple of the processor count {num_procs.prod[-1]}", BenchparkWarning)
+
+                start_dim = num_procs.min_dim
+                ndims = num_procs.ndims
+         
+                for itr in range(num_exprs):
+                    dim = (start_dim + itr) % ndims
+                    num_procs.scale_dim(dim, lambda v: v * scaling_factor)
+                    process_problem_size.append(problem_sizes.prod[-1] // num_procs.prod[-1])
+                    if problem_sizes.prod[-1] % num_procs.prod[-1] != 0:
+                        warnings.warn(f"Problem size {problem_sizes.prod[-1]} is not an exact multiple of the processor count {num_procs.prod[-1]}", BenchparkWarning)
+
+                result = VariableDict()
+                result.add_scalar_variable("nprocs", num_procs.prod)
+                result.add_scalar_variable("process_problem_size", process_problem_size)
+                result.add_scalar_variable("total_problem_size", problem_sizes.prod)
+
+                return result
+            ScalingType.strong_scale = strong_scale
+
+        if mode == ScalingMode.Weak:
+            @requires_experiment_variables("num_procs", "problem_sizes")
+            def weak_scale(self):
+                """
+                Weak scales the problem by increasing the number of processes along each dimension in a
+                round-robin manner, starting with the minimum process dimension.
+                The corresponding per process sizes are scaled accordingly as well
+                """
+
+                num_procs = self.expr_vars.num_procs
+                problem_sizes = self.expr_vars.problem_sizes
+
+                if problem_sizes.ndims != num_procs.ndims:
+                    raise BenchparkError(
+                        f"problem_sizes dimensions {problem_sizes.dims} do not match num_procs dimensions {num_procs.dims}"
+                    )
+
+                num_exprs = int(self.spec.variants["scaling-iterations"][0]) - 1
+                scaling_factor = int(self.spec.variants["scaling-factor"][0])
+
+                process_problem_size = [problem_sizes.prod[-1] // num_procs.prod[-1]]
+                if problem_sizes.prod[-1] % num_procs.prod[-1] != 0:
+                    warnings.warn(f"Problem size {problem_sizes.prod[-1]} is not an exact multiple of the processor count {num_procs.prod[-1]}", BenchparkWarning)
+
+                start_dim = num_procs.min_dim
+                ndims = num_procs.ndims
+         
+                for itr in range(num_exprs):
+                    dim = (start_dim + itr) % ndims
+                    num_procs.scale_dim(dim, lambda v: v * scaling_factor)
+                    problem_sizes.scale_dim(dim, lambda v: v * scaling_factor)
+                    process_problem_size.append(problem_sizes.prod[-1] // num_procs.prod[-1])
+                    if problem_sizes.prod[-1] % num_procs.prod[-1] != 0:
+                        warnings.warn(f"Problem size {problem_sizes.prod[-1]} is not an exact multiple of the processor count {num_procs.prod[-1]}", BenchparkWarning)
+
+                result = VariableDict()
+                result.add_scalar_variable("nprocs", num_procs.prod)
+                result.add_scalar_variable("process_problem_size", process_problem_size)
+                result.add_scalar_variable("total_problem_size", problem_sizes.prod)
+
+                return result
+            ScalingType.weak_scale = weak_scale
+
+        if mode == ScalingMode.Throughput:
+            @requires_experiment_variables("num_procs", "problem_sizes")
+            def throughput_scale(self):
+                """
+                Throughput scales the problem by increasing the total process size in a
+                round-robin manner starting with the minimum process dimension
+                There are no changes to the number of processes
+                """
+
+                num_procs = self.expr_vars.num_procs
+                problem_sizes = self.expr_vars.problem_sizes
+
+                if problem_sizes.ndims != num_procs.ndims:
+                    raise BenchparkError(
+                        f"problem_sizes dimensions {problem_sizes.dims} do not match num_procs dimensions {num_procs.dims}"
+                    )
+
+                num_exprs = int(self.spec.variants["scaling-iterations"][0]) - 1
+                scaling_factor = int(self.spec.variants["scaling-factor"][0])
+
+                process_problem_size = [problem_sizes.prod[-1] // num_procs.prod[-1]]
+                if problem_sizes.prod[-1] % num_procs.prod[-1] != 0:
+                    warnings.warn(f"Problem size {problem_sizes.prod[-1]} is not an exact multiple of the processor count {num_procs.prod[-1]}", BenchparkWarning)
+
+                start_dim = num_procs.min_dim
+                ndims = num_procs.ndims
+         
+                for itr in range(num_exprs):
+                    dim = (start_dim + itr) % ndims
+                    problem_sizes.scale_dim(dim, lambda v: v * scaling_factor)
+                    process_problem_size.append(problem_sizes.prod[-1] // num_procs.prod[-1])
+                    if problem_sizes.prod[-1] % num_procs.prod[-1] != 0:
+                        warnings.warn(f"Problem size {problem_sizes.prod[-1]} is not an exact multiple of the processor count {num_procs.prod[-1]}", BenchparkWarning)
+
+                result = VariableDict()
+                result.add_scalar_variable("nprocs", num_procs.prod)
+                result.add_scalar_variable("process_problem_size", process_problem_size)
+                result.add_scalar_variable("total_problem_size", problem_sizes.prod)
+
+                return result
+            ScalingType.throughput_scale = throughput_scale
+
+    def register_required_variables(self):
+        self.required_vars.extend(["nprocs", "process_problem_size", "total_problem_size"])
+
+    return type(
+        "GlobalDomainScaling",
+        (ScalingType,),
+        {
+            "register_required_variables": register_required_variables,
+        },
+    )

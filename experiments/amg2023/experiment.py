@@ -41,10 +41,10 @@ class Amg2023(
 
     def initialize_experiment_variables(self):
         # Number of processes in each dimension
-        self.add_dimensional_variable("num_procs", {"px": 2, "py": 2, "pz": 2}, True, True)
+        self.add_dimensional_variable("num_procs", {"px": 2, "py": 2, "pz": 2}, named=True, scalable=True)
 
         # Per-process size (in zones) in each dimension
-        self.add_dimensional_variable("problem_sizes", {"nx": 80, "ny": 80, "nz": 80}, True, True)
+        self.add_dimensional_variable("problem_sizes", {"nx": 80, "ny": 80, "nz": 80}, named=True, scalable=True)
 
     def setup_default_experiment(self):
         self.add_scalar_variable("nprocs", self.expr_vars.num_procs.prod)
@@ -53,10 +53,10 @@ class Amg2023(
 
     def compute_applications_section(self):
         if self.spec.satisfies("+openmp"):
-            self.add_scalar_variable("n_ranks", '{nprocs}', True)
-            self.add_scalar_variable("n_threads_per_proc", 1, True)
+            self.add_scalar_variable("n_ranks", "{nprocs}", named=True)
+            self.add_scalar_variable("n_threads_per_proc", 1, named=True)
         elif self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
-            self.add_scalar_variable("n_gpus", '{nprocs}', True)
+            self.add_scalar_variable("n_gpus", "{nprocs}", named=True)
 
     def compute_package_section(self):
         # get package version

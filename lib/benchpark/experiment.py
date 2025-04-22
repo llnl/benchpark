@@ -147,9 +147,11 @@ class Experiment(ExperimentSystemBase):
         self._expr_vars = VariableDict()
         self._required_vars = []
 
+        visited_helper_impls = set()
         for cls in self.__class__.mro()[1:]:
             if cls is not Experiment and cls is not object:
-                if hasattr(cls, "Helper"):
+                if hasattr(cls, "Helper") and cls.Helper not in visited_helper_impls:
+                    visited_helper_impls.add(cls.Helper)
                     helper_instance = cls.Helper(self)
                     self.helpers.append(helper_instance)
 
@@ -220,11 +222,11 @@ class Experiment(ExperimentSystemBase):
     def add_experiment_name_prefix(self, prefix):
         self.expr_var_names = [prefix] + self.expr_var_names
 
-    def add_dimensional_variable(self, name, values, use_in_expr_name=False, scalable=False):
-        self.expr_vars.add_dimensional_variable(name, values, use_in_expr_name, scalable)
+    def add_dimensional_variable(self, name, values, named=False, scalable=False):
+        self.expr_vars.add_dimensional_variable(name, values, named, scalable)
 
-    def add_scalar_variable(self, name, values, use_in_expr_name=False, scalable=False):
-        self.expr_vars.add_scalar_variable(name, values, use_in_expr_name, scalable)
+    def add_scalar_variable(self, name, values, named=False, scalable=False):
+        self.expr_vars.add_scalar_variable(name, values, named, scalable)
 
     def set_environment_variable(self, name, values):
         """Set value of environment variable"""
@@ -283,10 +285,10 @@ class Experiment(ExperimentSystemBase):
 
         self.initialize_experiment_variables()
 
-        required_variables_setters = set()
-        for cls in type(self).mro():
-            if hasattr(cls, "register_required_variables") and cls.register_required_variables not in required_variables_setters:
-                required_variables_setters.add(cls.register_required_variables)
+        visited_required_variables_setters = set()
+        for cls in self.__class__.mro():
+            if hasattr(cls, "register_required_variables") and cls.register_required_variables not in visited_required_variables_setters:
+                visited_required_variables_setters.add(cls.register_required_variables)
                 cls.register_required_variables(self)
 
         if "scaling" in self.spec.variants and not self.spec.satisfies("scaling=off"):
