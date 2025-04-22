@@ -31,6 +31,8 @@ class VariableDict:
             self._vars[name] = Variable({name:values}, named)
 
     def extend(self, vardict):
+        if not vardict:
+            return
         if not isinstance(vardict, VariableDict):
             raise TypeError("input variable must be of type VariableDict")
         else:
