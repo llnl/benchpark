@@ -84,7 +84,7 @@ def mirror_create(args):
     dest = os.path.abspath(args.destdir)
     marker = os.path.join(dest, _CACHE_MARKER)
 
-    ramble_workspace = os.path.abspath(args.workspace)
+    ramble_workspace = os.path.realpath(os.path.abspath(args.workspace))
 
     workspace, ramble_workspace_relative = (
         locate_benchpark_workspace_parent_of_ramble_workspace(ramble_workspace)
