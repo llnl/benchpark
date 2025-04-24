@@ -36,8 +36,8 @@ class LbnlPerlmutter(System):
         super().__init__(spec)
 
         if self.spec.satisfies("compiler=gcc"):
-            self.gcc_version = Version("12.2.0")
-            self.mpi_version = Version("8.1.26")
+            self.gcc_version = Version("13.2.1")
+            self.mpi_version = Version("8.1.30")
 
         self.scheduler = "slurm"
         attrs = self.id_to_resources.get("perlmutter")
@@ -48,116 +48,117 @@ class LbnlPerlmutter(System):
         selections = {
             "packages": {
                 "all": {"require": "target=x86_64:"},
-                "tar": {"externals": [{"spec": "tar@1.30", "prefix": "/usr"}]},
+                "tar": {"externals": [{"spec": "tar@1.34", "prefix": "/usr"}]},
                 "coreutils": {
-                    "externals": [{"spec": "coreutils@8.30", "prefix": "/usr"}]
+                    "externals": [{"spec": "coreutils@8.32", "prefix": "/usr"}]
                 },
                 "libtool": {"externals": [{"spec": "libtool@2.4.6", "prefix": "/usr"}]},
-                "flex": {"externals": [{"spec": "flex@2.6.1+lex", "prefix": "/usr"}]},
+                "flex": {"externals": [{"spec": "flex@2.6.4+lex", "prefix": "/usr"}]},
                 "openssl": {
-                    "externals": [{"spec": "openssl@1.1.1k", "prefix": "/usr"}]
+                    "externals": [{"spec": "openssl@1.1.1l-fips", "prefix": "/usr"}]
                 },
                 "m4": {"externals": [{"spec": "m4@1.4.18", "prefix": "/usr"}]},
-                "groff": {"externals": [{"spec": "groff@1.22.3", "prefix": "/usr"}]},
+                "groff": {"externals": [{"spec": "groff@1.22.4", "prefix": "/usr"}]},
                 "cmake": {
-                    "externals": [
-                        {"spec": "cmake@3.20.2", "prefix": "/usr"},
-                        {"spec": "cmake@3.23.1", "prefix": "/usr/tce"},
-                        {"spec": "cmake@3.24.2", "prefix": "/usr/tce"},
-                    ],
+                    "externals": [{"spec": "cmake@3.20.4", "prefix": "/usr"}],
                     "buildable": False,
                 },
-                "elfutils": {
-                    "externals": [{"spec": "elfutils@0.190", "prefix": "/usr"}],
-                    "buildable": False,
-                },
-                "papi": {
-                    "externals": [{"spec": "papi@5.6.0.0", "prefix": "/usr"}],
-                    "buildable": False,
-                },
-                "unwind": {
-                    "externals": [{"spec": "unwind@8.0.1", "prefix": "/usr"}],
-                    "buildable": False,
-                },
-                "pkgconf": {"externals": [{"spec": "pkgconf@1.4.2", "prefix": "/usr"}]},
                 "curl": {
                     "externals": [
-                        {"spec": "curl@7.61.1+gssapi+ldap+nghttp2", "prefix": "/usr"}
+                        {"spec": "curl@8.0.1+gssapi+ldap+nghttp2", "prefix": "/usr"}
                     ]
                 },
                 "gmake": {"externals": [{"spec": "gmake@4.2.1", "prefix": "/usr"}]},
                 "subversion": {
-                    "externals": [{"spec": "subversion@1.10.2", "prefix": "/usr"}]
+                    "externals": [{"spec": "subversion@1.14.1", "prefix": "/usr"}],
+                    "buildable": False,
                 },
                 "diffutils": {
-                    "externals": [{"spec": "diffutils@3.6", "prefix": "/usr"}]
+                    "externals": [{"spec": "diffutils@3.6", "prefix": "/usr"}],
+                    "buildable": False,
                 },
-                "swig": {"externals": [{"spec": "swig@3.0.12", "prefix": "/usr"}]},
                 "gawk": {"externals": [{"spec": "gawk@4.2.1", "prefix": "/usr"}]},
                 "binutils": {
-                    "externals": [{"spec": "binutils@2.30.113", "prefix": "/usr"}]
+                    "externals": [
+                        {"spec": "binutils@2.40~gold~headers", "prefix": "/opt/cray/pe/cce/18.0.0/binutils/x86_64/x86_64-pc-linux-gnu"}
+                        {"spec": "binutils@2.43.1~gold~headers", "prefix": "/usr"}
+                    ],
+                    "buildable": False,
                 },
                 "findutils": {
-                    "externals": [{"spec": "findutils@4.6.0", "prefix": "/usr"}]
+                    "externals": [{"spec": "findutils@4.8.0", "prefix": "/usr"}],
+                    "buildable": False,
                 },
-                "git-lfs": {
-                    "externals": [{"spec": "git-lfs@2.11.0", "prefix": "/usr/tce"}]
+                "ccache": {
+                    "externals": [{"spec": "ccache@3.4.7", "prefix": "/usr"}]},
+                    "buildable": False,
                 },
-                "ccache": {"externals": [{"spec": "ccache@3.7.7", "prefix": "/usr"}]},
                 "automake": {
-                    "externals": [{"spec": "automake@1.16.1", "prefix": "/usr"}]
+                    "externals": [{"spec": "automake@1.15.1", "prefix": "/usr"}],
+                    "buildable": False,
                 },
-                "cvs": {"externals": [{"spec": "cvs@1.11.23", "prefix": "/usr"}]},
                 "git": {
-                    "externals": [
-                        {"spec": "git@2.31.1+tcltk", "prefix": "/usr"},
-                        {"spec": "git@2.29.1+tcltk", "prefix": "/usr/tce"},
-                    ]
+                    "externals": [{"spec": "git@2.35.3~tcltk", "prefix": "/usr"}],
+                    "buildable": False,
                 },
-                "openssh": {"externals": [{"spec": "openssh@8.0p1", "prefix": "/usr"}]},
+                "openssh": {
+                    "externals": [{"spec": "openssh@8.4p1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
                 "autoconf": {
-                    "externals": [{"spec": "autoconf@2.69", "prefix": "/usr"}]
+                    "externals": [{"spec": "autoconf@2.69", "prefix": "/usr"}],
+                    "buildable": False,
                 },
-                "texinfo": {"externals": [{"spec": "texinfo@6.5", "prefix": "/usr"}]},
-                "bison": {"externals": [{"spec": "bison@3.0.4", "prefix": "/usr"}]},
+                "bison": {
+                    "externals": [{"spec": "bison@3.0.4", "prefix": "/usr"}],
+                    "buildable": False,
+                },
                 "python": {
                     "externals": [
                         {
-                            "spec": "python@3.9.12",
-                            "prefix": "/usr/tce/packages/python/python-3.9.12",
-                            "buildable": False,
-                        }
-                    ]
-                },
-                "unzip": {
-                    "buildable": False,
-                    "externals": [{"spec": "unzip@6.0", "prefix": "/usr"}],
-                },
-                "hypre": {"variants": "amdgpu_target=gfx90a"},
-                "hwloc": {
-                    "externals": [
-                        {"spec": "hwloc@2.9.1", "prefix": "/usr", "buildable": False}
-                    ]
-                },
-                "fftw": {"buildable": False},
-                "intel-oneapi-mkl": {
-                    "externals": [
+                            "prefix": "/usr",
+                            "spec": "python@2.7.18+bz2+crypt+ctypes~dbm~lzma+nis~pyexpat+pythoncmd~readline~sqlite3~ssl~tkinter+uuid+zlib",
+                        },
                         {
-                            "spec": "intel-oneapi-mkl@2023.2.0",
-                            "prefix": "/opt/intel/oneapi",
-                        }
+                            "prefix": "/usr",
+                            "spec": "python@3.6.15+bz2+crypt+ctypes~dbm+lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl~tkinter+uuid+zlib",
+                        },
                     ],
                     "buildable": False,
                 },
-                "mpi": {"buildable": False},
-                "libfabric": {
-                    "externals": [
-                        {"spec": "libfabric@2.1", "prefix": "/opt/cray/libfabric/2.1"}
-                    ],
+                "doxygen": {
+                    "externals": [{"spec": "doxygen@1.8.14~graphviz~mscgen", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "gettext": {
+                    "externals": [{"spec": "gettext@0.20.2", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "ninja": {
+                    "externals": [{"spec": "ninja@1.10.0", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "perl": {
+                    "externals": [{"spec": "perl@5.26.1~cpanm+opcode+open+shared+threads", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "pkg-config": {
+                    "externals": [{"spec": "pkg-config@0.29.2", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "sed": {
+                    "externals": [{"spec": "sed@4.4", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "tar": {
+                    "externals": [{"spec": "tar@1.34", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "zlib": {
+                    "externals": [{"spec": "zlib@1.2.13", "prefix": "/usr"}],
                     "buildable": False,
                 },
             }
-        }
 
         selections["packages"] |= self.mpi_config()["packages"]
 
