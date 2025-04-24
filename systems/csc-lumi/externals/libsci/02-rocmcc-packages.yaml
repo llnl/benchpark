@@ -1,0 +1,6 @@
+packages:
+  cray-libsci:
+    - spec: cray-libsci@23.09.1.1%rocmcc
+      prefix: /opt/cray/pe/libsci/23.09.1.1/AMD/5.0/x86_64
+      modules: [cray-libsci/23.09.1.1]
+      buildable: false

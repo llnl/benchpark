@@ -2,7 +2,6 @@
 # Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: Apache-2.0
-
 system_definition:
   name: HPECray-zen4-MI300A-Slingshot
   integrator:
@@ -29,6 +28,12 @@ system_definition:
       runtime: rocm
       mpi: cray-mpich
   top500-system-instances:
-    - El Capitan (LLNL) <https://www.top500.org/system/180307>
-    - Tuolumne   (LLNL) <https://www.top500.org/system/180308>
-    - rzAdams    (LLNL) <https://www.top500.org/system/180284>
+    El Capitan:
+      benchpark_system: llnl-elcapitan
+      top500: <https://www.top500.org/system/180307>
+    Tuolumne:
+      benchpark_system:
+      top500: <https://www.top500.org/system/180308>
+    rzAdams:
+      benchpark_system:
+      top500: <https://www.top500.org/system/180284>

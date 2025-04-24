@@ -12,9 +12,7 @@ class Ior(ExecutableApplication):
     """Ior benchmark"""
     name = "ior"
 
-    tags = ['asc','engineering','hypre','solver','cfd','large-scale',
-            'multi-node','single-node','mpi','network-latency-bound',
-            'network-collectives','unstructured-grid']
+    tags = ['synthetic','i-o','large-scale','mpi','c']
 
     executable('p', 'ior -Cge -vv -F -i5'+
             ' -b {b}' +

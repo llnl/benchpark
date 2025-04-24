@@ -8,7 +8,8 @@ import yaml
 
 def main():
     sysconfig_yaml_files = glob.glob(
-        "../legacy/systems/**/system_definition.yaml", recursive=True
+        "../systems/all_hardware_descriptions/**/hardware_description.yaml",
+        recursive=True,
     )
 
     df_list = []
@@ -24,26 +25,27 @@ def main():
 
     df = pd.concat(df_list)
 
-    # Data formatting: converts system-tested.description yaml value to rst
-    # format for external links
-    df.loc[
-        df["system_definition.system-tested.description"].notna(),
-        "system_definition.system-tested.description",
-    ] = (
-        "`"
-        + df.loc[
-            df["system_definition.system-tested.description"].notna(),
-            "system_definition.system-tested.description",
-        ].astype(str)
-        + "`_"
-    )
+    systested_columns_to_merge = [col for col in df.columns if "systems-tested" in col]
+    top500_cols_to_merge = [
+        col for col in df.columns if "top500-system-instances" in col
+    ]
 
-    # Data formatting: converts top500-system-instances yaml list to rst string
-    # of strings (ideally to put 1 per line)
-    list_of_strings = []
-    for i in df["system_definition.top500-system-instances"]:
-        list_of_strings.append(", ".join(item for item in i if item))
-    df.loc[:, "system_definition.top500-system-instances"] = list_of_strings
+    def merge_dicts(row, merge_cols):
+        combined_dict = {}
+        for col in merge_cols:
+            if isinstance(row[col], dict):  # Check if the value is a dictionary
+                combined_dict.update(
+                    {col.split(".")[-1]: row[col]}
+                )  # Merge the dictionary
+        return combined_dict
+
+    df["systems-tested"] = df.apply(
+        lambda row: merge_dicts(row, systested_columns_to_merge), axis=1
+    )
+    df["top500-system-instances"] = df.apply(
+        lambda row: merge_dicts(row, top500_cols_to_merge), axis=1
+    )
+    df = df.drop(columns=systested_columns_to_merge + top500_cols_to_merge)
 
     # Remove system_definition from all field names
     # (e.g., system_definition.system-tested.description)

@@ -120,9 +120,10 @@ def do_list(args, extra_args):
     ]
 
     old_output = sys.stdout
+    exit_code = 0
     try:
         sys.stdout = output = io.StringIO()
-        pytest.main(["--collect-only"] + extra_args)
+        exit_code = pytest.main(["--collect-only"] + extra_args)
     finally:
         sys.stdout = old_output
 
@@ -185,6 +186,7 @@ def do_list(args, extra_args):
             for f in sorted(functions)
         ]
         colify.colify(all_functions)
+    return exit_code
 
 
 def add_back_pytest_args(args, unknown_args):
@@ -219,14 +221,13 @@ def command(args, unknown_args):
                 "--dist",
                 "loadfile",
                 "--tx",
-                f"{args.numprocesses}*popen//python=benchpark-tmpconfig benchpark-python",
+                f"{args.numprocesses}*popen//python=benchpark-tmpconfig benchpark-python -i",
             ]
         )
 
     # pytest.ini lives in the root of the spack repository.
     with llnl.util.filesystem.working_dir(pytest_root):
         if args.list:
-            do_list(args, pytest_args)
-            return
+            return do_list(args, pytest_args)
 
         return pytest.main(pytest_args)

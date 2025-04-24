@@ -9,8 +9,9 @@
    :maxdepth: 1
    :caption: Basics
 
+   for-the-impatient
    getting-started
-   basic-usage
+   benchpark-commands
    benchpark-workflow
    FAQ
 
@@ -27,10 +28,11 @@
 
    example-workflow
    llnl-tutorial
+   comparing-experiment-builds
 
 .. toctree::
    :maxdepth: 1
-   :caption: Running Benchpark
+   :caption: Using Benchpark
 
    benchpark-setup
    build-experiment
@@ -38,6 +40,19 @@
    analyze-experiment
    modifiers
    set-of-experiments
+   run-binary
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Benchpark Utils
+
+   diffBuildSpecs
+   diffExperimentBuilds
+   diffExperimentSpecs
+   diffPackageCommits
+   diffSystemSpecs
+   scripts
+   developer-scripts
 
 .. toctree::
    :maxdepth: 1
@@ -47,15 +62,10 @@
    add-a-benchmark
    add-an-experiment
    add-a-dryrun
+   update-a-system-config
 
 .. toctree::
    :maxdepth: 2
    :caption: API Docs
 
    Benchpark API Docs <source/benchpark>
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Legacy Workflow
-
-   legacy-getting-started

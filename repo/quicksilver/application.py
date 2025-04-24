@@ -17,7 +17,7 @@ class Quicksilver(ExecutableApplication):
             'high-branching',
             'irregular-memory-access',
             'mpi',
-            'c++','openmp']
+            'c++']
 
     executable('run', 'qs'+
             ' -i {i}' +

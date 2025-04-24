@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
@@ -36,6 +36,8 @@ class Lammps(
         when=("+cuda" or "+rocm"),
         description="Enable GPU-aware MPI",
     )
+
+    maintainers("simongdg", "rfhaque")
 
     def compute_applications_section(self):
         if self.spec.satisfies("+openmp"):
@@ -89,34 +91,12 @@ class Lammps(
             False,
         )
 
-    def compute_spack_section(self):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-
-        # get system config options
-        # TODO: Get compiler/mpi/package handles directly from system.py
-        system_specs = {}
-        system_specs["compiler"] = "default-compiler"
-        system_specs["mpi"] = "default-mpi"
-        system_specs["blas"] = "blas"
-
-        # set package spack specs
-        # empty package_specs value implies external package
-        self.add_spack_spec(system_specs["mpi"])
-
-        if self.spec.satisfies("+cuda"):
-            system_specs["cuda_version"] = "{default_cuda_version}"
-            system_specs["cuda_arch"] = "{cuda_arch}"
-        elif self.spec.satisfies("+rocm"):
-            system_specs["rocm_arch"] = "{rocm_arch}"
-
-        # empty package_specs value implies external package
-        self.add_spack_spec(system_specs["blas"])
-
-        self.add_spack_spec(
+        self.add_package_spec(
             self.name,
             [
-                f"lammps@{app_version} +mpi+opt+manybody+molecule+kspace+rigid+kokkos+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth+reaxff lammps_sizes=bigbig ",
-                system_specs["compiler"],
+                f"lammps@{app_version} +mpi+opt+manybody+molecule+kspace+rigid+kokkos+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth+reaxff lammps_sizes=bigbig "
             ],
         )

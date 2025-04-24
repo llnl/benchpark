@@ -2,7 +2,6 @@
 # Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: Apache-2.0
-
 system_definition:
   name: DELL-sapphirerapids-OmniPath
   integrator:
@@ -29,4 +28,6 @@ system_definition:
       runtime:
       mpi: mvapich
   top500-system-instances:
-    - Dane (LLNL) <https://www.top500.org/system/180228>
+    Dane:
+      benchpark_system: llnl-cluster
+      top500: <https://www.top500.org/system/180228>

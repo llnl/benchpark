@@ -2,7 +2,6 @@
 # Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: Apache-2.0
-
 system_definition:
   name: DELL-cascadelake-InfiniBand
   integrator:
@@ -29,4 +28,6 @@ system_definition:
       runtime: gpu
       mpi: intelmpi
   top500-system-instances:
-    - Grace (TAMU) <https://www.top500.org/system/179905>
+    Grace:
+      benchpark_system:
+      top500: <https://www.top500.org/system/179905>
