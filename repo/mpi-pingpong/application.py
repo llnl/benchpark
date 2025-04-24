@@ -13,9 +13,11 @@ class MpiPingpong(ExecutableApplication):
 
     tags = ['single-node']
 
-    executable("pingpong", "pingpong -i {iterations} -m {msg_size} -p 0,56", use_mpi=True)
+
+    executable("pingpong", "pingpong -i {iterations} -m {msg_size} -p 0,{partner_rank}", use_mpi=True)
     #executable("pingpong1", "pingpong -i {iterations} -m {msg_size} -p 0,56", use_mpi=True)
     #executable("pingpong2", "pingpong -i {iterations} -m {msg_size} -p 0,112", use_mpi=True)
 
     workload("run", executables=["pingpong"])
+    
 
