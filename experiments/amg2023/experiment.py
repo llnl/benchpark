@@ -113,7 +113,7 @@ class Amg2023(
             for k, v in scaled_variables.items():
                 self.add_experiment_variable(k, v, True)
 
-        self.add_experiment_variable("nprocs", n_resources, True)
+        self.add_experiment_variable("nprocs", n_resources)
         if self.spec.satisfies("+openmp"):
             self.add_experiment_variable("n_ranks", n_resources, True)
             self.add_experiment_variable("n_threads_per_proc", 1, True)
