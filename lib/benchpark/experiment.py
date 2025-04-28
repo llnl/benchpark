@@ -15,6 +15,92 @@ import benchpark.repo
 import benchpark.runtime
 import benchpark.variant
 
+import ast
+import astor
+import sys
+import re
+import os
+
+def get_ramble_app_class_name(name):
+    # Replace hyphens and underscores with spaces
+    name = re.sub(r'[-_]', ' ', name)
+    # Capitalize each word and join them
+    return ''.join(word.capitalize() for word in name.split())
+
+def add_validator(benchpark_root_dir, app_name):
+    app_spec_file = os.path.join(benchpark_root_dir, "repo", app_name, "application.py")
+
+    # Read the file
+    with open(app_spec_file, "r") as f:
+        source = f.read()
+    
+    # Parse the file
+    tree = ast.parse(source)
+
+    validator_class_name = "BenchparkValidator"
+
+    validator_class = None
+    for node in tree.body:
+        if isinstance(node, ast.ClassDef) and node.name == validator_class_name:
+            validator_class = node
+            break
+
+    if validator_class:
+        tree.body.remove(validator_class)
+
+    validator_class = ast.ClassDef(
+        name=validator_class_name,
+        bases=[],
+        keywords=[],
+        body=[
+            ast.Expr(
+                value=ast.Call(
+                    func=ast.Name(id="register_validator", ctx=ast.Load()),
+                    args=[],
+                    keywords=[
+                        ast.keyword(arg="name", value=ast.Constant(value="benchpark_validator")),
+                        ast.keyword(arg="predicate", value=ast.Constant(value="{validation_checks}")),
+                        ast.keyword(
+                            arg="message",
+                            value=ast.Constant(
+                                value="Benchpark validation checks failed. Please review "
+                                      "validation_checks variable in ramble.yaml for "
+                                      "the failing check"
+                            )
+                        ),
+                        ast.keyword(arg="fail_on_invalid", value=ast.Constant(value=True)),
+                    ],
+                )
+            )
+        ],
+        decorator_list=[]
+    )
+
+    # Insert the new class at the end
+    tree.body.append(validator_class)
+
+    # Add BenchparkValidator as a base class of the application class
+    app_class_name = get_ramble_app_class_name(app_name)
+    for node in tree.body:
+        if isinstance(node, ast.ClassDef) and node.name == app_class_name:
+            app_class = node
+            if not any(isinstance(base, ast.Name) and base.id == validator_class_name for base in node.bases):
+                node.bases.append(ast.Name(id=validator_class_name, ctx=ast.Load()))
+            break
+
+    vc = tree.body.index(validator_class)
+    ac = tree.body.index(app_class)
+
+    tree.body[ac], tree.body[vc] = tree.body[vc], tree.body[ac]
+
+    # Unparse back to source
+    #new_source = ast.unparse(tree)
+    new_source = astor.to_source(tree)
+
+    # Write back to file
+    with open(app_spec_file, "w") as f:
+        f.write(new_source)
+
 bootstrapper = benchpark.runtime.RuntimeResources(benchpark.paths.benchpark_home)
 bootstrapper.bootstrap()
 
@@ -133,6 +219,7 @@ class Experiment(ExperimentSystemBase, SingleNode):
         self.helpers = []
         self._spack_name = None
         self._ramble_name = None
+        self._validation_checks = []
 
         for cls in self.__class__.mro()[1:]:
             if cls is not Experiment and cls is not object:
@@ -148,6 +235,11 @@ class Experiment(ExperimentSystemBase, SingleNode):
             raise BenchparkError(f"No workload variant defined for package {self.name}")
 
         self.package_specs = {}
+
+        if self.spec.satisfies("+single_node"):
+            self._validation_checks.append("{n_nodes} == 1")
+
+        add_validator(benchpark.paths.benchpark_root, self.name)
 
     @property
     def spack_name(self):
@@ -253,6 +345,14 @@ class Experiment(ExperimentSystemBase, SingleNode):
             self.env_vars["append"][0] |= env_vars["append"][0]
 
         self.compute_applications_section()
+
+        if self._validation_checks:
+            if len(self._validation_checks) > 1:
+                self.variables["validation_checks"] = "(" + ") and (".join(self._validation_checks) + ")"
+            else:
+                self.variables["validation_checks"] = self._validation_checks[0]
+        else:
+            self.variables["validation_checks"] = "True"
 
         expr_helper_list = []
         for cls in self.helpers:

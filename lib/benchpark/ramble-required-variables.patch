@@ -1,0 +1,63 @@
+diff --git a/lib/ramble/ramble/application.py b/lib/ramble/ramble/application.py
+index 215822c9..305844d6 100644
+--- a/lib/ramble/ramble/application.py
++++ b/lib/ramble/ramble/application.py
+@@ -922,6 +922,15 @@ class ApplicationBase(metaclass=ApplicationMeta):
+                 self.expander.add_no_expand_var(var)
+                 mod_inst.expander.add_no_expand_var(var)
+ 
++    def get_required_variables(self):
++        """Get all the required variables based on the mode."""
++        required_vars = self.required_vars
++        filtered_vars = {}
++        if required_vars:
++            for var_name, var_props in required_vars.items():
++                filtered_vars[var_name] = var_props
++        return filtered_vars
++
+     def validate_experiment(self, warn_validation=True, die_on_validate_error=True):
+         # Validate the new modifiers variables exist
+         # (note: the base ramble variables are checked earlier too)
+diff --git a/lib/ramble/ramble/experiment_set.py b/lib/ramble/ramble/experiment_set.py
+index 2315cbee..4d1f4153 100644
+--- a/lib/ramble/ramble/experiment_set.py
++++ b/lib/ramble/ramble/experiment_set.py
+@@ -355,6 +355,9 @@ class ExperimentSet:
+         )
+ 
+         app_inst.add_expand_vars(self._workspace)
++
++        self.keywords.update_keys(app_inst.get_required_variables())
++
+         app_inst.read_status()
+ 
+         return app_inst
+diff --git a/lib/ramble/ramble/language/application_language.py b/lib/ramble/ramble/language/application_language.py
+index 80b363d7..ab4e45da 100644
+--- a/lib/ramble/ramble/language/application_language.py
++++ b/lib/ramble/ramble/language/application_language.py
+@@ -193,6 +193,24 @@ def input_file(
+     return _execute_input_file
+ 
+ 
++@application_directive("required_vars")
++def required_variable(var: str, results_level="variable", modes=None, description=None):
++    """Mark a variable as being required by this modifier
++
++    Args:
++        var (str): Variable name to mark as required
++        description (str | None): Description of the required variable.
++    """
++
++    def _mark_required_var(app):
++        app.required_vars[var] = {
++            "type": ramble.keywords.key_type.required,
++            "description": description,
++        }
++
++    return _mark_required_var
++
++
+ @application_directive("workload_group_vars")
+ def workload_variable(
+     name,

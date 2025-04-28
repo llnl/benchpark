@@ -5,6 +5,7 @@
 
 from contextlib import contextmanager
 import os
+import shutil
 import pathlib
 import shlex
 import subprocess
@@ -109,6 +110,16 @@ class RuntimeResources:
             self.ramble_commit,
             self.ramble_location,
         )
+        cdir = os.getcwd()
+        patch_file = "ramble-required-variables.patch"
+        patch_src = os.path.join(self.root, "lib/benchpark", patch_file)
+        patch_dest = os.path.join(self.ramble_location, patch_file)
+        try: 
+            shutil.copy(patch_src, patch_dest)
+            os.chdir(self.ramble_location)
+            subprocess.run(['git', 'apply', patch_file], check=True)
+        finally:
+            os.chdir(cdir)
         debug_print(f"Done cloning Ramble ({self.ramble_location})")
 
     def _install_spack(self):
