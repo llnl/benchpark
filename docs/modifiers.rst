@@ -18,45 +18,58 @@ Linux Thread and GPU Affinity
 -----------------------------
 We are using (with permission) the following implementation of `affinity checks <https://github.com/bcumming/affinity>`_. The following checks are possible:
 
-- `affinity.omp` : for testing thread affinity without MPI
-- `affinity.mpi` : for testing thread affinity of each rank in an MPI job
-- `affinity.rocm` : for testing AMD GPU affinity of each rank an MPI job
-- `affinity.cuda` : for testing NVIDIA GPU affinity of each rank in an MPI job
+- ``affinity.mpi`` : for testing thread affinity of each rank in an MPI job
+- ``affinity.rocm`` : for testing AMD GPU affinity of each rank an MPI job
+- ``affinity.cuda`` : for testing NVIDIA GPU affinity of each rank in an MPI job
 
 To use the Affinity modifier:
 
-- `experiment.py` has to derive from the `Affinity` class
-- When you initialize your experiment, add `affinity=X` to `experiment init`, where X can be `omp`, `mpi`, `rocm`, `cuda` 
-- A small separate run will execute in your allocation to record the information
-- The Affinity modifier will output a text file in the experiment directory which will look like this for `saxpy+openmp affinity=mpi` on 8 ranks, 2 threads/proc, 1 node:
+- ``experiment.py`` has to derive from the ``Affinity`` class, for example:
 
-```
-affinity test for 8 MPI ranks
-rank      0 @ dane1514
-  thread   0 on cores [112]
-  thread   1 on cores [119]
-rank      1 @ dane1514
-  thread   0 on cores [126]
-  thread   1 on cores [133]
-rank      2 @ dane1514
-  thread   0 on cores [140]
-  thread   1 on cores [147]
-rank      3 @ dane1514
-  thread   0 on cores [154]
-  thread   1 on cores [161]
-rank      4 @ dane1514
-  thread   0 on cores [168]
-  thread   1 on cores [175]
-rank      5 @ dane1514
-  thread   0 on cores [182]
-  thread   1 on cores [189]
-rank      6 @ dane1514
-  thread   0 on cores [196]
-  thread   1 on cores [203]
-rank      7 @ dane1514
-  thread   0 on cores [210]
-  thread   1 on cores [217]
-```
+.. code-block:: python
+
+  my-experiment/experiment.py
+
+  from benchpark.affinity import Affinity
+
+  class MyExperiment(
+    Affinity,
+    ...
+
+
+- When you initialize your experiment, add ``affinity=X`` to ``experiment init``, where X can be ``mpi``, ``rocm``, ``cuda``.
+- A small, separate run will execute in your allocation to record the information.
+- The Affinity modifier will output a text file in the experiment directory which will look like this for ``benchpark experiment init --dest=saxpy saxpy+openmp affinity=mpi`` on 8 ranks, 2 threads/proc, 1 node:
+
+.. code-block:: console
+
+  affinity.mpi.out
+
+  affinity test for 8 MPI ranks
+  rank      0 @ dane1514
+    thread   0 on cores [112]
+    thread   1 on cores [119]
+  rank      1 @ dane1514
+    thread   0 on cores [126]
+    thread   1 on cores [133]
+  rank      2 @ dane1514
+    thread   0 on cores [140]
+    thread   1 on cores [147]
+  rank      3 @ dane1514
+    thread   0 on cores [154]
+    thread   1 on cores [161]
+  rank      4 @ dane1514
+    thread   0 on cores [168]
+    thread   1 on cores [175]
+  rank      5 @ dane1514
+    thread   0 on cores [182]
+    thread   1 on cores [189]
+  rank      6 @ dane1514
+    thread   0 on cores [196]
+    thread   1 on cores [203]
+  rank      7 @ dane1514
+    thread   0 on cores [210]
+    thread   1 on cores [217]
 
 
 Profiling with Caliper Modifier
