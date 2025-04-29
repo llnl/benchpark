@@ -50,12 +50,13 @@ class Caliper(BasicModifier):
 
     env_var_modification(
         "CALI_CONFIG",
-        'spot(output={}{}),metadata(file={}),metadata(file=/etc/node_info.json,keys="host.name,host.cluster,host.os")'.format(
+        'spot(output={}{},profile.mpi,comm.stats),metadata(file={}),metadata(file=/etc/node_info.json,keys="host.name,host.cluster,host.os")'.format(
             _cali_datafile, "${CALI_CONFIG_MODE}", _caliper_metadata_file
         ),
         method="set",
         modes=[_default_mode],
     )
+
 
     add_mode(
         mode_name="mpi",
