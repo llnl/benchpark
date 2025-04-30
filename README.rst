@@ -24,6 +24,8 @@
 
 .. image:: https://www.cdash.org/wp-content/uploads/2025/04/cdash-logo.png
     :target: https://my.cdash.org/index.php?project=Benchpark
+    :width: 200px
+    :height: 100px
 
 Overview
 --------
