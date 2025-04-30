@@ -22,6 +22,9 @@
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
     :target: https://github.com/psf/black
 
+.. image:: https://www.cdash.org/wp-content/uploads/2025/04/cdash-logo.png
+    :target: https://my.cdash.org/index.php?project=Benchpark
+
 Overview
 --------
 You can find detailed documentation at `software.llnl.gov/benchpark
