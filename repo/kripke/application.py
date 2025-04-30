@@ -112,7 +112,45 @@ class Kripke(ExecutableApplication):
                       description='Parallel solver method. "sweep" for full up-wind sweep (wavefront algorithm). "bj" for Block Jacobi. (Default: --pmethod sweep)',
                       workloads=['kripke'])
 
+    register_phase(
+        "calculate_values", pipeline="setup", run_before=["validate_values"]
+    )
+
+    register_phase(
+        "validate_values", pipeline="setup", run_before=["make_experiments"]
+    )
+
     #figure_of_merit('Figure of Merit (FOM)', log_file='{experiment_run_dir}/{experiment_name}.out', fom_regex=r'Figure of Merit \(FOM\):\s+(?P<fom>[0-9]+\.[0-9]*(e^[0-9]*)?)', group_name='fom', units='')
 
     #TODO: Fix the FOM success_criteria(...)
     #success_criteria('pass', mode='string', match=r'Figure of Merit \(FOM\)', file='{experiment_run_dir}/{experiment_name}.out')
+
+    def _validate_values(self, workspace, app_inst):
+        expander = self.expander
+
+        if "n_resources" not in self.variables:
+            raise AttributeError("Missing 'n_resources' variable")
+
+        px = int(expander.expand_var_name("px"))
+        py = int(expander.expand_var_name("py"))
+        pz = int(expander.expand_var_name("pz"))
+
+        nRanks = int(expander.expand_var_name("n_resources"))
+        if nRanks != px*py*pz:
+            raise AttributeError("n_resources must be equal to px*py*pz")
+
+    def _calculate_values(self, workspace, app_inst):
+        expander = self.expander
+
+        px = int(expander.expand_var_name("px"))
+        py = int(expander.expand_var_name("py"))
+        pz = int(expander.expand_var_name("pz"))
+
+        nx = int(expander.expand_var_name("nx"))
+        ny = int(expander.expand_var_name("ny"))
+        nz = int(expander.expand_var_name("nz"))
+
+        # Input parameters (nzx, nzy, nzz) denote global problem size
+        self.define_variable("n_resources", npx*npy*npz)
+        self.define_variable("process_problem_size", (nzx*nzy*nzz)/(npx*npy*npz))
+        self.define_variable("total_problem_size", nzx*nzy*nzz)
