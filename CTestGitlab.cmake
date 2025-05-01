@@ -22,6 +22,6 @@ ctest_test(INCLUDE "Gitlab")
 
 # Submit results
 ctest_submit(
-    PARTS Update Test # Configure Build
+    PARTS Update Test # 'Configure' and 'Build' not uploaded
     HTTPHEADER "Authorization: Bearer ${_auth_token}"
 )
