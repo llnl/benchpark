@@ -19,7 +19,7 @@ class Hpcg(ExecutableApplication):
             'conjugate-gradient','solver','sparse-linear-algebra',
             'large-scale',
             'mpi','network-point-to-point',
-            'c++','openmp']
+            'c++']
 
     executable("execute", "xhpcg", use_mpi=True)
 

@@ -4,10 +4,7 @@
 # configuration settings.
 spack:
   # add package specs to the `specs` list
-  specs:
-  - py-pyyaml
-  - py-pytest
-  - py-codespell
+  specs: [py-pyyaml, py-pytest, py-codespell]
   view: true
   concretizer:
     unify: true

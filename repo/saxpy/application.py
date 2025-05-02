@@ -14,7 +14,7 @@ class Saxpy(ExecutableApplication):
 
     tags = ['synthetic','single-node','high-memory-bandwidth',
             'regular-memory-access',
-            'c++','cuda','hip','openmp']
+            'c++']
 
     executable('p', 'saxpy -n {n}', use_mpi=True)
 

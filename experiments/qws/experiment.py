@@ -50,14 +50,4 @@ class Qws(Experiment, OpenMPExperiment):
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-
-        system_specs = {}
-        system_specs["compiler"] = "default-compiler"
-        system_specs["mpi"] = "default-mpi"
-
-        # if package_spec left empty spack will use external
-        self.add_package_spec(system_specs["mpi"])
-
-        self.add_package_spec(
-            self.name, [f"qws@{app_version} +mpi", system_specs["compiler"]]
-        )
+        self.add_package_spec(self.name, [f"qws@{app_version} +mpi"])

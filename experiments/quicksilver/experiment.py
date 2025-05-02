@@ -8,6 +8,7 @@ from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.scaling import StrongScaling
 from benchpark.scaling import WeakScaling
+from benchpark.caliper import Caliper
 
 
 class Quicksilver(
@@ -15,6 +16,7 @@ class Quicksilver(
     OpenMPExperiment,
     StrongScaling,
     WeakScaling,
+    Caliper,
 ):
     variant(
         "workload",
@@ -24,7 +26,8 @@ class Quicksilver(
 
     variant(
         "version",
-        default="master",
+        default="caliper",
+        values=("master", "caliper"),
         description="app version",
     )
 
@@ -52,16 +55,4 @@ class Quicksilver(
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-
-        # TODO: express that we need certain variables from system
-        # Does not need to happen before merge, separate task
-        system_specs = {}
-        system_specs["compiler"] = "default-compiler"
-        system_specs["mpi"] = "default-mpi"
-
-        # empty package_specs value implies external package
-        self.add_package_spec(system_specs["mpi"])
-
-        self.add_package_spec(
-            self.name, [f"quicksilver@{app_version} +mpi", system_specs["compiler"]]
-        )
+        self.add_package_spec(self.name, [f"quicksilver@{app_version} +mpi"])
