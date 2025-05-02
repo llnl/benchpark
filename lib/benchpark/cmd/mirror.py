@@ -8,6 +8,7 @@
 import os
 import os.path
 import pathlib
+import re
 import shutil
 import tempfile
 
@@ -71,6 +72,13 @@ def locate_benchpark_workspace_parent_of_ramble_workspace(ramble_workspace_dir):
             "Cannot locate Benchpark workspace as a parent of Ramble workspace"
         )
     return found_parent, ramble_workspace.relative_to(found_parent)
+
+
+def find_one(basedir, basename):
+    for root, dirs, files in os.walk(basedir):
+        for x in (dirs + files):
+            if re.match(basename, x):
+                return os.path.join(root, x)
 
 
 _CACHE_MARKER = ".benchpark-mirror-dir"
@@ -156,27 +164,37 @@ export _BENCHPARK_INITIALIZED=true
 """
             )
 
-    # This next section is about "relocating" the references in
-    # Spack/Ramble that refer to Benchpark's additional app/package
-    # definitions. Those are generally abspaths and we need to
-    # rewrite both. It's easier to do this by reinstantiating the
-    # configs from scratch
+    env_dir = os.path.dirname(find_one(ramble_workspace, "spack.yaml"))
+    git_repo_dst = os.path.join(dest, "git-repos")
+    repo_copy_script = os.path.join(benchpark.paths.benchpark_root, "lib", "scripts", "env-collect-branch-tips.py")
+    out, err = run_command(f"spack -e {env_dir} python {repo_copy_script} {git_repo_dst}")
+    copied_pkgs = out.strip().split("\n")
+    git_redirects = list()
+    for pkg_name in copied_pkgs:
+        git_url = f"$this_script_dir/git-repos/{pkg_name}"
+        git_redirects.append(f"spack config --scope=site add packages:{pkg_name}:package_attributes:git:{git_url}")
+    git_redirects = "\n".join(git_redirects)
+
     delete_configs_in(os.path.join(spack_dest, "etc", "spack"))
     delete_configs_in(os.path.join(ramble_dest, "etc", "ramble"))
     first_time_dest = os.path.join(dest, "first-time.sh")
     if not os.path.exists(first_time_dest):
         with open(first_time_dest, "w", encoding="utf-8") as f:
             f.write(
-                """\
-this_script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+                f"""\
+this_script_dir=$(cd "$(dirname "${{BASH_SOURCE[0]}}")" && pwd)
 
 . $this_script_dir/setup.sh
 
 spack uninstall -ay
 spack repo add --scope=site $this_script_dir/repo
-spack config add "config:misc_cache:$this_script_dir/spack-misc-cache"
-spack bootstrap add --trust local-sources "$this_script_dir/spack-bootstrap-mirror/metadata/sources/"
+spack config --scope=site add "config:misc_cache:$this_script_dir/spack-misc-cache"
+spack bootstrap add --scope=site --trust local-sources "$this_script_dir/spack-bootstrap-mirror/metadata/sources/"
+# We store local copies of git repos for packages that install branch tips
+{git_redirects}
 
+# We deleted the repo config because it may have absolute paths;
+# it is reinstantiated here
 ramble repo add --scope=site $this_script_dir/repo
 ramble repo add -t modifiers --scope=site $this_script_dir/modifiers
 ramble config --scope=site add "config:disable_progress_bar:true"
