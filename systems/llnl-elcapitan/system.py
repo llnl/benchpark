@@ -17,7 +17,7 @@ class LlnlElcapitan(System):
     id_to_resources = {
         "tioga": {
             "rocm_arch": "gfx90a",
-            "sys_cores_per_node": 64,
+            "sys_cores_per_node": 56,
             "sys_gpus_per_node": 8,
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
