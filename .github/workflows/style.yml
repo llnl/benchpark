@@ -22,6 +22,6 @@ jobs:
       - name: Lint and Format Check
         run: |
           black --diff --check .
-          codespell --ignore-words=.codespellignore
+          codespell
           isort
           flake8
