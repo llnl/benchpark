@@ -11,7 +11,9 @@ def main():
     e = ev.active_environment()
     for _, spec in e.concretized_specs():
         df = spec.package.stage[0].default_fetcher
-        if not df.cachable and isinstance(df, GitFetchStrategy):  # codespell: disable=cachable
+        if not df.cachable and isinstance(  # codespell: disable=cachable
+            df, GitFetchStrategy
+        ):
             df.get_full_repo = True
             pkg_dst = os.path.join(destination, spec.name)
             if not os.path.exists(pkg_dst):
