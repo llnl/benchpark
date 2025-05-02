@@ -76,7 +76,7 @@ def locate_benchpark_workspace_parent_of_ramble_workspace(ramble_workspace_dir):
 
 def find_one(basedir, basename):
     for root, dirs, files in os.walk(basedir):
-        for x in (dirs + files):
+        for x in dirs + files:
             if re.match(basename, x):
                 return os.path.join(root, x)
 
@@ -166,13 +166,19 @@ export _BENCHPARK_INITIALIZED=true
 
     env_dir = os.path.dirname(find_one(ramble_workspace, "spack.yaml"))
     git_repo_dst = os.path.join(dest, "git-repos")
-    repo_copy_script = os.path.join(benchpark.paths.benchpark_root, "lib", "scripts", "env-collect-branch-tips.py")
-    out, err = run_command(f"spack -e {env_dir} python {repo_copy_script} {git_repo_dst}")
+    repo_copy_script = os.path.join(
+        benchpark.paths.benchpark_root, "lib", "scripts", "env-collect-branch-tips.py"
+    )
+    out, err = run_command(
+        f"spack -e {env_dir} python {repo_copy_script} {git_repo_dst}"
+    )
     copied_pkgs = out.strip().split("\n")
     git_redirects = list()
     for pkg_name in copied_pkgs:
         git_url = f"$this_script_dir/git-repos/{pkg_name}"
-        git_redirects.append(f"spack config --scope=site add packages:{pkg_name}:package_attributes:git:{git_url}")
+        git_redirects.append(
+            f"spack config --scope=site add packages:{pkg_name}:package_attributes:git:{git_url}"
+        )
     git_redirects = "\n".join(git_redirects)
 
     delete_configs_in(os.path.join(spack_dest, "etc", "spack"))
