@@ -19,6 +19,8 @@ def main():
                 spec.package.stage.fetch()
                 shutil.move(spec.package.stage.source_path, pkg_dst)
             print(f"{spec.name}")
+
+
 # codespell: enable
 
 
