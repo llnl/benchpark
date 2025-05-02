@@ -6,25 +6,29 @@
         SCHEDULER_PARAMETERS: -N 1 -t 20m
         BENCHMARK: [amg2023, kripke, laghos]
         VARIANT: [+rocm]
-        DASHBOARD_NAME: "Tioga HPECray-zen3-MI250X-Slingshot [benchpark system init --dest=tioga-system llnl-elcapitan cluster=tioga]"
+        DASHBOARD_NAME: Tioga HPECray-zen3-MI250X-Slingshot [benchpark system init
+          --dest=tioga-system llnl-elcapitan cluster=tioga]
       - HOST: dane
         ARCHCONFIG: llnl-cluster
         SCHEDULER_PARAMETERS: -N 1 -t 00:20:00
         BENCHMARK: [hpl, hpcg, amg2023, kripke]
         VARIANT: [+openmp]
-        DASHBOARD_NAME: "Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system llnl-cluster cluster=dane]"
+        DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
+          llnl-cluster cluster=dane]
       - HOST: ruby
         ARCHCONFIG: llnl-cluster
         SCHEDULER_PARAMETERS: -N 1 -t 00:20:00
         BENCHMARK: [hpl, hpcg, amg2023, kripke]
         VARIANT: [+openmp]
-        DASHBOARD_NAME: "Ruby Supermicro-icelake-OmniPath [benchpark system init --dest=ruby-system llnl-cluster cluster=ruby]"
+        DASHBOARD_NAME: Ruby Supermicro-icelake-OmniPath [benchpark system init --dest=ruby-system
+          llnl-cluster cluster=ruby]
       - HOST: ruby
         ARCHCONFIG: llnl-cluster
         SCHEDULER_PARAMETERS: -N 1 -t 00:20:00
         BENCHMARK: [laghos]
-        VARIANT: [""]
-        DASHBOARD_NAME: "Ruby Supermicro-icelake-OmniPath [benchpark system init --dest=ruby-system llnl-cluster cluster=ruby]"
+        VARIANT: ['']
+        DASHBOARD_NAME: Ruby Supermicro-icelake-OmniPath [benchpark system init --dest=ruby-system
+          llnl-cluster cluster=ruby]
 .push_status: &push_status
   # Max job name length 140 characters
   - |
@@ -52,7 +56,6 @@
         -DBUILD_NAME="${HOST}/${BENCHMARK}${VARIANT}" \
         -DSITE="$(hostname)" \
         -DTEST_TYPE="${TEST_TYPE}" \
-
     - *push_status
 workflow:
   auto_cancel:
