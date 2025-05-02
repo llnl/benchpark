@@ -5,23 +5,19 @@ import os
 import shutil
 
 
-# codespell: disable
 def main():
     destination = sys.argv[1]
 
     e = ev.active_environment()
     for _, spec in e.concretized_specs():
         df = spec.package.stage[0].default_fetcher
-        if not df.cachable and isinstance(df, GitFetchStrategy):
+        if not df.cachable and isinstance(df, GitFetchStrategy):  # codespell: disable=cachable
             df.get_full_repo = True
             pkg_dst = os.path.join(destination, spec.name)
             if not os.path.exists(pkg_dst):
                 spec.package.stage.fetch()
                 shutil.move(spec.package.stage.source_path, pkg_dst)
             print(f"{spec.name}")
-
-
-# codespell: enable
 
 
 if __name__ == "__main__":
