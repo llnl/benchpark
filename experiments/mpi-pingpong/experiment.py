@@ -19,7 +19,7 @@ class MpiPingpong(Experiment, Caliper, Affinity):
     maintainers("stephanielam3211")
 
     def compute_applications_section(self):
-        n_ranks = 352   #dane:896, ruby:448, tioga:512, lassen:352, tuolumne:768
+        n_ranks = 448   #dane:896, ruby:448, tioga:512, lassen:352, tuolumne:768
         expr_vars = {
             "n_ranks": [n_ranks]*5, #[113]*5,
             #"n_nodes" : 2,
