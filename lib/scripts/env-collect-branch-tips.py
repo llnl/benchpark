@@ -5,6 +5,7 @@ import os
 import shutil
 
 
+# codespell: disable
 def main():
     destination = sys.argv[1]
 
@@ -18,6 +19,7 @@ def main():
                 spec.package.stage.fetch()
                 shutil.move(spec.package.stage.source_path, pkg_dst)
             print(f"{spec.name}")
+# codespell: enable
 
 
 if __name__ == "__main__":
