@@ -52,6 +52,15 @@ class Amg2023(ExecutableApplication):
     workload_variable('nz', default='220',
                       description='nz',
                       workloads=['problem1', 'problem2'])
+    workload_variable('n_resources', default='{px}*{py}*{pz}',
+                      description='How many processes (CPU cores or GPUs) are required',
+                      workloads=['problem1', 'problem2'])  
+    workload_variable('process_problem_size', default='{nx}*{ny}*{nz}',
+                      description='Problem size per process',
+                      workloads=['problem1', 'problem2']) 
+    workload_variable('total_problem_size', default='{nx}*{ny}*{nz}*{px}*{py}*{pz}',
+                      description='Total problem size',
+                      workloads=['problem1', 'problem2']) 
 
     figure_of_merit('Figure of Merit (FOM)', log_file='{experiment_run_dir}/{experiment_name}.out', fom_regex=r'Figure of Merit \(FOM\):\s+(?P<fom>[0-9]+\.[0-9]*(e^[0-9]*)?)', group_name='fom', units='')
 
