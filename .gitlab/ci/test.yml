@@ -31,7 +31,7 @@
       #     llnl-cluster cluster=ruby]
       - HOST: lassen
         ARCHCONFIG: llnl-sierra
-        SCHEDULER_PARAMETERS: -N 1 -t 20m
+        SCHEDULER_PARAMETERS: 1 -W 20 -q pci
         BENCHMARK: [amg2023, kripke, laghos]
         VARIANT: [+cuda]
         DASHBOARD_NAME: Lassen [benchpark system init
