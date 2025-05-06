@@ -6,9 +6,10 @@
 import sys
 
 from ramble.appkit import *
+from ramble.base_app.benchpark.benchpark import Benchpark as BenchparkApplication
 
 
-class Amg2023(ExecutableApplication):
+class Amg2023(BenchparkApplication):
     """AMG2023 benchmark"""
     name = "amg2023"
 
