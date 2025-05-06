@@ -33,7 +33,8 @@
         ARCHCONFIG: llnl-sierra
         SCHEDULER_PARAMETERS: -nnodes 1 -W 20 -q pci  # ref: https://github.com/LLNL/radiuss-shared-ci/blob/main/customization/custom-jobs-and-variables.yml
         BENCHMARK: [
-          amg2023,
+          saxpy,
+          #amg2023,
           #kripke,
           #laghos,
         ]
