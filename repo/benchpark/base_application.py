@@ -5,22 +5,25 @@
 import sys
 from ramble.appkit import *
 
-class benchpark(ExecutableApplication):
+class Benchpark(ExecutableApplication):
   """Define a base benchpark application."""
 
   name = "benchpark"
 
-  workload_group("standard", workloads=[])
-  
-  workload_variable('n_resources', default="1",
-                    description='How many processes (CPU cores or GPUs) are required',
-                    workload_group="standard",
-                   )
-  workload_variable('process_problem_size', default="1",
-                    description='Problem size per process',
-                    workload_group="standard",
-                   )
-  workload_variable('total_problem_size', default="1",
-                    description='Total problem size',
-                    workload_group="standard",
-                   )
+  register_validator(
+    "n_resources_defined",
+    predicate="'{n_resources}' != '\{n_resources\}'",
+    message="Benchpark requires a definition for 'n_resources', which is how many processes (CPU cores or GPUs) are required",
+  )
+
+  register_validator(
+	  "process_problem_size_defined",
+	  predicate="'{process_problem_size}' != '\{process_problem_size\}'",
+	  message="Benchpark requires a definition for 'process_problem_size'",
+  )
+
+  register_validator(
+	  "total_problem_size_defined",
+	  predicate="'{total_problem_size}' != '\{total_problem_size\}'",
+	  message="Benchpark requires a definition for 'total_problem_size'",
+  )
