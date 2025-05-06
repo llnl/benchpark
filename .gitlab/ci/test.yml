@@ -61,6 +61,8 @@
         export pipeline_status="$CI_JOB_STATUS"
         export EXIT_CODE=true
       fi
+    - module load cmake/3.23.1  # CTest requirement
+    - |
       ctest -S CTestGitlab.cmake \
         -DHOST="${HOST}" \
         -DDASHBOARD_NAME="${DASHBOARD_NAME}" \
@@ -97,8 +99,8 @@ test_run:
       if [ "$HOST" == "tioga" ]; then
           EXTRA_ARGS="~gtl"
       fi
+    - |
       if [ "$HOST" == "lassen" ]; then
-          module load cmake/3.23.1  # CTest requirement
           ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} $EXTRA_ARGS  # llnl-sierra no cluster
       else
           ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} cluster=$HOST $EXTRA_ARGS
