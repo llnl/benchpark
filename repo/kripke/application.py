@@ -4,10 +4,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from ramble.appkit import *
+from ramble.base_app.benchpark.benchpark import Benchpark as BenchparkApplication
 
 import sys
 
-class Kripke(ExecutableApplication):
+class Kripke(BenchparkApplication):
     """Kripke benchmark uses RAJA Portability Layer"""
     name = "Kripke"
 
