@@ -1,42 +1,41 @@
 .test_clusters: &test_clusters
   parallel:
     matrix:
-      # - HOST: tioga
-      #   ARCHCONFIG: llnl-elcapitan
-      #   SCHEDULER_PARAMETERS: -N 1 -t 20m
-      #   BENCHMARK: [amg2023, kripke, laghos]
-      #   VARIANT: [+rocm]
-      #   DASHBOARD_NAME: Tioga HPECray-zen3-MI250X-Slingshot [benchpark system init
-      #     --dest=tioga-system llnl-elcapitan cluster=tioga]
-      # - HOST: dane
-      #   ARCHCONFIG: llnl-cluster
-      #   SCHEDULER_PARAMETERS: -N 1 -t 00:20:00
-      #   BENCHMARK: [hpl, hpcg, amg2023, kripke]
-      #   VARIANT: [+openmp]
-      #   DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
-      #     llnl-cluster cluster=dane]
-      # - HOST: ruby
-      #   ARCHCONFIG: llnl-cluster
-      #   SCHEDULER_PARAMETERS: -N 1 -t 00:20:00
-      #   BENCHMARK: [hpl, hpcg, amg2023, kripke]
-      #   VARIANT: [+openmp]
-      #   DASHBOARD_NAME: Ruby Supermicro-icelake-OmniPath [benchpark system init --dest=ruby-system
-      #     llnl-cluster cluster=ruby]
-      # - HOST: ruby
-      #   ARCHCONFIG: llnl-cluster
-      #   SCHEDULER_PARAMETERS: -N 1 -t 00:20:00
-      #   BENCHMARK: [laghos]
-      #   VARIANT: ['']
-      #   DASHBOARD_NAME: Ruby Supermicro-icelake-OmniPath [benchpark system init --dest=ruby-system
-      #     llnl-cluster cluster=ruby]
+      - HOST: tioga
+        ARCHCONFIG: llnl-elcapitan
+        SCHEDULER_PARAMETERS: -N 1 -t 20m
+        BENCHMARK: [amg2023, kripke, laghos]
+        VARIANT: [+rocm]
+        DASHBOARD_NAME: Tioga HPECray-zen3-MI250X-Slingshot [benchpark system init
+          --dest=tioga-system llnl-elcapitan cluster=tioga]
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: -N 1 -t 00:20:00
+        BENCHMARK: [hpl, hpcg, amg2023, kripke]
+        VARIANT: [+openmp]
+        DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
+          llnl-cluster cluster=dane]
+      - HOST: ruby
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: -N 1 -t 00:20:00
+        BENCHMARK: [hpl, hpcg, amg2023, kripke]
+        VARIANT: [+openmp]
+        DASHBOARD_NAME: Ruby Supermicro-icelake-OmniPath [benchpark system init --dest=ruby-system
+          llnl-cluster cluster=ruby]
+      - HOST: ruby
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: -N 1 -t 00:20:00
+        BENCHMARK: [laghos]
+        VARIANT: ['']
+        DASHBOARD_NAME: Ruby Supermicro-icelake-OmniPath [benchpark system init --dest=ruby-system
+          llnl-cluster cluster=ruby]
       - HOST: lassen
         ARCHCONFIG: llnl-sierra
         SCHEDULER_PARAMETERS: -nnodes 1 -W 20 -q pci  # ref: https://github.com/LLNL/radiuss-shared-ci/blob/main/customization/custom-jobs-and-variables.yml
         BENCHMARK: [
-          saxpy,
-          #amg2023,
-          #kripke,
-          #laghos,
+          amg2023,
+          kripke,
+          laghos,
         ]
         VARIANT: [+cuda]
         DASHBOARD_NAME: Lassen IBM-power9-V100-Infiniband [benchpark system init
@@ -98,7 +97,12 @@ test_run:
       if [ "$HOST" == "tioga" ]; then
           EXTRA_ARGS="~gtl"
       fi
-      ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} $EXTRA_ARGS
+      if [ "$HOST" == "lassen" ]; then
+          module load cmake/3.23.1  # CTest requirement
+          ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} $EXTRA_ARGS  # llnl-sierra no cluster
+      else
+          ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} cluster=$HOST $EXTRA_ARGS
+      fi
     # Initialize Experiment
     - ./bin/benchpark experiment init --dest=${BENCHMARK}-benchmark ${BENCHMARK}${VARIANT}
     # Build Workspace
