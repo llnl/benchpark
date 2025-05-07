@@ -6,10 +6,9 @@
 import sys
 
 from ramble.appkit import *
-from ramble.base_app.benchpark.benchpark import Benchpark as BenchparkApplication
 
 
-class Laghos(BenchparkApplication):
+class Laghos(ExecutableApplication):
     """Laghos benchmark"""
     name = "laghos"
 
@@ -33,7 +32,6 @@ class Laghos(BenchparkApplication):
     workload_variable('problem', default='3',
                       description='problem number',
                       workloads=['triplept'])
-        
     workload_variable('rs', default='2',
                       description='number of serial refinements',
                       workloads=['triplept'])
@@ -43,20 +41,9 @@ class Laghos(BenchparkApplication):
     workload_variable('ms', default='250',
                       description='max number of steps',
                       workloads=['triplept'])
-    
     workload_variable('device', default='cpu',
                       description='cpu or cuda',
                       workloads=['triplept'])
-    workload_variable('n_resources', default='1',
-                      description='How many processes (CPU cores or GPUs) are required. Should it be a range?',
-                      workloads=['triplept'])
-    
-    workload_variable('process_problem_size', default='{mesh_size}*{{rs}+1}*{{rp}+1}/{n_resources}',
-                      description='Problem size per process',
-                      workloads=['triplept']) 
-    workload_variable('total_problem_size', default='{mesh_size}*{rs+1}*{rp+1}',
-                      description='Total problem size',
-                      workloads=['triplept']) 
 
     figure_of_merit('Major kernels total time',
                     log_file='{experiment_run_dir}/{experiment_name}.out',
