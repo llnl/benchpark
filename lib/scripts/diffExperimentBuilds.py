@@ -33,7 +33,7 @@ def main():
         "--programming-model",
         type=str,
         required=True,
-        help="Programming model to run experiments. choose from: ('openmp', 'cuda', 'rocm')",
+        help="Programming model to run experiments. choose from: ('mpi', 'openmp', 'cuda', 'rocm')",
     )
     parser.add_argument(
         "--commit-hash1",
@@ -67,6 +67,12 @@ def main():
         default=[],
         help="Subselect benchmarks to run (e.g. amg2023)",
     )
+    parser.add_argument(
+        "--exclude-benchmarks",
+        nargs="*",
+        default=[],
+        help="Exclude certain experiments",
+    )
     parser.add_argument("--run-experiment", action="store_true")
     parser.add_argument(
         "--rebuild",
@@ -87,11 +93,17 @@ def main():
         )
         experiments = experiments_out.stdout.replace(" ", "")
         lines = experiments.split("\n")
-        experiments = [line for line in lines if args.programming_model in line]
+        if args.programming_model == "mpi":
+            experiments = set(line.split("+")[0] for line in lines)
+        else:
+            experiments = [line for line in lines if args.programming_model in line]
     else:
         experiments = []
         for e in args.benchmarks:
-            experiments.append(e + "+" + args.programming_model)
+            if args.programming_model == "mpi":
+                experiments.append(e)
+            else: 
+                experiments.append(e + "+" + args.programming_model)
 
     print(f"Running these experiments: {experiments}")
 
@@ -105,21 +117,33 @@ def main():
     ):
         pass
     else:
-        for name, tag in {
+        for i, (name, tag) in enumerate({
             old_name: args.commit_hash1,
             new_name: args.commit_hash2,
-        }.items():
+        }.items()):
+            if i == 0:
+                print(f"Skipping {name} - {tag}")
+                continue
             if name in os.listdir(os.getcwd()):
                 print(f"Removing {name}...")
                 shutil.rmtree(name)
             subprocess.run(
                 ["git", "clone", "https://github.com/LLNL/benchpark.git", name]
             )
+            # if i == 1:
+            #     subprocess.run(
+            #         ["git", "fetch", "origin", "pull/697/head:features/build-instructions"], cwd=name
+            #     )
             subprocess.run(["git", "checkout", tag], cwd=name)
 
             for exper in experiments:
-                exper, spec = exper.split("+")
-                spec = "+" + spec
+                if any([e in exper for e in args.exclude_benchmarks]):
+                    print(f"Skipping {exper}")
+                    continue
+                spec = ""
+                if args.programming_model != "mpi":
+                    exper, spec = exper.split("+")
+                    spec = "+" + spec
                 var = "cluster"
                 if os.path.isdir(f"{name}/{cluster}"):
                     shutil.rmtree(f"{name}/{cluster}")
@@ -162,6 +186,8 @@ def main():
                 ramble_command = f"{name}/wkp/ramble/bin/ramble --workspace-dir {name}/wkp/{name}/{exper}/{name}/{cluster}/workspace workspace setup"
                 # Combine sourcing the script and running the command
                 run_str = f"bash -c 'source {spack_setup_script} && {ramble_command}"
+                if i == 1:
+                    run_str += f" && python {name}/lib/main.py show-build dump {name}/wkp/{name}/{exper}/{name}/{cluster}/workspace {name}/wkp/{name}/{exper}/{name}/{cluster}/workspace/"
                 if args.run_experiment:
                     run_str += f" && {name}/wkp/ramble/bin/ramble --workspace-dir {name}/wkp/{name}/{exper}/{name}/{cluster}/workspace on"
                 run_str += "'"
@@ -203,7 +229,7 @@ def main():
         # Path to the Spack setup script
         spack_setup_script = f"{old_name}/wkp/setup.sh"
         # Define the ramble command
-        cmd = f"{old_name}/wkp/spack/bin/spack-python diffSpecs.py -t -d {old_file} {new_file}"
+        cmd = f"{old_name}/wkp/spack/bin/spack-python diffBuildSpecs.py -t -d {old_file} {new_file}"
         # Combine sourcing the script and running the command
         try:
             diff = subprocess.run(
