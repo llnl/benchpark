@@ -51,7 +51,7 @@ class Laghos(BenchparkApplication):
                       description='How many processes (CPU cores or GPUs) are required. Should it be a range?',
                       workloads=['triplept'])
     
-    workload_variable('process_problem_size', default='{mesh_size}*{rs+1}*{rp+1}/{n_resources}',
+    workload_variable('process_problem_size', default='{mesh_size}*{{rs}+1}*{{rp}+1}/{n_resources}',
                       description='Problem size per process',
                       workloads=['triplept']) 
     workload_variable('total_problem_size', default='{mesh_size}*{rs+1}*{rp+1}',
