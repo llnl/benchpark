@@ -6,9 +6,10 @@
 import sys
 
 from ramble.appkit import *
+from ramble.base_app.benchpark.benchpark import Benchpark as BenchparkApplication
 
 
-class Laghos(ExecutableApplication):
+class Laghos(BenchparkApplication):
     """Laghos benchmark"""
     name = "laghos"
 
@@ -24,27 +25,38 @@ class Laghos(ExecutableApplication):
     workload('triplept', executables=['prob'])
 
     workload_variable('mesh', default='{laghos}/data/box01_hex.mesh',
-            description='mesh file',
-            workloads=['triplept'])
-
+                      description='mesh file',
+                      workloads=['triplept'])
+    workload_variable('mesh_size', default='96',
+                      description='number of zones in the mesh described by the mesh file',
+                      workloads=['triplept'])
     workload_variable('problem', default='3',
-            description='problem number',
-            workloads=['triplept'])
+                      description='problem number',
+                      workloads=['triplept'])
         
     workload_variable('rs', default='2',
-            description='number of serial refinements',
-            workloads=['triplept'])
-    
+                      description='number of serial refinements',
+                      workloads=['triplept'])
     workload_variable('rp', default='0',
-            description='number of parallel refinements',
-            workloads=['triplept'])
-    
+                      description='number of parallel refinements',
+                      workloads=['triplept'])
     workload_variable('ms', default='250',
-            description='max number of steps',
-            workloads=['triplept'])
+                      description='max number of steps',
+                      workloads=['triplept'])
+    
     workload_variable('device', default='cpu',
-        description='cpu or cuda',
-        workloads=['triplept'])
+                      description='cpu or cuda',
+                      workloads=['triplept'])
+    workload_variable('n_resources', default='1',
+                      description='How many processes (CPU cores or GPUs) are required. Should it be a range?',
+                      workloads=['triplept'])
+    
+    workload_variable('process_problem_size', default='{mesh_size}*{rs+1}*{rp+1}/{n_resources}',
+                      description='Problem size per process',
+                      workloads=['triplept']) 
+    workload_variable('total_problem_size', default='{mesh_size}*{rs+1}*{rp+1}',
+                      description='Total problem size',
+                      workloads=['triplept']) 
 
     figure_of_merit('Major kernels total time',
                     log_file='{experiment_run_dir}/{experiment_name}.out',
