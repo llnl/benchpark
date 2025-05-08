@@ -207,7 +207,7 @@ system.py, and make a system called Modifiedx86.
 
         return selections
 
-External packages can be found via `benchpark system external --new_system {mysite}-{mysystem}`.
+External packages can be found via `benchpark system external ---new-system {mysite}-{mysystem}`.
 Note, if your externals are *not* installed via Spack, read `Spack documentation on modules <https://spack.readthedocs.io/en/latest/packages_yaml.html#external-packages>`_.
 
 4. Next, add any of the packages that can be managed by spack, such as blas/cublas pointing to the correct version,
