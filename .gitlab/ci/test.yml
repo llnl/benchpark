@@ -32,7 +32,7 @@
       - HOST: lassen
         ARCHCONFIG: llnl-sierra
         SCHEDULER_PARAMETERS: -nnodes 1 -W 20 -q pci  # ref: https://github.com/LLNL/radiuss-shared-ci/blob/main/customization/custom-jobs-and-variables.yml
-        BENCHMARK: [amg2023, kripke, laghos]
+        BENCHMARK: [kripke]
         VARIANT: [+cuda]
         DASHBOARD_NAME: Lassen IBM-power9-V100-Infiniband [benchpark system init --dest=lassen-system
           llnl-sierra]
