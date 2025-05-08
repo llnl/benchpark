@@ -28,7 +28,6 @@ class LbnlPerlmutter(System):
     variant(
         "compiler",
         default="gcc",
-        values=("gcc"),
         description="Which compiler to use",
     )
 
@@ -68,6 +67,18 @@ class LbnlPerlmutter(System):
                         {"spec": "curl@8.0.1+gssapi+ldap+nghttp2", "prefix": "/usr"}
                     ]
                 },
+                "cusolver": {
+                    "externals": [{"spec": "cusolver@12.4", "prefix": "/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/cuda/12.4"}],
+                    "buildable": False,
+                },
+                "cublas": {
+                    "externals": [{"spec": "cublas@12.4", "prefix": "/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/cuda/12.4"}],
+                    "buildable": False,
+                },
+                "automake": {
+                    "externals": [{"spec": "automake@1.15.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
                 "gmake": {"externals": [{"spec": "gmake@4.2.1", "prefix": "/usr"}]},
                 "subversion": {
                     "externals": [{"spec": "subversion@1.14.1", "prefix": "/usr"}],
@@ -80,7 +91,7 @@ class LbnlPerlmutter(System):
                 "gawk": {"externals": [{"spec": "gawk@4.2.1", "prefix": "/usr"}]},
                 "binutils": {
                     "externals": [
-                        {"spec": "binutils@2.40~gold~headers", "prefix": "/opt/cray/pe/cce/18.0.0/binutils/x86_64/x86_64-pc-linux-gnu"}
+                        {"spec": "binutils@2.40~gold~headers", "prefix": "/opt/cray/pe/cce/18.0.0/binutils/x86_64/x86_64-pc-linux-gnu"},
                         {"spec": "binutils@2.43.1~gold~headers", "prefix": "/usr"}
                     ],
                     "buildable": False,
@@ -91,10 +102,6 @@ class LbnlPerlmutter(System):
                 },
                 "ccache": {
                     "externals": [{"spec": "ccache@3.4.7", "prefix": "/usr"}]},
-                    "buildable": False,
-                },
-                "automake": {
-                    "externals": [{"spec": "automake@1.15.1", "prefix": "/usr"}],
                     "buildable": False,
                 },
                 "git": {
@@ -160,31 +167,21 @@ class LbnlPerlmutter(System):
                 },
             }
 
-        selections["packages"] |= self.mpi_config()["packages"]
+        #selections["packages"] |= self.mpi_config()
 
-        if self.spec.satisfies("compiler=gcc"):
-            selections["packages"] |= {
-                "cray-libsci": {
-                    "externals": [
-                        {
-                            "spec": "cray-libsci@23.05.1.4%gcc",
-                            "prefix": "/opt/cray/pe/libsci/23.05.1.4/gnu/10.3/x86_64/",
-                        }
-                    ]
-                }
-            }
-
-        selections["packages"] |= self.compiler_weighting_cfg()["packages"]
+#        if self.spec.satisfies("compiler=gcc"):
+#            selections["packages"] |= {
+#                "cray-libsci": {
+#                    "externals": [
+#                        {
+#                            "spec": "cray-libsci@23.05.1.4%gcc",
+#                            "prefix": "/opt/cray/pe/libsci/23.05.1.4/gnu/10.3/x86_64/",
+#                        }
+#                    ]
+#                }
+#            }
 
         return selections
-
-    def compiler_weighting_cfg(self):
-        compiler = self.spec.variants["compiler"][0]
-
-        if compiler == "gcc":
-            return {"packages": {}}
-        else:
-            raise ValueError(f"Unexpected value for compiler: {compiler}")
 
     def compute_compilers_section(self):
         selections = {
@@ -212,23 +209,19 @@ class LbnlPerlmutter(System):
         return selections
 
     def mpi_config(self):
-        gtl = self.spec.variants["gtl"][0]
-
         if self.spec.satisfies("compiler=gcc"):
             return {
-                "packages": {
-                    "cray-mpich": {
-                        "externals": [
-                            {
-                                "spec": f"cray-mpich@{self.mpi_version}%gcc@{self.gcc_version} ~gtl +wrappers",
-                                "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/10.3",
-                                "extra_attributes": {
-                                    "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
-                                    "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/10.3/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
-                                },
-                            }
-                        ]
-                    }
+                "cray-mpich": {
+                    "externals": [
+                        {
+                            "spec": f"cray-mpich@{self.mpi_version}%gcc@{self.gcc_version} ~gtl +wrappers",
+                            "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/10.3",
+                            "extra_attributes": {
+                                "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
+                                "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/10.3/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
+                            },
+                        }
+                    ]
                 }
             }
 
@@ -251,8 +244,6 @@ class LbnlPerlmutter(System):
                     "compiler-amdclang": {"pkg_spec": "clang"},
                     "compiler-gcc": {"pkg_spec": "gcc"},
                     "mpi-gcc": {"pkg_spec": "cray-mpich~gtl"},
-                    "blas": {"pkg_spec": f"{self.spec.variants['blas'][0]}"},
-                    "lapack": {"pkg_spec": f"{self.spec.variants['lapack'][0]}"},
                     "lapack-oneapi": {"pkg_spec": "intel-oneapi-mkl"},
                 }
             }
