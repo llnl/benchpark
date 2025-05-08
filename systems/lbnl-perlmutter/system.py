@@ -28,6 +28,7 @@ class LbnlPerlmutter(System):
     variant(
         "compiler",
         default="gcc",
+        values=("gcc",),
         description="Which compiler to use",
     )
 
@@ -68,11 +69,11 @@ class LbnlPerlmutter(System):
                     ]
                 },
                 "cusolver": {
-                    "externals": [{"spec": "cusolver@12.4", "prefix": "/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/cuda/12.4"}],
+                    "externals": [{"spec": "cusolver@12.4", "prefix": "/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/math_libs/12.4"}],
                     "buildable": False,
                 },
                 "cublas": {
-                    "externals": [{"spec": "cublas@12.4", "prefix": "/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/cuda/12.4"}],
+                    "externals": [{"spec": "cublas@12.4", "prefix": "/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/math_libs/12.4"}],
                     "buildable": False,
                 },
                 "automake": {
