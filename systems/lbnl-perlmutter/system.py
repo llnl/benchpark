@@ -27,8 +27,8 @@ class LbnlPerlmutter(System):
 
     variant(
         "compiler",
-        default="cce",
-        values=("cce", "gcc"),
+        default="gcc",
+        values=("gcc"),
         description="Which compiler to use",
     )
 
@@ -162,18 +162,7 @@ class LbnlPerlmutter(System):
 
         selections["packages"] |= self.mpi_config()["packages"]
 
-        if self.spec.satisfies("compiler=cce"):
-            selections["packages"] |= {
-                "cray-libsci": {
-                    "externals": [
-                        {
-                            "spec": "cray-libsci@23.05.1.4%cce",
-                            "prefix": "/opt/cray/pe/libsci/23.05.1.4/cray/12.0/x86_64/",
-                        }
-                    ]
-                }
-            }
-        elif self.spec.satisfies("compiler=gcc"):
+        if self.spec.satisfies("compiler=gcc"):
             selections["packages"] |= {
                 "cray-libsci": {
                     "externals": [
@@ -192,9 +181,7 @@ class LbnlPerlmutter(System):
     def compiler_weighting_cfg(self):
         compiler = self.spec.variants["compiler"][0]
 
-        if compiler == "cce":
-            return {"packages": {"all": {"require": [{"one_of": ["%cce", "%gcc"]}]}}}
-        elif compiler == "gcc":
+        if compiler == "gcc":
             return {"packages": {}}
         else:
             raise ValueError(f"Unexpected value for compiler: {compiler}")
@@ -227,43 +214,7 @@ class LbnlPerlmutter(System):
     def mpi_config(self):
         gtl = self.spec.variants["gtl"][0]
 
-        if self.spec.satisfies("compiler=cce"):
-            dont_use_gtl = {
-                "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
-                "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
-            }
-
-            use_gtl = {
-                "gtl_flags": "$MV2_COMM_WORLD_LOCAL_RANK",
-                "gtl_cutoff_size": 4096,
-                "fi_cxi_ats": 0,
-                "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
-                "gtl_libs": ["libmpi_gtl_hsa"],
-                "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -lmpi_gtl_hsa",
-            }
-
-            if gtl:
-                gtl_spec = "+gtl"
-                gtl_cfg = use_gtl
-            else:
-                gtl_spec = "~gtl"
-                gtl_cfg = dont_use_gtl
-
-            return {
-                "packages": {
-                    "cray-mpich": {
-                        "externals": [
-                            {
-                                "spec": f"cray-mpich@{self.mpi_version}%cce@{self.cce_version} {gtl_spec} +wrappers",
-                                "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}",
-                                "extra_attributes": gtl_cfg,  # Assuming `gtl_cfg` is already defined elsewhere
-                            }
-                        ]
-                    }
-                }
-            }
-
-        elif self.spec.satisfies("compiler=gcc"):
+        if self.spec.satisfies("compiler=gcc"):
             return {
                 "packages": {
                     "cray-mpich": {
