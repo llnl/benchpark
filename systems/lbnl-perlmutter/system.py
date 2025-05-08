@@ -101,7 +101,7 @@ class LbnlPerlmutter(System):
                     "buildable": False,
                 },
                 "ccache": {
-                    "externals": [{"spec": "ccache@3.4.7", "prefix": "/usr"}]},
+                    "externals": [{"spec": "ccache@3.4.7", "prefix": "/usr"}],
                     "buildable": False,
                 },
                 "git": {
@@ -166,6 +166,7 @@ class LbnlPerlmutter(System):
                     "buildable": False,
                 },
             }
+        }
 
         #selections["packages"] |= self.mpi_config()
 
