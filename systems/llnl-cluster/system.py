@@ -77,20 +77,6 @@ class LlnlCluster(System):
                     "externals": [{"spec": "unwind@8.0.1", "prefix": "/usr"}],
                     "buildable": False,
                 },
-                "tar": {
-                    "buildable": False,
-                    "externals": [{"spec": "tar@1.30", "prefix": "/usr"}],
-                },
-                "cmake": {
-                    "buildable": False,
-                    "externals": [
-                        {
-                            "spec": "cmake@3.26.3",
-                            "prefix": "/usr/tce/packages/cmake/cmake-3.26.3",
-                        }
-                    ],
-                },
-                "gmake": {"externals": [{"spec": "gmake@4.2.1", "prefix": "/usr"}]},
                 "blas": {
                     "buildable": False,
                     "externals": [
@@ -109,19 +95,6 @@ class LlnlCluster(System):
                         }
                     ],
                 },
-                "python": {
-                    "buildable": False,
-                    "externals": [
-                        {
-                            "spec": "python@3.9.12",
-                            "prefix": "/usr/tce/packages/python/python-3.9.12/",
-                        }
-                    ],
-                },
-                "hwloc": {
-                    "buildable": False,
-                    "externals": [{"spec": "hwloc@2.9.1", "prefix": "/usr"}],
-                },
                 "fftw": {
                     "buildable": False,
                     "externals": [
@@ -130,6 +103,68 @@ class LlnlCluster(System):
                             "prefix": "/usr/tce/packages/fftw/fftw-3.3.10",
                         }
                     ],
+                },
+                "diffutils": {
+                    "externals": [
+                        {"spec": "diffutils@3.6", "prefix": "/usr"}
+                    ],
+                    "buildable": False
+                },
+                "cmake": {
+                    "externals": [
+                        {"spec": "cmake@3.26.5", "prefix": "/usr"},
+                        {"spec": "cmake@3.23.1", "prefix": "/usr/tce"}
+                    ],
+                    "buildable": False
+                },
+                "tar": {
+                    "externals": [
+                        {"spec": "tar@1.30", "prefix": "/usr"}
+                    ],
+                    "buildable": False
+                },
+                "autoconf": {
+                    "externals": [
+                        {"spec": "autoconf@2.69", "prefix": "/usr"}
+                    ],
+                    "buildable": False
+                },
+                "python": {
+                    "externals": [
+                        {
+                            "spec": "python@2.7.18+bz2+crypt+ctypes+dbm~lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl~tkinter+uuid+zlib",
+                            "prefix": "/usr"
+                        },
+                        {
+                            "spec": "python@3.6.8+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
+                            "prefix": "/usr"
+                        },
+                        {
+                            "spec": "python@2.7.18+bz2+crypt+ctypes+dbm~lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
+                            "prefix": "/usr/tce"
+                        },
+                        {
+                            "spec": "python@3.9.12+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
+                            "prefix": "/usr/tce"
+                        },
+                        {
+                            "spec": "python@3.12.8+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat+pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
+                            "prefix": "/usr/workspace/wsa/mckinsey/venv/benchpark-3.12.8"
+                        }
+                    ],
+                    "buildable": False
+                },
+                "hwloc": {
+                    "externals": [
+                        {"spec": "hwloc@2.11.2", "prefix": "/usr"}
+                    ],
+                    "buildable": False
+                },
+                "gmake": {
+                    "externals": [
+                        {"spec": "gmake@4.2.1", "prefix": "/usr"}
+                    ],
+                    "buildable": False
                 },
             }
         }
