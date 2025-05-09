@@ -16,3 +16,11 @@ class Lammps(LammpsBase):
             'large-scale','multi-node','single-node','sub-node',
             'mpi','network-collectives','network-point-to-point',
             'c++','python','kokkos','vectorization']
+
+    workload_variable(
+        "input_stage",
+        default="patch_21Nov2023",
+        description="Stage name of LAMMPS input archive",
+        workloads=["hns-reaxff"],
+    )
+
