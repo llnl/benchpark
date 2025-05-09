@@ -18,10 +18,12 @@ class CudaSystem:
         description="CUDA version",
     )
 
-    # Specify default cuda_arch and default_cuda_version
-    # How to make sure the derived classes overwrite this?
-    def system_specific_variables(self):
-        return {
-            "cuda_arch": 70,
-            "default_cuda_version": self.spec.variants["cuda"][0].replace("-", "."),
-        }
+    def cuda_arch(self):
+        return NotImplementedError(
+            "Each system must implement cuda_arch"
+        )
+
+    def default_cuda_version(self):
+        return NotImplementedError(
+            "Each system must implement cuda_version"
+        )

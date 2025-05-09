@@ -107,6 +107,12 @@ class LlnlElcapitan(System, ROCmSystem):
         for k, v in attrs.items():
             setattr(self, k, v)
 
+    def rocm_arch(self):
+        return {"rocm_arch": self.rocm_arch}
+
+    def default_rocm_version(self):
+        return {"default_rocm_version": self.default_rocm_version}
+
     def system_specific_variables(self):
         return {"rocm_arch": self.rocm_arch}
 

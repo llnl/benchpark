@@ -9,7 +9,7 @@ from benchpark.experiment import ExperimentHelper
 
 
 class ROCmExperiment:
-    requires("cuda")
+    requires("rocm")
     variant("rocm", default=False, description="Build and run with ROCm")
 
     class Helper(ExperimentHelper):

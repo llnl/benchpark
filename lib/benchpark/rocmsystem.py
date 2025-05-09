@@ -18,10 +18,13 @@ class ROCmSystem:
         description="ROCm version",
     )
 
-    # Specify default rocm_arch and default_rocm_version
-    # How to make sure the derived classes overwrite this?
-    def system_specific_variables(self):
-        return {
-            "rocm_arch": "gfx90a",
-            "default_rocm_version": self.spec.variants["rocm"][0].replace("-", "."),
-        }
+    def set_rocm_arch(self):
+        return NotImplementedError(
+            "Each system must implement set_rocm_arch"
+        )
+
+    def set_default_rocm_version(self):
+        return NotImplementedError(
+            "Each system must implement set_rocm_version"
+        )
+    
