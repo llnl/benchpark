@@ -19,6 +19,6 @@ include:
     file:
       - utilities/preliminary-ignore-draft-pr.yml
       - utilities/skip-branch-not-a-pr.yml
-  - local: /.gitlab/ci/test.yml
-  - local: /.gitlab/ci/nightly.yml
+  - local: .gitlab/tests/test.yml
+  - local: .gitlab/tests/nightly.yml
 stages: [test]
