@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import provides, variant
+from benchpark.directives import provides
 
 
 class ROCmSystem:
