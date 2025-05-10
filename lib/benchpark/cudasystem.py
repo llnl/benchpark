@@ -19,11 +19,7 @@ class CudaSystem:
     )
 
     def cuda_arch(self):
-        return NotImplementedError(
-            "Each system must implement cuda_arch"
-        )
+        return NotImplementedError("Each system must implement cuda_arch")
 
     def default_cuda_version(self):
-        return NotImplementedError(
-            "Each system must implement cuda_version"
-        )
+        return NotImplementedError("Each system must implement cuda_version")
