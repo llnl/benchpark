@@ -105,66 +105,56 @@ class LlnlCluster(System):
                     ],
                 },
                 "diffutils": {
-                    "externals": [
-                        {"spec": "diffutils@3.6", "prefix": "/usr"}
-                    ],
-                    "buildable": False
+                    "externals": [{"spec": "diffutils@3.6", "prefix": "/usr"}],
+                    "buildable": False,
                 },
                 "cmake": {
                     "externals": [
                         {"spec": "cmake@3.26.5", "prefix": "/usr"},
-                        {"spec": "cmake@3.23.1", "prefix": "/usr/tce"}
+                        {"spec": "cmake@3.23.1", "prefix": "/usr/tce"},
                     ],
-                    "buildable": False
+                    "buildable": False,
                 },
                 "tar": {
-                    "externals": [
-                        {"spec": "tar@1.30", "prefix": "/usr"}
-                    ],
-                    "buildable": False
+                    "externals": [{"spec": "tar@1.30", "prefix": "/usr"}],
+                    "buildable": False,
                 },
                 "autoconf": {
-                    "externals": [
-                        {"spec": "autoconf@2.69", "prefix": "/usr"}
-                    ],
-                    "buildable": False
+                    "externals": [{"spec": "autoconf@2.69", "prefix": "/usr"}],
+                    "buildable": False,
                 },
                 "python": {
                     "externals": [
                         {
                             "spec": "python@2.7.18+bz2+crypt+ctypes+dbm~lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl~tkinter+uuid+zlib",
-                            "prefix": "/usr"
+                            "prefix": "/usr",
                         },
                         {
                             "spec": "python@3.6.8+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
-                            "prefix": "/usr"
+                            "prefix": "/usr",
                         },
                         {
                             "spec": "python@2.7.18+bz2+crypt+ctypes+dbm~lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
-                            "prefix": "/usr/tce"
+                            "prefix": "/usr/tce",
                         },
                         {
                             "spec": "python@3.9.12+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
-                            "prefix": "/usr/tce"
+                            "prefix": "/usr/tce",
                         },
                         {
                             "spec": "python@3.12.8+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat+pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
-                            "prefix": "/usr/workspace/wsa/mckinsey/venv/benchpark-3.12.8"
-                        }
+                            "prefix": "/usr/workspace/wsa/mckinsey/venv/benchpark-3.12.8",
+                        },
                     ],
-                    "buildable": False
+                    "buildable": False,
                 },
                 "hwloc": {
-                    "externals": [
-                        {"spec": "hwloc@2.11.2", "prefix": "/usr"}
-                    ],
-                    "buildable": False
+                    "externals": [{"spec": "hwloc@2.11.2", "prefix": "/usr"}],
+                    "buildable": False,
                 },
                 "gmake": {
-                    "externals": [
-                        {"spec": "gmake@4.2.1", "prefix": "/usr"}
-                    ],
-                    "buildable": False
+                    "externals": [{"spec": "gmake@4.2.1", "prefix": "/usr"}],
+                    "buildable": False,
                 },
             }
         }
