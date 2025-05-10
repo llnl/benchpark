@@ -24,4 +24,4 @@
 ## Adding/modifying core functionality, CI, or documentation:
 
 - [ ] Update docs
-- [ ] Update `.github/workflows` and `.gitlab/ci` unit tests (if needed)
+- [ ] Update `.github/workflows` and `.gitlab/tests` unit tests (if needed)
