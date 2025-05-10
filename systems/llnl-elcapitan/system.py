@@ -96,9 +96,11 @@ class LlnlElcapitan(System, ROCmSystem):
             )
         if self.rocm_version >= Version("6.0.0"):
             self.pmi_version = Version("6.1.15.6")
+            self.pals_version = Version("1.2.12")
             self.llvm_version = Version("18.0.1")
         else:
             self.pmi_version = Version("6.1.12")
+            self.pals_version = Version("1.2.9")
             self.llvm_version = Version("16.0.0")
         # TODO: Replace this with lookups into the working set
 
@@ -612,7 +614,7 @@ class LlnlElcapitan(System, ROCmSystem):
                                     "LD_LIBRARY_PATH": "/opt/cray/pe/gcc-libs"
                                 },
                                 "prepend_path": {
-                                    "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib",
+                                    "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib",
                                     "LIBRARY_PATH": f"/opt/rocm-{self.rocm_version}/lib",
                                 },
                             },
@@ -648,7 +650,7 @@ class LlnlElcapitan(System, ROCmSystem):
                             "modules": [f"cce/{self.cce_version}"],
                             "environment": {
                                 "prepend_path": {
-                                    "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/rocm-{self.rocm_version}/lib"
+                                    "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/rocm-{self.rocm_version}/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib"
                                 }
                             },
                             "extra_rpaths": [
