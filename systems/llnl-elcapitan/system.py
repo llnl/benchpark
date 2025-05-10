@@ -80,7 +80,6 @@ class LlnlElcapitan(System, ROCmSystem):
         super().__init__(spec)
 
         # TODO: Replace this with lookups into the working set
-        self.rocm_version = Version(self.spec.variants["rocm"][0])
         if self.spec.satisfies("compiler=gcc"):
             self.gcc_version = Version("12.2.0")
             self.mpi_version = Version("8.1.26")
@@ -108,6 +107,12 @@ class LlnlElcapitan(System, ROCmSystem):
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
+
+    def set_rocm_arch(self):
+        self.rocm_arch = self.id_to_resources.get(self.spec.variants["cluster"][0]["rocm_arch"])
+
+    def set_default_rocm_version(self):
+        self.rocm_version = Version(self.spec.variants["rocm"][0])
 
     def rocm_arch(self):
         return {"rocm_arch": self.rocm_arch}

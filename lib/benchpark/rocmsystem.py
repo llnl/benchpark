@@ -18,6 +18,10 @@ class ROCmSystem:
         description="ROCm version",
     )
 
+    def __init__(self):
+        set_rocm_arch(self)
+        set_default_rocm_version(self)
+
     def set_rocm_arch(self):
         return NotImplementedError("Each system must implement set_rocm_arch")
 
