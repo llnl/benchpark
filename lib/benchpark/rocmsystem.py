@@ -23,4 +23,3 @@ class ROCmSystem:
 
     def set_default_rocm_version(self):
         return NotImplementedError("Each system must implement set_rocm_version")
-    
