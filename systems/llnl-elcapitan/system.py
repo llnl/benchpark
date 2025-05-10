@@ -18,6 +18,7 @@ class LlnlElcapitan(System):
     id_to_resources = {
         "tioga": {
             "rocm_arch": "gfx90a",
+            #"rocm_version": "6.2.4",
             "sys_cores_per_node": 64,
             "sys_gpus_per_node": 8,
             "system_site": "llnl",
@@ -26,6 +27,7 @@ class LlnlElcapitan(System):
         },
         "elcapitan": {
             "rocm_arch": "gfx942",
+            #"rocm_version": "6.2.4",            
             "sys_cores_per_node": 96,
             "sys_gpus_per_node": 4,
             "system_site": "llnl",
@@ -114,17 +116,30 @@ class LlnlElcapitan(System):
             self.spec.variants["cluster"][0]["rocm_arch"]
         )
 
-    def set_default_rocm_version(self):
+    def set_rocm_version(self):
         self.rocm_version = Version(self.spec.variants["rocm"][0])
+        # TODO: should probably check if it is in the options for specific systems?
+        #self.rocm_version = self.id_to_resources.get(
+        #    self.spec.variants["cluster"][0]["rocm_version"]
+        #)
+
+    #def set_default_rocm_version(self):
+    #    self.rocm_version = Version(self.spec.variants["rocm"][0])
 
     def rocm_arch(self):
         return {"rocm_arch": self.rocm_arch}
+
+    def rocm_version(self):
+        return {"rocm_version": self.rocm_version}
 
     def default_rocm_version(self):
         return {"default_rocm_version": self.default_rocm_version}
 
     def system_specific_variables(self):
-        return {"rocm_arch": self.rocm_arch}
+        return {
+            "rocm_arch": self.rocm_arch,
+            "rocm_version": self.rocm_version,
+        }
 
     def compute_packages_section(self):
         selections = {

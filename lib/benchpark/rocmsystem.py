@@ -12,7 +12,7 @@ class ROCmSystem:
     def verify(self, system):
         assert "rocm" in system.variants
         assert hasattr(system, "rocm_arch")
-        assert hasattr(system, "default_rocm_version")
+        assert hasattr(system, "rocm_version")
 
     def system_attrs(self):
-        return ["rocm_arch", "default_rocm_version"]
+        return ["rocm_arch", "rocm_version"]
