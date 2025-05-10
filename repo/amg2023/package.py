@@ -35,6 +35,7 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("hypre+mixedint~fortran")
 
     depends_on("hypre+cuda", when="+cuda")
+    depends_on("hypre+openmp", when="+openmp")
     requires("+cuda", when="^hypre+cuda")
     for arch in ("none", "50", "60", "70", "80", "90"):
         depends_on(f"hypre cuda_arch={arch}", when=f"cuda_arch={arch}")
