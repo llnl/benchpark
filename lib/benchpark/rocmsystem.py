@@ -15,4 +15,4 @@ class ROCmSystem:
         assert hasattr(system, "default_rocm_version")
 
     def system_attrs(self):
-        return ["rocm_arch","default_rocm_version"]
+        return ["rocm_arch", "default_rocm_version"]

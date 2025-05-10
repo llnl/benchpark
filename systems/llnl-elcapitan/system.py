@@ -110,7 +110,9 @@ class LlnlElcapitan(System):
             setattr(self, k, v)
 
     def set_rocm_arch(self):
-        self.rocm_arch = self.id_to_resources.get(self.spec.variants["cluster"][0]["rocm_arch"])
+        self.rocm_arch = self.id_to_resources.get(
+            self.spec.variants["cluster"][0]["rocm_arch"]
+        )
 
     def set_default_rocm_version(self):
         self.rocm_version = Version(self.spec.variants["rocm"][0])

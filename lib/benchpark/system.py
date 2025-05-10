@@ -109,6 +109,12 @@ class System(ExperimentSystemBase):
     def programming_models(self):
         return []
 
+    @programming_models.setter
+    def programming_models(self, pm_list):
+        if not isinstance(pm_list, list):
+            raise ValueError("Value must be a list")
+        self._programming_models = pm_list
+
     def verify(self):
         for pm in self.programming_models:
             pm.verify(self)
