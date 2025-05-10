@@ -29,6 +29,13 @@
         VARIANT: ['']
         DASHBOARD_NAME: Ruby Supermicro-icelake-OmniPath [benchpark system init --dest=ruby-system
           llnl-cluster cluster=ruby]
+      - HOST: lassen
+        ARCHCONFIG: llnl-sierra
+        SCHEDULER_PARAMETERS: -nnodes 1 -W 20 -q pci  # ref: https://github.com/LLNL/radiuss-shared-ci/blob/main/customization/custom-jobs-and-variables.yml
+        BENCHMARK: [kripke]
+        VARIANT: [+cuda]
+        DASHBOARD_NAME: Lassen IBM-power9-V100-Infiniband [benchpark system init --dest=lassen-system
+          llnl-sierra]
 .push_status: &push_status
   # Max job name length 140 characters
   - |
@@ -46,16 +53,30 @@
       if [[ "$CI_JOB_STATUS" == "failed" ]]; then
         export pipeline_status="failure"
         export EXIT_CODE=false
-      else
+        RUN_CTEST=true
+      elif [[ "$CI_JOB_STATUS" == "canceled" ]]; then
+        export pipeline_status="$CI_JOB_STATUS"
+        RUN_CTEST=false
+      elif [[ "$CI_JOB_STATUS" == "success" ]]; then
         export pipeline_status="$CI_JOB_STATUS"
         export EXIT_CODE=true
+        RUN_CTEST=true
+      else
+        echo "ERROR: Unexpected status CI_JOB_STATUS=$CI_JOB_STATUS"
+        RUN_CTEST=false
       fi
-      ctest -S CTestGitlab.cmake \
-        -DHOST="${HOST}" \
-        -DDASHBOARD_NAME="${DASHBOARD_NAME}" \
-        -DBUILD_NAME="${HOST}/${BENCHMARK}${VARIANT}" \
-        -DSITE="$(hostname)" \
-        -DTEST_TYPE="${TEST_TYPE}" \
+    - |
+      if [[ $RUN_CTEST == "true" ]]; then
+        module load cmake/3.23.1
+        ctest -S CTestGitlab.cmake \
+          -DHOST="${HOST}" \
+          -DDASHBOARD_NAME="${DASHBOARD_NAME}" \
+          -DBUILD_NAME="${HOST}/${BENCHMARK}${VARIANT}" \
+          -DSITE="$(hostname)" \
+          -DTEST_TYPE="${TEST_TYPE}" \
+      else
+        echo "Skipping ctest execution due to CI_JOB_STATUS=$CI_JOB_STATUS"
+      fi
     - *push_status
 workflow:
   auto_cancel:
@@ -86,7 +107,12 @@ test_run:
       if [ "$HOST" == "tioga" ]; then
           EXTRA_ARGS="~gtl"
       fi
-      ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} cluster=$HOST $EXTRA_ARGS
+    - |
+      if [ "$HOST" == "lassen" ]; then
+          ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} $EXTRA_ARGS  # llnl-sierra no cluster
+      else
+          ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} cluster=$HOST $EXTRA_ARGS
+      fi
     # Initialize Experiment
     - ./bin/benchpark experiment init --dest=${BENCHMARK}-benchmark ${BENCHMARK}${VARIANT}
     # Build Workspace
