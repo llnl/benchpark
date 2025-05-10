@@ -105,8 +105,20 @@ class System(ExperimentSystemBase):
     def compiler_configs(self):
         return None
 
+    @property
+    def programming_models(self):
+        return []
+
+    def verify(self):
+        for pm in self.programming_models:
+            pm.verify(self)
+
     def system_specific_variables(self):
-        return {}
+        vars = {}
+        for pm in self.programming_models:
+            for x in pm.system_attrs():
+                vars[x] = getattr(self, x)
+        return vars
 
     def compute_packages_section(self):
         selections = self.external_pkg_configs()

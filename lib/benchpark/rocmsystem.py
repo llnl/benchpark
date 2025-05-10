@@ -3,27 +3,16 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-
 from benchpark.directives import provides, variant
 
 
 class ROCmSystem:
     provides("rocm")
 
-    # How can we enforce that all ROCmSystems expose a rocm variant?
-    variant(
-        "rocm",
-        default="6.2.4",
-        values=("5.7.1", "6.2.4", "6.3.1"),
-        description="ROCm version",
-    )
+    def verify(self, system):
+        assert "rocm" in system.variants
+        assert hasattr(system, "rocm_arch")
+        assert hasattr(system, "default_rocm_version")
 
-    def __init__(self):
-        set_rocm_arch(self)
-        set_default_rocm_version(self)
-
-    def set_rocm_arch(self):
-        return NotImplementedError("Each system must implement set_rocm_arch")
-
-    def set_default_rocm_version(self):
-        return NotImplementedError("Each system must implement set_rocm_version")
+    def system_attrs(self):
+        return ["rocm_arch","default_rocm_version"]

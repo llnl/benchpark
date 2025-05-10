@@ -11,7 +11,7 @@ from benchpark.rocmsystem import ROCmSystem
 from benchpark.paths import hardware_descriptions
 
 
-class LlnlElcapitan(System, ROCmSystem):
+class LlnlElcapitan(System):
 
     maintainers("pearce8", "nhanford", "rfhaque")
 
@@ -78,6 +78,7 @@ class LlnlElcapitan(System, ROCmSystem):
 
     def __init__(self, spec):
         super().__init__(spec)
+        self.programming_models = [ROCmSystem()]
 
         # TODO: Replace this with lookups into the working set
         if self.spec.satisfies("compiler=gcc"):
