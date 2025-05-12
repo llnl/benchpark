@@ -17,11 +17,11 @@
     # Initialize Experiment
     - ./bin/benchpark experiment init --dest=${BENCHMARK}-benchmark ${BENCHMARK}${VARIANT}
     # Build Workspace
-    - ./bin/benchpark setup ${BENCHMARK}-benchmark ${HOST}-system workspace/
+    - ./bin/benchpark setup ${BENCHMARK}-benchmark ${HOST}-system /dev/shm/workspace/
     # Setup Ramble & Spack
-    - . workspace/setup.sh
+    - . /dev/shm/workspace/setup.sh
     # Setup Workspace
-    - cd ./workspace/${BENCHMARK}-benchmark/${HOST}-system/workspace/
+    - cd /dev/shm/workspace/${BENCHMARK}-benchmark/${HOST}-system/workspace/
     - ramble --workspace-dir . --disable-progress-bar --disable-logger workspace setup
     # Run Experiments
     - ramble --workspace-dir . --disable-progress-bar --disable-logger on --executor
@@ -31,4 +31,4 @@
       yaml text
     # Check Experiment Exit Codes
     - cd -
-    - python ./.gitlab/bin/exit-codes ./workspace/${BENCHMARK}-benchmark/${HOST}-system/workspace/results.latest.json
+    - python ./.gitlab/bin/exit-codes /dev/shm/workspace/${BENCHMARK}-benchmark/${HOST}-system/workspace/results.latest.json
