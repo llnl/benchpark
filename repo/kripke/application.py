@@ -4,11 +4,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from ramble.appkit import *
-from ramble.base_app.benchpark.benchpark import Benchpark as BenchparkApplication
 
 import sys
 
-class Kripke(BenchparkApplication):
+class Kripke(ExecutableApplication):
     """Kripke benchmark uses RAJA Portability Layer"""
     name = "Kripke"
 
@@ -112,15 +111,6 @@ class Kripke(BenchparkApplication):
     workload_variable('method', default='sweep',
                       description='Parallel solver method. "sweep" for full up-wind sweep (wavefront algorithm). "bj" for Block Jacobi. (Default: --pmethod sweep)',
                       workloads=['kripke'])
-    workload_variable('n_resources', default='{npx}*{npy}*{npz}',
-                      description='How many processes (CPU cores or GPUs) are required',
-                      workloads=['kripke'])  
-    workload_variable('process_problem_size', default='{nzx}*{nzy}*{nzz}/{npx}/{npy}/{npz}',
-                      description='Problem size per process',
-                      workloads=['kripke']) 
-    workload_variable('total_problem_size', default='{nzx}*{nzy}*{nzz}',
-                      description='Total problem size',
-                      workloads=['kripke']) 
 
     #figure_of_merit('Figure of Merit (FOM)', log_file='{experiment_run_dir}/{experiment_name}.out', fom_regex=r'Figure of Merit \(FOM\):\s+(?P<fom>[0-9]+\.[0-9]*(e^[0-9]*)?)', group_name='fom', units='')
 
