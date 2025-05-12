@@ -82,6 +82,8 @@ class LlnlElcapitan(System):
         super().__init__(spec)
         self.programming_models = [ROCmSystem()]
 
+        self.set_rocm_version()
+
         # TODO: Replace this with lookups into the working set
         if self.spec.satisfies("compiler=gcc"):
             self.gcc_version = Version("12.2.0")
@@ -117,7 +119,7 @@ class LlnlElcapitan(System):
         )
 
     def set_rocm_version(self):
-        self.rocm_version = Version(self.spec.variants["rocm"][0])
+        self.rocm_version = self.spec.variants["rocm"][0]
         # TODO: should probably check if it is in the options for specific systems?
         # self.rocm_version = self.id_to_resources.get(
         #    self.spec.variants["cluster"][0]["rocm_version"]
@@ -129,8 +131,8 @@ class LlnlElcapitan(System):
     def rocm_arch(self):
         return {"rocm_arch": self.rocm_arch}
 
-    def rocm_version(self):
-        return {"rocm_version": Version(self.rocm_version)}
+    # def rocm_version(self):
+    #     return {"rocm_version": Version(self.rocm_version)}
 
     def default_rocm_version(self):
         return {"default_rocm_version": Version(self.default_rocm_version)}
