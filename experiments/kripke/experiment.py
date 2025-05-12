@@ -139,15 +139,7 @@ class Kripke(
         elif self.spec.satisfies("+rocm"):
             self.add_experiment_variable("arch", "HIP")
 
-        # total_problem_size = [
-        #         x * y * z
-        #         for x, y, z in zip(scaled_variables["nzx"], scaled_variables["nzy"], scaled_variables["nzz"])
-        # ]
-        # process_problem_size = [
-        #     a / (x * y * z)
-        #     for a, x, y, z in zip(total_problem_size, scaled_variables["npx"], scaled_variables["npy"], scaled_variables["npz"])
-        # ]
-        self.add_experiment_variable("n_resources", n_resources, False)
+        self.add_experiment_variable("n_resources", "{npx}*{npy}*{npz}", False)
         self.add_experiment_variable("process_problem_size", "{nzx}*{nzy}*{nzz}/({npx}*{npy}*{npz})", False)
         self.add_experiment_variable("total_problem_size", "{nzx}*{nzy}*{nzz}", False)
 
