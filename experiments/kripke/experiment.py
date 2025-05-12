@@ -80,6 +80,7 @@ class Kripke(
             for nk, nv in problem_sizes.items():
                 self.add_experiment_variable(nk, nv, True)
         elif self.spec.satisfies("+throughput"):
+            problem_sizes = {"nzx": 32, "nzy": 32, "nzz": 32} # TEMP: Lower problem size for lassen oom error
             n_resources = 1
             for pk, pv in num_procs.items():
                 self.add_experiment_variable(pk, pv, True)
@@ -137,6 +138,18 @@ class Kripke(
             self.add_experiment_variable("arch", "CUDA")
         elif self.spec.satisfies("+rocm"):
             self.add_experiment_variable("arch", "HIP")
+
+        # total_problem_size = [
+        #         x * y * z
+        #         for x, y, z in zip(scaled_variables["nzx"], scaled_variables["nzy"], scaled_variables["nzz"])
+        # ]
+        # process_problem_size = [
+        #     a / (x * y * z)
+        #     for a, x, y, z in zip(total_problem_size, scaled_variables["npx"], scaled_variables["npy"], scaled_variables["npz"])
+        # ]
+        self.add_experiment_variable("n_resources", n_resources, False)
+        self.add_experiment_variable("process_problem_size", "{nzx}*{nzy}*{nzz}/({npx}*{npy}*{npz})", False)
+        self.add_experiment_variable("total_problem_size", "{nzx}*{nzy}*{nzz}", False)
 
     def compute_package_section(self):
         # get package version
