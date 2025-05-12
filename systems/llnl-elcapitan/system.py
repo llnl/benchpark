@@ -140,7 +140,7 @@ class LlnlElcapitan(System):
     def system_specific_variables(self):
         return {
             "rocm_arch": self.rocm_arch,
-            "rocm_version": Version(self.rocm_version),
+            "rocm_version": self.rocm_version,
         }
 
     def compute_packages_section(self):
