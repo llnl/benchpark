@@ -3,12 +3,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from packaging.version import Version
 
 from benchpark.directives import variant, maintainers
-from benchpark.system import System
-from benchpark.rocmsystem import ROCmSystem
 from benchpark.paths import hardware_descriptions
+from benchpark.rocmsystem import ROCmSystem
+from benchpark.system import System
+from packaging.version import Version
 
 
 class LlnlElcapitan(System):
@@ -18,7 +18,6 @@ class LlnlElcapitan(System):
     id_to_resources = {
         "tioga": {
             "rocm_arch": "gfx90a",
-            # "rocm_version": "6.2.4",
             "sys_cores_per_node": 64,
             "sys_gpus_per_node": 8,
             "system_site": "llnl",
@@ -27,7 +26,6 @@ class LlnlElcapitan(System):
         },
         "elcapitan": {
             "rocm_arch": "gfx942",
-            # "rocm_version": "6.2.4",
             "sys_cores_per_node": 96,
             "sys_gpus_per_node": 4,
             "system_site": "llnl",
@@ -120,16 +118,9 @@ class LlnlElcapitan(System):
 
     def set_rocm_version(self):
         self.rocm_version = self.spec.variants["rocm"][0]
-        # TODO: should probably check if it is in the options for specific systems?
-        # self.rocm_version = self.id_to_resources.get(
-        #    self.spec.variants["cluster"][0]["rocm_version"]
-        # )
 
-    # def set_default_rocm_version(self):
-    #    self.rocm_version = Version(self.spec.variants["rocm"][0])
-
-    def rocm_arch(self):
-        return {"rocm_arch": self.rocm_arch}
+    #def rocm_arch(self):
+    #    return {"rocm_arch": self.rocm_arch}
 
     # def rocm_version(self):
     #     return {"rocm_version": Version(self.rocm_version)}

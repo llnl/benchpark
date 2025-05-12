@@ -5,16 +5,20 @@
 
 
 from benchpark.directives import variant
-from benchpark.system import System
-from benchpark.rocmsystem import ROCmSystem
-from packaging.version import Version
 from benchpark.paths import hardware_descriptions
+from benchpark.rocmsystem import ROCmSystem
+from benchpark.system import System
+from packaging.version import Version
+
 
 
 class CscLumi(System, ROCmSystem):
 
+    maintainers("mckinsey1")
+    
     id_to_resources = {
         "lumi": {
+            "rocm_arch": "gfx90a",            
             "sys_cores_per_node": 64,
             "sys_gpus_per_node": 8,
             "sys_mem_per_node": 512,
@@ -38,9 +42,11 @@ class CscLumi(System, ROCmSystem):
 
     def __init__(self, spec):
         super().__init__(spec)
+        self.programming_models = [ROCmSystem()]
 
-        self.rocm_version = Version(self.spec.variants["rocm"][0])
-
+        #self.rocm_version = Version(self.spec.variants["rocm"][0])
+        self.set_rocm_version()
+        
         full_versions = {
             "cce16": "16.0.1",
             "cce15": "15.0.1",
@@ -57,15 +63,24 @@ class CscLumi(System, ROCmSystem):
         for k, v in attrs.items():
             setattr(self, k, v)
 
-    def rocm_arch(self):
-        return {"rocm_arch": self.rocm_arch}
+    def set_rocm_arch(self):
+        self.rocm_arch = self.id_to_resources.get(
+            self.spec.variants["cluster"][0]["rocm_arch"]
+        )
 
-    def default_rocm_version(self):
-        return {"default_rocm_version": self.default_rocm_version}
+    def set_rocm_version(self):
+        self.rocm_version = self.spec.variants["rocm"][0]
+            
+    #def rocm_arch(self):
+    #    return {"rocm_arch": self.rocm_arch}
+
+    #def default_rocm_version(self):
+    #    return {"default_rocm_version": self.default_rocm_version}
 
     def system_specific_variables(self):
         return {
-            "rocm_arch": "gfx90a",
+            "rocm_arch": self.rocm_arch,
+            "rocm_version": self.rocm_version,
             "gtl_flag": "",
         }
 
