@@ -45,6 +45,7 @@ import benchpark.cmd.setup  # noqa: E402
 import benchpark.cmd.unit_test  # noqa: E402
 import benchpark.cmd.info  # noqa: E402
 import benchpark.cmd.list  # noqa: E402
+import benchpark.cmd.analyze  # noqa: E402
 import benchpark.paths  # noqa: E402
 from benchpark.accounting import benchpark_benchmarks  # noqa: E402
 
@@ -187,6 +188,11 @@ def init_commands(subparsers, actions_dict):
     )
     benchpark.cmd.list.setup_parser(list_parser)
 
+    analyze_parser = subparsers.add_parser(
+        "analyze", help="Perform canned analysis on the performance data (caliper files) after 'ramble on'"
+    )
+    benchpark.cmd.analyze.setup_parser(analyze_parser)
+
     actions_dict["system"] = benchpark.cmd.system.command
     actions_dict["experiment"] = benchpark.cmd.experiment.command
     actions_dict["setup"] = benchpark.cmd.setup.command
@@ -194,6 +200,7 @@ def init_commands(subparsers, actions_dict):
     actions_dict["audit"] = benchpark.cmd.audit.command
     actions_dict["info"] = benchpark.cmd.info.command
     actions_dict["list"] = benchpark.cmd.list.command
+    actions_dict["analyze"] = benchpark.cmd.analyze.command
 
 
 def run_command(command_str, env=None):
