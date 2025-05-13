@@ -1,5 +1,5 @@
-import argparse
 from glob import glob
+import os
 import re
 
 import matplotlib.pyplot as plt
@@ -7,24 +7,45 @@ import matplotlib as mpl
 import thicket as th
 
 
-def make_stacked_line_chart(df, chart_type, x_axis, y_axis_metric, **kwargs):
+def make_stacked_line_chart(**kwargs):
+    # Extract required parameters from kwargs
+    df = kwargs.get("df")
+    chart_type = kwargs.get("chart_type")
+    x_axis = kwargs.get("x_axis")
+    y_axis_metric = kwargs.get("y_axis_metric")
+
+    # Validate required parameters
+    if df is None or chart_type is None or x_axis is None or y_axis_metric is None:
+        raise ValueError(
+            "Missing required parameters. Ensure 'df', 'chart_type', 'x_axis', and 'y_axis_metric' are provided in kwargs."
+        )
+
+    # Determine value and y_label based on chart_type
     if chart_type == "percentage_time":
         value = "perc"
         y_label = (
             kwargs["chart_ylabel"]
-            if kwargs["chart_ylabel"]
+            if "chart_ylabel" in kwargs and kwargs["chart_ylabel"]
             else "Percentage of " + y_axis_metric
         )
     elif chart_type == "time":
         value = y_axis_metric
-        y_label = kwargs["chart_ylabel"] if kwargs["chart_ylabel"] else y_axis_metric
+        y_label = (
+            kwargs["chart_ylabel"]
+            if "chart_ylabel" in kwargs and kwargs["chart_ylabel"]
+            else y_axis_metric
+        )
     else:
         raise ValueError(
             "Invalid chart_type value. Please choose from 'percentage_time' or 'time'."
         )
 
-    df.to_csv(kwargs["chart_file_name"] + ".csv")
+    # Save DataFrame to CSV
+    csvfile = kwargs["out_dir"] + kwargs["chart_file_name"] + ".csv"
+    print(csvfile)
+    df.to_csv(csvfile)
 
+    # Transform DataFrame for plotting
     tdf = df[[(i, value) for i in x_axis]].T
     tdf = tdf.reset_index(level=1, drop=True)  # Drop metric name from index
 
@@ -44,24 +65,23 @@ def make_stacked_line_chart(df, chart_type, x_axis, y_axis_metric, **kwargs):
     mpl.rcParams["axes.prop_cycle"] = mpl.cycler(color=color)
 
     # Set font size of text
-    if kwargs["chart_fontsize"]:
+    if "chart_fontsize" in kwargs and kwargs["chart_fontsize"]:
         mpl.rcParams.update({"font.size": kwargs["chart_fontsize"]})
 
     # Plotting
     fig, ax = plt.subplots()
     tdf.plot(
         kind="area",
-        title=kwargs["chart_title"],
-        xlabel=kwargs["chart_xlabel"],
+        title=kwargs.get("chart_title", ""),
+        xlabel=kwargs.get("chart_xlabel", ""),
         ylabel=y_label,
-        figsize=tuple(kwargs["chart_figsize"]) if kwargs["chart_figsize"] else (10, 5),
+        figsize=(
+            tuple(kwargs["chart_figsize"])
+            if "chart_figsize" in kwargs and kwargs["chart_figsize"]
+            else (10, 6)
+        ),
         ax=ax,
     )
-    # # Set scaling of x-axis
-    # if "scaling-factor" in kwargs:
-    #     ax.set_xscale("log", base=kwargs["scaling-factor"])
-    # else:
-    #     ax.set_xticks(tdf.index)
 
     # Reverse legend order
     handles, labels = ax.get_legend_handles_labels()
@@ -76,23 +96,21 @@ def make_stacked_line_chart(df, chart_type, x_axis, y_axis_metric, **kwargs):
     fig.autofmt_xdate()
 
     plt.tight_layout()
-    filename = kwargs["chart_file_name"] + ".png"
+    filename = kwargs["out_dir"] + kwargs["chart_file_name"] + ".png"
     print(filename)
     plt.savefig(filename)
 
 
 def prepare_data(
-    input_files,
-    y_axis_metric,
-    filter_nodes_name_prefix,
-    top_n_nodes,
-    chart_type,
     **additional_args,
 ):
 
-    tk = th.Thicket.from_caliperreader(
-        glob(input_files + "/**/*.cali", recursive=True), disable_tqdm=True
-    )
+    files = glob(additional_args["workspace_dir"] + "/**/*.cali", recursive=True)
+    print(f"Analyzing {len(files)} files:")
+    for i, f in enumerate(files):
+        print(i + 1, f)
+
+    tk = th.Thicket.from_caliperreader(files, disable_tqdm=True)
     tk.update_inclusive_columns()
 
     # This is to get tree with no metric
@@ -109,10 +127,12 @@ def prepare_data(
     text_without_ansi = text_without_ansi.replace("0", "")
     additional_args["tree_str"] = text_without_ansi
 
-    f = open(additional_args["chart_file_name"] + ".txt", "w")
+    filename = additional_args["out_dir"] + additional_args["chart_file_name"] + ".txt"
+    print(filename)
+    f = open(filename, "w")
     f.write(additional_args["tree_str"])
     f.close()
-    print("Full tree:\n"+additional_args["tree_str"]+"\n")
+    print("Full tree:\n" + additional_args["tree_str"])
 
     # Apply query to remove MPI regions from the tree, if any
     if additional_args["no_mpi"]:
@@ -120,13 +140,18 @@ def prepare_data(
             ".", lambda row: row["name"].apply(lambda n: "MPI_" not in n).all()
         )
         tk = tk.query(query)
-    if y_axis_metric in tk.inc_metrics:
+    if additional_args["y_axis_metric"] in tk.inc_metrics:
         if len(tk.graph.roots) == 1:
             root = tk.graph.roots[0].frame["name"]
-            print(f"Automatically removing singular root '{root}' to visualize inclusive metric '{y_axis_metric}' with greater fidelity")
-            query = th.query.Query().match(
-                ".", lambda row: row["name"].apply(lambda n: n != root).all()
-            ).rel("*")
+            y_axis_met = additional_args["y_axis_metric"]
+            print(
+                f"Automatically removing singular root '{root}' to visualize inclusive metric '{y_axis_met}' with greater fidelity"
+            )
+            query = (
+                th.query.Query()
+                .match(".", lambda row: row["name"].apply(lambda n: n != root).all())
+                .rel("*")
+            )
             tk = tk.query(query)
 
     spec = tk.metadata["benchpark_spec"].iloc[0][0]
@@ -195,7 +220,7 @@ def prepare_data(
         )
 
     additional_args["chart_file_name"] = (
-        f"{app_name}_{programming_model}_{scaling}_{chart_type}"
+        f"{app_name}_{programming_model}_{scaling}_{additional_args['chart_type']}"
     )
 
     if additional_args["group_nodes_name"]:
@@ -203,15 +228,19 @@ def prepare_data(
 
     for i in x_axis:
         ctk.dataframe[i, "perc"] = (
-            ctk.dataframe[i, y_axis_metric] / ctk.dataframe[i, y_axis_metric].sum()
+            ctk.dataframe[i, additional_args["y_axis_metric"]]
+            / ctk.dataframe[i, additional_args["y_axis_metric"]].sum()
         ) * 100
 
-    if filter_nodes_name_prefix != "":
-        ctk.dataframe = ctk.dataframe.filter(like=filter_nodes_name_prefix, axis=0)
+    if additional_args["filter_nodes_name_prefix"] != "":
+        ctk.dataframe = ctk.dataframe.filter(
+            like=additional_args["filter_nodes_name_prefix"], axis=0
+        )
 
-    if top_n_nodes != -1:
+    if additional_args["top_n_nodes"] != -1:
         ctk.dataframe = ctk.dataframe.nlargest(
-            top_n_nodes, [(x_axis[0], y_axis_metric)]
+            additional_args["top_n_nodes"],
+            [(x_axis[0], additional_args["y_axis_metric"])],
         )
         print("Showing only top 10 nodes")
 
@@ -231,87 +260,85 @@ def prepare_data(
 
     make_stacked_line_chart(
         df=ctk.dataframe,
-        chart_type=chart_type,
         x_axis=x_axis,
-        y_axis_metric=y_axis_metric,
         **additional_args,
     )
 
 
 def setup_parser(root_parser):
     root_parser.add_argument(
-        "--input_files",
+        "--workspace-dir",
         required=True,
         type=str,
-        help="Directory of Caliper file input, including all subdirectories. Will search for all .cali files.",
+        help="Directory of ramble workspace.",
     )
     root_parser.add_argument(
-        "--chart_type",
+        "--chart-type",
         default="time",
         choices=["percentage_time", "time"],
         type=str,
         help="Specify type of output chart.",
     )
     root_parser.add_argument(
-        "--x_axis_unique_metadata",
+        "--x_axis-unique-metadata",
         default=None,
         type=str,
         help="Parameter that is varied during the experiment.",
     )
     root_parser.add_argument(
-        "--y_axis_metric",
+        "--y-axis-metric",
         default="Avg time/rank (exc)",
         type=str,
         help="Metric to be visualized.",
     )
     root_parser.add_argument(
-        "--filter_nodes_name_prefix",
+        "--filter-nodes-name-prefix",
         default="",
         type=str,
         help="Optional: Filters only entries with prefix to be included in chart.",
     )
     root_parser.add_argument(
-        "--group_nodes_name",
+        "--group-nodes-name",
         default=True,
         type=bool,
         help="Optional: Specify if nodes with the same name are combined or not.",
     )
     root_parser.add_argument(
-        "--top_n_nodes",
+        "--top-n-nodes",
         default=-1,
         type=int,
         help="Optional: Filters only top n longest time entries to be included in chart.",
     )
     root_parser.add_argument(
-        "--chart_title",
+        "--chart-title",
         default=None,
         type=str,
         help="Optional: Title of the output chart.",
     )
     root_parser.add_argument(
-        "--chart_xlabel",
+        "--chart-xlabel",
         type=str,
         help="Optional: X Label of chart.",
     )
     root_parser.add_argument(
-        "--chart_ylabel",
+        "--chart-ylabel",
         type=str,
         help="Optional: Y Label of chart.",
     )
     root_parser.add_argument(
-        "--chart_file_name",
+        "--chart-file-name",
         default="stacked_line_chart",
         type=str,
         help="Optional: Set output chart file name.",
     )
     root_parser.add_argument(
-        "--chart_figsize",
+        "--chart-figsize",
         nargs="+",
         type=int,
-        help="Optional: Size of the output chart (xdim, ydim). Ex: --chart_figsize 10 5",
+        help="Optional: Size of the output chart (xdim, ydim). Ex: --chart-figsize 10 6",
     )
     root_parser.add_argument(
-        "--chart_fontsize",
+        "--chart-fontsize",
         type=int,
         help="Optional: Font size of the output chart.",
     )
@@ -319,10 +346,17 @@ def setup_parser(root_parser):
         "--no-mpi", action="store_true", help="Hide MPI regions in the tree."
     )
 
+
 def command(args):
-    prepare_data(args)
+    if ".ramble-workspace" not in os.listdir(args.workspace_dir):
+        raise ValueError(
+            f"Directory '{args.workspace_dir}' must be a valid ramble workspace"
+        )
 
+    wkp_dir = args.workspace_dir
+    if wkp_dir[-1] != "/":
+        wkp_dir += "/"
+    args.out_dir = wkp_dir + "analyze/"
+    os.mkdir(args.out_dir)
 
-# if __name__ == "__main__":
-#     args = arg_parse()
-#     prepare_data(**vars(args))
+    prepare_data(**vars(args))
