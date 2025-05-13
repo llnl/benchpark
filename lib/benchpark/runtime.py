@@ -7,6 +7,7 @@ from contextlib import contextmanager
 import os
 import pathlib
 import shlex
+import shutil
 import stat
 import subprocess
 import sys
@@ -88,7 +89,7 @@ class RuntimeResources:
             self._install_spack()
 
         spack_lib_path = self.spack_location / "lib" / "spack"
-        externals = str(spack_lib_path / "external")
+        externals = str(spack_lib_path / "external/_vendoring")
         if externals not in sys.path:
             sys.path.insert(1, externals)
         internals = str(spack_lib_path)
@@ -119,8 +120,12 @@ class RuntimeResources:
         files = [
             f
             for f in fs.find(self.ramble_location, "*")
-            if os.stat(f).st_mode & stat.S_IWUSR and not os.path.isdir(f)
+            if os.stat(f).st_mode & stat.S_IWUSR
+            and not os.path.isdir(f)
+            and "lib/ramble/external" not in f
+            and "ramble/.git" not in f
         ]
+
         file_filter = fs.FileFilter(*files)
         # Don't replace if it's already replaced or if it's a field in an existing module
         file_filter.filter(r"(?<!_|\.)spack\.", "ramble_spack.")
@@ -129,6 +134,13 @@ class RuntimeResources:
         ramble_lib_path = self.ramble_location / "lib" / "ramble"
         os.rename(ramble_lib_path / "spack", ramble_lib_path / "ramble_spack")
         os.rename(ramble_lib_path / "llnl", ramble_lib_path / "ramble_llnl")
+
+        shutil.rmtree(ramble_lib_path / "external/ruamel")
+        os.symlink(
+            self.spack_location / "lib/spack/external/_vendoring/ruamel",
+            ramble_lib_path / "external/ruamel",
+        )
+        # TODO: Need to figure out how to apply patch
 
     def _install_ramble(self):
         print(f"Cloning Ramble to {self.ramble_location}")
