@@ -5,6 +5,10 @@ workflow:
   auto_cancel:
     on_new_commit: conservative
 
+stages:
+  - allocate-resources
+  - test
+  - release-resources
 
 .on_ruby:
   tags:
