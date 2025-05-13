@@ -32,6 +32,15 @@ allocate_resources:
   script:
     - salloc ${SCHEDULER_PARAMETERS} --no-shell --job-name=${ALLOC_NAME}
 
+release_resources:
+  variables:
+    GIT_STRATEGY: none
+  extends: .on_ruby
+  stage: release-resources
+  script:
+    - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
+    - ([[ -n "${JOBID}" ]] && scancel ${JOBID} || exit 0)
+
 .test_clusters: &test_clusters
   parallel:
     matrix:
