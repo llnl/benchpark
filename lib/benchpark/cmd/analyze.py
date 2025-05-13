@@ -357,6 +357,8 @@ def command(args):
     if wkp_dir[-1] != "/":
         wkp_dir += "/"
     args.out_dir = wkp_dir + "analyze/"
-    os.mkdir(args.out_dir)
+    
+    if not os.path.isdir(args.out_dir):
+        os.mkdir(args.out_dir)
 
     prepare_data(**vars(args))
