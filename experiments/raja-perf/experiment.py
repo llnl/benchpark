@@ -56,6 +56,20 @@ class RajaPerf(
         if self.spec.satisfies("+single_node"):
             for pk, pv in n_resources.items():
                 n_resources = pv
+            for nk, nv in problem_sizes.items():
+                self.add_experiment_variable(nk, nv, True)
+        elif self.spec.satisfies("+weak"):
+            # "strong scale" since problem size is per-process
+            scaled_variables = self.generate_strong_scaling_params(
+                {tuple(n_resources.keys()): list(n_resources.values())},
+                int(self.spec.variants["scaling-factor"][0]),
+                int(self.spec.variants["scaling-iterations"][0]),
+            )
+            n_resources = scaled_variables["n_ranks"]
+            for pk, pv in scaled_variables.items():
+                self.add_experiment_variable(pk, pv, True)
+            for nk, nv in problem_sizes.items():
+                self.add_experiment_variable(nk, nv, True)
         elif self.spec.satisfies("+strong"):
             scaled_variables = self.generate_strong_scaling_params(
                 {tuple(n_resources.keys()): list(n_resources.values())},
@@ -65,9 +79,15 @@ class RajaPerf(
             n_resources = scaled_variables["n_ranks"]
             for pk, pv in scaled_variables.items():
                 self.add_experiment_variable(pk, pv, True)
-
-        for nk, nv in problem_sizes.items():
-            self.add_experiment_variable(nk, nv, True)
+            # Notice 1/scaling-factor to keep total problem size constant
+            scaled_problem_sizes = self.generate_strong_scaling_params(
+                {tuple(problem_sizes.keys()): list(problem_sizes.values())},
+                1/int(self.spec.variants["scaling-factor"][0]),
+                int(self.spec.variants["scaling-iterations"][0]),
+            )
+            problem_sizes = scaled_problem_sizes["size"]
+            for nk, nv in scaled_problem_sizes.items():
+                self.add_experiment_variable(nk, nv, True)
 
         if self.spec.satisfies("+cuda"):
             self.add_experiment_variable("variant", "Base_CUDA", True)
