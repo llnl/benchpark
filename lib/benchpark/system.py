@@ -4,9 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import hashlib
-import importlib.util
 import os
-import sys
 import yaml
 
 import benchpark.paths
