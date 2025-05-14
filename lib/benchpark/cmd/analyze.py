@@ -37,19 +37,6 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s: %(messag
 # -----------------------------
 # Helper Functions
 # -----------------------------
-def configure_matplotlib(colors=None, fontsize=None):
-    """
-    Configures matplotlib with custom colors and font size.
-
-    Args:
-        colors (list of str, optional): List of color hex codes.
-        fontsize (int, optional): Font size for the chart text.
-    """
-    mpl.rcParams["axes.prop_cycle"] = mpl.cycler(color=colors or COLOR_PALETTE)
-    if fontsize:
-        mpl.rcParams.update({"font.size": fontsize})
-
-
 def get_scaling_type(spec):
     """
     Determines the scaling type based on a specification string.
@@ -88,24 +75,6 @@ def validate_single_metadata_value(column, tk, label):
     if len(unique_vals) != 1:
         raise ValueError(f"Expected one {label}, got: {list(unique_vals)}")
     return unique_vals[0]
-
-
-def clean_tree_string(raw_tree_str):
-    """
-    Cleans ANSI escape sequences and legend from a raw calltree string.
-
-    Args:
-        raw_tree_str (str): The raw calltree string.
-
-    Returns:
-        str: A cleaned version of the calltree string.
-    """
-    ansi_escape = re.compile(r"\x1b\[([0-9;]*m)")
-    text = ansi_escape.sub("", raw_tree_str)
-    legend_index = text.find("Legend")
-    if legend_index != -1:
-        text = text[:legend_index]
-    return text.replace("0", "")
 
 
 # -----------------------------
@@ -151,7 +120,9 @@ def make_stacked_line_chart(**kwargs):
     df.to_csv(csvfile)
 
     tdf = df[[(i, value) for i in x_axis]].T.reset_index(level=1, drop=True)
-    configure_matplotlib(fontsize=kwargs.get("chart_fontsize"))
+    mpl.rcParams["axes.prop_cycle"] = mpl.cycler(color=COLOR_PALETTE)
+    if kwargs.get("chart_fontsize"):
+        mpl.rcParams.update({"font.size": kwargs.get("chart_fontsize")})
 
     fig, ax = plt.subplots()
     tdf.plot(
@@ -210,22 +181,31 @@ def prepare_data(**kwargs):
     tk = th.Thicket.from_caliperreader(files, disable_tqdm=True)
     tk.update_inclusive_columns()
 
+    # Save tree before modification
+    # Cleans ANSI escape sequences and legend from a raw calltree string.
     tk.dataframe["nothing"] = 0
     raw_tree = tk.tree("nothing", render_header=False, precision=0)
-    clean_tree = clean_tree_string(raw_tree)
+    ansi_escape = re.compile(r"\x1b\[([0-9;]*m)")
+    text = ansi_escape.sub("", raw_tree)
+    legend_index = text.find("Legend")
+    if legend_index != -1:
+        text = text[:legend_index]
+    clean_tree = text.replace("0", "")
     kwargs["tree_str"] = clean_tree
-
+    # Save to file
     tree_file = os.path.join(kwargs["out_dir"], kwargs["chart_file_name"] + ".txt")
     with open(tree_file, "w") as f:
         f.write(clean_tree)
     logger.info(f"Saving Unmodified Calltree structure to {tree_file}")
 
+    # Remove MPI regions, if necesasry
     if kwargs.get("no_mpi"):
         query = th.query.Query().match(
             ".", lambda row: row["name"].apply(lambda n: "MPI_" not in n).all()
         )
         tk = tk.query(query)
 
+    # Remove singular roots if inclusive metric
     metric = kwargs["y_axis_metric"]
     if metric in tk.inc_metrics and len(tk.graph.roots) == 1:
         root_name = tk.graph.roots[0].frame["name"]
@@ -237,9 +217,11 @@ def prepare_data(**kwargs):
         )
         tk = tk.query(query)
 
+    # Spec should not vary across runs
     spec = tk.metadata["benchpark_spec"].iloc[0][0]
     scaling = get_scaling_type(spec)
 
+    # What we are varying for each scaling type
     x_axis_metadata = (
         kwargs.get("x_axis_unique_metadata")
         or {
@@ -250,20 +232,24 @@ def prepare_data(**kwargs):
     )
     kwargs["x_axis_unique_metadata"] = x_axis_metadata
 
+    # Group by varied parameters
     grouped = tk.groupby(x_axis_metadata)
     ctk = th.Thicket.concat_thickets(
         list(grouped.values()), headers=list(grouped.keys()), axis="columns"
     )
 
+    # Check these values are constant
     app = validate_single_metadata_value("application_name", tk, "application")
     cluster = validate_single_metadata_value("cluster", tk, "cluster")
     version = validate_single_metadata_value("version", tk, "version")
 
+    # Find programming model from spec
     programming_model = "mpi"
     for keyword in ["+cuda", "+rocm", "+openmp"]:
         if keyword in spec:
             programming_model = keyword.lstrip("+")
 
+    # Constant information that will be added to the title
     constant_keys = {
         "strong": ["total_problem_size"],
         "weak": ["process_problem_size"],
@@ -281,6 +267,7 @@ def prepare_data(**kwargs):
     kwargs["chart_file_name"] = (
         f"{app}_{programming_model}_{scaling}_{kwargs['chart_type']}_{'inc' if metric in tk.inc_metrics else 'exc'}"
     )
+
 
     if kwargs.get("group_nodes_name"):
         ctk.dataframe = ctk.dataframe.groupby("name").sum()
