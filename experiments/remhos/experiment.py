@@ -85,6 +85,10 @@ class Remhos(
         elif self.spec.satisfies("+rocm"):
             self.add_experiment_variable("arch", "HIP")
 
+        # self.add_experiment_variable("n_resources", "{n_nodes}", False)
+        # self.add_experiment_variable("process_problem_size", ???, False)
+        # self.add_experiment_variable("total_problem_size", ???, False)
+
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
