@@ -16,39 +16,90 @@ import thicket as th
 # Constants
 # -----------------------------
 COLOR_PALETTE = [
-    "#00FFFF", "#ff7f00", "#4daf4a", "#f781bf", "#a65628",
-    "#984ea3", "#999999", "#e41a1c", "#dede00", "#377eb8"
+    "#00FFFF",
+    "#ff7f00",
+    "#4daf4a",
+    "#f781bf",
+    "#a65628",
+    "#984ea3",
+    "#999999",
+    "#e41a1c",
+    "#dede00",
+    "#377eb8",
 ]
 SCALING_TYPES = ["+strong", "+throughput", "+weak"]
 
 # Configure logging
 logger = logging.getLogger(__name__)
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(levelname)s:%(name)s: %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s: %(message)s")
+
 
 # -----------------------------
 # Helper Functions
 # -----------------------------
 def configure_matplotlib(colors=None, fontsize=None):
+    """
+    Configures matplotlib with custom colors and font size.
+
+    Args:
+        colors (list of str, optional): List of color hex codes.
+        fontsize (int, optional): Font size for the chart text.
+    """
     mpl.rcParams["axes.prop_cycle"] = mpl.cycler(color=colors or COLOR_PALETTE)
     if fontsize:
         mpl.rcParams.update({"font.size": fontsize})
 
+
 def get_scaling_type(spec):
+    """
+    Determines the scaling type based on a specification string.
+
+    Args:
+        spec (str): Specification string containing scaling information.
+
+    Returns:
+        str: The identified scaling type ("strong", "throughput", or "weak").
+
+    Raises:
+        ValueError: If no valid scaling type is found in the specification.
+    """
     for keyword in SCALING_TYPES:
         if keyword in spec:
             return keyword.lstrip("+")
     raise ValueError(f"Unknown scaling type. Must be one of {SCALING_TYPES}")
 
+
 def validate_single_metadata_value(column, tk, label):
+    """
+    Validates that a Thicket metadata column has a single unique value.
+
+    Args:
+        column (str): Column name to check.
+        tk (th.Thicket): Thicket object.
+        label (str): Label to include in error messages.
+
+    Returns:
+        Any: The single unique value in the column.
+
+    Raises:
+        ValueError: If the column contains more than one unique value.
+    """
     unique_vals = tk.metadata[column].unique()
     if len(unique_vals) != 1:
         raise ValueError(f"Expected one {label}, got: {list(unique_vals)}")
     return unique_vals[0]
 
+
 def clean_tree_string(raw_tree_str):
+    """
+    Cleans ANSI escape sequences and legend from a raw calltree string.
+
+    Args:
+        raw_tree_str (str): The raw calltree string.
+
+    Returns:
+        str: A cleaned version of the calltree string.
+    """
     ansi_escape = re.compile(r"\x1b\[([0-9;]*m)")
     text = ansi_escape.sub("", raw_tree_str)
     legend_index = text.find("Legend")
@@ -56,20 +107,43 @@ def clean_tree_string(raw_tree_str):
         text = text[:legend_index]
     return text.replace("0", "")
 
+
 # -----------------------------
 # Chart Generation
 # -----------------------------
 def make_stacked_line_chart(**kwargs):
+    """
+    Generates a stacked area line chart based on Thicket DataFrame.
+
+    Args:
+        df (pd.DataFrame): DataFrame to plot.
+        chart_type (str): Type of chart ("time" or "percentage_time").
+        x_axis (list): Metadata keys to use for the X-axis.
+        y_axis_metric (str): Metric to plot on the Y-axis.
+        chart_ylabel (str, optional): Y-axis label.
+        chart_title (str, optional): Chart title.
+        chart_xlabel (str, optional): X-axis label.
+        chart_fontsize (int, optional): Font size.
+        chart_figsize (tuple, optional): Figure size.
+        chart_file_name (str): Name for the saved files.
+        out_dir (str): Directory to save output images and CSV.
+    """
     df = kwargs.get("df")
     chart_type = kwargs.get("chart_type")
     x_axis = kwargs.get("x_axis")
     y_axis_metric = kwargs.get("y_axis_metric")
 
     if df is None or chart_type is None or x_axis is None or y_axis_metric is None:
-        raise ValueError("Missing required parameters. 'df', 'chart_type', 'x_axis', and 'y_axis_metric' are required.")
+        raise ValueError(
+            "Missing required parameters. 'df', 'chart_type', 'x_axis', and 'y_axis_metric' are required."
+        )
 
     value = "perc" if chart_type == "percentage_time" else y_axis_metric
-    y_label = kwargs.get("chart_ylabel") or (f"Percentage of {y_axis_metric}" if chart_type == "percentage_time" else y_axis_metric)
+    y_label = kwargs.get("chart_ylabel") or (
+        f"Percentage of {y_axis_metric}"
+        if chart_type == "percentage_time"
+        else y_axis_metric
+    )
 
     os.makedirs(kwargs["out_dir"], exist_ok=True)
     csvfile = os.path.join(kwargs["out_dir"], kwargs["chart_file_name"] + ".csv")
@@ -85,12 +159,17 @@ def make_stacked_line_chart(**kwargs):
         title=kwargs.get("chart_title", ""),
         xlabel=kwargs.get("chart_xlabel", ""),
         ylabel=y_label,
-        figsize=(10,6),#tuple(kwargs.get("chart_figsize", (10, 6))),
+        figsize=(10, 6),
         ax=ax,
     )
 
     handles, labels = ax.get_legend_handles_labels()
-    ax.legend(list(reversed(handles)), list(reversed(labels)), bbox_to_anchor=(1, 0.5), loc="center left")
+    ax.legend(
+        list(reversed(handles)),
+        list(reversed(labels)),
+        bbox_to_anchor=(1, 0.5),
+        loc="center left",
+    )
 
     fig.autofmt_xdate()
     plt.tight_layout()
@@ -99,10 +178,31 @@ def make_stacked_line_chart(**kwargs):
     logger.info(f"Saving figure to {imgfile}")
     plt.savefig(imgfile)
 
-# -----------------------------
-# Data Preparation Pipeline
-# -----------------------------
+
+# ----------------
+# Data Preparation
+# ----------------
 def prepare_data(**kwargs):
+    """
+    Processes .cali files from a Ramble workspace to generate performance charts.
+
+    Args:
+        workspace_dir (str): Directory containing the Ramble workspace.
+        chart_type (str): Type of chart ("time" or "percentage_time").
+        x_axis_unique_metadata (list of str, optional): Metadata keys to use for X-axis grouping.
+        y_axis_metric (str): Metric used for chart visualization.
+        filter_nodes_name_prefix (str, optional): Prefix to filter node names in the data.
+        group_nodes_name (bool): If True, groups nodes by their name.
+        top_n_nodes (int): Number of top nodes to include in the chart.
+        chart_title (str, optional): Title of the chart.
+        chart_xlabel (str, optional): X-axis label.
+        chart_ylabel (str, optional): Y-axis label.
+        chart_file_name (str): Name for output files.
+        chart_figsize (list of int, optional): Size of the figure (width, height).
+        chart_fontsize (int, optional): Font size for the chart.
+        no_mpi (bool): If True, filters out MPI regions.
+        out_dir (str): Directory for output files.
+    """
     workspace_dir = kwargs["workspace_dir"]
     files = glob(os.path.join(workspace_dir, "**/*.cali"), recursive=True)
     logger.info(f"Found {len(files)} .cali files for analysis.")
@@ -110,7 +210,6 @@ def prepare_data(**kwargs):
     tk = th.Thicket.from_caliperreader(files, disable_tqdm=True)
     tk.update_inclusive_columns()
 
-    # Prepare tree string
     tk.dataframe["nothing"] = 0
     raw_tree = tk.tree("nothing", render_header=False, precision=0)
     clean_tree = clean_tree_string(raw_tree)
@@ -121,30 +220,40 @@ def prepare_data(**kwargs):
         f.write(clean_tree)
     logger.info(f"Saving Unmodified Calltree structure to {tree_file}")
 
-    # Optional: Filter out MPI regions
     if kwargs.get("no_mpi"):
-        query = th.query.Query().match(".", lambda row: row["name"].apply(lambda n: "MPI_" not in n).all())
+        query = th.query.Query().match(
+            ".", lambda row: row["name"].apply(lambda n: "MPI_" not in n).all()
+        )
         tk = tk.query(query)
 
     metric = kwargs["y_axis_metric"]
     if metric in tk.inc_metrics and len(tk.graph.roots) == 1:
         root_name = tk.graph.roots[0].frame["name"]
         logger.info(f"Removing root '{root_name}' to improve chart readability.")
-        query = th.query.Query().match(".", lambda row: row["name"].apply(lambda n: n != root_name).all()).rel("*")
+        query = (
+            th.query.Query()
+            .match(".", lambda row: row["name"].apply(lambda n: n != root_name).all())
+            .rel("*")
+        )
         tk = tk.query(query)
 
     spec = tk.metadata["benchpark_spec"].iloc[0][0]
     scaling = get_scaling_type(spec)
 
-    x_axis_metadata = kwargs.get("x_axis_unique_metadata") or {
-        "strong": ["n_resources", "n_nodes"],
-        "weak": ["n_resources", "n_nodes", "total_problem_size"],
-        "throughput": "total_problem_size"
-    }[scaling]
+    x_axis_metadata = (
+        kwargs.get("x_axis_unique_metadata")
+        or {
+            "strong": ["n_resources", "n_nodes"],
+            "weak": ["n_resources", "n_nodes", "total_problem_size"],
+            "throughput": "total_problem_size",
+        }[scaling]
+    )
     kwargs["x_axis_unique_metadata"] = x_axis_metadata
 
     grouped = tk.groupby(x_axis_metadata)
-    ctk = th.Thicket.concat_thickets(list(grouped.values()), headers=list(grouped.keys()), axis="columns")
+    ctk = th.Thicket.concat_thickets(
+        list(grouped.values()), headers=list(grouped.keys()), axis="columns"
+    )
 
     app = validate_single_metadata_value("application_name", tk, "application")
     cluster = validate_single_metadata_value("cluster", tk, "cluster")
@@ -160,12 +269,18 @@ def prepare_data(**kwargs):
         "weak": ["process_problem_size"],
         "throughput": ["n_resources", "n_nodes"],
     }[scaling]
-    constant_str = ", ".join(f"{tk.metadata[key].iloc[0]} {key}" for key in constant_keys)
+    constant_str = ", ".join(
+        f"{tk.metadata[key].iloc[0]} {key}" for key in constant_keys
+    )
 
     if not kwargs.get("chart_title"):
-        kwargs["chart_title"] = f"{cluster}/{app}+{programming_model}@{version} ({scaling} scaling, constant {constant_str})"
+        kwargs["chart_title"] = (
+            f"{cluster}/{app}+{programming_model}@{version} ({scaling} scaling, constant {constant_str})"
+        )
 
-    kwargs["chart_file_name"] = f"{app}_{programming_model}_{scaling}_{kwargs['chart_type']}_{'inc' if metric in tk.inc_metrics else 'exc'}"
+    kwargs["chart_file_name"] = (
+        f"{app}_{programming_model}_{scaling}_{kwargs['chart_type']}_{'inc' if metric in tk.inc_metrics else 'exc'}"
+    )
 
     if kwargs.get("group_nodes_name"):
         ctk.dataframe = ctk.dataframe.groupby("name").sum()
@@ -181,7 +296,9 @@ def prepare_data(**kwargs):
 
     top_n = kwargs.get("top_n_nodes", -1)
     if top_n != -1:
-        ctk.dataframe = ctk.dataframe.nlargest(top_n, [(list(grouped.keys())[0], metric)])
+        ctk.dataframe = ctk.dataframe.nlargest(
+            top_n, [(list(grouped.keys())[0], metric)]
+        )
         logger.info(f"Filtered top {top_n} nodes for chart display.")
 
     if not kwargs.get("chart_xlabel"):
@@ -192,12 +309,20 @@ def prepare_data(**kwargs):
         if len(scaling_factors) == 1:
             kwargs["scaling-factor"] = scaling_factors[0]
         else:
-            raise ValueError(f"Expected one scaling factor, found: {list(scaling_factors)}")
+            raise ValueError(
+                f"Expected one scaling factor, found: {list(scaling_factors)}"
+            )
 
     make_stacked_line_chart(df=ctk.dataframe, x_axis=list(grouped.keys()), **kwargs)
 
 
 def setup_parser(root_parser):
+    """
+    Adds command-line arguments to the root parser.
+
+    Args:
+        root_parser (argparse.ArgumentParser): The root argument parser.
+    """
     root_parser.add_argument(
         "--workspace-dir",
         required=True,
@@ -248,14 +373,10 @@ def setup_parser(root_parser):
         help="Optional: Title of the output chart.",
     )
     root_parser.add_argument(
-        "--chart-xlabel",
-        type=str,
-        help="Optional: X Label of chart.",
+        "--chart-xlabel", type=str, help="Optional: X Label of chart."
     )
     root_parser.add_argument(
-        "--chart-ylabel",
-        type=str,
-        help="Optional: Y Label of chart.",
+        "--chart-ylabel", type=str, help="Optional: Y Label of chart."
     )
     root_parser.add_argument(
         "--chart-file-name",
@@ -270,9 +391,7 @@ def setup_parser(root_parser):
         help="Optional: Size of the output chart (xdim, ydim). Ex: --chart-figsize 10 6",
     )
     root_parser.add_argument(
-        "--chart-fontsize",
-        type=int,
-        help="Optional: Font size of the output chart.",
+        "--chart-fontsize", type=int, help="Optional: Font size of the output chart."
     )
     root_parser.add_argument(
         "--no-mpi", action="store_true", help="Hide MPI regions in the tree."
@@ -280,6 +399,12 @@ def setup_parser(root_parser):
 
 
 def command(args):
+    """
+    Validates the workspace directory and initiates data processing.
+
+    Args:
+        args (argparse.Namespace): Parsed command-line arguments.
+    """
     if ".ramble-workspace" not in os.listdir(args.workspace_dir):
         raise ValueError(
             f"Directory '{args.workspace_dir}' must be a valid ramble workspace"
@@ -289,7 +414,7 @@ def command(args):
     if wkp_dir[-1] != "/":
         wkp_dir += "/"
     args.out_dir = wkp_dir + "analyze/"
-    
+
     if not os.path.isdir(args.out_dir):
         os.mkdir(args.out_dir)
 
