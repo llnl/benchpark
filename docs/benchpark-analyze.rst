@@ -14,6 +14,10 @@ We use `Thicket <https://github.com/LLNL/thicket>`_ to help compose and visualiz
 Caliper performance data collected from running our experiment with the Caliper modifier.
 After running, ``ramble on``, run the ``benchpark analyze`` command on the ramble workspace directory.
 
+.. note::
+
+  This command required optional packages to be installed, which can be achieved with ``pip install .[analyze]`` (assuming you are in the benchpark directory)
+
 How to Run
 **********
 
