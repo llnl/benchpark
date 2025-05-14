@@ -211,16 +211,9 @@ def init_commands(subparsers, actions_dict):
         benchpark.cmd.analyze.setup_parser(analyze_parser)
         actions_dict["analyze"] = benchpark.cmd.analyze.command
     else:
-        analyze_parser.set_defaults(
-            func=argparse.ArgumentError(
-                None,
-                "Packages required for 'analyze' not found. run 'pip install benchpark[analyze]'",
-            )
-        )
-
         def analyze_command_placeholder(*args, **kwargs):
             raise RuntimeError(
-                "The 'analyze' command is not available because required packages are not installed."
+                "Packages required for 'benchpark analyze' not found. run 'pip install .[analyze]' from the 'benchpark' directory."
             )
 
         actions_dict["analyze"] = analyze_command_placeholder
