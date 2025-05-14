@@ -77,7 +77,7 @@ def _path_for_system_class(sys_cls):
 def audit_system(sys_cls):
     errors = list()
     # (a) this is the only functionality in benchpark that uses spack imports
-    # (b) most configs are now generated dynamically, which this doesnt verify
+    # (b) most configs are now generated dynamically, which this doesn't verify
     # (c) this could be done with a spack-python script
     # basedir = _path_for_system_class(sys_cls)
     # externals = basedir / "externals"
