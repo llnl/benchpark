@@ -51,6 +51,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     depends_on("hypre+mpi")
     depends_on("hypre+cuda+mpi", when="+cuda")
     depends_on("hypre@2.31.0+mixedint~fortran", when="@develop")
+    depends_on("hypre+caliper", when="+caliper")
 
     requires("+cuda", when="^hypre+cuda")
     for arch in ("none", "50", "60", "70", "80"):
@@ -58,7 +59,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         depends_on(f"mfem cuda_arch={arch}", when=f"cuda_arch={arch}")
     depends_on("mfem +cuda+mpi", when="+cuda")
     depends_on("mfem +rocm+mpi", when="+rocm")
-    depends_on("hypre +rocm +mpi", when="+rocm")
+    depends_on("hypre +rocm+mpi", when="+rocm")
     requires("+rocm", when="^hypre+rocm")
     for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
         depends_on(f"hypre amdgpu_target={target}", when=f"amdgpu_target={target}")
@@ -69,6 +70,8 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         sha256="e783a71c3cb36886eb539c0f7ac622883ed5caf7ccae597d545d48eaf051d15d",
         when="@3.1 ^mfem@4.4:",
     )
+
+    patch('laghos-caliper.patch', when="+caliper")
 
     @property
     def build_targets(self):
