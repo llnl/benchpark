@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-
+from benchpark.error import BenchparkError
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.scaling import StrongScaling
@@ -50,14 +50,15 @@ class Scaffold(
         self.add_experiment_variable(
             "package_path", self.spec.variants["scaffold_path"][0], False
         )
+        self.add_experiment_variable("timeout", 720, True)
 
-        problem_sizes = {"problem_scale": 6}
+        problem_sizes = {"n_categories": 5}
 
         for nk, nv in problem_sizes.items():
             self.add_experiment_variable(nk, nv, True)
 
         if self.spec.satisfies("+rocm"):
-            n_resources = {"n_nodes": 1, "n_ranks_per_node": 1}
+            n_resources = {"n_gpus": 1}
 
         if self.spec.satisfies("+single_node"):
             for pk, pv in n_resources.items():
@@ -71,9 +72,9 @@ class Scaffold(
             for pk, pv in scaled_variables.items():
                 self.add_experiment_variable(pk, pv, True)
 
-        self.add_experiment_variable("n_resources", "{n_nodes}*{n_ranks_per_node}", False)
-        self.add_experiment_variable("process_problem_size", "", False)
-        self.add_experiment_variable("total_problem_size", "{xx}*{yy}*{zz}", False)
+        self.add_experiment_variable("n_resources", "{n_gpus}", False)
+        self.add_experiment_variable("process_problem_size", "{n_categories}/{n_gpus}", False)
+        self.add_experiment_variable("total_problem_size", "{n_categories}", False)
 
     def compute_package_section(self):
         # Spec written into requirements.txt for pip install
