@@ -511,8 +511,7 @@ jobs:
           benchmark_mode: cuda
           benchmark_spec: gromacs+openmp+cuda~rocm gpu-aware-mpi=on
           system_name: lassen
-          system_spec: llnl-sierra cuda=11-8-0 compiler=clang-ibm lapack=essl
-            blas=essl
+          system_spec: llnl-sierra cuda=11-8-0 compiler=clang-ibm lapack=essl blas=essl
       - name: gromacs/rocm gpu-aware-mpi=force llnl-elcapitan rocm=6.2.4 compiler=cce
           +gtl lapack=intel-oneapi-mkl blas=intel-oneapi-mkl
         uses: ./.github/actions/dynamic-dry-run
