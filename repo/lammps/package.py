@@ -38,3 +38,8 @@ class Lammps(BuiltinLammps):
     args.append(f"-DMPI_CXX_COMPILER={self.spec['mpi'].mpicxx}")
 
     return args
+ 
+  def install(self, spec, prefix):
+    super().install(spec, prefix)
+    mkdirp(prefix.src)
+    install_tree(self.stage.source_path, prefix.src)
