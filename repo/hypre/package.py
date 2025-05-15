@@ -27,8 +27,6 @@ class Hypre(BuiltinHypre):
             configure_args.append("--with-fmangle-blas=no-underscores") 
             configure_args.append("--with-fmangle-lapack=no-underscores")
 
-        if self.spec["blas"].satisfies("rocblas"):
-            configure_args.append("--enable-rocblas")
         if self.spec.satisfies("^cray-mpich+gtl"):
             configure_args.append("--enable-gpu-aware-mpi")
 

@@ -42,6 +42,7 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
         depends_on(f"hypre cuda_arch={arch}", when=f"cuda_arch={arch}")
 
     depends_on("hypre+rocm", when="+rocm")
+    depends_on("hypre+rocblas", when="+rocm")
     requires("+rocm", when="^hypre+rocm")
     for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
         depends_on(f"hypre amdgpu_target={target}", when=f"amdgpu_target={target}")
