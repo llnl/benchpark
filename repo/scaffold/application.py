@@ -24,7 +24,7 @@ class Scaffold(ExecutableApplication):
     )
     executable(
         "run",
-        "SCAFFOLD_REPO_ROOT={package_path} scaffold benchmark --parent --config {package_path}ScaFFold/configs/{config}.yml -j",
+        "SCAFFOLD_REPO_ROOT={package_path} scaffold benchmark -c {package_path}/ScaFFold/configs/benchmark_default.yml --parent -j --training-nodes-time 660 --training-nodes {n_nodes} --training-gpus-per-node {n_ranks_per_node} --problem-scale {problem_scale}",
     )
 
     workload("sweep", executables=["modules", "run"])
