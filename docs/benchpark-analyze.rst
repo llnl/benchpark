@@ -82,7 +82,7 @@ Run canned analysis:
 
 .. code:: console
 
-  $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/ --chart-type "percentage_time" --top-n-nodes 10
+  $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/ --chart-type "percentage_time" --top-n-functions 10
 
 .. figure:: _static/images/kripke_cuda_strong_percentage_time_exc.png
   :width: 800
@@ -90,7 +90,7 @@ Run canned analysis:
 
 .. code:: console
 
-   $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/ --chart-type "time" --top-n-nodes 10
+   $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/ --chart-type "time" --top-n-functions 10
 
 
 .. figure:: _static/images/kripke_cuda_strong_time_exc.png
@@ -112,7 +112,7 @@ Run canned analysis:
 
 .. code:: console
 
-   $ benchpark analyze --workspace-dir wkp/kripke/cuda/weak/lassen/workspace/ --chart-type "percentage_time" --top-n-nodes 10
+   $ benchpark analyze --workspace-dir wkp/kripke/cuda/weak/lassen/workspace/ --chart-type "percentage_time" --top-n-functions 10
 
 .. figure:: _static/images/kripke_cuda_weak_percentage_time_exc.png
   :width: 800
@@ -120,7 +120,7 @@ Run canned analysis:
 
 .. code:: console
 
-   $ benchpark analyze --workspace-dir wkp/kripke/cuda/weak/lassen/workspace/ --chart-type "time" --top-n-nodes 10
+   $ benchpark analyze --workspace-dir wkp/kripke/cuda/weak/lassen/workspace/ --chart-type "time" --top-n-functions 10
 
 .. figure:: _static/images/kripke_cuda_weak_time_exc.png
   :width: 800
@@ -141,7 +141,7 @@ Run canned analysis:
 
 .. code:: console
 
-   $ benchpark analyze --workspace-dir wkp/kripke/cuda/throughput/lassen/workspace/ --chart-type "percentage_time" --top-n-nodes 10
+   $ benchpark analyze --workspace-dir wkp/kripke/cuda/throughput/lassen/workspace/ --chart-type "percentage_time" --top-n-functions 10
 
 .. figure:: _static/images/kripke_cuda_throughput_percentage_time_exc.png
   :width: 800
@@ -149,7 +149,7 @@ Run canned analysis:
 
 .. code:: console
 
-   $ benchpark analyze --workspace-dir wkp/kripke/cuda/throughput/lassen/workspace/ --chart-type "time" --top-n-nodes 10
+   $ benchpark analyze --workspace-dir wkp/kripke/cuda/throughput/lassen/workspace/ --chart-type "time" --top-n-functions 10
 
 .. figure:: _static/images/kripke_cuda_throughput_time_exc.png
   :width: 800
@@ -160,7 +160,7 @@ Inclusive Metrics
 
 .. code:: console
 
-  $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/ --chart-type "time" --y-axis-metric "Avg time/rank" --top-n-nodes 10
+  $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/ --chart-type "time" --y-axis-metric "Avg time/rank" --top-n-functions 10
 
 We can also visualize any inclusive metrics by selecting them as the ``y_axis_metric``. Here we use ``Avg time/rank`` instead of ``Avg time/rank (exc)``.
 The ``main`` node is automatically removed from the figure, because this information is redundant for the inclusive metric.
