@@ -56,14 +56,13 @@ def get_scaling_type(spec):
     raise ValueError(f"Unknown scaling type. Must be one of {SCALING_TYPES}")
 
 
-def validate_single_metadata_value(column, tk, label):
+def validate_single_metadata_value(column, tk):
     """
     Validates that a Thicket metadata column has a single unique value.
 
     Args:
         column (str): Column name to check.
         tk (th.Thicket): Thicket object.
-        label (str): Label to include in error messages.
 
     Returns:
         Any: The single unique value in the column.
@@ -73,7 +72,7 @@ def validate_single_metadata_value(column, tk, label):
     """
     unique_vals = tk.metadata[column].unique()
     if len(unique_vals) != 1:
-        raise ValueError(f"Expected one {label}, got: {list(unique_vals)}")
+        raise ValueError(f"Expected one {column}, got: {list(unique_vals)}")
     return unique_vals[0]
 
 
@@ -233,9 +232,9 @@ def prepare_data(**kwargs):
     )
 
     # Check these values are constant
-    app = validate_single_metadata_value("application_name", tk, "application")
-    cluster = validate_single_metadata_value("cluster", tk, "cluster")
-    version = validate_single_metadata_value("version", tk, "version")
+    app = validate_single_metadata_value("application_name", tk)
+    cluster = validate_single_metadata_value("cluster", tk)
+    version = validate_single_metadata_value("version", tk)
 
     # Find programming model from spec
     programming_model = "mpi"
@@ -252,6 +251,9 @@ def prepare_data(**kwargs):
     constant_str = ", ".join(
         f"{tk.metadata[key].iloc[0]} {key}" for key in constant_keys
     )
+    # Check constant
+    for key in constant_keys:
+        validate_single_metadata_value(key, tk)
 
     if not kwargs.get("chart_title"):
         kwargs["chart_title"] = (
