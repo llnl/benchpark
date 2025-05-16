@@ -81,7 +81,7 @@ class LlnlElcapitan(System):
         # TODO: Replace this with lookups into the working set
         self.rocm_version = Version(self.spec.variants["rocm"][0])
         if self.spec.satisfies("compiler=gcc"):
-            self.gcc_version = Version("12.2.0")
+            self.gcc_version = Version("13.3.1")
             self.mpi_version = Version("8.1.26")
         else:
             if self.rocm_version >= Version("6.0.0"):
@@ -274,12 +274,12 @@ class LlnlElcapitan(System):
             "compilers": [
                 {
                     "compiler": {
-                        "spec": "gcc@12.2.0",
+                        "spec": "gcc@13.3.1",
                         "paths": {
-                            "cc": "/opt/cray/pe/gcc/12.2.0/bin/gcc",
-                            "cxx": "/opt/cray/pe/gcc/12.2.0/bin/g++",
-                            "f77": "/opt/cray/pe/gcc/12.2.0/bin/gfortran",
-                            "fc": "/opt/cray/pe/gcc/12.2.0/bin/gfortran",
+                            "cc": "/opt/cray/pe/gcc/13.3.1/bin/gcc",
+                            "cxx": "/opt/cray/pe/gcc/13.3.1/bin/g++",
+                            "f77": "/opt/cray/pe/gcc/13.3.1/bin/gfortran",
+                            "fc": "/opt/cray/pe/gcc/13.3.1/bin/gfortran",
                         },
                         "flags": {},
                         "operating_system": "rhel8",
