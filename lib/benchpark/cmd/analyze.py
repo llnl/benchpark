@@ -267,7 +267,7 @@ def prepare_data(**kwargs):
     if prefix:
         ctk.dataframe = ctk.dataframe.filter(like=prefix, axis=0)
 
-    top_n = kwargs.get("top_n_nodes", -1)
+    top_n = kwargs.get("top_n_functions", -1)
     if top_n != -1:
         ctk.dataframe = ctk.dataframe.nlargest(
             top_n, [(list(grouped.keys())[0], metric)]
@@ -334,7 +334,7 @@ def setup_parser(root_parser):
         help="Optional: Specify if nodes with the same name are combined or not.",
     )
     root_parser.add_argument(
-        "--top-n-nodes",
+        "--top-n-functions",
         default=-1,
         type=int,
         help="Optional: Filters only top n longest time entries to be included in chart.",
