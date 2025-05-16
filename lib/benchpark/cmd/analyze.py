@@ -119,8 +119,14 @@ def make_stacked_line_chart(**kwargs):
     logger.info(f"Saving DataFrame to {csvfile}")
     df.to_csv(csvfile)
 
-    tdf_calls = df[[(i, "Calls/rank (max)") for i in x_axis]].T.reset_index(level=1, drop=True)
-    calls_dict = {column: int(max(tdf_calls[column])) for column in tdf_calls.columns if column != "name"}
+    tdf_calls = df[[(i, "Calls/rank (max)") for i in x_axis]].T.reset_index(
+        level=1, drop=True
+    )
+    calls_dict = {
+        column: int(max(tdf_calls[column]))
+        for column in tdf_calls.columns
+        if column != "name"
+    }
     tdf = df[[(i, value) for i in x_axis]].T.reset_index(level=1, drop=True)
     mpl.rcParams["axes.prop_cycle"] = mpl.cycler(color=COLOR_PALETTE)
     if kwargs.get("chart_fontsize"):
@@ -151,7 +157,7 @@ def make_stacked_line_chart(**kwargs):
         labels,
         bbox_to_anchor=(1, 0.5),
         loc="center left",
-        title="Function (Calls/rank (max))"
+        title="Function (Calls/rank (max))",
     )
 
     fig.autofmt_xdate()
