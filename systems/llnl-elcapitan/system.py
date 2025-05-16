@@ -235,8 +235,8 @@ class LlnlElcapitan(System):
                 "cray-libsci": {
                     "externals": [
                         {
-                            "spec": "cray-libsci@23.05.1.4%cce",
-                            "prefix": "/opt/cray/pe/libsci/23.05.1.4/cray/12.0/x86_64/",
+                            "spec": "cray-libsci@25.03.0%cce",
+                            "prefix": "/opt/cray/pe/libsci/25.03.0/cray/18.0/x86_64/",
                         }
                     ]
                 }
@@ -246,8 +246,8 @@ class LlnlElcapitan(System):
                 "cray-libsci": {
                     "externals": [
                         {
-                            "spec": "cray-libsci@23.05.1.4%gcc",
-                            "prefix": "/opt/cray/pe/libsci/23.05.1.4/gnu/10.3/x86_64/",
+                            "spec": "cray-libsci@25.03.0%gcc",
+                            "prefix": "/opt/cray/pe/libsci/25.03.0/gnu/13.1/x86_64/",
                         }
                     ]
                 }
