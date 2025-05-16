@@ -28,6 +28,12 @@ COLOR_PALETTE = [
     "#377eb8",
 ]
 SCALING_TYPES = ["+strong", "+throughput", "+weak"]
+NAME_REMAP = {
+    "total_problem_size": "Total Problem Size",
+    "process_problem_size": "Process Problem Size",
+    "n_resources": "MPI Ranks",
+    "n_nodes": "Node(s)",
+}
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -124,7 +130,7 @@ def make_stacked_line_chart(**kwargs):
     tdf.plot(
         kind="area",
         title=kwargs.get("chart_title", ""),
-        xlabel=kwargs.get("chart_xlabel", ""),
+        xlabel=", ".join(NAME_REMAP[x] for x in kwargs.get("chart_xlabel", "")),
         ylabel=y_label,
         figsize=kwargs["chart_figsize"] if kwargs["chart_figsize"] else (12, 6),
         ax=ax,
@@ -234,7 +240,7 @@ def prepare_data(**kwargs):
         "throughput": ["n_resources", "n_nodes"],
     }[scaling]
     constant_str = ", ".join(
-        f"{tk.metadata[key].iloc[0]} {key}" for key in constant_keys
+        f"{int(tk.metadata[key].iloc[0]):,} {NAME_REMAP[key]}" for key in constant_keys
     )
     # Check constant
     for key in constant_keys:
@@ -242,7 +248,7 @@ def prepare_data(**kwargs):
 
     if not kwargs.get("chart_title"):
         kwargs["chart_title"] = (
-            f"{cluster}/{app}+{programming_model}@{version} ({scaling} scaling, constant {constant_str})"
+            f"{cluster}/{app}+{programming_model}@{version} ({scaling} scaling)\n{constant_str}"
         )
 
     kwargs["chart_file_name"] = (
