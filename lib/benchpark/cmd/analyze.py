@@ -101,11 +101,6 @@ def make_stacked_line_chart(**kwargs):
     x_axis = kwargs.get("x_axis")
     y_axis_metric = kwargs.get("y_axis_metric")
 
-    if df is None or chart_type is None or x_axis is None or y_axis_metric is None:
-        raise ValueError(
-            "Missing required parameters. 'df', 'chart_type', 'x_axis', and 'y_axis_metric' are required."
-        )
-
     value = "perc" if chart_type == "percentage_time" else y_axis_metric
     y_label = kwargs.get("chart_ylabel") or (
         f"Percentage of {y_axis_metric}"
@@ -118,6 +113,8 @@ def make_stacked_line_chart(**kwargs):
     logger.info(f"Saving DataFrame to {csvfile}")
     df.to_csv(csvfile)
 
+    tdf_calls = df[[(i, "Calls/rank (max)") for i in x_axis]].T.reset_index(level=1, drop=True)
+    calls_dict = {column: int(max(tdf_calls[column])) for column in tdf_calls.columns if column != "name"}
     tdf = df[[(i, value) for i in x_axis]].T.reset_index(level=1, drop=True)
     mpl.rcParams["axes.prop_cycle"] = mpl.cycler(color=COLOR_PALETTE)
     if kwargs.get("chart_fontsize"):
@@ -134,11 +131,15 @@ def make_stacked_line_chart(**kwargs):
     )
 
     handles, labels = ax.get_legend_handles_labels()
+    handles = list(reversed(handles))
+    labels = list(reversed(labels))
+    labels = [str(l) + " (" + str(calls_dict[l]) + ")" for l in labels]
     ax.legend(
-        list(reversed(handles)),
-        list(reversed(labels)),
+        handles,
+        labels,
         bbox_to_anchor=(1, 0.5),
         loc="center left",
+        title="Function (Calls/rank (max))"
     )
 
     fig.autofmt_xdate()
@@ -155,22 +156,6 @@ def make_stacked_line_chart(**kwargs):
 def prepare_data(**kwargs):
     """
     Processes .cali files from a Ramble workspace to generate performance charts.
-
-    Args:
-        workspace_dir (str): Directory containing the Ramble workspace.
-        chart_type (str): Type of chart ("time" or "percentage_time").
-        x_axis_unique_metadata (list of str, optional): Metadata keys to use for X-axis grouping.
-        y_axis_metric (str): Metric used for chart visualization.
-        filter_nodes_name_prefix (str, optional): Prefix to filter node names in the data.
-        group_nodes_name (bool): If True, groups nodes by their name.
-        top_n_nodes (int): Number of top nodes to include in the chart.
-        chart_title (str, optional): Title of the chart.
-        chart_xlabel (str, optional): X-axis label.
-        chart_ylabel (str, optional): Y-axis label.
-        chart_figsize (list of int, optional): Size of the figure (width, height).
-        chart_fontsize (int, optional): Font size for the chart.
-        no_mpi (bool): If True, filters out MPI regions.
-        out_dir (str): Directory for output files.
     """
     workspace_dir = kwargs["workspace_dir"]
     files = glob(os.path.join(workspace_dir, "**/*.cali"), recursive=True)
