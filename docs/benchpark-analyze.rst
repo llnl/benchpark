@@ -1,8 +1,7 @@
-..
-   Copyright 2022 Lawrence Livermore National Security, LLC and other
-   Thicket Project Developers. See the top-level LICENSE file for details.
+.. Copyright 2023 Lawrence Livermore National Security, LLC and other
+   Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 
-   SPDX-License-Identifier: MIT
+   SPDX-License-Identifier: Apache-2.0
 
 #####################################
 Canned Analysis for Scaling Studies
