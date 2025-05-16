@@ -248,7 +248,7 @@ def prepare_data(**kwargs):
 
     if not kwargs.get("chart_title"):
         kwargs["chart_title"] = (
-            f"{cluster}/{app}+{programming_model}@{version} ({scaling} scaling)\n{constant_str}"
+            f"{app}+{programming_model}@{version} on {cluster} ({scaling} scaling)\n{constant_str}"
         )
 
     kwargs["chart_file_name"] = (
