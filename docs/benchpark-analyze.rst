@@ -33,33 +33,33 @@ Available Arguments
 
    * - Argument
      - Description
-   * - --workspace-dir
+   * - workspace-dir
      - Str: Required. Directory of Ramble workspace.
-   * - --chart-type
+   * - chart-type
      - Str: Optional. Specify type of output chart. Choices: `"percentage_time"` | `"time"`. Default is `"time"`.
-   * - --x_axis-unique-metadata
+   * - x_axis-unique-metadata
      - Str: Optional. Parameter that is varied during the experiment. Default is `None`.
-   * - --y-axis-metric
+   * - y-axis-metric
      - Str: Optional. Metric to be visualized. Default is `"Avg time/rank (exc)"`.
-   * - --filter-nodes-name-prefix
+   * - filter-nodes-name-prefix
      - Str: Optional. Filters only entries with prefix to be included in the chart. Default is `""`.
-   * - --group-nodes-name
+   * - group-nodes-name
      - Bool: Optional. Specify if nodes with the same name are combined. Default is `True`.
-   * - --top-n-nodes
+   * - top-n-nodes
      - Int: Optional. Filters only top n longest time entries to be included in the chart. Default is `-1` (no filter).
-   * - --chart-title
+   * - chart-title
      - Str: Optional. Title of the output chart. Default is `None`.
-   * - --chart-xlabel
+   * - chart-xlabel
      - Str: Optional. X-axis label of the chart.
-   * - --chart-ylabel
+   * - chart-ylabel
      - Str: Optional. Y-axis label of the chart.
-   * - --chart-file-name
+   * - chart-file-name
      - Str: Optional. Output chart file name. Default is `"stacked_line_chart"`.
-   * - --chart-figsize
+   * - chart-figsize
      - List of Ints: Optional. Size of the output chart `(xdim, ydim)`. Example: `--chart-figsize 10 6`.
-   * - --chart-fontsize
+   * - chart-fontsize
      - Int: Optional. Font size of the output chart.
-   * - --no-mpi
+   * - no-mpi
      - Bool: Optional. Hide MPI regions in the tree.
 
 Analysis of Strong, Weak, and Throughput Scaling of Kripke
