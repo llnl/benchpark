@@ -151,7 +151,7 @@ def make_stacked_line_chart(**kwargs):
     handles, labels = ax.get_legend_handles_labels()
     handles = list(reversed(handles))
     labels = list(reversed(labels))
-    labels = [str(l) + " (" + str(calls_dict[l]) + ")" for l in labels]
+    labels = [str(label) + " (" + str(calls_dict[label]) + ")" for label in labels]
     ax.legend(
         handles,
         labels,
