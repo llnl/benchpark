@@ -270,7 +270,6 @@ def prepare_data(**kwargs):
         f.write(clean_tree)
     logger.info(f"Saving Unmodified Calltree structure to {tree_file}")
 
-
     if kwargs.get("group_nodes_name"):
         ctk.dataframe = ctk.dataframe.groupby("name").sum()
 
