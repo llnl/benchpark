@@ -129,7 +129,7 @@ def make_stacked_line_chart(**kwargs):
         title=kwargs.get("chart_title", ""),
         xlabel=kwargs.get("chart_xlabel", ""),
         ylabel=y_label,
-        figsize=kwargs["chart_figsize"] if "chart_figsize" in kwargs else (12, 6),
+        figsize=kwargs["chart_figsize"] if kwargs["chart_figsize"] else (12, 6),
         ax=ax,
     )
 
