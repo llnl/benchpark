@@ -168,7 +168,6 @@ def prepare_data(**kwargs):
         chart_title (str, optional): Title of the chart.
         chart_xlabel (str, optional): X-axis label.
         chart_ylabel (str, optional): Y-axis label.
-        chart_file_name (str): Name for output files.
         chart_figsize (list of int, optional): Size of the figure (width, height).
         chart_fontsize (int, optional): Font size for the chart.
         no_mpi (bool): If True, filters out MPI regions.
@@ -192,11 +191,6 @@ def prepare_data(**kwargs):
         text = text[:legend_index]
     clean_tree = text.replace("0", "")
     kwargs["tree_str"] = clean_tree
-    # Save to file
-    tree_file = os.path.join(kwargs["out_dir"], kwargs["chart_file_name"] + ".txt")
-    with open(tree_file, "w") as f:
-        f.write(clean_tree)
-    logger.info(f"Saving Unmodified Calltree structure to {tree_file}")
 
     # Remove MPI regions, if necesasry
     if kwargs.get("no_mpi"):
@@ -267,6 +261,12 @@ def prepare_data(**kwargs):
     kwargs["chart_file_name"] = (
         f"{app}_{programming_model}_{scaling}_{kwargs['chart_type']}_{'inc' if metric in tk.inc_metrics else 'exc'}"
     )
+
+    # Save tree to file
+    tree_file = os.path.join(kwargs["out_dir"], kwargs["chart_file_name"] + "-tree.txt")
+    with open(tree_file, "w") as f:
+        f.write(clean_tree)
+    logger.info(f"Saving Unmodified Calltree structure to {tree_file}")
 
 
     if kwargs.get("group_nodes_name"):
@@ -364,12 +364,6 @@ def setup_parser(root_parser):
     )
     root_parser.add_argument(
         "--chart-ylabel", type=str, help="Optional: Y Label of chart."
-    )
-    root_parser.add_argument(
-        "--chart-file-name",
-        default="stacked_line_chart",
-        type=str,
-        help="Optional: Set output chart file name.",
     )
     root_parser.add_argument(
         "--chart-figsize",
