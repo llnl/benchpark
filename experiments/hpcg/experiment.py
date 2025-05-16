@@ -79,6 +79,10 @@ class Hpcg(
 
         self.add_experiment_variable("iterations", "60", False)
 
+        self.add_experiment_variable("n_resources", "{n_ranks}", False)
+        self.add_experiment_variable("process_problem_size", "{mx}*{my}*{mz}/{n_ranks}", False)
+        self.add_experiment_variable("total_problem_size", "{mx}*{my}*{mz}", False)
+
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
