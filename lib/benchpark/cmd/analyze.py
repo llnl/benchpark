@@ -126,11 +126,17 @@ def make_stacked_line_chart(**kwargs):
     if kwargs.get("chart_fontsize"):
         mpl.rcParams.update({"font.size": kwargs.get("chart_fontsize")})
 
+    xlabel = kwargs.get("chart_xlabel")
+    if isinstance(xlabel, list):
+        xlabel = ", ".join(NAME_REMAP[x] for x in xlabel)
+    else:
+        if xlabel in NAME_REMAP:
+            xlabel = NAME_REMAP[xlabel]
     fig, ax = plt.subplots()
     tdf.plot(
         kind="area",
         title=kwargs.get("chart_title", ""),
-        xlabel=", ".join(NAME_REMAP[x] for x in kwargs.get("chart_xlabel", "")),
+        xlabel=xlabel,
         ylabel=y_label,
         figsize=kwargs["chart_figsize"] if kwargs["chart_figsize"] else (12, 6),
         ax=ax,
