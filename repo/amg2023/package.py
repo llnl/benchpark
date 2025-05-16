@@ -47,6 +47,8 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
         depends_on(f"hypre amdgpu_target={target}", when=f"amdgpu_target={target}")
 
+    depends_on("hypre+gpu-aware-mpi", when="^cray-mpich+gtl")
+
     def setup_build_environment(self, env):
         if "+cuda" in self.spec:
             env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")

@@ -27,9 +27,6 @@ class Hypre(BuiltinHypre):
             configure_args.append("--with-fmangle-blas=no-underscores") 
             configure_args.append("--with-fmangle-lapack=no-underscores")
 
-        if self.spec.satisfies("^cray-mpich+gtl"):
-            configure_args.append("--enable-gpu-aware-mpi")
-
         return configure_args
 
     def setup_build_environment(self, env):
