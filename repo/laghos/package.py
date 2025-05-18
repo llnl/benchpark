@@ -16,7 +16,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     tags = ["proxy-app", "ecp-proxy-app"]
 
     homepage = "https://github.com/CEED/Laghos"
-    git = "https://github.com/wdhawkins/Laghos.git"
+    git = "https://github.com/rfhaque/Laghos.git"
 
     maintainers("wdhawkins")
 
@@ -33,15 +33,14 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     depends_on("caliper", when="+caliper")
     depends_on("adiak~shared", when="+caliper")
 
-    depends_on("zlib@1.3.1+optimize+pic+shared")
-    #depends_on("zlib@1.3.1+optimize+pic+shared", when="@develop")
+    depends_on("zlib+optimize+pic~shared")
+    depends_on("mfem@develop", when="@develop")
     depends_on("mfem@4.2.0:", when="@3.1")
     depends_on("mfem@4.1.0:4.1", when="@3.0")
     # Recommended mfem version for laghos v2.0 is: ^mfem@3.4.1-laghos-v2.0
     depends_on("mfem@3.4.1-laghos-v2.0", when="@2.0")
     # Recommended mfem version for laghos v1.x is: ^mfem@3.3.1-laghos-v1.0
     depends_on("mfem@3.3.1-laghos-v1.0", when="@1.0,1.1")
-    depends_on("mfem@4.4", when="@develop")
     depends_on("mfem+caliper", when="+caliper")
     depends_on("mfem cxxstd=14")
 
@@ -50,7 +49,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     depends_on("mpi")
     depends_on("hypre+mpi")
     depends_on("hypre+cuda+cublas+mpi", when="+cuda")
-    depends_on("hypre@2.31.0+mixedint~fortran", when="@develop")
+    depends_on("hypre+mixedint~fortran", when="@develop")
     depends_on("hypre+caliper", when="+caliper")
 
     requires("+cuda", when="^hypre+cuda")
@@ -59,6 +58,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         depends_on(f"mfem cuda_arch={arch}", when=f"cuda_arch={arch}")
     depends_on("mfem +cuda+mpi", when="+cuda")
     depends_on("mfem +rocm+mpi", when="+rocm")
+    depends_on("mfem ^hipblas", when="+rocm")
     depends_on("hypre +rocm+rocblas +mpi", when="+rocm")
     requires("+rocm", when="^hypre+rocm")
     for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
@@ -74,8 +74,6 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         when="@3.1 ^mfem@4.4:",
     )
 
-    patch('laghos-caliper.patch', when="+caliper")
-
     @property
     def build_targets(self):
         targets = []
@@ -84,7 +82,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         targets.append("MFEM_DIR=%s" % spec["mfem"].prefix)
         targets.append("CONFIG_MK=%s" % spec["mfem"].package.config_mk)
         targets.append("TEST_MK=%s" % spec["mfem"].package.test_mk)
-        if "+caliper" in self.spec: 
+        if "+caliper" in self.spec:
             targets.append("CALIPER_DIR=%s" % spec["caliper"].prefix)
             targets.append("ADIAK_DIR=%s" % spec["adiak"].prefix)
         if spec.satisfies("@:2.0"):
@@ -97,7 +95,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     def check(self):
         with working_dir(self.build_directory):
             make("test", *self.build_targets)
- 
+
     def install(self, spec, prefix):
         mkdirp(prefix.bin)
         install("laghos", prefix.bin)
