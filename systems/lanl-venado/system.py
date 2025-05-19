@@ -59,15 +59,15 @@ class LanlVenado(System):
 
     variant(
         "lapack",
-        default="cusolver",
-        values=("cusolver", "cray-libsci"),
+        default="cray-libsci",
+        values=("cray-libsci",),
         description="Which lapack to use",
     )
 
     variant(
         "blas",
-        default="cublas",
-        values=("cublas", "cray-libsci"),
+        default="cray-libsci",
+        values=("cray-libsci",),
         description="Which blas to use",
     )
 
