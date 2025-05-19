@@ -57,7 +57,7 @@ class AwsPcluster(System):
     def __init__(self, spec):
         super().__init__(spec)
         self.programming_models = [OpenMPSystem()]
-        
+
         self.scheduler = "slurm"
         # TODO: for some reason I have to index to get value, even if multi=False
         attrs = self.id_to_resources.get(self.spec.variants["instance_type"][0])

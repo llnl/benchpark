@@ -34,7 +34,7 @@ class RikenFugaku(System):
     def __init__(self, spec):
         super().__init__(spec)
         self.programming_models = [OpenMPSystem()]
-        
+
         self.scheduler = "pjm"
         attrs = self.id_to_resources.get("fugaku")
         for k, v in attrs.items():

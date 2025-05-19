@@ -47,7 +47,7 @@ class JscJuwels(System):
         super().__init__(spec)
         self.programming_models = [CudaSystem()]
         self.cuda_version = Version(self.spec.variants["cuda"][0])
-        self.gtl_flag = Version(self.spec.variants["gtl"][0])
+        self.gtl_flag = self.spec.variants["gtl"][0]
 
         if self.spec.satisfies("compiler=gcc"):
             self.gcc_version = Version("12.3.0")
@@ -57,7 +57,6 @@ class JscJuwels(System):
         attrs = self.id_to_resources.get("juwels")
         for k, v in attrs.items():
             setattr(self, k, v)
-
 
     def compute_compilers_section(self):
         selections = {

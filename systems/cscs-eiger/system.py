@@ -32,7 +32,7 @@ class CscsEiger(System):
     def __init__(self, spec):
         super().__init__(spec)
         self.programming_models = [OpenMPSystem()]
-        
+
         self.gcc_version = Version("12.3.0")
 
         self.scheduler = "slurm"

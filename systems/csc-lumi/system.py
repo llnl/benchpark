@@ -11,15 +11,14 @@ from benchpark.system import System
 from packaging.version import Version
 
 
-
 class CscLumi(System):
 
     maintainers("mckinsey1")
-    
+
     id_to_resources = {
         "lumi": {
             "rocm_arch": "gfx90a",
-            "gtl_flag" : "",
+            "gtl_flag": "",
             "sys_cores_per_node": 64,
             "sys_gpus_per_node": 8,
             "sys_mem_per_node": 512,
@@ -47,13 +46,13 @@ class CscLumi(System):
         values=("gcc11", "gcc12", "cce14", "cce15", "cce16"),
         description="Which compiler to use",
     )
-    
+
     def __init__(self, spec):
         super().__init__(spec)
         self.programming_models = [ROCmSystem()]
         self.rocm_version = Version(self.spec.variants["rocm"][0])
-        self.gtl_flag = Version(self.spec.variants["gtl"][0])
-        
+        self.gtl_flag = self.spec.variants["gtl"][0]
+
         full_versions = {
             "cce16": "16.0.1",
             "cce15": "15.0.1",
@@ -65,11 +64,9 @@ class CscLumi(System):
             if key == self.spec.variants["compiler"][0]:
                 self.compiler_version = Version(value)
 
-
         attrs = self.id_to_resources.get("lumi")
         for k, v in attrs.items():
             setattr(self, k, v)
-
 
     def compute_packages_section(self):
 

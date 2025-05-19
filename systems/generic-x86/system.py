@@ -15,7 +15,7 @@ class GenericX86(System):
     def __init__(self, spec):
         super().__init__(spec)
         self.programming_models = [OpenMPSystem()]
-        
+
         self.scheduler = "mpi"
         setattr(self, "sys_cores_per_node", 1)
 

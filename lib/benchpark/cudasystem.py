@@ -11,7 +11,7 @@ class CudaSystem:
 
     def verify(self, system):
         assert "cuda" in system.variants
-        assert "gtl" in	system.variants
+        assert "gtl" in system.variants
         assert hasattr(system, "cuda_arch")
         assert hasattr(system, "cuda_version")
         assert hasattr(system, "gtl_flag")
@@ -20,5 +20,5 @@ class CudaSystem:
         return {
             "cuda_arch": system.cuda_arch,
             "cuda_version": system.cuda_version,
-            "gtl_flag":	system.gtl_flag,
+            "gtl_flag": system.gtl_flag,
         }

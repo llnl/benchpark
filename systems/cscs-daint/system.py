@@ -43,14 +43,13 @@ class CscsDaint(System):
         description="Which compiler to use",
     )
 
-
     def __init__(self, spec):
         super().__init__(spec)
         self.programming_models = [CudaSystem()]
         self.cuda_arch = 60
         self.cuda_version = Version(self.spec.variants["cuda"][0])
-        self.gtl_flag = Version(self.spec.variants["gtl"][0])
-        
+        self.gtl_flag = self.spec.variants["gtl"][0]
+
         full_versions = {
             "cce": "12.0.3",
             "gcc9": "9.3.0",
@@ -67,7 +66,6 @@ class CscsDaint(System):
         attrs = self.id_to_resources.get("daint")
         for k, v in attrs.items():
             setattr(self, k, v)
-
 
     def compute_packages_section(self):
         selections = self.cuda_config(self.cuda_version)

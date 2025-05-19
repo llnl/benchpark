@@ -75,15 +75,14 @@ class LanlVenado(System):
         if self.spec.variants["cluster"][0] == "grace-hopper":
             self.programming_models = [CudaSystem()]
             self.cuda_version = Version(self.spec.variants["cuda"][0])
-            self.gtl_flag = Version(self.spec.variants["gtl"][0])
+            self.gtl_flag = self.spec.variants["gtl"][0]
         if self.spec.variants["cluster"][0] == "grace-grace":
             self.programming_models = [OpenMPSystem()]
-        
+
         self.scheduler = "slurm"
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
-
 
     def compute_packages_section(self):
         selections = {

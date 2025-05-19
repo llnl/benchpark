@@ -77,7 +77,7 @@ class LlnlElcapitan(System):
         super().__init__(spec)
         self.programming_models = [ROCmSystem()]
         self.rocm_version = Version(self.spec.variants["rocm"][0])
-        self.gtl_flag = Version(self.spec.variants["gtl"][0])
+        self.gtl_flag = self.spec.variants["gtl"][0]
 
         # TODO: Replace this with lookups into the working set
         if self.spec.satisfies("compiler=gcc"):
@@ -106,7 +106,6 @@ class LlnlElcapitan(System):
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
-
 
     def compute_packages_section(self):
         selections = {
