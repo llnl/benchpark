@@ -12,8 +12,6 @@ from benchpark.paths import hardware_descriptions
 
 class CscLumi(System):
 
-    maintainers("pszi1ard")
-
     id_to_resources = {
         "lumi": {
             "sys_cores_per_node": 64,
