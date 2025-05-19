@@ -12,8 +12,6 @@ from benchpark.paths import hardware_descriptions
 
 class JscJuwels(System):
 
-    maintainers("pearce8")
-
     id_to_resources = {
         "juwels": {
             "sys_cores_per_node": 48,

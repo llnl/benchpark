@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainers
+from benchpark.directives import variant
 from benchpark.experiment import Experiment
 from benchpark.scaling import StrongScaling
 
@@ -23,8 +23,6 @@ class MdTest(
         default="1.9.3",
         description="app version",
     )
-
-    maintainers("rfhaque")
 
     def compute_applications_section(self):
 

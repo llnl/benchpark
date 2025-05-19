@@ -12,8 +12,6 @@ from benchpark.paths import hardware_descriptions
 
 class CscsEiger(System):
 
-    maintainers("pearce8")
-
     id_to_resources = {
         "eiger": {
             "sys_cores_per_node": 128,
