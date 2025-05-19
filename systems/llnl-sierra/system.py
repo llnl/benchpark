@@ -3,20 +3,19 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-
 from benchpark.directives import variant, maintainers
-from benchpark.system import System
 from benchpark.cudasystem import CudaSystem
-from benchpark.openmpsystem import OpenMPSystem
 from benchpark.paths import hardware_descriptions
+from benchpark.system import System
 
 
-class LlnlSierra(System, CudaSystem, OpenMPSystem):
+class LlnlSierra(System):
 
     maintainers("pearce8", "nhanford", "rfhaque")
 
     id_to_resources = {
         "lassen": {
+            "cuda_arch": 70,
             "sys_cores_per_node": 44,
             "sys_gpus_per_node": 4,
             "system_site": "llnl",
@@ -28,25 +27,28 @@ class LlnlSierra(System, CudaSystem, OpenMPSystem):
 
     variant(
         "cuda",
-        default="11-8-0",
-        values=("11-8-0", "10-1-243"),
+        default="11.8.0",
+        values=("11.8.0", "10.1.243"),
         description="CUDA version",
     )
-
+    variant(
+        "gtl",
+        default=False,
+        values=(True, False),
+        description="Use GTL-enabled MPI",
+    )
     variant(
         "compiler",
         default="clang-ibm",
         values=("clang-ibm", "xl", "xl-gcc", "clang"),
         description="Which compiler to use",
     )
-
     variant(
         "lapack",
         default="essl",
         values=("essl",),
         description="Which lapack to use",
     )
-
     variant(
         "blas",
         default="essl",
@@ -56,17 +58,15 @@ class LlnlSierra(System, CudaSystem, OpenMPSystem):
 
     def __init__(self, spec):
         super().__init__(spec)
+        self.programming_models = [CudaSystem()]
+        self.cuda_version = Version(self.spec.variants["cuda"][0])
+        self.gtl_flag = Version(self.spec.variants["gtl"][0])
 
         self.scheduler = "lsf"
         attrs = self.id_to_resources.get("lassen")
         for k, v in attrs.items():
             setattr(self, k, v)
 
-    def system_specific_variables(self):
-        return {
-            "cuda_arch": 70,
-            "default_cuda_version": self.spec.variants["cuda"][0].replace("-", "."),
-        }
 
     def compute_packages_section(self):
 

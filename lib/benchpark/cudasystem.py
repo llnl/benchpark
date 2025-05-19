@@ -3,23 +3,22 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-
-from benchpark.directives import provides, variant
+from benchpark.directives import provides
 
 
 class CudaSystem:
     provides("cuda")
 
-    # How can we enforce that all CudaSystems expose a cuda variant?
-    variant(
-        "cuda",
-        default="11-8-0",
-        values=("11-8-0", "10-1-243"),
-        description="CUDA version",
-    )
+    def verify(self, system):
+        assert "cuda" in system.variants
+        assert "gtl" in	system.variants
+        assert hasattr(system, "cuda_arch")
+        assert hasattr(system, "cuda_version")
+        assert hasattr(system, "gtl_flag")
 
-    def cuda_arch(self):
-        return NotImplementedError("Each system must implement cuda_arch")
-
-    def default_cuda_version(self):
-        return NotImplementedError("Each system must implement cuda_version")
+    def system_specific_variables(self, system):
+        return {
+            "cuda_arch": system.cuda_arch,
+            "cuda_version": system.cuda_version,
+            "gtl_flag":	system.gtl_flag,
+        }

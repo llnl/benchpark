@@ -11,15 +11,17 @@ from benchpark.cudasystem import CudaSystem
 from benchpark.paths import hardware_descriptions
 
 
-class LanlVenado(System, OpenMPSystem, CudaSystem):
+class LanlVenado(System):
 
     maintainers("rfhaque", "gshipman")
 
     id_to_resources = {
         "grace-hopper": {
+            "cuda_arch": 90,
             "sys_cores_per_node": 144,
             "sys_gpus_per_node": 4,
             "system_site": "lanl",
+            "extra_batch_opts": "-A llnl_ai_g -pgpu",
             "hardware_key": str(hardware_descriptions)
             + "/HPECray-neoverse-H100-Slingshot/hardware_description.yaml",
         },
@@ -37,35 +39,30 @@ class LanlVenado(System, OpenMPSystem, CudaSystem):
         values=("grace-hopper", "grace-grace"),
         description="Which cluster to run on",
     )
-
     variant(
         "cuda",
         default="12.5",
         values=("11.8", "12.5"),
         description="CUDA version",
     )
-
     variant(
         "compiler",
         default="cce",
         values=("gcc", "cce"),
         description="Which compiler to use",
     )
-
     variant(
         "gtl",
         default=False,
         values=(True, False),
         description="Use GTL-enabled MPI",
     )
-
     variant(
         "lapack",
         default="cray-libsci",
         values=("cray-libsci",),
         description="Which lapack to use",
     )
-
     variant(
         "blas",
         default="cray-libsci",
@@ -75,18 +72,18 @@ class LanlVenado(System, OpenMPSystem, CudaSystem):
 
     def __init__(self, spec):
         super().__init__(spec)
-
+        if self.spec.variants["cluster"][0] == "grace-hopper":
+            self.programming_models = [CudaSystem()]
+            self.cuda_version = Version(self.spec.variants["cuda"][0])
+            self.gtl_flag = Version(self.spec.variants["gtl"][0])
+        if self.spec.variants["cluster"][0] == "grace-grace":
+            self.programming_models = [OpenMPSystem()]
+        
         self.scheduler = "slurm"
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
 
-    def system_specific_variables(self):
-        return {
-            "cuda_arch": 90,
-            "default_cuda_version": self.spec.variants["cuda"][0],
-            "extra_batch_opts": "-A llnl_ai_g -pgpu",
-        }
 
     def compute_packages_section(self):
         selections = {

@@ -11,7 +11,7 @@ from packaging.version import Version
 from benchpark.paths import hardware_descriptions
 
 
-class JscJuwels(System, CudaSystem):
+class JscJuwels(System):
 
     id_to_resources = {
         "juwels": {
@@ -26,6 +26,18 @@ class JscJuwels(System, CudaSystem):
     }
 
     variant(
+        "cuda",
+        default="12.2.0",
+        values=("11.8.0", "12.2.0"),
+        description="CUDA version",
+    )
+    variant(
+        "gtl",
+        default=False,
+        values=(True, False),
+        description="Use GTL-enabled MPI",
+    )
+    variant(
         "compiler",
         default="gcc",
         description="Which compiler to use",
@@ -33,8 +45,9 @@ class JscJuwels(System, CudaSystem):
 
     def __init__(self, spec):
         super().__init__(spec)
-
-        self.cuda_version = Version("12.2.0")
+        self.programming_models = [CudaSystem()]
+        self.cuda_version = Version(self.spec.variants["cuda"][0])
+        self.gtl_flag = Version(self.spec.variants["gtl"][0])
 
         if self.spec.satisfies("compiler=gcc"):
             self.gcc_version = Version("12.3.0")
@@ -45,8 +58,6 @@ class JscJuwels(System, CudaSystem):
         for k, v in attrs.items():
             setattr(self, k, v)
 
-    def system_specific_variables(self):
-        return {"cuda_arch": self.cuda_arch}
 
     def compute_compilers_section(self):
         selections = {

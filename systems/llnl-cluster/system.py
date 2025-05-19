@@ -10,7 +10,7 @@ from benchpark.openmpsystem import OpenMPSystem
 from benchpark.paths import hardware_descriptions
 
 
-class LlnlCluster(System, OpenMPSystem):
+class LlnlCluster(System):
 
     maintainers("nhanford", "rfhaque")
 
@@ -51,7 +51,8 @@ class LlnlCluster(System, OpenMPSystem):
 
     def __init__(self, spec):
         super().__init__(spec)
-
+        self.programming_models = [OpenMPSystem()]
+        
         self.scheduler = "slurm"
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
         for k, v in attrs.items():

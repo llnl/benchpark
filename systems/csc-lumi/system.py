@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.paths import hardware_descriptions
 from benchpark.rocmsystem import ROCmSystem
 from benchpark.system import System
@@ -12,40 +12,47 @@ from packaging.version import Version
 
 
 
-class CscLumi(System, ROCmSystem):
+class CscLumi(System):
 
     maintainers("mckinsey1")
     
     id_to_resources = {
         "lumi": {
-            "rocm_arch": "gfx90a",            
+            "rocm_arch": "gfx90a",
+            "gtl_flag" : "",
             "sys_cores_per_node": 64,
             "sys_gpus_per_node": 8,
             "sys_mem_per_node": 512,
             "system_site": "csc",
+            "scheduler": "slurm",
             "hardware_key": str(hardware_descriptions)
             + "/HPECray-zen3-MI250X-Slingshot/hardware_description.yaml",
         }
     }
 
     variant(
+        "rocm",
+        default="5.6.1",
+        description="ROCm version",
+    )
+    variant(
+        "gtl",
+        default=False,
+        values=(True, False),
+        description="Use GTL-enabled MPI",
+    )
+    variant(
         "compiler",
         default="cce15",
         values=("gcc11", "gcc12", "cce14", "cce15", "cce16"),
         description="Which compiler to use",
     )
-    variant(
-        "rocm",
-        default="5.6.1",
-        description="ROCm version",
-    )
-
+    
     def __init__(self, spec):
         super().__init__(spec)
         self.programming_models = [ROCmSystem()]
-
-        #self.rocm_version = Version(self.spec.variants["rocm"][0])
-        self.set_rocm_version()
+        self.rocm_version = Version(self.spec.variants["rocm"][0])
+        self.gtl_flag = Version(self.spec.variants["gtl"][0])
         
         full_versions = {
             "cce16": "16.0.1",
@@ -58,31 +65,11 @@ class CscLumi(System, ROCmSystem):
             if key == self.spec.variants["compiler"][0]:
                 self.compiler_version = Version(value)
 
-        self.scheduler = "slurm"
+
         attrs = self.id_to_resources.get("lumi")
         for k, v in attrs.items():
             setattr(self, k, v)
 
-    def set_rocm_arch(self):
-        self.rocm_arch = self.id_to_resources.get(
-            self.spec.variants["cluster"][0]["rocm_arch"]
-        )
-
-    def set_rocm_version(self):
-        self.rocm_version = self.spec.variants["rocm"][0]
-            
-    #def rocm_arch(self):
-    #    return {"rocm_arch": self.rocm_arch}
-
-    #def default_rocm_version(self):
-    #    return {"default_rocm_version": self.default_rocm_version}
-
-    def system_specific_variables(self):
-        return {
-            "rocm_arch": self.rocm_arch,
-            "rocm_version": self.rocm_version,
-            "gtl_flag": "",
-        }
 
     def compute_packages_section(self):
 

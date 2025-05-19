@@ -11,7 +11,7 @@ from packaging.version import Version
 from benchpark.paths import hardware_descriptions
 
 
-class CscsEiger(System, OpenMPSystem):
+class CscsEiger(System):
 
     id_to_resources = {
         "eiger": {
@@ -31,7 +31,8 @@ class CscsEiger(System, OpenMPSystem):
 
     def __init__(self, spec):
         super().__init__(spec)
-
+        self.programming_models = [OpenMPSystem()]
+        
         self.gcc_version = Version("12.3.0")
 
         self.scheduler = "slurm"

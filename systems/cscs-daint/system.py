@@ -11,7 +11,7 @@ from packaging.version import Version
 from benchpark.paths import hardware_descriptions
 
 
-class CscsDaint(System, CudaSystem):
+class CscsDaint(System):
 
     id_to_resources = {
         "daint": {
@@ -25,23 +25,32 @@ class CscsDaint(System, CudaSystem):
     }
 
     variant(
-        "compiler",
-        default="cce",
-        values=("gcc9", "gcc10", "gcc11", "cce", "intel", "pgi", "nvhpc"),
-        description="Which compiler to use",
-    )
-    variant(
         "cuda",
         default="11.2.0",
         values=("11.2.0", "11.1.0", "11.0.207", "10.2.89"),
         description="CUDA version",
     )
+    variant(
+        "gtl",
+        default=False,
+        values=(True, False),
+        description="Use GTL-enabled MPI",
+    )
+    variant(
+        "compiler",
+        default="cce",
+        values=("gcc9", "gcc10", "gcc11", "cce", "intel", "pgi", "nvhpc"),
+        description="Which compiler to use",
+    )
+
 
     def __init__(self, spec):
         super().__init__(spec)
-
+        self.programming_models = [CudaSystem()]
+        self.cuda_arch = 60
         self.cuda_version = Version(self.spec.variants["cuda"][0])
-
+        self.gtl_flag = Version(self.spec.variants["gtl"][0])
+        
         full_versions = {
             "cce": "12.0.3",
             "gcc9": "9.3.0",
@@ -59,8 +68,6 @@ class CscsDaint(System, CudaSystem):
         for k, v in attrs.items():
             setattr(self, k, v)
 
-    def system_specific_variables(self):
-        return {"cuda_arch": "60", "enable_mps": "/usr/tcetmp/bin/enable_mps"}
 
     def compute_packages_section(self):
         selections = self.cuda_config(self.cuda_version)

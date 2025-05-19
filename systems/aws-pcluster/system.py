@@ -10,7 +10,7 @@ from benchpark.openmpsystem import OpenMPSystem
 from benchpark.paths import hardware_descriptions
 
 
-class AwsPcluster(System, OpenMPSystem):
+class AwsPcluster(System):
     # Taken from https://aws.amazon.com/ec2/instance-types/
     # With boto3, we could determine this dynamically vs. storing a static table
 
@@ -56,7 +56,8 @@ class AwsPcluster(System, OpenMPSystem):
 
     def __init__(self, spec):
         super().__init__(spec)
-
+        self.programming_models = [OpenMPSystem()]
+        
         self.scheduler = "slurm"
         # TODO: for some reason I have to index to get value, even if multi=False
         attrs = self.id_to_resources.get(self.spec.variants["instance_type"][0])
