@@ -34,6 +34,12 @@ class Laghos(
     maintainers("wdhawkins")
 
     def compute_applications_section(self):
+        # "zones" defined from mesh file, we are hardcoding it here
+        problem_sizes = {"zones": 1024}
+
+        for nk, nv in problem_sizes.items():
+            self.add_experiment_variable(nk, nv, True)
+
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             device = "n_gpus"
             n_devices_per_node = "{sys_gpus_per_node}"
@@ -73,6 +79,11 @@ class Laghos(
         self.add_experiment_variable(
             device, f"{n_devices_per_node} * {{scaling_factor}}", True
         )
+
+        n_resources = "{" + str(device) + "}"
+        self.add_experiment_variable("n_resources", n_resources, False)
+        self.add_experiment_variable("process_problem_size", "{zones}/" + n_resources, False)
+        self.add_experiment_variable("total_problem_size", "{zones}", False)
 
     def compute_package_section(self):
         # get package version
