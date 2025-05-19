@@ -24,26 +24,27 @@ class Laghos(ExecutableApplication):
     workload('triplept', executables=['prob'])
 
     workload_variable('mesh', default='{laghos}/data/box01_hex.mesh',
-                      description='mesh file',
-                      workloads=['triplept'])
-    workload_variable('mesh_size', default='96',
-                      description='number of zones in the mesh described by the mesh file',
-                      workloads=['triplept'])
+            description='mesh file',
+            workloads=['triplept'])
+
     workload_variable('problem', default='3',
-                      description='problem number',
-                      workloads=['triplept'])
+            description='problem number',
+            workloads=['triplept'])
+        
     workload_variable('rs', default='2',
-                      description='number of serial refinements',
-                      workloads=['triplept'])
+            description='number of serial refinements',
+            workloads=['triplept'])
+    
     workload_variable('rp', default='0',
-                      description='number of parallel refinements',
-                      workloads=['triplept'])
+            description='number of parallel refinements',
+            workloads=['triplept'])
+    
     workload_variable('ms', default='250',
-                      description='max number of steps',
-                      workloads=['triplept'])
+            description='max number of steps',
+            workloads=['triplept'])
     workload_variable('device', default='cpu',
-                      description='cpu or cuda',
-                      workloads=['triplept'])
+        description='cpu or cuda',
+        workloads=['triplept'])
 
     figure_of_merit('Major kernels total time',
                     log_file='{experiment_run_dir}/{experiment_name}.out',
