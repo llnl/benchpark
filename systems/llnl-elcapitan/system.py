@@ -312,8 +312,8 @@ class LlnlElcapitan(System):
 
             use_gtl = {
                 "gtl_flags": "$MV2_COMM_WORLD_LOCAL_RANK",
-                "gtl_cutoff_size": 4096,
-                "fi_cxi_ats": 0,
+                "gtl_cutoff_size": "4096",
+                "fi_cxi_ats": "0",
                 "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
                 "gtl_libs": "libmpi_gtl_hsa",
                 "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -lmpi_gtl_hsa",
@@ -348,10 +348,10 @@ class LlnlElcapitan(System):
             }
 
             use_gtl = {
-                "gtl_cutoff_size": 4096,
-                "fi_cxi_ats": 0,
+                "gtl_cutoff_size": "4096",
+                "fi_cxi_ats": "0",
                 "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
-                "gtl_libs": ["libmpi_gtl_hsa"],
+                "gtl_libs": "libmpi_gtl_hsa",
                 "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}/lib -lmpi "
                 f"-L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib "
                 f"-Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -lmpi_gtl_hsa",
