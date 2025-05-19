@@ -12,6 +12,8 @@ from benchpark.paths import hardware_descriptions
 
 class CscsDaint(System):
 
+    maintainers("pearce8")
+
     id_to_resources = {
         "daint": {
             "sys_cores_per_node": 12,
