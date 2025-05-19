@@ -11,7 +11,7 @@ set(CTEST_BUILD_NAME ${BUILD_NAME})
 
 # Separate dashboards for Nightly testing and PRs
 if ("${TEST_TYPE}" STREQUAL "Nightly")
-    ctest_start("Nightly" GROUP "Nightly [benchpark-develop]")
+    ctest_start("Nightly" GROUP "${DASHBOARD_NAME}")
 else()
     ctest_start("Continuous" GROUP "${DASHBOARD_NAME}")
 endif()

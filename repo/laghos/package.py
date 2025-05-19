@@ -49,7 +49,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
 
     depends_on("mpi")
     depends_on("hypre+mpi")
-    depends_on("hypre+cuda+mpi", when="+cuda")
+    depends_on("hypre+cuda+cublas+mpi", when="+cuda")
     depends_on("hypre@2.31.0+mixedint~fortran", when="@develop")
 
     requires("+cuda", when="^hypre+cuda")
@@ -58,11 +58,14 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         depends_on(f"mfem cuda_arch={arch}", when=f"cuda_arch={arch}")
     depends_on("mfem +cuda+mpi", when="+cuda")
     depends_on("mfem +rocm+mpi", when="+rocm")
-    depends_on("hypre +rocm +mpi", when="+rocm")
+    depends_on("hypre +rocm+rocblas +mpi", when="+rocm")
     requires("+rocm", when="^hypre+rocm")
     for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
         depends_on(f"hypre amdgpu_target={target}", when=f"amdgpu_target={target}")
         depends_on(f"mfem amdgpu_target={target}", when=f"amdgpu_target={target}")
+
+    depends_on("hypre+gpu-aware-mpi", when="^cray-mpich+gtl")
+
     # Replace MPI_Session
     patch(
         "https://github.com/CEED/Laghos/commit/c800883ab2741c8c3b99486e7d8ddd8e53a7cb95.patch?full_index=1",
