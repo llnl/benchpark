@@ -63,8 +63,6 @@ jobs:
               - 'pyproject.toml'
               - '.flake8'
             run:
-              - '.github/**'
-              - '.gitlab/**'
               - 'bin/**'
               - 'configs/**'
               - 'checkout-versions.yaml'
