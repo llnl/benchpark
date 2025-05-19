@@ -17,7 +17,6 @@ benchpark_root = _source_location()
 lib_path = benchpark_root / "lib" / "benchpark"
 test_path = lib_path / "test"
 benchpark_home = pathlib.Path(os.path.expanduser("~/.benchpark"))
-# benchpark_home = benchpark_root / ".benchpark"
 global_ramble_path = benchpark_home / "ramble"
 global_spack_path = benchpark_home / "spack"
 hardware_descriptions = benchpark_root / "systems" / "all_hardware_descriptions"
