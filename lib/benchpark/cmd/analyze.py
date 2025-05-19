@@ -205,7 +205,7 @@ def prepare_data(**kwargs):
     metric = kwargs["y_axis_metric"]
     if metric in tk.inc_metrics and len(tk.graph.roots) == 1:
         root_name = tk.graph.roots[0].frame["name"]
-        logger.info(f"Removing root '{root_name}' to improve chart readability.")
+        logger.info(f"Removing root '{root_name}' to improve chart readability for inclusive metric.")
         query = (
             th.query.Query()
             .match(".", lambda row: row["name"].apply(lambda n: n != root_name).all())
@@ -271,7 +271,7 @@ def prepare_data(**kwargs):
     tree_file = os.path.join(kwargs["out_dir"], kwargs["chart_file_name"] + "-tree.txt")
     with open(tree_file, "w") as f:
         f.write(clean_tree)
-    logger.info(f"Saving Unmodified Calltree structure to {tree_file}")
+    logger.info(f"Saving Input Calltree to {tree_file}")
 
     if kwargs.get("group_nodes_name"):
         ctk.dataframe = ctk.dataframe.groupby("name").sum()
