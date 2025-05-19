@@ -65,14 +65,14 @@ class LlnlElcapitan(System):
     variant(
         "lapack",
         default="intel-oneapi-mkl",
-        values=("intel-oneapi-mkl", "cray-libsci", "rocsolver"),
+        values=("intel-oneapi-mkl", "cray-libsci"),
         description="Which lapack to use",
     )
 
     variant(
         "blas",
         default="intel-oneapi-mkl",
-        values=("intel-oneapi-mkl", "rocblas"),
+        values=("intel-oneapi-mkl",),
         description="Which blas to use",
     )
 
