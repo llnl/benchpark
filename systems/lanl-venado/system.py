@@ -5,11 +5,11 @@
 
 
 from benchpark.directives import variant, maintainers
-from benchpark.system import System
-from benchpark.openmpsystem import OpenMPSystem
 from benchpark.cudasystem import CudaSystem
+from benchpark.openmpsystem import OpenMPSystem
+from benchpark.system import System
 from benchpark.paths import hardware_descriptions
-
+from packaging.version import Version
 
 class LanlVenado(System):
 

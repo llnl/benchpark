@@ -134,7 +134,7 @@ class LlnlSierra(System):
             }
         }
         # 00-version-10-1-243-packages.yaml  01-version-11-8-0-packages.yaml
-        if self.spec.satisfies("cuda=10-1-243"):
+        if self.spec.satisfies("cuda=10.1.243"):
             selections["packages"] |= {
                 "curand": {
                     "externals": [
@@ -191,7 +191,7 @@ class LlnlSierra(System):
                     "buildable": False,
                 },
             }
-        elif self.spec.satisfies("cuda=11-8-0"):
+        elif self.spec.satisfies("cuda=11.8.0"):
             selections["packages"] |= {
                 "curand": {
                     "externals": [
@@ -250,7 +250,7 @@ class LlnlSierra(System):
             }
 
         if self.spec.satisfies("lapack=cusolver"):
-            if self.spec.satisfies("cuda=10-1-243"):
+            if self.spec.satisfies("cuda=10.1.243"):
                 selections["packages"] |= {
                     "cusolver": {
                         "externals": [
@@ -262,7 +262,7 @@ class LlnlSierra(System):
                         "buildable": False,
                     }
                 }
-            elif self.spec.satisfies("cuda=11-8-0"):
+            elif self.spec.satisfies("cuda=11.8.0"):
                 selections["packages"] |= {
                     "cusolver": {
                         "externals": [
@@ -288,7 +288,7 @@ class LlnlSierra(System):
             }
 
         if self.spec.satisfies("blas=cublas"):
-            if self.spec.satisfies("cuda=10-1-243"):
+            if self.spec.satisfies("cuda=10.1.243"):
                 selections["packages"] |= {
                     "cublas": {
                         "externals": [
@@ -300,7 +300,7 @@ class LlnlSierra(System):
                         "buildable": False,
                     }
                 }
-            elif self.spec.satisfies("cuda=11-8-0"):
+            elif self.spec.satisfies("cuda=11.8.0"):
                 selections["packages"] |= {
                     "cublas": {
                         "externals": [
@@ -390,7 +390,7 @@ class LlnlSierra(System):
         }
 
         compiler = self.spec.variants["compiler"][0]
-        cuda_ver = self.spec.variants["cuda"][0]
+        cuda_ver = Version(self.spec.variants["cuda"][0])
         cfg = mpi_cfgs[(compiler, cuda_ver)]
         selections["packages"] |= {
             "blas": {"require": [self.spec.variants["blas"][0]]},  # Replace dynamically
@@ -547,7 +547,7 @@ class LlnlSierra(System):
         }
 
         compiler = self.spec.variants["compiler"][0]
-        cuda_ver = self.spec.variants["cuda"][0]
+        cuda_ver = Version(self.spec.variants["cuda"][0])
         cfg = compiler_cfgs[(compiler, cuda_ver)]
         return {"compilers": cfg}
 
