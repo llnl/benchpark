@@ -40,15 +40,15 @@ class LlnlSierra(System):
 
     variant(
         "lapack",
-        default="cusolver",
-        values=("cusolver", "essl"),
+        default="essl",
+        values=("essl",),
         description="Which lapack to use",
     )
 
     variant(
         "blas",
-        default="cublas",
-        values=("cublas", "essl"),
+        default="essl",
+        values=("essl",),
         description="Which blas to use",
     )
 
