@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainers
+from benchpark.directives import variant
 from benchpark.experiment import Experiment
 from benchpark.scaling import StrongScaling
 from benchpark.scaling import WeakScaling
@@ -30,8 +30,6 @@ class Hpcg(
         values=("3.1", "develop", "caliper"),
         description="app version",
     )
-
-    maintainers("pearce8")
 
     def compute_applications_section(self):
 
