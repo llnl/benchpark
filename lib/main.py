@@ -42,7 +42,6 @@ import benchpark.cmd.audit  # noqa: E402
 import benchpark.cmd.system  # noqa: E402
 import benchpark.cmd.experiment  # noqa: E402
 import benchpark.cmd.setup  # noqa: E402
-import benchpark.cmd.show_build  # noqa: E402
 import benchpark.cmd.unit_test  # noqa: E402
 import benchpark.cmd.info  # noqa: E402
 import benchpark.cmd.list  # noqa: E402
@@ -183,11 +182,6 @@ def init_commands(subparsers, actions_dict):
     )
     benchpark.cmd.info.setup_parser(info_parser)
 
-    show_build_parser = subparsers.add_parser(
-        "show-build", help="Show how spack built a benchmark"
-    )
-    benchpark.cmd.show_build.setup_parser(show_build_parser)
-
     list_parser = subparsers.add_parser(
         "list", help="List experiments, systems, benchmarks, and modifiers"
     )
@@ -199,7 +193,6 @@ def init_commands(subparsers, actions_dict):
     actions_dict["unit-test"] = benchpark.cmd.unit_test.command
     actions_dict["audit"] = benchpark.cmd.audit.command
     actions_dict["info"] = benchpark.cmd.info.command
-    actions_dict["show-build"] = benchpark.cmd.show_build.command
     actions_dict["list"] = benchpark.cmd.list.command
 
 

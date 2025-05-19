@@ -44,16 +44,6 @@
 
 .. toctree::
    :maxdepth: 1
-   :caption: Contributing
-
-   add-a-system-config
-   add-a-benchmark
-   add-an-experiment
-   add-a-dryrun
-   update-a-system-config
-
-.. toctree::
-   :maxdepth: 1
    :caption: Benchpark Utils
 
    diffBuildSpecs
@@ -61,7 +51,18 @@
    diffExperimentSpecs
    diffPackageCommits
    diffSystemSpecs
-   showBuild
+   scripts
+   developer-scripts
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Contributing
+
+   add-a-system-config
+   add-a-benchmark
+   add-an-experiment
+   add-a-dryrun
+   update-a-system-config
 
 .. toctree::
    :maxdepth: 2

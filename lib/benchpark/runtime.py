@@ -39,23 +39,21 @@ def git_clone_commit(url, commit, destination):
         run_command(f"git checkout {commit}")
 
 
-def run_command(command_str, env=None, stdout=None, stderr=None):
-    stdout = stdout or subprocess.PIPE
-    stderr = stderr or subprocess.PIPE
+def run_command(command_str, env=None):
     proc = subprocess.Popen(
         shlex.split(command_str),
         env=env,
-        stdout=stdout,
-        stderr=stderr,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
         text=True,
     )
-    out, err = proc.communicate()
+    stdout, stderr = proc.communicate()
     if proc.returncode != 0:
         raise RuntimeError(
             f"Failed command: {command_str}\nOutput: {stdout}\nError: {stderr}"
         )
 
-    return (out, err)
+    return (stdout, stderr)
 
 
 class Command:
