@@ -83,7 +83,7 @@ class Remhos(
                 self.add_experiment_variable(pk, pv, True)
 
         self.add_experiment_variable(
-            device, f"{n_devices_per_node} * {{scaling_factor}}", True
+            device, f"{n_devices_per_node} *"+ "{scaling_factor}", True
         )
 
         if self.spec.satisfies("+cuda"):
@@ -91,7 +91,7 @@ class Remhos(
         elif self.spec.satisfies("+rocm"):
             self.add_experiment_variable("arch", "HIP")
 
-        n_resources = "{" + str(device) + "}"
+        n_resources = "{" + device + "}"
         self.set_required_variables(
             n_resources=n_resources,
             process_problem_size="{epm}",
