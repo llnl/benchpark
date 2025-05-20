@@ -133,6 +133,7 @@ class Experiment(ExperimentSystemBase, SingleNode):
         self.helpers = []
         self._spack_name = None
         self._ramble_name = None
+        self.req_vars = ["n_resources", "process_problem_size", "total_problem_size"]
 
         for cls in self.__class__.mro()[1:]:
             if cls is not Experiment and cls is not object:
@@ -166,6 +167,21 @@ class Experiment(ExperimentSystemBase, SingleNode):
     @ramble_name.setter
     def ramble_name(self, value: str):
         self._ramble_name = value
+
+    def set_required_variables(self, **kwargs):
+        """Helper function to set required variables."""
+        for var in kwargs.keys():
+            if var not in self.req_vars:
+                raise ValueError(f"Unexpected experiment variable provided '{var}'")
+            self.add_experiment_variable(var, kwargs[var], False)
+
+    def check_required_variables(self):
+        """Raises error if any of the self.req_vars variables are not set in derived classes."""
+        unset_vars = [v for v in self.req_vars if v not in self.variables.keys()]
+        if len(unset_vars) > 0:
+            raise NotImplementedError(
+                f"The following experiment variables must be set with 'self.add_experiment_variable': {', '.join([v for v in unset_vars])}."
+            )
 
     def compute_include_section(self):
         # include the config directory
@@ -260,6 +276,8 @@ class Experiment(ExperimentSystemBase, SingleNode):
             if helper_prefix:
                 expr_helper_list.append(helper_prefix)
         expr_name_suffix = "_".join(expr_helper_list + self.expr_name)
+
+        self.check_required_variables()
 
         expr_setup = {
             "variants": {"package_manager": self.spec.variants["package_manager"][0]},
