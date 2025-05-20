@@ -390,7 +390,7 @@ class LlnlSierra(System):
         }
 
         compiler = self.spec.variants["compiler"][0]
-        cuda_ver = Version(self.spec.variants["cuda"][0]).replace(".", "-")
+        cuda_ver = self.spec.variants["cuda"][0].replace(".", "-")
         cfg = mpi_cfgs[(compiler, cuda_ver)]
         selections["packages"] |= {
             "blas": {"require": [self.spec.variants["blas"][0]]},  # Replace dynamically
@@ -547,7 +547,7 @@ class LlnlSierra(System):
         }
 
         compiler = self.spec.variants["compiler"][0]
-        cuda_ver = Version(self.spec.variants["cuda"][0]).replace(".", "-")
+        cuda_ver = self.spec.variants["cuda"][0].replace(".", "-")
         cfg = compiler_cfgs[(compiler, cuda_ver)]
         return {"compilers": cfg}
 
