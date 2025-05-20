@@ -80,11 +80,6 @@ class Kripke(
             for nk, nv in problem_sizes.items():
                 self.add_experiment_variable(nk, nv, True)
         elif self.spec.satisfies("+throughput"):
-            problem_sizes = {
-                "nzx": 32,
-                "nzy": 32,
-                "nzz": 32,
-            }  # TEMP: Lower problem size for lassen oom error
             n_resources = 1
             for pk, pv in num_procs.items():
                 self.add_experiment_variable(pk, pv, True)
