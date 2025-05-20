@@ -38,7 +38,7 @@ using ramble. We also define programming model (``CUDA``, ``ROCm``, or ``OpenMP`
 
 We can specify experiment variables to benchpark using the ``Experiment.add_experiment_variable()`` member function.
 *One* of ``n_ranks``, ``n_nodes``, ``n_gpus`` must be set, using ``add_experiment_variable`` for benchpark to allocate the correct amount of resources for the experiment.
-Addtionally, all of ``n_resources``, ``process_problem_size``, and ``total_problem_size`` must be set, which can be accomplished using ``Experiment.set_required_variables()``.
+Additionally, all of ``n_resources``, ``process_problem_size``, and ``total_problem_size`` must be set, which can be accomplished using ``Experiment.set_required_variables()``.
 
 compute_package_section
 ~~~~~~~~~~~~~~~~~~~~~~~
