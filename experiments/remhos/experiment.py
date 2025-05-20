@@ -69,7 +69,6 @@ class Remhos(
             n_devices_per_node = "{sys_cores_per_node}"
             self.add_experiment_variable("n_threads_per_proc", 1)
 
-
         if self.spec.satisfies("+single_node"):
             for pk, pv in scaling_factor.items():
                 self.add_experiment_variable(device, pv, True)
@@ -93,9 +92,11 @@ class Remhos(
             self.add_experiment_variable("arch", "HIP")
 
         n_resources = "{" + str(device) + "}"
-        self.add_experiment_variable("n_resources", n_resources, False)
-        self.add_experiment_variable("process_problem_size", "{epm}", False)
-        self.add_experiment_variable("total_problem_size", "{epm}*" + n_resources, False)
+        self.set_required_variables(
+            n_resources=n_resources,
+            process_problem_size="{epm}",
+            total_problem_size="{epm}*" + n_resources,
+        )
 
     def compute_package_section(self):
         # get package version

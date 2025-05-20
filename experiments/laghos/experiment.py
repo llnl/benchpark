@@ -81,9 +81,11 @@ class Laghos(
         )
 
         n_resources = "{" + str(device) + "}"
-        self.add_experiment_variable("n_resources", n_resources, False)
-        self.add_experiment_variable("process_problem_size", "{zones}/" + n_resources, False)
-        self.add_experiment_variable("total_problem_size", "{zones}", False)
+        self.set_required_variables(
+            n_resources=n_resources,
+            process_problem_size="{zones}/" + n_resources,
+            total_problem_size="{zones}",
+        )
 
     def compute_package_section(self):
         # get package version

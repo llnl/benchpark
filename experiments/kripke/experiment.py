@@ -80,7 +80,11 @@ class Kripke(
             for nk, nv in problem_sizes.items():
                 self.add_experiment_variable(nk, nv, True)
         elif self.spec.satisfies("+throughput"):
-            problem_sizes = {"nzx": 32, "nzy": 32, "nzz": 32} # TEMP: Lower problem size for lassen oom error
+            problem_sizes = {
+                "nzx": 32,
+                "nzy": 32,
+                "nzz": 32,
+            }  # TEMP: Lower problem size for lassen oom error
             n_resources = 1
             for pk, pv in num_procs.items():
                 self.add_experiment_variable(pk, pv, True)
@@ -139,9 +143,11 @@ class Kripke(
         elif self.spec.satisfies("+rocm"):
             self.add_experiment_variable("arch", "HIP")
 
-        self.add_experiment_variable("n_resources", "{npx}*{npy}*{npz}", False)
-        self.add_experiment_variable("process_problem_size", "{nzx}*{nzy}*{nzz}/({npx}*{npy}*{npz})", False)
-        self.add_experiment_variable("total_problem_size", "{nzx}*{nzy}*{nzz}", False)
+        self.set_required_variables(
+            n_resources="{npx}*{npy}*{npz}",
+            process_problem_size="{nzx}*{nzy}*{nzz}/({npx}*{npy}*{npz})",
+            total_problem_size="{nzx}*{nzy}*{nzz}",
+        )
 
     def compute_package_section(self):
         # get package version

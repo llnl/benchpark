@@ -135,9 +135,11 @@ class Amg2023(
         else:
             self.add_experiment_variable("n_ranks", n_resources, True)
 
-        self.add_experiment_variable("n_resources", "{px}*{py}*{pz}", False)
-        self.add_experiment_variable("process_problem_size", "{nx}*{ny}*{nz}", False)
-        self.add_experiment_variable("total_problem_size", "{nx}*{ny}*{nz}*{px}*{py}*{pz}", False)
+        self.set_required_variables(
+            n_resources="{px}*{py}*{pz}",
+            process_problem_size="{nx}*{ny}*{nz}",
+            total_problem_size="{nx}*{ny}*{nz}*{px}*{py}*{pz}",
+        )
 
     def compute_package_section(self):
         # get package version

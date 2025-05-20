@@ -82,7 +82,7 @@ class RajaPerf(
             # Notice 1/scaling-factor to keep total problem size constant
             scaled_problem_sizes = self.generate_strong_scaling_params(
                 {tuple(problem_sizes.keys()): list(problem_sizes.values())},
-                1/int(self.spec.variants["scaling-factor"][0]),
+                1 / int(self.spec.variants["scaling-factor"][0]),
                 int(self.spec.variants["scaling-iterations"][0]),
             )
             problem_sizes = scaled_problem_sizes["size"]
@@ -107,9 +107,11 @@ class RajaPerf(
             self.add_experiment_variable("tuning", "default", True)
             self.add_experiment_variable("n_ranks", n_resources, True)
 
-        self.add_experiment_variable("n_resources", "{n_ranks}", False)
-        self.add_experiment_variable("process_problem_size", "{size}", False)
-        self.add_experiment_variable("total_problem_size", "{n_ranks}*{size}", False)
+        self.set_required_variables(
+            n_resources="{n_ranks}",
+            process_problem_size="{size}",
+            total_problem_size="{n_ranks}*{size}",
+        )
 
     def compute_package_section(self):
         # get package version

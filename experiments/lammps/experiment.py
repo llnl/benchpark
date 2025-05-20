@@ -99,10 +99,11 @@ class Lammps(
             False,
         )
 
-        self.add_experiment_variable("n_resources", "{n_nodes}*{n_ranks_per_node}", False)
-        self.add_experiment_variable("process_problem_size", "{xx}*{yy}*{zz}/{n_resources}", False)
-        self.add_experiment_variable("total_problem_size", "{xx}*{yy}*{zz}", False)
-
+        self.set_required_variables(
+            n_resources="{n_nodes}*{n_ranks_per_node}",
+            process_problem_size="{xx}*{yy}*{zz}/{n_resources}",
+            total_problem_size="{xx}*{yy}*{zz}",
+        )
 
     def compute_package_section(self):
         # get package version
