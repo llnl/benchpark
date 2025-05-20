@@ -69,11 +69,7 @@ class Remhos(
             n_devices_per_node = "{sys_cores_per_node}"
             self.add_experiment_variable("n_threads_per_proc", 1)
 
-        if self.spec.satisfies("+single_node"):
-            for pk, pv in scaling_factor.items():
-                self.add_experiment_variable(device, pv, True)
-
-        elif self.spec.satisfies("+strong"):
+        if self.spec.satisfies("+strong"):
             scaled_variables = self.generate_strong_scaling_params(
                 {tuple(scaling_factor.keys()): list(scaling_factor.values())},
                 int(self.spec.variants["scaling-factor"][0]),
@@ -81,9 +77,12 @@ class Remhos(
             )
             for pk, pv in scaled_variables.items():
                 self.add_experiment_variable(pk, pv, True)
+        else:
+            for pk, pv in scaling_factor.items():
+                self.add_experiment_variable(pk, pv, True)
 
         self.add_experiment_variable(
-            device, f"{n_devices_per_node} *" + "{scaling_factor}", True
+            device, f"{n_devices_per_node}*" + "{scaling_factor}", True
         )
 
         if self.spec.satisfies("+cuda"):
