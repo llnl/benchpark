@@ -134,17 +134,17 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
             # Ensure build with hip is disabled
             args.append("-DENABLE_HIP=OFF")
 
-        if "+cuda" in spec:
+        if spec.satisfies("+cuda"):
             args.append("-DENABLE_CUDA=ON")
             args.append(self.define("CMAKE_CUDA_HOST_COMPILER", self.spec["mpi"].mpicxx))
             if not spec.satisfies("cuda_arch=none"):
                 cuda_arch = spec.variants["cuda_arch"].value
                 args.append("-DCUDA_ARCH={0}".format(cuda_arch[0]))
                 args.append("-DCMAKE_CUDA_ARCHITECTURES={0}".format(cuda_arch[0]))
-            args.append(
-                "-DCMAKE_CUDA_FLAGS=--extended-lambda -I%s -I=%s"
-                % (self.spec["cub"].prefix.include, self.spec["mpi"].prefix.include)
-            )
+                args.append(
+                    "-DCMAKE_CUDA_FLAGS=--expt-extended-lambda -I%s -I=%s"
+                    % (self.spec["cub"].prefix.include, self.spec["mpi"].prefix.include)
+                )
         else:
             args.append("-DENABLE_CUDA=OFF")
 
