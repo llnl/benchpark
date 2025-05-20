@@ -83,7 +83,7 @@ class Remhos(
                 self.add_experiment_variable(pk, pv, True)
 
         self.add_experiment_variable(
-            device, f"{n_devices_per_node} *"+ "{scaling_factor}", True
+            device, f"{n_devices_per_node} *" + "{scaling_factor}", True
         )
 
         if self.spec.satisfies("+cuda"):
