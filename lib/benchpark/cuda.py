@@ -11,6 +11,11 @@ from benchpark.experiment import ExperimentHelper
 class CudaExperiment:
     variant("cuda", default=False, description="Build and run with CUDA")
 
+    def __init__(self):
+        super().__init__()
+        if self.spec.variants["cuda"][0]:
+            self.device_type = "gpu"
+
     class Helper(ExperimentHelper):
         def compute_package_section(self):
             # get system config options

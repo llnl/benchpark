@@ -129,11 +129,18 @@ class Experiment(ExperimentSystemBase, SingleNode):
 
     def __init__(self, spec):
         self.spec: "benchpark.spec.ConcreteExperimentSpec" = spec
+        # Device type must be set before super with absence of mpionly experiment type
+        self.device_type = "cpu"
         super().__init__()
         self.helpers = []
         self._spack_name = None
         self._ramble_name = None
-        self.req_vars = ["n_resources", "process_problem_size", "total_problem_size"]
+        self.req_vars = [
+            "n_resources",
+            "process_problem_size",
+            "total_problem_size",
+            "device_type",
+        ]
 
         for cls in self.__class__.mro()[1:]:
             if cls is not Experiment and cls is not object:
@@ -170,6 +177,7 @@ class Experiment(ExperimentSystemBase, SingleNode):
 
     def set_required_variables(self, **kwargs):
         """Helper function to set required variables."""
+        self.add_experiment_variable("device_type", self.device_type, False)
         for var in kwargs.keys():
             if var not in self.req_vars:
                 raise ValueError(f"Unexpected experiment variable provided '{var}'")

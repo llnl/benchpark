@@ -11,6 +11,11 @@ from benchpark.experiment import ExperimentHelper
 class OpenMPExperiment:
     variant("openmp", default=False, description="Build and run with OpenMP")
 
+    def __init__(self):
+        super().__init__()
+        if self.spec.variants["openmp"][0]:
+            self.device_type = "cpu"
+
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):
             return "openmp" if self.spec.satisfies("+openmp") else ""
