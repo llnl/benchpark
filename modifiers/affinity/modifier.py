@@ -46,12 +46,18 @@ class Affinity(BasicModifier):
         post_exec = []
 
         # attach affinity json data to caliper metadata if caliper is on
-        caliper_modifier = any([modifier["name"] == "caliper" for modifier in app_inst.modifiers])
+        caliper_modifier = any(
+            [modifier["name"] == "caliper" for modifier in app_inst.modifiers]
+        )
         if caliper_modifier:
             pre_exec.append(
                 CommandExecutable(
                     f"modify-caliper-config-{executable_name}",
-                    template=['export CALI_CONFIG="$CALI_CONFIG,metadata(file={})"'.format(affinity_json_file)],
+                    template=[
+                        'export CALI_CONFIG="$CALI_CONFIG,metadata(file={})"'.format(
+                            affinity_json_file
+                        )
+                    ],
                 )
             )
 

@@ -11,6 +11,7 @@ from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
 from benchpark.caliper import Caliper
 
+
 class Saxpy(
     Experiment,
     OpenMPExperiment,

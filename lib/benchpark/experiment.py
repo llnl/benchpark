@@ -85,6 +85,7 @@ class SingleNode:
         def get_helper_name_prefix(self):
             return "single_node" if self.spec.satisfies("+single_node") else ""
 
+
 class Affinity:
     variant(
         "affinity",
@@ -142,7 +143,6 @@ class Affinity:
                 "packages": {k: v for k, v in package_specs.items() if v},
                 "environments": {"affinity": {"packages": list(package_specs.keys())}},
             }
-
 
 
 class Experiment(ExperimentSystemBase, SingleNode, Affinity):
