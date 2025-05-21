@@ -78,16 +78,8 @@ class Affinity(BasicModifier):
                 )
             )
 
-            post_exec.append(
-                CommandExecutable(
-                    f"unload-affinity-{executable_name}",
-                    template=["spack unload affinity"],
-                )
-            )
-
             affinity_parser_dir = os.path.dirname(f"{self._file_path}")
-
-            post_exec.append(
+            pre_exec.append(
                 CommandExecutable(
                     f"parse-stdout-{executable_name}",
                     template=[
@@ -95,4 +87,12 @@ class Affinity(BasicModifier):
                     ],
                 )
             )
+
+            post_exec.append(
+                CommandExecutable(
+                    f"unload-affinity-{executable_name}",
+                    template=["spack unload affinity"],
+                )
+            )
+
         return pre_exec, post_exec
