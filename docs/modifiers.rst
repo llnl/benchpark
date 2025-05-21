@@ -24,22 +24,9 @@ We are using (with permission) the following implementation of `affinity checks 
 
 To use the Affinity modifier:
 
-- ``experiment.py`` has to derive from the ``Affinity`` class, for example:
-
-.. code-block:: python
-
-  my-experiment/experiment.py
-
-  from benchpark.affinity import Affinity
-
-  class MyExperiment(
-    Affinity,
-    ...
-
-
-- When you initialize your experiment, add ``affinity=X`` to ``experiment init``, where X can be ``mpi``, ``rocm``, ``cuda``.
+- When you initialize your experiment, add ``affinity=on`` to ``experiment init``.
 - A small, separate run will execute in your allocation to record the information.
-- The Affinity modifier will output a text file in the experiment directory which will look like this for ``benchpark experiment init --dest=saxpy saxpy+openmp affinity=mpi`` on 8 ranks, 2 threads/proc, 1 node:
+- The Affinity modifier will output a text file in the experiment directory which will look like this for ``benchpark experiment init --dest=saxpy saxpy+openmp affinity=on`` on 8 ranks, 2 threads/proc, 1 node:
 
 .. code-block:: console
 
@@ -71,6 +58,7 @@ To use the Affinity modifier:
     thread   0 on cores [210]
     thread   1 on cores [217]
 
+If also running with the ``caliper`` modifier, affinity information will be included in the Caliper metadata.
 
 Profiling with Caliper Modifier
 -------------------------------
