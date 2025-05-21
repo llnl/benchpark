@@ -142,10 +142,6 @@ class LlnlCluster(System):
                             "spec": "python@3.9.12+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
                             "prefix": "/usr/tce",
                         },
-                        {
-                            "spec": "python@3.12.8+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat+pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
-                            "prefix": "/usr/workspace/wsa/mckinsey/venv/benchpark-3.12.8",
-                        },
                     ],
                     "buildable": False,
                 },

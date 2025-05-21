@@ -140,6 +140,7 @@ def command(args):
     )
 
     initializer_script = experiments_root / "setup.sh"
+    run_script = experiments_root / ".latest-experiment.sh"
 
     per_workspace_setup = RuntimeResources(experiments_root)
 
@@ -191,11 +192,20 @@ export _BENCHPARK_INITIALIZED=true
 """
             )
 
+    ramble_setup = f"ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} workspace setup"
+    ramble_run = (
+        f"ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} on"
+    )
+
     instructions = f"""\
 To complete the benchpark setup, do the following:
 
     . {initializer_script}
 
-Further steps are needed to build the experiments (ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} workspace setup) and run them (ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} on)
+Further steps are needed to build the experiments ({ramble_setup}) and run them ({ramble_run})
 """
     print(instructions)
+
+    # Generate shell script to setup and run latest experiment
+    with open(run_script, "w") as f:
+        f.write(f"{ramble_setup}\n{ramble_run}\n")
