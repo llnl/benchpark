@@ -38,7 +38,9 @@ class Affinity(BasicModifier):
         import os
         from ramble.util.executable import CommandExecutable
 
-        affinity_log_file = f"{{experiment_run_dir}}/affinity.{self._usage_mode}.out"
+        affinity_file = f"{{experiment_run_dir}}/affinity.{self._usage_mode}"
+        affinity_log_file = affinity_file + ".out"
+        affinity_json_file = affinity_file + ".json"
 
         pre_exec = []
         post_exec = []
@@ -49,7 +51,7 @@ class Affinity(BasicModifier):
             pre_exec.append(
                 CommandExecutable(
                     f"modify-caliper-config-{executable_name}",
-                    template=['export CALI_CONFIG="$CALI_CONFIG,metadata(file={})"'.format(affinity_log_file.replace(".out", ".json"))],
+                    template=['export CALI_CONFIG="$CALI_CONFIG,metadata(file={})"'.format(affinity_json_file)],
                 )
             )
 
