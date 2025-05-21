@@ -6,6 +6,7 @@
 import hashlib
 import importlib.util
 import os
+import packaging.version
 import sys
 import yaml
 
@@ -107,7 +108,7 @@ class System(ExperimentSystemBase):
 
     @property
     def programming_models(self):
-        return []
+        return self._programming_models
 
     @programming_models.setter
     def programming_models(self, pm_list):
@@ -122,8 +123,15 @@ class System(ExperimentSystemBase):
     def system_specific_variables(self):
         vars = {}
         for pm in self.programming_models:
-            for x in pm.system_attrs():
-                vars[x] = getattr(self, x)
+            for x, y in pm.system_specific_variables(self).items():
+                # Note: if you put an object into a yaml file there is an
+                # attempt to represent the object, whereas we want the string.
+                # We make use of the Version behavior on e.g. 'cuda_version'
+                # in some places, so cannot generally store it as a string, and
+                # instead just convert it here where it goes into yaml
+                if isinstance(y, packaging.version.Version):
+                    y = str(y)
+                vars[x] = y
         return vars
 
     def compute_packages_section(self):
