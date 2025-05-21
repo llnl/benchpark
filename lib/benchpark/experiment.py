@@ -91,9 +91,7 @@ class Affinity:
         default="none",
         values=(
             "none",
-            "mpi",
-            "cuda",
-            "rocm",
+            "on",
         ),
         multi=False,
         description="Build and run the affinity package",
@@ -105,7 +103,12 @@ class Affinity:
             if not self.spec.satisfies("affinity=none"):
                 affinity_modifier_modes = {}
                 affinity_modifier_modes["name"] = "affinity"
-                affinity_modifier_modes["mode"] = self.spec.variants["affinity"][0]
+                if self.spec.satisfies("+cuda"):
+                    affinity_modifier_modes["mode"] = "cuda"
+                elif self.spec.satisfies("+rocm"):
+                    affinity_modifier_modes["mode"] = "rocm"
+                else:
+                    affinity_modifier_modes["mode"] = "mpi"
                 modifier_list.append(affinity_modifier_modes)
             return modifier_list
 
@@ -117,9 +120,9 @@ class Affinity:
             # TODO: Get compiler/mpi/package handles directly from system.py
             system_specs = {}
             system_specs["compiler"] = "default-compiler"
-            if self.spec.satisfies("affinity=cuda"):
+            if self.spec.satisfies("+cuda"):
                 system_specs["cuda_arch"] = "{cuda_arch}"
-            if self.spec.satisfies("affinity=rocm"):
+            if self.spec.satisfies("+rocm"):
                 system_specs["rocm_arch"] = "{rocm_arch}"
 
             # set package spack specs
@@ -130,9 +133,9 @@ class Affinity:
                     "pkg_spec": f"affinity@{affinity_version}+mpi",
                     "compiler": system_specs["compiler"],
                 }
-                if self.spec.satisfies("affinity=cuda"):
+                if self.spec.satisfies("+cuda"):
                     package_specs["affinity"]["pkg_spec"] += "+cuda"
-                elif self.spec.satisfies("affinity=rocm"):
+                elif self.spec.satisfies("+rocm"):
                     package_specs["affinity"]["pkg_spec"] += "+rocm"
 
             return {
