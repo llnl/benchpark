@@ -6,7 +6,6 @@
 import hashlib
 import os
 import packaging.version
-import sys
 import yaml
 
 import benchpark.paths
