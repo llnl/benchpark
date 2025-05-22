@@ -205,7 +205,9 @@ def prepare_data(**kwargs):
     metric = kwargs["y_axis_metric"]
     if metric in tk.inc_metrics and len(tk.graph.roots) == 1:
         root_name = tk.graph.roots[0].frame["name"]
-        logger.info(f"Removing root '{root_name}' to improve chart readability for inclusive metric.")
+        logger.info(
+            f"Removing root '{root_name}' to improve chart readability for inclusive metric."
+        )
         query = (
             th.query.Query()
             .match(".", lambda row: row["name"].apply(lambda n: n != root_name).all())
