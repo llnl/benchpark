@@ -253,7 +253,7 @@ class LanlVenado(System):
                             "prefix": f"/opt/cray/pe/mpich/{mpi_version}/ofi/{mpi_compiler_suffix}",
                             "extra_attributes": {
                                 "gtl_lib_path": f"/opt/cray/pe/mpich/{mpi_version}/gtl/lib",
-                                "gtl_libs": ["libmpi_gtl_cuda"],
+                                "gtl_libs": "libmpi_gtl_cuda",
                                 "ldflags": f"-L/opt/cray/pe/mpich/{mpi_version}/ofi/{mpi_compiler_suffix}/lib -lmpi -L/opt/cray/pe/mpich/{mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{mpi_version}/gtl/lib -lmpi_gtl_cuda",
                             },
                         }
