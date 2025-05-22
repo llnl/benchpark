@@ -90,7 +90,7 @@ class RuntimeResources:
 
     def bootstrap(self):
         if not self.ramble_location.exists():
-            self._install_ramble()
+            self._install_ramble(bootstrap=True)
         else:
             self.update_old_bootstrap(self.ramble_commit, self.ramble_location)
         ramble_lib_path = self.ramble_location / "lib" / "ramble"
@@ -105,23 +105,33 @@ class RuntimeResources:
         # The reason for this oddity is that spack modules will compete with the internal
         # spack modules from ramble
         if not self.spack_location.exists():
-            self._install_spack()
+            self._install_spack(bootstrap=True)
         else:
             self.update_old_bootstrap(self.spack_commit, self.spack_location)
 
-    def _install_ramble(self):
+    def _install_ramble(self, bootstrap=False):
         print(f"Cloning Ramble to {self.ramble_location}")
         git_clone_commit(
-            "https://github.com/GoogleCloudPlatform/ramble.git",
+            (
+                "https://github.com/GoogleCloudPlatform/ramble.git"
+                if bootstrap
+                else benchpark.paths.benchpark_home / "ramble"
+            ),
             self.ramble_commit,
             self.ramble_location,
         )
         debug_print(f"Done cloning Ramble ({self.ramble_location})")
 
-    def _install_spack(self):
+    def _install_spack(self, bootstrap=False):
         print(f"Cloning Spack to {self.spack_location}")
         git_clone_commit(
-            "https://github.com/spack/spack.git", self.spack_commit, self.spack_location
+            (
+                "https://github.com/spack/spack.git"
+                if bootstrap
+                else benchpark.paths.benchpark_home / "spack"
+            ),
+            self.spack_commit,
+            self.spack_location,
         )
         debug_print(f"Done cloning Spack ({self.spack_location})")
 
