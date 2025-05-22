@@ -142,8 +142,8 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
                 args.append("-DCUDA_ARCH={0}".format(cuda_arch[0]))
                 args.append("-DCMAKE_CUDA_ARCHITECTURES={0}".format(cuda_arch[0]))
                 args.append(
-                    "-DCMAKE_CUDA_FLAGS=--expt-extended-lambda -I%s -I=%s"
-                    % (self.spec["cub"].prefix.include, self.spec["mpi"].prefix.include)
+                    "-DCMAKE_CUDA_FLAGS=--expt-extended-lambda -I=%s"
+                    % (self.spec["mpi"].prefix.include)
                 )
         else:
             args.append("-DENABLE_CUDA=OFF")
