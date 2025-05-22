@@ -44,7 +44,7 @@ class LlnlCluster(System):
     variant(
         "compiler",
         default="gcc",
-        values=("gcc", "intel"),
+        values=("gcc", "intel", "oneapi"),
         description="Which compiler to use",
     )
 
@@ -106,6 +106,15 @@ class LlnlCluster(System):
                 },
                 "diffutils": {
                     "externals": [{"spec": "diffutils@3.6", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "llvm": {
+                    "externals": [
+                        {
+                            "spec": "llvm@18.0.0",
+                            "prefix": "/usr",
+                        }
+                    ],
                     "buildable": False,
                 },
                 "cmake": {
@@ -191,6 +200,24 @@ class LlnlCluster(System):
                     }
                 }
             }
+        elif self.spec.satisfies("compiler=oneapi"):
+            selections |= {
+                "packages": selections["packages"]
+                | {
+                    "mpi": {
+                        "buildable": False,
+                        "externals": [
+                            {
+                                "spec": "mvapich2@2.3.7-intel202210",
+                                "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2022.1.0",
+                                "extra_attributes": {
+                                    "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2022.1.0/lib -lmpi"
+                                },
+                            }
+                        ],
+                    }
+                }
+            }
 
         return selections
 
@@ -229,6 +256,28 @@ class LlnlCluster(System):
                                 "cxx": "/usr/tce/packages/intel-classic/intel-classic-2021.6.0/bin/icpc",
                                 "f77": "/usr/tce/packages/intel-classic/intel-classic-2021.6.0/bin/ifort",
                                 "fc": "/usr/tce/packages/intel-classic/intel-classic-2021.6.0/bin/ifort",
+                            },
+                            "flags": {},
+                            "operating_system": "rhel8",
+                            "target": "x86_64",
+                            "modules": [],
+                            "environment": {},
+                            "extra_rpaths": [],
+                        }
+                    }
+                ]
+            }
+        elif self.spec.satisfies("compiler=oneapi"):
+            selections = {
+                "compilers": [
+                    {
+                        "compiler": {
+                            "spec": "oneapi@2022.1.0",
+                            "paths": {
+                                "cc": "/usr/tce/packages/intel/intel-2022.1.0/compiler/2022.1.0/linux/bin/icx",
+                                "cxx": "/usr/tce/packages/intel/intel-2022.1.0/compiler/2022.1.0/linux/bin/icpx",
+                                "f77": "/usr/tce/packages/intel/intel-2022.1.0/compiler/2022.1.0/linux/bin/ifx",
+                                "fc": "/usr/tce/packages/intel/intel-2022.1.0/compiler/2022.1.0/linux/bin/ifx",
                             },
                             "flags": {},
                             "operating_system": "rhel8",
