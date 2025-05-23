@@ -25,7 +25,7 @@ Variants are predefined keywords that execute specific logic and set configurati
 
 * All possible variants are evaluated at the beginning of the ``concretize()`` function
 * This function is called by classes that directly inherits the ``Spec`` class (e.g., ``SystemSpec``, ``ExperimentSpec``)
-* We collect all possible variants (keywords that, when present, lead to specific configurations being set)
+* We get all possible acceptable variants (args/keywords that, when present, lead to specific configurations being set) that are applicable for the required benchmark/experiment.
 * These configurations affect the experiments to run, such as adding specific libraries or tools, and their effect is dumped to configuration files (mainly yaml files) so later Spack and Ramble can procide the needed dependencies/libraries requested.
 
 **Determining Acceptable Variants:**
@@ -34,17 +34,30 @@ In both ``benchpark system`` and ``benchpark experiment`` commands, you'll find 
 
     cls = ....get_obj_class(self.name)
 
-* ``self`` contains the extra arguments passed in the user command
-* ``self.name`` contains the extra arguments passed in the user command
+* ``self`` contains all the Specs, in other words the extra arguments passed in the user command, defined for the current context
+* ``self.name`` contains the name of the core component spec relative to the current context, examples:
+  
+  * ``llnl-cluster`` in benchmark system commands running BP on LLNL systems
+    
+    * At executing benchpark system command (``benchpark system init --dest=.... llnl-cluster cluster=...``), ``self.name`` resolves to ``llnl-cluster`` since it is the core component, as it defines the system we will run our experiments on
+  
+  * ``saxpy`` when running benchmark experiment command
+    
+    * At executing benchpark experiment command (``benchpark experiment init --dest=... saxpy``), ``self.name`` resolves to ``saxpy`` as it is the core component that defines the benchmark that will be used
+* A valid question could be, why not the ``cluster=ruby`` be used as ``self.name``?
+
+  * Based on my experiments, order of args passed to benchpark does really matters. By default our parser expectes key-value pairs to be at the end, and prior is the Spec name.
+
 * We get the parent directory of the Python class path responsible for creating the ``self.name`` object
-* For example, in ``benchpark system ... command``, this is set when creating the ``SystemSpec`` object that calls its parent class ``Spec``, right before executing ``concretize()``
+* ``self.name`` is set when creating the corresponding ChildSpec object, (``SystemSpec``, ``ExperimentSpec``) where they inherit from ``Spec`` class (the parent class). This is done right before executing ``concretize()``
 * We depend on Ramble for resolving this
+
 
 **Example:**
 
 For the command::
 
-    benchpark system init --dest=amr-ruby-system llnl-cluster cluster=ruby
+    benchpark system init --dest=test-ruby-system llnl-cluster cluster=ruby
 
 * ``self.name`` will be resolved to ``llnl-cluster``
 * This resolves to get the path of the ``LlnlCluster`` class that contains the variants it accepts
@@ -96,14 +109,14 @@ Benchpark Command Workflow
 
 .. code-block:: bash
 
-   benchpark system init --dest=amr-ruby-system llnl-cluster cluster=ruby
+   benchpark system init --dest=test-ruby-system llnl-cluster cluster=ruby
 
 **Generated Output:**
 
 * **YAML files:** Define software needed (to be installed by Spack later)
 * **YAML files:** Define the LLNL cluster system to be used
 
-**Generated Directory Structure:** ``amr-ruby-system/``
+**Generated Directory Structure:** ``test-ruby-system/``
 
 * ``variables.yaml``: Contains configurations for job execution (#nodes, #cores, etc.)
 
@@ -114,9 +127,9 @@ Benchpark Command Workflow
 
 .. code-block:: bash
 
-   benchpark experiment init --dest=amg2023-benchmark amg2023 +openmp
+   benchpark experiment init --dest=test-amg2023-benchmark amg2023 +openmp
 
-**Generated Directory Structure:** ``amg2023-benchmark/``
+**Generated Directory Structure:** ``test-amg2023-benchmark/``
 
 * ``ramble.yaml``: 
   
@@ -130,13 +143,13 @@ Benchpark Command Workflow
 
 .. code-block:: bash
 
-   benchpark setup ./amr-amg2023-benchmark ./amr-ruby-system amr-workspace/
+   benchpark setup ./test-amg2023-benchmark ./test-ruby-system test-workspace/
 
-**Generated Directory Structure:** ``amr-workspace/``
+**Generated Directory Structure:** ``test-workspace/``
 
-**New Directory Created:** ``amr-amg2023/amr-ruby-system/workspace``
+**New Directory Created:** ``test-amg2023-benchmark/test-ruby-system/workspace``
 
-* Based on definitions in ``amr-ruby-system`` and ``amr-amg2023-benchmark``
+* Based on definitions in ``test-ruby-system`` and ``test-amg2023-benchmark``
 * Contains everything as defined before this step
 * Creates necessary scripts for configuring Ramble and Spack installation
 
@@ -147,7 +160,7 @@ Benchpark Command Workflow
 
 .. code-block:: bash
 
-   . amr-workspace/setup.sh
+   . test-workspace/setup.sh
 
 **Purpose:**
 
@@ -160,7 +173,7 @@ Benchpark Command Workflow
 
 .. code-block:: bash
 
-   cd ./amr-workspace/amr-amg2023-benchmark/amr-ruby-system/workspace/
+   cd ./test-workspace/test-amg2023-benchmark/test-ruby-system/workspace/
 
 **Command:**
 
@@ -237,41 +250,31 @@ Setup Instructions
         "version": "0.2.0",
         "configurations": [
           {
-            "name": "Debug benchpark init (ruby)",
+            "name": "Debug benchpark system init",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/bin/benchpark",
             "args": [
               "system",
               "init",
-              "--dest=amr-ruby-system",
+              "--dest=test-ruby-system",
               "llnl-cluster",
               "cluster=ruby"
             ],
             "console": "integratedTerminal"
           },
           {
-            "name": "Debug benchpark init (quartz)",
+            "name": "Debug benchpark experiment init",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/bin/benchpark",
             "args": [
-              "system",
+              "experiment",
               "init",
-              "--dest=amr-quartz-system",
-              "llnl-cluster",
-              "cluster=quartz"
-            ],
-            "console": "integratedTerminal"
-          },
-          {
-            "name": "Debug benchpark list clusters",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/bin/benchpark",
-            "args": [
-              "cluster",
-              "list"
+              "--dest=test-saxpy-benchmark",
+              "saxpy",
+              "+openmp",
+              "affinity=mpi"
             ],
             "console": "integratedTerminal"
           }
