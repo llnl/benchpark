@@ -53,20 +53,14 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     variant("openmp", default=False, description="Build with OpenMP enabled.")
     variant("caliper", default=False, description="Build with Caliper support enabled.")
 
-    depends_on('chai@2024.02', when='@develop')
+    depends_on("chai@2024.07.0+raja", when="@develop")
+    depends_on("fmt@9.1", when=f"^chai@2024.07.0")
 
     depends_on("mpi", when="+mpi")
     depends_on("chai+mpi", when="+mpi")
     depends_on("caliper", when="+caliper")
     depends_on("adiak@0.4:", when="+caliper")
     conflicts("^blt@:0.3.6", when="+rocm")
-
-    aligned_versions = ["2024.02"]
-    for v in aligned_versions:
-      depends_on(f"raja@{v}~exercises~examples", when=f"^chai@{v}")
-      depends_on(f"umpire@{v}~examples", when=f"^chai@{v}")
-      depends_on(f"chai@{v}~examples+raja", when=f"^chai@{v}")
-      depends_on(f"camp@{v}", when=f"^chai@{v}")
 
     depends_on("blt@0.6.2:", type="build", when=f"@1.2.7:")
 
