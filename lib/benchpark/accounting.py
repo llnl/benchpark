@@ -18,6 +18,11 @@ exp_dict = {
     "WeakScaling": "weak",
     "Caliper": "caliper",
 }
+sys_dict = {
+    "OpenMPSystem": "openmp",
+    "CudaSystem": "cuda",
+    "ROCmSystem": "rocm",
+}
 non_experiments = ["Caliper"]
 
 
