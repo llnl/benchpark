@@ -5,6 +5,7 @@
 
 import hashlib
 import os
+import packaging.version
 import yaml
 
 import benchpark.paths
@@ -68,8 +69,33 @@ class System(ExperimentSystemBase):
     def compiler_configs(self):
         return None
 
+    @property
+    def programming_models(self):
+        return self._programming_models
+
+    @programming_models.setter
+    def programming_models(self, pm_list):
+        if not isinstance(pm_list, list):
+            raise ValueError("Value must be a list")
+        self._programming_models = pm_list
+
+    def verify(self):
+        for pm in self.programming_models:
+            pm.verify(self)
+
     def system_specific_variables(self):
-        return {}
+        vars = {}
+        for pm in self.programming_models:
+            for x, y in pm.system_specific_variables(self).items():
+                # Note: if you put an object into a yaml file there is an
+                # attempt to represent the object, whereas we want the string.
+                # We make use of the Version behavior on e.g. 'cuda_version'
+                # in some places, so cannot generally store it as a string, and
+                # instead just convert it here where it goes into yaml
+                if isinstance(y, packaging.version.Version):
+                    y = str(y)
+                vars[x] = y
+        return vars
 
     def compute_packages_section(self):
         selections = self.external_pkg_configs()
