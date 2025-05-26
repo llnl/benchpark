@@ -85,32 +85,7 @@ class Remhos(
         elif self.spec.satisfies("+rocm"):
             self.add_experiment_variable("arch", "HIP")
 
-    def compute_spack_section(self):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-
-        # get system config options
-        # TODO: Get compiler/mpi/package handles directly from system.py
-        system_specs = {}
-        system_specs["compiler"] = "default-compiler"
-        system_specs["mpi"] = "default-mpi"
-        system_specs["blas"] = "blas"
-        system_specs["lapack"] = "lapack"
-
-        # set package spack specs
-        # empty package_specs value implies external package
-        self.add_spack_spec(system_specs["mpi"])
-
-        if self.spec.satisfies("+cuda"):
-            system_specs["cuda_version"] = "{default_cuda_version}"
-            system_specs["cuda_arch"] = "{cuda_arch}"
-        elif self.spec.satisfies("+rocm"):
-            system_specs["rocm_arch"] = "{rocm_arch}"
-
-        # empty package_specs value implies external package
-        self.add_spack_spec(system_specs["blas"])
-        self.add_spack_spec(system_specs["lapack"])
-
-        self.add_spack_spec(
-            self.name, [f"remhos@{app_version} +metis", system_specs["compiler"]]
-        )
+        self.add_package_spec(self.name, [f"remhos@{app_version} +metis"])

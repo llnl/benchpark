@@ -78,17 +78,7 @@ class Ior(
             "n_ranks", "{sys_cores_per_node} * {n_nodes}", True
         )
 
-    def compute_spack_section(self):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-
-        # get system config options
-        # TODO: Get compiler/mpi/package handles directly from system.py
-        system_specs = {}
-        system_specs["compiler"] = "default-compiler"
-        system_specs["mpi"] = "default-mpi"
-
-        # set package spack specs
-        self.add_spack_spec(system_specs["mpi"])
-
-        self.add_spack_spec(self.name, [f"ior@{app_version}", system_specs["compiler"]])
+        self.add_package_spec(self.name, [f"ior@{app_version}"])

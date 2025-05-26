@@ -1,7 +1,0 @@
-packages:
-  cray-libsci:
-    externals:
-    - spec: cray-libsci@23.09.1.1%cce
-      prefix: /opt/cray/pe/libsci/23.09.1.1/cray/12.0/x86_64
-      modules:
-      - cray-libsci/23.09.1.1

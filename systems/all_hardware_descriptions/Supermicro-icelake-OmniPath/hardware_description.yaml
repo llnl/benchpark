@@ -2,9 +2,8 @@
 # Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: Apache-2.0
-
 system_definition:
-  name: Penguin-icelake-OmniPath
+  name: Supermicro-icelake-OmniPath
   integrator:
     vendor: Supermicro
     name:

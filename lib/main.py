@@ -7,8 +7,6 @@
 
 import argparse
 import inspect
-import os
-import pathlib
 import shlex
 import subprocess
 import sys
@@ -18,7 +16,7 @@ __version__ = "0.1.0"
 if "-V" in sys.argv or "--version" in sys.argv:
     print(__version__)
     exit()
-helpstr = """usage: main.py [-h] [-V] {list,tags,system,experiment,setup,unit-test,audit} ...
+helpstr = """usage: main.py [-h] [-V] {tags,system,experiment,setup,unit-test,audit,info,list} ...
 
 Benchpark
 
@@ -27,15 +25,16 @@ options:
   -V, --version         show version number and exit
 
 Subcommands:
-  {list,tags,system,experiment,setup,unit-test,audit}
-    list                List available experiments, systems, and modifiers
+  {tags,system,experiment,setup,unit-test,audit,info,list}
     tags                Tags in Benchpark experiments
     system              Initialize a system config
     experiment          Interact with experiments
     setup               Set up an experiment and prepare it to build/run
     unit-test           Run benchpark unit tests
-    audit               Look for problems in System/Experiment repos"""
-if "-h" in sys.argv or "--help" in sys.argv:
+    audit               Look for problems in System/Experiment repos
+    info                Get information about Systems and Experiments
+    list                List experiments, systems, benchmarks, and modifiers"""
+if "-h" == sys.argv[1] or "--help" == sys.argv[1]:
     print(helpstr)
     exit()
 
@@ -45,12 +44,9 @@ import benchpark.cmd.experiment  # noqa: E402
 import benchpark.cmd.setup  # noqa: E402
 import benchpark.cmd.unit_test  # noqa: E402
 import benchpark.cmd.info  # noqa: E402
+import benchpark.cmd.list  # noqa: E402
 import benchpark.paths  # noqa: E402
-from benchpark.accounting import (  # noqa: E402
-    benchpark_experiments,
-    benchpark_modifiers,
-    benchpark_systems,
-)
+from benchpark.accounting import benchpark_benchmarks  # noqa: E402
 
 
 def main():
@@ -65,7 +61,6 @@ def main():
     subparsers = parser.add_subparsers(title="Subcommands", dest="subcommand")
 
     actions = {}
-    benchpark_list(subparsers, actions)
     benchpark_tags(subparsers, actions)
     init_commands(subparsers, actions)
 
@@ -76,21 +71,24 @@ def main():
         parser.print_help()
         return 1
 
+    exit_code = 0
+
     if args.subcommand in actions:
         action = actions[args.subcommand]
         if supports_unknown_args(action):
-            action(args, unknown_args)
+            exit_code = action(args, unknown_args)
         elif unknown_args:
             raise argparse.ArgumentTypeError(
                 f"benchpark {args.subcommand} has no option(s) {unknown_args}"
             )
         else:
-            action(args)
+            exit_code = action(args)
     else:
         print(
             "Invalid subcommand ({args.subcommand}) - must choose one of: "
             + " ".join(actions.keys())
         )
+    return exit_code
 
 
 def supports_unknown_args(command):
@@ -104,23 +102,6 @@ def supports_unknown_args(command):
     varnames = info["__code__"].co_varnames
     argcount = info["__code__"].co_argcount
     return argcount == 2 and varnames[1] == "unknown_args"
-
-
-def benchpark_list(subparsers, actions_dict):
-    list_parser = subparsers.add_parser(
-        "list", help="List available experiments, systems, and modifiers"
-    )
-    list_parser.add_argument("sublist", nargs="?")
-    actions_dict["list"] = benchpark_list_handler
-
-
-def benchpark_benchmarks():
-    source_dir = benchpark.paths.benchpark_root
-    benchmarks = []
-    experiments_dir = source_dir / "legacy" / "experiments"
-    for x in os.listdir(experiments_dir):
-        benchmarks.append(f"{x}")
-    return benchmarks
 
 
 def benchpark_get_tags():
@@ -143,42 +124,6 @@ def benchpark_get_tags():
             print("ERROR file does not contain benchpark-tags")
 
     return tags
-
-
-def benchpark_list_handler(args):
-    sublist = args.sublist
-    benchmarks = benchpark_benchmarks()
-    experiments = benchpark_experiments()
-    systems = benchpark_systems()
-    modifiers = benchpark_modifiers()
-
-    if sublist is None:
-        print("Experiments:")
-        for experiment in experiments:
-            print(f"\t{experiment}")
-        print("Systems:")
-        for system in systems:
-            print(f"\t{system}")
-    elif sublist == "benchmarks":
-        print("Benchmarks:")
-        for benchmark in benchmarks:
-            print(f"\t{benchmark}")
-    elif sublist == "experiments":
-        print("Experiments:")
-        for experiment in experiments:
-            print(f"\t{experiment}")
-    elif sublist == "systems":
-        print("Systems:")
-        for system in systems:
-            print(f"\t{system}")
-    elif sublist == "modifiers":
-        print("Modifiers:")
-        for modifier in modifiers:
-            print(f"\t{modifier}")
-    else:
-        raise ValueError(
-            f'Invalid benchpark list "{sublist}" - must choose [experiments], [systems], [modifiers] or leave empty'
-        )
 
 
 def benchpark_check_benchmark(arg_str):
@@ -237,12 +182,18 @@ def init_commands(subparsers, actions_dict):
     )
     benchpark.cmd.info.setup_parser(info_parser)
 
+    list_parser = subparsers.add_parser(
+        "list", help="List experiments, systems, benchmarks, and modifiers"
+    )
+    benchpark.cmd.list.setup_parser(list_parser)
+
     actions_dict["system"] = benchpark.cmd.system.command
     actions_dict["experiment"] = benchpark.cmd.experiment.command
     actions_dict["setup"] = benchpark.cmd.setup.command
     actions_dict["unit-test"] = benchpark.cmd.unit_test.command
     actions_dict["audit"] = benchpark.cmd.audit.command
     actions_dict["info"] = benchpark.cmd.info.command
+    actions_dict["list"] = benchpark.cmd.list.command
 
 
 def run_command(command_str, env=None):
@@ -264,11 +215,6 @@ def run_command(command_str, env=None):
 
 def benchpark_tags(subparsers, actions_dict):
     create_parser = subparsers.add_parser("tags", help="Tags in Benchpark experiments")
-    create_parser.add_argument(
-        "experiments_root",
-        type=str,
-        help="The experiments_root you specified during Benchpark setup.",
-    )
     create_parser.add_argument(
         "-a",
         "--application",
@@ -306,9 +252,9 @@ def benchpark_tags_handler(args):
     """
     Filter ramble tags by benchpark benchmarks
     """
-    experiments_root = pathlib.Path(os.path.abspath(args.experiments_root))
-    ramble_location = experiments_root / "ramble"
-    ramble_exe = ramble_location / "bin" / "ramble"
+    source_dir = benchpark.paths.benchpark_root
+    ramble_exe = benchpark.paths.benchpark_home / "ramble/bin/ramble"
+    subprocess.run([ramble_exe, "repo", "add", "--scope=site", f"{source_dir}/repo"])
     benchmarks = benchpark_benchmarks()
 
     if args.tag:
@@ -336,4 +282,6 @@ def benchpark_tags_handler(args):
 
 
 if __name__ == "__main__":
-    main()
+    exit_code = main()
+    if exit_code is not None and isinstance(exit_code, int):
+        sys.exit(exit_code)
