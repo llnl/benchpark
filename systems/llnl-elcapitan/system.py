@@ -64,14 +64,14 @@ class LlnlElcapitan(System):
     variant(
         "lapack",
         default="intel-oneapi-mkl",
-        values=("intel-oneapi-mkl", "cray-libsci", "rocsolver"),
+        values=("intel-oneapi-mkl", "cray-libsci"),
         description="Which lapack to use",
     )
 
     variant(
         "blas",
         default="intel-oneapi-mkl",
-        values=("intel-oneapi-mkl", "rocblas"),
+        values=("intel-oneapi-mkl",),
         description="Which blas to use",
     )
 
@@ -95,9 +95,11 @@ class LlnlElcapitan(System):
             )
         if self.rocm_version >= Version("6.0.0"):
             self.pmi_version = Version("6.1.15.6")
+            self.pals_version = Version("1.2.12")
             self.llvm_version = Version("18.0.1")
         else:
             self.pmi_version = Version("6.1.12")
+            self.pals_version = Version("1.2.9")
             self.llvm_version = Version("16.0.0")
         # TODO: Replace this with lookups into the working set
 
@@ -310,10 +312,10 @@ class LlnlElcapitan(System):
 
             use_gtl = {
                 "gtl_flags": "$MV2_COMM_WORLD_LOCAL_RANK",
-                "gtl_cutoff_size": 4096,
-                "fi_cxi_ats": 0,
+                "gtl_cutoff_size": "4096",
+                "fi_cxi_ats": "0",
                 "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
-                "gtl_libs": ["libmpi_gtl_hsa"],
+                "gtl_libs": "libmpi_gtl_hsa",
                 "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -lmpi_gtl_hsa",
             }
 
@@ -346,10 +348,10 @@ class LlnlElcapitan(System):
             }
 
             use_gtl = {
-                "gtl_cutoff_size": 4096,
-                "fi_cxi_ats": 0,
+                "gtl_cutoff_size": "4096",
+                "fi_cxi_ats": "0",
                 "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
-                "gtl_libs": ["libmpi_gtl_hsa"],
+                "gtl_libs": "libmpi_gtl_hsa",
                 "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}/lib -lmpi "
                 f"-L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib "
                 f"-Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -lmpi_gtl_hsa",
@@ -605,7 +607,7 @@ class LlnlElcapitan(System):
                                     "LD_LIBRARY_PATH": "/opt/cray/pe/gcc-libs"
                                 },
                                 "prepend_path": {
-                                    "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib",
+                                    "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib",
                                     "LIBRARY_PATH": f"/opt/rocm-{self.rocm_version}/lib",
                                 },
                             },
@@ -641,7 +643,7 @@ class LlnlElcapitan(System):
                             "modules": [f"cce/{self.cce_version}"],
                             "environment": {
                                 "prepend_path": {
-                                    "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/rocm-{self.rocm_version}/lib"
+                                    "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/rocm-{self.rocm_version}/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib"
                                 }
                             },
                             "extra_rpaths": [

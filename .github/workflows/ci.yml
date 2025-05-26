@@ -51,6 +51,7 @@ jobs:
               - 'pyproject.toml'
             style:
               - '.github/**'
+              - '.gitlab/**'
               - 'bin/**'
               - 'configs/**'
               - 'docs/conf.py'
@@ -61,8 +62,8 @@ jobs:
               - 'var/**'
               - 'pyproject.toml'
               - '.flake8'
+              - 'checkout-versions.yaml'
             run:
-              - '.github/**'
               - 'bin/**'
               - 'configs/**'
               - 'checkout-versions.yaml'
@@ -74,6 +75,7 @@ jobs:
               - 'var/**'
             coverage:
               - '.github/**'
+              - '.gitlab/**'
               - 'bin/**'
               - 'configs/**'
               - 'checkout-versions.yaml'
@@ -85,6 +87,7 @@ jobs:
               - 'pyproject.toml'
             license:
               - '.github/**'
+              - '.gitlab/**'
               - 'bin/**'
               - 'configs/**'
               - 'docs/**'
