@@ -1,11 +1,13 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 2d13707..5fcddb0 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -9,65 +9,184 @@
+@@ -9,55 +9,176 @@
  # Enbable debug mode by passing -DCMAKE_BUILD_TYPE=Debug to CMake, default is
  # Release
  
 -cmake_minimum_required (VERSION 3.11)
-+cmake_minimum_required(VERSION 3.23)
++cmake_minimum_required (VERSION 3.23)
  
 -option(USE_GPU "user-set flag to compile in GPU code" FALSE)
 +project (BRANSON
@@ -212,33 +214,14 @@
  
  # Build system support files are located here.
 -set( CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config )
-+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config ${CMAKE_MODULE_PATH})
++set( CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/config ${CMAKE_MODULE_PATH})
  
--message( "
--This is ${CMAKE_PROJECT_NAME} v. ${PROJECT_VERSION}.
--")
-+message("This is ${CMAKE_PROJECT_NAME} v. ${PROJECT_VERSION}.")
- 
- #------------------------------------------------------------------------------#
- # User configurable options
- 
- set (BRANSON_N_GROUPS ${N_GROUPS})
--if (NOT BRANSON_N_GROUPS)
-+if(NOT BRANSON_N_GROUPS)
-   message(STATUS
-     "HARDCODED NUMBER OF GROUPS NOT SET, DEFAULTING TO ONE GROUP (GRAY)
-      use '-DN_GROUPS=<int>' when running cmake to select multigroup.\n")
-@@ -83,28 +202,10 @@ set(ENABLE_VERBOSE_GPU_TRANSPORT ${ENABLE_VERBOSE_GPU_TRANSPORT} CACHE STRING "F
- #------------------------------------------------------------------------------#
- # Record the site name
- 
--site_name( SITENAME )
--string( REGEX REPLACE "([A-z0-9]+).*" "\\1" SITENAME ${SITENAME} )
-+site_name(SITENAME)
-+string(REGEX REPLACE "([A-z0-9]+).*" "\\1" SITENAME ${SITENAME})
+ message( "
+ This is ${CMAKE_PROJECT_NAME} v. ${PROJECT_VERSION}.
+@@ -88,24 +209,6 @@ string( REGEX REPLACE "([A-z0-9]+).*" "\\1" SITENAME ${SITENAME} )
  include (lanl-setup)
--set( SITENAME ${SITENAME} CACHE "STRING" "Name of the current machine" FORCE)
--
+ set( SITENAME ${SITENAME} CACHE "STRING" "Name of the current machine" FORCE)
+ 
 -#------------------------------------------------------------------------------#
 -# Setup compiler options
 -set( CXX_STANDARD_REQUIRED ON )
@@ -256,48 +239,12 @@
 -  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Release|Debug|RelWithDebInfo"
 -    FORCE)
 -endif ()
-+set(SITENAME ${SITENAME} CACHE "STRING" "Name of the current machine" FORCE)
- 
+-
  # GCC options for address or undefined sanitizing
  #set(GCC_SANITIZE_COMPILE_FLAGS "-fsanitize=address")
-@@ -113,135 +214,137 @@ endif ()
- #set(GCC_SANITIZE_LINK_FLAGS "-fsanitize=undefined")
- 
- # add compiler flags
--if( CMAKE_CXX_COMPILER_ID STREQUAL "GNU" )
--  set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -ffp-contract=off")
--  set( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -O0")
--  #set( CMAKE_CXX_FLAGS_RELEASE "-march=native  -O3 -funroll-loops -fno-var-tracking-assignments")
--  set( CMAKE_CXX_FLAGS_RELEASE "-g -O3 -funroll-loops -fno-var-tracking-assignments")
-+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -ffp-contract=off")
-+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -O0")
-+  #set(CMAKE_CXX_FLAGS_RELEASE "-march=native  -O3 -funroll-loops -fno-var-tracking-assignments")
-+  set(CMAKE_CXX_FLAGS_RELEASE "-g -O3 -funroll-loops -fno-var-tracking-assignments")
-   # optionally add sanitize flags
--  #set( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${GCC_SANITIZE_COMPILE_FLAGS}")
--  #set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_SANITIZE_LINK_FLAGS}")
--elseif( CMAKE_CXX_COMPILER_ID STREQUAL "Intel" )
--  set( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -O0")
-+  #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${GCC_SANITIZE_COMPILE_FLAGS}")
-+  #set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_SANITIZE_LINK_FLAGS}")
-+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
-+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -O0")
-   # note that the "fp-model=precise" flag significantly limite vectorization and slows down
-   # branson but it makes it the hardware counter data match Jayenne more closely (Jayenne uses
-   # this flag)
--  set( CMAKE_CXX_FLAGS_RELEASE "-g -O3 -fp-speculation=fast -xhost -qno-opt-dynamic-align")
--elseif (CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
-+  set(CMAKE_CXX_FLAGS_RELEASE "-g -O3 -fp-speculation=fast -xhost -qno-opt-dynamic-align")
-+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
-   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -Wall -O0 -xhost -qopenmp")
- 	set(CMAKE_CXX_FLAGS_RELEASE "-g -O3 -xhost -qopenmp -qopt-zmm-usage=high -fp-speculation=fast -qopt-report=3 -qopt-report-file=runAVX512.optrpt")
--elseif( CMAKE_CXX_COMPILER_ID STREQUAL "Cray" )
--  set( CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -g -DR123_USE_GNU_UINT128=0")
--  set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -DR123_USE_GNU_UINT128=0")
-+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Cray")
-+  set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -g -DR123_USE_GNU_UINT128=0")
-+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -DR123_USE_GNU_UINT128=0")
+ #set(GCC_SANITIZE_LINK_FLAGS "-fsanitize=address")
+@@ -136,14 +239,17 @@ elseif( CMAKE_CXX_COMPILER_ID STREQUAL "Cray" )
+   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -DR123_USE_GNU_UINT128=0")
  endif()
  
 +if(ENABLE_CUDA)
@@ -317,48 +264,20 @@
  #------------------------------------------------------------------------------#
  # Report build configuration
  
- # Summary of TPLs
- include(FeatureSummary)
- message(" ")
--feature_summary( WHAT ALL
-+feature_summary(WHAT ALL
-   INCLUDE_QUIET_PACKAGES
-   FATAL_ON_MISSING_REQUIRED_PACKAGES
--  QUIET_ON_EMPTY )
-+  QUIET_ON_EMPTY)
- 
- # Summary of user-selectable build options
--message( "\nBuild Summary:\n")
--message( STATUS "Machine name    : ${SITENAME}")
-+message("\nBuild Summary:\n")
-+message(STATUS "Machine name    : ${SITENAME}")
- report_lanl_hpc_features()
--if( ${BRANSON_N_GROUPS} GREATER 1 )
--  message( STATUS "Energy groups   : ${BRANSON_N_GROUPS}")
-+if(${BRANSON_N_GROUPS} GREATER 1)
-+  message(STATUS "Energy groups   : ${BRANSON_N_GROUPS}")
- else()
--  message( STATUS "Energy groups   : Gray (1-group)")
-+  message(STATUS "Energy groups   : Gray (1-group)")
+@@ -166,83 +272,82 @@ else()
  endif()
--message( STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
--message( STATUS "Compiler        : ${CMAKE_CXX_COMPILER}")
--if( CMAKE_CONFIGURATION_TYPES )
+ message( STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+ message( STATUS "Compiler        : ${CMAKE_CXX_COMPILER}")
++string( REPLACE ";" " " CMAKE_BRANSON_CXXFLAGS_STR "${CMAKE_BRANSON_CXXFLAGS}")
+ if( CMAKE_CONFIGURATION_TYPES )
 -  message( STATUS "Compiler Flags (All)    : ${CMAKE_CXX_FLAGS}")
--  message( STATUS "Compiler Flags (Debug)  : ${CMAKE_CXX_FLAGS_DEBUG}")
--  message( STATUS "Compiler Flags (Release): ${CMAKE_CXX_FLAGS_RELEASE}")
-+message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
-+message(STATUS "Compiler        : ${CMAKE_CXX_COMPILER}")
-+string(REPLACE ";" " " CMAKE_BRANSON_CXXFLAGS_STR "${CMAKE_BRANSON_CXXFLAGS}")
-+if(CMAKE_CONFIGURATION_TYPES)
-+  message(STATUS "Compiler Flags (All)    : ${CMAKE_CXX_FLAGS} ${CMAKE_BRANSON_CXXFLAGS_STR}")
-+  message(STATUS "Compiler Flags (Debug)  : ${CMAKE_CXX_FLAGS_DEBUG}")
-+  message(STATUS "Compiler Flags (Release): ${CMAKE_CXX_FLAGS_RELEASE}")
++  message( STATUS "Compiler Flags (All)    : ${CMAKE_CXX_FLAGS} ${CMAKE_BRANSON_CXXFLAGS_STR}")
+   message( STATUS "Compiler Flags (Debug)  : ${CMAKE_CXX_FLAGS_DEBUG}")
+   message( STATUS "Compiler Flags (Release): ${CMAKE_CXX_FLAGS_RELEASE}")
  else()
--  string( TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPER )
+   string( TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPER )
 -  message( STATUS "Compiler Flags  : ${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE_UPPER}}")
-+  string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPER)
-+  message(STATUS "Compiler Flags  : ${CMAKE_CXX_FLAGS} ${CMAKE_BRANSON_CXXFLAGS_STR} ${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE_UPPER}}")
++  message( STATUS "Compiler Flags  : ${CMAKE_CXX_FLAGS} ${CMAKE_BRANSON_CXXFLAGS_STR} ${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE_UPPER}}")
  endif()
  message("\n")
  
@@ -373,7 +292,7 @@
 -file(GLOB headers *.h)
 -add_executable(BRANSON main.cc ${headers})
 -target_include_directories( BRANSON PRIVATE
--  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}> ${PROJECT_SOURCE_DIR}/pugixml/src/)
+-  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}> ${PROJECT_SOURCE_DIR}/pugixml/src/ ${PROJECT_SOURCE_DIR}/random123/ )
 -set( branson_deps
 -  MPI::MPI_CXX
 -  MPI::MPI_C
@@ -489,7 +408,7 @@
  if(BUILD_TESTING)
    enable_testing()
    add_subdirectory(test)
-@@ -252,11 +355,38 @@ else()
+@@ -253,11 +358,38 @@ else()
      "Building tests disabled, set BUILD_TESTING=TRUE or don't set BUILD_TESTING to enable test builds")
  endif()
  
