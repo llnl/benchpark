@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.directives import variant
+from benchpark.directives import variant, mainteiners
 from benchpark.system import System
 from benchpark.cudasystem import CudaSystem
 from packaging.version import Version
