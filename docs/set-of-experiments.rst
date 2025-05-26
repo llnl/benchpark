@@ -3,9 +3,9 @@
 
    SPDX-License-Identifier: Apache-2.0
 
-==============
-Working with a set of experiments
-==============
+===============================
+Benchpark Suites of Experiments
+===============================
 
 You may want to use the same experiments_root directory when setting up multiple experiments:
 
@@ -18,29 +18,29 @@ You may want to use the same experiments_root directory when setting up multiple
 To use the same experiments directory when setting up multiple experiments,
 instruct benchpark to set them up in the same experiments_root::
 
-    benchpark setup benchmark1/ProgrammingModel1 system1 /output/path/to/experiments_root
-    benchpark setup benchmark1/ProgrammingModel2 system2 /output/path/to/experiments_root
-    benchpark setup benchmark2/ProgrammingModel2 system1 /output/path/to/experiments_root
+    benchpark setup ${Benchmark1}/${ProgrammingModel1} ${System1} /output/path/to/experiments_root
+    benchpark setup ${Benchmark1}/${ProgrammingModel2} ${System2} /output/path/to/experiments_root
+    benchpark setup ${Benchmark2}/${ProgrammingModel2} ${System1} /output/path/to/experiments_root
 
 This will result in the following directory structure::
 
     experiments_root/
         ramble/
         spack/
-        benchmark1/
-            ProgrammingModel1/
-                system1/
+        ${Benchmark1}/
+            ${ProgrammingModel1}/
+                ${System1}/
                     workspace/
-            ProgrammingModel2/
-                system2/
+            ${ProgrammingModel2}/
+                ${System2}/
                     workspace/
-        benchmark2/
-            ProgrammingModel2/
-                system1/
+        ${Benchmark2}/
+            ${ProgrammingModel2}/
+                ${System1}/
                     workspace/
 
 Note that there is a single clone of Ramble, and a single clone of Spack,
 which all of the ``experiments`` use.
-Each ``experiment`` (``benchmark/ProgrammingModel`` x ``system`` combination)
+Each ``experiment`` (``Benchmark/ProgrammingModel`` x ``system`` combination)
 has its own ``Ramble workspace``, where this specific ``experiment``
 will be compiled and run.

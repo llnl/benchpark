@@ -4,9 +4,25 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from ramble.modkit import *
+import json
 
 
-class Caliper(SpackModifier):
+def add_mode(mode_name, mode_option, description):
+    mode(
+        name=mode_name,
+        description=description,
+    )
+
+    env_var_modification(
+        "CALI_CONFIG_MODE",
+        mode_option,
+        method="append",
+        separator=",",
+        modes=[mode_name],
+    )
+
+
+class Caliper(BasicModifier):
     """Define a modifier for Caliper"""
 
     name = "caliper"
@@ -15,19 +31,88 @@ class Caliper(SpackModifier):
 
     maintainers("pearce8")
 
-    mode("time", description="Platform-independent collection of time")
-
+    # The filename for Caliper output data
     _cali_datafile = "{experiment_run_dir}/{experiment_name}.cali"
+
+    # The filename for metadata forwarded from Benchpark to Caliper
+    _caliper_metadata_file = "{experiment_run_dir}/{experiment_name}_metadata.json"
+
+    _default_mode = "time"
+
+    # Write out the metadata file once all variables are resolved
+    register_phase("build_metadata", pipeline="setup", run_after=["make_experiments"])
+
+    add_mode(
+        mode_name=_default_mode,
+        mode_option="time.exclusive",
+        description="Platform-independent collection of time (default mode)",
+    )
 
     env_var_modification(
         "CALI_CONFIG",
-        "spot(output={})".format(_cali_datafile),
+        'spot(output={}{}),metadata(file={}),metadata(file=/etc/node_info.json,keys="host.name,host.cluster,host.os")'.format(
+            _cali_datafile, "${CALI_CONFIG_MODE}", _caliper_metadata_file
+        ),
         method="set",
-        modes=["time"],
+        modes=[_default_mode],
     )
+
+    add_mode(
+        mode_name="mpi",
+        mode_option="profile.mpi",
+        description="Profile MPI functions",
+    )
+
+    add_mode(
+        mode_name="cuda",
+        mode_option="profile.cuda",
+        description="Profile CUDA API functions",
+    )
+
+    add_mode(
+        mode_name="topdown-counters-all",
+        mode_option="topdown-counters.all",
+        description="Raw counter values for Intel top-down analysis (all levels)",
+    )
+
+    add_mode(
+        mode_name="topdown-counters-toplevel",
+        mode_option="topdown-counters.toplevel",
+        description="Raw counter values for Intel top-down analysis (top level)",
+    )
+
+    add_mode(
+        mode_name="topdown-all",
+        mode_option="topdown.all",
+        description="Top-down analysis for Intel CPUs (all levels)",
+    )
+
+    add_mode(
+        mode_name="topdown-toplevel",
+        mode_option="topdown.toplevel",
+        description="Top-down analysis for Intel CPUs (top level)",
+    )
+
+    def _build_metadata(self, workspace, app_inst):
+        """Write the caliper metadata to json"""
+        # Load the Caliper metadata variable from ramble.yaml
+        experiment_metadata = app_inst.expander.expand_var_name(
+            "caliper_metadata", typed=True, merge_used_stage=False
+        )
+        app_inst.expander.flush_used_variable_stage()
+
+        # rebuild dictionary with expanded variables
+        cali_metadata = {}
+        for key, val in experiment_metadata.items():
+            cali_metadata[key] = app_inst.expander.expand_var(val)
+
+        # Write to the Caliper metadata file
+        cali_metadata_file = self.expander.expand_var(self._caliper_metadata_file)
+        with open(cali_metadata_file, "w") as f:
+            f.write(json.dumps(cali_metadata))
 
     archive_pattern(_cali_datafile)
 
-    software_spec("caliper", spack_spec="caliper")
+    software_spec("caliper", pkg_spec="caliper")
 
     required_package("caliper")

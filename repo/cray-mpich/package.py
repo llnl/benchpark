@@ -11,17 +11,28 @@ class CrayMpich(BuiltinCM):
 
     variant("gtl", default=False, description="enable GPU-aware mode")
 
+    @property
+    def libs(self):
+        libs = super().libs
+
+        if self.spec.satisfies("+gtl"):
+            gtl_lib_prefix = self.spec.extra_attributes["gtl_lib_path"]
+            # gtl_libs, if set, must be a single string. You can pass multiple
+            # libs by adding a space between each
+            gtl_libs = self.spec.extra_attributes["gtl_libs"].split()
+            libs += find_libraries(gtl_libs, root=gtl_lib_prefix, recursive=True)
+
+        return libs
+
     def setup_run_environment(self, env):
 
-        super(CrayMpich, self).setup_run_environment(env)
+        super().setup_run_environment(env)
 
         if self.spec.satisfies("+gtl"):
             env.set("MPICH_GPU_SUPPORT_ENABLED", "1")
             env.prepend_path("LD_LIBRARY_PATH", self.spec.extra_attributes["gtl_lib_path"])
-            env.set("GTL_HSA_VSMSG_CUTOFF_SIZE", str(self.spec.extra_attributes["gtl_cutoff_size"]))
-            env.set("FI_CXI_ATS", str(self.spec.extra_attributes["fi_cxi_ats"]))
         else:
-            env.unset("MPICH_GPU_SUPPORT_ENABLED")
+            env.set("MPICH_GPU_SUPPORT_ENABLED", "0")
             gtl_path = self.spec.extra_attributes.get("gtl_lib_path", "")
             if gtl_path:
                 env.prepend_path("LD_LIBRARY_PATH", gtl_path)

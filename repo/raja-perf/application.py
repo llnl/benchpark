@@ -8,7 +8,7 @@ import sys
 from ramble.appkit import *
 
 
-class RajaPerf(SpackApplication):
+class RajaPerf(ExecutableApplication):
     """RAJA Performance suite"""
     name = "raja-perf"
 
@@ -16,7 +16,7 @@ class RajaPerf(SpackApplication):
             'atomics','simd','vectorization','register-pressure',
             'high-memory-bandwidth','regular-memory-access',
             'mpi','network-point-to-point','network-latency-bound',
-            'c++','raja','cuda','hip','openmp','sycl']
+            'c++','raja','sycl']
 
     executable('run', 'raja-perf.exe', use_mpi=True)
 

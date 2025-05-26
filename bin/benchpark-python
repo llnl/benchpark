@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+#
+# benchpark-python
+#
+# If you want to write your own executable Python script that uses Benchpark
+# modules, on Mac OS or maybe some others, you may be able to do it like
+# this:
+#
+#   #!/usr/bin/env benchpark-python
+#
+# This is compatible across platforms.
+#
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+export PYTHONPATH="${SCRIPT_DIR}/../lib":$PYTHONPATH
+# Check if the first argument is -i
+if [ "$1" = "-i" ]; then
+    # Shift the arguments to remove the first one (-i)
+    shift
+    exec python3 -i "$@"
+else
+    exec python3 "$@"
+fi

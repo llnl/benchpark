@@ -1,4 +1,5 @@
-black==24.4.0
-flake8==7.0.0
-isort==5.13.2
-codespell==2.2.6
+black==25.1.0
+flake8==7.2.0
+isort==6.0.1
+codespell==2.4.1
+yamlfix==1.17.0

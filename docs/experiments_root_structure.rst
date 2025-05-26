@@ -15,8 +15,8 @@ to build and run the experiment::
                 <system>/
                     workspace/
                         configs/
-                            (everything from source/configs/<system>)
-                            (everything from source/experiments/<benchmark>)
+                            (everything from system_def_dir)
+                            (everything from experiment_def_dir)
                         experiments/
                             <benchmark>/
                                 <problem>/

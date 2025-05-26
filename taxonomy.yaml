@@ -1,0 +1,178 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+benchpark-tags:
+  application-domain:
+    - asc  # Advanced Simulation and Computing
+    - astrophysics
+    - automotive
+    - bioinformatics
+    - biology
+    - cfd  # computational fluid dynamics
+    - chemistry
+    - climate
+    - combustion
+    - computer-vision
+    - cosmology
+    - cryptography
+    - dft  # density functional theory
+    - electromagnetics
+    - engineering
+    - finance
+    - fusion
+    - geoscience
+    - hep
+    - hydrodynamics
+    - material-science
+    - medical
+    - molecular-dynamics
+    - nuclear
+    - physics
+    - polymers
+    - qcd
+    - robotics
+    - seismic
+    - solarphysics
+    - synthetic
+    - thermodynamics
+  benchmark-scale:
+    - large-scale
+    - multi-node
+    - single-node
+    - strong-scaling
+    - sub-node
+    - weak-scaling
+  communication:
+    - mpi
+    - nccl
+    - nvsmem
+    - openshmem
+    - rccl
+    - shmem
+    - upc
+    - upc++
+  communication-performance-characteristics:
+    - network-bandwidth-bound
+    - network-bisection-bandwidth-bound
+    - network-collectives
+    - network-latency-bound
+    - network-multi-threaded
+    - network-nonblocking-collectives
+    - network-onesided
+    - network-point-to-point
+  compute-performance-characteristics:
+    - atomics
+    - high-branching
+    - high-fp
+    - i-o
+    - low-precision
+    - mixed-precision
+    - register-pressure
+    - pipeline-parallelism
+    - simd
+    - tensor
+    - vectorization
+  math-libraries:
+    - blas
+    - cublas
+    - hypre
+    - lapack
+    - mfem
+    - pytorch
+    - qphix
+    - quda
+    - rocblas
+    - rocsolver
+    - tpetra
+  memory-access-characteristics:
+    - high-memory-bandwidth
+    - irregular-memory-access
+    - large-memory-footprint
+    - managed-memory
+    - regular-memory-access
+  mesh-representation:
+    - amr
+    - block-structured-grid
+    - meshfree
+    - multigrid
+    - structured-grid
+    - unstructured-grid
+  method-type:
+    - ai  # AI, ML, DL
+    - ai-inference
+    - ai-training
+    - ale  # arbitrary lagrangian-eulerian
+    - automatic-differentiation
+    - compiler-transformation
+    - compression
+    - conjugate-gradient
+    - dense-linear-algebra
+    - deterministic
+    - direct-solve
+    - eulerian
+    - explicit-differentiation
+    - explicit-timestepping
+    - fft  # fast fourier transform
+    - finite-difference
+    - finite-element
+    - finite-volume
+    - full-assembly
+    - gpt  # generative pre-trained transformer
+    - graph
+    - graph-traversal
+    - high-order
+    - hydrodynamics
+    - implicit-differentiation
+    - implicit-timestepping
+    - lagrangian
+    - lbm
+    - llm  # large language model
+    - low-order
+    - math
+    - montecarlo
+    - nbody
+    - no-method
+    - ode  # ordinary differential equations
+    - partial-assembly
+    - particles
+    - pde
+    - rng
+    - signal-processing
+    - solver
+    - sorting
+    - sparse-linear-algebra
+    - spatial-discretization
+    - sph  # smoothed particle hydrodynamics
+    - task-parallelism
+    - tft  # temporal fusion transformer
+    - time-dependent
+    - transformer
+    - transport
+    - workflow
+  programming-language:
+    - c
+    - c++
+    - fortran
+    - java
+    - julia
+    - python
+    - rust
+  programming-model:
+    - charm++
+    - cuda
+    - dpc++
+    - futhark
+    - hip
+    - kokkos
+    - oneapi
+    - openacc
+    - opencl
+    - openmp
+    - openmp-target
+    - pstl
+    - raja
+    - rocm
+    - sycl
+    - tbb
+    - thrust

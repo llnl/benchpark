@@ -13,11 +13,13 @@
 # And here's the CITATION.cff format:
 
 cff-version: 1.2.0
-message: "If you are referencing Benchpark in a publication, please cite the paper below."
 title: "Benchpark"
+message: "If you are referencing Benchpark in a publication, please cite the paper below."
 repository-code: "https://github.com/llnl/benchpark"
 preferred-citation:
   type: conference-paper
+  doi: 10.1145/3624062.3624135
+  url: https://doi.org/10.1145/3624062.3624135
   authors:
     - family-names: "Pearce"
       given-names: "Olga"
@@ -44,7 +46,30 @@ preferred-citation:
     name: "Supercomputing 2023 (SC’23)"
     city: "Denver"
     region: "Colorado"
-    country: "USA"
-  month: November 12-17
+    country: "US"
+    date-start: 2023-11-12
+    date-end: 2023-11-17
+  month: 11
   year: 2023
   notes: LLNL-CONF-853344
+authors:
+  - family-names: "Pearce"
+    given-names: "Olga"
+  - family-names: "Scott"
+    given-names: "Alec"
+  - family-names: "Becker"
+    given-names: "Gregory"
+  - family-names: "Haque"
+    given-names: "Riyaz"
+  - family-names: "Hanford"
+    given-names: "Nathan"
+  - family-names: "Brink"
+    given-names: "Stephanie"
+  - family-names: "Jacobsen"
+    given-names: "Doug"
+  - family-names: "Poxon"
+    given-names: "Heidi"
+  - family-names: "Domke"
+    given-names: "Jens"
+  - family-names: "Gamblin"
+    given-names: "Todd"

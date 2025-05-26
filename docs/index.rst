@@ -7,38 +7,65 @@
 
 .. toctree::
    :maxdepth: 1
-   :numbered:
-   :caption: Getting Started
+   :caption: Basics
 
-   1-getting-started
-   2-benchpark-list
-   3-opt-edit-experiment
-   4-benchpark-setup
-   5-build-experiment
-   6-run-experiment
-   7-analyze-experiment
-   FAQ-what-to-rerun
+   for-the-impatient
+   getting-started
+   benchpark-commands
+   benchpark-workflow
+   FAQ
 
 .. toctree::
    :maxdepth: 1
    :caption: Catalogue
 
-   catalogue-of-benchmarks
-   available-system-specs
+   system-list
    benchmark-list
-   benchpark-help
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Tutorials
+
+   example-workflow
+   llnl-tutorial
+   comparing-experiment-builds
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Using Benchpark
+
+   benchpark-setup
+   build-experiment
+   run-experiment
+   analyze-experiment
+   modifiers
+   set-of-experiments
+   run-binary
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Benchpark Utils
+
+   diffBuildSpecs
+   diffExperimentBuilds
+   diffExperimentSpecs
+   diffPackageCommits
+   diffSystemSpecs
+   scripts
+   developer-scripts
 
 .. toctree::
    :maxdepth: 1
    :caption: Contributing
 
+   add-a-system-config
    add-a-benchmark
    add-an-experiment
-   add-a-system-config
-   add-a-site-specific-system-config
+   add-a-dryrun
+   update-a-system-config
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Benchmark Suites
+   :maxdepth: 2
+   :caption: API Docs
 
-   set-of-experiments
+   Benchpark API Docs <source/benchpark>
