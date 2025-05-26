@@ -6,6 +6,7 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.system import System
+from benchpark.openmpsystem import OpenMPSystem
 from benchpark.paths import hardware_descriptions
 
 
@@ -44,12 +45,13 @@ class LlnlCluster(System):
     variant(
         "compiler",
         default="gcc",
-        values=("gcc", "intel", "oneapi"),
+        values=("gcc", "intel"),
         description="Which compiler to use",
     )
 
     def __init__(self, spec):
         super().__init__(spec)
+        self.programming_models = [OpenMPSystem()]
 
         self.scheduler = "slurm"
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
@@ -57,7 +59,6 @@ class LlnlCluster(System):
             setattr(self, k, v)
 
     def compute_packages_section(self):
-
         selections = {
             "packages": {
                 "elfutils": {
@@ -108,15 +109,6 @@ class LlnlCluster(System):
                     "externals": [{"spec": "diffutils@3.6", "prefix": "/usr"}],
                     "buildable": False,
                 },
-                "llvm": {
-                    "externals": [
-                        {
-                            "spec": "llvm@18.0.0",
-                            "prefix": "/usr",
-                        }
-                    ],
-                    "buildable": False,
-                },
                 "cmake": {
                     "externals": [
                         {"spec": "cmake@3.26.5", "prefix": "/usr"},
@@ -135,19 +127,19 @@ class LlnlCluster(System):
                 "python": {
                     "externals": [
                         {
-                            "spec": "python@2.7.18+bz2+crypt+ctypes+dbm~lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl~tkinter+uuid+zlib",
+                            "spec": "python@2.7.18+bz2+crypt+ctypes+dbm~lzma+pyexpat~pythoncmd+readline+sqlite3+ssl~tkinter+uuid+zlib",
                             "prefix": "/usr",
                         },
                         {
-                            "spec": "python@3.6.8+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
+                            "spec": "python@3.6.8+bz2+crypt+ctypes+dbm+lzma+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
                             "prefix": "/usr",
                         },
                         {
-                            "spec": "python@2.7.18+bz2+crypt+ctypes+dbm~lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
+                            "spec": "python@2.7.18+bz2+crypt+ctypes+dbm~lzma+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
                             "prefix": "/usr/tce",
                         },
                         {
-                            "spec": "python@3.9.12+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
+                            "spec": "python@3.9.12+bz2+crypt+ctypes+dbm+lzma+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
                             "prefix": "/usr/tce",
                         },
                     ],
@@ -200,24 +192,6 @@ class LlnlCluster(System):
                     }
                 }
             }
-        elif self.spec.satisfies("compiler=oneapi"):
-            selections |= {
-                "packages": selections["packages"]
-                | {
-                    "mpi": {
-                        "buildable": False,
-                        "externals": [
-                            {
-                                "spec": "mvapich2@2.3.7-intel202210",
-                                "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2022.1.0",
-                                "extra_attributes": {
-                                    "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2022.1.0/lib -lmpi"
-                                },
-                            }
-                        ],
-                    }
-                }
-            }
 
         return selections
 
@@ -256,28 +230,6 @@ class LlnlCluster(System):
                                 "cxx": "/usr/tce/packages/intel-classic/intel-classic-2021.6.0/bin/icpc",
                                 "f77": "/usr/tce/packages/intel-classic/intel-classic-2021.6.0/bin/ifort",
                                 "fc": "/usr/tce/packages/intel-classic/intel-classic-2021.6.0/bin/ifort",
-                            },
-                            "flags": {},
-                            "operating_system": "rhel8",
-                            "target": "x86_64",
-                            "modules": [],
-                            "environment": {},
-                            "extra_rpaths": [],
-                        }
-                    }
-                ]
-            }
-        elif self.spec.satisfies("compiler=oneapi"):
-            selections = {
-                "compilers": [
-                    {
-                        "compiler": {
-                            "spec": "oneapi@2022.1.0",
-                            "paths": {
-                                "cc": "/usr/tce/packages/intel/intel-2022.1.0/compiler/2022.1.0/linux/bin/icx",
-                                "cxx": "/usr/tce/packages/intel/intel-2022.1.0/compiler/2022.1.0/linux/bin/icpx",
-                                "f77": "/usr/tce/packages/intel/intel-2022.1.0/compiler/2022.1.0/linux/bin/ifx",
-                                "fc": "/usr/tce/packages/intel/intel-2022.1.0/compiler/2022.1.0/linux/bin/ifx",
                             },
                             "flags": {},
                             "operating_system": "rhel8",
