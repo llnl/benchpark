@@ -53,7 +53,7 @@ class RikenFugaku(System):
                     },
                     "permissions": {"write": "group"},
                 },
-                "htslib": {"version": ["1.12"]},
+                "htslib": {"version": [1.12]},
                 "python": {
                     "externals": [
                         {
@@ -646,9 +646,9 @@ class RikenFugaku(System):
 
     def system_specific_variables(self):
         return {
-            "extra_cmd_opts": "-std-proc fjmpioutdir/bmexe",
-            "extra_batch_opts": '-x PJM_LLIO_GFSCACHE="/vol0002:/vol0003:/vol0004:/vol0005:/vol0006"',
-            "post_exec_cmds": "for F in $(ls -1v fjmpioutdir/bmexe.*); do cat $F >> {log_file}; done",
+            "extra_cmd_opts": "-std-proc fjmpioutdir/bmexe\n",
+            "extra_batch_opts": '-x PJM_LLIO_GFSCACHE="/vol0002:/vol0003:/vol0004:/vol0005:/vol0006"\n',
+            "post_exec_cmds": "for F in $(ls -1v fjmpioutdir/bmexe.*); do cat $F >> {log_file}; done\n",
         }
 
     def compute_software_section(self):

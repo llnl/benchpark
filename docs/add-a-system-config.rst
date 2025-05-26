@@ -22,14 +22,9 @@ System specifications include two types of information:
 To specify a new system:
 
 1. Identify a system in Benchpark with the same hardware.
-2. If a system with the same hardware does not exist, add a new hardware description,
-   as described in Adding System Hardware Specs section.
-3. Identify the same software stack description.  Typically if the same hardware
-  is already used by Benchpark, the same software stack may already be specified
-  if the same vendor software stack is used on this hardware - or, if a software
-  stack of your datacenter is already specified.
-4. If the same software stack description does not exists,
-  determine if there is one that can be parameterized to match yours.
+2. If a system with the same hardware does not exist, add a new hardware description, as described in Adding System Hardware Specs section.
+3. Identify the same software stack description.  Typically if the same hardware is already used by Benchpark, the same software stack may already be specified if the same vendor software stack is used on this hardware - or, if a software stack of your datacenter is already specified.
+4. If the same software stack description does not exist, determine if there is one that can be parameterized to match yours.
 5. If can't parameterize existing software description, add a new one.
 
 ------------------------------
@@ -106,13 +101,9 @@ For example, the generic-x86 system software stack is defined in::
         ├── system.py
 
 
-The System base class defined in ``/lib/benchpark/system.py`` is shown below,
+The System base class is defined in ``/lib/benchpark/system.py``, 
 some or all of the functions can be overridden to define custom system behavior.
-
-.. literalinclude:: ../lib/benchpark/system.py
-   :language: python
-
-``systems/{SYSTEM}/system.py`` should inherit from the System base class.
+Your ``systems/{SYSTEM}/system.py`` should inherit from the System base class.
 
 The generic-x86 system subclass should run on most x86_64 systems,
 but we mostly provide it as a starting point for modifying or testing.
@@ -123,8 +114,7 @@ To make these changes, we provided an example below, where we start with the gen
 system.py, and make a system called Modifiedx86.
 
 1. First, make a copy of the system.py file in generic_x86 folder and move it into a new folder,
-   e.g., ``systems/modified_x86/system.py``.
-Then, update the class name to ``Modifiedx86``.::
+   e.g., ``systems/modified_x86/system.py``.  Then, update the class name to ``Modifiedx86``.::
 
     class Modifiedx86(System):
 
@@ -217,7 +207,7 @@ Then, update the class name to ``Modifiedx86``.::
 
         return selections
 
-External packages can be found via `benchpark system external --new_system {mysite}-{mysystem}`.
+External packages can be found via `benchpark system external ---new-system {mysite}-{mysystem}`.
 Note, if your externals are *not* installed via Spack, read `Spack documentation on modules <https://spack.readthedocs.io/en/latest/packages_yaml.html#external-packages>`_.
 
 4. Next, add any of the packages that can be managed by spack, such as blas/cublas pointing to the correct version,
@@ -401,4 +391,4 @@ file
     mpi_command: "placeholder"
 
 
-Once you can run an experiment successfully, and the yaml looks correct the new system has been validated and you can continue your :doc:`benchpark-workflow`.
+Once you can run an experiment successfully, and the yaml looks correct, the new system has been validated and you can continue your :doc:`benchpark-workflow`.

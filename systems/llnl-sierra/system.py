@@ -40,15 +40,15 @@ class LlnlSierra(System):
 
     variant(
         "lapack",
-        default="cusolver",
-        values=("cusolver", "essl"),
+        default="essl",
+        values=("essl",),
         description="Which lapack to use",
     )
 
     variant(
         "blas",
-        default="cublas",
-        values=("cublas", "essl"),
+        default="essl",
+        values=("essl",),
         description="Which blas to use",
     )
 
@@ -390,19 +390,17 @@ class LlnlSierra(System):
         compiler = self.spec.variants["compiler"][0]
         cuda_ver = self.spec.variants["cuda"][0]
         cfg = mpi_cfgs[(compiler, cuda_ver)]
-        return {
-            "packages": {
-                "blas": {
-                    "require": [self.spec.variants["blas"][0]]  # Replace dynamically
-                },
-                "lapack": {
-                    "require": [self.spec.variants["lapack"][0]]  # Replace dynamically
-                },
-                "mpi": {
-                    "externals": cfg  # Replace dynamically with the value of `cfg`
-                },
-            }
+        selections["packages"] |= {
+            "blas": {"require": [self.spec.variants["blas"][0]]},  # Replace dynamically
+            "lapack": {
+                "require": [self.spec.variants["lapack"][0]]  # Replace dynamically
+            },
+            "mpi": {
+                "externals": cfg,  # Replace dynamically with the value of `cfg`
+                "buildable": False,
+            },
         }
+        return selections
 
     def compute_compilers_section(self):
         # values=("clang-ibm", "xl", "xl-gcc", "clang"),

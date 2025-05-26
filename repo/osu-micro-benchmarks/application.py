@@ -19,4 +19,4 @@ class OsuMicroBenchmarks(OsuMicroBenchmarksBase):
             'network-collectives','network-latency-bound',
             'network-multi-threaded','network-nonblocking-collectives',
             'network-onesided','network-point-to-point',
-            'c','java','python','cuda','rocm','openacc']
+            'c','java','python','openacc']
