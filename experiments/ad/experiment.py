@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 
 
@@ -19,6 +19,8 @@ class Ad(Experiment):
         default="main",
         description="app version",
     )
+
+    maintainers("rfhaque")
 
     def compute_applications_section(self):
         self.add_experiment_variable("n_ranks", 1, True)

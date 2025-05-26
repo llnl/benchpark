@@ -3,8 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant
-
+from benchpark.directives import variant, maintainers
 from benchpark.system import System
 from benchpark.cudasystem import CudaSystem
 from packaging.version import Version
@@ -12,6 +11,8 @@ from benchpark.paths import hardware_descriptions
 
 
 class JscJuwels(System):
+
+    maintainers("pearce8")
 
     id_to_resources = {
         "juwels": {
