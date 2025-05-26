@@ -3,11 +3,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from packaging.version import Version
 
 from benchpark.directives import variant, maintainers
-from benchpark.system import System
 from benchpark.paths import hardware_descriptions
+from benchpark.rocmsystem import ROCmSystem
+from benchpark.system import System
+from packaging.version import Version
 
 
 class LlnlElcapitan(System):
@@ -20,6 +21,7 @@ class LlnlElcapitan(System):
             "sys_cores_per_node": 64,
             "sys_gpus_per_node": 8,
             "system_site": "llnl",
+            "scheduler": "flux",
             "hardware_key": str(hardware_descriptions)
             + "/HPECray-zen3-MI250X-Slingshot/hardware_description.yaml",
         },
@@ -28,6 +30,7 @@ class LlnlElcapitan(System):
             "sys_cores_per_node": 96,
             "sys_gpus_per_node": 4,
             "system_site": "llnl",
+            "scheduler": "flux",
             "hardware_key": str(hardware_descriptions)
             + "/HPECray-zen4-MI300A-Slingshot/hardware_description.yaml",
         },
@@ -39,35 +42,30 @@ class LlnlElcapitan(System):
         values=("tioga", "elcapitan"),
         description="Which cluster to run on",
     )
-
     variant(
         "rocm",
         default="6.2.4",
         values=("5.7.1", "6.2.4", "6.3.1"),
         description="ROCm version",
     )
-
-    variant(
-        "compiler",
-        default="cce",
-        values=("cce", "gcc", "rocmcc"),
-        description="Which compiler to use",
-    )
-
     variant(
         "gtl",
         default=False,
         values=(True, False),
         description="Use GTL-enabled MPI",
     )
-
+    variant(
+        "compiler",
+        default="cce",
+        values=("cce", "gcc", "rocmcc"),
+        description="Which compiler to use",
+    )
     variant(
         "lapack",
         default="intel-oneapi-mkl",
         values=("intel-oneapi-mkl", "cray-libsci"),
         description="Which lapack to use",
     )
-
     variant(
         "blas",
         default="intel-oneapi-mkl",
@@ -77,9 +75,11 @@ class LlnlElcapitan(System):
 
     def __init__(self, spec):
         super().__init__(spec)
+        self.programming_models = [ROCmSystem()]
+        self.rocm_version = Version(self.spec.variants["rocm"][0])
+        self.gtl_flag = self.spec.variants["gtl"][0]
 
         # TODO: Replace this with lookups into the working set
-        self.rocm_version = Version(self.spec.variants["rocm"][0])
         if self.spec.satisfies("compiler=gcc"):
             self.gcc_version = Version("12.2.0")
             self.mpi_version = Version("8.1.26")
@@ -103,13 +103,9 @@ class LlnlElcapitan(System):
             self.llvm_version = Version("16.0.0")
         # TODO: Replace this with lookups into the working set
 
-        self.scheduler = "flux"
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
-
-    def system_specific_variables(self):
-        return {"rocm_arch": self.rocm_arch}
 
     def compute_packages_section(self):
         selections = {
