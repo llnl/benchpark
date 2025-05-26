@@ -6,6 +6,7 @@
 
 from benchpark.system import System
 from benchpark.directives import variant, maintainers
+from benchpark.openmpsystem import OpenMPSystem
 from benchpark.paths import hardware_descriptions
 
 
@@ -55,6 +56,7 @@ class AwsPcluster(System):
 
     def __init__(self, spec):
         super().__init__(spec)
+        self.programming_models = [OpenMPSystem()]
 
         self.scheduler = "slurm"
         # TODO: for some reason I have to index to get value, even if multi=False
