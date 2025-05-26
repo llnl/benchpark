@@ -8,6 +8,7 @@ from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.caliper import Caliper
 
+
 class Qws(Experiment, OpenMPExperiment, Caliper):
 
     variant(
