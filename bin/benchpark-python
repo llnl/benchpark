@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Copyright 2023 Lawrence Livermore National Security, LLC and other
 # Benchpark Project Developers. See the top-level COPYRIGHT file for details.
@@ -18,4 +18,11 @@
 #
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 export PYTHONPATH="${SCRIPT_DIR}/../lib":$PYTHONPATH
-exec python3 -i "$@"
+# Check if the first argument is -i
+if [ "$1" = "-i" ]; then
+    # Shift the arguments to remove the first one (-i)
+    shift
+    exec python3 -i "$@"
+else
+    exec python3 "$@"
+fi

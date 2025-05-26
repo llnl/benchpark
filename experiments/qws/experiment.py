@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 
@@ -21,6 +21,8 @@ class Qws(Experiment, OpenMPExperiment):
         default="master",
         description="app version",
     )
+
+    maintainers("jdomke", "SBA0486")
 
     def compute_applications_section(self):
 
@@ -45,17 +47,7 @@ class Qws(Experiment, OpenMPExperiment):
             self.add_experiment_variable("omp_num_threads", ["48"])
             self.add_experiment_variable("arch", "OpenMP")
 
-    def compute_spack_section(self):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-
-        system_specs = {}
-        system_specs["compiler"] = "default-compiler"
-        system_specs["mpi"] = "default-mpi"
-
-        # if package_spec left empty spack will use external
-        self.add_spack_spec(system_specs["mpi"])
-
-        self.add_spack_spec(
-            self.name, [f"qws@{app_version} +mpi", system_specs["compiler"]]
-        )
+        self.add_package_spec(self.name, [f"qws@{app_version} +mpi"])

@@ -4,15 +4,23 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
 from benchpark.caliper import Caliper
+from benchpark.affinity import Affinity
 
 
-class Saxpy(Experiment, OpenMPExperiment, CudaExperiment, ROCmExperiment, Caliper):
+class Saxpy(
+    Experiment,
+    OpenMPExperiment,
+    CudaExperiment,
+    ROCmExperiment,
+    Caliper,
+    Affinity,
+):
     variant(
         "workload",
         default="problem",
@@ -24,6 +32,8 @@ class Saxpy(Experiment, OpenMPExperiment, CudaExperiment, ROCmExperiment, Calipe
         default="1.0.0",
         description="app version",
     )
+
+    maintainers("rfhaque")
 
     def compute_applications_section(self):
         # GPU tests include some smaller sizes
@@ -40,20 +50,7 @@ class Saxpy(Experiment, OpenMPExperiment, CudaExperiment, ROCmExperiment, Calipe
 
         self.add_experiment_variable("n", n, True)
 
-    def compute_spack_section(self):
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-
-        # TODO: express that we need certain variables from system
-        # Does not need to happen before merge, separate task
-        # TODO: Get compiler/mpi/package handles directly from system.py
-        system_specs = {}
-        system_specs["compiler"] = "default-compiler"
-        system_specs["mpi"] = "default-mpi"
-
-        # empty package_specs value implies external package
-        self.add_spack_spec(system_specs["mpi"])
-
-        self.add_spack_spec(
-            self.name, [f"saxpy@{app_version}", system_specs["compiler"]]
-        )
+        self.add_package_spec(self.name, [f"saxpy@{app_version}"])

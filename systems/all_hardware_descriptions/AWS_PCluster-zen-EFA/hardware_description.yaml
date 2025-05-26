@@ -2,7 +2,6 @@
 # Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: Apache-2.0
-
 system_definition:
   name: AWS_PCluster-zen-EFA
   integrator:
@@ -28,5 +27,4 @@ system_definition:
       compiler: gcc
       runtime:
       mpi: openmpi
-  top500-system-instances:
-    - instance-types <https://aws.amazon.com/ec2/instance-types>
+  instance-types: <https://aws.amazon.com/ec2/instance-types>

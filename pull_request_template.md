@@ -14,8 +14,9 @@
 
 ## Adding/modifying a benchmark (docs: [Adding a Benchmark](https://software.llnl.gov/benchpark/add-a-benchmark.html))
 
-- [ ] (optional) If package upstreamed to Spack is insufficient, add/modify `repo/benchmark_name/package.py`
-- [ ] (optional) If application upstreamed to Ramble is insufficient, add/modify `repo/benchmark_name/application.py`
+- [ ] If modifying the source code of a benchmark: create, self-assign, and link here a follow up issue with a link to the PR in the benchmark repo.
+- [ ] If package.py upstreamed to Spack is insufficient, add/modify `repo/benchmark_name/package.py` plus: create, self-assign, and link here a follow up issue with a link to the PR in the Spack repo.
+- [ ] If application.py upstreamed to Ramble is insufficient, add/modify `repo/benchmark_name/application.py` plus: create, self-assign, and link here a follow up issue with a link to the PR in the Ramble repo.
 - [ ] Tags in Ramble's `application.py` or in `repo/benchmark_name/application.py` will appear in the [docs catalogue](https://software.llnl.gov/benchpark/benchmark-list.html)
 - [ ] Add/modify an `experiments/benchmark_name/experiment.py` to define a single node and multi-node experiments
 - [ ] Add/modify a dry run unit test in `.github/workflows/run.yml`
@@ -23,4 +24,4 @@
 ## Adding/modifying core functionality, CI, or documentation:
 
 - [ ] Update docs
-- [ ] Update `.github/workflows` and `.gitlab/ci` unit tests (if needed)
+- [ ] Update `.github/workflows` and `.gitlab/tests` unit tests (if needed)

@@ -19,4 +19,4 @@ class Hpcc(HpccBase):
             'mpi','network-collectives','network-point-to-point',
             'network-bandwidth-bound','network-bisection-bandwidth-bound',
             'network-latency-bound',
-            'c','fortran','openmp']
+            'c','fortran']
