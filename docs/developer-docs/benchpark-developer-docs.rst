@@ -26,7 +26,7 @@ Variants are predefined keywords that execute specific logic and set configurati
 * All possible variants are evaluated at the beginning of the ``concretize()`` function
 * This function is called by classes that directly inherits the ``Spec`` class (e.g., ``SystemSpec``, ``ExperimentSpec``)
 * We get all possible acceptable variants (args/keywords that, when present, lead to specific configurations being set) that are applicable for the required benchmark/experiment.
-* These configurations affect the experiments to run, such as adding specific libraries or tools, and their effect is dumped to configuration files (mainly yaml files) so later Spack and Ramble can procide the needed dependencies/libraries requested.
+* These configurations affect the experiments to run, such as adding specific libraries or tools, and their effect is dumped to configuration files (mainly yaml files) so later Spack and Ramble can provide the needed dependencies/libraries requested.
 
 **Determining Acceptable Variants:**
 
@@ -46,7 +46,7 @@ In both ``benchpark system`` and ``benchpark experiment`` commands, you'll find 
     * At executing benchpark experiment command (``benchpark experiment init --dest=... saxpy``), ``self.name`` resolves to ``saxpy`` as it is the core component that defines the benchmark that will be used
 * A valid question could be, why not the ``cluster=ruby`` be used as ``self.name``?
 
-  * Based on my experiments, order of args passed to benchpark does really matters. By default our parser expectes key-value pairs to be at the end, and prior is the Spec name.
+  * Based on my experiments, order of args passed to benchpark does really matters. By default our parser expects key-value pairs to be at the end, and prior is the Spec name.
 
 * We get the parent directory of the Python class path responsible for creating the ``self.name`` object
 * ``self.name`` is set when creating the corresponding ChildSpec object, (``SystemSpec``, ``ExperimentSpec``) where they inherit from ``Spec`` class (the parent class). This is done right before executing ``concretize()``
