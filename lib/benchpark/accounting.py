@@ -8,13 +8,30 @@ import os
 import benchpark.paths
 
 exclude_exper = ["repo.yaml"]
+exp_dict = {
+    "OpenMPExperiment": "openmp",
+    "CudaExperiment": "cuda",
+    "ROCmExperiment": "rocm",
+    "SingleNode": "single_node",
+    "StrongScaling": "strong",
+    "ThroughputScaling": "throughput",
+    "WeakScaling": "weak",
+    "Caliper": "caliper",
+}
+sys_dict = {
+    "OpenMPSystem": "openmp",
+    "CudaSystem": "cuda",
+    "ROCmSystem": "rocm",
+}
+non_experiments = ["Caliper"]
 
 
-def benchpark_experiments():
+def benchpark_experiments(exclude_variants=non_experiments):
     source_dir = benchpark.paths.benchpark_root
     experiments = []
     experiments_dir = source_dir / "experiments"
-    exclude_variants = ["Caliper"]
+    exclude_variants = ["Caliper", "Affinity"]
+
     for x in sorted(os.listdir(experiments_dir)):
         if x not in exclude_exper:
             experiment_spec = benchpark.spec.ExperimentSpec(x)
@@ -23,7 +40,8 @@ def benchpark_experiments():
             for h in experiment_class.__dict__["helpers"]:
                 variant = str(h).split(".")[2]
                 if variant not in exclude_variants:
-                    experiments.append(f"{x}/{variant}")
+                    variant = variant.replace(variant, exp_dict[variant])
+                    experiments.append(f"{x}+{variant}")
     return experiments
 
 

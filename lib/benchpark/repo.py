@@ -137,7 +137,6 @@ def set_path(repo, object_type=default_type):
     Overwrite ``path`` and register it as an importer in
     ``sys.meta_path`` if it is a ``Repo`` or ``RepoPath``.
     """
-    global paths
     paths[object_type] = repo
 
     # make the new repo_path an importer if needed
@@ -170,7 +169,6 @@ def use_repositories(*paths_and_repos, object_type=default_type):
     Returns:
         Corresponding RepoPath object
     """
-    global paths
 
     # Construct a temporary RepoPath object from
     temporary_repositories = ramble.repository.RepoPath(

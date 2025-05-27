@@ -40,7 +40,7 @@ class Caliper:
                 modifier_list.append({"name": "caliper", "mode": "time"})
             return modifier_list
 
-        def compute_spack_section(self):
+        def compute_package_section(self):
             # set package versions
             caliper_version = "master"
 
@@ -115,10 +115,13 @@ class Caliper:
                     "n_threads_per_proc": "{n_threads_per_proc}",
                 }
                 # parse the spec for more metadata
-                for variant_spec in str.split(str(self.spec.variants)):
+                for i, variant_spec in enumerate(str.split(str(self.spec.variants))):
                     values = variant_spec.split("=")
                     if len(values) == 1:
-                        metadata_dict["benchpark_spec"] = values
+                        if i == 0:
+                            metadata_dict["benchpark_spec"] = values
+                        elif values[0] == "'":
+                            pass
                     elif len(values) == 2:
                         metadata_dict[values[0]] = values[1]
                     else:

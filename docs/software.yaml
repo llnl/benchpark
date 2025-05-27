@@ -4,9 +4,7 @@
 # configuration settings.
 spack:
   # add package specs to the `specs` list
-  specs:
-  - py-sphinx
-  - py-sphinx-rtd-theme
+  specs: [py-sphinx, py-sphinx-rtd-theme]
   view: true
   concretizer:
     unify: true

@@ -3,15 +3,16 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import pathlib
-from benchpark.directives import variant
-
+from benchpark.directives import variant, maintainers
 from benchpark.system import System
+from benchpark.openmpsystem import OpenMPSystem
 from packaging.version import Version
 from benchpark.paths import hardware_descriptions
 
 
 class CscsEiger(System):
+
+    maintainers("pearce8")
 
     id_to_resources = {
         "eiger": {
@@ -29,8 +30,9 @@ class CscsEiger(System):
         description="Which compiler to use",
     )
 
-    def initialize(self):
-        super().initialize()
+    def __init__(self, spec):
+        super().__init__(spec)
+        self.programming_models = [OpenMPSystem()]
 
         self.gcc_version = Version("12.3.0")
 
@@ -39,29 +41,43 @@ class CscsEiger(System):
         for k, v in attrs.items():
             setattr(self, k, v)
 
-    def generate_description(self, output_dir):
-        super().generate_description(output_dir)
+    def compute_compilers_section(self):
+        return {
+            "compilers": [
+                {
+                    "compiler": {
+                        "spec": "gcc@12.3.0",
+                        "paths": {"cc": "cc", "cxx": "CC", "f77": "ftn", "fc": "ftn"},
+                        "flags": {},
+                        "target": "any",
+                        "operating_system": "HPECray",
+                        "modules": ["PrgEnv-gnu", "gcc/12.3.0"],
+                        "environment": {},
+                        "extra_rpaths": [],
+                    }
+                }
+            ]
+        }
 
-        sw_description = pathlib.Path(output_dir) / "software.yaml"
+    def compute_packages_section(self):
 
-        with open(sw_description, "w") as f:
-            f.write(self.sw_description())
-
-    def compiler_configs(self):
-        selections = []
-        compilers = CscsEiger.resource_location / "compilers"
-        selections.append(compilers / "00-gcc12-compiler.yaml")
+        selections = {
+            "packages": {
+                "all": {"providers": {"mpi": ["cray-mpich"]}},
+                "cray-mpich": {
+                    "externals": [
+                        {
+                            "spec": "cray-mpich@8.1.28",
+                            "prefix": "/user-environment/env/default",
+                        }
+                    ]
+                },
+            }
+        }
 
         return selections
 
-    def external_pkg_configs(self):
-        externals = CscsEiger.resource_location / "externals"
-
-        selections = [externals / "00-packages.yaml"]
-
-        return selections
-
-    def sw_description(self):
+    def compute_software_section(self):
         """This is somewhat vestigial: for the Tioga config that is committed
         to the repo, multiple instances of mpi/compilers are stored and
         and these variables were used to choose consistent dependencies.
@@ -70,13 +86,12 @@ class CscsEiger(System):
         will fail if these variables are not defined though, so for now
         they are still generated (but with more-generic values).
         """
-        return """\
-software:
-  packages:
-    default-compiler:
-      pkg_spec: gcc@12.3.0
-    default-mpi:
-      pkg_spec: cray-mpich@8.1.28
-    compiler-gcc:
-      pkg_spec: gcc@12.3.0
-"""
+        return {
+            "software": {
+                "packages": {
+                    "default-compiler": {"pkg_spec": "gcc@12.3.0"},
+                    "default-mpi": {"pkg_spec": "cray-mpich@8.1.28"},
+                    "compiler-gcc": {"pkg_spec": "gcc@12.3.0"},
+                }
+            }
+        }

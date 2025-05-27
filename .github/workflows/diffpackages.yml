@@ -1,0 +1,18 @@
+on:
+  workflow_call:
+    inputs:
+      modified_repo_dirs:
+        required: true
+        type: string
+jobs:
+  diffPackages:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Add needed Python libs
+        run: |
+          pip install -r ./requirements.txt
+      - name: Check Packages Against Spack
+        run: |-
+          ./bin/benchpark-python lib/scripts/diffPackageCommits.py --packages "${{ inputs.modified_repo_dirs }}"
