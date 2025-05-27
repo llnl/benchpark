@@ -59,7 +59,7 @@ class RajaPerf(
             for nk, nv in problem_sizes.items():
                 self.add_experiment_variable(nk, nv, True)
         elif self.spec.satisfies("+weak"):
-            # "strong scale" since problem size is per-process
+            # Use "strong scaling" to generate resource scaling since problem size is per-process
             scaled_variables = self.generate_strong_scaling_params(
                 {tuple(n_resources.keys()): list(n_resources.values())},
                 int(self.spec.variants["scaling-factor"][0]),
@@ -79,7 +79,7 @@ class RajaPerf(
             n_resources = scaled_variables["n_ranks"]
             for pk, pv in scaled_variables.items():
                 self.add_experiment_variable(pk, pv, True)
-            # Notice 1/scaling-factor to keep total problem size constant
+            # Notice 1/scaling-factor to keep total problem size constant for per-process problem size experiments
             scaled_problem_sizes = self.generate_strong_scaling_params(
                 {tuple(problem_sizes.keys()): list(problem_sizes.values())},
                 1 / int(self.spec.variants["scaling-factor"][0]),
