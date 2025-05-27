@@ -86,7 +86,32 @@ class SingleNode:
             return "single_node" if self.spec.satisfies("+single_node") else ""
 
 
-class Experiment(ExperimentSystemBase, SingleNode):
+class Hwloc:
+    variant(
+        "hwloc",
+        default="on",
+        values=(
+            "on",
+            "off"
+        ),
+        multi=False,
+        description="Get underlying infrastructure topology",
+    )
+
+    class Helper(ExperimentHelper):
+        def compute_modifiers_section(self):
+            modifier_list = []
+
+            if self.spec.satisfies("hwloc=on"):
+                affinity_modifier_modes = {}
+                affinity_modifier_modes["name"] = "hwloc"
+                affinity_modifier_modes["mode"] = self.spec.variants["hwloc"][0]
+                modifier_list.append(affinity_modifier_modes)
+
+            return modifier_list
+        
+
+class Experiment(ExperimentSystemBase, SingleNode, Hwloc):
     """This is the superclass for all benchpark experiments.
 
     ***The Experiment class***
