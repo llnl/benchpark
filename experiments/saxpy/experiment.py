@@ -10,6 +10,7 @@ from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
 from benchpark.caliper import Caliper
+from benchpark.hwloc import Hwloc
 
 
 class Saxpy(
@@ -18,6 +19,7 @@ class Saxpy(
     CudaExperiment,
     ROCmExperiment,
     Caliper,
+    Hwloc
 ):
     variant(
         "workload",
