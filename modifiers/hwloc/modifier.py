@@ -10,46 +10,30 @@ class Hwloc(BasicModifier):
     """Define a modifier for showing the underlying infrastructure topology"""
 
     name = "hwloc"
-
-    executable_modifier("hwloc")
     
     mode(
         name="on",
         description="Mode for executing lstopo",
     )
 
+    executable_modifier("hwloc")
+
     def hwloc(self, executable_name, executable, app_inst=None):
         import os
         from ramble.util.executable import CommandExecutable
 
-        affinity_log_file = f"{{experiment_run_dir}}/affinity.{self._usage_mode}.out"
+        
+        hwloc_log_file = f"{{experiment_run_dir}}/hwloc.{self._usage_mode}.out"
 
         pre_exec = []
         post_exec = []
-        print(executable, executable_name)
-        # if executable.on:
+
         pre_exec.append(
             CommandExecutable(
-                f"lstopo {executable_name}",
+                f"get-underlying-topology",
                 template=["lstopo"],
+                redirect=hwloc_log_file
             )
         )
 
-            # post_exec.append(
-            #     CommandExecutable(
-            #         f"unload-affinity-{executable_name}",
-            #         template=["spack unload affinity"],
-            #     )
-            # )
-
-            # affinity_parser_dir = os.path.dirname(f"{self._file_path}")
-
-            # post_exec.append(
-            #     CommandExecutable(
-            #         f"parse-stdout-{executable_name}",
-            #         template=[
-            #             f"python {affinity_parser_dir}/parse_affinity_log.py {affinity_log_file} {self._usage_mode}"
-            #         ],
-            #     )
-            # )
         return pre_exec, post_exec
