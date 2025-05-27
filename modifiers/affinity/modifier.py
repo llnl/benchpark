@@ -42,6 +42,7 @@ class Affinity(BasicModifier):
 
         pre_exec = []
         post_exec = []
+
         if executable.mpi:
             pre_exec.append(
                 CommandExecutable(

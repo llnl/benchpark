@@ -127,6 +127,13 @@ class Experiment(ExperimentSystemBase, SingleNode):
         description="Append to environment PATH during experiment execution",
     )
 
+    variant(
+        "hwloc",
+        default="on",
+        values=("on", "off"),
+        description="Execute hwlock lstopo to get underlying system infrastructure"
+    )
+
     def __init__(self, spec):
         self.spec: "benchpark.spec.ConcreteExperimentSpec" = spec
         super().__init__()
