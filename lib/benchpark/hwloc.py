@@ -17,9 +17,17 @@ class Hwloc:
             "off"
         ),
         multi=False,
-        description="Get infrastructure underlying topology",
+        description="Get underlying infrastructure topology",
     )
 
     class Helper(ExperimentHelper):
         def compute_modifiers_section(self):
-            return [{"name": "hwloc"}]
+            modifier_list = []
+
+            if self.spec.satisfies("hwloc=on"):
+                affinity_modifier_modes = {}
+                affinity_modifier_modes["name"] = "hwloc"
+                affinity_modifier_modes["mode"] = self.spec.variants["hwloc"][0]
+                modifier_list.append(affinity_modifier_modes)
+
+            return modifier_list
