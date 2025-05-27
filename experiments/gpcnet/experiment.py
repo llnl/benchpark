@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.scaling import StrongScaling
 
@@ -21,6 +21,8 @@ class Gpcnet(Experiment, StrongScaling):
         default="master",
         description="app version",
     )
+
+    maintainers("rfhaque")
 
     def compute_applications_section(self):
         # TODO: Replace with conflicts clause

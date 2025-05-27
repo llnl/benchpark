@@ -14,12 +14,25 @@ Running on an LLNL System
 This tutorial will guide you through the process of using Benchpark on LLNL
 systems. 
 
-To run Benchpark, you will need to install its requirements: go to the
-Benchpark root directory::
+To run Benchpark, you will need to install its requirements:
 
-    python -m venv my-env
-    . my-env/bin/activate
-    pip install -r requirements.txt
+1) Clone LLNL/Benchpark official repo
+
+You need git and Python 3.8+::
+    
+   git clone https://github.com/LLNL/benchpark.git
+   cd benchpark
+   . setup-env.sh
+   benchpark --version
+
+
+2) Install Dependencies
+
+Create virtual env. and install dependencies::
+
+   python3 -m venv my-env
+   . my-env/bin/activate
+   pip install -r requirements.txt
 
 ------------------------
 CTS (Ruby, Dane, Magma)
@@ -48,7 +61,7 @@ Run the setup script for dependency software, Ramble and Spack::
 
 Then setup the Ramble experiment workspace, this builds all software and may take some time::
 
-    cd ./workspace/amg2023-benchmark/Cts-6d48f81/workspace/
+    cd ./workspace/amg2023-benchmark/ruby-system/workspace/
     ramble --workspace-dir . --disable-progress-bar workspace setup
 
 Next, we run the AMG2023 experiments, which will launch jobs through the
