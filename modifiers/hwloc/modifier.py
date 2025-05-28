@@ -23,7 +23,7 @@ class Hwloc(BasicModifier):
         from ramble.util.executable import CommandExecutable
 
         
-        hwloc_output_file = f"{{experiment_run_dir}}/hwloc.out"
+        hwloc_output_file = f"{{experiment_run_dir}}/hwloc.xml"
 
         pre_exec = []
         post_exec = []
@@ -31,7 +31,7 @@ class Hwloc(BasicModifier):
         pre_exec.append(
             CommandExecutable(
                 f"get-underlying-topology",
-                template=["lstopo --whole-system --io --verbose"],
+                template=["lstopo --of xml --whole-system --whole-io --verbose"],
                 redirect=hwloc_output_file
             )
         )
