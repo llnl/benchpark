@@ -85,7 +85,66 @@ class SingleNode:
             return "single_node" if self.spec.satisfies("+single_node") else ""
 
 
-class Experiment(ExperimentSystemBase, SingleNode):
+class Affinity:
+    variant(
+        "affinity",
+        default="none",
+        values=(
+            "none",
+            "on",
+        ),
+        multi=False,
+        description="Build and run the affinity package",
+    )
+
+    class Helper(ExperimentHelper):
+        def compute_modifiers_section(self):
+            modifier_list = []
+            if not self.spec.satisfies("affinity=none"):
+                affinity_modifier_modes = {}
+                affinity_modifier_modes["name"] = "affinity"
+                if self.spec.satisfies("+cuda"):
+                    affinity_modifier_modes["mode"] = "cuda"
+                elif self.spec.satisfies("+rocm"):
+                    affinity_modifier_modes["mode"] = "rocm"
+                else:
+                    affinity_modifier_modes["mode"] = "mpi"
+                modifier_list.append(affinity_modifier_modes)
+            return modifier_list
+
+        def compute_package_section(self):
+            # set package versions
+            affinity_version = "master"
+
+            # get system config options
+            # TODO: Get compiler/mpi/package handles directly from system.py
+            system_specs = {}
+            system_specs["compiler"] = "default-compiler"
+            if self.spec.satisfies("+cuda"):
+                system_specs["cuda_arch"] = "{cuda_arch}"
+            if self.spec.satisfies("+rocm"):
+                system_specs["rocm_arch"] = "{rocm_arch}"
+
+            # set package spack specs
+            package_specs = {}
+
+            if not self.spec.satisfies("affinity=none"):
+                package_specs["affinity"] = {
+                    "pkg_spec": f"affinity@{affinity_version}+mpi",
+                    "compiler": system_specs["compiler"],
+                }
+                if self.spec.satisfies("+cuda"):
+                    package_specs["affinity"]["pkg_spec"] += "+cuda"
+                elif self.spec.satisfies("+rocm"):
+                    package_specs["affinity"]["pkg_spec"] += "+rocm"
+
+            return {
+                "packages": {k: v for k, v in package_specs.items() if v},
+                "environments": {"affinity": {"packages": list(package_specs.keys())}},
+            }
+
+
+class Experiment(ExperimentSystemBase, SingleNode, Affinity):
     """This is the superclass for all benchpark experiments.
 
     ***The Experiment class***
@@ -128,10 +187,18 @@ class Experiment(ExperimentSystemBase, SingleNode):
 
     def __init__(self, spec):
         self.spec: "benchpark.spec.ConcreteExperimentSpec" = spec
+        # Device type must be set before super with absence of mpionly experiment type
+        self.device_type = "cpu"
         super().__init__()
         self.helpers = []
         self._spack_name = None
         self._ramble_name = None
+        self.req_vars = [
+            "n_resources",
+            "process_problem_size",
+            "total_problem_size",
+            "device_type",
+        ]
 
         for cls in self.__class__.mro()[1:]:
             if cls is not Experiment and cls is not object:
@@ -165,6 +232,22 @@ class Experiment(ExperimentSystemBase, SingleNode):
     @ramble_name.setter
     def ramble_name(self, value: str):
         self._ramble_name = value
+
+    def set_required_variables(self, **kwargs):
+        """Helper function to set required variables."""
+        self.add_experiment_variable("device_type", self.device_type, False)
+        for var in kwargs.keys():
+            if var not in self.req_vars:
+                raise ValueError(f"Unexpected experiment variable provided '{var}'")
+            self.add_experiment_variable(var, kwargs[var], False)
+
+    def check_required_variables(self):
+        """Raises error if any of the self.req_vars variables are not set in derived classes."""
+        unset_vars = [v for v in self.req_vars if v not in self.variables.keys()]
+        if len(unset_vars) > 0:
+            raise NotImplementedError(
+                f"The following experiment variables must be set with 'self.add_experiment_variable': {', '.join([v for v in unset_vars])}."
+            )
 
     def compute_include_section(self):
         # include the config directory
@@ -259,6 +342,8 @@ class Experiment(ExperimentSystemBase, SingleNode):
             if helper_prefix:
                 expr_helper_list.append(helper_prefix)
         expr_name_suffix = "_".join(expr_helper_list + self.expr_name)
+
+        self.check_required_variables()
 
         expr_setup = {
             "variants": {"package_manager": self.spec.variants["package_manager"][0]},
