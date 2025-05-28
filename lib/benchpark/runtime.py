@@ -88,8 +88,8 @@ class RuntimeResources:
             self.bootstrap()
 
     def _check_and_update_bootstrap(self, desired_commit, location):
-        # Store first 7 of hash in checkout-versions.yaml
         with working_dir(location):
+            # length of hash is 7 in checkout-versions.yaml
             current_commit = run_command("git rev-parse HEAD")[0].strip()[:7]
             if current_commit != desired_commit:
                 run_command("git fetch --all")
