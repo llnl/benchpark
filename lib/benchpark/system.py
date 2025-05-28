@@ -17,7 +17,7 @@ from typing import Dict, Tuple
 import benchpark.spec
 import benchpark.variant
 
-benchpark.runtime.RuntimeResources(benchpark.paths.benchpark_home)
+RuntimeResources(benchpark.paths.benchpark_home)
 
 _repo_path = benchpark.repo.paths[benchpark.repo.ObjectTypes.systems]
 
