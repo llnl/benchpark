@@ -109,12 +109,18 @@ class Amg2023(
                     *(scaled_variables[p] for p in num_procs if p in scaled_variables)
                 )
             ]
-            for nk, nv in problem_sizes.items():
+            # Notice 1/scaling-factor to keep total problem size constant for per-process problem size experiments
+            scaled_problem_sizes = self.generate_strong_scaling_params(
+                {tuple(problem_sizes.keys()): list(problem_sizes.values())},
+                1 / int(self.spec.variants["scaling-factor"][0]),
+                int(self.spec.variants["scaling-iterations"][0]),
+            )
+            for nk, nv in scaled_problem_sizes.items():
                 self.add_experiment_variable(nk, nv, True)
         elif self.spec.satisfies("+weak"):
-            scaled_variables = self.generate_weak_scaling_params(
+            # Use "strong scaling" to generate resource scaling since problem size is per-process
+            scaled_variables = self.generate_strong_scaling_params(
                 {tuple(num_procs.keys()): list(num_procs.values())},
-                {tuple(problem_sizes.keys()): list(problem_sizes.values())},
                 int(self.spec.variants["scaling-factor"][0]),
                 int(self.spec.variants["scaling-iterations"][0]),
             )
@@ -126,6 +132,8 @@ class Amg2023(
             ]
             for k, v in scaled_variables.items():
                 self.add_experiment_variable(k, v, True)
+            for nk, nv in problem_sizes.items():
+                self.add_experiment_variable(nk, nv, True)
 
         if self.spec.satisfies("+openmp"):
             self.add_experiment_variable("n_threads_per_proc", 1, True)
@@ -134,6 +142,12 @@ class Amg2023(
             self.add_experiment_variable("n_gpus", n_resources, True)
         else:
             self.add_experiment_variable("n_ranks", n_resources, True)
+
+        self.set_required_variables(
+            n_resources="{px}*{py}*{pz}",
+            process_problem_size="{nx}*{ny}*{nz}",
+            total_problem_size="{nx}*{ny}*{nz}*{px}*{py}*{pz}",
+        )
 
     def compute_package_section(self):
         # get package version

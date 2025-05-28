@@ -5,6 +5,9 @@ codespell==2.4.1
 pandas==2.2.3
 pyyaml==6.0.2
 sphinxcontrib-programoutput==0.18
+# benchpark analyze -h command
+llnl-thicket
+matplotlib
 # The remaining requirements are from Ramble
 pytest
 flake8
