@@ -48,6 +48,12 @@ class Qws(Experiment, OpenMPExperiment, Caliper):
             self.add_experiment_variable("omp_num_threads", ["48"])
             self.add_experiment_variable("arch", "OpenMP")
 
+        self.set_required_variables(
+            n_resources="{n_ranks}",
+            process_problem_size="{lx}*{ly}*{lz}/{n_ranks}",
+            total_problem_size="{lx}*{ly}*{lz}",
+        )
+
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
