@@ -14,12 +14,7 @@ from benchpark.hwloc import Hwloc
 
 
 class Saxpy(
-    Experiment,
-    OpenMPExperiment,
-    CudaExperiment,
-    ROCmExperiment,
-    Caliper,
-    Hwloc
+    Experiment, OpenMPExperiment, CudaExperiment, ROCmExperiment, Caliper, Hwloc
 ):
     variant(
         "workload",

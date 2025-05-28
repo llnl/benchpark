@@ -190,7 +190,7 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity):
         "hwloc",
         default="on",
         values=("on", "off"),
-        description="Execute hwlock lstopo to get underlying system infrastructure"
+        description="Execute hwlock lstopo to get underlying system infrastructure",
     )
 
     def __init__(self, spec):

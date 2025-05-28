@@ -10,7 +10,7 @@ class Hwloc(BasicModifier):
     """Define a modifier for showing the underlying infrastructure topology"""
 
     name = "hwloc"
-    
+
     mode(
         name="on",
         description="Mode for executing lstopo",
@@ -22,17 +22,16 @@ class Hwloc(BasicModifier):
         import os
         from ramble.util.executable import CommandExecutable
 
-        
-        hwloc_output_file = f"{{experiment_run_dir}}/hwloc.xml"
+        hwloc_output_file = "{{experiment_run_dir}}/hwloc.xml"
 
         pre_exec = []
         post_exec = []
 
         pre_exec.append(
             CommandExecutable(
-                f"get-underlying-topology",
+                "get-underlying-topology",
                 template=["lstopo --of xml --whole-system --whole-io --verbose"],
-                redirect=hwloc_output_file
+                redirect=hwloc_output_file,
             )
         )
 
@@ -40,10 +39,10 @@ class Hwloc(BasicModifier):
 
         post_exec.append(
             CommandExecutable(
-                f"parse-lstopo-output",
+                "parse-lstopo-output",
                 template=[
-                        f"python {hwloc_parser_dir}/parse_hwloc_output.py {hwloc_output_file} {self._usage_mode}"
-                    ],
+                    f"python {hwloc_parser_dir}/parse_hwloc_output.py {hwloc_output_file} {self._usage_mode}"
+                ],
             )
         )
 

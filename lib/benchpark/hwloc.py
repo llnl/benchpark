@@ -12,10 +12,7 @@ class Hwloc:
     variant(
         "hwloc",
         default="on",
-        values=(
-            "on",
-            "off"
-        ),
+        values=("on", "off"),
         multi=False,
         description="Get underlying infrastructure topology",
     )

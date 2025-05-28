@@ -1,12 +1,10 @@
 import json
-import xmltodict, json
+import xmltodict
 import argparse
 from pathlib import Path
 
 
 def parse_lstopo_summary(file_path):
-    
-
     with open(file_path) as xml_file:
         data_dict = xmltodict.parse(xml_file.read())
         json_data = json.dumps(data_dict, indent=2)
