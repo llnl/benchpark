@@ -142,7 +142,9 @@ def command(args):
     initializer_script = experiments_root / "setup.sh"
     run_script = experiments_root / ".latest-experiment.sh"
 
-    per_workspace_setup = RuntimeResources(experiments_root)
+    per_workspace_setup = RuntimeResources(
+        experiments_root, upstream=RuntimeResources(benchpark.paths.benchpark_home)
+    )
 
     # Parse experiment YAML for package_manager
     def find(d, tag):

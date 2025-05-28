@@ -16,8 +16,7 @@ import benchpark.repo
 import benchpark.runtime
 import benchpark.variant
 
-bootstrapper = benchpark.runtime.RuntimeResources(benchpark.paths.benchpark_home)
-bootstrapper.bootstrap()
+benchpark.runtime.RuntimeResources(benchpark.paths.benchpark_home)
 
 import ramble.language.language_base  # noqa
 import ramble.language.language_helpers  # noqa

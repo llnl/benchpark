@@ -64,9 +64,13 @@ class Command:
 
 
 class RuntimeResources:
-    def __init__(self, dest):
+    def __init__(self, dest, upstream=None):
         self.root = benchpark.paths.benchpark_root
         self.dest = pathlib.Path(dest)
+        self.upstream = upstream
+
+        self.ramble_location = self.dest / "ramble"
+        self.spack_location = self.dest / "spack"
 
         checkout_versions_location = self.root / "checkout-versions.yaml"
         with open(checkout_versions_location, "r") as yaml_file:
@@ -74,8 +78,9 @@ class RuntimeResources:
             self.ramble_commit = data["versions"]["ramble"]
             self.spack_commit = data["versions"]["spack"]
 
-        self.ramble_location = self.dest / "ramble"
-        self.spack_location = self.dest / "spack"
+        # If instance does not have an upstream, it is the upstream
+        if not self.upstream:
+            self.bootstrap()
 
     def update_old_bootstrap(self, desired_commit, location):
         # Store first 7 of hash in checkout-versions.yaml
