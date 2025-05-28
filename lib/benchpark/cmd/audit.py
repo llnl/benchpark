@@ -13,7 +13,7 @@ import benchpark.repo
 
 from benchpark.runtime import RuntimeResources
 
-benchpark.runtime.RuntimeResources(benchpark.paths.benchpark_home)
+RuntimeResources(benchpark.paths.benchpark_home)
 
 import ramble.config as cfg  # noqa
 
