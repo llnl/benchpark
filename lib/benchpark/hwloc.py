@@ -11,7 +11,7 @@ from benchpark.experiment import ExperimentHelper
 class Hwloc:
     variant(
         "hwloc",
-        default="on",
+        default="off",
         values=("on", "off"),
         multi=False,
         description="Get underlying infrastructure topology",
