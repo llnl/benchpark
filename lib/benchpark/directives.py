@@ -118,6 +118,34 @@ def maintainers(*names: str):
     return _execute_maintainers
 
 
+@benchpark_directive("provides")
+def provides(*runtimes: str):
+    """Define what runtime the system provides.
+
+    Arguments:
+        runtimes: openmp, cuda, rocm
+    """
+
+    def _execute_provides(pkg):
+        pkg.provides = runtimes
+
+    return _execute_provides
+
+
+@benchpark_directive("requires")
+def requires(*runtimes: str):
+    """Define what runtime the experiment requires.
+
+    Arguments:
+        runtimes: openmp, cuda, rocm
+    """
+
+    def _execute_requires(pkg):
+        pkg.requires = runtimes
+
+    return _execute_requires
+
+
 @benchpark_directive("variants")
 def variant(
     name: str,
