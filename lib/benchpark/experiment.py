@@ -186,13 +186,6 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity):
         description="Append to environment PATH during experiment execution",
     )
 
-    variant(
-        "hwloc",
-        default="on",
-        values=("on", "off"),
-        description="Execute hwlock lstopo to get underlying system infrastructure",
-    )
-
     def __init__(self, spec):
         self.spec: "benchpark.spec.ConcreteExperimentSpec" = spec
         # Device type must be set before super with absence of mpionly experiment type
