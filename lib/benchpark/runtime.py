@@ -65,24 +65,29 @@ class Command:
 
 class RuntimeResources:
     def __init__(self, dest, upstream=None):
-        self.root = benchpark.paths.benchpark_root
         self.dest = pathlib.Path(dest)
         self.upstream = upstream
 
         self.ramble_location = self.dest / "ramble"
         self.spack_location = self.dest / "spack"
 
-        checkout_versions_location = self.root / "checkout-versions.yaml"
-        with open(checkout_versions_location, "r") as yaml_file:
+        # Read pinned versions of ramble and spack
+        with open(benchpark.paths.checkout_versions, "r") as yaml_file:
             data = yaml.safe_load(yaml_file)
             self.ramble_commit = data["versions"]["ramble"]
             self.spack_commit = data["versions"]["spack"]
+
+        # Read remote urls for ramble and spack
+        with open(benchpark.paths.remote_urls, "r") as yaml_file:
+            data = yaml.safe_load(yaml_file)
+            self.ramble_url = data["urls"]["ramble"]
+            self.spack_url = data["urls"]["spack"]
 
         # If instance does not have an upstream, it is the upstream
         if not self.upstream:
             self.bootstrap()
 
-    def update_old_bootstrap(self, desired_commit, location):
+    def _check_and_update_bootstrap(self, desired_commit, location):
         # Store first 7 of hash in checkout-versions.yaml
         with working_dir(location):
             current_commit = run_command("git rev-parse HEAD")[0].strip()[:7]
@@ -95,9 +100,9 @@ class RuntimeResources:
 
     def bootstrap(self):
         if not self.ramble_location.exists():
-            self._install_ramble(bootstrap=True)
+            self._install_ramble()
         else:
-            self.update_old_bootstrap(self.ramble_commit, self.ramble_location)
+            self._check_and_update_bootstrap(self.ramble_commit, self.ramble_location)
         ramble_lib_path = self.ramble_location / "lib" / "ramble"
         externals = str(ramble_lib_path / "external")
         if externals not in sys.path:
@@ -110,30 +115,30 @@ class RuntimeResources:
         # The reason for this oddity is that spack modules will compete with the internal
         # spack modules from ramble
         if not self.spack_location.exists():
-            self._install_spack(bootstrap=True)
+            self._install_spack()
         else:
-            self.update_old_bootstrap(self.spack_commit, self.spack_location)
+            self._check_and_update_bootstrap(self.spack_commit, self.spack_location)
 
-    def _install_ramble(self, bootstrap=False):
+    def _install_ramble(self):
         print(f"Cloning Ramble to {self.ramble_location}")
         git_clone_commit(
             (
-                "https://github.com/GoogleCloudPlatform/ramble.git"
-                if bootstrap
-                else benchpark.paths.benchpark_home / "ramble"
+                self.ramble_url
+                if not self.upstream
+                else self.upstream.ramble_location  # Clone from local "upstream" repository
             ),
             self.ramble_commit,
             self.ramble_location,
         )
         debug_print(f"Done cloning Ramble ({self.ramble_location})")
 
-    def _install_spack(self, bootstrap=False):
+    def _install_spack(self):
         print(f"Cloning Spack to {self.spack_location}")
         git_clone_commit(
             (
-                "https://github.com/spack/spack.git"
-                if bootstrap
-                else benchpark.paths.benchpark_home / "spack"
+                self.spack_url
+                if not self.upstream
+                else self.upstream.spack_location  # Clone from local "upstream" repository
             ),
             self.spack_commit,
             self.spack_location,
