@@ -38,6 +38,7 @@
    build-experiment
    run-experiment
    analyze-experiment
+   benchpark-analyze
    modifiers
    set-of-experiments
    run-binary

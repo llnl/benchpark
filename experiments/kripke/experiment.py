@@ -138,6 +138,12 @@ class Kripke(
         elif self.spec.satisfies("+rocm"):
             self.add_experiment_variable("arch", "HIP")
 
+        self.set_required_variables(
+            n_resources="{npx}*{npy}*{npz}",
+            process_problem_size="{nzx}*{nzy}*{nzz}/({npx}*{npy}*{npz})",
+            total_problem_size="{nzx}*{nzy}*{nzz}",
+        )
+
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
