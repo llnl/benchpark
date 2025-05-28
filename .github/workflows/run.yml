@@ -323,7 +323,8 @@ jobs:
           benchmark_spec: saxpy+cuda
           system_name: venado
           system_spec: lanl-venado cuda=12.5 compiler=cce +gtl
-      - name: saxpy/rocm affinity=on tioga llnl-elcapitan rocm=6.2.4 compiler=cce ~gtl
+      - name: saxpy/rocm affinity=on tioga llnl-elcapitan rocm=6.2.4 compiler=cce
+          ~gtl
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: saxpy
