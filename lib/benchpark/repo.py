@@ -14,10 +14,7 @@ import benchpark.runtime
 
 # isort: off
 
-bootstrapper = benchpark.runtime.RuntimeResources(
-    benchpark.paths.benchpark_home
-)  # noqa
-bootstrapper.bootstrap()  # noqa
+benchpark.runtime.RuntimeResources(benchpark.paths.benchpark_home)
 
 import llnl.util.lang  # noqa
 import ramble.language.language_base  # noqa

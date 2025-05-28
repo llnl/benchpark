@@ -17,8 +17,7 @@ import benchpark.paths
 import benchpark.repo
 import benchpark.runtime
 
-bootstrapper = benchpark.runtime.RuntimeResources(benchpark.paths.benchpark_home)
-bootstrapper.bootstrap()
+benchpark.runtime.RuntimeResources(benchpark.paths.benchpark_home)
 
 import llnl.util.lang  # noqa
 

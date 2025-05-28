@@ -13,8 +13,7 @@ import benchpark.repo
 
 from benchpark.runtime import RuntimeResources
 
-bootstrapper = RuntimeResources(benchpark.paths.benchpark_home)  # noqa
-bootstrapper.bootstrap()  # noqa
+benchpark.runtime.RuntimeResources(benchpark.paths.benchpark_home)
 
 import ramble.config as cfg  # noqa
 
