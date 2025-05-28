@@ -2,6 +2,12 @@
 # Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: Apache-2.0
-versions:
-  ramble: 6b4ecac  # develop on 5/06/2025 (newer than 0.6.0 release)
-  spack: 7e4b8aa  # develop on 2/22/2025 (pre-breaking changes on 1.0)
+
+from benchpark.directives import provides
+
+
+class OpenMPSystem:
+    provides("openmp")
+
+    def system_specific_variables(self, system):
+        return {}

@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.scaling import StrongScaling
 
@@ -24,6 +24,8 @@ class MdTest(
         description="app version",
     )
 
+    maintainers("rfhaque")
+
     def compute_applications_section(self):
 
         num_resources = {"n_ranks": 1}
@@ -42,6 +44,12 @@ class MdTest(
             )
             for k, v in scaled_variables.items():
                 self.add_experiment_variable(k, v, True)
+
+        self.set_required_variables(
+            n_resources="{n_ranks}",
+            process_problem_size="{num-objects}/{n_ranks}",
+            total_problem_size="{num-objects}",
+        )
 
     def compute_package_section(self):
         # get package version
