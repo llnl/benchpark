@@ -84,7 +84,7 @@ class RuntimeResources:
             self.spack_url = data["urls"]["spack"]
 
         # If instance does not have an upstream, it is the upstream
-        if not self.upstream:
+        if self.upstream is None:
             self.bootstrap()
 
     def _check_and_update_bootstrap(self, desired_commit, location):
@@ -124,7 +124,7 @@ class RuntimeResources:
         git_clone_commit(
             (
                 self.ramble_url
-                if not self.upstream
+                if self.upstream is None
                 else self.upstream.ramble_location  # Clone from local "upstream" repository
             ),
             self.ramble_commit,
@@ -137,7 +137,7 @@ class RuntimeResources:
         git_clone_commit(
             (
                 self.spack_url
-                if not self.upstream
+                if self.upstream is None
                 else self.upstream.spack_location  # Clone from local "upstream" repository
             ),
             self.spack_commit,
