@@ -30,5 +30,8 @@ def test_compute_variables_section_caliper(monkeypatch):
             "package_manager": "spack",
             "version": "1.0.0",
             "workload": "problem",
+            "n_resources": "{n_resources}",
+            "process_problem_size": "{process_problem_size}",
+            "total_problem_size": "{total_problem_size}",
         }
     }
