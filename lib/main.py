@@ -33,7 +33,8 @@ Subcommands:
     unit-test           Run benchpark unit tests
     audit               Look for problems in System/Experiment repos
     info                Get information about Systems and Experiments
-    list                List experiments, systems, benchmarks, and modifiers"""
+    list                List experiments, systems, benchmarks, and modifiers
+    analyze             Perform canned analysis on the performance data (caliper files) after 'ramble on'"""
 if "-h" == sys.argv[1] or "--help" == sys.argv[1]:
     print(helpstr)
     exit()
@@ -48,6 +49,13 @@ import benchpark.cmd.info  # noqa: E402
 import benchpark.cmd.list  # noqa: E402
 import benchpark.paths  # noqa: E402
 from benchpark.accounting import benchpark_benchmarks  # noqa: E402
+
+try:
+    import benchpark.cmd.analyze  # noqa: E402
+
+    analyze_installed = True
+except ModuleNotFoundError:
+    analyze_installed = False
 
 
 def main():
@@ -193,6 +201,11 @@ def init_commands(subparsers, actions_dict):
     )
     benchpark.cmd.list.setup_parser(list_parser)
 
+    analyze_parser = subparsers.add_parser(
+        "analyze",
+        help="Perform canned analysis on the performance data (caliper files) after 'ramble on'",
+    )
+
     actions_dict["system"] = benchpark.cmd.system.command
     actions_dict["experiment"] = benchpark.cmd.experiment.command
     actions_dict["setup"] = benchpark.cmd.setup.command
@@ -201,6 +214,17 @@ def init_commands(subparsers, actions_dict):
     actions_dict["info"] = benchpark.cmd.info.command
     actions_dict["show-build"] = benchpark.cmd.show_build.command
     actions_dict["list"] = benchpark.cmd.list.command
+    if analyze_installed:
+        benchpark.cmd.analyze.setup_parser(analyze_parser)
+        actions_dict["analyze"] = benchpark.cmd.analyze.command
+    else:
+
+        def analyze_command_placeholder(args, unknown_args):
+            raise RuntimeError(
+                "Packages required for 'benchpark analyze' not found. run 'pip install .[analyze]' from the 'benchpark' directory."
+            )
+
+        actions_dict["analyze"] = analyze_command_placeholder
 
 
 def run_command(command_str, env=None):
