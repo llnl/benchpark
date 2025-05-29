@@ -11,8 +11,8 @@ from benchpark.experiment import ExperimentHelper
 class Hwloc:
     variant(
         "hwloc",
-        default="off",
-        values=("on", "off"),
+        default="none",
+        values=("none", "on"),
         multi=False,
         description="Get underlying infrastructure topology",
     )
@@ -21,7 +21,7 @@ class Hwloc:
         def compute_modifiers_section(self):
             modifier_list = []
 
-            if self.spec.satisfies("hwloc=on"):
+            if not self.spec.satisfies("hwloc=none"):
                 affinity_modifier_modes = {}
                 affinity_modifier_modes["name"] = "hwloc"
                 affinity_modifier_modes["mode"] = self.spec.variants["hwloc"][0]

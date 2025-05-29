@@ -3,7 +3,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+from pathlib import Path
 from ramble.modkit import *
+import utils
 
 
 class Hwloc(BasicModifier):
@@ -13,7 +15,7 @@ class Hwloc(BasicModifier):
 
     mode(
         name="on",
-        description="Mode for executing lstopo",
+        description="Mode for executing hwloc command",
     )
 
     executable_modifier("hwloc")
@@ -22,28 +24,43 @@ class Hwloc(BasicModifier):
         import os
         from ramble.util.executable import CommandExecutable
 
-        hwloc_output_file = "{{experiment_run_dir}}/hwloc.xml"
+        hwloc_parser_dir = os.path.dirname(f"{self._file_path}")
+        hwloc_output_xml_file = f"{{experiment_run_dir}}/hwloc.{self._usage_mode}.xml"
+        hwloc_output_json_file = Path(hwloc_output_xml_file).with_suffix('.json')
 
         pre_exec = []
         post_exec = []
 
+        # Run the hwloc tool and save its output in XML format to a file
         pre_exec.append(
             CommandExecutable(
-                "get-underlying-topology",
+                "lstopo-to-get-underlying-infrastructure",
                 template=["lstopo --of xml --whole-system --whole-io --verbose"],
-                redirect=hwloc_output_file,
+                redirect=hwloc_output_xml_file,
             )
         )
 
-        hwloc_parser_dir = os.path.dirname(f"{self._file_path}")
-
-        post_exec.append(
-            CommandExecutable(
-                "parse-lstopo-output",
-                template=[
-                    f"python {hwloc_parser_dir}/parse_hwloc_output.py {hwloc_output_file} {self._usage_mode}"
-                ],
+        if utils.is_modifier_present("caliper", app_inst):
+            # Convert the .xml file from hwloc output to equivalent .json format
+            pre_exec.append(
+                CommandExecutable(
+                    "parse-lstopo-output",
+                    template=[
+                        f"python {hwloc_parser_dir}/parse_hwloc_output.py {hwloc_output_xml_file} {hwloc_output_json_file} {self._usage_mode}"
+                    ],
+                )
             )
-        )
+            
+            # Modify Caliper config to track this json as part of its metadata
+            pre_exec.append(
+                CommandExecutable(
+                    f"modify-caliper-config-{executable_name}",
+                    template=[
+                        'export CALI_CONFIG="$CALI_CONFIG,metadata(file={})"'.format(
+                            hwloc_output_json_file
+                        )
+                    ],
+                )
+            )
 
         return pre_exec, post_exec
