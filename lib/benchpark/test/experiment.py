@@ -115,6 +115,7 @@ def test_default_config_section():
     config_section = experiment.compute_config_section()
 
     assert config_section == {
+        "benchpark_command": "benchpark ",  # Not applicable here
         "deprecated": True,
         "spack_flags": {
             "install": "--add --keep-stage",
