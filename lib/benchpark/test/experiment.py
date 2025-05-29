@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 import yaml
+import sys
 
 import benchpark.experiment
 import benchpark.spec
@@ -115,7 +116,7 @@ def test_default_config_section():
     config_section = experiment.compute_config_section()
 
     assert config_section == {
-        "benchpark_command": "benchpark ",  # Not applicable here
+        "benchpark_command": "benchpark " + " ".join(sys.argv[1:]),  # Not applicable here
         "deprecated": True,
         "spack_flags": {
             "install": "--add --keep-stage",
