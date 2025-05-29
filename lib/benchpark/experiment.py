@@ -259,7 +259,7 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity):
         # default configs for all experiments
         default_config = {
             "deprecated": True,
-            "benchpark_command": "benchpark " + " ".join(sys.argv[1:])
+            "benchpark_command": "benchpark " + " ".join(sys.argv[1:]),
         }
         if self.spec.variants["package_manager"][0] == "spack":
             default_config["spack_flags"] = {
