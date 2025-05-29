@@ -5,7 +5,6 @@
 
 from pathlib import Path
 from ramble.modkit import *
-import utils
 
 
 class Hwloc(BasicModifier):
@@ -26,7 +25,7 @@ class Hwloc(BasicModifier):
 
         hwloc_parser_dir = os.path.dirname(f"{self._file_path}")
         hwloc_output_xml_file = f"{{experiment_run_dir}}/hwloc.{self._usage_mode}.xml"
-        hwloc_output_json_file = Path(hwloc_output_xml_file).with_suffix('.json')
+        hwloc_output_json_file = Path(hwloc_output_xml_file).with_suffix(".json")
 
         pre_exec = []
         post_exec = []
@@ -40,7 +39,10 @@ class Hwloc(BasicModifier):
             )
         )
 
-        if utils.is_modifier_present("caliper", app_inst):
+        caliper_modifier = any(
+            [modifier["name"] == "caliper" for modifier in app_inst.modifiers]
+        )
+        if caliper_modifier:
             # Convert the .xml file from hwloc output to equivalent .json format
             pre_exec.append(
                 CommandExecutable(
@@ -50,7 +52,7 @@ class Hwloc(BasicModifier):
                     ],
                 )
             )
-            
+
             # Modify Caliper config to track this json as part of its metadata
             pre_exec.append(
                 CommandExecutable(
