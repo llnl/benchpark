@@ -5,6 +5,7 @@
 
 from typing import Dict
 import yaml  # TODO: some way to ensure yaml available
+import sys
 
 from benchpark.error import BenchparkError
 from benchpark.directives import ExperimentSystemBase
@@ -258,6 +259,7 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity):
         # default configs for all experiments
         default_config = {
             "deprecated": True,
+            "benchpark_command": "benchpark " + " ".join(sys.argv[1:])
         }
         if self.spec.variants["package_manager"][0] == "spack":
             default_config["spack_flags"] = {

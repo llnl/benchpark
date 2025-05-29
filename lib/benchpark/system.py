@@ -7,6 +7,7 @@ import hashlib
 import os
 import packaging.version
 import yaml
+import sys
 
 import benchpark.paths
 from benchpark.directives import ExperimentSystemBase
@@ -57,6 +58,7 @@ class System(ExperimentSystemBase):
                 "name": self.__class__.__name__,
                 "spec": str(self.spec),
                 "config-hash": self.system_uid(),
+                "benchpark_command": "benchpark " + " ".join(sys.argv[1:])
             }
         }
 
