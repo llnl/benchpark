@@ -10,7 +10,7 @@ import socket
 from os import environ as env
 from os.path import join as pjoin
 
-from spack import *
+from spack.package import *
 
 
 def spec_uses_toolchain(spec):
@@ -128,6 +128,7 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
 
     version("develop", branch="develop", submodules="True")
     version("main",  branch="main",  submodules="True")
+    version("2024.07.0", tag="v2024.07.0", submodules="True")
     version("2022.10.0", tag="v2022.10.0", submodules="True")
     version("0.12.0", tag="v0.12.0", submodules="True")
     version("0.11.0", tag="v0.11.0", submodules="True")
