@@ -72,9 +72,11 @@ class Scaffold(
             for pk, pv in scaled_variables.items():
                 self.add_experiment_variable(pk, pv, True)
 
-        self.add_experiment_variable("n_resources", "{n_gpus}", False)
-        self.add_experiment_variable("process_problem_size", "{n_categories}/{n_gpus}", False)
-        self.add_experiment_variable("total_problem_size", "{n_categories}", False)
+        self.set_required_variables(
+            n_resources="{n_gpus}",
+            process_problem_size="{n_categories}/{n_gpus}",
+            total_problem_size="{n_categories}",
+        )
 
     def compute_package_section(self):
         # Spec written into requirements.txt for pip install
