@@ -183,6 +183,10 @@ class LlnlMatrix(System):
                     }
                 }
             }
+        
+        selections["packages"] |= self.cuda_config(self.spec.variants["cuda"][0])[
+            "packages"
+        ]
 
         return selections
 
@@ -235,7 +239,78 @@ class LlnlMatrix(System):
             }
 
         return selections
-      
+
+    def cuda_config(self, cuda_version):
+        return {
+            "packages": {
+                "blas": {"require": [f"{self.spec.variants['blas'][0]}"]},
+                "lapack": {"require": [f"{self.spec.variants['lapack'][0]}"]},
+                "curand": {
+                    "externals": [
+                        {
+                            "spec": f"curand@{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_aarch64/24.7/cuda/{cuda_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cusparse": {
+                    "externals": [
+                        {
+                            "spec": f"cusparse@{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_aarch64/24.7/cuda/{cuda_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cuda": {
+                    "externals": [
+                        {
+                            "spec": f"cuda@{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_aarch64/24.7/cuda/{cuda_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cub": {
+                    "externals": [
+                        {
+                            "spec": f"cub@{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_aarch64/24.7/cuda/{cuda_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cublas": {
+                    "externals": [
+                        {
+                            "spec": f"cublas@{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_aarch64/24.7/math_libs/{cuda_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cusolver": {
+                    "externals": [
+                        {
+                            "spec": f"cusolver@{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_aarch64/24.7/math_libs/{cuda_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cufft": {
+                    "externals": [
+                        {
+                            "spec": f"cufft@{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_aarch64/24.7/math_libs/{cuda_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+            }
+        }
+
     def compute_software_section(self):
         return {
             "software": {
