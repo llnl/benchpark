@@ -183,13 +183,12 @@ class LlnlMatrix(System):
                     }
                 }
             }
-        
+
         selections["packages"] |= self.cuda_config(self.spec.variants["cuda"][0])[
             "packages"
         ]
 
         return selections
-
 
     def compute_compilers_section(self):
         selections = {}
