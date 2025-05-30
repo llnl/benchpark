@@ -43,6 +43,12 @@ class LlnlElcapitan(System):
         description="Which cluster to run on",
     )
     variant(
+        "gpumode",
+        default="SPX",
+        values=("SPX", "TPX", "CPX"),
+        description="Which cluster to run on",
+    )
+    variant(
         "rocm",
         default="6.2.4",
         values=("5.7.1", "6.2.4", "6.3.1"),
@@ -79,6 +85,15 @@ class LlnlElcapitan(System):
         self.rocm_version = Version(self.spec.variants["rocm"][0])
         self.gtl_flag = self.spec.variants["gtl"][0]
 
+        if self.spec.satisfies("system=elcapitan"):
+            if self.spec.satisfies("gpumode=TPX"):
+                sys_gpus_per_node = 12
+            else:
+                if self.spec.satisfies("gpumode=CPX"):
+                    sys_gpus_per_node = 24
+                else:
+                    sys_gpus_per_node = 4 #CPX
+        
         # TODO: Replace this with lookups into the working set
         if self.spec.satisfies("compiler=gcc"):
             self.gcc_version = Version("12.2.0")
