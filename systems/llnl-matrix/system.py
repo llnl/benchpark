@@ -234,15 +234,6 @@ class LlnlMatrix(System):
                     ],
                     "buildable": False,
                 },
-                "cusparse": {
-                    "externals": [
-                        {
-                            "spec": f"cusparse@{cuda_version}",
-                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_x86_64/25.1/cuda/{cuda_version}",
-                        }
-                    ],
-                    "buildable": False,
-                },
                 "cuda": {
                     "externals": [
                         {
@@ -257,6 +248,15 @@ class LlnlMatrix(System):
                         {
                             "spec": f"cub@{cuda_version}",
                             "prefix": f"/opt/nvidia/hpc_sdk/Linux_x86_64/25.1/cuda/{cuda_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cusparse": {
+                    "externals": [
+                        {
+                            "spec": f"cusparse@{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_x86_64/25.1/math_libs/{cuda_version}",
                         }
                     ],
                     "buildable": False,
