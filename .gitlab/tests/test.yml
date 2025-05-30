@@ -47,8 +47,8 @@ workflow:
         SCHEDULER_PARAMETERS: -N 1 -t 00:20:00 --exclusive
         BENCHMARK: [amg2023, kripke]
         VARIANT: [+cuda]
-        DASHBOARD_NAME: Matrix DELL-sapphirerapids-H100-Infiniband [benchpark system init --dest=matrix-system
-          llnl-matrix]
+        DASHBOARD_NAME: Matrix DELL-sapphirerapids-H100-Infiniband [benchpark system
+          init --dest=matrix-system llnl-matrix]
 limited_test_run:
   resource_group: $HOST
   stage: test
