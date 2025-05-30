@@ -30,12 +30,19 @@ class Hwloc(BasicModifier):
         pre_exec = []
         post_exec = []
 
+        pre_exec.append(
+            CommandExecutable(
+                name="record_start_time", template=["start_time=$(date +%s)"]
+            )
+        )
+
         # Run the hwloc tool and save its output in XML format to a file
         pre_exec.append(
             CommandExecutable(
                 "lstopo-to-get-underlying-infrastructure",
-                template=["lstopo --of xml --whole-system --whole-io --verbose"],
-                redirect=hwloc_output_xml_file,
+                template=[
+                    f"lstopo --of xml --whole-system --whole-io --verbose {hwloc_output_xml_file} 2> /dev/null"
+                ],
             )
         )
 
@@ -49,6 +56,21 @@ class Hwloc(BasicModifier):
                     "parse-lstopo-output",
                     template=[
                         f"python {hwloc_parser_dir}/parse_hwloc_output.py {hwloc_output_xml_file} {hwloc_output_json_file} {self._usage_mode}"
+                    ],
+                )
+            )
+
+            pre_exec.append(
+                CommandExecutable(
+                    name="record_end_time", template=["end_time=$(date +%s)"]
+                )
+            )
+
+            pre_exec.append(
+                CommandExecutable(
+                    name="print_elapsed_time",
+                    template=[
+                        'echo "Elapsed time: $((end_time - start_time)) milliseconds"'
                     ],
                 )
             )
