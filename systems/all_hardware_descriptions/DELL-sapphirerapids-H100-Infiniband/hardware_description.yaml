@@ -30,4 +30,4 @@ system_definition:
   top500-system-instances:
     Dane:
       benchpark_system: llnl-matrix
-      top500: null
+      top500:
