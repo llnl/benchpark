@@ -57,7 +57,7 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
 
     depends_on("hypre+cuda+mpi", when="+cuda")
     requires("+cuda", when="^hypre+cuda")
-    for arch in ("none", "50", "60", "70", "80"):
+    for arch in ("none", "50", "60", "70", "80", "90"):
         depends_on(f"hypre cuda_arch={arch}", when=f"cuda_arch={arch}")
         depends_on(f"mfem cuda_arch={arch}", when=f"cuda_arch={arch}")
     depends_on("mfem +cuda+mpi", when="+cuda")
