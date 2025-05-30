@@ -37,18 +37,6 @@ class LlnlMatrix(System):
         values=("gcc", "intel"),
         description="Which compiler to use",
     )
-    variant(
-        "lapack",
-        default="essl",
-        values=("essl",),
-        description="Which lapack to use",
-    )
-    variant(
-        "blas",
-        default="essl",
-        values=("essl",),
-        description="Which blas to use",
-    )
 
     def __init__(self, spec):
         super().__init__(spec)
@@ -81,24 +69,6 @@ class LlnlMatrix(System):
                     "externals": [{"spec": "unwind@8.0.1", "prefix": "/usr"}],
                     "buildable": False,
                 },
-                "blas": {
-                    "buildable": False,
-                    "externals": [
-                        {
-                            "spec": "intel-oneapi-mkl@2022.1.0",
-                            "prefix": "/usr/tce/backend/installations/linux-rhel8-x86_64/intel-19.0.4/intel-oneapi-mkl-2022.1.0-sksz67twjxftvwchnagedk36gf7plkrp",
-                        }
-                    ],
-                },
-                "lapack": {
-                    "buildable": False,
-                    "externals": [
-                        {
-                            "spec": "intel-oneapi-mkl@2022.1.0",
-                            "prefix": "/usr/tce/backend/installations/linux-rhel8-x86_64/intel-19.0.4/intel-oneapi-mkl-2022.1.0-sksz67twjxftvwchnagedk36gf7plkrp",
-                        }
-                    ],
-                },
                 "fftw": {
                     "buildable": False,
                     "externals": [
@@ -107,6 +77,15 @@ class LlnlMatrix(System):
                             "prefix": "/usr/tce/packages/fftw/fftw-3.3.10",
                         }
                     ],
+                },
+                "intel-oneapi-mkl": {
+                    "externals": [
+                        {
+                            "spec": "intel-oneapi-mkl@2023.2.0",
+                            "prefix": "/opt/intel/oneapi",
+                        }
+                    ],
+                    "buildable": False,
                 },
                 "diffutils": {
                     "externals": [{"spec": "diffutils@3.6", "prefix": "/usr"}],
@@ -242,8 +221,10 @@ class LlnlMatrix(System):
     def cuda_config(self, cuda_version):
         return {
             "packages": {
-                "blas": {"require": [f"{self.spec.variants['blas'][0]}"]},
-                "lapack": {"require": [f"{self.spec.variants['lapack'][0]}"]},
+                "blas": {"require": "intel-oneapi-mkl"},
+                "lapack": {
+                    "require": "intel-oneapi-mkl"
+                },
                 "curand": {
                     "externals": [
                         {
@@ -318,8 +299,6 @@ class LlnlMatrix(System):
                     "default-mpi": {"pkg_spec": "mvapich2"},
                     "compiler-gcc": {"pkg_spec": "gcc"},
                     "compiler-intel": {"pkg_spec": "intel"},
-                    "blas": {"pkg_spec": "intel-oneapi-mkl"},
-                    "lapack": {"pkg_spec": "intel-oneapi-mkl"},
                     "mpi-gcc": {"pkg_spec": "mvapich2"},
                     "mpi-intel": {"pkg_spec": "mvapich2"},
                 }
