@@ -27,8 +27,8 @@ class LlnlMatrix(System):
 
     variant(
         "cuda",
-        default="11.8.0",
-        values=("12.2.2", "11.8.0", "10.2.89"),
+        default="12.6",
+        values=("12.6", "11.8"),
         description="CUDA version",
     )
     variant(
@@ -249,7 +249,7 @@ class LlnlMatrix(System):
                     "externals": [
                         {
                             "spec": f"curand@{cuda_version}",
-                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_aarch64/24.7/cuda/{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_x86_64/25.1/cuda/{cuda_version}",
                         }
                     ],
                     "buildable": False,
@@ -258,7 +258,7 @@ class LlnlMatrix(System):
                     "externals": [
                         {
                             "spec": f"cusparse@{cuda_version}",
-                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_aarch64/24.7/cuda/{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_x86_64/25.1/cuda/{cuda_version}",
                         }
                     ],
                     "buildable": False,
@@ -267,7 +267,7 @@ class LlnlMatrix(System):
                     "externals": [
                         {
                             "spec": f"cuda@{cuda_version}",
-                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_aarch64/24.7/cuda/{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_x86_64/25.1/cuda/{cuda_version}",
                         }
                     ],
                     "buildable": False,
@@ -276,7 +276,7 @@ class LlnlMatrix(System):
                     "externals": [
                         {
                             "spec": f"cub@{cuda_version}",
-                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_aarch64/24.7/cuda/{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_x86_64/25.1/cuda/{cuda_version}",
                         }
                     ],
                     "buildable": False,
@@ -285,7 +285,7 @@ class LlnlMatrix(System):
                     "externals": [
                         {
                             "spec": f"cublas@{cuda_version}",
-                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_aarch64/24.7/math_libs/{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_x86_64/25.1/math_libs/{cuda_version}",
                         }
                     ],
                     "buildable": False,
@@ -294,7 +294,7 @@ class LlnlMatrix(System):
                     "externals": [
                         {
                             "spec": f"cusolver@{cuda_version}",
-                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_aarch64/24.7/math_libs/{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_x86_64/25.1/math_libs/{cuda_version}",
                         }
                     ],
                     "buildable": False,
@@ -303,7 +303,7 @@ class LlnlMatrix(System):
                     "externals": [
                         {
                             "spec": f"cufft@{cuda_version}",
-                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_aarch64/24.7/math_libs/{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_x86_64/25.1/math_libs/{cuda_version}",
                         }
                     ],
                     "buildable": False,
