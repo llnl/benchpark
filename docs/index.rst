@@ -42,6 +42,7 @@
    modifiers
    set-of-experiments
    run-binary
+   create-mirror
 
 .. toctree::
    :maxdepth: 1
