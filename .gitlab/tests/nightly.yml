@@ -21,8 +21,7 @@ include:
         SCHEDULER_PARAMETERS: -N 1 -t 20m --queue=pci --exclusive
         BENCHMARK: [amg2023, kripke, laghos]
         VARIANT: [+rocm]
-        DASHBOARD_NAME: Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init
-          --dest=tuolumne-system llnl-elcapitan cluster=elcapitan]
+        DASHBOARD_NAME: Nightly [benchpark-develop]
       - HOST: dane
         ARCHCONFIG: llnl-cluster
         SCHEDULER_PARAMETERS: -N 1 -t 00:20:00 --exclusive --reservation=ci
