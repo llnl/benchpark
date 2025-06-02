@@ -3,10 +3,11 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from spack.package import *
-from spack.pkg.builtin.rocsolver import Rocsolver as BuiltinRocsolver
+from benchpark.directives import provides
 
 
-class Rocsolver(BuiltinRocsolver):
+class OpenMPSystem:
+    provides("openmp")
 
-    provides("lapack")
+    def system_specific_variables(self, system):
+        return {}

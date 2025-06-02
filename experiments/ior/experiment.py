@@ -78,6 +78,12 @@ class Ior(
             "n_ranks", "{sys_cores_per_node} * {n_nodes}", True
         )
 
+        self.set_required_variables(
+            n_resources="{n_ranks}",
+            process_problem_size="{b}/{n_ranks}",
+            total_problem_size="{b}",
+        )
+
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]

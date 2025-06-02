@@ -13,6 +13,10 @@ You need git and Python 3.8+::
    cd benchpark
    . setup-env.sh
    benchpark --version
+   
+   python3 -m venv my-env
+   . my-env/bin/activate
+   
    pip install -r requirements.txt
 
 --------------------------------

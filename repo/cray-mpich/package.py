@@ -17,7 +17,9 @@ class CrayMpich(BuiltinCM):
 
         if self.spec.satisfies("+gtl"):
             gtl_lib_prefix = self.spec.extra_attributes["gtl_lib_path"]
-            gtl_libs = self.spec.extra_attributes["gtl_libs"]
+            # gtl_libs, if set, must be a single string. You can pass multiple
+            # libs by adding a space between each
+            gtl_libs = self.spec.extra_attributes["gtl_libs"].split()
             libs += find_libraries(gtl_libs, root=gtl_lib_prefix, recursive=True)
 
         return libs

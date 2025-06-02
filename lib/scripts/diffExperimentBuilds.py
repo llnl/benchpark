@@ -203,7 +203,7 @@ def main():
         # Path to the Spack setup script
         spack_setup_script = f"{old_name}/wkp/setup.sh"
         # Define the ramble command
-        cmd = f"{old_name}/wkp/spack/bin/spack-python diffSpecs.py -t -d {old_file} {new_file}"
+        cmd = f"{old_name}/wkp/spack/bin/spack-python diffBuildSpecs.py -t -d {old_file} {new_file}"
         # Combine sourcing the script and running the command
         try:
             diff = subprocess.run(
