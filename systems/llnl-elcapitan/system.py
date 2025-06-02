@@ -28,7 +28,7 @@ class LlnlElcapitan(System):
         "elcapitan": {
             "rocm_arch": "gfx942",
             "sys_cores_per_node": 96,
-            "sys_gpus_per_node": 4,
+            "sys_gpus_per_node": None,  # Determined by gpumode variant
             "system_site": "llnl",
             "scheduler": "flux",
             "hardware_key": str(hardware_descriptions)
@@ -84,15 +84,6 @@ class LlnlElcapitan(System):
         self.programming_models = [ROCmSystem()]
         self.rocm_version = Version(self.spec.variants["rocm"][0])
         self.gtl_flag = self.spec.variants["gtl"][0]
-
-        if self.spec.satisfies("system=elcapitan"):
-            if self.spec.satisfies("gpumode=TPX"):
-                sys_gpus_per_node = 12
-            else:
-                if self.spec.satisfies("gpumode=CPX"):
-                    sys_gpus_per_node = 24
-                else:
-                    sys_gpus_per_node = 4 #CPX
         
         # TODO: Replace this with lookups into the working set
         if self.spec.satisfies("compiler=gcc"):
@@ -121,6 +112,16 @@ class LlnlElcapitan(System):
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
+
+        if self.spec.satisfies("cluster=elcapitan"):
+            if self.spec.satisfies("gpumode=SPX"):
+                self.sys_gpus_per_node = 4
+            elif self.spec.satisfies("gpumode=TPX"):
+                self.sys_gpus_per_node = 12
+            elif self.spec.satisfies("gpumode=CPX"):
+                self.sys_gpus_per_node = 24
+            else:
+                raise ValueError(f"Invalid gpumode in spec: {self.spec}")
 
     def compute_packages_section(self):
         selections = {
@@ -211,7 +212,7 @@ class LlnlElcapitan(System):
                     "buildable": False,
                     "externals": [{"spec": "unzip@6.0", "prefix": "/usr"}],
                 },
-                "hypre": {"variants": "amdgpu_target=gfx90a"},
+                "hypre": {"variants": f"amdgpu_target={self.rocm_arch}"},
                 "hwloc": {
                     "externals": [
                         {"spec": "hwloc@2.9.1", "prefix": "/usr", "buildable": False}
@@ -666,6 +667,11 @@ class LlnlElcapitan(System):
                     }
                 ]
             }
+
+    def system_specific_variables(self):
+        return {
+            "extra_cmd_opts": f"--setattr gpumode={self.spec.variants['gpumode'][0]}",
+        }
 
     def compute_software_section(self):
         """This is somewhat vestigial: for the Tioga config that is committed
