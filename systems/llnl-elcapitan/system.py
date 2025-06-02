@@ -118,10 +118,8 @@ class LlnlElcapitan(System):
                 self.sys_gpus_per_node = 4
             elif self.spec.satisfies("gpumode=TPX"):
                 self.sys_gpus_per_node = 12
-                self.division_factor = 3
             elif self.spec.satisfies("gpumode=CPX"):
                 self.sys_gpus_per_node = 24
-                self.division_factor = 6
             else:
                 raise ValueError(f"Invalid gpumode in spec: {self.spec}")
 
