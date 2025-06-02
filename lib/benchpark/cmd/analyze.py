@@ -115,9 +115,6 @@ def make_stacked_line_chart(**kwargs):
     )
 
     os.makedirs(kwargs["out_dir"], exist_ok=True)
-    csvfile = os.path.join(kwargs["out_dir"], kwargs["chart_file_name"] + ".csv")
-    logger.info(f"Saving DataFrame to {csvfile}")
-    df.to_csv(csvfile)
 
     tdf_calls = df[[(i, "Calls/rank (max)") for i in x_axis]].T.reset_index(
         level=1, drop=True
@@ -163,9 +160,11 @@ def make_stacked_line_chart(**kwargs):
     fig.autofmt_xdate()
     plt.tight_layout()
 
-    imgfile = os.path.join(kwargs["out_dir"], kwargs["chart_file_name"] + ".png")
-    logger.info(f"Saving figure to {imgfile}")
-    plt.savefig(imgfile)
+    filename = os.path.join(kwargs["out_dir"], kwargs["chart_file_name"])
+    logger.info(f"Saving figure to {filename}.png")
+    plt.savefig(filename+".png")
+    logger.info(f"Saving figure data points to {filename}.csv")
+    tdf.to_csv(filename+".csv")
 
 
 # ----------------
