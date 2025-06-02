@@ -109,9 +109,9 @@ class Lammps(
         # get package version
         app_version = self.spec.variants["version"][0]
         fft_kokkos = (
-            "fft_kokkos=cufft" if self.spec.satisfies("+cuda")
-            else "fft_kokkos=hipfft" if self.spec.satisfies("+rocm")
-            else ""
+            "fft_kokkos=cufft"
+            if self.spec.satisfies("+cuda")
+            else "fft_kokkos=hipfft" if self.spec.satisfies("+rocm") else ""
         )
         self.add_package_spec(
             self.name,
