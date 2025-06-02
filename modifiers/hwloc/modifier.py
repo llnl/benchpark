@@ -32,7 +32,7 @@ class Hwloc(BasicModifier):
 
         pre_exec.append(
             CommandExecutable(
-                name="record_start_time", template=["start_time=$(date +%s)"]
+                name="record_start_time", template=["start_time=$(date +%s%N)"]
             )
         )
 
@@ -62,7 +62,7 @@ class Hwloc(BasicModifier):
 
             pre_exec.append(
                 CommandExecutable(
-                    name="record_end_time", template=["end_time=$(date +%s)"]
+                    name="record_end_time", template=["end_time=$(date +%s%N)"]
                 )
             )
 
@@ -70,7 +70,7 @@ class Hwloc(BasicModifier):
                 CommandExecutable(
                     name="print_elapsed_time",
                     template=[
-                        'echo "Elapsed time: $((end_time - start_time)) milliseconds"'
+                        'echo "Elapsed time: $((end_time - start_time)) Nanoseconds"'
                     ],
                 )
             )
