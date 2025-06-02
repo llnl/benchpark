@@ -28,7 +28,7 @@ class LlnlElcapitan(System):
         "elcapitan": {
             "rocm_arch": "gfx942",
             "sys_cores_per_node": 96,
-            "sys_gpus_per_node": None,  # Determined by gpumode variant
+            "sys_gpus_per_node": None,  # Determined by "gpumode" variant
             "system_site": "llnl",
             "scheduler": "flux",
             "hardware_key": str(hardware_descriptions)
@@ -46,7 +46,7 @@ class LlnlElcapitan(System):
         "gpumode",
         default="SPX",
         values=("SPX", "TPX", "CPX"),
-        description="Which cluster to run on",
+        description="compute partitioning modes for MI300A",
     )
     variant(
         "rocm",
