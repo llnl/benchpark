@@ -13,13 +13,7 @@ import sys
 import yaml
 
 import benchpark.paths
-
-DEBUG = False
-
-
-def debug_print(message):
-    if DEBUG:
-        print("(debug) " + str(message))
+from benchpark.debug import debug_print
 
 
 @contextmanager
