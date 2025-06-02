@@ -84,7 +84,7 @@ class LlnlElcapitan(System):
         self.programming_models = [ROCmSystem()]
         self.rocm_version = Version(self.spec.variants["rocm"][0])
         self.gtl_flag = self.spec.variants["gtl"][0]
-        
+
         # TODO: Replace this with lookups into the working set
         if self.spec.satisfies("compiler=gcc"):
             self.gcc_version = Version("12.2.0")
