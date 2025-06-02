@@ -40,7 +40,7 @@ class LlnlElcapitan(System):
     variant(
         "cluster",
         default="tioga",
-        values=("tioga", "elcapitan"),
+        values=("tioga", "elcapitan", "tuolumne"),
         description="Which cluster to run on",
     )
     variant(
