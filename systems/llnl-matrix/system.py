@@ -222,9 +222,7 @@ class LlnlMatrix(System):
         return {
             "packages": {
                 "blas": {"require": "intel-oneapi-mkl"},
-                "lapack": {
-                    "require": "intel-oneapi-mkl"
-                },
+                "lapack": {"require": "intel-oneapi-mkl"},
                 "curand": {
                     "externals": [
                         {
