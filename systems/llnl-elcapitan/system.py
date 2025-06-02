@@ -118,8 +118,10 @@ class LlnlElcapitan(System):
                 self.sys_gpus_per_node = 4
             elif self.spec.satisfies("gpumode=TPX"):
                 self.sys_gpus_per_node = 12
+                self.division_factor = 3
             elif self.spec.satisfies("gpumode=CPX"):
                 self.sys_gpus_per_node = 24
+                self.division_factor = 6
             else:
                 raise ValueError(f"Invalid gpumode in spec: {self.spec}")
 
@@ -670,7 +672,7 @@ class LlnlElcapitan(System):
 
     def system_specific_variables(self):
         return {
-            "extra_cmd_opts": f"--setattr gpumode={self.spec.variants['gpumode'][0]}",
+            "extra_batch_opts": f"--setattr=gpumode={self.spec.variants['gpumode'][0]}",
         }
 
     def compute_software_section(self):
