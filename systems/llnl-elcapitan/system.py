@@ -202,7 +202,6 @@ class LlnlElcapitan(System):
                         {"spec": "hwloc@2.9.1", "prefix": "/usr", "buildable": False}
                     ]
                 },
-                "fftw": {"buildable": False},
                 "intel-oneapi-mkl": {
                     "externals": [
                         {
@@ -211,6 +210,14 @@ class LlnlElcapitan(System):
                         }
                     ],
                     "buildable": False,
+                },
+                "fftw": {
+                    "buildable": False,
+                    "require": "intel-oneapi-mkl",
+                },
+                "fftw3": {
+                    "buildable": False,
+                    "require": "intel-oneapi-mkl",
                 },
                 "mpi": {"buildable": False},
                 "libfabric": {
