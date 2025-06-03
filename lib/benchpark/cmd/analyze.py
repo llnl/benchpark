@@ -323,7 +323,7 @@ def prepare_data(**kwargs):
     if prefix:
         ctk.dataframe = ctk.dataframe.filter(like=prefix, axis=0)
 
-    top_n = kwargs.get("top_n_functions", -1)
+    top_n = kwargs.get("top_n_regions", -1)
     if top_n != -1:
         temp_df_idx = ctk.dataframe.nlargest(top_n, [(list(grouped.keys())[0], metric)]).index
         temp_df = ctk.dataframe[ctk.dataframe.index.isin(temp_df_idx)]
@@ -372,7 +372,7 @@ def setup_parser(root_parser):
         default="raw",
         choices=["raw", "percentage"],
         type=str,
-        help="Specify processing on the metric. 'raw' does nothing, 'percentage' shows the magnitude of metric relative to the regions.",
+        help="Specify processing on the metric. 'raw' does nothing, 'percentage' shows the metric values as a percentage relative to the total summation of all regions.",
     )
     root_parser.add_argument(
         "--xaxis-parameter",
@@ -396,10 +396,10 @@ def setup_parser(root_parser):
         metavar="PREFIX",
     )
     root_parser.add_argument(
-        "--top-n-functions",
+        "--top-n-regions",
         default=-1,
         type=int,
-        help="Filters only top N largest metric entries to be included in chart.",
+        help="Filters only top N largest metric entries to be included in chart (based on the first profile).",
         metavar="N",
     )
     root_parser.add_argument(

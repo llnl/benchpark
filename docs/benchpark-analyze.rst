@@ -81,18 +81,9 @@ Run canned analysis:
 
 .. code:: console
 
-  $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/ --chart-type "percentage_time" --top-n-functions 10
+   $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/
 
-.. figure:: _static/images/kripke_cuda_strong_percentage_time_exc.png
-  :width: 800
-  :align: center
-
-.. code:: console
-
-   $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/ --chart-type "time" --top-n-functions 10
-
-
-.. figure:: _static/images/kripke_cuda_strong_time_exc.png
+.. figure:: _static/images/kripke_cuda_strong_raw_exc.png
   :width: 800
   :align: center
 
@@ -111,17 +102,9 @@ Run canned analysis:
 
 .. code:: console
 
-   $ benchpark analyze --workspace-dir wkp/kripke/cuda/weak/lassen/workspace/ --chart-type "percentage_time" --top-n-functions 10
+   $ benchpark analyze --workspace-dir wkp/kripke/cuda/weak/lassen/workspace/
 
-.. figure:: _static/images/kripke_cuda_weak_percentage_time_exc.png
-  :width: 800
-  :align: center
-
-.. code:: console
-
-   $ benchpark analyze --workspace-dir wkp/kripke/cuda/weak/lassen/workspace/ --chart-type "time" --top-n-functions 10
-
-.. figure:: _static/images/kripke_cuda_weak_time_exc.png
+.. figure:: _static/images/kripke_cuda_weak_raw_exc.png
   :width: 800
   :align: center
 
@@ -140,17 +123,23 @@ Run canned analysis:
 
 .. code:: console
 
-   $ benchpark analyze --workspace-dir wkp/kripke/cuda/throughput/lassen/workspace/ --chart-type "percentage_time" --top-n-functions 10
+   $ benchpark analyze --workspace-dir wkp/kripke/cuda/throughput/lassen/workspace/
 
-.. figure:: _static/images/kripke_cuda_throughput_percentage_time_exc.png
+.. figure:: _static/images/kripke_cuda_throughput_raw_exc.png
   :width: 800
   :align: center
 
+Percentage
+----------
+
 .. code:: console
 
-   $ benchpark analyze --workspace-dir wkp/kripke/cuda/throughput/lassen/workspace/ --chart-type "time" --top-n-functions 10
+  $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/ --chart-type percentage
 
-.. figure:: _static/images/kripke_cuda_throughput_time_exc.png
+The ``--chart-type percentage`` option, visualizes the y-axis metric, relative to the summation of the metric for all regions.
+This is useful to visualize what percentage of the total time each region is taking.
+
+.. figure:: _static/images/kripke_cuda_strong_percentage_exc.png
   :width: 800
   :align: center
 
@@ -159,11 +148,27 @@ Inclusive Metrics
 
 .. code:: console
 
-  $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/ --chart-type "time" --y-axis-metric "Avg time/rank" --top-n-functions 10
+  $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/ --yaxis-metric "Avg time/rank"
 
-We can also visualize any inclusive metrics by selecting them as the ``y_axis_metric``. Here we use ``Avg time/rank`` instead of ``Avg time/rank (exc)``.
+We can also visualize any inclusive metrics by selecting them as the ``yaxis_metric``. Here we use ``Avg time/rank`` instead of ``Avg time/rank (exc)``.
 The ``main`` node is automatically removed from the figure, because this information is redundant for the inclusive metric.
 
-.. figure:: _static/images/kripke_cuda_strong_time_inc.png
+.. figure:: _static/images/kripke_cuda_strong_raw_inc.png
+  :width: 800
+  :align: center
+
+Arguments for Region Filtering
+------------------------------
+
+.. code:: console
+
+   $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/ --group-regions-name --top-n-regions 10
+
+An efficent way to filter out smaller regions quickly, is to use the ``--group-regions-name`` and ``--top-n-regions`` parameters. 
+``--group-regions-name`` computes the sum of the metric for all of the regions with the same name, so multiple regions are shown as a single region.
+``--top-n-regions`` filters the data to only show the ``n`` regions with the highest values for the given metric (based on the first profile).
+We can also add the ``--no-mpi`` argument to filter out all ``MPI_*`` regions.
+
+.. figure:: _static/images/kripke_cuda_strong_raw_exc-2.png
   :width: 800
   :align: center
