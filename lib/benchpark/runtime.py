@@ -13,13 +13,7 @@ import sys
 import yaml
 
 import benchpark.paths
-
-DEBUG = False
-
-
-def debug_print(message):
-    if DEBUG:
-        print("(debug) " + str(message))
+from benchpark.debug import debug_print
 
 
 @contextmanager
@@ -39,21 +33,23 @@ def git_clone_commit(url, commit, destination):
         run_command(f"git checkout {commit}")
 
 
-def run_command(command_str, env=None):
+def run_command(command_str, env=None, stdout=None, stderr=None):
+    stdout = stdout or subprocess.PIPE
+    stderr = stderr or subprocess.PIPE
     proc = subprocess.Popen(
         shlex.split(command_str),
         env=env,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        stdout=stdout,
+        stderr=stderr,
         text=True,
     )
-    stdout, stderr = proc.communicate()
+    out, err = proc.communicate()
     if proc.returncode != 0:
         raise RuntimeError(
             f"Failed command: {command_str}\nOutput: {stdout}\nError: {stderr}"
         )
 
-    return (stdout, stderr)
+    return (out, err)
 
 
 class Command:

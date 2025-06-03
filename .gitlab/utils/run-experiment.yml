@@ -29,6 +29,11 @@
     # Analyze Experiments
     - ramble --workspace-dir . --disable-progress-bar workspace analyze --format json
       yaml text
+    # Benchpark Analyze experiments with "+strong"
+    - |
+      if [[ "$VARIANT" == *"+strong"* ]]; then
+        ./bin/benchpark analyze --workspace-dir .
+      fi
     # Check Experiment Exit Codes
     - cd -
     - python ./.gitlab/bin/exit-codes ./workspace/${BENCHMARK}-benchmark/${HOST}-system/workspace/results.latest.json

@@ -20,8 +20,8 @@ class Remhos(ExecutableApplication):
             'network-latency-bound','network-collectives','unstructured-grid']
 
     #TODO: add -ms flag once it's implemented
-    executable('2d', 'remhos'+' -dim 2 -epm 1024'+' -p 14'+' -rs {rs2d}'+' -o 3 -dt {dt}'+' -tf {tf}'+' -ho {ho}' ' -lo {lo}'+' -fct {fct}'+' -vs {vs}'+' -ms {ms}'+' -d {device}'+' -pa -no-vis', use_mpi=True)
-    executable('3d', 'remhos'+' -dim 3 -epm 512'+' -p 10'+' -rs {rs3d}'+' -o 2'+' -dt {dt}'+' -tf {tf}'+' -ho {ho}' ' -lo {lo}'+' -fct {fct}'+' -vs {vs}'+' -ms {ms}'+' -d {device}'+' -pa -no-vis', use_mpi=True)
+    executable('2d', 'remhos'+' -dim 2 -epm {epm}'+' -p 14'+' -rs {rs2d}'+' -o 3 -dt {dt}'+' -tf {tf}'+' -ho {ho}' ' -lo {lo}'+' -fct {fct}'+' -vs {vs}'+' -ms {ms}'+' -d {device}'+' -pa -no-vis', use_mpi=True)
+    executable('3d', 'remhos'+' -dim 3 -epm {epm}'+' -p 10'+' -rs {rs3d}'+' -o 2'+' -dt {dt}'+' -tf {tf}'+' -ho {ho}' ' -lo {lo}'+' -fct {fct}'+' -vs {vs}'+' -ms {ms}'+' -d {device}'+' -pa -no-vis', use_mpi=True)
     workload('2d', executables=['2d'])
     workload('3d', executables=['3d'])
     

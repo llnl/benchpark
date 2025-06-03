@@ -86,6 +86,12 @@ class Gromacs(
         for k, v in other_input_variables.items():
             self.add_experiment_variable(k, v)
 
+        self.set_required_variables(
+            n_resources="{n_ranks}",
+            process_problem_size="{size}/{n_ranks}",
+            total_problem_size="{size}",
+        )
+
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]

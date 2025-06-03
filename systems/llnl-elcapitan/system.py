@@ -212,6 +212,10 @@ class LlnlElcapitan(System):
                     ],
                     "buildable": False,
                 },
+                "fftw-api": {
+                    "buildable": False,
+                    "require": "intel-oneapi-mkl",
+                },
                 "mpi": {"buildable": False},
                 "libfabric": {
                     "externals": [
@@ -261,7 +265,7 @@ class LlnlElcapitan(System):
         elif compiler == "gcc":
             return {"packages": {}}
         elif compiler == "rocmcc":
-            return {"packages": {}}
+            return {"packages": {"all": {"require": [{"one_of": ["%rocmcc", "%gcc"]}]}}}
         else:
             raise ValueError(f"Unexpected value for compiler: {compiler}")
 
