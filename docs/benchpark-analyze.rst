@@ -177,7 +177,7 @@ Arguments for Region Filtering
 
    $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/ --group-regions-name --top-n-regions 10
 
-An efficent way to filter out smaller regions quickly, is to use the ``--group-regions-name`` and ``--top-n-regions`` parameters. 
+An efficient way to filter out smaller regions quickly, is to use the ``--group-regions-name`` and ``--top-n-regions`` parameters. 
 ``--group-regions-name`` computes the sum of the metric for all of the regions with the same name, so multiple regions are shown as a single region.
 ``--top-n-regions`` filters the data to only show the ``n`` regions with the highest values for the given metric (based on the first profile).
 We can also add the ``--no-mpi`` argument to filter out all ``MPI_*`` regions.
