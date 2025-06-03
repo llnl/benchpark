@@ -9,9 +9,15 @@ Canned Analysis for Scaling Studies
 
 The ``benchpark analyze`` command can be used to generate pre-configured
 charts for analysis of scaling studies using Caliper and Thicket. 
-We use `Thicket <https://github.com/LLNL/thicket>`_ to help compose and visualize
-Caliper performance data collected from running our experiment with the Caliper modifier.
-After running, ``ramble on``, run the ``benchpark analyze`` command on the ramble workspace directory.
+We generate Caliper performance data using the Caliper modifier ``caliper=time,mpi`` (:doc:`modifiers`).
+We use the `Thicket <https://github.com/LLNL/thicket>`_ performance analysis library to compose and visualize the Caliper performance data.
+Thicket is embedded into the ``benchpark analyze`` command, leveraging metadata to generate the scaling study figures.
+
+After running, ``ramble on``, run the ``benchpark analyze`` command on the ramble workspace directory to generate:
+
+1. A calltree of the regions that were executed in the benchmark.
+2. A scaling study figure, which can be configured with command-line arguments.
+3. A csv of the datapoints plotted on the figure.
 
 .. note::
 
