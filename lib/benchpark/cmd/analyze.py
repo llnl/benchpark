@@ -159,7 +159,8 @@ def make_stacked_line_chart(**kwargs):
     labels = list(reversed(labels))
     calls_list = list(reversed(calls_list))
     for i, label in enumerate(labels):
-        name = calls_list[i][0][0].frame["name"]
+        obj = calls_list[i][0]
+        name = obj if isinstance(obj, str) else obj[0].frame["name"]
         if name not in label:
             raise ValueError(f"Name '{name}' is not in label '{label}'")
         labels[i] = str(name) + " (" + str(calls_list[i][1]) + ")"
@@ -324,7 +325,8 @@ def prepare_data(**kwargs):
 
     top_n = kwargs.get("top_n_functions", -1)
     if top_n != -1:
-        temp_df = ctk.dataframe.nlargest(top_n, [(list(grouped.keys())[0], metric)])
+        temp_df_idx = ctk.dataframe.nlargest(top_n, [(list(grouped.keys())[0], metric)]).index
+        temp_df = ctk.dataframe[ctk.dataframe.index.isin(temp_df_idx)]
         temp_df.loc["Sum(removed_regions)"] = 0
         for p in ctk.profile:
             temp_df.loc["Sum(removed_regions)", (p[1], metric)] = (
