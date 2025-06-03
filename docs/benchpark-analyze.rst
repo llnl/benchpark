@@ -88,6 +88,7 @@ Run canned analysis:
   :align: center
 
 The default configuration will visualize a stacked area chart of:
+
 - The exclusive average time per rank ``Avg time/rank (exc)`` collected by the caliper modifier ``caliper=time``.
 - Number of nodes and number of MPI ranks on the x-axis, which are the parameters we vary in the experiment (for strong scaling).
 - Constant information will be contained in the title, such as benchmark, programming model, benchmark version, cluster, etc.
@@ -143,7 +144,7 @@ Percentage
   $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/ --chart-type percentage
 
 The ``--chart-type percentage`` option, visualizes the y-axis metric, relative to the summation of the metric for all regions.
-This is useful to visualize what percentage of the total time each region is taking.
+This is useful in this example to visualize what percentage of the time each region is taking.
 
 .. figure:: _static/images/kripke_cuda_strong_percentage_exc.png
   :width: 800
