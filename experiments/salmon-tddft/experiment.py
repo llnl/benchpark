@@ -43,6 +43,10 @@ class SalmonTddft(Experiment, OpenMPExperiment):
         self.add_experiment_variable("processes_per_node", ["4"])
         self.add_experiment_variable("n_nodes", ["1"], True)
 
+        self.set_required_variables(
+            n_resources="{n_ranks}", process_problem_size="", total_problem_size=""
+        )
+
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
