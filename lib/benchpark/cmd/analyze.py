@@ -363,6 +363,7 @@ def setup_parser(root_parser):
         required=True,
         type=str,
         help="Directory of ramble workspace.",
+        metavar="RAMBLE_WORKSPACE_DIR",
     )
     root_parser.add_argument(
         "--chart-type",
