@@ -266,7 +266,7 @@ class Lammps(ExecutableApplication):
 
     workload_variable(
         "input_file",
-        default="in.reaxc.hns",
+        default="in.reaxff.hns",
         description="hns-reaxff input file name",
         workloads=["hns-reaxff"],
     )
