@@ -127,11 +127,12 @@ def make_stacked_line_chart(**kwargs):
     tdf_calls = df[[(i, "Calls/rank (max)") for i in x_axis]].T.reset_index(
         level=1, drop=True
     )
-    calls_dict = {
-        column: int(max(tdf_calls[column]))
-        for column in tdf_calls.columns
-        if column != "name"
-    }
+    calls_list = []
+    for column in tdf_calls.columns:
+        mx = max(tdf_calls[column])
+        val = int(mx) if mx > 0 else 0
+        calls_list.append((column, val))
+
     tdf = df[[(i, value) for i in x_axis]].T.reset_index(level=1, drop=True)
     mpl.rcParams["axes.prop_cycle"] = mpl.cycler(color=COLOR_PALETTE)
     if kwargs.get("chart_fontsize"):
@@ -149,14 +150,19 @@ def make_stacked_line_chart(**kwargs):
         title=kwargs.get("chart_title", ""),
         xlabel=xlabel,
         ylabel=y_label,
-        figsize=kwargs["chart_figsize"] if kwargs["chart_figsize"] else (12, 6),
+        figsize=kwargs["chart_figsize"] if kwargs["chart_figsize"] else (12, 7),
         ax=ax,
     )
 
     handles, labels = ax.get_legend_handles_labels()
     handles = list(reversed(handles))
     labels = list(reversed(labels))
-    labels = [str(label) + " (" + str(calls_dict[label]) + ")" for label in labels]
+    calls_list = list(reversed(calls_list))
+    for i, label in enumerate(labels):
+        name = calls_list[i][0][0].frame["name"] if not kwargs.get("group_regions_name") else calls_list[i][0]
+        if name not in label:
+            raise ValueError(f"Name '{name}' is not in label '{label}'")
+        labels[i] = str(name) + " (" + str(calls_list[i][1]) + ")"
     ax.legend(
         handles,
         labels,
@@ -283,6 +289,7 @@ def prepare_data(**kwargs):
     logger.info(f"Saving Input Calltree to {tree_file}")
 
     if kwargs.get("group_regions_name"):
+        logger.info("Computing sum of metrics for regions with the same name.")
         ctk.dataframe = ctk.dataframe.groupby("name").sum()
 
     for key in grouped.keys():
