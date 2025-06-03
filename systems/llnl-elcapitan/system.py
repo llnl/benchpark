@@ -213,6 +213,10 @@ class LlnlElcapitan(System):
                     ],
                     "buildable": False,
                 },
+                "fftw-api": {
+                    "buildable": False,
+                    "require": "intel-oneapi-mkl",
+                },
                 "mpi": {"buildable": False},
                 "libfabric": {
                     "externals": [
