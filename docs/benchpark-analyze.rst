@@ -87,6 +87,12 @@ Run canned analysis:
   :width: 800
   :align: center
 
+The default configuration will visualize a stacked area chart of:
+- The exclusive average time per rank ``Avg time/rank (exc)`` collected by the caliper modifier ``caliper=time``.
+- Number of nodes and number of MPI ranks on the x-axis, which are the parameters we vary in the experiment (for strong scaling).
+- Constant information will be contained in the title, such as benchmark, programming model, benchmark version, cluster, etc.
+- The legend will contain the regions and maximum calls out of all of the ranks (``Calls/rank (max)``).
+
 Weak
 ----
 

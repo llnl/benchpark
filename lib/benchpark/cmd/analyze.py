@@ -169,7 +169,7 @@ def make_stacked_line_chart(**kwargs):
         labels,
         bbox_to_anchor=(1, 0.5),
         loc="center left",
-        title="Function (Calls/rank (max))",
+        title="Region (Calls/rank (max))",
     )
 
     fig.autofmt_xdate()
@@ -240,8 +240,8 @@ def prepare_data(**kwargs):
     x_axis_metadata = (
         kwargs.get("xaxis_parameter")
         or {
-            "strong": ["n_resources", "n_nodes"],
-            "weak": ["n_resources", "n_nodes", "total_problem_size"],
+            "strong": ["n_nodes", "n_resources"],
+            "weak": ["n_nodes", "n_resources", "total_problem_size"],
             "throughput": "total_problem_size",
         }[scaling]
     )
