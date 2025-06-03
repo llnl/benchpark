@@ -221,7 +221,7 @@ class LlnlCluster(System):
         if compiler == "oneapi":
             return {"packages": {"all": {"require": [{"one_of": ["%oneapi", "%gcc"]}]}}}
         else:
-            return {}
+            return {"packages": {}}
 
     def compute_compilers_section(self):
         selections = {}
@@ -305,7 +305,7 @@ class LlnlCluster(System):
                             "environment": {},
                             "extra_rpaths": [],
                         }
-                    }
+                    },
                 ]
             }
 
