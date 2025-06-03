@@ -325,7 +325,9 @@ def prepare_data(**kwargs):
 
     top_n = kwargs.get("top_n_regions", -1)
     if top_n != -1:
-        temp_df_idx = ctk.dataframe.nlargest(top_n, [(list(grouped.keys())[0], metric)]).index
+        temp_df_idx = ctk.dataframe.nlargest(
+            top_n, [(list(grouped.keys())[0], metric)]
+        ).index
         temp_df = ctk.dataframe[ctk.dataframe.index.isin(temp_df_idx)]
         temp_df.loc["Sum(removed_regions)"] = 0
         for p in ctk.profile:
