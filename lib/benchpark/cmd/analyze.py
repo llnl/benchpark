@@ -171,10 +171,10 @@ def make_stacked_line_chart(**kwargs):
     plt.tight_layout()
 
     filename = os.path.join(kwargs["out_dir"], kwargs["chart_file_name"])
-    logger.info(f"Saving figure to {filename}.png")
-    plt.savefig(filename+".png")
     logger.info(f"Saving figure data points to {filename}.csv")
     tdf.to_csv(filename+".csv")
+    logger.info(f"Saving figure to {filename}.png")
+    plt.savefig(filename+".png")
 
 
 # ----------------
