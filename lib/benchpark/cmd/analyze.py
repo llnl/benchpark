@@ -180,7 +180,7 @@ def make_stacked_line_chart(**kwargs):
     logger.info(f"Saving figure to {filename}.png")
     plt.savefig(filename + ".png")
     logger.info(
-        "Note: ordering of regions in the figure should be in reverse order of the tree."
+        "Note: ordering of regions in the figure are in reverse order of the tree."
     )
 
 
