@@ -159,7 +159,7 @@ def make_stacked_line_chart(**kwargs):
     labels = list(reversed(labels))
     calls_list = list(reversed(calls_list))
     for i, label in enumerate(labels):
-        name = calls_list[i][0][0].frame["name"] if not kwargs.get("group_regions_name") else calls_list[i][0]
+        name = calls_list[i][0][0].frame["name"]
         if name not in label:
             raise ValueError(f"Name '{name}' is not in label '{label}'")
         labels[i] = str(name) + " (" + str(calls_list[i][1]) + ")"
@@ -179,6 +179,9 @@ def make_stacked_line_chart(**kwargs):
     tdf.to_csv(filename + ".csv")
     logger.info(f"Saving figure to {filename}.png")
     plt.savefig(filename + ".png")
+    logger.info(
+        "Note: ordering of regions in the figure should be in reverse order of the tree."
+    )
 
 
 # ----------------
@@ -243,6 +246,28 @@ def prepare_data(**kwargs):
     )
     kwargs["xaxis_parameter"] = x_axis_metadata
 
+    if kwargs.get("group_regions_name"):
+        logger.info(
+            "Computing sum of metrics for regions with the same name. Warning: this operation also sums Calls/rank value in figure legend, for affected regions."
+        )
+        grouped = (
+            tk.dataframe.reset_index()
+            .groupby(["name", "profile"])
+            .agg(
+                {
+                    **{
+                        col: "sum"
+                        for col in tk.dataframe.select_dtypes(include="number").columns
+                    },
+                    "node": "first",
+                }
+            )
+            .reset_index()
+            .set_index(["node", "profile"])
+        )
+        tk.dataframe = grouped
+        tk = tk.squash()
+
     # Group by varied parameters
     grouped = tk.groupby(x_axis_metadata)
     ctk = th.Thicket.concat_thickets(
@@ -287,10 +312,6 @@ def prepare_data(**kwargs):
     with open(tree_file, "w") as f:
         f.write(clean_tree)
     logger.info(f"Saving Input Calltree to {tree_file}")
-
-    if kwargs.get("group_regions_name"):
-        logger.info("Computing sum of metrics for regions with the same name.")
-        ctk.dataframe = ctk.dataframe.groupby("name").sum()
 
     for key in grouped.keys():
         ctk.dataframe[(key, "perc")] = (
