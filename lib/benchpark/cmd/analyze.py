@@ -288,10 +288,14 @@ def prepare_data(**kwargs):
 
     top_n = kwargs.get("top_n_functions", -1)
     if top_n != -1:
-        ctk.dataframe = ctk.dataframe.nlargest(
+        temp_df = ctk.dataframe.nlargest(
             top_n, [(list(grouped.keys())[0], metric)]
         )
-        logger.info(f"Filtered top {top_n} nodes for chart display.")
+        temp_df.loc["Sum(removed_regions)"] = 0
+        for p in ctk.profile:
+            temp_df.loc["Sum(removed_regions)", (p[1], metric)] = (ctk.dataframe.loc[:, (p[1], metric)].sum() - temp_df.loc[:, (p[1], metric)].sum()).iloc[0]
+        ctk.dataframe = temp_df
+        logger.info(f"Filtered top {top_n} nodes for chart display. Added the sum of the regions that were removed as single region.")
 
     if not kwargs.get("chart_xlabel"):
         kwargs["chart_xlabel"] = x_axis_metadata
