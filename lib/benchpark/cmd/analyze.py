@@ -35,7 +35,7 @@ COLOR_PALETTE = [
     "#f7b6d2",  # Light Pink
     "#c7c7c7",  # Light Gray
     "#dbdb8d",  # Light Olive
-    "#9edae5"   # Light Cyan
+    "#9edae5",  # Light Cyan
 ]
 SCALING_TYPES = ["+strong", "+throughput", "+weak"]
 NAME_REMAP = {
@@ -101,9 +101,9 @@ def make_stacked_line_chart(**kwargs):
 
     Args:
         df (pd.DataFrame): DataFrame to plot.
-        chart_type (str): Type of chart ("time" or "percentage_time").
+        chart_type (str): Type of chart ("raw" or "percentage").
         x_axis (list): Metadata keys to use for the X-axis.
-        y_axis_metric (str): Metric to plot on the Y-axis.
+        yaxis_metric (str): Metric to plot on the Y-axis.
         chart_ylabel (str, optional): Y-axis label.
         chart_title (str, optional): Chart title.
         chart_xlabel (str, optional): X-axis label.
@@ -115,13 +115,11 @@ def make_stacked_line_chart(**kwargs):
     df = kwargs.get("df")
     chart_type = kwargs.get("chart_type")
     x_axis = kwargs.get("x_axis")
-    y_axis_metric = kwargs.get("y_axis_metric")
+    yaxis_metric = kwargs.get("yaxis_metric")
 
-    value = "perc" if chart_type == "percentage_time" else y_axis_metric
+    value = "perc" if chart_type == "percentage" else yaxis_metric
     y_label = kwargs.get("chart_ylabel") or (
-        f"Percentage of {y_axis_metric}"
-        if chart_type == "percentage_time"
-        else y_axis_metric
+        f"Percentage of {yaxis_metric}" if chart_type == "percentage" else yaxis_metric
     )
 
     os.makedirs(kwargs["out_dir"], exist_ok=True)
@@ -172,9 +170,9 @@ def make_stacked_line_chart(**kwargs):
 
     filename = os.path.join(kwargs["out_dir"], kwargs["chart_file_name"])
     logger.info(f"Saving figure data points to {filename}.csv")
-    tdf.to_csv(filename+".csv")
+    tdf.to_csv(filename + ".csv")
     logger.info(f"Saving figure to {filename}.png")
-    plt.savefig(filename+".png")
+    plt.savefig(filename + ".png")
 
 
 # ----------------
@@ -211,7 +209,7 @@ def prepare_data(**kwargs):
         tk = tk.query(query)
 
     # Remove singular roots if inclusive metric
-    metric = kwargs["y_axis_metric"]
+    metric = kwargs["yaxis_metric"]
     if metric in tk.inc_metrics and len(tk.graph.roots) == 1:
         root_name = tk.graph.roots[0].frame["name"]
         logger.info(
@@ -230,14 +228,14 @@ def prepare_data(**kwargs):
 
     # What we are varying for each scaling type
     x_axis_metadata = (
-        kwargs.get("x_axis_unique_metadata")
+        kwargs.get("xaxis_parameter")
         or {
             "strong": ["n_resources", "n_nodes"],
             "weak": ["n_resources", "n_nodes", "total_problem_size"],
             "throughput": "total_problem_size",
         }[scaling]
     )
-    kwargs["x_axis_unique_metadata"] = x_axis_metadata
+    kwargs["xaxis_parameter"] = x_axis_metadata
 
     # Group by varied parameters
     grouped = tk.groupby(x_axis_metadata)
@@ -284,7 +282,7 @@ def prepare_data(**kwargs):
         f.write(clean_tree)
     logger.info(f"Saving Input Calltree to {tree_file}")
 
-    if kwargs.get("group_nodes_name"):
+    if kwargs.get("group_regions_name"):
         ctk.dataframe = ctk.dataframe.groupby("name").sum()
 
     for key in grouped.keys():
@@ -292,20 +290,23 @@ def prepare_data(**kwargs):
             ctk.dataframe[(key, metric)] / ctk.dataframe[(key, metric)].sum()
         ) * 100
 
-    prefix = kwargs.get("filter_nodes_name_prefix", "")
+    prefix = kwargs.get("filter_regions_name_prefix", "")
     if prefix:
         ctk.dataframe = ctk.dataframe.filter(like=prefix, axis=0)
 
     top_n = kwargs.get("top_n_functions", -1)
     if top_n != -1:
-        temp_df = ctk.dataframe.nlargest(
-            top_n, [(list(grouped.keys())[0], metric)]
-        )
+        temp_df = ctk.dataframe.nlargest(top_n, [(list(grouped.keys())[0], metric)])
         temp_df.loc["Sum(removed_regions)"] = 0
         for p in ctk.profile:
-            temp_df.loc["Sum(removed_regions)", (p[1], metric)] = (ctk.dataframe.loc[:, (p[1], metric)].sum() - temp_df.loc[:, (p[1], metric)].sum()).iloc[0]
+            temp_df.loc["Sum(removed_regions)", (p[1], metric)] = (
+                ctk.dataframe.loc[:, (p[1], metric)].sum()
+                - temp_df.loc[:, (p[1], metric)].sum()
+            ).iloc[0]
         ctk.dataframe = temp_df
-        logger.info(f"Filtered top {top_n} nodes for chart display. Added the sum of the regions that were removed as single region.")
+        logger.info(
+            f"Filtered top {top_n} regions for chart display. Added the sum of the regions that were removed as single region."
+        )
 
     if not kwargs.get("chart_xlabel"):
         kwargs["chart_xlabel"] = x_axis_metadata
@@ -337,64 +338,63 @@ def setup_parser(root_parser):
     )
     root_parser.add_argument(
         "--chart-type",
-        default="time",
-        choices=["percentage_time", "time"],
+        default="raw",
+        choices=["raw", "percentage"],
         type=str,
-        help="Specify type of output chart.",
+        help="Specify processing on the metric. 'raw' does nothing, 'percentage' shows the magnitude of metric relative to the regions.",
     )
     root_parser.add_argument(
-        "--x_axis-unique-metadata",
+        "--xaxis-parameter",
         default=None,
         type=str,
-        help="Parameter that is varied during the experiment.",
+        nargs="+",
+        help="One or more parameters from the metadata that are varied during the experiment (values will become the x-axis).",
+        metavar="PARAM",
     )
     root_parser.add_argument(
-        "--y-axis-metric",
+        "--yaxis-metric",
         default="Avg time/rank (exc)",
         type=str,
-        help="Metric to be visualized.",
+        help="Performance metric to be visualized on the y-axis.",
     )
     root_parser.add_argument(
-        "--filter-nodes-name-prefix",
+        "--filter-regions-name-prefix",
         default="",
         type=str,
-        help="Optional: Filters only entries with prefix to be included in chart.",
-    )
-    root_parser.add_argument(
-        "--group-nodes-name",
-        default=True,
-        type=bool,
-        help="Optional: Specify if nodes with the same name are combined or not.",
+        help="Filter for region names starting with PREFIX to be included in the chart.",
+        metavar="PREFIX",
     )
     root_parser.add_argument(
         "--top-n-functions",
         default=-1,
         type=int,
-        help="Optional: Filters only top n longest time entries to be included in chart.",
+        help="Filters only top N largest metric entries to be included in chart.",
+        metavar="N",
+    )
+    root_parser.add_argument(
+        "--group-regions-name",
+        action="store_true",
+        help="Whether to combine regions (sum of metric) with the same name.",
+    )
+    root_parser.add_argument(
+        "--no-mpi", action="store_true", help="Hide MPI regions in the tree."
     )
     root_parser.add_argument(
         "--chart-title",
         default=None,
         type=str,
-        help="Optional: Title of the output chart.",
+        help="Title of the output chart.",
     )
-    root_parser.add_argument(
-        "--chart-xlabel", type=str, help="Optional: X Label of chart."
-    )
-    root_parser.add_argument(
-        "--chart-ylabel", type=str, help="Optional: Y Label of chart."
-    )
+    root_parser.add_argument("--chart-xlabel", type=str, help="X Label of chart.")
+    root_parser.add_argument("--chart-ylabel", type=str, help="Y Label of chart.")
     root_parser.add_argument(
         "--chart-figsize",
         nargs="+",
         type=int,
-        help="Optional: Size of the output chart (xdim, ydim). Ex: --chart-figsize 12 6",
+        help="Size of the output chart (xdim, ydim). Ex: --chart-figsize 12 6",
     )
     root_parser.add_argument(
-        "--chart-fontsize", type=int, help="Optional: Font size of the output chart."
-    )
-    root_parser.add_argument(
-        "--no-mpi", action="store_true", help="Hide MPI regions in the tree."
+        "--chart-fontsize", type=int, help="Font size of the output chart."
     )
 
 
