@@ -74,6 +74,10 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         when="@3.1 ^mfem@4.4:",
     )
 
+    def setup_build_environment(self, env):
+        if "+cuda" in self.spec:
+            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
+
     @property
     def build_targets(self):
         targets = []
