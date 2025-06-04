@@ -223,6 +223,7 @@ class Experiment(ExperimentSystemBase, Affinity):
             raise BenchparkError(f"No workload variant defined for package {self.name}")
 
         self.package_specs = {}
+        self.add_scalar_variable("device_type", self.device_type)
 
     @property
     def spack_name(self):
