@@ -60,7 +60,7 @@ def parse_hwloc_tree_full_metadata(obj, path="topology", results=None, counters=
 
 def clean_keys(d):
     if isinstance(d, dict):
-        return {k.lstrip("@_"): clean_keys(v) for k, v in d.items()}
+        return {k.lstrip("@"): clean_keys(v) for k, v in d.items()}
 
     elif isinstance(d, list):
         return [clean_keys(i) for i in d]
@@ -69,31 +69,39 @@ def clean_keys(d):
         return d
 
 
-def parse_lstopo_summary(hwloc_xml_file_path, hwloc_json_file_path):
+def parse_lstopo_summary(hwloc_xml_file_path, hwloc_output_json_file_path):
     try:
         with open(hwloc_xml_file_path, "r") as xml_file:
             lines = xml_file.readlines()
 
         print("lines length", len(lines))
-        # Filter lines that appear to be XML tags or declarations
+        # 1) Filter lines that appear to be XML tags or declarations, because sometimes lstopo prints warnings/errors
         xml_like_lines = [line for line in lines if re.match(r"\s*<[^>]+>", line)]
 
         if not xml_like_lines:
             raise ValueError("No valid XML lines found in the file.")
 
         xml_content = "".join(xml_like_lines)
-
-        # Attempt to parse the cleaned XML string
         data_dict = xmltodict.parse(xml_content)
 
+        # 2) Traverse, flatten, and clean the generated json
         parsed_pairs = parse_hwloc_tree_full_metadata(data_dict["topology"]["object"])
         flat_dict = {path: metadata for path, metadata in parsed_pairs}
         cleaned_flat_dict = {
             path: clean_keys(metadata) for path, metadata in flat_dict.items()
         }
 
-        with open(hwloc_json_file_path, "w") as f:
-            json.dump(cleaned_flat_dict, f, indent=2)
+        # 3) Make resource name and its count as the key, and add its path as attribute
+        shortened_dict = {}
+        for full_path, metadata in cleaned_flat_dict.items():
+            *prefix, final_key = full_path.split("/")
+            metadata_with_path = dict(metadata)
+            metadata_with_path["path"] = "/".join(prefix)
+            shortened_dict[final_key] = metadata_with_path
+
+        # 4) Persist the json
+        with open(hwloc_output_json_file_path, "w") as f:
+            json.dump(shortened_dict, f, indent=2)
 
     except Exception as e:
         raise ValueError(f"Failed to convert Hwloc XML to JSON: {e}")
