@@ -194,7 +194,7 @@ Capturing underlying topology with Hwloc modifier
 -----------------------------
 Hwloc is a modifier that enables capturing the underlying infrastructure and topology used for running the experiment. It's independent from the running experiment.
 
-- ``hwloc.on`` : Enable the hwloc modifier 
+- ``hwloc=on`` : Enable the hwloc modifier 
 - Disabled by default [default value: ``hwloc=none``]
 
 To use the Hwloc modifier:
