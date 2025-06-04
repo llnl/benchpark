@@ -18,7 +18,7 @@ lib_path = benchpark_root / "lib" / "benchpark"
 test_path = lib_path / "test"
 
 try:
-    benchpark_home = os.environ["BENCHPARK_HOME"]
+    benchpark_home = pathlib.Path(os.environ["BENCHPARK_HOME"])
 except KeyError:
     benchpark_home = pathlib.Path(os.path.expanduser("~/.benchpark"))
 
