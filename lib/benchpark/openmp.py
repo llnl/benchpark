@@ -4,12 +4,18 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.directives import variant
+from benchpark.directives import requires, variant
 from benchpark.experiment import ExperimentHelper
 
 
 class OpenMPExperiment:
+    requires("openmp")
     variant("openmp", default=False, description="Build and run with OpenMP")
+
+    def __init__(self):
+        super().__init__()
+        if self.spec.variants["openmp"][0]:
+            self.device_type = "cpu"
 
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):

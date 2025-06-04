@@ -52,6 +52,28 @@ class Laghos(
 
         return None
 
+    def register_required_variables(self):
+        self.required_vars.extend(["nprocs", "process_problem_size", "total_problem_size"])
+
+    def compute_applications_section(self):
+        # "zones" defined from mesh file, we are hardcoding it here
+        problem_sizes = {"zones": 1024}
+
+        for nk, nv in problem_sizes.items():
+            self.add_scalar_variable(nk, nv, True)
+
+        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+            device = "n_gpus"
+            n_devices_per_node = "{sys_gpus_per_node}"
+        else:
+            device = "n_ranks"
+            n_devices_per_node = "{sys_cores_per_node}"
+            self.add_experiment_variable("n_threads_per_proc", 1)
+
+        self.add_scalar_variable("n_resources", f"{{device}}")
+        self.add_scalar_variable("process_problem_size", "{zones} / {n_resources}")
+        self.add_scalar_variable("total_problem_size", "{zones}")
+
     def initialize_experiment_variables(self):
         # The total number of resources for this experiment is calculated as:
         # n_devices = n_devices_per_node * device_scaling_factor
@@ -66,25 +88,6 @@ class Laghos(
 
     def setup_default_experiment(self):
         pass
-
-    def compute_applications_section(self):
-        if self.spec.satisfies("+cuda"):
-            self.add_scalar_variable(
-                "n_gpus", "{sys_gpus_per_node} * {device_scaling_factor}", True
-            )
-            self.add_scalar_variable("device", "cuda", named=True)
-        elif self.spec.satisfies("+rocm"):
-            self.add_scalar_variable(
-                "n_gpus", "{sys_gpus_per_node} * {device_scaling_factor}", True
-            )
-            self.add_scalar_variable("device", "hip", named=True)
-        else:
-            device = "n_ranks"
-            n_devices_per_node = "{sys_cores_per_node}"
-            self.add_scalar_variable(
-                "n_ranks", "{sys_cores_per_node} * {device_scaling_factor}", True
-            )
-            self.add_scalar_variable("n_threads_per_proc", 1)
 
     def compute_package_section(self):
         # get package version

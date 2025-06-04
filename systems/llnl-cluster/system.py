@@ -6,6 +6,7 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.system import System
+from benchpark.openmpsystem import OpenMPSystem
 from benchpark.paths import hardware_descriptions
 
 
@@ -44,12 +45,13 @@ class LlnlCluster(System):
     variant(
         "compiler",
         default="gcc",
-        values=("gcc", "intel"),
+        values=("gcc", "intel", "oneapi"),
         description="Which compiler to use",
     )
 
     def __init__(self, spec):
         super().__init__(spec)
+        self.programming_models = [OpenMPSystem()]
 
         self.scheduler = "slurm"
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
@@ -57,7 +59,6 @@ class LlnlCluster(System):
             setattr(self, k, v)
 
     def compute_packages_section(self):
-
         selections = {
             "packages": {
                 "elfutils": {
@@ -77,20 +78,6 @@ class LlnlCluster(System):
                     "externals": [{"spec": "unwind@8.0.1", "prefix": "/usr"}],
                     "buildable": False,
                 },
-                "tar": {
-                    "buildable": False,
-                    "externals": [{"spec": "tar@1.30", "prefix": "/usr"}],
-                },
-                "cmake": {
-                    "buildable": False,
-                    "externals": [
-                        {
-                            "spec": "cmake@3.26.3",
-                            "prefix": "/usr/tce/packages/cmake/cmake-3.26.3",
-                        }
-                    ],
-                },
-                "gmake": {"externals": [{"spec": "gmake@4.2.1", "prefix": "/usr"}]},
                 "blas": {
                     "buildable": False,
                     "externals": [
@@ -109,19 +96,6 @@ class LlnlCluster(System):
                         }
                     ],
                 },
-                "python": {
-                    "buildable": False,
-                    "externals": [
-                        {
-                            "spec": "python@3.9.12",
-                            "prefix": "/usr/tce/packages/python/python-3.9.12/",
-                        }
-                    ],
-                },
-                "hwloc": {
-                    "buildable": False,
-                    "externals": [{"spec": "hwloc@2.9.1", "prefix": "/usr"}],
-                },
                 "fftw": {
                     "buildable": False,
                     "externals": [
@@ -130,6 +104,54 @@ class LlnlCluster(System):
                             "prefix": "/usr/tce/packages/fftw/fftw-3.3.10",
                         }
                     ],
+                },
+                "diffutils": {
+                    "externals": [{"spec": "diffutils@3.6", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "cmake": {
+                    "externals": [
+                        {"spec": "cmake@3.26.5", "prefix": "/usr"},
+                        {"spec": "cmake@3.23.1", "prefix": "/usr/tce"},
+                    ],
+                    "buildable": False,
+                },
+                "tar": {
+                    "externals": [{"spec": "tar@1.30", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "autoconf": {
+                    "externals": [{"spec": "autoconf@2.69", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "python": {
+                    "externals": [
+                        {
+                            "spec": "python@2.7.18+bz2+crypt+ctypes+dbm~lzma+pyexpat~pythoncmd+readline+sqlite3+ssl~tkinter+uuid+zlib",
+                            "prefix": "/usr",
+                        },
+                        {
+                            "spec": "python@3.6.8+bz2+crypt+ctypes+dbm+lzma+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
+                            "prefix": "/usr",
+                        },
+                        {
+                            "spec": "python@2.7.18+bz2+crypt+ctypes+dbm~lzma+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
+                            "prefix": "/usr/tce",
+                        },
+                        {
+                            "spec": "python@3.9.12+bz2+crypt+ctypes+dbm+lzma+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
+                            "prefix": "/usr/tce",
+                        },
+                    ],
+                    "buildable": False,
+                },
+                "hwloc": {
+                    "externals": [{"spec": "hwloc@2.11.2", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "gmake": {
+                    "externals": [{"spec": "gmake@4.2.1", "prefix": "/usr"}],
+                    "buildable": False,
                 },
             }
         }
@@ -170,8 +192,36 @@ class LlnlCluster(System):
                     }
                 }
             }
+        elif self.spec.satisfies("compiler=oneapi"):
+            selections |= {
+                "packages": selections["packages"]
+                | {
+                    "mpi": {
+                        "buildable": False,
+                        "externals": [
+                            {
+                                "spec": "mvapich2@2.3.7-intel202210",
+                                "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2022.1.0",
+                                "extra_attributes": {
+                                    "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2022.1.0/lib -lmpi"
+                                },
+                            }
+                        ],
+                    }
+                }
+            }
+
+        selections["packages"] |= self.compiler_weighting_cfg()["packages"]
 
         return selections
+
+    def compiler_weighting_cfg(self):
+        compiler = self.spec.variants["compiler"][0]
+
+        if compiler == "oneapi":
+            return {"packages": {"all": {"require": [{"one_of": ["%oneapi", "%gcc"]}]}}}
+        else:
+            return {"packages": {}}
 
     def compute_compilers_section(self):
         selections = {}
@@ -217,6 +267,45 @@ class LlnlCluster(System):
                             "extra_rpaths": [],
                         }
                     }
+                ]
+            }
+        elif self.spec.satisfies("compiler=oneapi"):
+            selections = {
+                "compilers": [
+                    {
+                        "compiler": {
+                            "spec": "gcc@12.1.1",
+                            "paths": {
+                                "cc": "/usr/tce/packages/gcc/gcc-12.1.1/bin/gcc",
+                                "cxx": "/usr/tce/packages/gcc/gcc-12.1.1/bin/g++",
+                                "f77": "/usr/tce/packages/gcc/gcc-12.1.1/bin/gfortran",
+                                "fc": "/usr/tce/packages/gcc/gcc-12.1.1/bin/gfortran",
+                            },
+                            "flags": {},
+                            "operating_system": "rhel8",
+                            "target": "x86_64",
+                            "modules": [],
+                            "environment": {},
+                            "extra_rpaths": [],
+                        }
+                    },
+                    {
+                        "compiler": {
+                            "spec": "oneapi@2022.1.0",
+                            "paths": {
+                                "cc": "/usr/tce/packages/intel/intel-2022.1.0/compiler/2022.1.0/linux/bin/icx",
+                                "cxx": "/usr/tce/packages/intel/intel-2022.1.0/compiler/2022.1.0/linux/bin/icpx",
+                                "f77": "/usr/tce/packages/intel/intel-2022.1.0/compiler/2022.1.0/linux/bin/ifx",
+                                "fc": "/usr/tce/packages/intel/intel-2022.1.0/compiler/2022.1.0/linux/bin/ifx",
+                            },
+                            "flags": {},
+                            "operating_system": "rhel8",
+                            "target": "x86_64",
+                            "modules": [],
+                            "environment": {},
+                            "extra_rpaths": [],
+                        }
+                    },
                 ]
             }
 

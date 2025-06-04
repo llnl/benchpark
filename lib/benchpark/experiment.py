@@ -95,8 +95,66 @@ def requires_method(method_name):
         return wrapper
     return decorator
 
+class Affinity:
+    variant(
+        "affinity",
+        default="none",
+        values=(
+            "none",
+            "on",
+        ),
+        multi=False,
+        description="Build and run the affinity package",
+    )
 
-class Experiment(ExperimentSystemBase):
+    class Helper(ExperimentHelper):
+        def compute_modifiers_section(self):
+            modifier_list = []
+            if not self.spec.satisfies("affinity=none"):
+                affinity_modifier_modes = {}
+                affinity_modifier_modes["name"] = "affinity"
+                if self.spec.satisfies("+cuda"):
+                    affinity_modifier_modes["mode"] = "cuda"
+                elif self.spec.satisfies("+rocm"):
+                    affinity_modifier_modes["mode"] = "rocm"
+                else:
+                    affinity_modifier_modes["mode"] = "mpi"
+                modifier_list.append(affinity_modifier_modes)
+            return modifier_list
+
+        def compute_package_section(self):
+            # set package versions
+            affinity_version = "master"
+
+            # get system config options
+            # TODO: Get compiler/mpi/package handles directly from system.py
+            system_specs = {}
+            system_specs["compiler"] = "default-compiler"
+            if self.spec.satisfies("+cuda"):
+                system_specs["cuda_arch"] = "{cuda_arch}"
+            if self.spec.satisfies("+rocm"):
+                system_specs["rocm_arch"] = "{rocm_arch}"
+
+            # set package spack specs
+            package_specs = {}
+
+            if not self.spec.satisfies("affinity=none"):
+                package_specs["affinity"] = {
+                    "pkg_spec": f"affinity@{affinity_version}+mpi",
+                    "compiler": system_specs["compiler"],
+                }
+                if self.spec.satisfies("+cuda"):
+                    package_specs["affinity"]["pkg_spec"] += "+cuda"
+                elif self.spec.satisfies("+rocm"):
+                    package_specs["affinity"]["pkg_spec"] += "+rocm"
+
+            return {
+                "packages": {k: v for k, v in package_specs.items() if v},
+                "environments": {"affinity": {"packages": list(package_specs.keys())}},
+            }
+
+
+class Experiment(ExperimentSystemBase, Affinity):
     """This is the superclass for all benchpark experiments.
 
     ***The Experiment class***
@@ -140,12 +198,14 @@ class Experiment(ExperimentSystemBase):
     @requires_method("setup_default_experiment")
     def __init__(self, spec):
         self.spec: "benchpark.spec.ConcreteExperimentSpec" = spec
+        # Device type must be set before super with absence of mpionly experiment type
+        self.device_type = "cpu"
         super().__init__()
         self.helpers = []
         self._spack_name = None
         self._ramble_name = None
         self._expr_vars = VariableDict()
-        self._required_vars = []
+        self._required_vars = ["device_type"]
 
         visited_helper_impls = set()
         for cls in self.__class__.mro()[1:]:

@@ -47,16 +47,18 @@ class Amg2023(
         self.add_dimensional_variable("problem_sizes", {"nx": 80, "ny": 80, "nz": 80}, named=True, scalable=True)
 
     def setup_default_experiment(self):
-        self.add_scalar_variable("nprocs", self.expr_vars.num_procs.prod)
+        self.add_scalar_variable("n_resources", self.expr_vars.num_procs.prod)
         self.add_scalar_variable("process_problem_size", self.expr_vars.problem_sizes.prod)
         self.add_scalar_variable("total_problem_size", [p*n for p, n in zip(self.expr_vars.num_procs.prod, self.expr_vars.problem_sizes.prod)])
 
     def compute_applications_section(self):
         if self.spec.satisfies("+openmp"):
-            self.add_scalar_variable("n_ranks", "{nprocs}", named=True)
-            self.add_scalar_variable("n_threads_per_proc", 1, named=True)
-        elif self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
-            self.add_scalar_variable("n_gpus", "{nprocs}", named=True)
+            self.add_scalar_variable("n_threads_per_proc", 1, True)
+
+        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+            self.add_scalar_variable("n_gpus", "{n_resources}", True)
+        else:
+            self.add_scalar_variable("n_ranks", "{n_resources}", True)
 
     def compute_package_section(self):
         # get package version

@@ -113,12 +113,18 @@ class Caliper:
                     "n_nodes": "{n_nodes}",
                     "n_ranks": "{n_ranks}",
                     "n_threads_per_proc": "{n_threads_per_proc}",
+                    "n_resources": "{n_resources}",
+                    "process_problem_size": "{process_problem_size}",
+                    "total_problem_size": "{total_problem_size}",
                 }
                 # parse the spec for more metadata
-                for variant_spec in str.split(str(self.spec.variants)):
+                for i, variant_spec in enumerate(str.split(str(self.spec.variants))):
                     values = variant_spec.split("=")
                     if len(values) == 1:
-                        metadata_dict["benchpark_spec"] = values
+                        if i == 0:
+                            metadata_dict["benchpark_spec"] = values
+                        elif values[0] == "'":
+                            pass
                     elif len(values) == 2:
                         metadata_dict[values[0]] = values[1]
                     else:
