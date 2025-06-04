@@ -148,7 +148,7 @@ class System(ExperimentSystemBase):
             "variables": self.compute_variables_section(),
             "software": self.compute_software_section(),
             "auxiliary_software_files": {
-                "compilers": self.compute_compilers_section(),
+                "compilers": {"compilers:": self.compute_compilers_section()["compilers"]},
                 "packages": self.compute_packages_section(),
             },
         }
