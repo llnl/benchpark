@@ -10,12 +10,9 @@ from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
 from benchpark.caliper import Caliper
-from benchpark.hwloc import Hwloc
 
 
-class Saxpy(
-    Experiment, OpenMPExperiment, CudaExperiment, ROCmExperiment, Caliper, Hwloc
-):
+class Saxpy(Experiment, OpenMPExperiment, CudaExperiment, ROCmExperiment, Caliper):
     variant(
         "workload",
         default="problem",
