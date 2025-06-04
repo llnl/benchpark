@@ -53,7 +53,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     depends_on("hypre+caliper", when="+caliper")
 
     requires("+cuda", when="^hypre+cuda")
-    for arch in ("none", "50", "60", "70", "80"):
+    for arch in ("none", "50", "60", "70", "80", "90"):
         depends_on(f"hypre cuda_arch={arch}", when=f"cuda_arch={arch}")
         depends_on(f"mfem cuda_arch={arch}", when=f"cuda_arch={arch}")
     depends_on("mfem +cuda+mpi", when="+cuda")
@@ -73,6 +73,10 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         sha256="e783a71c3cb36886eb539c0f7ac622883ed5caf7ccae597d545d48eaf051d15d",
         when="@3.1 ^mfem@4.4:",
     )
+
+    def setup_build_environment(self, env):
+        if "+cuda" in self.spec:
+            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
 
     @property
     def build_targets(self):

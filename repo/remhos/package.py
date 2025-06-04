@@ -53,7 +53,7 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
     depends_on("hypre+caliper", when="+caliper")
 
     requires("+cuda", when="^hypre+cuda")
-    for arch in ("none", "50", "60", "70", "80"):
+    for arch in ("none", "50", "60", "70", "80", "90"):
         depends_on(f"hypre cuda_arch={arch}", when=f"cuda_arch={arch}")
         depends_on(f"mfem cuda_arch={arch}", when=f"cuda_arch={arch}")
     depends_on("mfem +cuda+mpi", when="+cuda")
@@ -66,6 +66,10 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
         depends_on(f"mfem amdgpu_target={target}", when=f"amdgpu_target={target}")
 
     depends_on("hypre+gpu-aware-mpi", when="^cray-mpich+gtl")
+
+    def setup_build_environment(self, env):
+        if "+cuda" in self.spec:
+            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
 
     @property
     def build_targets(self):

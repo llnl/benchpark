@@ -22,6 +22,10 @@ class Mfem(BuiltinMfem):
 
     requires("+caliper", when="^hypre+caliper")
 
+    def setup_build_environment(self, env):
+        if "+cuda" in self.spec:
+            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
+
     #
     # Note: Although MFEM does support CMake configuration, MFEM
     # development team indicates that vanilla GNU Make is the
