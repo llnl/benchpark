@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+
 from benchpark.directives import variant, maintainers
 from benchpark.cudasystem import CudaSystem
 from benchpark.paths import hardware_descriptions
@@ -31,10 +32,11 @@ class LlnlMatrix(System):
         values=("12.2.2", "11.8.0"),
         description="CUDA version",
     )
+
     variant(
         "compiler",
         default="gcc",
-        values=("gcc", "intel"),
+        values=("gcc", "intel", "oneapi"),
         description="Which compiler to use",
     )
 
@@ -86,6 +88,24 @@ class LlnlMatrix(System):
                         }
                     ],
                     "buildable": False,
+                },
+                "blas": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "spec": "intel-oneapi-mkl@2023.2.0",
+                            "prefix": "/opt/intel/oneapi",
+                        }
+                    ],
+                },
+                "lapack": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "spec": "intel-oneapi-mkl@2023.2.0",
+                            "prefix": "/opt/intel/oneapi",
+                        }
+                    ],
                 },
                 "diffutils": {
                     "externals": [{"spec": "diffutils@3.6", "prefix": "/usr"}],
@@ -162,12 +182,40 @@ class LlnlMatrix(System):
                     }
                 }
             }
+        elif self.spec.satisfies("compiler=oneapi"):
+            selections |= {
+                "packages": selections["packages"]
+                | {
+                    "mpi": {
+                        "buildable": False,
+                        "externals": [
+                            {
+                                "spec": "mvapich2@2.3.7-intel202321",
+                                "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2023.2.1",
+                                "extra_attributes": {
+                                    "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2023.2.1/lib -lmpi"
+                                },
+                            }
+                        ],
+                    }
+                }
+            }
+
+        selections["packages"] |= self.compiler_weighting_cfg()["packages"]
 
         selections["packages"] |= self.cuda_config(self.spec.variants["cuda"][0])[
             "packages"
         ]
 
         return selections
+
+    def compiler_weighting_cfg(self):
+        compiler = self.spec.variants["compiler"][0]
+
+        if compiler == "oneapi":
+            return {"packages": {"all": {"require": [{"one_of": ["%oneapi", "%gcc"]}]}}}
+        else:
+            return {"packages": {}}
 
     def compute_compilers_section(self):
         selections = {}
@@ -213,6 +261,45 @@ class LlnlMatrix(System):
                             "extra_rpaths": [],
                         }
                     }
+                ]
+            }
+        elif self.spec.satisfies("compiler=oneapi"):
+            selections = {
+                "compilers": [
+                    {
+                        "compiler": {
+                            "spec": "gcc@12.1.1",
+                            "paths": {
+                                "cc": "/usr/tce/packages/gcc/gcc-12.1.1/bin/gcc",
+                                "cxx": "/usr/tce/packages/gcc/gcc-12.1.1/bin/g++",
+                                "f77": "/usr/tce/packages/gcc/gcc-12.1.1/bin/gfortran",
+                                "fc": "/usr/tce/packages/gcc/gcc-12.1.1/bin/gfortran",
+                            },
+                            "flags": {},
+                            "operating_system": "rhel8",
+                            "target": "x86_64",
+                            "modules": [],
+                            "environment": {},
+                            "extra_rpaths": [],
+                        }
+                    },
+                    {
+                        "compiler": {
+                            "spec": "oneapi@2023.2.1",
+                            "paths": {
+                                "cc": "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/bin/icx",
+                                "cxx": "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/bin/icpx",
+                                "f77": "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/bin/ifx",
+                                "fc": "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/bin/ifx",
+                            },
+                            "flags": {},
+                            "operating_system": "rhel8",
+                            "target": "x86_64",
+                            "modules": [],
+                            "environment": {},
+                            "extra_rpaths": [],
+                        }
+                    },
                 ]
             }
 
@@ -297,6 +384,8 @@ class LlnlMatrix(System):
                     "default-mpi": {"pkg_spec": "mvapich2"},
                     "compiler-gcc": {"pkg_spec": "gcc"},
                     "compiler-intel": {"pkg_spec": "intel"},
+                    "blas": {"pkg_spec": "intel-oneapi-mkl"},
+                    "lapack": {"pkg_spec": "intel-oneapi-mkl"},
                     "mpi-gcc": {"pkg_spec": "mvapich2"},
                     "mpi-intel": {"pkg_spec": "mvapich2"},
                 }
