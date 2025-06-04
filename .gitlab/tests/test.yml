@@ -48,7 +48,7 @@ workflow:
         ARCHCONFIG: llnl-cluster
         SCHEDULER_PARAMETERS: -N 1 -t 00:20:00 --exclusive --reservation=ci
         BENCHMARK: [kripke]
-        VARIANT: ['caliper=mpi,time hwloc=on affinity=on']
+        VARIANT: [' caliper=mpi,time hwloc=on affinity=on']
         DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
           llnl-cluster cluster=dane]
 limited_test_run:
