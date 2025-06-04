@@ -116,7 +116,6 @@ For example::
   
   class Amg2023(Experiment, Caliper):
 
-
 Requesting Resources with the Allocation Modifier
 ---------------------------------------------------
 Given:
@@ -190,3 +189,17 @@ If you do not specify values, it will assign the default values as listed below.
      - 0 
    * - n_threads_per_proc
      - 1 
+
+Capturing underlying topology with Hwloc modifier
+-----------------------------
+Hwloc is a modifier that enables capturing the underlying infrastructure and topology used for running the experiment. It's independent from the running experiment.
+
+- ``hwloc.on`` : Enable the hwloc modifier 
+- Disabled by default [default value: ``hwloc=none``]
+
+To use the Hwloc modifier:
+
+- When you initialize your experiment, add ``hwloc=on`` to ``experiment init``.
+- ``Caliper`` must be enabled in the experiment in order to ``hwloc`` to start.
+- The Hwloc modifier will output a flattened json file in the experiment directory which will have the topology of the underlying infrastructure the experiment ran on.
+- It will attach some metadata information that will be captured by caliper that can be analyzed later.
