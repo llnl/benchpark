@@ -669,9 +669,11 @@ class LlnlElcapitan(System):
             }
 
     def system_specific_variables(self):
-        return {
-            "extra_batch_opts": f"--setattr=gpumode={self.spec.variants['gpumode'][0]}",
-        }
+        if self.spec.variants["cluster"][0] == "elcapitan":
+            return {
+                "extra_batch_opts": f"--setattr=gpumode={self.spec.variants['gpumode'][0]}\n--conf=resource.rediscover=true",
+            }
+        return {}
 
     def compute_software_section(self):
         """This is somewhat vestigial: for the Tioga config that is committed
