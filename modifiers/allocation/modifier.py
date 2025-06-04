@@ -389,7 +389,9 @@ class Allocation(BasicModifier):
         if v.timeout:
             batch_opts.append(f"-t {v.timeout}m")
 
-        batch_directives = list(f"# flux: {x}" for x in ([batch_ranks] + cmd_opts + batch_opts))
+        batch_directives = list(
+            f"# flux: {x}" for x in ([batch_ranks] + cmd_opts + batch_opts)
+        )
 
         v.mpi_command = f"flux run {' '.join([cmd_ranks] + cmd_opts)}"
         v.batch_submit = "flux batch {execute_experiment}"
