@@ -678,10 +678,12 @@ class LlnlElcapitan(System):
             elif self.spec.satisfies("gpumode=CPX"):
                 gpu_factor = 6
 
-            opts.update({
-                "gpu_factor": gpu_factor,
-                "extra_batch_opts": f"--setattr=gpumode={self.spec.variants['gpumode'][0]}\n--conf=resource.rediscover=true",
-            })
+            opts.update(
+                {
+                    "gpu_factor": gpu_factor,
+                    "extra_batch_opts": f"--setattr=gpumode={self.spec.variants['gpumode'][0]}\n--conf=resource.rediscover=true",
+                }
+            )
         return opts
 
     def compute_software_section(self):
