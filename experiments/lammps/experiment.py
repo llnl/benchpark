@@ -27,7 +27,7 @@ class Lammps(
 
     variant(
         "version",
-        default="20231121",
+        default="20250204",
         description="app version",
     )
 
@@ -92,7 +92,7 @@ class Lammps(
                 self.add_experiment_variable(pk, pv, True)
 
         self.add_experiment_variable("timesteps", 100, False)
-        self.add_experiment_variable("input_file", "{input_path}/in.reaxc.hns", False)
+        self.add_experiment_variable("input_file", "{input_path}/in.reaxff.hns", False)
         self.add_experiment_variable(
             "lammps_flags",
             f"{input_sizes} -k on {kokkos_mode} -sf kk -pk kokkos gpu/aware {kokkos_gpu_aware} neigh half comm {kokkos_comm} neigh/qeq full newton on -nocite",
@@ -108,9 +108,14 @@ class Lammps(
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
+        fft_kokkos = (
+            "fft_kokkos=cufft"
+            if self.spec.satisfies("+cuda")
+            else "fft_kokkos=hipfft" if self.spec.satisfies("+rocm") else ""
+        )
         self.add_package_spec(
             self.name,
             [
-                f"lammps@{app_version} +mpi+opt+manybody+molecule+kspace+rigid+kokkos+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth+reaxff lammps_sizes=bigbig "
+                f"lammps@{app_version} +mpi+opt+manybody+molecule+kspace+rigid+kokkos+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth+reaxff lammps_sizes=bigbig {fft_kokkos} "
             ],
         )
