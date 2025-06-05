@@ -12,6 +12,8 @@ class Hwloc(BasicModifier):
 
     name = "hwloc"
 
+    maintainers("amroakmal")
+
     mode(
         name="on",
         description="Mode for executing hwloc command",
