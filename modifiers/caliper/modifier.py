@@ -104,8 +104,8 @@ class Caliper(BasicModifier):
             "scheduler",  # required
             "rocm_arch",
             "cuda_arch",
-            "sys_cores_os_reserved",
-            "sys_cores_os_reserved_list",
+            "sys_cores_os_reserved_per_node",
+            "sys_cores_os_reserved_per_node_list",
             "sys_gpus_per_node",
             "sys_mem_per_node",
             "system_site",
