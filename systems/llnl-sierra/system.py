@@ -19,6 +19,7 @@ class LlnlSierra(System):
             "cuda_arch": 70,
             "sys_cores_per_node": 40,
             "sys_cores_os_reserved": 4,
+            "sys_cores_os_reserved_list": [0, 1],  # First two cores on each socket reserved.
             "sys_gpus_per_node": 4,
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
