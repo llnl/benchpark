@@ -17,7 +17,8 @@ class LlnlSierra(System):
     id_to_resources = {
         "lassen": {
             "cuda_arch": 70,
-            "sys_cores_per_node": 44,
+            "sys_cores_per_node": 40,
+            "sys_cores_os_reserved": 4,
             "sys_gpus_per_node": 4,
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)

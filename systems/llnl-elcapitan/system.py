@@ -18,7 +18,8 @@ class LlnlElcapitan(System):
     id_to_resources = {
         "tioga": {
             "rocm_arch": "gfx90a",
-            "sys_cores_per_node": 64,
+            "sys_cores_per_node": 56,
+            "sys_cores_os_reserved": 8,
             "sys_gpus_per_node": 8,
             "system_site": "llnl",
             "scheduler": "flux",
@@ -27,7 +28,8 @@ class LlnlElcapitan(System):
         },
         "elcapitan": {
             "rocm_arch": "gfx942",
-            "sys_cores_per_node": 96,
+            "sys_cores_per_node": 84,
+            "sys_cores_os_reserved": 12,
             "sys_gpus_per_node": 4,
             "system_site": "llnl",
             "scheduler": "flux",
