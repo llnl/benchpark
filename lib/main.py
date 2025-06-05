@@ -211,7 +211,7 @@ def init_commands(subparsers, actions_dict):
         "list", help="List experiments, systems, benchmarks, and modifiers"
     )
     benchpark.cmd.list.setup_parser(list_parser)
-    
+
     bootstrap_parser = subparsers.add_parser(
         "bootstrap", help="Bootstrap benchpark or update an existing bootstrap"
     )
