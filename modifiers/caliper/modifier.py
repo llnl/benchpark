@@ -32,7 +32,7 @@ class Caliper(BasicModifier):
     maintainers("pearce8")
 
     # The filename for Caliper output data
-    _cali_datafile = "{experiment_run_dir}/"
+    _cali_datafile = "{experiment_run_dir}/{experiment_name}.cali"
 
     # The filename for metadata forwarded from Benchpark to Caliper
     _caliper_metadata_file = "{experiment_run_dir}/{experiment_name}_metadata.json"
