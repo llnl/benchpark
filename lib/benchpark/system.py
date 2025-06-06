@@ -4,9 +4,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import hashlib
-import importlib.util
 import os
-import sys
+import packaging.version
 import yaml
 
 import benchpark.paths
@@ -20,41 +19,6 @@ import benchpark.variant
 
 bootstrapper = RuntimeResources(benchpark.paths.benchpark_home)  # noqa
 bootstrapper.bootstrap()  # noqa
-
-import ramble.config as cfg  # noqa
-import ramble.language.language_helpers  # noqa
-import ramble.language.shared_language  # noqa
-import spack.util.spack_yaml as syaml  # noqa
-
-# We cannot import this the normal way because it from modern Spack
-# and mixing modern Spack modules with ramble modules that depend on
-# ancient Spack will cause errors. This module is safe to load as an
-# individual because it is not used by Ramble
-# The following code block implements the line
-# import spack.schema.packages as packages_schema
-schemas = {
-    "spack.schema.packages": f"{bootstrapper.spack_location}/lib/spack/spack/schema/packages.py",
-    "spack.schema.compilers": f"{bootstrapper.spack_location}/lib/spack/spack/schema/compilers.py",
-}
-
-
-def load_schema(schema_id, schema_path):
-    schema_spec = importlib.util.spec_from_file_location(schema_id, schema_path)
-    schema = importlib.util.module_from_spec(schema_spec)
-    sys.modules[schema_id] = schema
-    schema_spec.loader.exec_module(schema)
-    return schema
-
-
-packages_schema = load_schema(
-    "spack.schema.packages",
-    f"{bootstrapper.spack_location}/lib/spack/spack/schema/packages.py",
-)
-compilers_schema = load_schema(
-    "spack.schema.compilers",
-    f"{bootstrapper.spack_location}/lib/spack/spack/schema/compilers.py",
-)
-
 
 _repo_path = benchpark.repo.paths[benchpark.repo.ObjectTypes.systems]
 
@@ -79,6 +43,8 @@ class System(ExperimentSystemBase):
         self.external_resources = None
 
         self.sys_cores_per_node = None
+        self.sys_cores_os_reserved = None
+        self.sys_cores_os_reserved_list = None
         self.sys_gpus_per_node = None
         self.sys_mem_per_node = None
         self.scheduler = None
@@ -105,8 +71,33 @@ class System(ExperimentSystemBase):
     def compiler_configs(self):
         return None
 
+    @property
+    def programming_models(self):
+        return self._programming_models
+
+    @programming_models.setter
+    def programming_models(self, pm_list):
+        if not isinstance(pm_list, list):
+            raise ValueError("Value must be a list")
+        self._programming_models = pm_list
+
+    def verify(self):
+        for pm in self.programming_models:
+            pm.verify(self)
+
     def system_specific_variables(self):
-        return {}
+        vars = {}
+        for pm in self.programming_models:
+            for x, y in pm.system_specific_variables(self).items():
+                # Note: if you put an object into a yaml file there is an
+                # attempt to represent the object, whereas we want the string.
+                # We make use of the Version behavior on e.g. 'cuda_version'
+                # in some places, so cannot generally store it as a string, and
+                # instead just convert it here where it goes into yaml
+                if isinstance(y, packaging.version.Version):
+                    y = str(y)
+                vars[x] = y
+        return vars
 
     def compute_packages_section(self):
         selections = self.external_pkg_configs()
@@ -123,7 +114,13 @@ class System(ExperimentSystemBase):
                 raise ValueError(f"Missing required info: {attr}")
 
         optionals = {}
-        for opt in ["sys_gpus_per_node", "sys_mem_per_node", "queue"]:
+        for opt in [
+            "sys_cores_os_reserved",
+            "sys_cores_os_reserved_list",
+            "sys_gpus_per_node",
+            "sys_mem_per_node",
+            "queue",
+        ]:
             if getattr(self, opt, None):
                 optionals[opt] = getattr(self, opt)
 

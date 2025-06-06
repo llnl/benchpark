@@ -14,13 +14,7 @@ import sys
 import yaml
 
 import benchpark.paths
-
-DEBUG = False
-
-
-def debug_print(message):
-    if DEBUG:
-        print("(debug) " + str(message))
+from benchpark.debug import debug_print
 
 
 @contextmanager
@@ -40,21 +34,23 @@ def git_clone_commit(url, commit, destination):
         run_command(f"git checkout {commit}")
 
 
-def run_command(command_str, env=None):
+def run_command(command_str, env=None, stdout=None, stderr=None):
+    stdout = stdout or subprocess.PIPE
+    stderr = stderr or subprocess.PIPE
     proc = subprocess.Popen(
         shlex.split(command_str),
         env=env,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        stdout=stdout,
+        stderr=stderr,
         text=True,
     )
-    stdout, stderr = proc.communicate()
+    out, err = proc.communicate()
     if proc.returncode != 0:
         raise RuntimeError(
             f"Failed command: {command_str}\nOutput: {stdout}\nError: {stderr}"
         )
 
-    return (stdout, stderr)
+    return (out, err)
 
 
 class Command:
@@ -82,13 +78,22 @@ class RuntimeResources:
         self.ramble_location = self.dest / "ramble"
         self.spack_location = self.dest / "spack"
 
+    def update_old_bootstrap(self, desired_commit, location):
+        # Store first 7 of hash in checkout-versions.yaml
+        with working_dir(location):
+            current_commit = run_command("git rev-parse HEAD")[0].strip()[:7]
+            if current_commit != desired_commit:
+                run_command("git fetch --all")
+                run_command(f"git checkout {desired_commit}")
+                print(
+                    f"Updating '{location}' from {current_commit} to {desired_commit}"
+                )
+
     def bootstrap(self):
         if not self.ramble_location.exists():
             self._install_ramble()
         else:
-            with working_dir(self.ramble_location):
-                run_command("git fetch --all")
-                run_command(f"git checkout {self.ramble_commit}")
+            self.update_old_bootstrap(self.ramble_commit, self.ramble_location)
         ramble_lib_path = self.ramble_location / "lib" / "ramble"
         externals = str(ramble_lib_path / "external")
         if externals not in sys.path:
@@ -102,6 +107,8 @@ class RuntimeResources:
         # spack modules from ramble
         if not self.spack_location.exists():
             self._install_spack()
+        else:
+            self.update_old_bootstrap(self.spack_commit, self.spack_location)
 
     def _install_ramble(self):
         print(f"Cloning Ramble to {self.ramble_location}")
@@ -150,10 +157,6 @@ class RuntimeResources:
                 "add",
                 f"config:misc_cache:{spack_cache_location}",
             )
-        else:
-            with working_dir(self.spack_location):
-                run_command("git fetch --all")
-                run_command(f"git checkout {self.spack_commit}")
         return spack, first_time
 
     def spack_first_time_setup(self):

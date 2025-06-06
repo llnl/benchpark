@@ -53,7 +53,7 @@ class VariantMap(llnl.util.lang.HashableMap):
 
     def satisfies(self, other: "VariantMap") -> bool:
         if isinstance(other, ConcreteVariantMap):
-            self == other
+            return self == other
 
         return all(
             name in self and set(self[name]) >= set(other[name]) for name in other

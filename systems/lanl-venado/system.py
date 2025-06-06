@@ -5,8 +5,11 @@
 
 
 from benchpark.directives import variant, maintainers
+from benchpark.cudasystem import CudaSystem
+from benchpark.openmpsystem import OpenMPSystem
 from benchpark.system import System
 from benchpark.paths import hardware_descriptions
+from packaging.version import Version
 
 
 class LanlVenado(System):
@@ -15,9 +18,11 @@ class LanlVenado(System):
 
     id_to_resources = {
         "grace-hopper": {
+            "cuda_arch": 90,
             "sys_cores_per_node": 144,
             "sys_gpus_per_node": 4,
             "system_site": "lanl",
+            "extra_batch_opts": "-A llnl_ai_g -pgpu",
             "hardware_key": str(hardware_descriptions)
             + "/HPECray-neoverse-H100-Slingshot/hardware_description.yaml",
         },
@@ -35,56 +40,50 @@ class LanlVenado(System):
         values=("grace-hopper", "grace-grace"),
         description="Which cluster to run on",
     )
-
     variant(
         "cuda",
         default="12.5",
         values=("11.8", "12.5"),
         description="CUDA version",
     )
-
     variant(
         "compiler",
         default="cce",
         values=("gcc", "cce"),
         description="Which compiler to use",
     )
-
     variant(
         "gtl",
         default=False,
         values=(True, False),
         description="Use GTL-enabled MPI",
     )
-
     variant(
         "lapack",
-        default="cusolver",
-        values=("cusolver", "cray-libsci"),
+        default="cray-libsci",
+        values=("cray-libsci",),
         description="Which lapack to use",
     )
-
     variant(
         "blas",
-        default="cublas",
-        values=("cublas", "cray-libsci"),
+        default="cray-libsci",
+        values=("cray-libsci",),
         description="Which blas to use",
     )
 
     def __init__(self, spec):
         super().__init__(spec)
+        if self.spec.variants["cluster"][0] == "grace-hopper":
+            self.programming_models = [CudaSystem()]
+            self.cuda_version = Version(self.spec.variants["cuda"][0])
+            self.gtl_flag = self.spec.variants["gtl"][0]
+        if self.spec.variants["cluster"][0] == "grace-grace":
+            self.programming_models = [OpenMPSystem()]
 
         self.scheduler = "slurm"
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
-
-    def system_specific_variables(self):
-        return {
-            "cuda_arch": 90,
-            "default_cuda_version": self.spec.variants["cuda"][0],
-            "extra_batch_opts": "-A llnl_ai_g -pgpu",
-        }
 
     def compute_packages_section(self):
         selections = {
@@ -253,7 +252,7 @@ class LanlVenado(System):
                             "prefix": f"/opt/cray/pe/mpich/{mpi_version}/ofi/{mpi_compiler_suffix}",
                             "extra_attributes": {
                                 "gtl_lib_path": f"/opt/cray/pe/mpich/{mpi_version}/gtl/lib",
-                                "gtl_libs": ["libmpi_gtl_cuda"],
+                                "gtl_libs": "libmpi_gtl_cuda",
                                 "ldflags": f"-L/opt/cray/pe/mpich/{mpi_version}/ofi/{mpi_compiler_suffix}/lib -lmpi -L/opt/cray/pe/mpich/{mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{mpi_version}/gtl/lib -lmpi_gtl_cuda",
                             },
                         }
