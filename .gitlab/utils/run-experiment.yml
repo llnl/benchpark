@@ -8,7 +8,8 @@
       if [  "$HOST" != "lassen" ]; then
           EXTRA_ARGS="cluster=$HOST"  # llnl-sierra has no 'cluster'
       fi
-    - ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} $EXTRA_ARGS $SYSTEM_ARGS
+    - ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} $EXTRA_ARGS
+      $SYSTEM_ARGS
     # Initialize Experiment
     - ./bin/benchpark experiment init --dest=${BENCHMARK}-benchmark ${BENCHMARK}${VARIANT}
     # Build Workspace
