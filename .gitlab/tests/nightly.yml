@@ -15,18 +15,21 @@ include:
           - lammps
           - osu-micro-benchmarks
         VARIANT: [+rocm]
+        SYSTEM_ARGS: ['']
         DASHBOARD_NAME: Nightly [benchpark-develop]
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
         SCHEDULER_PARAMETERS: -N 1 -t 20m --queue=pci --exclusive
         BENCHMARK: [amg2023, kripke, laghos]
         VARIANT: [+rocm]
+        SYSTEM_ARGS: ['']
         DASHBOARD_NAME: Nightly [benchpark-develop]
       - HOST: dane
         ARCHCONFIG: llnl-cluster
         SCHEDULER_PARAMETERS: -N 1 -t 00:20:00 --exclusive --reservation=ci
         BENCHMARK: [amg2023, babelstream, kripke, lammps]
         VARIANT: [+openmp]
+        SYSTEM_ARGS: ['']
         DASHBOARD_NAME: Nightly [benchpark-develop]
       - HOST: ruby
         ARCHCONFIG: llnl-cluster
@@ -44,6 +47,7 @@ include:
           - smb
           - stream
         VARIANT: ['']  # MPI-only
+        SYSTEM_ARGS: ['']
         DASHBOARD_NAME: Nightly [benchpark-develop]
       - HOST: lassen
         ARCHCONFIG: llnl-sierra
@@ -55,6 +59,7 @@ include:
           - lammps
           - osu-micro-benchmarks
         VARIANT: [+cuda]
+        SYSTEM_ARGS: ['']
         DASHBOARD_NAME: Nightly [benchpark-develop]
 nightly_test_run:
   resource_group: $HOST
