@@ -131,7 +131,8 @@ class LlnlElcapitan(System):
         for k, v in attrs.items():
             setattr(self, k, v)
 
-        if self.spec.satisfies("rocm_arch=gfx942"):
+        # MI300A modes
+        if self.rocm_arch == "gfx942":
             if self.spec.satisfies("gpumode=SPX"):
                 self.sys_gpus_per_node = 4
             elif self.spec.satisfies("gpumode=TPX"):
@@ -692,7 +693,8 @@ class LlnlElcapitan(System):
 
     def system_specific_variables(self):
         opts = super().system_specific_variables()
-        if self.spec.variants["cluster"][0] == "elcapitan":
+        # MI300A modes
+        if self.rocm_arch == "gfx942":
             if self.spec.satisfies("gpumode=SPX"):
                 gpu_factor = 1
             elif self.spec.satisfies("gpumode=TPX"):
