@@ -35,11 +35,12 @@ class LlnlElcapitan(System):
             + "/HPECray-zen4-MI300A-Slingshot/hardware_description.yaml",
         },
     }
+    id_to_resources["tuolumne"] = id_to_resources["elcapitan"]
 
     variant(
         "cluster",
         default="tioga",
-        values=("tioga", "elcapitan"),
+        values=("tioga", "elcapitan", "tuolumne"),
         description="Which cluster to run on",
     )
     variant(
