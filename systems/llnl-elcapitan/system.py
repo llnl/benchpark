@@ -131,7 +131,7 @@ class LlnlElcapitan(System):
         for k, v in attrs.items():
             setattr(self, k, v)
 
-        if self.spec.satisfies("cluster=elcapitan"):
+        if self.spec.satisfies("rocm_arch=gfx942"):
             if self.spec.satisfies("gpumode=SPX"):
                 self.sys_gpus_per_node = 4
             elif self.spec.satisfies("gpumode=TPX"):
