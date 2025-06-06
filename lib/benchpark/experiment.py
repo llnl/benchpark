@@ -300,7 +300,7 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity):
         if self.spec.satisfies("+single_node"):
             self._validation_checks.append("{n_nodes} == 1")
 
-        add_validator(benchpark.paths.benchpark_root, self.name)
+        #add_validator(benchpark.paths.benchpark_root, self.name)
 
     @property
     def spack_name(self):
@@ -323,6 +323,11 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity):
     def set_required_variables(self, **kwargs):
         """Helper function to set required variables."""
         self.add_experiment_variable("device_type", self.device_type, False)
+        for var in kwargs.keys():
+            #if var not in self.req_vars:
+            #    raise ValueError(f"Unexpected experiment variable provided '{var}'")
+            self.add_experiment_variable(var, kwargs[var], False)
+
 
     def compute_include_section(self):
         # include the config directory
@@ -425,6 +430,8 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity):
             if helper_prefix:
                 expr_helper_list.append(helper_prefix)
         expr_name_suffix = "_".join(expr_helper_list + self.expr_name)
+
+        #self.check_required_variables()
 
         expr_setup = {
             "variants": {"package_manager": self.spec.variants["package_manager"][0]},

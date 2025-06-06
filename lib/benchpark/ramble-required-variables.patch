@@ -1,10 +1,10 @@
 diff --git a/lib/ramble/ramble/application.py b/lib/ramble/ramble/application.py
-index 215822c9..305844d6 100644
+index 3f9ab0dd..b6733bc5 100644
 --- a/lib/ramble/ramble/application.py
 +++ b/lib/ramble/ramble/application.py
-@@ -922,6 +922,15 @@ class ApplicationBase(metaclass=ApplicationMeta):
-                 self.expander.add_no_expand_var(var)
-                 mod_inst.expander.add_no_expand_var(var)
+@@ -908,6 +908,15 @@ class ApplicationBase(metaclass=ApplicationMeta):
+             if obj_variants is not None:
+                 self.object_variants.merge_multi_value_variants(obj_variants)
  
 +    def get_required_variables(self):
 +        """Get all the required variables based on the mode."""
@@ -19,10 +19,10 @@ index 215822c9..305844d6 100644
          # Validate the new modifiers variables exist
          # (note: the base ramble variables are checked earlier too)
 diff --git a/lib/ramble/ramble/experiment_set.py b/lib/ramble/ramble/experiment_set.py
-index 2315cbee..4d1f4153 100644
+index c42c39a3..3987c172 100644
 --- a/lib/ramble/ramble/experiment_set.py
 +++ b/lib/ramble/ramble/experiment_set.py
-@@ -355,6 +355,9 @@ class ExperimentSet:
+@@ -359,6 +359,9 @@ class ExperimentSet:
          )
  
          app_inst.add_expand_vars(self._workspace)
