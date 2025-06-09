@@ -5,7 +5,6 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
-from benchpark.scaling import StrongScaling
 from benchpark.caliper import Caliper
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
