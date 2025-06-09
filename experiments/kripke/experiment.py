@@ -41,7 +41,7 @@ class Kripke(
 
         # Per-process size (in zones) in each dimension
         self.add_experiment_variable(
-            "problem_sizes", {"nzx": 80, "nzy": 80, "nzz": 80}, True
+            "problem_sizes", {"nzx": 64, "nzy": 64, "nzz": 32}, True
         )
 
         self.add_experiment_variable("ngroups", 64, True)
