@@ -202,4 +202,4 @@ Further steps are needed to build the experiments ({ramble_setup}) and run them 
 
     # Generate shell script to setup and run latest experiment
     with open(run_script, "w") as f:
-        f.write(f"{ramble_setup}\n{ramble_run}\n")
+        f.write(f"{ramble_setup} && {ramble_run}\n")
