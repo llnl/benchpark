@@ -18,7 +18,9 @@ class LlnlElcapitan(System):
     id_to_resources = {
         "tioga": {
             "rocm_arch": "gfx90a",
-            "sys_cores_per_node": 64,
+            "sys_cores_per_node": 56,
+            "sys_cores_os_reserved_per_node": 8,
+            "sys_cores_os_reserved_per_node_list": [0, 8, 16, 24, 32, 40, 48, 56],
             "sys_gpus_per_node": 8,
             "system_site": "llnl",
             "scheduler": "flux",
@@ -27,7 +29,22 @@ class LlnlElcapitan(System):
         },
         "elcapitan": {
             "rocm_arch": "gfx942",
-            "sys_cores_per_node": 96,
+            "sys_cores_per_node": 84,
+            "sys_cores_os_reserved_per_node": 12,
+            "sys_cores_os_reserved_per_node_list": [
+                0,
+                8,
+                16,
+                24,
+                32,
+                40,
+                48,
+                56,
+                64,
+                72,
+                80,
+                88,
+            ],  # 3 cores reserved per socket
             "sys_gpus_per_node": 4,
             "system_site": "llnl",
             "scheduler": "flux",
@@ -35,11 +52,12 @@ class LlnlElcapitan(System):
             + "/HPECray-zen4-MI300A-Slingshot/hardware_description.yaml",
         },
     }
+    id_to_resources["tuolumne"] = id_to_resources["elcapitan"]
 
     variant(
         "cluster",
         default="tioga",
-        values=("tioga", "elcapitan"),
+        values=("tioga", "elcapitan", "tuolumne"),
         description="Which cluster to run on",
     )
     variant(
