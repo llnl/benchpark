@@ -4,11 +4,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
+from benchpark.error import BenchparkError
 from benchpark.directives import variant
 from benchpark.experiment import ExperimentHelper
-from benchpark.variables import VariableDict
 from enum import Enum
-from functools import reduce
 
 
 class ScalingMode(Enum):
@@ -103,7 +102,7 @@ def Scaling(*modes):
 
         if dim_set and len(dim_set) > 1:
             raise BenchparkError(
-                f"All scaling variables must either have the same number of dimensions, or only one dimension"
+                "All scaling variables must either have the same number of dimensions, or only one dimension"
             )
 
         start_dim = scaling_vars[0].min_dim
@@ -131,8 +130,6 @@ def Scaling(*modes):
                 f"Experiment supports scaling modes {', '.join(m.value for m in unimplemented_modes)}, but does not define a config for them"
             )
 
-        scaling_vars = []
-        scaling_funcs = []
         for var in scaling_config.keys():
             if var not in modes:
                 raise ValueError(
