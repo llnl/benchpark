@@ -34,7 +34,7 @@
         ctest -S CTestGitlab.cmake \
           -DHOST="${HOST}" \
           -DDASHBOARD_NAME="${DASHBOARD_NAME}" \
-          -DBUILD_NAME="${HOST}/${BENCHMARK}${VARIANT}" \
+          -DBUILD_NAME="${HOST}/${BENCHMARK}${VARIANT} ${SYSTEM_ARGS}" \
           -DSITE="$(hostname)" \
           -DTEST_TYPE="${TEST_TYPE}"
       else
