@@ -75,25 +75,17 @@ class ExperimentHelper:
         return self._expr_vars, self.env_vars
 
 
-def requires_experiment_variables(*attrs):
-    def decorator(method):
-        def wrapper(self, *args, **kwargs):
-            missing = [attr for attr in attrs if not hasattr(self.expr_vars, attr)]
-            if missing:
-                raise AttributeError(f"Missing required input variable(s): {', '.join(missing)}")
-            return method(self, *args, **kwargs)
-        return wrapper
-    return decorator
+class SingleNode:
+    variant(
+        "single_node",
+        default=True,
+        description="Single node execution mode",
+    )
 
+    class Helper(ExperimentHelper):
+        def get_helper_name_prefix(self):
+            return "single_node" if self.spec.satisfies("+single_node") else ""
 
-def requires_method(method_name):
-    def decorator(init_func):
-        def wrapper(self, *args, **kwargs):
-            if not hasattr(self, method_name) or not callable(getattr(self, method_name)):
-                raise TypeError(f"Class {self.__class__.__name__} must define a '{method_name}' method.")
-            return init_func(self, *args, **kwargs)
-        return wrapper
-    return decorator
 
 class Affinity:
     variant(
@@ -154,7 +146,7 @@ class Affinity:
             }
 
 
-class Experiment(ExperimentSystemBase, Affinity):
+class Experiment(ExperimentSystemBase, SingleNode, Affinity):
     """This is the superclass for all benchpark experiments.
 
     ***The Experiment class***
@@ -195,7 +187,6 @@ class Experiment(ExperimentSystemBase, Affinity):
         description="Append to environment PATH during experiment execution",
     )
 
-    @requires_method("setup_default_experiment")
     def __init__(self, spec):
         self.spec: "benchpark.spec.ConcreteExperimentSpec" = spec
         # Device type must be set before super with absence of mpionly experiment type
@@ -205,13 +196,16 @@ class Experiment(ExperimentSystemBase, Affinity):
         self._spack_name = None
         self._ramble_name = None
         self._expr_vars = VariableDict()
-        self._required_vars = ["device_type"]
+        self.req_vars = [
+            "n_resources",
+            "process_problem_size",
+            "total_problem_size",
+            "device_type",
+        ]
 
-        visited_helper_impls = set()
         for cls in self.__class__.mro()[1:]:
             if cls is not Experiment and cls is not object:
-                if hasattr(cls, "Helper") and cls.Helper not in visited_helper_impls:
-                    visited_helper_impls.add(cls.Helper)
+                if hasattr(cls, "Helper"):
                     helper_instance = cls.Helper(self)
                     self.helpers.append(helper_instance)
 
@@ -223,7 +217,6 @@ class Experiment(ExperimentSystemBase, Affinity):
             raise BenchparkError(f"No workload variant defined for package {self.name}")
 
         self.package_specs = {}
-        self.add_scalar_variable("device_type", self.device_type)
 
     @property
     def spack_name(self):
@@ -248,10 +241,21 @@ class Experiment(ExperimentSystemBase, Affinity):
         """Dictionary of experiment variables"""
         return self._expr_vars
 
-    @property
-    def required_vars(self):
-        """Dictionary of experiment variables"""
-        return self._required_vars
+    def set_required_variables(self, **kwargs):
+        """Helper function to set required variables."""
+        self.add_experiment_variable("device_type", self.device_type, False)
+        for var in kwargs.keys():
+            if var not in self.req_vars:
+                raise ValueError(f"Unexpected experiment variable provided '{var}'")
+            self.add_experiment_variable(var, kwargs[var], False)
+
+    def check_required_variables(self):
+        """Raises error if any of the self.req_vars variables are not set in derived classes."""
+        unset_vars = [v for v in self.req_vars if v not in self.variables.keys()]
+        if len(unset_vars) > 0:
+            raise NotImplementedError(
+                f"The following experiment variables must be set with 'self.add_experiment_variable': {', '.join([v for v in unset_vars])}."
+            )
 
     def compute_include_section(self):
         # include the config directory
@@ -283,11 +287,11 @@ class Experiment(ExperimentSystemBase, Affinity):
     def add_experiment_name_prefix(self, prefix):
         self.expr_var_names = [prefix] + self.expr_var_names
 
-    def add_dimensional_variable(self, name, values, named=False, scalable=False):
-        self.expr_vars.add_dimensional_variable(name, values, named, scalable)
-
-    def add_scalar_variable(self, name, values, named=False, scalable=False):
-        self.expr_vars.add_scalar_variable(name, values, named, scalable)
+    def add_experiment_variable(self, name, values, named=False):
+        if isinstance(values, dict):
+            self.expr_vars.add_dimensional_variable(name, values, named)
+        else:
+            self.expr_vars.add_scalar_variable(name, values, named)
 
     def set_environment_variable(self, name, values):
         """Set value of environment variable"""
@@ -317,11 +321,6 @@ class Experiment(ExperimentSystemBase, Affinity):
     def add_experiment_exclude(self, exclude_clause):
         self.excludes.append(exclude_clause)
 
-    def initialize_experiment_variables(self):
-        raise NotImplementedError(
-            "Each experiment must implement initialize_experiment_variables"
-        )
-
     def compute_applications_section(self):
         raise NotImplementedError(
             "Each experiment must implement compute_applications_section"
@@ -344,20 +343,10 @@ class Experiment(ExperimentSystemBase, Affinity):
             self.env_vars["set"] |= env_vars["set"]
             self.env_vars["append"][0] |= env_vars["append"][0]
 
-        self.initialize_experiment_variables()
-
-        visited_required_variables_setters = set()
-        for cls in self.__class__.mro():
-            if hasattr(cls, "register_required_variables") and cls.register_required_variables not in visited_required_variables_setters:
-                visited_required_variables_setters.add(cls.register_required_variables)
-                cls.register_required_variables(self)
+        self.compute_applications_section()
 
         if "scaling" in self.spec.variants and not self.spec.satisfies("scaling=off"):
             self.expr_vars.extend(self.scale())
-        else:
-            self.setup_default_experiment()
-
-        self.compute_applications_section()
 
         for var in self.expr_vars.values():
             for dim in var.dims():
@@ -368,19 +357,14 @@ class Experiment(ExperimentSystemBase, Affinity):
                 else:
                     self.variables[dim] = var[dim]
 
-        missing_vars = []
-        for var in self.required_vars:
-            if var not in self.variables:
-                missing_vars.append(var)
-        if missing_vars:
-            raise AttributeError(f"Missing required experiment variable(s): {', '.join(missing_vars)}")
-
         expr_helper_list = []
         for cls in self.helpers:
             helper_prefix = cls.get_helper_name_prefix()
             if helper_prefix:
                 expr_helper_list.append(helper_prefix)
         expr_name_suffix = "_".join(expr_helper_list + self.expr_var_names)
+
+        self.check_required_variables()
 
         expr_setup = {
             "variants": {"package_manager": self.spec.variants["package_manager"][0]},

@@ -17,18 +17,12 @@ class VariableDict:
         raise AttributeError(f"'DictWrapper' object has no attribute '{name}'")
 
     # values must be a dict of type str->type or str->list(type)
-    def add_dimensional_variable(self, name, values, named=False, scalable=False):
-        if scalable:
-            self._vars[name] = ScaledVariable(values, named)
-        else:
-            self._vars[name] = Variable(values, named)
+    def add_dimensional_variable(self, name, values, named=False):
+        self._vars[name] = Variable(values, named)
 
     # values must be a non-dict type or list(type)
-    def add_scalar_variable(self, name, values, named=False, scalable=False):
-        if scalable:
-            self._vars[name] = ScaledVariable({name:values}, named)
-        else:
-            self._vars[name] = Variable({name:values}, named)
+    def add_scalar_variable(self, name, values, named=False):
+        self._vars[name] = Variable({name:values}, named)
 
     def extend(self, vardict):
         if not vardict:
@@ -68,7 +62,7 @@ class Variable:
 
         for k, v in var.items():
             if not isinstance(k, str):
-                raise TypeError(f"Labels of a scaling variable must be strings")
+                raise TypeError(f"Labels of a variable must be strings")
 
         values = list(var.values())
         has_list = any(isinstance(v, list) for v in values)
@@ -138,25 +132,13 @@ class Variable:
     def ndims(self):
         return self._ndims
 
+    def val(self, key):
+        return self[key][-1]
 
-class ScaledVariable(Variable):
-    def __init__(self, var, named=False):
-        if not isinstance(var, dict):
-            raise TypeError("scaling variable must be a dictionary")
-
-        for k, v in var.items():
-            if not isinstance(v, (int, float)) and not (isinstance(v, list) and all(isinstance(x, (int, float)) for x in v)):
-                raise TypeError(f"Values of a scaling variable must be a numeric type")
-
-        super().__init__(var, named)
-
-    # appends an entry for each dimension by applying a scaling function
-    # to the specified index of that dimension
-    # scales the last index of each dimension if no index is specified
-    def scale_dim(self, dim, func, idx=-1):
-        key = self._dims[dim]
+    def scale_dim(self, itr, dim, scaling_func, sf):
+        key = self._dims[0] if self.ndims == 1 else self._dims[dim]
         for k in self._dims:
             if k == key:
-                self._var[k].append(func(self._var[k][idx]))
+                self._var[k].append(scaling_func(self, itr, k, sf))
             else:
-                self._var[k].append(self._var[k][idx])
+                self._var[k].append(self.val(k))

@@ -9,7 +9,7 @@ from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
-from benchpark.new_scaling import ScalingMode, UsesPerProcessDomains
+from benchpark.new_scaling import ScalingMode, Scaling
 from benchpark.caliper import Caliper
 
 
@@ -18,7 +18,7 @@ class Amg2023(
     OpenMPExperiment,
     CudaExperiment,
     ROCmExperiment,
-    UsesPerProcessDomains(
+    Scaling(
         ScalingMode.Strong,
         ScalingMode.Weak,
         ScalingMode.Throughput),
@@ -39,26 +39,43 @@ class Amg2023(
 
     maintainers("pearce8")
 
-    def initialize_experiment_variables(self):
+    def compute_applications_section(self):
         # Number of processes in each dimension
-        self.add_dimensional_variable("num_procs", {"px": 2, "py": 2, "pz": 2}, named=True, scalable=True)
+        self.add_experiment_variable("num_procs", {"px": 2, "py": 2, "pz": 2}, True)
 
         # Per-process size (in zones) in each dimension
-        self.add_dimensional_variable("problem_sizes", {"nx": 80, "ny": 80, "nz": 80}, named=True, scalable=True)
+        self.add_experiment_variable("problem_sizes", {"nx": 80, "ny": 80, "nz": 80}, True)
 
-    def setup_default_experiment(self):
-        self.add_scalar_variable("n_resources", self.expr_vars.num_procs.prod)
-        self.add_scalar_variable("process_problem_size", self.expr_vars.problem_sizes.prod)
-        self.add_scalar_variable("total_problem_size", [p*n for p, n in zip(self.expr_vars.num_procs.prod, self.expr_vars.problem_sizes.prod)])
+        # Register the scaling variables and their respective scaling functions 
+        # required to correctly scale the experiment for the given scaliing policy
+        self.register_scaling_config({
+            ScalingMode.Strong: {
+                "num_procs": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+                "problem_sizes": lambda var, itr, dim, scaling_factor: var.val(dim) // scaling_factor,
+            },
+            ScalingMode.Weak: {
+                "num_procs": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+                "problem_sizes": lambda var, itr, dim, scaling_factor: var.val(dim),
+            },
+            ScalingMode.Throughput: {
+                "num_procs": lambda var, itr, dim, scaling_factor: var.val(dim),
+                "problem_sizes": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+            }
+        })
 
-    def compute_applications_section(self):
+        # Set the variables required by the experiment
+        self.set_required_variables(
+            n_resources="{px}*{py}*{pz}",
+            process_problem_size="{nx}*{ny}*{nz}",
+            total_problem_size="{nx}*{ny}*{nz}*{px}*{py}*{pz}",
+        )
+
         if self.spec.satisfies("+openmp"):
-            self.add_scalar_variable("n_threads_per_proc", 1, True)
-
+            self.add_experiment_variable("n_threads_per_proc", 1, True)
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
-            self.add_scalar_variable("n_gpus", "{n_resources}", True)
+            self.add_experiment_variable("n_gpus", "{n_resources}", True)
         else:
-            self.add_scalar_variable("n_ranks", "{n_resources}", True)
+            self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
     def compute_package_section(self):
         # get package version

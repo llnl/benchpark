@@ -9,7 +9,7 @@ from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
-from benchpark.new_scaling import ScalingMode, UsesGlobalDomains
+from benchpark.new_scaling import ScalingMode, Scaling
 from benchpark.caliper import Caliper
 
 
@@ -18,16 +18,16 @@ class Kripke(
     OpenMPExperiment,
     CudaExperiment,
     ROCmExperiment,
-    UsesGlobalDomains(
+    Scaling(
         ScalingMode.Strong,
         ScalingMode.Weak,
-        ScalingMode.Throughput
-    ),
+        ScalingMode.Throughput),
     Caliper,
 ):
     variant(
         "workload",
         default="kripke",
+        values=("kripke",),
         description="problem1 or problem2",
     )
 
@@ -39,39 +39,56 @@ class Kripke(
 
     maintainers("pearce8")
 
-    def initialize_experiment_variables(self):
+    def compute_applications_section(self):
         # Number of processes in each dimension
-        self.add_dimensional_variable("num_procs", {"npx": 2, "npy": 2, "npz": 2}, named=True, scalable=True)
+        self.add_experiment_variable("num_procs", {"npx": 2, "npy": 2, "npz": 2}, True)
 
         # Per-process size (in zones) in each dimension
-        self.add_dimensional_variable("problem_sizes", {"nzx": 80, "nzy": 80, "nzz": 80}, named=True, scalable=True)
+        self.add_experiment_variable("problem_sizes", {"nzx": 80, "nzy": 80, "nzz": 80}, True)
 
-        self.add_scalar_variable("ngroups", 64, named=True)
-        self.add_scalar_variable("gs", 1, named=True)
-        self.add_scalar_variable("nquad", 128, named=True)
-        self.add_scalar_variable("ds", 128, named=True)
-        self.add_scalar_variable("lorder", 4, named=True)
+        self.add_experiment_variable("ngroups", 64, True)
+        self.add_experiment_variable("gs", 1, True)
+        self.add_experiment_variable("nquad", 128, True)
+        self.add_experiment_variable("ds", 128, True)
+        self.add_experiment_variable("lorder", 4, True)
 
-    def setup_default_experiment(self):
-        self.add_scalar_variable("n_resources", self.expr_vars.num_procs.prod)
-        self.add_scalar_variable("process_problem_size", self.expr_vars.problem_sizes.prod)
-        self.add_scalar_variable("total_problem_size", [p*n for p, n in zip(self.expr_vars.num_procs.prod, self.expr_vars.problem_sizes.prod)])
+        # Register the scaling variables and their respective scaling functions 
+        # required to correctly scale the experiment for the given scaliing policy
+        self.register_scaling_config({
+            ScalingMode.Strong: {
+                "num_procs": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+                "problem_sizes": lambda var, itr, dim, scaling_factor: var.val(dim),
+            },
+            ScalingMode.Weak: {
+                "num_procs": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+                "problem_sizes": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+            },
+            ScalingMode.Throughput: {
+                "num_procs": lambda var, itr, dim, scaling_factor: var.val(dim),
+                "problem_sizes": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+            }
+        })
 
-    def compute_applications_section(self):
+        # Set the variables required by the experiment
+        self.set_required_variables(
+            n_resources="{npx}*{npy}*{npz}",
+            process_problem_size="{nzx}*{nzy}*{nzz}/({npx}*{npy}*{npz})",
+            total_problem_size="{nzx}*{nzy}*{nzz}",
+        )
+
         if self.spec.satisfies("+openmp"):
-            self.add_scalar_variable("n_ranks", "{n_resources}", named=True)
-            self.add_scalar_variable("n_threads_per_proc", 1, named=True)
-        elif self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
-            self.add_scalar_variable("n_gpus", "{n_resources}", named=True)
-        else:
-            self.add_scalar_variable("n_ranks", "{n_resources}", True)
-
-        if self.spec.satisfies("+openmp"):
-            self.add_scalar_variable("arch", "OpenMP")
+            self.add_experiment_variable("arch", "OpenMP")
         elif self.spec.satisfies("+cuda"):
-            self.add_scalar_variable("arch", "CUDA")
+            self.add_experiment_variable("arch", "CUDA")
         elif self.spec.satisfies("+rocm"):
-            self.add_scalar_variable("arch", "HIP")
+            self.add_experiment_variable("arch", "HIP")
+
+        if self.spec.satisfies("+openmp"):
+            self.add_experiment_variable("n_threads_per_proc", 1, True)
+        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+            self.add_experiment_variable("n_gpus", "{n_resources}", True)
+        else:
+            self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
     def compute_package_section(self):
         # get package version
