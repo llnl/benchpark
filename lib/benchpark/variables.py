@@ -80,9 +80,9 @@ class Variable:
                 raise ValueError("All lists must have the same length")
 
         if has_list:
-            self._var = {k: v for k,v in var.items()}
+            self._var = {k: v for k, v in var.items()}
         else:
-            self._var = {k: [v] for k,v in var.items()}
+            self._var = {k: [v] for k, v in var.items()}
 
         self._dims = list(self._var.keys())
         self._ndims = len(self._var)

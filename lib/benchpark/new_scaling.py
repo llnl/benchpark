@@ -57,7 +57,7 @@ def Scaling(*modes):
                     ),
                 )
             )
- 
+
         if mode == ScalingMode.Weak:
             scaling_calls.append(
                 (
