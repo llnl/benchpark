@@ -34,7 +34,7 @@ class Stream(
         self.add_experiment_variable("n", "35", False)
         self.add_experiment_variable("o", "0", False)
         self.add_experiment_variable("n_ranks", 1, True)
-        self.add_experiment_variable("n_threads_per_proc", [16, 32], True)
+        self.add_experiment_variable("n_threads_per_proc", [16, 32], True, True)
 
         self.matrix_experiment_variables("n_threads_per_proc")
 

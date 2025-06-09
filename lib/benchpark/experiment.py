@@ -287,11 +287,11 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity):
     def add_experiment_name_prefix(self, prefix):
         self.expr_var_names = [prefix] + self.expr_var_names
 
-    def add_experiment_variable(self, name, values, named=False):
+    def add_experiment_variable(self, name, values, named=False, matrixed=False):
         if isinstance(values, dict):
-            self.expr_vars.add_dimensional_variable(name, values, named)
+            self.expr_vars.add_dimensional_variable(name, values, named, matrixed)
         else:
-            self.expr_vars.add_scalar_variable(name, values, named)
+            self.expr_vars.add_scalar_variable(name, values, named, matrixed)
 
     def set_environment_variable(self, name, values):
         """Set value of environment variable"""
@@ -352,7 +352,7 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity):
             for dim in var.dims():
                 if var.is_named:
                     self.expr_var_names.append(f"{{{dim}}}")
-                if len(var[dim]) == 1:
+                if len(var[dim]) == 1 and not var.is_matrixed:
                     self.variables[dim] = var[dim][0]
                 else:
                     self.variables[dim] = var[dim]

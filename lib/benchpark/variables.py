@@ -17,12 +17,12 @@ class VariableDict:
         raise AttributeError(f"'DictWrapper' object has no attribute '{name}'")
 
     # values must be a dict of type str->type or str->list(type)
-    def add_dimensional_variable(self, name, values, named=False):
-        self._vars[name] = Variable(values, named)
+    def add_dimensional_variable(self, name, values, named=False, matrixed=False):
+        self._vars[name] = Variable(values, named, matrixed)
 
     # values must be a non-dict type or list(type)
-    def add_scalar_variable(self, name, values, named=False):
-        self._vars[name] = Variable({name: values}, named)
+    def add_scalar_variable(self, name, values, named=False, matrixed=False):
+        self._vars[name] = Variable({name: values}, named, matrixed)
 
     def extend(self, vardict):
         if not vardict:
@@ -56,7 +56,7 @@ class VariableDict:
 
 
 class Variable:
-    def __init__(self, var, named=False):
+    def __init__(self, var, named=False, matrixed=False):
         if not isinstance(var, dict):
             raise TypeError(
                 "Input argument to a variable constructor must be a dictionary"
@@ -87,6 +87,7 @@ class Variable:
         self._dims = list(self._var.keys())
         self._ndims = len(self._var)
         self._named = named
+        self._matrixed = matrixed
 
     def __getitem__(self, key):
         return self._var[key]
@@ -119,6 +120,10 @@ class Variable:
     @property
     def is_named(self):
         return self._named
+
+    @property
+    def is_matrixed(self):
+        return self._matrixed
 
     @property
     def prod(self):
