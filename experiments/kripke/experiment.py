@@ -18,10 +18,7 @@ class Kripke(
     OpenMPExperiment,
     CudaExperiment,
     ROCmExperiment,
-    Scaling(
-        ScalingMode.Strong,
-        ScalingMode.Weak,
-        ScalingMode.Throughput),
+    Scaling(ScalingMode.Strong, ScalingMode.Weak, ScalingMode.Throughput),
     Caliper,
 ):
     variant(
@@ -44,7 +41,9 @@ class Kripke(
         self.add_experiment_variable("num_procs", {"npx": 2, "npy": 2, "npz": 2}, True)
 
         # Per-process size (in zones) in each dimension
-        self.add_experiment_variable("problem_sizes", {"nzx": 80, "nzy": 80, "nzz": 80}, True)
+        self.add_experiment_variable(
+            "problem_sizes", {"nzx": 80, "nzy": 80, "nzz": 80}, True
+        )
 
         self.add_experiment_variable("ngroups", 64, True)
         self.add_experiment_variable("gs", 1, True)
@@ -52,22 +51,28 @@ class Kripke(
         self.add_experiment_variable("ds", 128, True)
         self.add_experiment_variable("lorder", 4, True)
 
-        # Register the scaling variables and their respective scaling functions 
+        # Register the scaling variables and their respective scaling functions
         # required to correctly scale the experiment for the given scaliing policy
-        self.register_scaling_config({
-            ScalingMode.Strong: {
-                "num_procs": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
-                "problem_sizes": lambda var, itr, dim, scaling_factor: var.val(dim),
-            },
-            ScalingMode.Weak: {
-                "num_procs": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
-                "problem_sizes": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
-            },
-            ScalingMode.Throughput: {
-                "num_procs": lambda var, itr, dim, scaling_factor: var.val(dim),
-                "problem_sizes": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+        self.register_scaling_config(
+            {
+                ScalingMode.Strong: {
+                    "num_procs": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "problem_sizes": lambda var, itr, dim, scaling_factor: var.val(dim),
+                },
+                ScalingMode.Weak: {
+                    "num_procs": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "problem_sizes": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                },
+                ScalingMode.Throughput: {
+                    "num_procs": lambda var, itr, dim, scaling_factor: var.val(dim),
+                    "problem_sizes": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                },
             }
-        })
+        )
 
         # Set the variables required by the experiment
         self.set_required_variables(

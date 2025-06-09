@@ -49,22 +49,34 @@ def Scaling(*modes):
 
     for mode in modes:
         if mode == ScalingMode.Strong:
-            scaling_calls.append((
-                lambda self: self.spec.satisfies("scaling=strong"),
-                lambda self: self.scale_params(self.scaling_config[ScalingMode.Strong]),
-            ))
+            scaling_calls.append(
+                (
+                    lambda self: self.spec.satisfies("scaling=strong"),
+                    lambda self: self.scale_params(
+                        self.scaling_config[ScalingMode.Strong]
+                    ),
+                )
+            )
  
         if mode == ScalingMode.Weak:
-            scaling_calls.append((
-                lambda self: self.spec.satisfies("scaling=weak"),
-                lambda self: self.scale_params(self.scaling_config[ScalingMode.Weak]),
-            ))
+            scaling_calls.append(
+                (
+                    lambda self: self.spec.satisfies("scaling=weak"),
+                    lambda self: self.scale_params(
+                        self.scaling_config[ScalingMode.Weak]
+                    ),
+                )
+            )
 
         if mode == ScalingMode.Throughput:
-            scaling_calls.append((
-                lambda self: self.spec.satisfies("scaling=throughput"),
-                lambda self: self.scale_params(self.scaling_config[ScalingMode.Throughput]),
-            ))
+            scaling_calls.append(
+                (
+                    lambda self: self.spec.satisfies("scaling=throughput"),
+                    lambda self: self.scale_params(
+                        self.scaling_config[ScalingMode.Throughput]
+                    ),
+                )
+            )
 
     def scale(self):
         for check, action in scaling_calls:
@@ -77,7 +89,7 @@ def Scaling(*modes):
     def scale_params(self, scaling_config):
         """
         scaling_config is a dictionary of the form variable -> scaling_func
-        This method scales the problem by applying scaling_function to each variable in scaling_config 
+        This method scales the problem by applying scaling_function to each variable in scaling_config
         Starting with the smallest value dimension for the first variable in scaling_config,
         the scaling proceeds in a round-robin manner for the specified number of iterations
         """
@@ -96,14 +108,16 @@ def Scaling(*modes):
 
         start_dim = scaling_vars[0].min_dim
         ndims = dim_set.pop() if dim_set else 1
- 
+
         num_exprs = int(self.spec.variants["scaling-iterations"][0]) - 1
         scaling_factor = int(self.spec.variants["scaling-factor"][0])
 
         for itr in range(num_exprs):
             dim = (start_dim + itr) % ndims
             for var_name, scaling_func in scaling_config.items():
-                getattr(self.expr_vars, var_name).scale_dim(itr, dim, scaling_func, scaling_factor)
+                getattr(self.expr_vars, var_name).scale_dim(
+                    itr, dim, scaling_func, scaling_factor
+                )
 
     BaseScaling.scale_params = scale_params
 
@@ -113,13 +127,17 @@ def Scaling(*modes):
             if mode not in scaling_config.keys():
                 unimplemented_modes.append(mode)
         if unimplemented_modes:
-            raise ValueError(f"Experiment supports scaling modes {', '.join(m.value for m in unimplemented_modes)}, but does not define a config for them")
+            raise ValueError(
+                f"Experiment supports scaling modes {', '.join(m.value for m in unimplemented_modes)}, but does not define a config for them"
+            )
 
         scaling_vars = []
         scaling_funcs = []
         for var in scaling_config.keys():
             if var not in modes:
-                raise ValueError(f"Unsupported scaling config '{var}', this experiment only supports {', '.join(m.value for m in modes)}")
+                raise ValueError(
+                    f"Unsupported scaling config '{var}', this experiment only supports {', '.join(m.value for m in modes)}"
+                )
         self.scaling_config = scaling_config
 
     BaseScaling.register_scaling_config = register_scaling_config

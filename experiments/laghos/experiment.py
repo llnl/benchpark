@@ -15,9 +15,7 @@ class Laghos(
     Experiment,
     CudaExperiment,
     ROCmExperiment,
-    Scaling(
-        ScalingMode.Strong,
-    ),
+    Scaling(ScalingMode.Strong),
     Caliper,
 ):
 
@@ -50,13 +48,16 @@ class Laghos(
         # n_devices = n_gpus
         self.add_experiment_variable("scaling_factor", 1, False)
 
-        # Register the scaling variables and their respective scaling functions 
+        # Register the scaling variables and their respective scaling functions
         # required to correctly scale the experiment for the given scaliing policy
-        self.register_scaling_config({
-            ScalingMode.Strong: {
-                "scaling_factor": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
-            },
-        })
+        self.register_scaling_config(
+            {
+                ScalingMode.Strong: {
+                    "scaling_factor": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                },
+            }
+        )
 
         if self.spec.satisfies("+cuda"):
             self.add_experiment_variable("device", "cuda", True)
@@ -78,9 +79,9 @@ class Laghos(
         )
 
         self.set_required_variables(
-            n_resources = f"{{{device}}}",
-            process_problem_size = "{zones} / {n_resources}",
-            total_problem_size = "{zones}",
+            n_resources=f"{{{device}}}",
+            process_problem_size="{zones} / {n_resources}",
+            total_problem_size="{zones}",
         )
 
     def compute_package_section(self):
