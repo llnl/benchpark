@@ -28,7 +28,7 @@ include:
         BENCHMARK: [amg2023, babelstream, kripke, lammps]
         VARIANT: [+openmp]
         DASHBOARD_NAME: Nightly [benchpark-develop]
-      - HOST: ruby
+      - HOST: dane
         ARCHCONFIG: llnl-cluster
         SCHEDULER_PARAMETERS: -N 1 -t 00:30:00 --exclusive --reservation=ci
         BENCHMARK:
