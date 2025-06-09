@@ -9,8 +9,6 @@ from benchpark.experiment import ExperimentHelper
 from benchpark.variables import VariableDict
 from enum import Enum
 from functools import reduce
-import warnings
-from benchpark.warning import BenchparkWarning
 
 
 class ScalingMode(Enum):
