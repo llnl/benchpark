@@ -181,14 +181,8 @@ export SPACK_DISABLE_LOCAL_CONFIG=1
         with open(initializer_script, "w") as f:
             f.write(
                 f"""\
-if [ -n "${{_BENCHPARK_INITIALIZED:-}}" ]; then
-    return 0
-fi
-
 {pkg_str}
 . {per_workspace_setup.ramble_location}/share/ramble/setup-env.sh
-
-export _BENCHPARK_INITIALIZED=true
 """
             )
 
