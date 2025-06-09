@@ -37,7 +37,7 @@ class Kripke(
 
     def compute_applications_section(self):
         # Number of processes in each dimension
-        self.add_experiment_variable("num_procs", {"npx": 2, "npy": 2, "npz": 2}, True)
+        self.add_experiment_variable("num_procs", {"npx": 2, "npy": 2, "npz": 1}, True)
 
         # Per-process size (in zones) in each dimension
         self.add_experiment_variable(
