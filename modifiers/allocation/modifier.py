@@ -36,6 +36,7 @@ class AllocOpt(Enum):
     EXTRA_CMD_OPTS = 301
     POST_EXEC_CMDS = 302
     PRE_EXEC_CMDS = 303
+    GPU_FACTOR = 304
 
     @staticmethod
     def as_type(enumval, input):
@@ -372,7 +373,12 @@ class Allocation(BasicModifier):
         batch_opts, cmd_opts = Allocation._init_batch_and_cmd_opts(v)
 
         if v.n_ranks:
-            cmd_opts.append(f"-n {v.n_ranks}")
+            cmd_ranks = f"-n {v.n_ranks}"
+            if v.gpu_factor:
+                req = int(math.ceil(v.n_ranks / v.gpu_factor))
+                batch_ranks = f"-n {req}"
+            else:
+                batch_ranks = cmd_ranks
         if v.n_nodes:
             cmd_opts.append(f"-N {v.n_nodes}")
             cmd_opts.append("--exclusive")
@@ -383,9 +389,11 @@ class Allocation(BasicModifier):
         if v.timeout:
             batch_opts.append(f"-t {v.timeout}m")
 
-        batch_directives = list(f"# flux: {x}" for x in (cmd_opts + batch_opts))
+        batch_directives = list(
+            f"# flux: {x}" for x in ([batch_ranks] + cmd_opts + batch_opts)
+        )
 
-        v.mpi_command = f"flux run {' '.join(cmd_opts)}"
+        v.mpi_command = f"flux run {' '.join([cmd_ranks] + cmd_opts)}"
         v.batch_submit = "flux batch {execute_experiment}"
         v.allocation_directives = "\n".join(batch_directives)
 
