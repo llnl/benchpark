@@ -64,7 +64,7 @@ class Variable:
 
         for k, v in var.items():
             if not isinstance(k, str):
-                raise TypeError(f"Labels of a variable must be strings")
+                raise TypeError("Labels of a variable must be strings")
 
         values = list(var.values())
         has_list = any(isinstance(v, list) for v in values)
