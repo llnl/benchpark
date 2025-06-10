@@ -8,6 +8,8 @@
       else
           ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} cluster=$HOST
       fi
+    - ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} $EXTRA_ARGS
+      $SYSTEM_ARGS
     # Initialize Experiment
     - ./bin/benchpark experiment init --dest=${BENCHMARK}-benchmark ${BENCHMARK}${VARIANT}
     # Build Workspace

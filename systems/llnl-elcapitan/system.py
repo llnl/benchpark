@@ -45,7 +45,7 @@ class LlnlElcapitan(System):
                 80,
                 88,
             ],  # 3 cores reserved per socket
-            "sys_gpus_per_node": 4,
+            "sys_gpus_per_node": None,  # Determined by "gpumode" variant
             "system_site": "llnl",
             "scheduler": "flux",
             "hardware_key": str(hardware_descriptions)
@@ -59,6 +59,12 @@ class LlnlElcapitan(System):
         default="tioga",
         values=("tioga", "elcapitan", "tuolumne"),
         description="Which cluster to run on",
+    )
+    variant(
+        "gpumode",
+        default="SPX",
+        values=("SPX", "TPX", "CPX"),
+        description="compute partitioning modes for MI300A",
     )
     variant(
         "rocm",
@@ -124,6 +130,17 @@ class LlnlElcapitan(System):
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
+
+        # MI300A modes
+        if self.rocm_arch == "gfx942":
+            if self.spec.satisfies("gpumode=SPX"):
+                self.sys_gpus_per_node = 4
+            elif self.spec.satisfies("gpumode=TPX"):
+                self.sys_gpus_per_node = 12
+            elif self.spec.satisfies("gpumode=CPX"):
+                self.sys_gpus_per_node = 24
+            else:
+                raise ValueError(f"Invalid gpumode in spec: {self.spec}")
 
     def compute_packages_section(self):
         selections = {
@@ -214,7 +231,7 @@ class LlnlElcapitan(System):
                     "buildable": False,
                     "externals": [{"spec": "unzip@6.0", "prefix": "/usr"}],
                 },
-                "hypre": {"variants": "amdgpu_target=gfx90a"},
+                "hypre": {"variants": f"amdgpu_target={self.rocm_arch}"},
                 "hwloc": {
                     "externals": [
                         {"spec": "hwloc@2.9.1", "prefix": "/usr", "buildable": False}
@@ -673,6 +690,25 @@ class LlnlElcapitan(System):
                     }
                 ]
             }
+
+    def system_specific_variables(self):
+        opts = super().system_specific_variables()
+        # MI300A modes
+        if self.rocm_arch == "gfx942":
+            if self.spec.satisfies("gpumode=SPX"):
+                gpu_factor = 1
+            elif self.spec.satisfies("gpumode=TPX"):
+                gpu_factor = 3
+            elif self.spec.satisfies("gpumode=CPX"):
+                gpu_factor = 6
+
+            opts.update(
+                {
+                    "gpu_factor": gpu_factor,
+                    "extra_batch_opts": f"--setattr=gpumode={self.spec.variants['gpumode'][0]}\n--conf=resource.rediscover=true",
+                }
+            )
+        return opts
 
     def compute_software_section(self):
         """This is somewhat vestigial: for the Tioga config that is committed
