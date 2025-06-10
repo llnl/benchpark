@@ -40,7 +40,7 @@ if "-h" == sys.argv[1] or "--help" == sys.argv[1]:
     exit()
 
 import benchpark.paths  # noqa: E402
-from benchpark.runtime import RuntimeResources
+from benchpark.runtime import RuntimeResources  # noqa: E402
 
 bootstrapper = RuntimeResources(benchpark.paths.benchpark_home)  # noqa
 bootstrapper.bootstrap()  # noqa
