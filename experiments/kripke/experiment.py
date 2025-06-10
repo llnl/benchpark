@@ -86,6 +86,8 @@ class Kripke(
             self.add_experiment_variable("arch", "CUDA")
         elif self.spec.satisfies("+rocm"):
             self.add_experiment_variable("arch", "HIP")
+        else:
+            self.add_experiment_variable("arch", "Sequential")
 
         if self.spec.satisfies("+openmp"):
             self.add_experiment_variable("n_threads_per_proc", 1, True)
