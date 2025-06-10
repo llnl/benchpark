@@ -39,6 +39,12 @@ if "-h" == sys.argv[1] or "--help" == sys.argv[1]:
     print(helpstr)
     exit()
 
+import benchpark.paths  # noqa: E402
+from benchpark.runtime import RuntimeResources
+
+bootstrapper = RuntimeResources(benchpark.paths.benchpark_home)  # noqa
+bootstrapper.bootstrap()  # noqa
+
 import benchpark.cmd.audit  # noqa: E402
 import benchpark.cmd.system  # noqa: E402
 import benchpark.cmd.experiment  # noqa: E402
@@ -48,7 +54,6 @@ import benchpark.cmd.unit_test  # noqa: E402
 import benchpark.cmd.mirror  # noqa: E402
 import benchpark.cmd.info  # noqa: E402
 import benchpark.cmd.list  # noqa: E402
-import benchpark.paths  # noqa: E402
 from benchpark.accounting import benchpark_benchmarks  # noqa: E402
 
 try:

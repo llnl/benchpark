@@ -15,7 +15,6 @@ import ruamel.yaml as yaml
 import benchpark.paths
 from benchpark.debug import debug_print
 from benchpark.runtime import RuntimeResources
-import benchpark.system
 
 
 # Note: it would be nice to vendor spack.llnl.util.link_tree, but that
