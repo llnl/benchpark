@@ -14,7 +14,7 @@ class VariableDict:
     def __getattr__(self, name):
         if name in self._vars:
             return self._vars[name]
-        raise AttributeError(f"'DictWrapper' object has no attribute '{name}'")
+        raise AttributeError(f"'{__class__.__name__}' object has no attribute '{name}'")
 
     # values must be a dict of type str->type or str->list(type)
     def add_dimensional_variable(self, name, values, named=False, matrixed=False):
