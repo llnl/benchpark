@@ -40,22 +40,6 @@ def symlink_tree(src, dst, include_fn=None):
             os.symlink(src_file, dst_symlink)
 
 
-def setup_parser(root_parser):
-    root_parser.add_argument(
-        "experiment",
-        type=str,
-        help="The experiment (benchmark/ProgrammingModel) to run",
-    )
-    root_parser.add_argument(
-        "system", type=str, help="The system on which to run the experiment"
-    )
-    root_parser.add_argument(
-        "experiments_root",
-        type=str,
-        help="Where to install packages and store results for the experiments. Benchpark expects to manage this directory, and it should be empty/nonexistent the first time you run benchpark setup experiments.",
-    )
-
-
 def command(args):
     """
     experiments_root/
