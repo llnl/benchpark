@@ -95,14 +95,32 @@ class Caliper(BasicModifier):
 
     def _build_metadata(self, workspace, app_inst):
         """Write the caliper metadata to json"""
+
+        cali_metadata = {}
+
+        # system metadata
+        system_metadata = [
+            "sys_cores_per_node",  # required
+            "scheduler",  # required
+            "rocm_arch",
+            "cuda_arch",
+            "sys_cores_os_reserved_per_node",
+            "sys_cores_os_reserved_per_node_list",
+            "sys_gpus_per_node",
+            "sys_mem_per_node",
+            "system_site",
+        ]
+        for key in system_metadata:
+            # Certain keys not required or may not be present
+            if key in app_inst.variables.keys():
+                cali_metadata[key] = app_inst.variables[key]
+
         # Load the Caliper metadata variable from ramble.yaml
         experiment_metadata = app_inst.expander.expand_var_name(
             "caliper_metadata", typed=True, merge_used_stage=False
         )
         app_inst.expander.flush_used_variable_stage()
-
         # rebuild dictionary with expanded variables
-        cali_metadata = {}
         for key, val in experiment_metadata.items():
             cali_metadata[key] = app_inst.expander.expand_var(val)
 

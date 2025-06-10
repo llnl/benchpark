@@ -17,6 +17,8 @@ class LlnlCluster(System):
     id_to_resources = {
         "ruby": {
             "sys_cores_per_node": 56,
+            "sys_cores_os_reserved_per_node": 0,  # No core or thread reservation
+            "sys_cores_os_reserved_per_node_list": None,
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/Supermicro-icelake-OmniPath/hardware_description.yaml",
@@ -29,6 +31,8 @@ class LlnlCluster(System):
         },
         "dane": {
             "sys_cores_per_node": 112,
+            "sys_cores_os_reserved_per_node": 0,  # No explicit core reservation, first thread on each core reserved (2 threads per core)
+            "sys_cores_os_reserved_per_node_list": None,
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/DELL-sapphirerapids-OmniPath/hardware_description.yaml",
@@ -44,8 +48,8 @@ class LlnlCluster(System):
 
     variant(
         "compiler",
-        default="gcc",
-        values=("gcc", "intel", "oneapi"),
+        default="oneapi",
+        values=("oneapi", "gcc", "intel"),
         description="Which compiler to use",
     )
 
