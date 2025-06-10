@@ -153,6 +153,9 @@ def make_stacked_line_chart(**kwargs):
         figsize=kwargs["chart_figsize"] if kwargs["chart_figsize"] else (12, 7),
         ax=ax,
     )
+    y_axis_limits = kwargs.get("chart_yaxis_limits")
+    if y_axis_limits is not None:
+        ax.set_ylim(y_axis_limits[0], y_axis_limits[1])
 
     handles, labels = ax.get_legend_handles_labels()
     handles = list(reversed(handles))
@@ -428,6 +431,14 @@ def setup_parser(root_parser):
     )
     root_parser.add_argument(
         "--chart-fontsize", type=int, help="Font size of the output chart."
+    )
+    root_parser.add_argument(
+        "--chart-yaxis-limits",
+        type=float,
+        nargs=2,
+        metavar=('YMIN', 'YMAX'),
+        default=None,
+        help="Set both y-axis limits: --chart-yaxis-limits YMIN YMAX"
     )
 
 
