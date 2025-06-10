@@ -80,12 +80,18 @@ class RuntimeResources:
         # Read remote urls for ramble and spack
         with open(benchpark.paths.remote_urls, "r") as yaml_file:
             data = yaml.safe_load(yaml_file)
-            self.ramble_url = data["urls"]["ramble"]
-            self.spack_url = data["urls"]["spack"]
+            remote_ramble_url = data["urls"]["ramble"]
+            remote_spack_url = data["urls"]["spack"]
 
         # If instance does not have an upstream, it is the upstream
         if self.upstream is None:
+            self.ramble_url = remote_ramble_url
+            self.spack_url = remote_spack_url
             self.bootstrap()
+        else:
+            # Clone from local "upstream" repository
+            self.ramble_url = self.upstream.ramble_location
+            self.spack_url = self.upstream.spack_location
 
     def _check_and_update_bootstrap(self, desired_commit, location):
         with working_dir(location):
@@ -122,11 +128,7 @@ class RuntimeResources:
     def _install_ramble(self):
         print(f"Cloning Ramble to {self.ramble_location}")
         git_clone_commit(
-            (
-                self.ramble_url
-                if self.upstream is None
-                else self.upstream.ramble_location  # Clone from local "upstream" repository
-            ),
+            self.ramble_url,
             self.ramble_commit,
             self.ramble_location,
         )
@@ -135,11 +137,7 @@ class RuntimeResources:
     def _install_spack(self):
         print(f"Cloning Spack to {self.spack_location}")
         git_clone_commit(
-            (
-                self.spack_url
-                if self.upstream is None
-                else self.upstream.spack_location  # Clone from local "upstream" repository
-            ),
+            self.spack_url,
             self.spack_commit,
             self.spack_location,
         )
