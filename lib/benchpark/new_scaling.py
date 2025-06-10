@@ -120,6 +120,52 @@ def Scaling(*modes):
 
     BaseScaling.scale_params = scale_params
 
+    # The register_scaling_policy method defines the scaled variables and their
+    # scaling function for each scaling mode supported in the experiment
+    # The input to register_scaling_policy is a dictionary of the form
+    # ScalingMode -> { scaled_var: scaling_function }
+    # An entry is required for each ScalingMode supported in the experiment
+    # For a multi-dimensional variable of the form:
+    # num_procs -> { "px": 2, "py": 2, "pz": 1 }, the value of scaled_var is "num_procs"
+    # For a scalar variable, the value of scaled_var is the name of the variable
+    # Each scaled_var specified in register_scaling_policy must be added to the
+    # list of experiment variables using add_experiment_variable
+    #
+    # The scaling function has the following form
+    # def scaling_function(var, itr, dim, scaling_factor):
+    #    return ...
+    # The arguments for the scaling_function are:
+    # var: benchpark.Variable instance of the scaled variable
+    # itr: The current iteration in the specified number of scaling iterations
+    # dim: The current dimension that is being scaled
+    # scaling_factor: The factor by which the variable dimension must be scaled
+    # The scaling_function must return the new scaled value for the variable dimension
+    #
+    # scaling starts from the dimension with the minimum value for the first variable
+    # in the list of variables and proceeds through the dimensions in a round-robin
+    # manner for the spcified number of scaling iterations
+    # e.g. if the scaling config is defined as: 
+    # ScalingMode.Strong: {
+    #     "np": lambda var, itr, dim, sf: var.val(dim) * sf,
+    #     "sizes": lambda var, itr, dim, sf: var.val(dim) * sf,
+    # }, and the starting values of the variables are
+    # "np" : { "px": 2,
+    #          "py": 2,
+    #          "pz": 1 } and, 
+    # "probs" : { "nx": 16,
+    #             "ny": 32,
+    #             "nz": 32 },
+    # then after 4 scaling iterations (3 scalings), the 
+    # final values of the scaled variables will be
+    # "np" : { "px": [2,2,4,4]
+    #          "py": [2,2,2,4]
+    #          "pz": [1,2,2,2] } and, 
+    # "probs" : { "nx": [16,16,32,32]
+    #             "ny": [32,32,32,64]
+    #             "nz": [32,64,64,64] },
+    # Note that scaling starts with the minimum value dimension (pz) of the
+    # first variable (np) and proceeds in a round-robin manner
+
     def register_scaling_config(self, scaling_config):
         unimplemented_modes = []
         for mode in modes:
