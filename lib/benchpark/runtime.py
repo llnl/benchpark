@@ -46,7 +46,7 @@ def run_command(command_str, env=None, stdout=None, stderr=None):
     out, err = proc.communicate()
     if proc.returncode != 0:
         raise RuntimeError(
-            f"Failed command: {command_str}\nOutput: {stdout}\nError: {stderr}"
+            f"Failed command: {command_str}\nOutput: {out}\nError: {err}"
         )
 
     return (out, err)
