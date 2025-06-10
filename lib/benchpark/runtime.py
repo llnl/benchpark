@@ -86,7 +86,6 @@ class RuntimeResources:
         # If this does not have an upstream, then we will be cloning from the URLs indicated in remote-urls.yaml
         if self.upstream is None:
             self.ramble_url, self.spack_url = remote_ramble_url, remote_spack_url
-            self.bootstrap()
         else:
             # Clone from local "upstream" repository
             self.ramble_url, self.spack_url = (

@@ -17,7 +17,8 @@ from typing import Dict, Tuple
 import benchpark.spec
 import benchpark.variant
 
-RuntimeResources(benchpark.paths.benchpark_home)
+bootstrapper = RuntimeResources(benchpark.paths.benchpark_home)  # noqa
+bootstrapper.bootstrap()  # noqa
 
 _repo_path = benchpark.repo.paths[benchpark.repo.ObjectTypes.systems]
 
