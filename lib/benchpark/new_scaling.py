@@ -143,23 +143,23 @@ def Scaling(*modes):
     #
     # scaling starts from the dimension with the minimum value for the first variable
     # in the list of variables and proceeds through the dimensions in a round-robin
-    # manner for the spcified number of scaling iterations
-    # e.g. if the scaling config is defined as: 
+    # manner for the specified number of scaling iterations
+    # e.g. if the scaling config is defined as:
     # ScalingMode.Strong: {
     #     "np": lambda var, itr, dim, sf: var.val(dim) * sf,
     #     "sizes": lambda var, itr, dim, sf: var.val(dim) * sf,
     # }, and the starting values of the variables are
     # "np" : { "px": 2,
     #          "py": 2,
-    #          "pz": 1 } and, 
+    #          "pz": 1 } and,
     # "probs" : { "nx": 16,
     #             "ny": 32,
     #             "nz": 32 },
-    # then after 4 scaling iterations (3 scalings), the 
+    # then after 4 scaling iterations (3 scalings), the
     # final values of the scaled variables will be
     # "np" : { "px": [2,2,4,4]
     #          "py": [2,2,2,4]
-    #          "pz": [1,2,2,2] } and, 
+    #          "pz": [1,2,2,2] } and,
     # "probs" : { "nx": [16,16,32,32]
     #             "ny": [32,32,32,64]
     #             "nz": [32,64,64,64] },
