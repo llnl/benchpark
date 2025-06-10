@@ -68,30 +68,31 @@ class RuntimeResources:
         self.dest = pathlib.Path(dest)
         self.upstream = upstream
 
-        self.ramble_location = self.dest / "ramble"
-        self.spack_location = self.dest / "spack"
+        self.ramble_location, self.spack_location = (
+            self.dest / "ramble",
+            self.dest / "spack",
+        )
 
         # Read pinned versions of ramble and spack
         with open(benchpark.paths.checkout_versions, "r") as yaml_file:
-            data = yaml.safe_load(yaml_file)
-            self.ramble_commit = data["versions"]["ramble"]
-            self.spack_commit = data["versions"]["spack"]
+            data = yaml.safe_load(yaml_file)["versions"]
+            self.ramble_commit, self.spack_commit = data["ramble"], data["spack"]
 
         # Read remote urls for ramble and spack
         with open(benchpark.paths.remote_urls, "r") as yaml_file:
-            data = yaml.safe_load(yaml_file)
-            remote_ramble_url = data["urls"]["ramble"]
-            remote_spack_url = data["urls"]["spack"]
+            data = yaml.safe_load(yaml_file)["urls"]
+            remote_ramble_url, remote_spack_url = data["ramble"], data["spack"]
 
         # If this does not have an upstream, then we will be cloning from the URLs indicated in remote-urls.yaml
         if self.upstream is None:
-            self.ramble_url = remote_ramble_url
-            self.spack_url = remote_spack_url
+            self.ramble_url, self.spack_url = remote_ramble_url, remote_spack_url
             self.bootstrap()
         else:
             # Clone from local "upstream" repository
-            self.ramble_url = self.upstream.ramble_location
-            self.spack_url = self.upstream.spack_location
+            self.ramble_url, self.spack_url = (
+                self.upstream.ramble_location,
+                self.upstream.spack_location,
+            )
 
     def _check_and_update_bootstrap(self, desired_commit, location):
         with working_dir(location):
