@@ -83,7 +83,7 @@ class RuntimeResources:
             remote_ramble_url = data["urls"]["ramble"]
             remote_spack_url = data["urls"]["spack"]
 
-        # If instance does not have an upstream, it is the upstream
+        # If this does not have an upstream, then we will be cloning from the URLs indicated in remote-urls.yaml
         if self.upstream is None:
             self.ramble_url = remote_ramble_url
             self.spack_url = remote_spack_url
