@@ -13,7 +13,6 @@ specifications. Modifiers are intended to encapsulate reusable patterns that
 perform a specific configuration of an experiment. This may include injecting
 performance analysis or setting up system resources.
 
-
 Linux Thread and GPU Affinity
 -----------------------------
 We are using (with permission) the following implementation of `affinity checks <https://github.com/bcumming/affinity>`_. The following checks are possible:
@@ -116,7 +115,6 @@ For example::
   
   class Amg2023(Experiment, Caliper):
 
-
 Requesting Resources with the Allocation Modifier
 ---------------------------------------------------
 Given:
@@ -190,3 +188,25 @@ If you do not specify values, it will assign the default values as listed below.
      - 0 
    * - n_threads_per_proc
      - 1 
+
+Capturing Underlying Topology with the Hwloc Modifier
+-----------------------------------------------------
+The hwloc modifier enables capturing the underlying hardware infrastructure and
+hierarchical topology used for running the experiment. It's independent from
+the running experiment. More information on hwloc can be found `here
+<https://www.open-mpi.org/projects/hwloc/>`_.
+
+To turn on the hwloc modifier, add ``hwloc=on`` to the experiment init steup
+step. This modifier is disabled by default (``hwloc=none``). It is required
+that the caliper modifier be enabled as well.::
+
+    benchpark experiment init --dest=</path/to/experiment_root> <benchmark> caliper=<caliper_variant> hwloc=on
+
+To use the hwloc modifier:
+
+- The caliper modifier must also be enabled in the experiment to use the hwloc modifier.
+- The hwloc modifier outputs a flattened JSON file in the experiment
+  directory containing the topology of the underlying infrastructure the
+  experiment ran on.
+- Caliper appends metadata information collected by the hwloc modifier to its
+  output file, which can be analyzed post hoc.

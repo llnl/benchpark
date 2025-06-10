@@ -2,18 +2,14 @@
   script:
     # Activate Virtual Environment
     - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
-    # Initialize System
-    - |
-      EXTRA_ARGS=""
-      if [ "$HOST" == "tioga" ]; then
-          EXTRA_ARGS="~gtl"
-      fi
     - |
       if [ "$HOST" == "lassen" ]; then
-          ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} $EXTRA_ARGS  # llnl-sierra has no 'cluster'
+          ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG}  # llnl-sierra has no 'cluster'
       else
-          ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} cluster=$HOST $EXTRA_ARGS
+          ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} cluster=$HOST
       fi
+    - ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} $EXTRA_ARGS
+      $SYSTEM_ARGS
     # Initialize Experiment
     - ./bin/benchpark experiment init --dest=${BENCHMARK}-benchmark ${BENCHMARK}${VARIANT}
     # Build Workspace
