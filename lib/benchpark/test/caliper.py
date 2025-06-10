@@ -19,6 +19,7 @@ def test_compute_variables_section_caliper(monkeypatch):
     assert vars_section == {
         "caliper_metadata": {
             "affinity": "none",
+            "hwloc": "none",
             "application_name": "{application_name}",
             "experiment_name": "{experiment_name}",
             "n_nodes": "{n_nodes}",

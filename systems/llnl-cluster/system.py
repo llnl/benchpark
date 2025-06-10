@@ -17,6 +17,8 @@ class LlnlCluster(System):
     id_to_resources = {
         "ruby": {
             "sys_cores_per_node": 56,
+            "sys_cores_os_reserved_per_node": 0,  # No core or thread reservation
+            "sys_cores_os_reserved_per_node_list": None,
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/Supermicro-icelake-OmniPath/hardware_description.yaml",
@@ -29,6 +31,8 @@ class LlnlCluster(System):
         },
         "dane": {
             "sys_cores_per_node": 112,
+            "sys_cores_os_reserved_per_node": 0,  # No explicit core reservation, first thread on each core reserved (2 threads per core)
+            "sys_cores_os_reserved_per_node_list": None,
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/DELL-sapphirerapids-OmniPath/hardware_description.yaml",
@@ -45,7 +49,7 @@ class LlnlCluster(System):
     variant(
         "compiler",
         default="gcc",
-        values=("gcc", "intel"),
+        values=("gcc", "intel", "oneapi"),
         description="Which compiler to use",
     )
 
@@ -192,8 +196,36 @@ class LlnlCluster(System):
                     }
                 }
             }
+        elif self.spec.satisfies("compiler=oneapi"):
+            selections |= {
+                "packages": selections["packages"]
+                | {
+                    "mpi": {
+                        "buildable": False,
+                        "externals": [
+                            {
+                                "spec": "mvapich2@2.3.7-intel202210",
+                                "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2022.1.0",
+                                "extra_attributes": {
+                                    "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2022.1.0/lib -lmpi"
+                                },
+                            }
+                        ],
+                    }
+                }
+            }
+
+        selections["packages"] |= self.compiler_weighting_cfg()["packages"]
 
         return selections
+
+    def compiler_weighting_cfg(self):
+        compiler = self.spec.variants["compiler"][0]
+
+        if compiler == "oneapi":
+            return {"packages": {"all": {"require": [{"one_of": ["%oneapi", "%gcc"]}]}}}
+        else:
+            return {"packages": {}}
 
     def compute_compilers_section(self):
         selections = {}
@@ -239,6 +271,45 @@ class LlnlCluster(System):
                             "extra_rpaths": [],
                         }
                     }
+                ]
+            }
+        elif self.spec.satisfies("compiler=oneapi"):
+            selections = {
+                "compilers": [
+                    {
+                        "compiler": {
+                            "spec": "gcc@12.1.1",
+                            "paths": {
+                                "cc": "/usr/tce/packages/gcc/gcc-12.1.1/bin/gcc",
+                                "cxx": "/usr/tce/packages/gcc/gcc-12.1.1/bin/g++",
+                                "f77": "/usr/tce/packages/gcc/gcc-12.1.1/bin/gfortran",
+                                "fc": "/usr/tce/packages/gcc/gcc-12.1.1/bin/gfortran",
+                            },
+                            "flags": {},
+                            "operating_system": "rhel8",
+                            "target": "x86_64",
+                            "modules": [],
+                            "environment": {},
+                            "extra_rpaths": [],
+                        }
+                    },
+                    {
+                        "compiler": {
+                            "spec": "oneapi@2022.1.0",
+                            "paths": {
+                                "cc": "/usr/tce/packages/intel/intel-2022.1.0/compiler/2022.1.0/linux/bin/icx",
+                                "cxx": "/usr/tce/packages/intel/intel-2022.1.0/compiler/2022.1.0/linux/bin/icpx",
+                                "f77": "/usr/tce/packages/intel/intel-2022.1.0/compiler/2022.1.0/linux/bin/ifx",
+                                "fc": "/usr/tce/packages/intel/intel-2022.1.0/compiler/2022.1.0/linux/bin/ifx",
+                            },
+                            "flags": {},
+                            "operating_system": "rhel8",
+                            "target": "x86_64",
+                            "modules": [],
+                            "environment": {},
+                            "extra_rpaths": [],
+                        }
+                    },
                 ]
             }
 

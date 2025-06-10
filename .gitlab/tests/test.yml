@@ -9,37 +9,59 @@ workflow:
     matrix:
       - HOST: tioga
         ARCHCONFIG: llnl-elcapitan
-        SCHEDULER_PARAMETERS: -N 1 -t 20m --queue=pci --exclusive  # ref: https://github.com/LLNL/radiuss-shared-ci/blob/main/customization/custom-jobs-and-variables.yml
+        SCHEDULER_PARAMETERS: -N 1 -t 30m --queue=pci --exclusive  # ref: https://github.com/LLNL/radiuss-shared-ci/blob/main/customization/custom-jobs-and-variables.yml
         BENCHMARK: [amg2023, kripke, laghos]
         VARIANT: [+rocm]
+        SYSTEM_ARGS: ['']
         DASHBOARD_NAME: Tioga HPECray-zen3-MI250X-Slingshot [benchpark system init
           --dest=tioga-system llnl-elcapitan cluster=tioga]
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        SCHEDULER_PARAMETERS: -N 1 -t 30m --queue=pci --exclusive
+        BENCHMARK: [kripke]
+        VARIANT: [+rocm]
+        SYSTEM_ARGS: [gpumode=SPX, gpumode=TPX, gpumode=CPX]
+        DASHBOARD_NAME: Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init
+          --dest=tuolumne-system llnl-elcapitan cluster=tuolumne]
       - HOST: dane
         ARCHCONFIG: llnl-cluster
-        SCHEDULER_PARAMETERS: -N 1 -t 00:20:00 --exclusive --reservation=ci
+        SCHEDULER_PARAMETERS: -N 1 -t 00:30:00 --exclusive --reservation=ci
         BENCHMARK: [hpl, hpcg, amg2023, kripke]
         VARIANT: [+openmp]
+        SYSTEM_ARGS: ['']
         DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
           llnl-cluster cluster=dane]
-      - HOST: ruby
+      - HOST: dane
         ARCHCONFIG: llnl-cluster
-        SCHEDULER_PARAMETERS: -N 1 -t 00:20:00 --exclusive --reservation=ci
-        BENCHMARK: [laghos]
+        SCHEDULER_PARAMETERS: -N 1 -t 00:30:00 --exclusive --reservation=ci
+        BENCHMARK: [amg2023, kripke, laghos]
         VARIANT: ['']  # MPI-only test
+        SYSTEM_ARGS: ['']
         DASHBOARD_NAME: Ruby Supermicro-icelake-OmniPath [benchpark system init --dest=ruby-system
           llnl-cluster cluster=ruby]
       - HOST: lassen
         ARCHCONFIG: llnl-sierra
-        SCHEDULER_PARAMETERS: -nnodes 1 -W 20 -q pci
+        SCHEDULER_PARAMETERS: -nnodes 1 -W 40 -q pci
         BENCHMARK: [amg2023, kripke]
         VARIANT: [+cuda]
+        SYSTEM_ARGS: ['']
         DASHBOARD_NAME: Lassen IBM-power9-V100-Infiniband [benchpark system init --dest=lassen-system
           llnl-sierra]
+      # Strong scaling runs for "benchpark analyze" test
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: -N 1 -t 00:30:00 --exclusive --reservation=ci
+        BENCHMARK: [kripke]
+        VARIANT: ['+strong~single_node caliper=mpi,time']
+        SYSTEM_ARGS: ['']
+        DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
+          llnl-cluster cluster=dane]
+      # Test affinity and hwloc with caliper on
       - HOST: dane
         ARCHCONFIG: llnl-cluster
         SCHEDULER_PARAMETERS: -N 1 -t 00:20:00 --exclusive --reservation=ci
         BENCHMARK: [kripke]
-        VARIANT: ['+strong~single_node caliper=mpi,time']
+        VARIANT: ['+single_node caliper=mpi,time hwloc=on affinity=on']
         DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
           llnl-cluster cluster=dane]
 limited_test_run:

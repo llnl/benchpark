@@ -5,15 +5,11 @@
     # Initialize System
     - |
       EXTRA_ARGS=""
-      if [ "$HOST" == "tioga" ]; then
-          EXTRA_ARGS="~gtl"
+      if [  "$HOST" != "lassen" ]; then
+          EXTRA_ARGS="cluster=$HOST"  # llnl-sierra has no 'cluster'
       fi
-    - |
-      if [ "$HOST" == "lassen" ]; then
-          ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} $EXTRA_ARGS  # llnl-sierra has no 'cluster'
-      else
-          ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} cluster=$HOST $EXTRA_ARGS
-      fi
+    - ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} $EXTRA_ARGS
+      $SYSTEM_ARGS
     # Initialize Experiment
     - ./bin/benchpark experiment init --dest=${BENCHMARK}-benchmark ${BENCHMARK}${VARIANT}
     # Build Workspace
@@ -29,11 +25,11 @@
     # Analyze Experiments
     - ramble --workspace-dir . --disable-progress-bar workspace analyze --format json
       yaml text
+    - cd -
     # Benchpark Analyze experiments with "+strong"
     - |
       if [[ "$VARIANT" == *"+strong"* ]]; then
         ./bin/benchpark analyze --workspace-dir .
       fi
     # Check Experiment Exit Codes
-    - cd -
     - python ./.gitlab/bin/exit-codes ./workspace/${BENCHMARK}-benchmark/${HOST}-system/workspace/results.latest.json

@@ -34,7 +34,7 @@ def system_init(args):
         raise ValueError("Must specify one of: --dest, --basedir")
 
     try:
-        os.mkdir(destdir)
+        os.makedirs(destdir)
         system.write_system_dict(destdir)
     except FileExistsError:
         print(f"Abort: system description dir already exists ({destdir})")
