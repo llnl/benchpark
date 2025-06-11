@@ -382,6 +382,7 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("cmake@3.9.6:3", type="build", when="@2020")
     depends_on("cmake@3.13.0:3", type="build", when="@2021")
     depends_on("cmake@3.16.3:3", type="build", when="@2022:")
+    # depends_on("cmake@3.28:", type="build", when="@2025:")
     depends_on("cmake@3.18.4:3", type="build", when="@main")
     depends_on("cmake@3.16.0:3", type="build", when="%fj")
     depends_on("pkgconfig", type="build")
@@ -529,8 +530,6 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
                     "lib",
                 ),
             )
-        if self.spec.satisfies("^[virtuals=lapack] intel-oneapi-mkl"):
-            env.prepend_path("LD_LIBRARY_PATH", self.spec["blas"].libs.directories[0])
 
 
 class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
@@ -915,5 +914,3 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
                     "lib",
                 ),
             )
-        if self.spec.satisfies("^[virtuals=lapack] intel-oneapi-mkl"):
-            env.prepend_path("LD_LIBRARY_PATH", self.spec["blas"].libs.directories[0])
