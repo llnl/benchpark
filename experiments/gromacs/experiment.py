@@ -41,6 +41,14 @@ class Gromacs(
         description="Use GPU-aware MPI",
     )
 
+    variant(
+        "sycl",
+        default=True,
+        values=(True, False),
+        when=("+rocm"),
+        description="Enable GPU-aware MPI",
+    )
+
     def compute_applications_section(self):
         if self.spec.satisfies("+openmp"):
             self.set_environment_variable("OMP_PROC_BIND", "close")
@@ -98,7 +106,7 @@ class Gromacs(
         app_version = self.spec.variants["version"][0]
 
         spack_specs = "+mpi~hwloc"
-        spack_specs += "+sycl" if self.spec.satisfies("+rocm") else "~sycl"
+        spack_specs += "+sycl" if self.spec.satisfies("+sycl") else "~sycl"
 
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             spack_specs += f" gpu-aware-mpi={self.spec.variants['gpu-aware-mpi'][0]} "

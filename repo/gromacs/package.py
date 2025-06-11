@@ -382,7 +382,7 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("cmake@3.9.6:3", type="build", when="@2020")
     depends_on("cmake@3.13.0:3", type="build", when="@2021")
     depends_on("cmake@3.16.3:3", type="build", when="@2022:")
-    # depends_on("cmake@3.28:", type="build", when="@2025:")
+    depends_on("cmake@3.28:", type="build", when="@2025:")
     depends_on("cmake@3.18.4:3", type="build", when="@main")
     depends_on("cmake@3.16.0:3", type="build", when="%fj")
     depends_on("pkgconfig", type="build")
@@ -408,6 +408,8 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("nvhpc", when="+cufftmp")
     depends_on("nvhpc", when="+nvshmem")
     depends_on("heffte", when="+heffte")
+
+    conflicts("cmake@:3.27", when="@:2024")
 
     requires(
         "%intel",
@@ -530,6 +532,12 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
                     "lib",
                 ),
             )
+        if "on" in self.spec.variants["gpu-aware-mpi"].value:
+            env.set("GMX_ENABLE_DIRECT_GPU_COMM", 1)
+            env.set("GMX_FORCE_GPU_AWARE_MPI", 0)
+        elif "force" in self.spec.variants["gpu-aware-mpi"].value:
+            env.set("GMX_ENABLE_DIRECT_GPU_COMM", 1)
+            env.set("GMX_FORCE_GPU_AWARE_MPI", 1)
 
 
 class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
@@ -696,6 +704,11 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
                     options.append(f"-DHIPSYCL_TARGETS:STRING=hip:{rocm_archs}")
                     options.append("-DGMX_SYCL=ACPP")
                     options.append(f"-DACPP_TARGETS=hip:{rocm_archs}")
+            elif self.spec.satisfies("+rocm") and self.spec.satisfies("~sycl"):
+                rocm_archs = ",".join(self.spec.variants["amdgpu_target"].value)
+                options.append(f"-DCMAKE_HIP_COMPILER={self.spec['hip'].prefix.bin}/amdclang++")
+                options.append("-DGMX_GPU=HIP")
+                options.append(f"-DGMX_HIP_TARGET_ARCH={rocm_archs}")
             else:
                 options.append("-DGMX_GPU:STRING=OFF")
         else:
@@ -914,3 +927,9 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
                     "lib",
                 ),
             )
+        if "on" in self.spec.variants["gpu-aware-mpi"].value:
+            env.set("GMX_ENABLE_DIRECT_GPU_COMM", 1)
+            env.set("GMX_FORCE_GPU_AWARE_MPI", 0)
+        elif "force" in self.spec.variants["gpu-aware-mpi"].value:
+            env.set("GMX_ENABLE_DIRECT_GPU_COMM", 1)
+            env.set("GMX_FORCE_GPU_AWARE_MPI", 1)
