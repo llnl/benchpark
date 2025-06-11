@@ -149,18 +149,12 @@ def mirror_create(args):
         with open(setup_dest, "w", encoding="utf-8") as f:
             f.write(
                 """\
-if [ -n "${_BENCHPARK_INITIALIZED:-}" ]; then
-    return 0
-fi
-
 this_script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 . $this_script_dir/spack/share/spack/setup-env.sh
 . $this_script_dir/ramble/share/ramble/setup-env.sh
 
 export SPACK_DISABLE_LOCAL_CONFIG=1
-
-export _BENCHPARK_INITIALIZED=true
 """
             )
 

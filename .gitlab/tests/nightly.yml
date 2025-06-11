@@ -20,9 +20,15 @@ include:
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
         SCHEDULER_PARAMETERS: -N 1 -t 60m --queue=pci --exclusive
-        BENCHMARK: [amg2023, kripke, laghos]
+        BENCHMARK:
+          - amg2023
+          - babelstream
+          - kripke
+          - laghos
+          - lammps
+          - osu-micro-benchmarks
         VARIANT: [+rocm]
-        SYSTEM_ARGS: ['']
+        SYSTEM_ARGS: [gpumode=SPX, gpumode=TPX, gpumode=CPX]
         DASHBOARD_NAME: Nightly [benchpark-develop]
       - HOST: dane
         ARCHCONFIG: llnl-cluster
