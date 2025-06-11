@@ -376,13 +376,13 @@ class Allocation(BasicModifier):
         # Always run exclusive for mpibind + flux.
         # Otherwise, binding may oversubscribe cores before all cores are allocated.
         cmd_opts.append("--exclusive")
+        # Required for '--exclusive'. Will be computed, if not defined, from initialization
+        cmd_opts.append(f"-N {v.n_nodes}")
 
         if v.n_ranks:
             cmd_ranks = f"-n {v.n_ranks}"
             if v.gpu_factor:
                 cmd_ranks = f"-n {v.n_ranks * v.gpu_factor}"
-        if v.n_nodes:
-            cmd_opts.append(f"-N {v.n_nodes}")
         if v.n_gpus:
             gpus_per_rank = 1  # self.gpus_as_gpus_per_rank(v)
             cmd_opts.append(f"-g={gpus_per_rank}")
