@@ -21,6 +21,30 @@ class Hwloc(BasicModifier):
 
     executable_modifier("hwloc")
 
+    def get_os_reserved_data(self, app_inst):
+        import json
+
+        system_metadata = [
+            "sys_cores_per_node",  # required
+            "scheduler",  # required
+            "rocm_arch",
+            "cuda_arch",
+            "sys_cores_os_reserved_per_node",
+            "sys_cores_os_reserved_per_node_list",
+            "sys_gpus_per_node",
+            "sys_mem_per_node",
+            "system_site",
+        ]
+        os_reserved_metadata = {}
+        print("app_inst.variables:", app_inst.variables.keys())
+        for key in system_metadata:
+            # Certain keys not required or may not be present
+            if key in app_inst.variables.keys():
+                os_reserved_metadata[key] = app_inst.variables[key]
+        
+        return f"'{json.dumps(os_reserved_metadata)}'"
+
+
     def hwloc(self, executable_name, executable, app_inst=None):
         import os
         from ramble.util.executable import CommandExecutable
@@ -43,21 +67,31 @@ class Hwloc(BasicModifier):
             CommandExecutable(
                 "lstopo-to-get-underlying-infrastructure",
                 template=[
-                    f"lstopo --of xml --whole-system --whole-io --verbose {hwloc_output_xml_file} 2> /dev/null"
+                    f"(lstopo --of xml --whole-system --whole-io --verbose > {hwloc_output_xml_file} 2> /dev/null)"
                 ],
             )
         )
+        # pre_exec.append(
+        #     CommandExecutable(
+        #         "lstopo-to-get-underlying-infrastructure",
+        #         template=[
+        #             f"lstopo --of xml --whole-system --whole-io --verbose {hwloc_output_xml_file} 2> /dev/null"
+        #         ],
+        #     )
+        # )
 
         caliper_modifier = any(
             [modifier["name"] == "caliper" for modifier in app_inst.modifiers]
         )
         if caliper_modifier:
+            os_reserved_metadata = self.get_os_reserved_data(app_inst)
+            print("os_reserved_metadata:", os_reserved_metadata)
             # Convert the .xml file from hwloc output to equivalent .json format
             pre_exec.append(
                 CommandExecutable(
                     "parse-lstopo-output",
                     template=[
-                        f"python {hwloc_parser_dir}/parse_hwloc_output.py {hwloc_output_xml_file} {hwloc_output_json_file} {self._usage_mode}"
+                        f"python {hwloc_parser_dir}/parse_hwloc_output.py {hwloc_output_xml_file} {hwloc_output_json_file} {self._usage_mode} {os_reserved_metadata}"
                     ],
                 )
             )
