@@ -404,7 +404,7 @@ class LlnlElcapitan(System):
                     "cray-mpich": {
                         "externals": [
                             {
-                                "spec": f"cray-mpich@{self.mpi_version}%cce@{self.cce_version} {gtl_spec} +wrappers",
+                                "spec": f"cray-mpich@{self.mpi_version}%rocmcc@{self.rocm_version} {gtl_spec} +wrappers",
                                 "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}",
                                 "extra_attributes": gtl_cfg,
                             }

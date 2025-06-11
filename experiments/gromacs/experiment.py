@@ -18,14 +18,14 @@ class Gromacs(
 ):
     variant(
         "workload",
-        default="water_gmx50_adac",
+        default="water_gmx50",
         description="workload name",
     )
 
     variant(
         "version",
-        default="2024",
-        values=("2024", "2023.3"),
+        default="2025.2",
+        values=("2025.2", "2024", "2023.3"),
         description="app version",
     )
 
@@ -79,6 +79,7 @@ class Gromacs(
             "pme": "auto",
             "bonded": f"{bonded_target}",
             "update": f"{target}",
+            "additional_args": "-pin {pin} -nb {nb} -pme {pme} -bonded {bonded} -update {update} -maxh {maxh} -nstlist {nstlist} -npme {npme}"
         }
 
         for k, v in input_variables.items():
