@@ -1,9 +1,10 @@
 .run_experiment:
   script:
+    - set -xv
     # Activate Virtual Environment
     - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
     # Initialize System
-    - >
+    - |
       EXTRA_ARGS=""
       if [  "$HOST" != "lassen" ]; then
           EXTRA_ARGS="cluster=$HOST"  # llnl-sierra has no 'cluster'
