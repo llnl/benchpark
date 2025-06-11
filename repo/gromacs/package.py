@@ -167,10 +167,19 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("heffte +sycl", when="+heffte +sycl")
     variant("opencl", default=False, description="Enable OpenCL support")
     variant("sycl", default=False, when="@2021:", description="Enable SYCL support")
-    variant("sycl", default=True, when="@2021: +rocm", description="Enable SYCL support when using ROCm")
+
+    with when("+rocm"):
+        depends_on("hip")
+        depends_on("rocfft")
+        with when("+sycl"):
+            for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
+                depends_on(f"hipsycl +rocm amdgpu_target={target}", when=f"+rocm amdgpu_target={target}")
+            conflicts("hipsycl ^llvm@18:")
+
     requires(
         "^intel-oneapi-runtime",
         "^hipsycl %clang",
+        "^hipsycl %rocmcc",
         policy="one_of",
         when="+sycl",
         msg="GROMACS SYCL support comes either from intel-oneapi-runtime or a "
@@ -376,16 +385,8 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("cmake@3.18.4:3", type="build", when="@main")
     depends_on("cmake@3.16.0:3", type="build", when="%fj")
     depends_on("pkgconfig", type="build")
+
     depends_on("cuda", when="+cuda")
-
-    for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
-        requires(f"^hipsycl+rocm amdgpu_target={target}", when=f"gromacs@2024: +rocm amdgpu_target={target}")
-
-    with when("+rocm"):
-        depends_on("sycl")
-        depends_on("hip")
-        depends_on("rocfft")
-
     depends_on("sycl", when="+sycl")
     depends_on("lapack")
     depends_on("blas")
@@ -513,8 +514,8 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
                 )
 
     def setup_run_environment(self, env):
-        if self.pkg.compiler.extra_rpaths:
-            for rpath in self.pkg.compiler.extra_rpaths:
+        if self.compiler.extra_rpaths:
+            for rpath in self.compiler.extra_rpaths:
                 env.prepend_path("LD_LIBRARY_PATH", rpath)
         if self.spec.satisfies("+cufftmp"):
             env.append_path(
@@ -528,6 +529,8 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
                     "lib",
                 ),
             )
+        if self.spec.satisfies("^[virtuals=lapack] intel-oneapi-mkl"):
+            env.prepend_path("LD_LIBRARY_PATH", self.spec["blas"].libs.directories[0])
 
 
 class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
@@ -576,7 +579,7 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
 
         #gmx_cc = spack_cc
         #gmx_cxx = spack_cxx
-        #if "+rocm" in self.spec:
+        #if self.spec.satisfies("+rocm"):
         #    # The ROCm version requires the ROCm LLVM installation
         #    gmx_cc = os.path.join(self.spec["llvm"].prefix.bin, "clang")
         #    gmx_cxx = os.path.join(self.spec["llvm"].prefix.bin, "clang++")
@@ -618,14 +621,14 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
                         "-DMPI_CXX_COMPILER=%s" % self.spec["mpi"].mpicxx,
                     ]
                 )
-            if 'on' in self.spec.variants['gpu-aware-mpi'].value:
+            if "on" in self.spec.variants["gpu-aware-mpi"].value:
                 options.extend(
                     [
                         "-DGMX_ENABLE_DIRECT_GPU_COMM=ON",
                         "-DGMX_FORCE_GPU_AWARE_MPI=OFF",
                     ]
                 )
-            elif 'force' in self.spec.variants['gpu-aware-mpi'].value:
+            elif "force" in self.spec.variants["gpu-aware-mpi"].value:
                 options.extend(
                     [
                         "-DGMX_ENABLE_DIRECT_GPU_COMM=ON",
@@ -645,7 +648,7 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
 
         # Here we cannot use spack_cc because we need also libstdc++ to be reachable
         # Spack wrapper (spack_cc) hides includes/lib and CMake will fail
-        options.append("-DGMX_GPLUSPLUS_PATH=%s" % self.pkg.compiler.cxx)
+        # options.append("-DGMX_GPLUSPLUS_PATH=%s" % self.pkg.compiler.cxx)
 
         if self.spec.satisfies("%aocc"):
             options.append("-DCMAKE_CXX_FLAGS=--stdlib=libc++")
@@ -684,14 +687,16 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
                 options.append("-DGMX_GPU:STRING=CUDA")
             elif self.spec.satisfies("+opencl"):
                 options.append("-DGMX_GPU:STRING=OpenCL")
-            elif self.spec.satisfies("+sycl") or self.spec.satisfies("+rocm"):
+            elif self.spec.satisfies("+sycl"):
                 options.append("-DGMX_GPU:STRING=SYCL")
-                if "+rocm" in self.spec:
+                if self.spec.satisfies("+rocm"):
                     options.append("-DGMX_SYCL_HIPSYCL:BOOL=ON")
                     hipsycl_dir = os.path.join(self.spec["sycl"].prefix.lib, "cmake/hipSYCL/")
                     options.append(f"-Dhipsycl_DIR:STRING={hipsycl_dir}")
                     rocm_archs = ",".join(self.spec.variants["amdgpu_target"].value)
                     options.append(f"-DHIPSYCL_TARGETS:STRING=hip:{rocm_archs}")
+                    options.append("-DGMX_SYCL=ACPP")
+                    options.append(f"-DACPP_TARGETS=hip:{rocm_archs}")
             else:
                 options.append("-DGMX_GPU:STRING=OFF")
         else:
@@ -882,7 +887,7 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
                     "-DFFTWF_INCLUDE_DIR={0}".format(self.spec["acfl"].headers.directories[0])
                 )
                 options.append("-DFFTWF_LIBRARY={0}".format(self.spec["acfl"].libs.joined(";")))
-            elif self.pkg.version >= Version("2023") and "+rocm" in self.spec:
+            elif self.pkg.version >= Version("2023") and self.spec.satisfies("+rocm"):
                 # Use ROCm FFT library
                 options.append("-DGMX_GPU_FFT_LIBRARY=rocFFT")
 
@@ -910,3 +915,5 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
                     "lib",
                 ),
             )
+        if self.spec.satisfies("^[virtuals=lapack] intel-oneapi-mkl"):
+            env.prepend_path("LD_LIBRARY_PATH", self.spec["blas"].libs.directories[0])
