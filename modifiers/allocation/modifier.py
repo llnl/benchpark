@@ -285,6 +285,8 @@ class Allocation(BasicModifier):
             gpus_node_request = None
             if v.n_gpus:
                 if v.sys_gpus_per_node:
+                    if v.gpu_factor:
+                        v.n_gpus *= v.gpu_factor
                     gpus_node_request = math.ceil(v.n_gpus / float(v.sys_gpus_per_node))
                 else:
                     raise ValueError(
