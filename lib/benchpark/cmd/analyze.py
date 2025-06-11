@@ -196,7 +196,7 @@ def prepare_data(**kwargs):
     Processes .cali files from a Ramble workspace to generate performance charts.
     """
     workspace_dir = kwargs["workspace_dir"]
-    files = glob(os.path.join(workspace_dir, "**/*.cali"), recursive=True)
+    files = glob(os.path.join(workspace_dir, f"**/*{kwargs['file_name_match']}.cali"), recursive=True)
     logger.info(f"Found {len(files)} .cali files for analysis.")
 
     tk = th.Thicket.from_caliperreader(files, disable_tqdm=True)
@@ -439,6 +439,12 @@ def setup_parser(root_parser):
         metavar=('YMIN', 'YMAX'),
         default=None,
         help="Set both y-axis limits: --chart-yaxis-limits YMIN YMAX"
+    )
+    root_parser.add_argument(
+        "--file-name-match",
+        type=str,
+        default="",
+        help="Set optional cali file name to match. Useful if multiple caliper files are generated per experiment (e.g. RAJAPerf)"
     )
 
 
