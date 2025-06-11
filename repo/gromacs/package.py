@@ -533,11 +533,14 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
                 ),
             )
         if "on" in self.spec.variants["gpu-aware-mpi"].value:
-            env.set("GMX_ENABLE_DIRECT_GPU_COMM", 1)
-            env.set("GMX_FORCE_GPU_AWARE_MPI", 0)
+            env.set("GMX_ENABLE_DIRECT_GPU_COMM", "1")
+            env.set("GMX_FORCE_GPU_AWARE_MPI", "0")
         elif "force" in self.spec.variants["gpu-aware-mpi"].value:
-            env.set("GMX_ENABLE_DIRECT_GPU_COMM", 1)
-            env.set("GMX_FORCE_GPU_AWARE_MPI", 1)
+            env.set("GMX_ENABLE_DIRECT_GPU_COMM", "1")
+            env.set("GMX_FORCE_GPU_AWARE_MPI", "1")
+        else:
+            env.set("GMX_ENABLE_DIRECT_GPU_COMM", "0")
+            env.set("GMX_FORCE_GPU_AWARE_MPI", "0")
 
 
 class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
@@ -928,8 +931,11 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
                 ),
             )
         if "on" in self.spec.variants["gpu-aware-mpi"].value:
-            env.set("GMX_ENABLE_DIRECT_GPU_COMM", 1)
-            env.set("GMX_FORCE_GPU_AWARE_MPI", 0)
+            env.set("GMX_ENABLE_DIRECT_GPU_COMM", "1")
+            env.set("GMX_FORCE_GPU_AWARE_MPI", "0")
         elif "force" in self.spec.variants["gpu-aware-mpi"].value:
-            env.set("GMX_ENABLE_DIRECT_GPU_COMM", 1)
-            env.set("GMX_FORCE_GPU_AWARE_MPI", 1)
+            env.set("GMX_ENABLE_DIRECT_GPU_COMM", "1")
+            env.set("GMX_FORCE_GPU_AWARE_MPI", "1")
+        else:
+            env.set("GMX_ENABLE_DIRECT_GPU_COMM", "0")
+            env.set("GMX_FORCE_GPU_AWARE_MPI", "0")
