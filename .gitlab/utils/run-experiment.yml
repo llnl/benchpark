@@ -22,6 +22,7 @@
     # Run Experiments
     - ramble --workspace-dir . --disable-progress-bar on --executor '{execute_experiment}'
       --where '{n_nodes} == 1'
+    - cat '{experiment_name}.out'
     # Analyze Experiments
     - ramble --workspace-dir . --disable-progress-bar workspace analyze --format json
       yaml text
