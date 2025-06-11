@@ -43,6 +43,8 @@ class System(ExperimentSystemBase):
         self.external_resources = None
 
         self.sys_cores_per_node = None
+        self.sys_cores_os_reserved = None
+        self.sys_cores_os_reserved_list = None
         self.sys_gpus_per_node = None
         self.sys_mem_per_node = None
         self.scheduler = None
@@ -112,7 +114,13 @@ class System(ExperimentSystemBase):
                 raise ValueError(f"Missing required info: {attr}")
 
         optionals = {}
-        for opt in ["sys_gpus_per_node", "sys_mem_per_node", "queue"]:
+        for opt in [
+            "sys_cores_os_reserved",
+            "sys_cores_os_reserved_list",
+            "sys_gpus_per_node",
+            "sys_mem_per_node",
+            "queue",
+        ]:
             if getattr(self, opt, None):
                 optionals[opt] = getattr(self, opt)
 

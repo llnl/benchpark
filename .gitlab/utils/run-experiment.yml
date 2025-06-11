@@ -2,17 +2,11 @@
   script:
     # Activate Virtual Environment
     - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
-    # Initialize System
-    - |
-      EXTRA_ARGS=""
-      if [ "$HOST" == "tioga" ]; then
-          EXTRA_ARGS="~gtl"
-      fi
     - |
       if [ "$HOST" == "lassen" ]; then
-          ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} $EXTRA_ARGS  # llnl-sierra has no 'cluster'
+          ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} $SYSTEM_ARGS # llnl-sierra has no 'cluster'
       else
-          ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} cluster=$HOST $EXTRA_ARGS
+          ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} cluster=$HOST $SYSTEM_ARGS
       fi
     # Initialize Experiment
     - ./bin/benchpark experiment init --dest=${BENCHMARK}-benchmark ${BENCHMARK}${VARIANT}
@@ -29,11 +23,11 @@
     # Analyze Experiments
     - ramble --workspace-dir . --disable-progress-bar workspace analyze --format json
       yaml text
+    - cd -
     # Benchpark Analyze experiments with "+strong"
     - |
       if [[ "$VARIANT" == *"+strong"* ]]; then
         ./bin/benchpark analyze --workspace-dir .
       fi
     # Check Experiment Exit Codes
-    - cd -
     - python ./.gitlab/bin/exit-codes ./workspace/${BENCHMARK}-benchmark/${HOST}-system/workspace/results.latest.json
