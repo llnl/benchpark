@@ -37,6 +37,7 @@ class AllocOpt(Enum):
     POST_EXEC_CMDS = 302
     PRE_EXEC_CMDS = 303
     GPU_FACTOR = 304
+    MPIBIND_BINDINGS = 305
 
     @staticmethod
     def as_type(enumval, input):
@@ -388,6 +389,9 @@ class Allocation(BasicModifier):
 
         if v.timeout:
             batch_opts.append(f"-t {v.timeout}m")
+
+        if v.mpibind_bindings:
+            cmd_opts.append("--setopt=mpibind=verbose:1")
 
         batch_directives = list(f"# flux: {x}" for x in (cmd_opts + batch_opts))
 
