@@ -2,7 +2,7 @@
 Benchpark Design Concepts and Command Workflow
 ===============================================
 
-This document outlines the important concepts and patterns used consistently in Benchpark (BP) code design, along with detailed explanations of key commands and their workflow.
+This document outlines the important concepts and patterns used consistently in Benchpark code design, along with detailed explanations of key commands and their workflow.
 
 Table of Contents
 =================
@@ -19,7 +19,7 @@ Core Concepts and Patterns
 1. Variants
 -----------
 
-Variants are predefined keywords that execute specific logic and set configurations for benchmarks based on whether these keywords are found in user arguments.
+Variants are directives that execute specific logic and set configurations for experiments, systems, and packages. Variants are of the form `name=value`, where the `value` is selected from a set of possible values, defined by the given experiment, system, or package.
 
 **How Variants Work:**
 
@@ -37,7 +37,7 @@ In both ``benchpark system`` and ``benchpark experiment`` commands, you'll find 
 * ``self`` contains all the Specs, in other words the extra arguments passed in the user command, defined for the current context
 * ``self.name`` contains the name of the core component spec relative to the current context, examples:
   
-  * ``llnl-cluster`` in benchmark system commands running BP on LLNL systems
+  * ``llnl-cluster`` in benchmark system commands running Benchpark on LLNL systems
     
     * At executing benchpark system command (``benchpark system init --dest=.... llnl-cluster cluster=...``), ``self.name`` resolves to ``llnl-cluster`` since it is the core component, as it defines the system we will run our experiments on
   
@@ -49,7 +49,7 @@ In both ``benchpark system`` and ``benchpark experiment`` commands, you'll find 
   * Based on my experiments, order of args passed to benchpark does really matters. By default our parser expects key-value pairs to be at the end, and prior is the Spec name.
 
 * We get the parent directory of the Python class path responsible for creating the ``self.name`` object
-* ``self.name`` is set when creating the corresponding ChildSpec object, (``SystemSpec``, ``ExperimentSpec``) where they inherit from ``Spec`` class (the parent class). This is done right before executing ``concretize()``
+* ``self.name`` is set when creating the corresponding child object, (``SystemSpec``, ``ExperimentSpec``) where they inherit from ``Spec`` class (the parent class). This is done right before executing ``concretize()``
 * We depend on Ramble for resolving this
 
 
@@ -79,7 +79,7 @@ For the command::
    * Gets needed imports, including ``cmd.experiment``
    * Executes ``benchpark.experiment`` (``lib/benchpark/experiment.py``)
    * Checks if Ramble and Spack exist in home directory
-   * Clones and installs them if they don't exist
+   * Clones Ramble and Spack libraries in the home directory (`~/.benchpark`) if they do not exist.
 
 2. **Command Processing:**
    
@@ -133,10 +133,10 @@ Benchpark Command Workflow
 
 * ``ramble.yaml``: 
   
-  * Defines problems and experiments to run
+  * Defines experiment variables, which ramble uses to set up experiments.
   * Contains required modifiers and packages to be installed
 
-3. Setup Workspace
+3. Setup Benchpark Workspace
 ------------------
 
 **Command:**
@@ -151,7 +151,7 @@ Benchpark Command Workflow
 
 * Based on definitions in ``test-ruby-system`` and ``test-amg2023-benchmark``
 * Contains everything as defined before this step
-* Creates necessary scripts for configuring Ramble and Spack installation
+* Clones Ramble and Spack into the Benchpark workspace
 
 4. Environment Setup
 --------------------
@@ -184,14 +184,14 @@ Benchpark Command Workflow
 **What Happens:**
 
 * **Spack Role:** Installs all needed software
-* **Ramble Role:** Sets up all experiments/problems defined previously for execution
+* **Ramble Role:** Sets up all experiments/problems defined in the experiment `ramble.yaml`
 * **Benchpark Role:** Complete at this point
 
 **Generated Content:**
 
-* New directory ``experiments`` is created
+* New directory ``experiments`` is created for each experiment in the `ramble.yaml`
 * Contains script ``execute_experiment`` for the next step
-* This script is the main one that Ramble runs to fire jobs for experiments on the HPC cluster
+* This is a job script submitted to the scheduler
 * Script includes all needed steps to run experiments using:
   
   * Requested benchmark
@@ -211,8 +211,7 @@ Benchpark Command Workflow
 
 **Purpose:**
 
-* Runs the ``execute_experiment`` script generated from the previous step
-* Execution occurs on the chosen LLNL cluster (e.g., Ruby or Dane)
+* Submits the ``execute_experiment`` job script generated from the previous step to the scheduler
 
 Debugging Benchpark with VSCode
 ===============================
