@@ -14,17 +14,14 @@
     - ./bin/benchpark setup ${BENCHMARK}-benchmark ${HOST}-system workspace/
     # Setup Ramble & Spack
     - . workspace/setup.sh
-    # Setup Workspace and Print Log
+    # Setup Workspace
     - cd ./workspace/${BENCHMARK}-benchmark/${HOST}-system/workspace/
-    - |
-      setup_out=$(ramble --workspace-dir . workspace setup)
-      cat $(echo "$setup_out" | grep -o "log file: [^ ]*\.out" | head -n1 | sed 's/log file: //')
+    - ramble --disable-logger --workspace-dir . workspace setup
     # Run Experiments and Print Log
-    - |
-      ramble --workspace-dir . on --executor '{execute_experiment}' --where '{n_nodes} == 1'
-      find experiments/ -type f -name "*.out" -exec cat {} +
+    - ramble --disable-logger --workspace-dir . on --executor '{execute_experiment}' --where '{n_nodes} == 1'
+    - find experiments/ -type f -name "*.out" -exec cat {} +
     # Analyze Experiments
-    - ramble --workspace-dir . workspace analyze --format json yaml text
+    - ramble --disable-logger --workspace-dir . workspace analyze --format json yaml text
     - cd -
     # Benchpark Analyze experiments with "+strong"
     - |
