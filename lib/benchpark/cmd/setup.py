@@ -182,14 +182,8 @@ export SPACK_DISABLE_LOCAL_CONFIG=1
         with open(initializer_script, "w") as f:
             f.write(
                 f"""\
-if [ -n "${{_BENCHPARK_INITIALIZED:-}}" ]; then
-    return 0
-fi
-
 {pkg_str}
 . {per_workspace_setup.ramble_location}/share/ramble/setup-env.sh
-
-export _BENCHPARK_INITIALIZED=true
 """
             )
 
@@ -209,4 +203,4 @@ Further steps are needed to build the experiments ({ramble_setup}) and run them 
 
     # Generate shell script to setup and run latest experiment
     with open(run_script, "w") as f:
-        f.write(f"{ramble_setup}\n{ramble_run}\n")
+        f.write(f"{ramble_setup} && {ramble_run}\n")
