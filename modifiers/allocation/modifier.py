@@ -380,11 +380,6 @@ class Allocation(BasicModifier):
 
         if v.n_ranks:
             cmd_ranks = f"-n {v.n_ranks}"
-            if v.gpu_factor:
-                req = int(math.ceil(v.n_ranks / v.gpu_factor))
-                batch_ranks = f"-n {req}"
-            else:
-                batch_ranks = cmd_ranks
         if v.n_gpus:
             gpus_per_rank = 1  # self.gpus_as_gpus_per_rank(v)
             cmd_opts.append(f"-g={gpus_per_rank}")
@@ -392,9 +387,7 @@ class Allocation(BasicModifier):
         if v.timeout:
             batch_opts.append(f"-t {v.timeout}m")
 
-        batch_directives = list(
-            f"# flux: {x}" for x in ([batch_ranks] + cmd_opts + batch_opts)
-        )
+        batch_directives = list(f"# flux: {x}" for x in (cmd_opts + batch_opts))
 
         v.mpi_command = f"flux run {' '.join([cmd_ranks] + cmd_opts)}"
         v.batch_submit = "flux batch {execute_experiment}"
