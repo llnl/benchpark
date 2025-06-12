@@ -18,7 +18,9 @@ class LlnlElcapitan(System):
     id_to_resources = {
         "tioga": {
             "rocm_arch": "gfx90a",
-            "sys_cores_per_node": 64,
+            "sys_cores_per_node": 56,
+            "sys_cores_os_reserved_per_node": 8,
+            "sys_cores_os_reserved_per_node_list": [0, 8, 16, 24, 32, 40, 48, 56],
             "sys_gpus_per_node": 8,
             "system_site": "llnl",
             "scheduler": "flux",
@@ -27,20 +29,42 @@ class LlnlElcapitan(System):
         },
         "elcapitan": {
             "rocm_arch": "gfx942",
-            "sys_cores_per_node": 96,
-            "sys_gpus_per_node": 4,
+            "sys_cores_per_node": 84,
+            "sys_cores_os_reserved_per_node": 12,
+            "sys_cores_os_reserved_per_node_list": [
+                0,
+                8,
+                16,
+                24,
+                32,
+                40,
+                48,
+                56,
+                64,
+                72,
+                80,
+                88,
+            ],  # 3 cores reserved per socket
+            "sys_gpus_per_node": None,  # Determined by "gpumode" variant
             "system_site": "llnl",
             "scheduler": "flux",
             "hardware_key": str(hardware_descriptions)
             + "/HPECray-zen4-MI300A-Slingshot/hardware_description.yaml",
         },
     }
+    id_to_resources["tuolumne"] = id_to_resources["elcapitan"]
 
     variant(
         "cluster",
         default="tioga",
-        values=("tioga", "elcapitan"),
+        values=("tioga", "elcapitan", "tuolumne"),
         description="Which cluster to run on",
+    )
+    variant(
+        "gpumode",
+        default="SPX",
+        values=("SPX", "TPX", "CPX"),
+        description="compute partitioning modes for MI300A",
     )
     variant(
         "rocm",
@@ -50,7 +74,7 @@ class LlnlElcapitan(System):
     )
     variant(
         "gtl",
-        default=False,
+        default=True,
         values=(True, False),
         description="Use GTL-enabled MPI",
     )
@@ -106,6 +130,17 @@ class LlnlElcapitan(System):
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
+
+        # MI300A modes
+        if self.rocm_arch == "gfx942":
+            if self.spec.satisfies("gpumode=SPX"):
+                self.sys_gpus_per_node = 4
+            elif self.spec.satisfies("gpumode=TPX"):
+                self.sys_gpus_per_node = 12
+            elif self.spec.satisfies("gpumode=CPX"):
+                self.sys_gpus_per_node = 24
+            else:
+                raise ValueError(f"Invalid gpumode in spec: {self.spec}")
 
     def compute_packages_section(self):
         selections = {
@@ -196,7 +231,7 @@ class LlnlElcapitan(System):
                     "buildable": False,
                     "externals": [{"spec": "unzip@6.0", "prefix": "/usr"}],
                 },
-                "hypre": {"variants": "amdgpu_target=gfx90a"},
+                "hypre": {"variants": f"amdgpu_target={self.rocm_arch}"},
                 "hwloc": {
                     "externals": [
                         {"spec": "hwloc@2.9.1", "prefix": "/usr", "buildable": False}
@@ -211,6 +246,10 @@ class LlnlElcapitan(System):
                         }
                     ],
                     "buildable": False,
+                },
+                "fftw-api": {
+                    "buildable": False,
+                    "require": "intel-oneapi-mkl",
                 },
                 "mpi": {"buildable": False},
                 "libfabric": {
@@ -651,6 +690,25 @@ class LlnlElcapitan(System):
                     }
                 ]
             }
+
+    def system_specific_variables(self):
+        opts = super().system_specific_variables()
+        # MI300A modes
+        if self.rocm_arch == "gfx942":
+            if self.spec.satisfies("gpumode=SPX"):
+                gpu_factor = 1
+            elif self.spec.satisfies("gpumode=TPX"):
+                gpu_factor = 3
+            elif self.spec.satisfies("gpumode=CPX"):
+                gpu_factor = 6
+
+            opts.update(
+                {
+                    "gpu_factor": gpu_factor,
+                    "extra_batch_opts": f"--setattr=gpumode={self.spec.variants['gpumode'][0]}\n--conf=resource.rediscover=true",
+                }
+            )
+        return opts
 
     def compute_software_section(self):
         """This is somewhat vestigial: for the Tioga config that is committed
