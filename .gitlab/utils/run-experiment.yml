@@ -1,7 +1,5 @@
 .run_experiment:
   script:
-    # Expand multi-line commands
-    - export FF_SCRIPT_SECTIONS=true
     # Activate Virtual Environment
     - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
     - |
