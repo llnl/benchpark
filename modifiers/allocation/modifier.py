@@ -37,7 +37,6 @@ class AllocOpt(Enum):
     POST_EXEC_CMDS = 302
     PRE_EXEC_CMDS = 303
     GPU_FACTOR = 304
-    MPIBIND_BINDINGS = 305
 
     @staticmethod
     def as_type(enumval, input):
@@ -285,8 +284,6 @@ class Allocation(BasicModifier):
             gpus_node_request = None
             if v.n_gpus:
                 if v.sys_gpus_per_node:
-                    if v.gpu_factor:
-                        v.n_gpus *= v.gpu_factor
                     gpus_node_request = math.ceil(v.n_gpus / float(v.sys_gpus_per_node))
                 else:
                     raise ValueError(
@@ -384,7 +381,10 @@ class Allocation(BasicModifier):
         if v.n_ranks:
             cmd_ranks = f"-n {v.n_ranks}"
             if v.gpu_factor:
-                cmd_ranks = f"-n {v.n_ranks * v.gpu_factor}"
+                req = int(math.ceil(v.n_ranks / v.gpu_factor))
+                batch_ranks = f"-n {req}"
+            else:
+                batch_ranks = cmd_ranks
         if v.n_gpus:
             gpus_per_rank = 1  # self.gpus_as_gpus_per_rank(v)
             cmd_opts.append(f"-g={gpus_per_rank}")
@@ -392,10 +392,9 @@ class Allocation(BasicModifier):
         if v.timeout:
             batch_opts.append(f"-t {v.timeout}m")
 
-        if v.mpibind_bindings:
-            cmd_opts.append("--setopt=mpibind=verbose:1")
-
-        batch_directives = list(f"# flux: {x}" for x in (cmd_opts + batch_opts))
+        batch_directives = list(
+            f"# flux: {x}" for x in ([batch_ranks] + cmd_opts + batch_opts)
+        )
 
         v.mpi_command = f"flux run {' '.join([cmd_ranks] + cmd_opts)}"
         v.batch_submit = "flux batch {execute_experiment}"
