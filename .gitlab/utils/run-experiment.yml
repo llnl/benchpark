@@ -18,10 +18,12 @@
     - cd ./workspace/${BENCHMARK}-benchmark/${HOST}-system/workspace/
     - ramble --disable-logger --workspace-dir . workspace setup
     # Run Experiments and Print Log
-    - ramble --disable-logger --workspace-dir . on --executor '{execute_experiment}' --where '{n_nodes} == 1'
-    - find experiments/ -type f -name "*.out" -exec cat {} +
+    - |
+      ramble --disable-logger --workspace-dir . on --executor '{execute_experiment}' --where '{n_nodes} == 1'
+      find experiments/ -type f -name "*.out" -exec cat {} +
     # Analyze Experiments
-    - ramble --disable-logger --workspace-dir . workspace analyze --format json yaml text
+    - ramble --disable-logger --workspace-dir . workspace analyze --format json yaml
+      text
     - cd -
     # Benchpark Analyze experiments with "+strong"
     - |
