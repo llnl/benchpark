@@ -534,12 +534,15 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
             )
         if "on" in self.spec.variants["gpu-aware-mpi"].value:
             env.set("GMX_ENABLE_DIRECT_GPU_COMM", "1")
+            env.set("GMX_DISABLE_DIRECT_GPU_COMM", "0")
             env.set("GMX_FORCE_GPU_AWARE_MPI", "0")
         elif "force" in self.spec.variants["gpu-aware-mpi"].value:
             env.set("GMX_ENABLE_DIRECT_GPU_COMM", "1")
+            env.set("GMX_DISABLE_DIRECT_GPU_COMM", "0")
             env.set("GMX_FORCE_GPU_AWARE_MPI", "1")
         else:
             env.set("GMX_ENABLE_DIRECT_GPU_COMM", "0")
+            env.set("GMX_DISABLE_DIRECT_GPU_COMM", "1")
             env.set("GMX_FORCE_GPU_AWARE_MPI", "0")
 
 
@@ -587,21 +590,6 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
         # In other words, the mapping between package variants and the
         # GMX CMake variables is often non-trivial.
 
-        #gmx_cc = spack_cc
-        #gmx_cxx = spack_cxx
-        #if self.spec.satisfies("+rocm"):
-        #    # The ROCm version requires the ROCm LLVM installation
-        #    gmx_cc = os.path.join(self.spec["llvm"].prefix.bin, "clang")
-        #    gmx_cxx = os.path.join(self.spec["llvm"].prefix.bin, "clang++")
-        #    if not fs.is_exe(gmx_cc) or not fs.is_exe(gmx_cxx):
-        #        gmx_cc = path.join(self.spec["llvm"].prefix.bin, "amdclang")
-        #        gmx_cxx = path.join(self.spec["llvm"].prefix.bin, "amdclang++")
-        #        if not fs.is_exe(gmx_cc) or not fs.is_exe(gmx_cxx):
-        #            raise InstallError(
-        #                "concretized LLVM dependency must provide a "
-        #                "valid clang/amdclang executable, found invalid: "
-        #                "{0}/{1}".format(gmx_cc, gmx_cxx)
-        #            )
         if self.spec.satisfies("+mpi"):
             options.append("-DGMX_MPI:BOOL=ON")
             if self.pkg.version < Version("2020"):
@@ -635,6 +623,7 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
                 options.extend(
                     [
                         "-DGMX_ENABLE_DIRECT_GPU_COMM=ON",
+                        "-DGMX_DISABLE_DIRECT_GPU_COMM=OFF",
                         "-DGMX_FORCE_GPU_AWARE_MPI=OFF",
                     ]
                 )
@@ -642,7 +631,16 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
                 options.extend(
                     [
                         "-DGMX_ENABLE_DIRECT_GPU_COMM=ON",
+                        "-DGMX_DISABLE_DIRECT_GPU_COMM=OFF",
                         "-DGMX_FORCE_GPU_AWARE_MPI=ON",
+                    ]
+                )
+            else:
+                options.extend(
+                    [
+                        "-DGMX_ENABLE_DIRECT_GPU_COMM=OFF",
+                        "-DGMX_DISABLE_DIRECT_GPU_COMM=ON",
+                        "-DGMX_FORCE_GPU_AWARE_MPI=OFF",
                     ]
                 )
             options.extend([f"-DMPI_CXX_LINK_FLAGS='{self.spec['mpi'].libs.ld_flags}'"])
@@ -655,10 +653,6 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
                     "-DGMX_THREAD_MPI:BOOL=ON",
                 ]
             )
-
-        # Here we cannot use spack_cc because we need also libstdc++ to be reachable
-        # Spack wrapper (spack_cc) hides includes/lib and CMake will fail
-        # options.append("-DGMX_GPLUSPLUS_PATH=%s" % self.pkg.compiler.cxx)
 
         if self.spec.satisfies("%aocc"):
             options.append("-DCMAKE_CXX_FLAGS=--stdlib=libc++")
@@ -932,10 +926,13 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
             )
         if "on" in self.spec.variants["gpu-aware-mpi"].value:
             env.set("GMX_ENABLE_DIRECT_GPU_COMM", "1")
+            env.set("GMX_DISABLE_DIRECT_GPU_COMM", "0")
             env.set("GMX_FORCE_GPU_AWARE_MPI", "0")
         elif "force" in self.spec.variants["gpu-aware-mpi"].value:
             env.set("GMX_ENABLE_DIRECT_GPU_COMM", "1")
+            env.set("GMX_DISABLE_DIRECT_GPU_COMM", "0")
             env.set("GMX_FORCE_GPU_AWARE_MPI", "1")
         else:
             env.set("GMX_ENABLE_DIRECT_GPU_COMM", "0")
+            env.set("GMX_DISABLE_DIRECT_GPU_COMM", "1")
             env.set("GMX_FORCE_GPU_AWARE_MPI", "0")

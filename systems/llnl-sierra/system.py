@@ -36,7 +36,7 @@ class LlnlSierra(System):
     variant(
         "cuda",
         default="11.8.0",
-        values=("11.8.0", "10.1.243"),
+        values=("12.2.2", "11.8.0", "10.1.243"),
         description="CUDA version",
     )
     variant(
@@ -48,7 +48,7 @@ class LlnlSierra(System):
     variant(
         "compiler",
         default="clang-ibm",
-        values=("clang-ibm", "xl", "xl-gcc", "clang"),
+        values=("clang-ibm", "xl", "xl-gcc", "clang", "gcc"),
         description="Which compiler to use",
     )
     variant(
@@ -255,6 +255,63 @@ class LlnlSierra(System):
                     "buildable": False,
                 },
             }
+        elif self.spec.satisfies("cuda=12.2.2"):
+            selections["packages"] |= {
+                "curand": {
+                    "externals": [
+                        {
+                            "spec": "curand@12.2.2",
+                            "prefix": "/usr/tce/packages/cuda/cuda-12.2.2",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cusparse": {
+                    "externals": [
+                        {
+                            "spec": "cusparse@12.2.2",
+                            "prefix": "/usr/tce/packages/cuda/cuda-12.2.2",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cuda": {
+                    "externals": [
+                        {
+                            "spec": "cuda@12.2.2+allow-unsupported-compilers",
+                            "prefix": "/usr/tce/packages/cuda/cuda-12.2.2",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cub": {
+                    "externals": [
+                        {
+                            "spec": "cub@12.2.2",
+                            "prefix": "/usr/tce/packages/cuda/cuda-12.2.2",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cublas": {
+                    "externals": [
+                        {
+                            "spec": "cublas@12.2.2",
+                            "prefix": "/usr/tce/packages/cuda/cuda-12.2.2",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cusolver": {
+                    "externals": [
+                        {
+                            "spec": "cusolver@12.2.2",
+                            "prefix": "/usr/tce/packages/cuda/cuda-12.2.2",
+                        }
+                    ],
+                    "buildable": False,
+                },
+            }
 
         if self.spec.satisfies("lapack=cusolver"):
             if self.spec.satisfies("cuda=10.1.243"):
@@ -276,6 +333,18 @@ class LlnlSierra(System):
                             {
                                 "spec": "cusolver@11.8.0",
                                 "prefix": "/usr/tce/packages/cuda/cuda-11.8.0",
+                            }
+                        ],
+                        "buildable": False,
+                    }
+                }
+            elif self.spec.satisfies("cuda=12.2.2"):
+                selections["packages"] |= {
+                    "cusolver": {
+                        "externals": [
+                            {
+                                "spec": "cusolver@12.2.2",
+                                "prefix": "/usr/tce/packages/cuda/cuda-12.2.2",
                             }
                         ],
                         "buildable": False,
@@ -314,6 +383,18 @@ class LlnlSierra(System):
                             {
                                 "spec": "cublas@11.8.0",
                                 "prefix": "/usr/tce/packages/cuda/cuda-11.8.0",
+                            }
+                        ],
+                        "buildable": False,
+                    }
+                }
+            elif self.spec.satisfies("cuda=12.2.2"):
+                selections["packages"] |= {
+                    "cublas": {
+                        "externals": [
+                            {
+                                "spec": "cublas@12.2.2",
+                                "prefix": "/usr/tce/packages/cuda/cuda-12.2.2",
                             }
                         ],
                         "buildable": False,
@@ -391,6 +472,18 @@ class LlnlSierra(System):
                     "prefix": "/usr/tce/packages/spectrum-mpi/spectrum-mpi-rolling-release-xl-2022.08.19-cuda-11.8.0",
                     "extra_attributes": {
                         "ldflags": "-lmpiprofilesupport -lmpi_ibm_usempi -lmpi_ibm_mpifh -lmpi_ibm"
+                    },
+                }
+            ],
+            (
+                "gcc",
+                "12-2-2",
+            ): [
+                {
+                    "spec": "spectrum-mpi@2023.06.28-gcc-11.2.2-cuda-12.2.2",
+                    "prefix": "/usr/tce/packages/spectrum-mpi/spectrum-mpi-rolling-release-gcc-11.2.1",
+                    "extra_attributes": {
+                        "ldflags": "-lmpiprofilesupport -lmpi_ibm_usempi -lmpi_ibm_mpifh -lmpi_ibm",
                     },
                 }
             ],
@@ -547,6 +640,36 @@ class LlnlSierra(System):
                         "target": "ppc64le",
                         "modules": [],
                         "environment": {},
+                        "extra_rpaths": [],
+                    }
+                }
+            ],
+            (
+                "gcc",
+                "12-2-2",
+            ): [
+                {
+                    "compiler": {
+                        "spec": "gcc@11.2.1-cuda12.2.2",
+                        "paths": {
+                            "cc": "/usr/tce/packages/gcc/gcc-11.2.1/bin/gcc",
+                            "cxx": "/usr/tce/packages/gcc/gcc-11.2.1/bin/g++",
+                            "f77": "/usr/tce/packages/gcc/gcc-11.2.1/bin/gfortran",
+                            "fc": "/usr/tce/packages/gcc/gcc-11.2.1/bin/gfortran",
+                        },
+                        "flags": {
+                            "cflags": "-g -O2",
+                            "cxxflags": "-g -O2 -std=c++17",
+                            "fflags": "",
+                        },
+                        "operating_system": "rhel7",
+                        "target": "ppc64le",
+                        "modules": ["cuda/12.2.2", "gcc/11.2.1"],
+                        "environment": {
+                            "set": {
+                                "CUDA_DIR": "/usr/tce/packages/cuda/cuda-12.2.2",
+                            },
+                        },
                         "extra_rpaths": [],
                     }
                 }
