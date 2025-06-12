@@ -28,7 +28,7 @@
     # Benchpark Analyze experiments with "+strong"
     - |
       if [[ "$VARIANT" == *"+strong"* ]]; then
-        ./bin/benchpark analyze --workspace-dir .
+        ./bin/benchpark analyze --workspace-dir ./workspace/${BENCHMARK}-benchmark/${HOST}-system/workspace/
       fi
     # Check Experiment Exit Codes
     - python ./.gitlab/bin/exit-codes ./workspace/${BENCHMARK}-benchmark/${HOST}-system/workspace/results.latest.json
