@@ -18,7 +18,6 @@ class AllocOpt(Enum):
     N_GPUS = 6
     N_CORES_PER_NODE = 7
     OMP_NUM_THREADS = 8
-    MPIBIND_BINDINGS = 305
 
     # Descriptions of resources available on systems
     SYS_GPUS_PER_NODE = 100
@@ -38,6 +37,7 @@ class AllocOpt(Enum):
     POST_EXEC_CMDS = 302
     PRE_EXEC_CMDS = 303
     GPU_FACTOR = 304
+    MPIBIND_BINDINGS = 305
 
     @staticmethod
     def as_type(enumval, input):
