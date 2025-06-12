@@ -16,14 +16,13 @@
     - . workspace/setup.sh
     # Setup Workspace
     - cd ./workspace/${BENCHMARK}-benchmark/${HOST}-system/workspace/
-    - ramble --workspace-dir . --disable-progress-bar workspace setup
+    - ramble --workspace-dir . workspace setup
     # Run Experiments
-    - |
-      output=$(ramble --workspace-dir . --disable-progress-bar on --executor '{execute_experiment}' --where '{n_nodes} == 1')
-      log_path=$(echo "$output" | grep -oP '^==>\s+\K/.+execute\..+\.out')
-      cat $log_path
+    - ramble --workspace-dir . on --executor '{execute_experiment}' --where '{n_nodes} == 1'
+    # Cat each output file
+    - find experiments/ -type f -name "*.out" -exec cat {} +
     # Analyze Experiments
-    - ramble --workspace-dir . --disable-progress-bar workspace analyze --format json
+    - ramble --workspace-dir . workspace analyze --format json
       yaml text
     - cd -
     # Benchpark Analyze experiments with "+strong"
