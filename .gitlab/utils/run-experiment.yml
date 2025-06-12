@@ -18,9 +18,10 @@
     - cd ./workspace/${BENCHMARK}-benchmark/${HOST}-system/workspace/
     - ramble --workspace-dir . --disable-progress-bar workspace setup
     # Run Experiments
-    - ramble --workspace-dir . --disable-progress-bar on --executor '{execute_experiment}'
-      --where '{n_nodes} == 1'
-    - cat '{experiment_name}.out'
+    - |
+      output=$(ramble --workspace-dir . --disable-progress-bar on --executor '{execute_experiment}' --where '{n_nodes} == 1')
+      log_path=$(echo "$output" | grep -oP '^==>\s+\K/.+execute\..+\.out')
+      cat $log_path
     # Analyze Experiments
     - ramble --workspace-dir . --disable-progress-bar workspace analyze --format json
       yaml text
