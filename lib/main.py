@@ -13,50 +13,35 @@ import sys
 import yaml
 
 __version__ = "0.1.0"
-if "-V" in sys.argv or "--version" in sys.argv:
-    print(__version__)
-    exit()
-helpstr = """usage: main.py [-h] [-V] {tags,system,experiment,setup,unit-test,audit,info,list} ...
+BOOTSTRAP = True
+NOARGS = True if len(sys.argv) == 1 else False
+if NOARGS or any(arg in sys.argv for arg in ["-V", "--version", "-h", "--help"]):
+    BOOTSTRAP = False
 
-Benchpark
+if BOOTSTRAP:
+    import benchpark.paths  # noqa: E402
+    from benchpark.runtime import RuntimeResources
 
-options:
-  -h, --help            show this help message and exit
-  -V, --version         show version number and exit
+    bootstrapper = RuntimeResources(benchpark.paths.benchpark_home)  # noqa
+    bootstrapper.bootstrap()  # noqa
 
-Subcommands:
-  {tags,system,experiment,setup,unit-test,audit,info,list}
-    tags                Tags in Benchpark experiments
-    system              Initialize a system config
-    experiment          Interact with experiments
-    setup               Set up an experiment and prepare it to build/run
-    unit-test           Run benchpark unit tests
-    audit               Look for problems in System/Experiment repos
-    info                Get information about Systems and Experiments
-    list                List experiments, systems, benchmarks, and modifiers
-    analyze             Perform canned analysis on the performance data (caliper files) after 'ramble on'"""
-if "-h" == sys.argv[1] or "--help" == sys.argv[1]:
-    print(helpstr)
-    exit()
+    import benchpark.cmd.audit  # noqa: E402
+    import benchpark.cmd.system  # noqa: E402
+    import benchpark.cmd.experiment  # noqa: E402
+    import benchpark.cmd.setup  # noqa: E402
+    import benchpark.cmd.show_build  # noqa: E402
+    import benchpark.cmd.unit_test  # noqa: E402
+    import benchpark.cmd.mirror  # noqa: E402
+    import benchpark.cmd.info  # noqa: E402
+    import benchpark.cmd.list  # noqa: E402
+    from benchpark.accounting import benchpark_benchmarks  # noqa: E402
 
-import benchpark.cmd.audit  # noqa: E402
-import benchpark.cmd.system  # noqa: E402
-import benchpark.cmd.experiment  # noqa: E402
-import benchpark.cmd.setup  # noqa: E402
-import benchpark.cmd.show_build  # noqa: E402
-import benchpark.cmd.unit_test  # noqa: E402
-import benchpark.cmd.mirror  # noqa: E402
-import benchpark.cmd.info  # noqa: E402
-import benchpark.cmd.list  # noqa: E402
-import benchpark.paths  # noqa: E402
-from benchpark.accounting import benchpark_benchmarks  # noqa: E402
+    try:
+        import benchpark.cmd.analyze  # noqa: E402
 
-try:
-    import benchpark.cmd.analyze  # noqa: E402
-
-    analyze_installed = True
-except ModuleNotFoundError:
-    analyze_installed = False
+        analyze_installed = True
+    except ModuleNotFoundError:
+        analyze_installed = False
 
 
 def main():
@@ -71,15 +56,77 @@ def main():
     subparsers = parser.add_subparsers(title="Subcommands", dest="subcommand")
 
     actions = {}
-    benchpark_tags(subparsers, actions)
-    init_commands(subparsers, actions)
+    actions["system"] = subparsers.add_parser(
+        "system", help="Initialize a system config"
+    )
+    actions["experiment"] = subparsers.add_parser(
+        "experiment", help="Interact with experiments"
+    )
+    actions["setup"] = subparsers.add_parser(
+        "setup", help="Set up an experiment and prepare it to build/run"
+    )
+    actions["setup"].add_argument(
+        "experiment",
+        type=str,
+        help="The experiment (benchmark/ProgrammingModel) to run",
+    )
+    actions["setup"].add_argument(
+        "system", type=str, help="The system on which to run the experiment"
+    )
+    actions["setup"].add_argument(
+        "experiments_root",
+        type=str,
+        help="Where to install packages and store results for the experiments. Benchpark expects to manage this directory, and it should be empty/nonexistent the first time you run benchpark setup experiments.",
+    )
+    actions["unit-test"] = subparsers.add_parser(
+        "unit-test", help="Run benchpark unit tests"
+    )
+    actions["audit"] = subparsers.add_parser(
+        "audit", help="Look for problems in System/Experiment repos"
+    )
+    actions["mirror"] = subparsers.add_parser(
+        "mirror", help="Copy a benchpark workspace"
+    )
+    actions["info"] = subparsers.add_parser(
+        "info", help="Get information about Systems and Experiments"
+    )
+    actions["show-build"] = subparsers.add_parser(
+        "show-build", help="Show how spack built a benchmark"
+    )
+    actions["list"] = subparsers.add_parser(
+        "list", help="List experiments, systems, benchmarks, and modifiers"
+    )
+    actions["analyze"] = subparsers.add_parser(
+        "analyze",
+        help="Perform canned analysis on the performance data (caliper files) after 'ramble on'",
+    )
+    actions["tags"] = subparsers.add_parser(
+        "tags", help="Tags in Benchpark experiments"
+    )
+    actions["tags"].add_argument(
+        "-a",
+        "--application",
+        action="store",
+        help="The application for which to find Benchpark tags",
+    )
+    actions["tags"].add_argument(
+        "-t",
+        "--tag",
+        action="store",
+        help="The tag for which to search in Benchpark experiments",
+    )
 
     args, unknown_args = parser.parse_known_args()
-    no_args = True if len(sys.argv) == 1 else False
 
-    if no_args:
+    if args.version:
+        print(__version__)
+        return
+    elif not BOOTSTRAP:
         parser.print_help()
-        return 1
+        return
+
+    actions["tags"] = benchpark_tags_handler
+    init_commands(actions)
 
     exit_code = 0
 
@@ -158,57 +205,20 @@ def benchpark_check_tag(arg_str):
     return found
 
 
-def init_commands(subparsers, actions_dict):
+def init_commands(actions_dict):
     """This function is for initializing commands that are defined outside
     of this script. It is intended that all command setup will eventually
     be refactored in this way (e.g. `benchpark_setup` will be defined in
     another file.
     """
-    system_parser = subparsers.add_parser("system", help="Initialize a system config")
-    benchpark.cmd.system.setup_parser(system_parser)
-
-    experiment_parser = subparsers.add_parser(
-        "experiment", help="Interact with experiments"
-    )
-    benchpark.cmd.experiment.setup_parser(experiment_parser)
-
-    setup_parser = subparsers.add_parser(
-        "setup", help="Set up an experiment and prepare it to build/run"
-    )
-    benchpark.cmd.setup.setup_parser(setup_parser)
-
-    unit_test_parser = subparsers.add_parser(
-        "unit-test", help="Run benchpark unit tests"
-    )
-    benchpark.cmd.unit_test.setup_parser(unit_test_parser)
-
-    audit_parser = subparsers.add_parser(
-        "audit", help="Look for problems in System/Experiment repos"
-    )
-    benchpark.cmd.audit.setup_parser(audit_parser)
-
-    mirror_parser = subparsers.add_parser("mirror", help="Copy a benchpark workspace")
-    benchpark.cmd.mirror.setup_parser(mirror_parser)
-
-    info_parser = subparsers.add_parser(
-        "info", help="Get information about Systems and Experiments"
-    )
-    benchpark.cmd.info.setup_parser(info_parser)
-
-    show_build_parser = subparsers.add_parser(
-        "show-build", help="Show how spack built a benchmark"
-    )
-    benchpark.cmd.show_build.setup_parser(show_build_parser)
-
-    list_parser = subparsers.add_parser(
-        "list", help="List experiments, systems, benchmarks, and modifiers"
-    )
-    benchpark.cmd.list.setup_parser(list_parser)
-
-    analyze_parser = subparsers.add_parser(
-        "analyze",
-        help="Perform canned analysis on the performance data (caliper files) after 'ramble on'",
-    )
+    benchpark.cmd.system.setup_parser(actions_dict["system"])
+    benchpark.cmd.experiment.setup_parser(actions_dict["experiment"])
+    benchpark.cmd.unit_test.setup_parser(actions_dict["unit-test"])
+    benchpark.cmd.audit.setup_parser(actions_dict["audit"])
+    benchpark.cmd.mirror.setup_parser(actions_dict["mirror"])
+    benchpark.cmd.info.setup_parser(actions_dict["info"])
+    benchpark.cmd.show_build.setup_parser(actions_dict["show-build"])
+    benchpark.cmd.list.setup_parser(actions_dict["list"])
 
     actions_dict["system"] = benchpark.cmd.system.command
     actions_dict["experiment"] = benchpark.cmd.experiment.command
@@ -220,7 +230,7 @@ def init_commands(subparsers, actions_dict):
     actions_dict["show-build"] = benchpark.cmd.show_build.command
     actions_dict["list"] = benchpark.cmd.list.command
     if analyze_installed:
-        benchpark.cmd.analyze.setup_parser(analyze_parser)
+        benchpark.cmd.analyze.setup_parser(actions_dict["analyze"])
         actions_dict["analyze"] = benchpark.cmd.analyze.command
     else:
 
@@ -247,23 +257,6 @@ def run_command(command_str, env=None):
         )
 
     return (stdout, stderr)
-
-
-def benchpark_tags(subparsers, actions_dict):
-    create_parser = subparsers.add_parser("tags", help="Tags in Benchpark experiments")
-    create_parser.add_argument(
-        "-a",
-        "--application",
-        action="store",
-        help="The application for which to find Benchpark tags",
-    )
-    create_parser.add_argument(
-        "-t",
-        "--tag",
-        action="store",
-        help="The tag for which to search in Benchpark experiments",
-    )
-    actions_dict["tags"] = benchpark_tags_handler
 
 
 def helper_experiments_tags(ramble_exe, benchmarks):

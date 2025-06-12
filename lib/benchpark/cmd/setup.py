@@ -15,7 +15,6 @@ import ruamel.yaml as yaml
 import benchpark.paths
 from benchpark.debug import debug_print
 from benchpark.runtime import RuntimeResources
-import benchpark.system
 
 
 # Note: it would be nice to vendor spack.llnl.util.link_tree, but that
@@ -39,22 +38,6 @@ def symlink_tree(src, dst, include_fn=None):
             dst_symlink = dst_dir / x
             src_file = os.path.join(src_subdir, x)
             os.symlink(src_file, dst_symlink)
-
-
-def setup_parser(root_parser):
-    root_parser.add_argument(
-        "experiment",
-        type=str,
-        help="The experiment (benchmark/ProgrammingModel) to run",
-    )
-    root_parser.add_argument(
-        "system", type=str, help="The system on which to run the experiment"
-    )
-    root_parser.add_argument(
-        "experiments_root",
-        type=str,
-        help="Where to install packages and store results for the experiments. Benchpark expects to manage this directory, and it should be empty/nonexistent the first time you run benchpark setup experiments.",
-    )
 
 
 def command(args):
@@ -142,7 +125,9 @@ def command(args):
     initializer_script = experiments_root / "setup.sh"
     run_script = experiments_root / ".latest-experiment.sh"
 
-    per_workspace_setup = RuntimeResources(experiments_root)
+    per_workspace_setup = RuntimeResources(
+        experiments_root, upstream=RuntimeResources(benchpark.paths.benchpark_home)
+    )
 
     # Parse experiment YAML for package_manager
     def find(d, tag):
