@@ -11,13 +11,7 @@ from benchpark.error import BenchparkError
 from benchpark.directives import ExperimentSystemBase
 from benchpark.directives import variant
 import benchpark.spec
-import benchpark.paths
-import benchpark.repo
-import benchpark.runtime
 import benchpark.variant
-
-bootstrapper = benchpark.runtime.RuntimeResources(benchpark.paths.benchpark_home)
-bootstrapper.bootstrap()
 
 import ramble.language.language_base  # noqa
 import ramble.language.language_helpers  # noqa

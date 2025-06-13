@@ -15,7 +15,6 @@ import ruamel.yaml as yaml
 import benchpark.paths
 from benchpark.debug import debug_print
 from benchpark.runtime import RuntimeResources
-import benchpark.system
 
 
 # Note: it would be nice to vendor spack.llnl.util.link_tree, but that
@@ -142,7 +141,9 @@ def command(args):
     initializer_script = experiments_root / "setup.sh"
     run_script = experiments_root / ".latest-experiment.sh"
 
-    per_workspace_setup = RuntimeResources(experiments_root)
+    per_workspace_setup = RuntimeResources(
+        experiments_root, upstream=RuntimeResources(benchpark.paths.benchpark_home)
+    )
 
     # Parse experiment YAML for package_manager
     def find(d, tag):
