@@ -20,12 +20,7 @@ class RajaPerf(ExecutableApplication):
 
     executable('run', 'raja-perf.exe --size {size}', use_mpi=True)
 
-    executable(
-        "modules",
-        "export LD_LIBRARY_PATH=/opt/cray/pe/cce/18.0.1/cce/x86_64/lib:$LD_LIBRARY_PATH",
-    )
-
-    workload('suite', executables=['modules', 'run'])
+    workload('suite', executables=['run'])
 
     figure_of_merit('All tests pass', log_file='{experiment_run_dir}/{experiment_name}.out', fom_regex=r'(?P<tpass>DONE)!!!...', group_name='tpass', units='')
 
