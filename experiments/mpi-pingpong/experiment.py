@@ -19,10 +19,8 @@ class MpiPingpong(Experiment, Caliper):
     maintainers("stephanielam3211")
 
     def compute_applications_section(self):
-        n_ranks = 1   #dane:896, ruby:448, tioga:512, lassen:352, tuolumne:768
         n_nodes = 8     #max number of nodes
         expr_vars = {
-            "n_ranks": n_ranks, #[113]*5,
             "n_nodes": n_nodes,
             #"iterations": [10]*5+[10000]*5+[100000]*5,
             #"msg_size": [16,256,4096,65536,1048576]*3
@@ -45,6 +43,10 @@ class MpiPingpong(Experiment, Caliper):
             process_problem_size="{msg_size}",
             total_problem_size="{msg_size}",
         )
+
+        #self.set_environment_variable(
+            
+        #)
 
     def compute_package_section(self):
         self.add_package_spec(self.name, ["mpi-pingpong@main"])
