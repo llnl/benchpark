@@ -1,3 +1,0 @@
-.run_experiment:
-  script:
-    - echo -e run-experiment.sh | xargs srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) --reservation=ci --nodes=1

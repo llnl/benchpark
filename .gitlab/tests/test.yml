@@ -100,3 +100,7 @@ limited_test_run:
     - !reference [.run_experiment, script]
   after_script:
     - !reference [.report_status, after_script]
+
+.run_experiment:
+  script:
+    - echo -e run-experiment.sh | xargs srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) --reservation=ci --nodes=1
