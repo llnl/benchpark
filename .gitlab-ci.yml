@@ -7,6 +7,8 @@ variables:
 # test".  Add protected branches here. See default value in
 # preliminary-ignore-draft-pr.yml.
   ALWAYS_RUN_PATTERN: ^develop$|^master$|^v[0-9.]*$|^releases/$
+  # Expand multi-line commands in logs
+  FF_SCRIPT_SECTIONS: 1
 default:
   id_tokens:
     SITE_ID_TOKEN:
