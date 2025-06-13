@@ -7,20 +7,11 @@ import hashlib
 import os
 import packaging.version
 import yaml
-
-import benchpark.paths
-from benchpark.directives import ExperimentSystemBase
-import benchpark.repo
-from benchpark.runtime import RuntimeResources
-
 from typing import Dict, Tuple
+
+from benchpark.directives import ExperimentSystemBase
 import benchpark.spec
 import benchpark.variant
-
-bootstrapper = RuntimeResources(benchpark.paths.benchpark_home)  # noqa
-bootstrapper.bootstrap()  # noqa
-
-_repo_path = benchpark.repo.paths[benchpark.repo.ObjectTypes.systems]
 
 
 def _hash_id(content_list):
@@ -43,6 +34,8 @@ class System(ExperimentSystemBase):
         self.external_resources = None
 
         self.sys_cores_per_node = None
+        self.sys_cores_os_reserved = None
+        self.sys_cores_os_reserved_list = None
         self.sys_gpus_per_node = None
         self.sys_mem_per_node = None
         self.scheduler = None
@@ -112,7 +105,13 @@ class System(ExperimentSystemBase):
                 raise ValueError(f"Missing required info: {attr}")
 
         optionals = {}
-        for opt in ["sys_gpus_per_node", "sys_mem_per_node", "queue"]:
+        for opt in [
+            "sys_cores_os_reserved",
+            "sys_cores_os_reserved_list",
+            "sys_gpus_per_node",
+            "sys_mem_per_node",
+            "queue",
+        ]:
             if getattr(self, opt, None):
                 optionals[opt] = getattr(self, opt)
 

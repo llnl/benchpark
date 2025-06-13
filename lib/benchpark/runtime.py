@@ -13,13 +13,7 @@ import sys
 import yaml
 
 import benchpark.paths
-
-DEBUG = False
-
-
-def debug_print(message):
-    if DEBUG:
-        print("(debug) " + str(message))
+from benchpark.debug import debug_print
 
 
 @contextmanager
@@ -52,7 +46,7 @@ def run_command(command_str, env=None, stdout=None, stderr=None):
     out, err = proc.communicate()
     if proc.returncode != 0:
         raise RuntimeError(
-            f"Failed command: {command_str}\nOutput: {stdout}\nError: {stderr}"
+            f"Failed command: {command_str}\nOutput: {out}\nError: {err}"
         )
 
     return (out, err)
@@ -70,22 +64,38 @@ class Command:
 
 
 class RuntimeResources:
-    def __init__(self, dest):
-        self.root = benchpark.paths.benchpark_root
+    def __init__(self, dest, upstream=None):
         self.dest = pathlib.Path(dest)
+        self.upstream = upstream
 
-        checkout_versions_location = self.root / "checkout-versions.yaml"
-        with open(checkout_versions_location, "r") as yaml_file:
-            data = yaml.safe_load(yaml_file)
-            self.ramble_commit = data["versions"]["ramble"]
-            self.spack_commit = data["versions"]["spack"]
+        self.ramble_location, self.spack_location = (
+            self.dest / "ramble",
+            self.dest / "spack",
+        )
 
-        self.ramble_location = self.dest / "ramble"
-        self.spack_location = self.dest / "spack"
+        # Read pinned versions of ramble and spack
+        with open(benchpark.paths.checkout_versions, "r") as yaml_file:
+            data = yaml.safe_load(yaml_file)["versions"]
+            self.ramble_commit, self.spack_commit = data["ramble"], data["spack"]
 
-    def update_old_bootstrap(self, desired_commit, location):
-        # Store first 7 of hash in checkout-versions.yaml
+        # Read remote urls for ramble and spack
+        with open(benchpark.paths.remote_urls, "r") as yaml_file:
+            data = yaml.safe_load(yaml_file)["urls"]
+            remote_ramble_url, remote_spack_url = data["ramble"], data["spack"]
+
+        # If this does not have an upstream, then we will be cloning from the URLs indicated in remote-urls.yaml
+        if self.upstream is None:
+            self.ramble_url, self.spack_url = remote_ramble_url, remote_spack_url
+        else:
+            # Clone from local "upstream" repository
+            self.ramble_url, self.spack_url = (
+                self.upstream.ramble_location,
+                self.upstream.spack_location,
+            )
+
+    def _check_and_update_bootstrap(self, desired_commit, location):
         with working_dir(location):
+            # length of hash is 7 in checkout-versions.yaml
             current_commit = run_command("git rev-parse HEAD")[0].strip()[:7]
             if current_commit != desired_commit:
                 run_command("git fetch --all")
@@ -98,7 +108,7 @@ class RuntimeResources:
         if not self.ramble_location.exists():
             self._install_ramble()
         else:
-            self.update_old_bootstrap(self.ramble_commit, self.ramble_location)
+            self._check_and_update_bootstrap(self.ramble_commit, self.ramble_location)
         ramble_lib_path = self.ramble_location / "lib" / "ramble"
         externals = str(ramble_lib_path / "external")
         if externals not in sys.path:
@@ -113,12 +123,12 @@ class RuntimeResources:
         if not self.spack_location.exists():
             self._install_spack()
         else:
-            self.update_old_bootstrap(self.spack_commit, self.spack_location)
+            self._check_and_update_bootstrap(self.spack_commit, self.spack_location)
 
     def _install_ramble(self):
         print(f"Cloning Ramble to {self.ramble_location}")
         git_clone_commit(
-            "https://github.com/GoogleCloudPlatform/ramble.git",
+            self.ramble_url,
             self.ramble_commit,
             self.ramble_location,
         )
@@ -127,7 +137,9 @@ class RuntimeResources:
     def _install_spack(self):
         print(f"Cloning Spack to {self.spack_location}")
         git_clone_commit(
-            "https://github.com/spack/spack.git", self.spack_commit, self.spack_location
+            self.spack_url,
+            self.spack_commit,
+            self.spack_location,
         )
         debug_print(f"Done cloning Spack ({self.spack_location})")
 
