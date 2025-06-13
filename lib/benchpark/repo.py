@@ -10,14 +10,8 @@ import sys
 from enum import Enum
 
 import benchpark.paths
-import benchpark.runtime
 
 # isort: off
-
-bootstrapper = benchpark.runtime.RuntimeResources(
-    benchpark.paths.benchpark_home
-)  # noqa
-bootstrapper.bootstrap()  # noqa
 
 import llnl.util.lang  # noqa
 import ramble.language.language_base  # noqa

@@ -7,20 +7,11 @@ import hashlib
 import os
 import packaging.version
 import yaml
-
-import benchpark.paths
-from benchpark.directives import ExperimentSystemBase
-import benchpark.repo
-from benchpark.runtime import RuntimeResources
-
 from typing import Dict, Tuple
+
+from benchpark.directives import ExperimentSystemBase
 import benchpark.spec
 import benchpark.variant
-
-bootstrapper = RuntimeResources(benchpark.paths.benchpark_home)  # noqa
-bootstrapper.bootstrap()  # noqa
-
-_repo_path = benchpark.repo.paths[benchpark.repo.ObjectTypes.systems]
 
 
 def _hash_id(content_list):
