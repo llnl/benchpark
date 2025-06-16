@@ -159,9 +159,18 @@ class LlnlElcapitan(System):
                 "groff": {"externals": [{"spec": "groff@1.22.3", "prefix": "/usr"}]},
                 "cmake": {
                     "externals": [
-                        {"spec": "cmake@3.23.1", "prefix": "/usr/tce/packages/cmake/cmake-3.23.1"},
-                        {"spec": "cmake@3.24.2", "prefix": "/usr/tce/packages/cmake/cmake-3.24.2"},
-                        {"spec": "cmake@3.29.2", "prefix": "/usr/tce/packages/cmake/cmake-3.29.2"},
+                        {
+                            "spec": "cmake@3.23.1",
+                            "prefix": "/usr/tce/packages/cmake/cmake-3.23.1",
+                        },
+                        {
+                            "spec": "cmake@3.24.2",
+                            "prefix": "/usr/tce/packages/cmake/cmake-3.24.2",
+                        },
+                        {
+                            "spec": "cmake@3.29.2",
+                            "prefix": "/usr/tce/packages/cmake/cmake-3.29.2",
+                        },
                     ],
                     "buildable": False,
                 },
