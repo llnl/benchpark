@@ -120,15 +120,15 @@ def Scaling(*modes):
 
     BaseScaling.scale_params = scale_params
 
-    # The register_scaling_policy method defines the scaled variables and their
+    # The register_scaling_config method defines the scaled variables and their
     # scaling function for each scaling mode supported in the experiment
-    # The input to register_scaling_policy is a dictionary of the form
+    # The input to register_scaling_config is a dictionary of the form
     # ScalingMode -> { scaled_var: scaling_function }
     # An entry is required for each ScalingMode supported in the experiment
     # For a multi-dimensional variable of the form:
     # num_procs -> { "px": 2, "py": 2, "pz": 1 }, the value of scaled_var is "num_procs"
     # For a scalar variable, the value of scaled_var is the name of the variable
-    # Each scaled_var specified in register_scaling_policy must be added to the
+    # Each scaled_var specified in register_scaling_config must be added to the
     # list of experiment variables using add_experiment_variable
     #
     # The scaling function has the following form
@@ -147,7 +147,7 @@ def Scaling(*modes):
     # e.g. if the scaling config is defined as:
     # ScalingMode.Strong: {
     #     "np": lambda var, itr, dim, sf: var.val(dim) * sf,
-    #     "sizes": lambda var, itr, dim, sf: var.val(dim) * sf,
+    #     "probs": lambda var, itr, dim, sf: var.val(dim) * sf,
     # }, and the starting values of the variables are
     # "np" : { "px": 2,
     #          "py": 2,

@@ -312,9 +312,6 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
             modifier_list += cls.compute_modifiers_section()
         return modifier_list
 
-    def add_experiment_name_prefix(self, prefix):
-        self.expr_var_names = [prefix] + self.expr_var_names
-
     def add_experiment_variable(self, name, values, named=False, matrixed=False):
         if isinstance(values, dict):
             self.expr_vars.add_dimensional_variable(name, values, named, matrixed)

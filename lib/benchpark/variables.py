@@ -125,13 +125,15 @@ class Variable:
     def is_matrixed(self):
         return self._matrixed
 
-    @property
-    def prod(self):
-        return self.reduce(lambda x, y: x * y)
-
     def reduce(self, func):
         return [reduce(func, col) for col in zip(*self._var.values())]
 
+    # This method checks the last value for each dimension
+    # and returns the dimension that has the minimum value
+    # for its last entry
+    # e.g. px: [1,1,2], py: [1,2,2] and pz: [1,1,1]
+    # the last values are px: 2, py: 2 and pz: 1
+    # hence the method returns 2 (the index of pz)
     @property
     def min_dim(self):
         last_values = [v[-1] for v in self._var.values()]
