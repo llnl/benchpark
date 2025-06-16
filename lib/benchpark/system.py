@@ -151,7 +151,9 @@ class System(ExperimentSystemBase):
                 "compilers": (
                     # "'compilers:':" syntax is required to enforce spack to use benchpark-defined
                     # compilers instead of external compilers defined by spack compiler search (from ramble).
-                    {"compilers:": compilers["compilers"]} if compilers else None
+                    {"compilers:": compilers["compilers"]}
+                    if compilers
+                    else None
                 ),
                 "packages": self.compute_packages_section(),
             },
