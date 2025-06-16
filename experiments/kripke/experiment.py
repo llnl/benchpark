@@ -99,7 +99,6 @@ class Kripke(
         # Note that scaling starts with the minimum value dimension (pz) of the
         # first variable (np) and proceeds in a round-robin manner
 
-
         # In this application, since the input problem sizes (problem_sizes)
         # are global process sizes, strong scaling the problem requires that
         # only num_procs are scaled up, i.e. (x * scaling_factor),
