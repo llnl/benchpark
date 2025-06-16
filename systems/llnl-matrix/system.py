@@ -143,6 +143,10 @@ class LlnlMatrix(System):
                     "externals": [{"spec": "gmake@4.2.1", "prefix": "/usr"}],
                     "buildable": False,
                 },
+                "curl": {
+                    "externals": [{"spec": "curl@7.61.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
             }
         }
 
@@ -295,7 +299,9 @@ class LlnlMatrix(System):
                             "flags": {},
                             "operating_system": "rhel8",
                             "target": "x86_64",
-                            "modules": [],
+                            "modules": [
+                                f"cuda/{self.cuda_version}",
+                            ],
                             "environment": {},
                             "extra_rpaths": [],
                         }
@@ -322,7 +328,7 @@ class LlnlMatrix(System):
                 "cuda": {
                     "externals": [
                         {
-                            "spec": f"cuda@{cuda_version}",
+                            "spec": f"cuda@{cuda_version}+allow-unsupported-compilers",
                             "prefix": f"/usr/tce/packages/cuda/cuda-{cuda_version}",
                         }
                     ],
