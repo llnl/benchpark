@@ -115,8 +115,9 @@ class LlnlCluster(System):
                 },
                 "cmake": {
                     "externals": [
-                        {"spec": "cmake@3.26.5", "prefix": "/usr"},
-                        {"spec": "cmake@3.23.1", "prefix": "/usr/tce"},
+                        {"spec": "cmake@3.26.5", "prefix": "/usr/tce/packages/cmake/cmake-3.26.3"},
+                        {"spec": "cmake@3.23.1", "prefix": "/usr/tce/packages/cmake/cmake-3.23.1"},
+                        {"spec": "cmake@3.31.7", "prefix": "/collab/usr/global/tools/cmake/toss_4_x86_64_ib/cmake-3.31.7"},
                     ],
                     "buildable": False,
                 },
