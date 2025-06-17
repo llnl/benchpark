@@ -90,21 +90,13 @@ class RajaPerf(
                 self.add_experiment_variable(nk, nv, True)
 
         if self.spec.satisfies("+cuda"):
-            self.add_experiment_variable("RAJAPerf_variant", "Base_CUDA", True)
-            self.add_experiment_variable("RAJAPerf_tuning", "block_256", True)
             self.add_experiment_variable("n_gpus", n_resources, True)
         elif self.spec.satisfies("+rocm"):
-            self.add_experiment_variable("RAJAPerf_variant", "Base_HIP", True)
-            self.add_experiment_variable("RAJAPerf_tuning", "block_256", True)
             self.add_experiment_variable("n_gpus", n_resources, True)
         elif self.spec.satisfies("+openmp"):
-            self.add_experiment_variable("RAJAPerf_variant", "Base_OpenMP", True)
-            self.add_experiment_variable("RAJAPerf_tuning", "default", True)
             self.add_experiment_variable("n_ranks", n_resources, True)
             self.add_experiment_variable("n_threads_per_proc", 1, True)
         else:
-            self.add_experiment_variable("RAJAPerf_variant", "Base_Seq", True)
-            self.add_experiment_variable("RAJAPerf_tuning", "default", True)
             self.add_experiment_variable("n_ranks", n_resources, True)
 
         self.set_required_variables(
