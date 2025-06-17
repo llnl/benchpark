@@ -20,8 +20,6 @@ def get_caliper_vars_section(expr_spec):
         if isinstance(helper, benchpark.caliper.Caliper.Helper):
             cali = helper
             break
-    else:
-        raise RuntimeError("Caliper helper not found")
     return cali.compute_variables_section()
 
 
