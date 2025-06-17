@@ -322,6 +322,7 @@ class Allocation(BasicModifier):
         sbatch_directives = list(f"#SBATCH {x}" for x in (srun_opts + sbatch_opts))
 
         v.mpi_command = f"srun {' '.join(srun_opts)}"
+        v.single_rank_mpi_command = "srun -n 1 -N 1"
         v.batch_submit = "sbatch {execute_experiment}"
         v.allocation_directives = "\n".join(sbatch_directives)
 
@@ -390,6 +391,7 @@ class Allocation(BasicModifier):
         batch_directives = list(f"# flux: {x}" for x in (cmd_opts + batch_opts))
 
         v.mpi_command = f"flux run {' '.join([cmd_ranks] + cmd_opts)}"
+        v.single_rank_mpi_command = "flux run -n 1 -N 1"
         v.batch_submit = "flux batch {execute_experiment}"
         v.allocation_directives = "\n".join(batch_directives)
 
@@ -398,6 +400,7 @@ class Allocation(BasicModifier):
         cmd_opts.extend([f"-n {v.n_ranks}"])
 
         v.mpi_command = "mpirun " + " ".join(cmd_opts)
+        v.single_rank_mpi_command = "mpirun -n 1"
         v.batch_submit = "{execute_experiment}"
         v.allocation_directives = ""
 
@@ -428,6 +431,7 @@ class Allocation(BasicModifier):
         batch_directives = list(f"#BSUB {x}" for x in batch_opts)
 
         v.mpi_command = f"lrun {' '.join(cmd_opts)}"
+        v.single_rank_mpi_command = "lrun -n 1"
         v.batch_submit = "bsub {execute_experiment}"
         v.allocation_directives = "\n".join(batch_directives)
 
@@ -444,6 +448,7 @@ class Allocation(BasicModifier):
         batch_directives = list(f"#PJM {x}" for x in batch_opts)
 
         v.mpi_command = "mpiexec " + " ".join(cmd_opts)
+        v.single_rank_mpi_command = "mpiexec --mpi proc=1"
         v.batch_submit = "pjsub {execute_experiment}"
         v.allocation_directives = "\n".join(batch_directives)
 

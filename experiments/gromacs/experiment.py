@@ -54,19 +54,19 @@ class Gromacs(
             self.set_environment_variable("OMP_PROC_BIND", "close")
             self.set_environment_variable("OMP_PLACES", "cores")
             self.add_experiment_variable("n_threads_per_proc", 8, True)
-            self.add_experiment_variable("n_ranks", 4, True)
+            self.add_experiment_variable("n_ranks", 8, True)
             target = "cpu"
             bonded_target = "cpu"
             npme = "0"
 
         # Overrides +openmp settings
         if self.spec.satisfies("+cuda"):
-            self.add_experiment_variable("n_gpus", 4, True)
+            self.add_experiment_variable("n_gpus", 8, True)
             target = "gpu"
             bonded_target = "cpu"
             npme = "1"
         elif self.spec.satisfies("+rocm"):
-            self.add_experiment_variable("n_gpus", 4, True)
+            self.add_experiment_variable("n_gpus", 8, True)
             target = "gpu"
             bonded_target = "cpu"
             npme = "1"
