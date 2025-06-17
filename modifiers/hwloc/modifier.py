@@ -85,7 +85,7 @@ class Hwloc(BasicModifier):
         )
         if caliper_modifier:
             os_reserved_metadata = self.get_os_reserved_data(app_inst)
-            print("os_reserved_metadata:", os_reserved_metadata)
+            # print("os_reserved_metadata:", os_reserved_metadata)
             # Convert the .xml file from hwloc output to equivalent .json format
             pre_exec.append(
                 CommandExecutable(
