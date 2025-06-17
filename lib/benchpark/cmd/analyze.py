@@ -153,6 +153,9 @@ def make_stacked_line_chart(**kwargs):
         figsize=kwargs["chart_figsize"] if kwargs["chart_figsize"] else (12, 7),
         ax=ax,
     )
+    y_axis_limits = kwargs.get("chart_yaxis_limits")
+    if y_axis_limits is not None:
+        ax.set_ylim(y_axis_limits[0], y_axis_limits[1])
 
     handles, labels = ax.get_legend_handles_labels()
     handles = list(reversed(handles))
@@ -193,7 +196,10 @@ def prepare_data(**kwargs):
     Processes .cali files from a Ramble workspace to generate performance charts.
     """
     workspace_dir = kwargs["workspace_dir"]
-    files = glob(os.path.join(workspace_dir, "**/*.cali"), recursive=True)
+    files = glob(
+        os.path.join(workspace_dir, f"**/*{kwargs['file_name_match']}.cali"),
+        recursive=True,
+    )
     logger.info(f"Found {len(files)} .cali files for analysis.")
 
     tk = th.Thicket.from_caliperreader(files, disable_tqdm=True)
@@ -428,6 +434,20 @@ def setup_parser(root_parser):
     )
     root_parser.add_argument(
         "--chart-fontsize", type=int, help="Font size of the output chart."
+    )
+    root_parser.add_argument(
+        "--chart-yaxis-limits",
+        type=float,
+        nargs=2,
+        metavar=("YMIN", "YMAX"),
+        default=None,
+        help="Set both y-axis limits: --chart-yaxis-limits YMIN YMAX",
+    )
+    root_parser.add_argument(
+        "--file-name-match",
+        type=str,
+        default="",
+        help="Set optional cali file name to match. Useful if multiple caliper files are generated per experiment (e.g. RAJAPerf)",
     )
 
 

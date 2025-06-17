@@ -144,12 +144,19 @@ class System(ExperimentSystemBase):
 
     def compute_dict(self):
         # This can be overridden by any subclass that needs more flexibility
+        compilers = self.compute_compilers_section()
         return {
             "system_id": self.compute_system_id(),
             "variables": self.compute_variables_section(),
             "software": self.compute_software_section(),
             "auxiliary_software_files": {
-                "compilers": self.compute_compilers_section(),
+                "compilers": (
+                    # "'compilers:':" syntax is required to enforce spack to use benchpark-defined
+                    # compilers instead of external compilers defined by spack compiler search (from ramble).
+                    {"compilers:": compilers["compilers"]}
+                    if compilers
+                    else None
+                ),
                 "packages": self.compute_packages_section(),
             },
         }
