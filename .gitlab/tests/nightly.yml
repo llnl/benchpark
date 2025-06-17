@@ -1,6 +1,6 @@
 include:
   - local: .gitlab/utils/status.yml
-  - local: .gitlab/utils/run-experiment.yml
+  #- local: .gitlab/utils/run-experiment.yml
 .test_clusters_nightly: &test_clusters_nightly
   parallel:
     matrix:

@@ -1,0 +1,75 @@
+include:
+  - local: .gitlab/utils/status.yml
+workflow:
+  auto_cancel:
+    on_new_commit: conservative
+.on_host_tuolumne:
+  tags: [shell, tuolumne]
+  rules:
+    # Advanced jobs can only run on master, develop or if ALL_TARGETS is ON.
+    # Set ADVANCED_JOB to ON in the job definition to make it an advanced job.
+    - if: $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH
+        != "develop" && $ALL_TARGETS != "ON"
+      when: never
+    # We should always release resources allocated in the pipeline.
+    - if: $CI_JOB_NAME =~ /release_resources/
+      when: always
+    # A true statement is expected to allow jobs to run. Here is the default.
+    - when: on_success
+allocate_resources_tuolumne:
+  variables:
+    GIT_STRATEGY: none
+  extends: .on_host_tuolumne
+  stage: allocate-resources
+  script:
+    - |
+      set -x
+      flux --parent alloc ${TUOLUMNE_SHARED_ALLOC} --job-name=${ALLOC_NAME} --bg
+release_resources_tuolumne:
+  variables:
+    GIT_STRATEGY: none
+  extends: .on_host_tuolumne
+  stage: release-resources
+  script:
+    - |
+      set -x
+      export URI=$(flux jobs -o "{id} {name}" | grep ${ALLOC_NAME} | awk '{print $1}')
+      ([[ -n "${URI}" ]] && flux job kill ${URI} || exit 0)
+.test_clusters_tuolumne: &test_clusters_tuolumne
+  parallel:
+    matrix:
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [stream, kripke]
+        VARIANT: ['']
+        SYSTEM_ARGS: ['']
+        DASHBOARD_NAME: Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init
+          --dest=tuolumne-system llnl-elcapitan cluster=tuolumne]
+limited_test_run_tuolumne:
+  extends: .on_host_tuolumne
+  resource_group: $HOST
+  stage: test
+  <<: *test_clusters_tuolumne
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - changes:
+        - .gitlab-ci.yml
+        - .gitlab/**
+        - experiments/**
+        - systems/$ARCHCONFIG/**
+        - repo/$BENCHMARK/**
+        - modifiers/**
+        - var/**
+        - lib/**
+  before_script:
+    - !reference [.report_status, before_script]
+  script:
+    - |
+      ALLOC_ID=$(flux jobs --name="${ALLOC_NAME}" -n -o "{id}")
+      echo -e "[Information]: Shared allocation ID = ${ALLOC_ID}"
+      PROXY="$( [[ -n "${ALLOC_ID}" ]] && echo "flux proxy ${ALLOC_ID}" || echo "" )"
+    - ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${TUOLUMNE_FLUX_ARGS}
+      .gitlab/utils/run-experiment.sh )
+  after_script:
+    - !reference [.report_status, after_script]
