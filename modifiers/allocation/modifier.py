@@ -322,7 +322,7 @@ class Allocation(BasicModifier):
         sbatch_directives = list(f"#SBATCH {x}" for x in (srun_opts + sbatch_opts))
 
         v.mpi_command = f"srun {' '.join(srun_opts)}"
-        v.single_rank_mpi_command = "srun -n 1 -N 1"
+        v.single_rank_mpi_command = f"srun -n 1 -N 1 {'--gpus 1' if v.n_gpus else ''}"
         v.batch_submit = "sbatch {execute_experiment}"
         v.allocation_directives = "\n".join(sbatch_directives)
 
@@ -391,7 +391,7 @@ class Allocation(BasicModifier):
         batch_directives = list(f"# flux: {x}" for x in (cmd_opts + batch_opts))
 
         v.mpi_command = f"flux run {' '.join([cmd_ranks] + cmd_opts)}"
-        v.single_rank_mpi_command = "flux run -n 1 -N 1"
+        v.single_rank_mpi_command = f"flux run -n 1 -N 1 {'-g=1' if v.n_gpus else ''}"
         v.batch_submit = "flux batch {execute_experiment}"
         v.allocation_directives = "\n".join(batch_directives)
 
@@ -431,7 +431,7 @@ class Allocation(BasicModifier):
         batch_directives = list(f"#BSUB {x}" for x in batch_opts)
 
         v.mpi_command = f"lrun {' '.join(cmd_opts)}"
-        v.single_rank_mpi_command = "lrun -n 1"
+        v.single_rank_mpi_command = f"lrun -n 1 -N 1 {'-g 1' if v.n_gpus else ''}"
         v.batch_submit = "bsub {execute_experiment}"
         v.allocation_directives = "\n".join(batch_directives)
 
