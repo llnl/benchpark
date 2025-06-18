@@ -139,7 +139,7 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
     # on: turn on, but allow groamcs to disable it if GPU-aware MPI is not supported
     # force: turn on and force gromacs to use GPU-aware MPI. May result in error if unsupported
     variant(
-        "gpu-aware-mpi",
+        "direct-gpu-comm",
         default="on",
         values=("on", "off", "force"),
         when="@2021: +mpi",
@@ -533,9 +533,9 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
                     "lib",
                 ),
             )
-        if "force" in self.spec.variants["gpu-aware-mpi"].value:
+        if "force" in self.spec.variants["direct-gpu-comm"].value:
             env.set("GMX_FORCE_GPU_AWARE_MPI", "1")
-        elif "off" in self.spec.variants["gpu-aware-mpi"].value:
+        elif "off" in self.spec.variants["direct-gpu-comm"].value:
             env.set("GMX_DISABLE_DIRECT_GPU_COMM", "1")
 
 
@@ -893,7 +893,7 @@ class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
                     "lib",
                 ),
             )
-        if "force" in self.spec.variants["gpu-aware-mpi"].value:
+        if "force" in self.spec.variants["direct-gpu-comm"].value:
             env.set("GMX_FORCE_GPU_AWARE_MPI", "1")
-        elif "off" in self.spec.variants["gpu-aware-mpi"].value:
+        elif "off" in self.spec.variants["direct-gpu-comm"].value:
             env.set("GMX_DISABLE_DIRECT_GPU_COMM", "1")

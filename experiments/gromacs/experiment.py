@@ -35,7 +35,7 @@ class Gromacs(
     # on: turn on, but allow groamcs to disable it if GPU-aware MPI is not supported
     # force: turn on and force gromacs to use GPU-aware MPI. May result in error if unsupported
     variant(
-        "gpu-aware-mpi",
+        "direct-gpu-comm",
         default="on",
         values=("on", "off", "force"),
         description="Use GPU-aware MPI",
@@ -109,10 +109,10 @@ class Gromacs(
         spack_specs += "+sycl" if self.spec.satisfies("+sycl") else "~sycl"
 
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
-            spack_specs += f" gpu-aware-mpi={self.spec.variants['gpu-aware-mpi'][0]} "
+            spack_specs += f" direct-gpu-comm={self.spec.variants['direct-gpu-comm'][0]} "
             spack_specs += " ~double "
         else:
-            spack_specs += " gpu-aware-mpi=off "
+            spack_specs += " direct-gpu-comm=off "
 
         self.add_package_spec(
             self.name,
