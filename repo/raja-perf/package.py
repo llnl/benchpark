@@ -361,3 +361,10 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
     def cmake_args(self):
         options = [f"-DMPI_CXX_LINK_FLAGS='{self.spec['mpi'].libs.ld_flags}'"]
         return options
+
+    def setup_run_environment(self, env):
+        super().setup_run_environment(env)
+
+        if self.compiler.extra_rpaths:
+            for rpath in self.compiler.extra_rpaths:
+                env.prepend_path("LD_LIBRARY_PATH", rpath)

@@ -10,6 +10,7 @@ from benchpark.scaling import StrongScaling
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
+from benchpark.scaling import ThroughputScaling
 from benchpark.caliper import Caliper
 
 
@@ -19,6 +20,7 @@ class RajaPerf(
     CudaExperiment,
     ROCmExperiment,
     OpenMPExperiment,
+    ThroughputScaling,
     Caliper,
 ):
     variant(
@@ -49,9 +51,13 @@ class RajaPerf(
             raise BenchparkError(
                 f"Only one type of scaling per experiment is allowed for application package {self.name}"
             )
-
-        n_resources = {"n_ranks": 1}
-        problem_sizes = {"size": 1048576}
+        
+        # 1048576
+        factor = 1
+        scale = 4 * factor
+        init_problem_size = 33554432
+        n_resources = {"n_ranks": scale}
+        problem_sizes = {"size": init_problem_size // scale} ## Reminder: divide by 24 NOT 6
 
         if self.spec.satisfies("+single_node"):
             for pk, pv in n_resources.items():
@@ -88,23 +94,24 @@ class RajaPerf(
             problem_sizes = scaled_problem_sizes["size"]
             for nk, nv in scaled_problem_sizes.items():
                 self.add_experiment_variable(nk, nv, True)
+        elif self.spec.satisfies("+throughput"):
+            scaled_variables = self.generate_throughput_scaling_params(
+                {tuple(problem_sizes.keys()): list(problem_sizes.values())},
+                int(self.spec.variants["scaling-factor"][0]),
+                int(self.spec.variants["scaling-iterations"][0]),
+            )
+            n_resources = n_resources["n_ranks"]
+            for nk, nv in scaled_variables.items():
+                self.add_experiment_variable(nk, nv, True)
 
         if self.spec.satisfies("+cuda"):
-            self.add_experiment_variable("RAJAPerf_variant", "Base_CUDA", True)
-            self.add_experiment_variable("RAJAPerf_tuning", "block_256", True)
             self.add_experiment_variable("n_gpus", n_resources, True)
         elif self.spec.satisfies("+rocm"):
-            self.add_experiment_variable("RAJAPerf_variant", "Base_HIP", True)
-            self.add_experiment_variable("RAJAPerf_tuning", "block_256", True)
             self.add_experiment_variable("n_gpus", n_resources, True)
         elif self.spec.satisfies("+openmp"):
-            self.add_experiment_variable("RAJAPerf_variant", "Base_OpenMP", True)
-            self.add_experiment_variable("RAJAPerf_tuning", "default", True)
             self.add_experiment_variable("n_ranks", n_resources, True)
             self.add_experiment_variable("n_threads_per_proc", 1, True)
         else:
-            self.add_experiment_variable("RAJAPerf_variant", "Base_Seq", True)
-            self.add_experiment_variable("RAJAPerf_tuning", "default", True)
             self.add_experiment_variable("n_ranks", n_resources, True)
 
         self.set_required_variables(

@@ -31,9 +31,6 @@ class Caliper(BasicModifier):
 
     maintainers("pearce8")
 
-    # The filename for Caliper output data
-    _cali_datafile = "{experiment_run_dir}/{experiment_name}.cali"
-
     # The filename for metadata forwarded from Benchpark to Caliper
     _caliper_metadata_file = "{experiment_run_dir}/{experiment_name}_metadata.json"
 
@@ -50,8 +47,8 @@ class Caliper(BasicModifier):
 
     env_var_modification(
         "CALI_CONFIG",
-        'spot(output={}{}),metadata(file={}),metadata(file=/etc/node_info.json,keys="host.name,host.cluster,host.os")'.format(
-            _cali_datafile, "${CALI_CONFIG_MODE}", _caliper_metadata_file
+        'spot({}),metadata(file={}),metadata(file=/etc/node_info.json,keys="host.name,host.cluster,host.os")'.format(
+            "${CALI_CONFIG_MODE}", _caliper_metadata_file
         ),
         method="set",
         modes=[_default_mode],
@@ -128,8 +125,6 @@ class Caliper(BasicModifier):
         cali_metadata_file = self.expander.expand_var(self._caliper_metadata_file)
         with open(cali_metadata_file, "w") as f:
             f.write(json.dumps(cali_metadata))
-
-    archive_pattern(_cali_datafile)
 
     software_spec("caliper", pkg_spec="caliper")
 
