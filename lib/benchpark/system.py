@@ -85,6 +85,9 @@ class System(ExperimentSystemBase):
         for pm in self.programming_models:
             pm.verify(self)
 
+    def enforce(self, attr):
+        assert attr in self.system_provides
+
     def system_specific_variables(self):
         vars = {}
         for pm in self.programming_models:

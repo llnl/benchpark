@@ -146,6 +146,22 @@ def requires(*runtimes: str):
     return _execute_requires
 
 
+@benchpark_directive("system_depends")
+def system_depends(*attrs: str):
+    def _execute_system_depends(cls):
+        cls.system_depends = attrs
+
+    return _execute_system_depends
+
+
+@benchpark_directive("system_provides")
+def system_provides(*attrs: str):
+    def _execute_system_provides(cls):
+        cls.system_provides = attrs
+
+    return _execute_system_provides
+
+
 @benchpark_directive("variants")
 def variant(
     name: str,

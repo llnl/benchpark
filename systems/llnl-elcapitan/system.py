@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.directives import variant, maintainers
+from benchpark.directives import variant, maintainers, system_provides
 from benchpark.paths import hardware_descriptions
 from benchpark.rocmsystem import ROCmSystem
 from benchpark.system import System
@@ -14,6 +14,8 @@ from packaging.version import Version
 class LlnlElcapitan(System):
 
     maintainers("pearce8", "nhanford", "rfhaque")
+
+    system_provides("rocm")
 
     id_to_resources = {
         "tioga": {
