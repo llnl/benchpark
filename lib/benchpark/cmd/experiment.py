@@ -24,6 +24,8 @@ def experiment_init(args):
         with open(system_file, "rb") as f:
             system_spec = pickle.load(f)
 
+        experiment.system_spec = system_spec
+
     if args.basedir:
         base = args.basedir
         expdir = str(hash(experiment_spec))
