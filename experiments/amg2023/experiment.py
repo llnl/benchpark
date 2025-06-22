@@ -37,11 +37,18 @@ class Amg2023(
 
     def compute_applications_section(self):
         # Number of processes in each dimension
-        self.add_experiment_variable("num_procs", {"px": 2, "py": 2, "pz": 2}, True)
+        self.add_experiment_variable("n_resources_dict", {"px": 2, "py": 2, "pz": 2}, True)
 
         # Per-process size (in zones) in each dimension
         self.add_experiment_variable(
-            "problem_sizes", {"nx": 80, "ny": 80, "nz": 80}, True
+            "process_problem_size_dict", {"nx": 80, "ny": 80, "nz": 80}, True
+        )
+
+        # Set the variables required by the experiment
+        self.set_required_variables(
+            n_resources="{px}*{py}*{pz}",
+            process_problem_size="{nx}*{ny}*{nz}",
+            total_problem_size="{nx}*{ny}*{nz}*{px}*{py}*{pz}",
         )
 
         # Register the scaling variables and their respective scaling functions
@@ -53,7 +60,7 @@ class Amg2023(
         # ScalingMode -> { scaled_var: scaling_function }
         # An entry is required for each ScalingMode supported in the experiment
         # For a multi-dimensional variable of the form:
-        # num_procs -> { "px": 2, "py": 2, "pz": 1 }, the value of scaled_var is "num_procs"
+        # n_resources_dict -> { "px": 2, "py": 2, "pz": 1 }, the value of scaled_var is "n_resources_dict"
         # For a scalar variable, the value of scaled_var is the name of the variable
         # Each scaled_var specified in register_scaling_config must be added to the
         # list of experiment variables using add_experiment_variable
@@ -93,40 +100,33 @@ class Amg2023(
         # Note that scaling starts with the minimum value dimension (pz) of the
         # first variable (np) and proceeds in a round-robin manner
 
-        # In this application, since the input problem sizes (problem_sizes)
+        # In this application, since the input problem sizes (process_problem_size_dict)
         # are per process sizes, strong scaling the problem implies that
-        # as num_procs are scaled up, i.e. (x * scaling_factor),
-        # problem_sizes are commensurately scaled down i.e. (x // scaling_factor)
+        # as n_resources_dict are scaled up, i.e. (x * scaling_factor),
+        # process_problem_size_dict are commensurately scaled down i.e. (x // scaling_factor)
 
-        # For weak scaling, only the num_procs have to be scaled up,
-        # problem_sizes remain the same
+        # For weak scaling, only the n_resources_dict have to be scaled up,
+        # process_problem_size_dict remain the same
 
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "num_procs": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(dim)
                     * scaling_factor,
-                    "problem_sizes": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(dim)
                     // scaling_factor,
                 },
                 ScalingMode.Weak: {
-                    "num_procs": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(dim)
                     * scaling_factor,
-                    "problem_sizes": lambda var, itr, dim, scaling_factor: var.val(dim),
+                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(dim),
                 },
                 ScalingMode.Throughput: {
-                    "num_procs": lambda var, itr, dim, scaling_factor: var.val(dim),
-                    "problem_sizes": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(dim),
+                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(dim)
                     * scaling_factor,
                 },
             }
-        )
-
-        # Set the variables required by the experiment
-        self.set_required_variables(
-            n_resources="{px}*{py}*{pz}",
-            process_problem_size="{nx}*{ny}*{nz}",
-            total_problem_size="{nx}*{ny}*{nz}*{px}*{py}*{pz}",
         )
 
         if self.spec.satisfies("+openmp"):

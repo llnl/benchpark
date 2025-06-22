@@ -37,11 +37,11 @@ class Kripke(
 
     def compute_applications_section(self):
         # Number of processes in each dimension
-        self.add_experiment_variable("num_procs", {"npx": 2, "npy": 2, "npz": 1}, True)
+        self.add_experiment_variable("n_resources_dict", {"npx": 2, "npy": 2, "npz": 1}, True)
 
         # Per-process size (in zones) in each dimension
         self.add_experiment_variable(
-            "problem_sizes", {"nzx": 64, "nzy": 64, "nzz": 32}, True
+            "total_problem_size_dict", {"nzx": 64, "nzy": 64, "nzz": 32}, True
         )
 
         self.add_experiment_variable("ngroups", 64, True)
@@ -49,6 +49,13 @@ class Kripke(
         self.add_experiment_variable("nquad", 128, True)
         self.add_experiment_variable("ds", 128, True)
         self.add_experiment_variable("lorder", 4, True)
+
+        # Set the variables required by the experiment
+        self.set_required_variables(
+            n_resources="{npx}*{npy}*{npz}",
+            process_problem_size="({nzx}*{nzy}*{nzz})/({npx}*{npy}*{npz})",
+            total_problem_size="{nzx}*{nzy}*{nzz}",
+        )
 
         # Register the scaling variables and their respective scaling functions
         # required to correctly scale the experiment for the given scaliing config
@@ -59,7 +66,7 @@ class Kripke(
         # ScalingMode -> { scaled_var: scaling_function }
         # An entry is required for each ScalingMode supported in the experiment
         # For a multi-dimensional variable of the form:
-        # num_procs -> { "px": 2, "py": 2, "pz": 1 }, the value of scaled_var is "num_procs"
+        # n_resources_dict -> { "px": 2, "py": 2, "pz": 1 }, the value of scaled_var is "n_resources_dict"
         # For a scalar variable, the value of scaled_var is the name of the variable
         # Each scaled_var specified in register_scaling_config must be added to the
         # list of experiment variables using add_experiment_variable
@@ -99,40 +106,33 @@ class Kripke(
         # Note that scaling starts with the minimum value dimension (pz) of the
         # first variable (np) and proceeds in a round-robin manner
 
-        # In this application, since the input problem sizes (problem_sizes)
+        # In this application, since the input problem sizes (total_problem_size_dict)
         # are global process sizes, strong scaling the problem requires that
-        # only num_procs are scaled up, i.e. (x * scaling_factor),
-        # problem_sizes remain unchanged
+        # only n_resources_dict are scaled up, i.e. (x * scaling_factor),
+        # total_problem_size_dict remain unchanged
 
-        # For weak scaling, both num_procs and problem_sizes
+        # For weak scaling, both n_resources_dict and total_problem_size_dict
         # have to be scaled up i.e. (x * scaling_factor)
 
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "num_procs": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(dim)
                     * scaling_factor,
-                    "problem_sizes": lambda var, itr, dim, scaling_factor: var.val(dim),
+                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(dim),
                 },
                 ScalingMode.Weak: {
-                    "num_procs": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(dim)
                     * scaling_factor,
-                    "problem_sizes": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(dim)
                     * scaling_factor,
                 },
                 ScalingMode.Throughput: {
-                    "num_procs": lambda var, itr, dim, scaling_factor: var.val(dim),
-                    "problem_sizes": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(dim),
+                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(dim)
                     * scaling_factor,
                 },
             }
-        )
-
-        # Set the variables required by the experiment
-        self.set_required_variables(
-            n_resources="{npx}*{npy}*{npz}",
-            process_problem_size="{nzx}*{nzy}*{nzz}/({npx}*{npy}*{npz})",
-            total_problem_size="{nzx}*{nzy}*{nzz}",
         )
 
         if self.spec.satisfies("+openmp"):
