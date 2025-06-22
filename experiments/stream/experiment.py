@@ -30,13 +30,11 @@ class Stream(
 
         array_size = {"s": 650000000}
 
-        self.add_experiment_variable("processes_per_node", "1", True)
+        self.add_experiment_variable("processes_per_node", "1", named=True)
         self.add_experiment_variable("n", "35", False)
         self.add_experiment_variable("o", "0", False)
         self.add_experiment_variable("n_ranks", 1, True)
-        self.add_experiment_variable("n_threads_per_proc", [16, 32], True, True)
-
-        self.matrix_experiment_variables("n_threads_per_proc")
+        self.add_experiment_variable("n_threads_per_proc", [16, 32], named=True, matrixed=True)
 
         for pk, pv in array_size.items():
             self.add_experiment_variable(pk, pv, True)

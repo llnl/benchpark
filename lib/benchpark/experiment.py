@@ -311,8 +311,13 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
     def add_experiment_variable(self, name, values, named=False, matrixed=False):
         if isinstance(values, dict):
             self.expr_vars.add_dimensional_variable(name, values, named, matrixed)
+            self.zips[name] = list(values.keys())
+            if matrixed:
+                self.matrix.append(name)
         else:
             self.expr_vars.add_scalar_variable(name, values, named, matrixed)
+            if matrixed:
+                self.matrix.append(name)
 
     def set_environment_variable(self, name, values):
         """Set value of environment variable"""

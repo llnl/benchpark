@@ -37,25 +37,27 @@ class Saxpy(
         # GPU tests include some smaller sizes
         n = ["512", "1024"]
         if self.spec.satisfies("+openmp"):
-            device = "n_ranks"
-            self.add_experiment_variable("n_nodes", ["1", "2"], True)
-            self.add_experiment_variable("n_ranks", "8")
-            self.add_experiment_variable("n_threads_per_proc", ["2", "4"], True, True)
-            self.matrix_experiment_variables(["n", "n_threads_per_proc"])
+            self.add_experiment_variable("n_nodes", ["1", "2"], named=True)
+            # resource_count is the number of resources used for this experiment:
+            self.add_experiment_variable("resource_count", "8")
+            self.add_experiment_variable("n_threads_per_proc", ["2", "4"], named=True, matrixed=True)
         else:
-            device = "n_gpus"
             n = ["128", "256"] + n
-            self.add_experiment_variable("n_gpus", "1", False)
-            self.matrix_experiment_variables("n")
+            # resource_count is the number of resources used for this experiment:
+            self.add_experiment_variable("resource_count", "1")
 
-        self.add_experiment_variable("n", n, True, True)
+        self.add_experiment_variable("n", n, named=True, matrixed=True)
 
-        n_resources = "{" + device + "}"
         self.set_required_variables(
-            n_resources=n_resources,
-            process_problem_size="{n}/" + n_resources,
+            n_resources="{resource_count}",
+            process_problem_size="{n}/{n_resources}",
             total_problem_size="{n}",
         )
+
+        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+            self.add_experiment_variable("n_gpus", "{n_resources}", True)
+        else:
+            self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
     def compute_package_section(self):
         # get package version
