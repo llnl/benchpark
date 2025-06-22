@@ -333,17 +333,6 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
 
         self.env_vars["append"][0][target][name] = values
 
-    def zip_experiment_variables(self, name, variable_names):
-        self.zips[name] = list(variable_names)
-
-    def matrix_experiment_variables(self, variable_names):
-        if isinstance(variable_names, str):
-            self.matrix.append(variable_names)
-        elif isinstance(variable_names, list):
-            self.matrix.extend(variable_names)
-        else:
-            raise ValueError("Variable list must be of type str or list[str].")
-
     def add_experiment_exclude(self, exclude_clause):
         self.excludes.append(exclude_clause)
 
