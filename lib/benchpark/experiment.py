@@ -5,6 +5,7 @@
 
 from typing import Dict
 import yaml  # TODO: some way to ensure yaml available
+import sys
 from enum import Enum
 
 from benchpark.error import BenchparkError
@@ -12,13 +13,7 @@ from benchpark.directives import ExperimentSystemBase
 from benchpark.directives import variant
 from benchpark.variables import VariableDict
 import benchpark.spec
-import benchpark.paths
-import benchpark.repo
-import benchpark.runtime
 import benchpark.variant
-
-bootstrapper = benchpark.runtime.RuntimeResources(benchpark.paths.benchpark_home)
-bootstrapper.bootstrap()
 
 import ramble.language.language_base  # noqa
 import ramble.language.language_helpers  # noqa
@@ -293,6 +288,7 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
         # default configs for all experiments
         default_config = {
             "deprecated": True,
+            "benchpark_experiment_command": "benchpark " + " ".join(sys.argv[1:]),
         }
         if self.spec.variants["package_manager"][0] == "spack":
             default_config["spack_flags"] = {

@@ -74,7 +74,7 @@ class LlnlElcapitan(System):
     )
     variant(
         "gtl",
-        default=False,
+        default=True,
         values=(True, False),
         description="Use GTL-enabled MPI",
     )
