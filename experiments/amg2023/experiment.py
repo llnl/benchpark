@@ -118,7 +118,7 @@ class Amg2023(
                     )
                     * scaling_factor,
                     "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
-                       dim
+                        dim
                     )
                     // scaling_factor,
                 },

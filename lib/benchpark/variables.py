@@ -17,11 +17,15 @@ class VariableDict:
         raise AttributeError(f"'{__class__.__name__}' object has no attribute '{name}'")
 
     # values must be a dict of type str->type or str->list(type)
-    def add_dimensional_variable(self, name, values, named=False, zipped=True, matrixed=False):
+    def add_dimensional_variable(
+        self, name, values, named=False, zipped=True, matrixed=False
+    ):
         self._vars[name] = Variable(values, named, zipped, matrixed)
 
     # values must be a non-dict type or list(type)
-    def add_scalar_variable(self, name, values, named=False, zipped=False, matrixed=False):
+    def add_scalar_variable(
+        self, name, values, named=False, zipped=False, matrixed=False
+    ):
         self._vars[name] = Variable({name: values}, named, zipped, matrixed)
 
     def extend(self, vardict):
