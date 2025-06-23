@@ -72,7 +72,7 @@ class Kripke(ExecutableApplication):
     workload_variable('sigs2', default='0.05',
                       description='Total material cross-sections',
                       workloads=['kripke'])
-    workload_variable('arch', default='OpenMP',
+    workload_variable('arch', default='Sequential',
                       description='Architecture selection. Selects the back-end used for computation, available are Sequential, OpenMP, CUDA and HIP. The default depends on capabilities selected by the build system and is selected from list of increasing precedence: Sequential, OpenMP, CUDA and HIP.',
                       workloads=['kripke'])
     workload_variable('layout', default='DGZ',
