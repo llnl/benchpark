@@ -37,7 +37,9 @@ class Amg2023(
 
     def compute_applications_section(self):
         # Number of processes in each dimension
-        self.add_experiment_variable("n_resources_dict", {"px": 2, "py": 2, "pz": 2}, True)
+        self.add_experiment_variable(
+            "n_resources_dict", {"px": 2, "py": 2, "pz": 2}, True
+        )
 
         # Per-process size (in zones) in each dimension
         self.add_experiment_variable(
@@ -111,19 +113,31 @@ class Amg2023(
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
                     * scaling_factor,
-                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
+                       dim
+                    )
                     // scaling_factor,
                 },
                 ScalingMode.Weak: {
-                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
                     * scaling_factor,
-                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(dim),
+                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    ),
                 },
                 ScalingMode.Throughput: {
-                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(dim),
-                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    ),
+                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
                     * scaling_factor,
                 },
             }

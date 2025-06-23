@@ -40,7 +40,9 @@ class Saxpy(
             self.add_experiment_variable("n_nodes", ["1", "2"], named=True)
             # resource_count is the number of resources used for this experiment:
             self.add_experiment_variable("resource_count", "8")
-            self.add_experiment_variable("n_threads_per_proc", ["2", "4"], named=True, matrixed=True)
+            self.add_experiment_variable(
+                "n_threads_per_proc", ["2", "4"], named=True, matrixed=True
+            )
         else:
             n = ["128", "256"] + n
             # resource_count is the number of resources used for this experiment:

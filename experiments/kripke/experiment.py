@@ -37,7 +37,9 @@ class Kripke(
 
     def compute_applications_section(self):
         # Number of processes in each dimension
-        self.add_experiment_variable("n_resources_dict", {"npx": 2, "npy": 2, "npz": 1}, True)
+        self.add_experiment_variable(
+            "n_resources_dict", {"npx": 2, "npy": 2, "npz": 1}, True
+        )
 
         # Per-process size (in zones) in each dimension
         self.add_experiment_variable(
@@ -117,19 +119,31 @@ class Kripke(
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
                     * scaling_factor,
-                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(dim),
+                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    ),
                 },
                 ScalingMode.Weak: {
-                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
                     * scaling_factor,
-                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
                     * scaling_factor,
                 },
                 ScalingMode.Throughput: {
-                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(dim),
-                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    ),
+                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
                     * scaling_factor,
                 },
             }
