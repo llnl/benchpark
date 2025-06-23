@@ -310,12 +310,12 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
 
     def add_experiment_variable(self, name, values, named=False, matrixed=False):
         if isinstance(values, dict):
-            self.expr_vars.add_dimensional_variable(name, values, named, matrixed)
+            self.expr_vars.add_dimensional_variable(name, values, named, True, matrixed)
             self.zips[name] = list(values.keys())
             if matrixed:
                 self.matrix.append(name)
         else:
-            self.expr_vars.add_scalar_variable(name, values, named, matrixed)
+            self.expr_vars.add_scalar_variable(name, values, named, False, matrixed)
             if matrixed:
                 self.matrix.append(name)
 
@@ -367,7 +367,7 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
             for dim in var.dims():
                 if var.is_named:
                     self.expr_var_names.append(f"{{{dim}}}")
-                if len(var[dim]) == 1 and not var.is_matrixed:
+                if len(var[dim]) == 1 and not var.is_zipped and not var.is_matrixed:
                     self.variables[dim] = var[dim][0]
                 else:
                     self.variables[dim] = var[dim]
