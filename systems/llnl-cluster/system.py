@@ -379,8 +379,11 @@ class LlnlCluster(System):
             "software": {
                 "packages": {
                     "default-compiler": {
-                        "pkg_spec": "oneapi" if self.spec.satisfies("compiler=oneapi2023")
+                        "pkg_spec": (
+                            "oneapi"
+                            if self.spec.satisfies("compiler=oneapi2023")
                             else self.spec.variants["compiler"][0]
+                        )
                     },
                     "default-mpi": {"pkg_spec": "mvapich2"},
                     "compiler-gcc": {"pkg_spec": "gcc"},
