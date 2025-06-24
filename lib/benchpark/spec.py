@@ -380,11 +380,6 @@ class ConcreteExperimentSpec(ConcreteSpec, ExperimentSpec):
     def experiment(self) -> "benchpark.Experiment":
         return self.experiment_class(self)
 
-    def _concretize(self):
-        super()._concretize()
-        # Now look at system_dependency directives and check if the system
-        # satisfies
-
 
 class SystemSpec(Spec):
     @property

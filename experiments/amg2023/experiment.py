@@ -40,7 +40,6 @@ class Amg2023(
 
     maintainers("pearce8")
 
-    # TODO: this should only be required when +rocm
     system_depends("rocm", when="+rocm")
 
     # requires("system+papi", when(caliper=topdown*))
