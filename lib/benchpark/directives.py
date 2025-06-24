@@ -147,9 +147,15 @@ def requires(*runtimes: str):
 
 
 @benchpark_directive("system_depends")
-def system_depends(*attrs: str):
+def system_depends(
+    need: str,
+    when: Optional[Union[str, bool]] = None,
+):
     def _execute_system_depends(cls):
-        cls.system_depends = attrs
+        when_spec = _make_when_spec(when)
+
+        system_depends_when = cls.system_depends.setdefault(when_spec, [])
+        system_depends_when.append(need)
 
     return _execute_system_depends
 
