@@ -48,8 +48,15 @@ release_resources_slurm:
     matrix:
       - HOST: dane
         ARCHCONFIG: llnl-cluster
-        BENCHMARK: [hpl, hpcg, amg2023, kripke, laghos]
+        BENCHMARK: [hpl, hpcg, amg2023, kripke]
         VARIANT: [+openmp, '']
+        SYSTEM_ARGS: ['']
+        DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
+          llnl-cluster cluster=dane]
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        BENCHMARK: [laghos]
+        VARIANT: ['']
         SYSTEM_ARGS: ['']
         DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
           llnl-cluster cluster=dane]
