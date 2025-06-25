@@ -84,6 +84,6 @@ run_tests_slurm:
       echo -e "### Job ID is ${JOBID}"
     - |
       PROXY="$( [[ -n "${JOBID}" ]] && echo "flux proxy slurm:${JOBID}" || echo "" )"
-      ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${DANE_FLUX_ARGS} .gitlab/utils/run-experiment.sh )
+      ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${FLUX_ARGS} .gitlab/utils/run-experiment.sh )
   after_script:
     - !reference [.report_status, after_script]
