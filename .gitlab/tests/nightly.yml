@@ -90,7 +90,6 @@ nightly_test_run:
       when: never
   before_script:
     - !reference [.report_status, before_script]
-  script:
-    - !reference [./.gitlab/utils/run-experiment.sh]
+  script: [./.gitlab/utils/run-experiment.sh]
   after_script:
     - !reference [.report_status, after_script]
