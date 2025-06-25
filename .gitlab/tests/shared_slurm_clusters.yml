@@ -19,7 +19,7 @@ workflow:
     - when: on_success
 allocate_resources_slurm:
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
     - if: $CI_PIPELINE_SOURCE != "schedule"
       when: always
@@ -32,7 +32,7 @@ allocate_resources_slurm:
       -N 1 -n 1 flux start sleep inf"
 release_resources_slurm:
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
     - if: $CI_PIPELINE_SOURCE != "schedule"
       when: always

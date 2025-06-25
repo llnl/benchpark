@@ -14,7 +14,7 @@ workflow:
     - when: on_success
 allocate_resources_flux:
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
     - if: $CI_PIPELINE_SOURCE != "schedule"
       when: always
@@ -35,7 +35,7 @@ allocate_resources_flux:
       flux --parent alloc ${SHARED_ALLOC} --job-name=${ALLOC_NAME} --bg
 release_resources_flux:
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
     - if: $CI_PIPELINE_SOURCE != "schedule"
       when: always
