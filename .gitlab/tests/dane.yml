@@ -37,9 +37,24 @@ release_resources_dane:
     matrix:
       - HOST: dane
         ARCHCONFIG: llnl-cluster
-        BENCHMARK: [stream, kripke]
-        VARIANT: ['']
+        BENCHMARK: [hpl, hpcg, amg2023, kripke, laghos]
+        VARIANT: [+openmp, '']
         SYSTEM_ARGS: ['']
+        DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
+          llnl-cluster cluster=dane]
+      # Strong scaling runs for "benchpark analyze" test
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        BENCHMARK: [kripke]
+        VARIANT: ['+strong~single_node caliper=mpi,time']
+        SYSTEM_ARGS: ['']
+        DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
+          llnl-cluster cluster=dane]
+      # Test affinity and hwloc with caliper on
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        BENCHMARK: [kripke]
+        VARIANT: ['+single_node caliper=mpi,time hwloc=on affinity=on']
         DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
           llnl-cluster cluster=dane]
 limited_test_run_dane:

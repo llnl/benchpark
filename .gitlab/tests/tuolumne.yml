@@ -40,9 +40,9 @@ release_resources_tuolumne:
     matrix:
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [stream, kripke]
-        VARIANT: ['']
-        SYSTEM_ARGS: ['']
+        BENCHMARK: [kripke]
+        VARIANT: [+rocm]
+        SYSTEM_ARGS: [gpumode=SPX, gpumode=TPX, gpumode=CPX]
         DASHBOARD_NAME: Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init
           --dest=tuolumne-system llnl-elcapitan cluster=tuolumne]
 limited_test_run_tuolumne:
