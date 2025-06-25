@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Activate Virtual Environment
 . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate

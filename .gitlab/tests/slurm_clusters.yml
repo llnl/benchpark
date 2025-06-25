@@ -1,3 +1,4 @@
+# Clusters listed here are native slurm clusters that we test using flux. See "non_shared.yaml"
 include:
   - local: .gitlab/utils/status.yml
 workflow:
