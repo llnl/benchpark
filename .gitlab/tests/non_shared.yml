@@ -34,6 +34,8 @@ run_tests_nonshared:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
+    - if: $CI_PIPELINE_SOURCE != "schedule"
+      when: always
     - changes:
         - .gitlab-ci.yml
         - .gitlab/**

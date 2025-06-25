@@ -16,6 +16,8 @@ allocate_resources_flux:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
+    - if: $CI_PIPELINE_SOURCE != "schedule"
+      when: always
   variables:
     GIT_STRATEGY: none
   stage: allocate-resources
@@ -35,6 +37,8 @@ release_resources_flux:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
+    - if: $CI_PIPELINE_SOURCE != "schedule"
+      when: always
   variables:
     GIT_STRATEGY: none
   stage: release-resources

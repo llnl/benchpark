@@ -21,6 +21,8 @@ allocate_resources_slurm:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
+    - if: $CI_PIPELINE_SOURCE != "schedule"
+      when: always
   variables:
     GIT_STRATEGY: none
   extends: .on_host_dane
@@ -32,6 +34,8 @@ release_resources_slurm:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
       when: never
+    - if: $CI_PIPELINE_SOURCE != "schedule"
+      when: always
   variables:
     GIT_STRATEGY: none
   extends: .on_host_dane
