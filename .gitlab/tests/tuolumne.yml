@@ -58,10 +58,11 @@ release_resources:
         DASHBOARD_NAME: Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init --dest=tuolumne-system llnl-elcapitan cluster=tuolumne]
       - HOST: tioga
         ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [kripke]
+        BENCHMARK: [amg2023, kripke, laghos]
         VARIANT: [+rocm]
-        SYSTEM_ARGS: [gpumode=SPX, gpumode=TPX, gpumode=CPX]
-        DASHBOARD_NAME: Tioga HPECray-zen4-MI300A-Slingshot [benchpark system init --dest=tioga-system llnl-elcapitan cluster=tioga]
+        SYSTEM_ARGS: ['']
+        DASHBOARD_NAME: Tioga HPECray-zen3-MI250X-Slingshot [benchpark system init
+          --dest=tioga-system llnl-elcapitan cluster=tioga]
 
 limited_test_run:
   stage: test

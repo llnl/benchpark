@@ -14,12 +14,14 @@ variables:
   # Job variables
   # LLNL_SLURM_SCHEDULER_PARAMETERS: "-N 1 -t 00:30:00 --exclusive --reservation=ci"
   ALLOC_NAME: ${CI_PROJECT_NAME}_ci_${CI_PIPELINE_ID}
+  FLUX_ARGS: -N 1 --exclusive
   # Dane
   DANE_SHARED_ALLOC: -N 1 -t 12:00:00 --exclusive --reservation=ci
-  DANE_FLUX_ARGS: -N 1 --exclusive
-  # Tuolumne
-  TUOLUMNE_SHARED_ALLOC: -N 1 -t 12h --queue=pci --exclusive
-  TUOLUMNE_FLUX_ARGS: -N 1 --exclusive
+  # Tuolumne (max 4hr policy)
+  TUOLUMNE_SHARED_ALLOC: -N 1 -t 4h --queue=pci --exclusive
+  # Tioga
+  TIOGA_SHARED_ALLOC: "-N 1 -t 12h --queue=pci --exclusive"
+
 default:
   id_tokens:
     SITE_ID_TOKEN:
