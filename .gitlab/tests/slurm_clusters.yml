@@ -17,7 +17,7 @@ workflow:
       when: always
     # A true statement is expected to allow jobs to run. Here is the default.
     - when: on_success
-allocate_resources_dane:
+allocate_resources_slurm:
   variables:
     GIT_STRATEGY: none
   extends: .on_host_dane
@@ -25,7 +25,7 @@ allocate_resources_dane:
   script:
     - sbatch ${DANE_SHARED_ALLOC} --wait-all-nodes=1 --job-name=${ALLOC_NAME} --wrap="srun
       -N 1 -n 1 flux start sleep inf"
-release_resources_dane:
+release_resources_slurm:
   variables:
     GIT_STRATEGY: none
   extends: .on_host_dane
@@ -58,7 +58,7 @@ release_resources_dane:
         VARIANT: ['+single_node caliper=mpi,time hwloc=on affinity=on']
         DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
           llnl-cluster cluster=dane]
-limited_test_run_dane:
+run_tests_slurm:
   extends: .on_host_dane
   resource_group: $HOST
   stage: test

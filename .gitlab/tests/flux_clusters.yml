@@ -12,7 +12,7 @@ workflow:
     - if: $CI_JOB_NAME =~ /release_resources/
       when: always
     - when: on_success
-allocate_resources:
+allocate_resources_flux:
   variables:
     GIT_STRATEGY: none
   stage: allocate-resources
@@ -28,7 +28,7 @@ allocate_resources:
     - |
       set -x
       flux --parent alloc ${SHARED_ALLOC} --job-name=${ALLOC_NAME} --bg
-release_resources:
+release_resources_flux:
   variables:
     GIT_STRATEGY: none
   stage: release-resources
@@ -68,7 +68,7 @@ release_resources:
         SYSTEM_ARGS: ['']
         DASHBOARD_NAME: Tioga HPECray-zen3-MI250X-Slingshot [benchpark system init
           --dest=tioga-system llnl-elcapitan cluster=tioga]
-limited_test_run:
+run_tests_flux:
   stage: test
   tags: [shell, $HOST]
   extends: .on_host_template
