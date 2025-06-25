@@ -13,6 +13,9 @@ workflow:
       when: always
     - when: on_success
 allocate_resources_flux:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
   variables:
     GIT_STRATEGY: none
   stage: allocate-resources
@@ -29,6 +32,9 @@ allocate_resources_flux:
       set -x
       flux --parent alloc ${SHARED_ALLOC} --job-name=${ALLOC_NAME} --bg
 release_resources_flux:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
   variables:
     GIT_STRATEGY: none
   stage: release-resources
