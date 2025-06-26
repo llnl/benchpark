@@ -49,7 +49,7 @@ class LlnlCluster(System):
     variant(
         "compiler",
         default="oneapi",
-        values=("oneapi", "gcc", "intel"),
+        values=("oneapi", "oneapi2023", "gcc", "intel"),
         description="Which compiler to use",
     )
 
@@ -214,6 +214,24 @@ class LlnlCluster(System):
                     }
                 }
             }
+        elif self.spec.satisfies("compiler=oneapi2023"):
+            selections |= {
+                "packages": selections["packages"]
+                | {
+                    "mpi": {
+                        "buildable": False,
+                        "externals": [
+                            {
+                                "spec": "mvapich2@2.3.7-intel202321",
+                                "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2023.2.1",
+                                "extra_attributes": {
+                                    "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2023.2.1/lib -lmpi"
+                                },
+                            }
+                        ],
+                    }
+                }
+            }
 
         selections["packages"] |= self.compiler_weighting_cfg()["packages"]
 
@@ -223,6 +241,8 @@ class LlnlCluster(System):
         compiler = self.spec.variants["compiler"][0]
 
         if compiler == "oneapi":
+            return {"packages": {"all": {"require": [{"one_of": ["%oneapi", "%gcc"]}]}}}
+        elif compiler == "oneapi2023":
             return {"packages": {"all": {"require": [{"one_of": ["%oneapi", "%gcc"]}]}}}
         else:
             return {"packages": {}}
@@ -312,6 +332,45 @@ class LlnlCluster(System):
                     },
                 ]
             }
+        elif self.spec.satisfies("compiler=oneapi2023"):
+            selections = {
+                "compilers": [
+                    {
+                        "compiler": {
+                            "spec": "gcc@12.1.1",
+                            "paths": {
+                                "cc": "/usr/tce/packages/gcc/gcc-12.1.1/bin/gcc",
+                                "cxx": "/usr/tce/packages/gcc/gcc-12.1.1/bin/g++",
+                                "f77": "/usr/tce/packages/gcc/gcc-12.1.1/bin/gfortran",
+                                "fc": "/usr/tce/packages/gcc/gcc-12.1.1/bin/gfortran",
+                            },
+                            "flags": {},
+                            "operating_system": "rhel8",
+                            "target": "x86_64",
+                            "modules": [],
+                            "environment": {},
+                            "extra_rpaths": [],
+                        }
+                    },
+                    {
+                        "compiler": {
+                            "spec": "oneapi@2023.2.1",
+                            "paths": {
+                                "cc": "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/bin/icx",
+                                "cxx": "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/bin/icpx",
+                                "f77": "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/bin/ifx",
+                                "fc": "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/bin/ifx",
+                            },
+                            "flags": {},
+                            "operating_system": "rhel8",
+                            "target": "x86_64",
+                            "modules": [],
+                            "environment": {},
+                            "extra_rpaths": [],
+                        }
+                    },
+                ]
+            }
 
         return selections
 
@@ -319,7 +378,13 @@ class LlnlCluster(System):
         return {
             "software": {
                 "packages": {
-                    "default-compiler": {"pkg_spec": self.spec.variants["compiler"][0]},
+                    "default-compiler": {
+                        "pkg_spec": (
+                            "oneapi"
+                            if self.spec.satisfies("compiler=oneapi2023")
+                            else self.spec.variants["compiler"][0]
+                        )
+                    },
                     "default-mpi": {"pkg_spec": "mvapich2"},
                     "compiler-gcc": {"pkg_spec": "gcc"},
                     "compiler-intel": {"pkg_spec": "intel"},

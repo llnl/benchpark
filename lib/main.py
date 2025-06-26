@@ -34,7 +34,8 @@ Subcommands:
     audit               Look for problems in System/Experiment repos
     info                Get information about Systems and Experiments
     list                List experiments, systems, benchmarks, and modifiers
-    analyze             Perform canned analysis on the performance data (caliper files) after 'ramble on'"""
+    bootstrap           Bootstrap benchpark or update an existing bootstrap
+    analyze             Perform pre-defined analysis on the performance data (caliper files) after 'ramble on'"""
 if "-h" == sys.argv[1] or "--help" == sys.argv[1]:
     print(helpstr)
     exit()
@@ -54,6 +55,7 @@ import benchpark.cmd.unit_test  # noqa: E402
 import benchpark.cmd.mirror  # noqa: E402
 import benchpark.cmd.info  # noqa: E402
 import benchpark.cmd.list  # noqa: E402
+import benchpark.cmd.bootstrap  # noqa: E402
 from benchpark.accounting import benchpark_benchmarks  # noqa: E402
 
 try:
@@ -210,9 +212,14 @@ def init_commands(subparsers, actions_dict):
     )
     benchpark.cmd.list.setup_parser(list_parser)
 
+    bootstrap_parser = subparsers.add_parser(
+        "bootstrap", help="Bootstrap benchpark or update an existing bootstrap"
+    )
+    benchpark.cmd.bootstrap.setup_parser(bootstrap_parser)
+
     analyze_parser = subparsers.add_parser(
         "analyze",
-        help="Perform canned analysis on the performance data (caliper files) after 'ramble on'",
+        help="Perform pre-defined analysis on the performance data (caliper files) after 'ramble on'",
     )
 
     actions_dict["system"] = benchpark.cmd.system.command
@@ -224,6 +231,7 @@ def init_commands(subparsers, actions_dict):
     actions_dict["info"] = benchpark.cmd.info.command
     actions_dict["show-build"] = benchpark.cmd.show_build.command
     actions_dict["list"] = benchpark.cmd.list.command
+    actions_dict["bootstrap"] = benchpark.cmd.bootstrap.command
     if analyze_installed:
         benchpark.cmd.analyze.setup_parser(analyze_parser)
         actions_dict["analyze"] = benchpark.cmd.analyze.command

@@ -86,9 +86,11 @@ class Remhos(
         )
 
         if self.spec.satisfies("+cuda"):
-            self.add_experiment_variable("arch", "CUDA")
+            self.add_experiment_variable("device", "cuda")
         elif self.spec.satisfies("+rocm"):
-            self.add_experiment_variable("arch", "HIP")
+            self.add_experiment_variable("device", "hip")
+        else:
+            self.add_experiment_variable("device", "cpu")
 
         n_resources = "{" + device + "}"
         self.set_required_variables(
