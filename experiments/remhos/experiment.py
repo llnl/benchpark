@@ -41,23 +41,24 @@ class Remhos(
         elif self.spec.variants["workload"][0] == "3d":
             self.add_experiment_variable("epm", 512, False)
 
-        # The total number of resources for this experiment is calculated as:
-        # n_devices = n_devices_per_node * scaling_factor
-        # Scaling (strong) is achieved by scaling the scaling_factor variable
-        # For mpi-only builds:
-        # n_devices_per_node = sys_cores_per_node, by default
-        # n_devices = n_ranks
-        # For gpu builds:
-        # n_devices_per_node = sys_gpus_per_node, by default
-        # n_devices = n_gpus
-        self.add_experiment_variable("scaling_factor", 1, False)
+        # resource_count is the number of resources used for this experiment:
+        self.add_experiment_variable("resource_count", 1, False)
+
+        # Set the variables required by the experiment
+        self.set_required_variables(
+            n_resources="{resource_count}",
+            process_problem_size="{epm}",
+            total_problem_size="{epm} * {n_resources}",
+        )
 
         # Register the scaling variables and their respective scaling functions
         # required to correctly scale the experiment for the given scaliing policy
+        # Strong scaling scales up resource_count by the specified scaling_factor
+        # and scales epm down by scaling_factor to keep the problem size constant
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "scaling_factor": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
                     * scaling_factor,
                     "epm": lambda var, itr, dim, scaling_factor: var.val(dim)
                     // scaling_factor,
@@ -73,22 +74,9 @@ class Remhos(
             self.add_experiment_variable("device", "cpu", True)
 
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
-            device = "n_gpus"
-            n_devices_per_node = "{sys_gpus_per_node}"
+            self.add_experiment_variable("n_gpus", "{n_resources}", True)
         else:
-            device = "n_ranks"
-            n_devices_per_node = "{sys_cores_per_node}"
-            self.add_experiment_variable("n_threads_per_proc", 1)
-
-        self.add_experiment_variable(
-            device, f"{n_devices_per_node} * {{scaling_factor}}", True
-        )
-
-        self.set_required_variables(
-            n_resources=f"{{{device}}}",
-            process_problem_size="{epm}",
-            total_problem_size="{epm} * {n_resources}",
-        )
+            self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
     def compute_package_section(self):
         # get package version
