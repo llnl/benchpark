@@ -83,7 +83,6 @@ run_tests_flux:
   tags: [shell, $HOST]
   extends: .on_host_template
   <<: *test_clusters_template
-  resource_group: $HOST
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never

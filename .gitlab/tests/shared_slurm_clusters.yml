@@ -77,7 +77,6 @@ release_resources_slurm:
           llnl-cluster cluster=dane]
 run_tests_slurm:
   extends: .on_host_dane
-  resource_group: $HOST
   stage: test
   <<: *test_clusters_dane
   rules:
