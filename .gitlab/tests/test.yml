@@ -59,7 +59,7 @@ workflow:
       - HOST: lassen
         ARCHCONFIG: llnl-sierra
         SCHEDULER_PARAMETERS: -nnodes 1 -W 40 -q pci
-        BENCHMARK: [amg2023, kripke]
+        BENCHMARK: [amg2023, kripke, raja-perf]
         VARIANT: [+cuda]
         SYSTEM_ARGS: ['']
         DASHBOARD_NAME: Lassen IBM-power9-V100-Infiniband [benchpark system init --dest=lassen-system
