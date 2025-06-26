@@ -23,6 +23,14 @@ workflow:
         SYSTEM_ARGS: [gpumode=SPX, gpumode=TPX, gpumode=CPX]
         DASHBOARD_NAME: Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init
           --dest=tuolumne-system llnl-elcapitan cluster=tuolumne]
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        SCHEDULER_PARAMETERS: -N 1 -t 30m --queue=pci --exclusive
+        BENCHMARK: [amg2023]
+        VARIANT: [+rocm caliper=mpi scaling=strong scaling-iterations=2]
+        SYSTEM_ARGS: ['']
+        DASHBOARD_NAME: Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init
+          --dest=tuolumne-system llnl-elcapitan cluster=tuolumne]
       - HOST: dane
         ARCHCONFIG: llnl-cluster
         SCHEDULER_PARAMETERS: -N 1 -t 00:30:00 --exclusive --reservation=ci
@@ -44,7 +52,7 @@ workflow:
         ARCHCONFIG: llnl-cluster
         SCHEDULER_PARAMETERS: -N 1 -t 00:30:00 --exclusive --reservation=ci
         BENCHMARK: [kripke]
-        VARIANT: ['+strong~single_node caliper=mpi,time']
+        VARIANT: ['scaling=strong caliper=mpi,time']
         SYSTEM_ARGS: ['']
         DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
           llnl-cluster cluster=dane]
@@ -53,7 +61,25 @@ workflow:
         ARCHCONFIG: llnl-cluster
         SCHEDULER_PARAMETERS: -N 1 -t 00:20:00 --exclusive --reservation=ci
         BENCHMARK: [kripke]
-        VARIANT: ['+single_node caliper=mpi,time hwloc=on affinity=on']
+        VARIANT: ['caliper=mpi,time hwloc=on affinity=on']
+        DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
+          llnl-cluster cluster=dane]
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: -N 1 -t 01:00:00 --exclusive --reservation=ci
+        BENCHMARK: [laghos]
+        VARIANT: [caliper=mpi scaling=strong scaling-iterations=2]
+        SYSTEM_ARGS: [compiler=oneapi2023]
+        DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
+          llnl-cluster cluster=dane]
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: -N 1 -t 01:00:00 --exclusive --reservation=ci
+        BENCHMARK: [amg2023]
+        VARIANT:
+          - caliper=mpi scaling=strong scaling-iterations=2
+          - caliper=mpi scaling=weak scaling-iterations=2
+        SYSTEM_ARGS: [compiler=oneapi]
         DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
           llnl-cluster cluster=dane]
       - HOST: lassen

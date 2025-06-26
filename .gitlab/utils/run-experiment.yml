@@ -27,7 +27,7 @@
     - cd -
     # Benchpark Analyze experiments with "+strong"
     - |
-      if [[ "$VARIANT" == *"+strong"* ]]; then
+      if [[ "$VARIANT" == *"scaling=strong caliper=mpi,time"* ]]; then
         ./bin/benchpark analyze --workspace-dir ./workspace/${BENCHMARK}-benchmark/${HOST}-system/workspace/
       fi
     # Check Experiment Exit Codes
