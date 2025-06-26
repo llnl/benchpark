@@ -3,12 +3,12 @@
 
    SPDX-License-Identifier: Apache-2.0
 
-#####################################
-Canned Analysis for Scaling Studies
-#####################################
+########################################
+Pre-Defined Analysis for Scaling Studies
+########################################
 
-The ``benchpark analyze`` command can be used to generate pre-configured
-charts for analysis of scaling studies using Caliper and Thicket. 
+The ``benchpark analyze`` command can be used to generate pre-defined
+charts for analysis of scaling studies using Caliper and Thicket.
 We generate Caliper performance data using the Caliper modifier ``caliper=time,mpi`` (:doc:`modifiers`).
 We use the `Thicket <https://github.com/LLNL/thicket>`_ performance analysis library to compose and visualize the Caliper performance data.
 Thicket is embedded into the ``benchpark analyze`` command, leveraging metadata to generate the scaling study figures.
@@ -83,7 +83,7 @@ Generate the Strong dataset:
   $ benchpark setup kripke/cuda/strong lassen/ wkp
   // Follow instructions for running Ramble ...
 
-Run canned analysis:
+Run pre-defined analysis:
 
 .. code:: console
 
@@ -111,7 +111,7 @@ Generate the Weak dataset:
   $ benchpark setup kripke/cuda/weak lassen/ wkp
   // Follow instructions for running Ramble ...
 
-Run canned analysis:
+Run pre-defined analysis:
 
 .. code:: console
 
@@ -132,7 +132,7 @@ Generate the Throughput dataset:
   $ benchpark setup kripke/cuda/throughput lassen/ wkp
   // Follow instructions for running Ramble ...
 
-Run canned analysis:
+Run pre-defined analysis:
 
 .. code:: console
 

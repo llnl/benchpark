@@ -33,31 +33,32 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     depends_on("caliper", when="+caliper")
     depends_on("adiak~shared", when="+caliper")
 
-    depends_on("zlib@1.3.1+optimize+pic+shared")
-    #depends_on("zlib@1.3.1+optimize+pic+shared", when="@develop")
+    depends_on("zlib+optimize+pic~shared")
+    depends_on("mfem@develop", when="@develop")
     depends_on("mfem@4.2.0:", when="@3.1")
     depends_on("mfem@4.1.0:4.1", when="@3.0")
     # Recommended mfem version for laghos v2.0 is: ^mfem@3.4.1-laghos-v2.0
     depends_on("mfem@3.4.1-laghos-v2.0", when="@2.0")
     # Recommended mfem version for laghos v1.x is: ^mfem@3.3.1-laghos-v1.0
     depends_on("mfem@3.3.1-laghos-v1.0", when="@1.0,1.1")
-    depends_on("mfem@4.4", when="@develop")
     depends_on("mfem+caliper", when="+caliper")
-    depends_on("mfem cxxstd=14")
+    depends_on("mfem cxxstd=17")
 
     requires("^[virtuals=zlib-api] zlib")
 
     depends_on("mpi")
     depends_on("hypre+mpi")
     depends_on("hypre+cuda+cublas+mpi", when="+cuda")
-    depends_on("hypre@2.31.0+mixedint~fortran", when="@develop")
+    depends_on("hypre+mixedint~fortran", when="@develop")
+    depends_on("hypre+caliper", when="+caliper")
 
     requires("+cuda", when="^hypre+cuda")
-    for arch in ("none", "50", "60", "70", "80"):
+    for arch in ("none", "50", "60", "70", "80", "90"):
         depends_on(f"hypre cuda_arch={arch}", when=f"cuda_arch={arch}")
         depends_on(f"mfem cuda_arch={arch}", when=f"cuda_arch={arch}")
     depends_on("mfem +cuda+mpi", when="+cuda")
     depends_on("mfem +rocm+mpi", when="+rocm")
+
     depends_on("hypre +rocm+rocblas +mpi", when="+rocm")
     requires("+rocm", when="^hypre+rocm")
     for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
@@ -73,6 +74,10 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         when="@3.1 ^mfem@4.4:",
     )
 
+    def setup_build_environment(self, env):
+        if "+cuda" in self.spec:
+            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
+
     @property
     def build_targets(self):
         targets = []
@@ -81,12 +86,12 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         targets.append("MFEM_DIR=%s" % spec["mfem"].prefix)
         targets.append("CONFIG_MK=%s" % spec["mfem"].package.config_mk)
         targets.append("TEST_MK=%s" % spec["mfem"].package.test_mk)
-        if "+caliper" in self.spec: 
+        if "+caliper" in self.spec:
             targets.append("CALIPER_DIR=%s" % spec["caliper"].prefix)
             targets.append("ADIAK_DIR=%s" % spec["adiak"].prefix)
         if spec.satisfies("@:2.0"):
             targets.append("CXX=%s" % spec["mpi"].mpicxx)
-        if "+ofast %gcc" in self.spec:
+        if self.spec.satisfies("+ofast %gcc"):
             targets.append("CXXFLAGS = -Ofast -finline-functions")
         return targets
 
@@ -94,7 +99,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     def check(self):
         with working_dir(self.build_directory):
             make("test", *self.build_targets)
- 
+
     def install(self, spec, prefix):
         mkdirp(prefix.bin)
         install("laghos", prefix.bin)
