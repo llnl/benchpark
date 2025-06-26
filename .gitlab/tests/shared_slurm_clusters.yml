@@ -18,6 +18,7 @@ workflow:
     # A true statement is expected to allow jobs to run. Here is the default.
     - when: on_success
 allocate_resources_slurm:
+  resource_group: $HOST
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
@@ -31,6 +32,7 @@ allocate_resources_slurm:
     - sbatch ${DANE_SHARED_ALLOC} --wait-all-nodes=1 --job-name=${ALLOC_NAME} --wrap="srun
       -N 1 -n 1 flux start sleep inf"
 release_resources_slurm:
+  resource_group: $HOST
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
