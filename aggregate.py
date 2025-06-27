@@ -25,7 +25,8 @@ def collect_experiments(workspace_dir):
             continue
         for dirpath, dirnames, filenames in os.walk(os.path.join(workspace_dir, entry)):
             for fname in filenames:
-                experiments.append(os.path.join(dirpath, fname)
+                if fname == "execute_experiment":
+                    experiments.append(os.path.join(dirpath, fname))
     return experiments
 
 if __name__ == "__main__":
