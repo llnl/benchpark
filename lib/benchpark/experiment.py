@@ -402,6 +402,10 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
         else:
             self.package_specs[package_name] = {}
 
+    def determine_version(self):
+        app_variant = self.spec.variants["version"][0]
+        return "" if app_variant == "latest" else "@" + app_variant
+
     def compute_package_section(self):
         raise NotImplementedError(
             "Each experiment must implement compute_package_section"

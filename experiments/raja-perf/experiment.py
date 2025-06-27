@@ -119,6 +119,4 @@ class RajaPerf(
 
     def compute_package_section(self):
         # get package version
-        app_variant = self.spec.variants["version"][0]
-        app_version = "" if app_variant == "latest" else "@" + app_variant
-        self.add_package_spec(self.name, [f"raja-perf{app_version}"])
+        self.add_package_spec(self.name, [f"raja-perf{self.determine_version()}"])
