@@ -22,14 +22,13 @@ class Scaffold(ExecutableApplication):
         """Function to prepend to LD_LIBRARY_PATH, since we are not using Spack"""
         paths = []
         dic = yaml.safe_load(workspace._auxiliary_software_files['compilers.yaml'])
-        compilers = dic["compilers"]
+        compilers = list(dic.values())[0]
         for compiler in compilers:
             env = compiler["compiler"]["environment"]
             if env != {}:
                 paths.append(env["prepend_path"]["LD_LIBRARY_PATH"])
         app_inst.variables["ld_paths"] = ":".join(paths)
 
-    os.system("ml load rocm/6.2.1 rocmcc/6.2.1-cce-18.0.1a-magic")
     software_spec("scaffold", None)
 
     executable(
