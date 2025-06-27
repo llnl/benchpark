@@ -80,14 +80,9 @@ class Scaffold(
 
     def compute_package_section(self):
         # Spec written into requirements.txt for pip install
-        wheel_version = ""
-        if self.spec.satisfies("+rocm"):
-            wheel_version = "rocm6.2"
-        elif self.spec.satisfies("+cuda"):
-            wheel_version = "cu118"
         self.add_package_spec(
             self.name,
             [
-                "--extra-index-url https://download.pytorch.org/whl/"+wheel_version+"\n{package_path}"
+                "--extra-index-url https://download.pytorch.org/whl/\n{package_path}"
             ],
         )
