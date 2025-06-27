@@ -9,7 +9,7 @@
           ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} cluster=$HOST $SYSTEM_ARGS
       fi
     # Initialize Experiment
-    - ./bin/benchpark experiment init --dest=${BENCHMARK}-benchmark ${BENCHMARK}${VARIANT}
+    - ./bin/benchpark experiment init --dest=${BENCHMARK}-benchmark ${BENCHMARK} ${VARIANT}
     # Build Workspace
     - ./bin/benchpark setup ${BENCHMARK}-benchmark ${HOST}-system workspace/
     # Setup Ramble & Spack
