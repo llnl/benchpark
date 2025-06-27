@@ -48,8 +48,8 @@ class LlnlCluster(System):
 
     variant(
         "compiler",
-        default="gcc",
-        values=("gcc", "intel", "oneapi", "oneapi2023"),
+        default="oneapi2023",
+        values=("oneapi", "oneapi2023", "gcc", "intel"),
         description="Which compiler to use",
     )
 
