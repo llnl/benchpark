@@ -34,7 +34,7 @@ workflow:
       - HOST: dane
         ARCHCONFIG: llnl-cluster
         SCHEDULER_PARAMETERS: -N 1 -t 00:30:00 --exclusive --reservation=ci
-        BENCHMARK: [laghos]
+        BENCHMARK: [laghos, phloem]
         VARIANT: ['']
         SYSTEM_ARGS: ['']
         DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
