@@ -25,7 +25,6 @@ def main():
             opts_to_scripts[batch_opts].append(experiment_script)
             opts_to_request[batch_opts] = batch_lines
         else:
-            #import pdb; pdb.set_trace()
             raise Exception(f"Not expected: no batch opts in {experiment_script}")
 
     os.mkdir(args.output)
@@ -55,9 +54,6 @@ def collect_scheduler_options(experiment_script):
                 if m:
                     batch_opts.append(tuple(m.group(1).strip().split()))
                     batch_lines.append(line.strip())
-                #elif "flux" in line:
-                #    import pdb; pdb.set_trace()
-                #    print('hi')
 
     return tuple(sorted(batch_opts)), batch_lines
 
