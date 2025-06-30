@@ -42,6 +42,7 @@ def make_aggregate_script(script_path, batch_lines, to_aggregate):
             f.write(os.path.abspath(experiment) + "\n")
 
 def collect_scheduler_options(experiment_script):
+    # Should only take 1 line per scheduler to handle all schedulers
     batch_patterns = [
         r"\s*#\s*(flux:.*$)"
     ]
