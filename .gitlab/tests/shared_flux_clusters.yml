@@ -60,7 +60,7 @@ release_resources_flux:
     matrix:
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [amg2023, kripke, laghos]
+        BENCHMARK: [amg2023, kripke, laghos, raja-perf]
         VARIANT: [+rocm]
         SYSTEM_ARGS: [gpumode=SPX]
         DASHBOARD_NAME: Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init

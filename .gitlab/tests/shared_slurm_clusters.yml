@@ -57,7 +57,7 @@ release_resources_slurm:
           llnl-cluster cluster=dane]
       - HOST: dane
         ARCHCONFIG: llnl-cluster
-        BENCHMARK: [laghos]
+        BENCHMARK: [laghos, raja-perf]
         VARIANT: ['']
         SYSTEM_ARGS: ['']
         DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
