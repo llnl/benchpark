@@ -18,7 +18,7 @@ workflow:
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
         SCHEDULER_PARAMETERS: -N 1 -t 30m --queue=pci --exclusive
-        BENCHMARK: [kripke]
+        BENCHMARK: [amg2023, kripke, raja-perf]
         VARIANT: [+rocm]
         SYSTEM_ARGS: [gpumode=SPX, gpumode=TPX, gpumode=CPX]
         DASHBOARD_NAME: Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init
@@ -85,7 +85,7 @@ workflow:
       - HOST: lassen
         ARCHCONFIG: llnl-sierra
         SCHEDULER_PARAMETERS: -nnodes 1 -W 40 -q pci
-        BENCHMARK: [amg2023, kripke]
+        BENCHMARK: [amg2023, kripke, raja-perf]
         VARIANT: [+cuda]
         SYSTEM_ARGS: ['']
         DASHBOARD_NAME: Lassen IBM-power9-V100-Infiniband [benchpark system init --dest=lassen-system
