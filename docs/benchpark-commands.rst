@@ -49,6 +49,9 @@ Search for available system and experiment specifications in Benchpark.
    * - benchpark info experiment <experiment>
      - Lists all information about a given experiment
      -
+   * - benchpark bootstrap
+     - Manually trigger bootstrapping or update the bootstrap
+     -
 
 Benchpark also has a help menu::
 

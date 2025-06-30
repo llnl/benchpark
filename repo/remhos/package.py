@@ -42,7 +42,7 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
     depends_on("mfem@develop", when="@gpu-fom")
     depends_on("mfem@develop", when="@gpu-opt")
     depends_on("mfem+caliper", when="+caliper")
-    depends_on("mfem cxxstd=14")
+    depends_on("mfem cxxstd=17")
 
     requires("^[virtuals=zlib-api] zlib")
 

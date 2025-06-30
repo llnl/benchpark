@@ -42,7 +42,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     # Recommended mfem version for laghos v1.x is: ^mfem@3.3.1-laghos-v1.0
     depends_on("mfem@3.3.1-laghos-v1.0", when="@1.0,1.1")
     depends_on("mfem+caliper", when="+caliper")
-    depends_on("mfem cxxstd=14")
+    depends_on("mfem cxxstd=17")
 
     requires("^[virtuals=zlib-api] zlib")
 
@@ -91,7 +91,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
             targets.append("ADIAK_DIR=%s" % spec["adiak"].prefix)
         if spec.satisfies("@:2.0"):
             targets.append("CXX=%s" % spec["mpi"].mpicxx)
-        if "+ofast %gcc" in self.spec:
+        if self.spec.satisfies("+ofast %gcc"):
             targets.append("CXXFLAGS = -Ofast -finline-functions")
         return targets
 
