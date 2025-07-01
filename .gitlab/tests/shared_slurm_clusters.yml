@@ -1,0 +1,110 @@
+# Clusters listed here are native slurm clusters that we test using flux. See "non_shared.yaml"
+include:
+  - local: .gitlab/utils/status.yml
+workflow:
+  auto_cancel:
+    on_new_commit: conservative
+.on_host_dane:
+  tags: [shell, dane]
+  rules:
+    # Advanced jobs can only run on master, develop or if ALL_TARGETS is ON.
+    # Set ADVANCED_JOB to ON in the job definition to make it an advanced job.
+    - if: $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH
+        != "develop" && $ALL_TARGETS != "ON"
+      when: never
+    # We should always release resources allocated in the pipeline.
+    - if: $CI_JOB_NAME =~ /release_resources/
+      when: always
+    # A true statement is expected to allow jobs to run. Here is the default.
+    - when: on_success
+allocate_resources_slurm:
+  resource_group: dane
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - if: $CI_PIPELINE_SOURCE != "schedule"
+      when: always
+  variables:
+    GIT_STRATEGY: none
+  extends: .on_host_dane
+  stage: allocate-resources
+  script:
+    - sbatch ${DANE_SHARED_ALLOC} --wait-all-nodes=1 --job-name=${ALLOC_NAME} --wrap="srun
+      -N 1 -n 1 flux start sleep inf"
+release_resources_slurm:
+  resource_group: dane
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - if: $CI_PIPELINE_SOURCE != "schedule"
+      when: always
+  variables:
+    GIT_STRATEGY: none
+  extends: .on_host_dane
+  stage: release-resources
+  script:
+    - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
+    - ([[ -n "${JOBID}" ]] && scancel ${JOBID} || exit 0)
+.test_clusters_dane: &test_clusters_dane
+  parallel:
+    matrix:
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        BENCHMARK: [hpl, hpcg, amg2023, kripke]
+        VARIANT: [+openmp, '']
+        SYSTEM_ARGS: ['']
+        DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
+          llnl-cluster cluster=dane]
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        BENCHMARK: [laghos, raja-perf]
+        VARIANT: ['']
+        SYSTEM_ARGS: ['']
+        DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
+          llnl-cluster cluster=dane]
+      # Strong scaling runs for "benchpark analyze" test
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        BENCHMARK: [kripke]
+        VARIANT: ['+strong~single_node caliper=mpi,time']
+        SYSTEM_ARGS: ['']
+        DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
+          llnl-cluster cluster=dane]
+      # Test affinity and hwloc with caliper on
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        BENCHMARK: [kripke]
+        VARIANT: ['+single_node caliper=mpi,time hwloc=on affinity=on']
+        DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
+          llnl-cluster cluster=dane]
+run_tests_slurm:
+  extends: .on_host_dane
+  resource_group: $HOST
+  stage: test
+  <<: *test_clusters_dane
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - if: $CI_PIPELINE_SOURCE != "schedule"
+      when: always
+    - changes:
+        - .gitlab-ci.yml
+        - .gitlab/**
+        - experiments/**
+        - systems/$ARCHCONFIG/**
+        - repo/$BENCHMARK/**
+        - modifiers/**
+        - var/**
+        - lib/**
+  before_script:
+    - !reference [.report_status, before_script]
+  script:
+    - |
+      echo -e "### Allocation name is ${ALLOC_NAME}"
+      export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
+      echo -e "### Job ID is ${JOBID}"
+    - |
+      PROXY="$( [[ -n "${JOBID}" ]] && echo "flux proxy slurm:${JOBID}" || echo "" )"
+      ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${FLUX_ARGS} .gitlab/utils/run-experiment.sh )
+  after_script:
+    - !reference [.report_status, after_script]
