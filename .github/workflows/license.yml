@@ -1,6 +1,11 @@
 name: License Checks
 on:
   workflow_call:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   verify-license:
     runs-on: ubuntu-24.04

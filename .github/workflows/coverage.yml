@@ -4,6 +4,11 @@ on:
     secrets:
       BENCHPARK_CODECOV_TOKEN:
         required: true
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   run_unit_tests:
     runs-on: ubuntu-24.04

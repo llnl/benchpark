@@ -4,6 +4,11 @@ on:
       modified_repo_dirs:
         required: true
         type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   diffPackages:
     runs-on: ubuntu-24.04

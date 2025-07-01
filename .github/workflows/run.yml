@@ -1,6 +1,11 @@
 name: Run Benchpark and Simple Benchmark Suite
 on:
   workflow_call:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   saxpy:
     runs-on: ubuntu-24.04
