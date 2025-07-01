@@ -1,11 +1,10 @@
 include:
   - local: .gitlab/utils/status.yml
   - local: .gitlab/utils/machine_checks.yml
-
 workflow:
   auto_cancel:
     on_new_commit: conservative
-
+# Common template for rules
 .on_host_template:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
@@ -23,70 +22,62 @@ workflow:
       - modifiers/**
       - var/**
       - lib/**
-
-allocate_resources_flux_tuolumne:
-  #resource_group: tuolumne
-  needs: ["tuolumne-up-check"]
+#############################
+# Resource Allocation Section
+#############################
+.allocate_resources_flux:
+  stage: allocate-resources
+  script:
+    - set -x
+    - flux --parent alloc ${SHARED_ALLOC} --job-name=${ALLOC_NAME} --bg
+allocate_resources_tuolumne:
+  resource_group: tuolumne
+  extends: .allocate_resources_flux
   variables:
-    GIT_STRATEGY: none
     HOST: tuolumne
     SHARED_ALLOC: $TUOLUMNE_SHARED_ALLOC
-  stage: allocate-resources
   tags: [shell, tuolumne]
-  extends: .on_host_template
-  script:
-    - set -x
-    - flux --parent alloc ${SHARED_ALLOC} --job-name=${ALLOC_NAME} --bg
-
-allocate_resources_flux_tioga:
-  allow_failure: false
-  #resource_group: tioga
-  needs: ["tioga-up-check"]
+  needs: ["tuolumne-up-check"]
+allocate_resources_tioga:
+  resource_group: tioga
+  extends: .allocate_resources_flux
   variables:
-    GIT_STRATEGY: none
     HOST: tioga
     SHARED_ALLOC: $TIOGA_SHARED_ALLOC
-  stage: allocate-resources
   tags: [shell, tioga]
-  extends: .on_host_template
+  needs: ["tioga-up-check"]
+##########################
+# Resource Release Section
+##########################
+.release_resources_flux:
+  stage: release-resources
   script:
     - set -x
-    - flux --parent alloc ${SHARED_ALLOC} --job-name=${ALLOC_NAME} --bg
-
+    - export URI=$(flux jobs -o "{id} {name}" | grep ${ALLOC_NAME} | awk '{print $1}')
+    - ([[ -n "${URI}" ]] && flux job kill ${URI} || exit 0)
+  variables:
+    GIT_STRATEGY: none
 release_resources_flux_tuolumne:
-  #resource_group: tuolumne
-  needs: ["allocate_resources_flux_tuolumne"]
+  resource_group: tuolumne
+  extends: .release_resources_flux
+  needs: ["allocate_resources_tuolumne"]
   variables:
-    GIT_STRATEGY: none
     HOST: tuolumne
-  stage: release-resources
   tags: [shell, tuolumne]
-  extends: .on_host_template
-  script:
-    - set -x
-    - export URI=$(flux jobs -o "{id} {name}" | grep ${ALLOC_NAME} | awk '{print $1}')
-    - ([[ -n "${URI}" ]] && flux job kill ${URI} || exit 0)
-
 release_resources_flux_tioga:
-  #resource_group: tioga
-  needs: ["allocate_resources_flux_tioga"]
+  resource_group: tioga
+  extends: .release_resources_flux
+  needs: ["allocate_resources_tioga"]
   variables:
-    GIT_STRATEGY: none
     HOST: tioga
-  stage: release-resources
   tags: [shell, tioga]
-  extends: .on_host_template
-  script:
-    - set -x
-    - export URI=$(flux jobs -o "{id} {name}" | grep ${ALLOC_NAME} | awk '{print $1}')
-    - ([[ -n "${URI}" ]] && flux job kill ${URI} || exit 0)
 
 run_tests_flux_tuolumne:
   stage: test
   tags: [shell, tuolumne]
   extends: .on_host_template
   #resource_group: tuolumne
-  needs: ["allocate_resources_flux_tuolumne"]
+  needs: ["allocate_resources_tuolumne"]
   variables:
     HOST: tuolumne
     ARCHCONFIG: llnl-elcapitan
@@ -111,7 +102,7 @@ run_tests_flux_tioga:
   tags: [shell, tioga]
   extends: .on_host_template
   #resource_group: tioga
-  needs: ["allocate_resources_flux_tioga"]
+  needs: ["allocate_resources_tioga"]
   variables:
     HOST: tioga
     ARCHCONFIG: llnl-elcapitan
