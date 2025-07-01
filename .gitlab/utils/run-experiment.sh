@@ -12,7 +12,7 @@ else
 fi
 
 # Initialize Experiment
-./bin/benchpark experiment init --dest=${BENCHMARK}-benchmark ${BENCHMARK}${VARIANT}
+./bin/benchpark experiment init --dest=${BENCHMARK}-benchmark ${BENCHMARK} ${VARIANT}
 
 # Build Workspace
 ./bin/benchpark setup ${BENCHMARK}-benchmark ${HOST}-system workspace/
@@ -40,7 +40,7 @@ ramble --disable-logger --workspace-dir . workspace analyze --format json yaml t
 cd -
 
 # Benchpark Analyze experiments with "+strong"
-if [[ "$VARIANT" == *"+strong"* ]]; then
+if [[ "$VARIANT" == *"scaling=strong caliper=mpi,time"* ]]; then
     ./bin/benchpark analyze --workspace-dir ./workspace/${BENCHMARK}-benchmark/${HOST}-system/workspace/
 fi
 

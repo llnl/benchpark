@@ -65,6 +65,14 @@ release_resources_flux:
         SYSTEM_ARGS: [gpumode=SPX]
         DASHBOARD_NAME: Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init
           --dest=tuolumne-system llnl-elcapitan cluster=tuolumne]
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        SCHEDULER_PARAMETERS: -N 1 -t 30m --queue=pci --exclusive
+        BENCHMARK: [amg2023]
+        VARIANT: [+rocm caliper=mpi scaling=strong scaling-iterations=2]
+        SYSTEM_ARGS: ['']
+        DASHBOARD_NAME: Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init
+          --dest=tuolumne-system llnl-elcapitan cluster=tuolumne]
       # Test TPX, CPX
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
