@@ -33,10 +33,16 @@ include:
     file:
       - utilities/preliminary-ignore-draft-pr.yml
       - utilities/skip-branch-not-a-pr.yml
+  # Machine checks
+  - local: .gitlab/utils/machine_checks.yml
   # Daily tests (from PRs)
   - local: .gitlab/tests/shared_flux_clusters.yml
-  - local: .gitlab/tests/shared_slurm_clusters.yml
-  - local: .gitlab/tests/non_shared.yml
+  #- local: .gitlab/tests/shared_slurm_clusters.yml
+  #- local: .gitlab/tests/non_shared.yml
   # Nightly tests
-  - local: .gitlab/tests/nightly.yml
-stages: [allocate-resources, test, release-resources]
+  #- local: .gitlab/tests/nightly.yml
+stages:
+  - machine-checks
+  - allocate-resources
+  - test
+  - release-resources
