@@ -4,10 +4,13 @@
 # For these clusters we run separate allocations, which is significantly slower overall.
 include:
   - local: .gitlab/utils/status.yml
+  - local: .gitlab/utils/machine_checks.yml
+  - local: .gitlab/utils/rules.yml
 workflow:
   auto_cancel:
     on_new_commit: conservative
 .test_clusters: &test_clusters
+  extends: .on_host_template
   parallel:
     matrix:
       - HOST: ruby
@@ -31,20 +34,6 @@ run_tests_nonshared:
   stage: test
   tags: [$HOST, batch]
   <<: *test_clusters
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule"
-      when: never
-    - if: $CI_PIPELINE_SOURCE != "schedule"
-      when: always
-    - changes:
-        - .gitlab-ci.yml
-        - .gitlab/**
-        - experiments/**
-        - systems/$ARCHCONFIG/**
-        - repo/$BENCHMARK/**
-        - modifiers/**
-        - var/**
-        - lib/**
   before_script:
     - !reference [.report_status, before_script]
   script: [./.gitlab/utils/run-experiment.sh]

@@ -13,27 +13,29 @@
              --data "{ \"state\": \"failure\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${CI_MACHINE} down\", \"context\": \"ci/gitlab/${CI_MACHINE}\" }"
         exit 1
       fi
-  allow_failure: false
-# machine-up-check:
-#   extends: .machine-check
-#   stage: machine-checks
-#   parallel:
-#     matrix:
-#       - CI_MACHINE: [tuolumne, tioga, dane, lassen, ruby]
-#   rules:
-#     - when: on_success
 
 tioga-up-check:
   stage: machine-checks
   variables:
     CI_MACHINE: "tioga"
   extends: [.machine-check]
-  script:
-    - echo "Forcing failure for tioga for testing"
-    - exit 1
-
 tuolumne-up-check:
   stage: machine-checks
   variables:
     CI_MACHINE: "tuolumne"
+  extends: [.machine-check]
+dane-up-check:
+  stage: machine-checks
+  variables:
+    CI_MACHINE: "dane"
+  extends: [.machine-check]
+ruby-up-check:
+  stage: machine-checks
+  variables:
+    CI_MACHINE: "ruby"
+  extends: [.machine-check]
+lassen-up-check:
+  stage: machine-checks
+  variables:
+    CI_MACHINE: "lassen"
   extends: [.machine-check]
