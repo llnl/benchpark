@@ -13,29 +13,28 @@
              --data "{ \"state\": \"failure\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${CI_MACHINE} down\", \"context\": \"ci/gitlab/${CI_MACHINE}\" }"
         exit 1
       fi
-
 tioga-up-check:
   stage: machine-checks
   variables:
-    CI_MACHINE: "tioga"
+    CI_MACHINE: tioga
   extends: [.machine-check]
 tuolumne-up-check:
   stage: machine-checks
   variables:
-    CI_MACHINE: "tuolumne"
+    CI_MACHINE: tuolumne
   extends: [.machine-check]
 dane-up-check:
   stage: machine-checks
   variables:
-    CI_MACHINE: "dane"
+    CI_MACHINE: dane
   extends: [.machine-check]
 ruby-up-check:
   stage: machine-checks
   variables:
-    CI_MACHINE: "ruby"
+    CI_MACHINE: ruby
   extends: [.machine-check]
 lassen-up-check:
   stage: machine-checks
   variables:
-    CI_MACHINE: "lassen"
+    CI_MACHINE: lassen
   extends: [.machine-check]

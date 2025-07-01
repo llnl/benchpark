@@ -11,7 +11,7 @@ workflow:
 #############################
 allocate_resources_dane:
   tags: [shell, dane]
-  needs: ["dane-up-check"]
+  needs: [dane-up-check]
   variables:
     GIT_STRATEGY: none
   extends: .on_host_template
@@ -24,7 +24,7 @@ allocate_resources_dane:
 ##########################
 release_resources_dane:
   tags: [shell, dane]
-  needs: ["allocate_resources_dane", "run_tests_dane"]
+  needs: [allocate_resources_dane, run_tests_dane]
   variables:
     GIT_STRATEGY: none
   extends: .on_host_template
@@ -70,7 +70,7 @@ release_resources_dane:
           llnl-cluster cluster=dane]
 run_tests_dane:
   tags: [shell, dane]
-  needs: ["allocate_resources_dane"]
+  needs: [allocate_resources_dane]
   stage: test
   <<: *test_clusters_dane
   before_script:

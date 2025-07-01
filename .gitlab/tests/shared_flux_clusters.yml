@@ -20,14 +20,14 @@ allocate_resources_tuolumne:
     HOST: tuolumne
     SHARED_ALLOC: $TUOLUMNE_SHARED_ALLOC
   tags: [shell, tuolumne]
-  needs: ["tuolumne-up-check"]
+  needs: [tuolumne-up-check]
 allocate_resources_tioga:
   extends: .allocate_resources_flux
   variables:
     HOST: tioga
     SHARED_ALLOC: $TIOGA_SHARED_ALLOC
   tags: [shell, tioga]
-  needs: ["tioga-up-check"]
+  needs: [tioga-up-check]
 ##########################
 # Resource Release Section
 ##########################
@@ -42,13 +42,13 @@ allocate_resources_tioga:
     GIT_STRATEGY: none
 release_resources_flux_tuolumne:
   extends: .release_resources_flux
-  needs: ["allocate_resources_tuolumne", "run_tests_flux_tuolumne"]
+  needs: [allocate_resources_tuolumne, run_tests_flux_tuolumne]
   variables:
     HOST: tuolumne
   tags: [shell, tuolumne]
 release_resources_flux_tioga:
   extends: .release_resources_flux
-  needs: ["allocate_resources_tioga", "run_tests_flux_tioga"]
+  needs: [allocate_resources_tioga, run_tests_flux_tioga]
   variables:
     HOST: tioga
   tags: [shell, tioga]
@@ -65,13 +65,14 @@ release_resources_flux_tioga:
       ALLOC_ID=$(flux jobs --name="${ALLOC_NAME}" -n -o "{id}")
       echo -e "[Information]: Shared allocation ID = ${ALLOC_ID}"
       PROXY="$( [[ -n "${ALLOC_ID}" ]] && echo "flux proxy ${ALLOC_ID}" || echo "" )"
-    - ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${FLUX_ARGS} .gitlab/utils/run-experiment.sh )
+    - ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${FLUX_ARGS}
+      .gitlab/utils/run-experiment.sh )
   after_script:
     - !reference [.report_status, after_script]
 run_tests_flux_tuolumne:
   extends: .run_tests_flux
   tags: [shell, tuolumne]
-  needs: ["allocate_resources_tuolumne"]
+  needs: [allocate_resources_tuolumne]
   parallel:
     matrix:
       - HOST: tuolumne
@@ -92,7 +93,7 @@ run_tests_flux_tuolumne:
 run_tests_flux_tioga:
   extends: .run_tests_flux
   tags: [shell, tioga]
-  needs: ["allocate_resources_tioga"]
+  needs: [allocate_resources_tioga]
   parallel:
     matrix:
       - HOST: tioga

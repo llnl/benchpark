@@ -11,7 +11,7 @@ workflow:
     on_new_commit: conservative
 .test_clusters: &test_clusters
   extends: .on_host_template
-  needs: ["ruby-up-check", "lassen-up-check"]
+  needs: [ruby-up-check, lassen-up-check]
   parallel:
     matrix:
       - HOST: ruby
