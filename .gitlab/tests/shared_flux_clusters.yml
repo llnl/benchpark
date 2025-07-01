@@ -31,7 +31,7 @@ workflow:
     - set -x
     - flux --parent alloc ${SHARED_ALLOC} --job-name=${ALLOC_NAME} --bg
 allocate_resources_tuolumne:
-  resource_group: tuolumne
+  #resource_group: tuolumne
   extends: .allocate_resources_flux
   variables:
     HOST: tuolumne
@@ -39,7 +39,7 @@ allocate_resources_tuolumne:
   tags: [shell, tuolumne]
   needs: ["tuolumne-up-check"]
 allocate_resources_tioga:
-  resource_group: tioga
+  #resource_group: tioga
   extends: .allocate_resources_flux
   variables:
     HOST: tioga
@@ -58,14 +58,14 @@ allocate_resources_tioga:
   variables:
     GIT_STRATEGY: none
 release_resources_flux_tuolumne:
-  resource_group: tuolumne
+  #resource_group: tuolumne
   extends: .release_resources_flux
   needs: ["allocate_resources_tuolumne"]
   variables:
     HOST: tuolumne
   tags: [shell, tuolumne]
 release_resources_flux_tioga:
-  resource_group: tioga
+  #resource_group: tioga
   extends: .release_resources_flux
   needs: ["allocate_resources_tioga"]
   variables:
