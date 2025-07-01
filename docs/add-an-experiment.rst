@@ -67,20 +67,23 @@ or ``openmp`` for an experiment using OpenMP (on a CPU).::
       OpenMPExperiment,
       CudaExperiment,
       ROCmExperiment,
-      StrongScaling,
-      WeakScaling,
-      ThroughputScaling,
+      Scaling(ScalingMode.Strong, ScalingMode.Weak, ScalingMode.Throughput),
       Caliper,
     ):
 
 Multiple types of experiments can be created using variants as well (e.g., strong scaling, weak scaling). See AMG2023 or Kripke for examples.
+When implementing scaling, the following variants are available to the experiment
+
+- ``scaling`` defines the scaling mode e.g. ``strong``, ``weak`` and ``throughput``
+- ``scaling-factor`` defines the factor by which a variable should be scaled
+- ``scaling-iterations`` defines the number of scaling experiments to be generated
 
 Once an experiment class has been written, an experiment is initialized with the following command, with any boolean variants with +/~ or 
 string variants defined in your experiment.py passed in as key-value pairs: 
 ``benchpark experiment init --dest {path/to/dest} {benchmark_name} +/~{boolean variant} {string variant}={value} ``
 
 For example, to run the AMG2023 strong scaling experiment for problem 1, using CUDA the command would be:
-``benchpark experiment init --dest amg2023_experiment amg2023 +cuda workload=problem1 +strong ~single_node``
+``benchpark experiment init --dest amg2023_experiment amg2023 +cuda workload=problem1 scaling=strong scaling-factor=2 scaling-iterations=4``
 
 Initializing an experiment generates the following yaml files:
 
@@ -91,9 +94,86 @@ A detailed description of Ramble configuration files is available at `Ramble wor
 
 For more advanced usage, such as customizing hardware allocation or performance profiling see :doc:`modifiers`.
 
+register_scaling_config
+~~~~~~~~~~~~~~~~~~~~~~~
+
+For each scaling mode supported by an application, the ``register_scaling_config`` method must define the scaled variables and their
+corresponding scaling function.
+The input to ``register_scaling_config`` is a dictionary of the form::
+
+    {
+        ScalingMode.Strong: {
+            "v1": strong_scaling_function1,
+            "v2": strong_scaling_function2,
+            ...
+        },
+        ScalingMode.Weak: {
+            "v1": weak_scaling_function1,
+            "v2": weak_scaling_function2,
+            ...
+        },
+        ...
+    }
+
+Scaled variables can be multi-dimensional or one-dimensional. All multi-dimensional variables in a scaling mode must have the same dimensionality.
+The scaling function for each variable takes the form::
+
+    def scaling_function(var, i, dim, sf):
+       # scale var[dim] for the i-th experiment
+       scaled_val = ...
+       return scaled_val
+
+where,
+
+- ``var`` is the ``benchpark.Variable`` instance corresponding to the scaled variable
+- ``i`` is the i-th experiment in the specified number of ``scaling-iterations``
+- ``dim`` is the current dimension that is being scaled (in any given experiment iteration the same dimension of each variable is scaled)
+- ``sf`` is the value by which the variable must be scaled, as specified by ``scaling-factor``
+
+In the list of variables defined for each scaling mode, scaling starts from the dimension that has the minimum value 
+for the first variable and proceeds through the dimensions in a round-robin manner till the specified number of experiments are generated
+e.g. if the scaling config is defined as::
+
+    register_scaling_config ({
+        ScalingMode.Strong: {
+            "n_resources_dict": lambda var, i, dim, sf: var.val(dim) * sf,
+            "process_problem_size_dict": lambda var, i, dim, sf: var.val(dim) * sf,
+        }
+    })
+
+and the initial values of the variables are::
+
+    "n_resources_dict" : {
+        "px": 2, # dim 0
+        "py": 2, # dim 1
+        "pz": 1, # dim 2
+    },
+    "process_problem_size_dict" : {
+        "nx": 16, # dim 0
+        "ny": 32, # dim 1
+        "nz": 32, # dim 2
+    },
+
+then after 4 scaling iterations (i.e. 3 scalings), the final values of the scaled variables will be::
+
+    "n_resources_dict" : {
+        "px": [2, 2, 4, 4]
+        "py": [2, 2, 2, 4]
+        "pz": [1, 2, 2, 2]
+    },
+    "process_problem_size_dict" : {
+        "nx": [16, 16, 32, 32]
+        "ny": [32, 32, 32, 64]
+        "nz": [32, 64, 64, 64]
+    },
+
+Note that scaling starts from the minimum value dimension (``pz``) of the first variable (``n_resources_dict``)
+and proceeds in a round-robin manner through the other dimensions.
+See AMG2023 or Kripke for examples of different scaling configurations.
+
 
 Validating the Benchmark/Experiment
------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To manually validate your new experiments work, you should initialize an existing system, and run your experiments. 
 For example if you just created a benchmark *baz* with OpenMP and strong scaling variants it may look like this:::
