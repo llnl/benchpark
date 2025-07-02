@@ -53,6 +53,7 @@
    add-an-experiment
    add-a-dryrun
    update-a-system-config
+   developer-guide
 
 .. toctree::
    :maxdepth: 1
