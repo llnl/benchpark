@@ -41,23 +41,26 @@ high-level view of Benchpark's directory structure:
    benchpark/
       bin/
          benchpark              <- main benchpark executable
+         benchpark-python       <- execute python scripts using benchpark library
 
       common-resources/
          execute_experiment.tpl
 
       docs/                     <- source for this documentation
 
-      experiments/              <- experiment specs are defined here
+      experiments/              <- experiment specs
 
       lib/
-         benchpark/             <- benchpark module
-         scripts/               <- developer scripts
+         benchpark/             <- benchpark library
+         scripts/               <- scripts for common benchpark use cases
 
       modifiers/                <- modifier definitions
 
       repo/                     <- benchmarks are defined here
+         **/application.py      <- ramble application spec
+         **/package.py          <- spack package spec
 
-      systems/                  <- system specs are defined here
+      systems/                  <- system specs
 
       var/
          exp_repo/
@@ -67,11 +70,11 @@ high-level view of Benchpark's directory structure:
 Updating Documentation
 ----------------------
 
-To update and build the documentation, we need to install the Sphinx package.
+To build the documentation, requirements can be easily installed from ``.github/workflows/requirements/docs.txt``, using:
 
 .. code-block:: bash
 
-   pip install sphinx
+   pip install -r .github/workflows/requirements/docs.txt
 
 After updating the documentation, render the pages with the following:
 
