@@ -97,12 +97,6 @@ class Variable:
     def __getitem__(self, key):
         return self._var[key]
 
-    def __setitem__(self, key, value):
-        if key in self._var:
-            self._var[key].append(value)
-        else:
-            raise KeyError(f"Cannot add new dimension: '{key}'.")
-
     def __iter__(self):
         return iter(self._var)
 
