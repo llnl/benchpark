@@ -16,7 +16,8 @@ system_definition:
     vendor: AMD
     name: MI300A
     ISA: GCN
-    uArch: gfx940
+    uArch: gfx942
+    gpumode: [SPX, TPX, CPX]
   interconnect:
     vendor: HPECray
     name: Slingshot11

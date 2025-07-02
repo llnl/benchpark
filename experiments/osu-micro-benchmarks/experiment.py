@@ -109,8 +109,16 @@ class OsuMicroBenchmarks(
         if self.spec.satisfies("+cuda"):
             self.add_experiment_variable("additional_args", " -d cuda", False)
         if self.spec.satisfies("+rocm") or self.spec.satisfies("+cuda"):
+            resource = "n_gpus"
             for pk, pv in num_nodes.items():
                 self.add_experiment_variable("n_gpus", pv, True)
+        else:
+            resource = "n_nodes"
+
+        n_resources = "{" + resource + "}"
+        self.set_required_variables(
+            n_resources=n_resources, process_problem_size="", total_problem_size=""
+        )
 
     def compute_package_section(self):
         self.add_package_spec(self.name, ["osu-micro-benchmarks"])

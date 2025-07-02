@@ -18,7 +18,7 @@ class RajaPerf(ExecutableApplication):
             'mpi','network-point-to-point','network-latency-bound',
             'c++','raja','sycl']
 
-    executable('run', 'raja-perf.exe', use_mpi=True)
+    executable('run', 'raja-perf.exe --size {size}', use_mpi=True)
 
     workload('suite', executables=['run'])
 

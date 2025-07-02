@@ -50,40 +50,54 @@ class Remhos(
                 f"Only one type of scaling per experiment is allowed for application package {self.name}"
             )
 
-        n_resources = {"n_nodes": 8}
-        # problem_size = {"epm": 512}
+        if self.spec.variants["workload"][0] == "2d":
+            problem_sizes = {"epm": 1024}
+        elif self.spec.variants["workload"][0] == "3d":
+            problem_sizes = {"epm": 512}
         device = "n_ranks"
 
-        if self.spec.satisfies("+cuda"):
-            self.add_experiment_variable("device", "cuda", True)
-        elif self.spec.satisfies("+rocm"):
-            self.add_experiment_variable("device", "hip", True)
+        for nk, nv in problem_sizes.items():
+            self.add_experiment_variable(nk, nv, True)
+
+        scaling_factor = {"scaling_factor": 1}
+
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             device = "n_gpus"
+            n_devices_per_node = "{sys_gpus_per_node}"
         else:
-            self.add_experiment_variable(
-                "n_ranks", "{sys_cores_per_node} * {n_nodes}", True
-            )
-            self.add_experiment_variable("device", "cpu", True)
+            device = "n_ranks"
+            n_devices_per_node = "{sys_cores_per_node}"
+            self.add_experiment_variable("n_threads_per_proc", 1)
 
-        if self.spec.satisfies("+single_node"):
-            for pk, pv in n_resources.items():
-                self.add_experiment_variable(device, pv, True)
-
-        elif self.spec.satisfies("+strong"):
+        if self.spec.satisfies("+strong"):
             scaled_variables = self.generate_strong_scaling_params(
-                {tuple(n_resources.keys()): list(n_resources.values())},
+                {tuple(scaling_factor.keys()): list(scaling_factor.values())},
                 int(self.spec.variants["scaling-factor"][0]),
                 int(self.spec.variants["scaling-iterations"][0]),
             )
             for pk, pv in scaled_variables.items():
                 self.add_experiment_variable(pk, pv, True)
-            num_resources = scaled_variables["n_nodes"]
-            self.add_experiment_variable(device, num_resources, True)
+        else:
+            for pk, pv in scaling_factor.items():
+                self.add_experiment_variable(pk, pv, True)
+
+        self.add_experiment_variable(
+            device, f"{n_devices_per_node}*" + "{scaling_factor}", True
+        )
+
         if self.spec.satisfies("+cuda"):
-            self.add_experiment_variable("arch", "CUDA")
+            self.add_experiment_variable("device", "cuda")
         elif self.spec.satisfies("+rocm"):
-            self.add_experiment_variable("arch", "HIP")
+            self.add_experiment_variable("device", "hip")
+        else:
+            self.add_experiment_variable("device", "cpu")
+
+        n_resources = "{" + device + "}"
+        self.set_required_variables(
+            n_resources=n_resources,
+            process_problem_size="{epm}",
+            total_problem_size="{epm}*" + n_resources,
+        )
 
     def compute_package_section(self):
         # get package version

@@ -137,6 +137,14 @@ class Kripke(
             self.add_experiment_variable("arch", "CUDA")
         elif self.spec.satisfies("+rocm"):
             self.add_experiment_variable("arch", "HIP")
+        else:
+            self.add_experiment_variable("arch", "Sequential")
+
+        self.set_required_variables(
+            n_resources="{npx}*{npy}*{npz}",
+            process_problem_size="{nzx}*{nzy}*{nzz}/({npx}*{npy}*{npz})",
+            total_problem_size="{nzx}*{nzy}*{nzz}",
+        )
 
     def compute_package_section(self):
         # get package version

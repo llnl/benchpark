@@ -12,6 +12,11 @@ class CudaExperiment:
     requires("cuda")
     variant("cuda", default=False, description="Build and run with CUDA")
 
+    def __init__(self):
+        super().__init__()
+        if self.spec.variants["cuda"][0]:
+            self.device_type = "gpu"
+
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):
             return "cuda" if self.spec.satisfies("+cuda") else ""

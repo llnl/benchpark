@@ -45,6 +45,12 @@ class MdTest(
             for k, v in scaled_variables.items():
                 self.add_experiment_variable(k, v, True)
 
+        self.set_required_variables(
+            n_resources="{n_ranks}",
+            process_problem_size="{num-objects}/{n_ranks}",
+            total_problem_size="{num-objects}",
+        )
+
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]

@@ -30,6 +30,16 @@ and package/application repositories, are used to generate a set of concrete Ram
 
 Some or all of the functions in the Experiment base class can be overridden to define custom behavior, such as adding experiment variants. 
 
+
+compute_applications_section
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In ``compute_applications_section``, we define the experiment variables necessary to perform scaling runs (``single_node``, ``strong``, ``weak``, or ``throughput``) 
+using ramble. We also define programming model (``CUDA``, ``ROCm``, or ``OpenMP``) specific variables, such as ``arch``, which may be used by the benchmark.
+
+We can specify experiment variables to benchpark using the ``Experiment.add_experiment_variable()`` member function.
+*One* of ``n_ranks``, ``n_nodes``, ``n_gpus`` must be set, using ``add_experiment_variable`` for benchpark to allocate the correct amount of resources for the experiment.
+Additionally, all of ``n_resources``, ``process_problem_size``, and ``total_problem_size`` must be set, which can be accomplished using ``Experiment.set_required_variables()``.
+
 compute_package_section
 ~~~~~~~~~~~~~~~~~~~~~~~
 In ``compute_package_section`` add the benchmark's package spec. Required packages for the benchmark should be defined in the ``package.py``. 

@@ -38,10 +38,29 @@ class Affinity(BasicModifier):
         import os
         from ramble.util.executable import CommandExecutable
 
-        affinity_log_file = f"{{experiment_run_dir}}/affinity.{self._usage_mode}.out"
+        affinity_file = f"{{experiment_run_dir}}/affinity.{self._usage_mode}"
+        affinity_log_file = affinity_file + ".out"
+        affinity_json_file = affinity_file + ".json"
 
         pre_exec = []
         post_exec = []
+
+        # attach affinity json data to caliper metadata if caliper is on
+        caliper_modifier = any(
+            [modifier["name"] == "caliper" for modifier in app_inst.modifiers]
+        )
+        if caliper_modifier:
+            pre_exec.append(
+                CommandExecutable(
+                    f"modify-caliper-config-{executable_name}",
+                    template=[
+                        'export CALI_CONFIG="$CALI_CONFIG,metadata(file={})"'.format(
+                            affinity_json_file
+                        )
+                    ],
+                )
+            )
+
         if executable.mpi:
             pre_exec.append(
                 CommandExecutable(
@@ -59,16 +78,8 @@ class Affinity(BasicModifier):
                 )
             )
 
-            post_exec.append(
-                CommandExecutable(
-                    f"unload-affinity-{executable_name}",
-                    template=["spack unload affinity"],
-                )
-            )
-
             affinity_parser_dir = os.path.dirname(f"{self._file_path}")
-
-            post_exec.append(
+            pre_exec.append(
                 CommandExecutable(
                     f"parse-stdout-{executable_name}",
                     template=[
@@ -76,4 +87,12 @@ class Affinity(BasicModifier):
                     ],
                 )
             )
+
+            post_exec.append(
+                CommandExecutable(
+                    f"unload-affinity-{executable_name}",
+                    template=["spack unload affinity"],
+                )
+            )
+
         return pre_exec, post_exec

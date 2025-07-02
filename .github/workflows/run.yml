@@ -150,6 +150,36 @@ jobs:
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
+      - name: Dry run dynamic kripke/rocm on Tuolumne SPX with allocation modifier
+        run: |
+          ./bin/benchpark system init --dest=tuolumne/spx llnl-elcapitan cluster=tuolumne gpumode=SPX
+          ./bin/benchpark setup ./kripke/rocm tuolumne/spx workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/kripke/rocm/tuolumne/spx/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+      - name: Dry run dynamic kripke/rocm on Tuolumne TPX with allocation modifier
+        run: |
+          ./bin/benchpark system init --dest=tuolumne/tpx llnl-elcapitan cluster=tuolumne gpumode=TPX
+          ./bin/benchpark setup ./kripke/rocm tuolumne/tpx workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/kripke/rocm/tuolumne/tpx/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+      - name: Dry run dynamic kripke/rocm on Tuolumne CPX with allocation modifier
+        run: |
+          ./bin/benchpark system init --dest=tuolumne/cpx llnl-elcapitan cluster=tuolumne gpumode=CPX
+          ./bin/benchpark setup ./kripke/rocm tuolumne/cpx workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/kripke/rocm/tuolumne/cpx/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
       - name: Dry run kripke/cuda on Sierra with allocation modifier
         run: |
           ./bin/benchpark experiment init --dest=kripke/cuda kripke+cuda
@@ -267,12 +297,12 @@ jobs:
           benchmark_spec: saxpy+openmp
           system_name: ruby
           system_spec: llnl-cluster cluster=ruby compiler=intel
-      - name: saxpy/openmp dane llnl-cluster cluster=dane
+      - name: saxpy/openmp dane affinity=on llnl-cluster cluster=dane
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: saxpy
           benchmark_mode: openmp
-          benchmark_spec: saxpy+openmp
+          benchmark_spec: saxpy+openmp affinity=on
           system_name: dane
           system_spec: llnl-cluster cluster=dane
       - name: saxpy/openmp magma llnl-cluster cluster=magma
@@ -291,12 +321,12 @@ jobs:
           benchmark_spec: saxpy+openmp
           system_name: aws
           system_spec: aws-pcluster instance_type=hpc6a.48xlarge
-      - name: saxpy/openmp venado lanl-venado cuda=12.5 compiler=cce +gtl
+      - name: saxpy/openmp affinity=on venado lanl-venado cuda=12.5 compiler=cce +gtl
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: saxpy
           benchmark_mode: openmp
-          benchmark_spec: saxpy+openmp
+          benchmark_spec: saxpy+openmp affinity=on
           system_name: venado
           system_spec: lanl-venado cuda=12.5 compiler=cce +gtl
       - name: saxpy/openmp lumi csc-lumi
@@ -323,12 +353,13 @@ jobs:
           benchmark_spec: saxpy+cuda
           system_name: venado
           system_spec: lanl-venado cuda=12.5 compiler=cce +gtl
-      - name: saxpy/rocm tioga llnl-elcapitan rocm=6.2.4 compiler=cce ~gtl
+      - name: saxpy/rocm affinity=on tioga llnl-elcapitan rocm=6.2.4 compiler=cce
+          ~gtl
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: saxpy
           benchmark_mode: rocm
-          benchmark_spec: saxpy+rocm
+          benchmark_spec: saxpy+rocm affinity=on
           system_name: tioga
           system_spec: llnl-elcapitan rocm=6.2.4 compiler=cce ~gtl
       - name: saxpy/openmp fugaku riken-fugaku
@@ -864,4 +895,4 @@ jobs:
           pip install -r ./requirements.txt
       - name: Run
         run: |-
-          python -m pytest
+          ./bin/benchpark unit-test

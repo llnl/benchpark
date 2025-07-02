@@ -53,6 +53,12 @@ class Babelstream(
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_experiment_variable("n_gpus", n_resources, True)
 
+        self.set_required_variables(
+            n_resources=f"{n_resources}",
+            process_problem_size="{n}/" + str(n_resources),
+            total_problem_size="{n}",
+        )
+
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]

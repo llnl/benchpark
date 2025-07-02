@@ -12,6 +12,11 @@ class ROCmExperiment:
     requires("rocm")
     variant("rocm", default=False, description="Build and run with ROCm")
 
+    def __init__(self):
+        super().__init__()
+        if self.spec.variants["rocm"][0]:
+            self.device_type = "gpu"
+
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):
             return "rocm" if self.spec.satisfies("+rocm") else ""

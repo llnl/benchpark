@@ -1,0 +1,113 @@
+include:
+  - local: .gitlab/utils/status.yml
+workflow:
+  auto_cancel:
+    on_new_commit: conservative
+# Common host template
+.on_host_template:
+  rules:
+    - if: $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH
+        != "develop" && $ALL_TARGETS != "ON"
+      when: never
+    - if: $CI_JOB_NAME =~ /release_resources/
+      when: always
+    - when: on_success
+allocate_resources_flux:
+  resource_group: $HOST
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - if: $CI_PIPELINE_SOURCE != "schedule"
+      when: always
+  variables:
+    GIT_STRATEGY: none
+  stage: allocate-resources
+  parallel:
+    matrix:
+      - HOST: tuolumne
+        SHARED_ALLOC: $TUOLUMNE_SHARED_ALLOC
+      - HOST: tioga
+        SHARED_ALLOC: $TIOGA_SHARED_ALLOC
+  tags: [shell, $HOST]
+  extends: .on_host_template
+  script:
+    - |
+      set -x
+      flux --parent alloc ${SHARED_ALLOC} --job-name=${ALLOC_NAME} --bg
+release_resources_flux:
+  resource_group: $HOST
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - if: $CI_PIPELINE_SOURCE != "schedule"
+      when: always
+  variables:
+    GIT_STRATEGY: none
+  stage: release-resources
+  parallel:
+    matrix:
+      - HOST: tuolumne
+      - HOST: tioga
+  tags: [shell, $HOST]
+  extends: .on_host_template
+  script:
+    - |
+      set -x
+      export URI=$(flux jobs -o "{id} {name}" | grep ${ALLOC_NAME} | awk '{print $1}')
+      ([[ -n "${URI}" ]] && flux job kill ${URI} || exit 0)
+.test_clusters_template: &test_clusters_template
+  parallel:
+    matrix:
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [amg2023, kripke, laghos, raja-perf]
+        VARIANT: [+rocm]
+        SYSTEM_ARGS: [gpumode=SPX]
+        DASHBOARD_NAME: Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init
+          --dest=tuolumne-system llnl-elcapitan cluster=tuolumne]
+      # Test TPX, CPX
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [laghos]
+        VARIANT: [+rocm]
+        SYSTEM_ARGS: [gpumode=TPX, gpumode=CPX]
+        DASHBOARD_NAME: Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init
+          --dest=tuolumne-system llnl-elcapitan cluster=tuolumne]
+      - HOST: tioga
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [amg2023, kripke, laghos]
+        VARIANT: [+rocm]
+        SYSTEM_ARGS: ['']
+        DASHBOARD_NAME: Tioga HPECray-zen3-MI250X-Slingshot [benchpark system init
+          --dest=tioga-system llnl-elcapitan cluster=tioga]
+run_tests_flux:
+  stage: test
+  tags: [shell, $HOST]
+  extends: .on_host_template
+  <<: *test_clusters_template
+  resource_group: $HOST
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - if: $CI_PIPELINE_SOURCE != "schedule"
+      when: always
+    - changes:
+        - .gitlab-ci.yml
+        - .gitlab/**
+        - experiments/**
+        - systems/$ARCHCONFIG/**
+        - repo/$BENCHMARK/**
+        - modifiers/**
+        - var/**
+        - lib/**
+  before_script:
+    - !reference [.report_status, before_script]
+  script:
+    - |
+      ALLOC_ID=$(flux jobs --name="${ALLOC_NAME}" -n -o "{id}")
+      echo -e "[Information]: Shared allocation ID = ${ALLOC_ID}"
+      PROXY="$( [[ -n "${ALLOC_ID}" ]] && echo "flux proxy ${ALLOC_ID}" || echo "" )"
+    - ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${FLUX_ARGS}
+      .gitlab/utils/run-experiment.sh )
+  after_script:
+    - !reference [.report_status, after_script]
