@@ -11,7 +11,7 @@ import inspect
 import shlex
 import subprocess
 import sys
-import yaml
+import yaml#
 
 __version__ = "0.1.0"
 if "-V" in sys.argv or "--version" in sys.argv:
