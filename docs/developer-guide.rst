@@ -43,9 +43,6 @@ high-level view of Benchpark's directory structure:
          benchpark              <- main benchpark executable
          benchpark-python       <- execute python scripts using benchpark library
 
-      common-resources/
-         execute_experiment.tpl
-
       docs/                     <- source for this documentation
 
       experiments/              <- experiment specs
@@ -61,10 +58,6 @@ high-level view of Benchpark's directory structure:
          **/package.py          <- spack package spec
 
       systems/                  <- system specs
-
-      var/
-         exp_repo/
-         sys_repo/
 
 ----------------------
 Updating Documentation
