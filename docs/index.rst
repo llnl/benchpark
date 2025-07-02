@@ -56,6 +56,12 @@
 
 .. toctree::
    :maxdepth: 1
+   :caption: Developer Docs
+
+   developer-guide
+
+.. toctree::
+   :maxdepth: 1
    :caption: Benchpark Utils
 
    diffBuildSpecs
