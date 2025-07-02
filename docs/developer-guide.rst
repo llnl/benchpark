@@ -76,7 +76,7 @@ To build the documentation, requirements can be easily installed from ``.github/
 
    pip install -r .github/workflows/requirements/docs.txt
 
-After updating the documentation, render the pages with the following:
+This requires ``python>=3.11`` (or try an earlier version of sphinx). After updating the documentation, render the pages with the following:
 
 .. code-block:: bash
 
