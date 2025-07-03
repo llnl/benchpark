@@ -100,7 +100,7 @@ class VariantMap(llnl.util.lang.HashableMap):
         for k, v in sorted(self.items()):
             yield (k, v)
 
-    #def __eq__(self, other):
+    # def __eq__(self, other):
     #    if not isinstance(other, VariantMap):
     #        return False
     #    return sorted(self.items()) == sorted(other.items())
