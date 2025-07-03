@@ -3,11 +3,11 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import provides
+from benchpark.directives import system_provides
 
 
 class ROCmSystem:
-    provides("rocm")
+    system_provides("rocm")
 
     def verify(self, system):
         assert "rocm" in system.variants

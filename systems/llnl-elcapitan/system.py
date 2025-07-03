@@ -15,8 +15,6 @@ class LlnlElcapitan(System):
 
     maintainers("pearce8", "nhanford", "rfhaque")
 
-    system_provides("rocm")
-
     id_to_resources = {
         "tioga": {
             "rocm_arch": "gfx90a",

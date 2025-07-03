@@ -40,8 +40,6 @@ class Amg2023(
 
     maintainers("pearce8")
 
-    system_depends("rocm", when="+rocm")
-
     # requires("system+papi", when(caliper=topdown*))
 
     # TODO: Support list of 3-tuples
