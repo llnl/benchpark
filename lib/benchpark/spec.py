@@ -96,6 +96,15 @@ class VariantMap(llnl.util.lang.HashableMap):
 
         return string.getvalue()
 
+    def _cmp_iter(self):
+        for k, v in sorted(self.items()):
+            yield (k, v)
+
+    #def __eq__(self, other):
+    #    if not isinstance(other, VariantMap):
+    #        return False
+    #    return sorted(self.items()) == sorted(other.items())
+
 
 class ConcreteVariantMap(VariantMap):
     def __setitem__(self, name, values):
