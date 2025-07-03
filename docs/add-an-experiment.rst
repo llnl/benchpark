@@ -40,6 +40,58 @@ We can specify experiment variables to benchpark using the ``Experiment.add_expe
 *One* of ``n_ranks``, ``n_nodes``, ``n_gpus`` must be set, using ``add_experiment_variable`` for benchpark to allocate the correct amount of resources for the experiment.
 Additionally, all of ``n_resources``, ``process_problem_size``, and ``total_problem_size`` must be set, which can be accomplished using ``Experiment.set_required_variables()``.
 
+add_experiment_variable
+-----------------------
+The method ``add_experiment_variable`` is used to add a variable to the experiment's ``ramble.yaml``. It has the following signature::
+
+  def add_experiment_variable(self, name, value, named, matrixed)
+
+
+where,
+
+- ``name`` is the name of the variable
+- ``value`` is the value of the variable
+- ``named`` indicates if the variable's name should appear in the experiment name (default ``False``)
+- ``matrixed`` indicates if the variable must be matrixed in ``ramble.yaml`` (default ``False``)
+
+``add_experiment_variable`` can be used to define multi-dimensional and scalar variables. e.g.::
+
+  self.add_experiment_variable("n_resources_dict", {"px": 2, "py": 2, "pz": 1}, named=True, matrix=True)
+  self.add_experiment_variable("groups", 16, named=True, matrix=True)
+  self.add_experiment_variable("n_gpus", 8, named=False, matrix=False)
+
+
+In the above example, ``n_resources_dict`` is added as 3D variable with dimensions ``px``, ``py`` and ``pz`` and assigned the values ``2``, ``2``, and ``1`` respectively.
+``groups`` and ``n_gpus`` are scalar variables with values ``16`` and ``8`` respectively.
+If ``named`` is set to ``True``, unexpanded variable name (individual dimension names for multi-dimensional variables) is appended to the experiment name in ``ramble.yaml``
+
+Every multi-dimensional experiment variable is defined as a zip in the ``ramble.yaml``.
+If ``matrixed`` is set to ``True``, the variable (or the zip iin case of a multi-dimensional variable) is declared as a matrix in ``ramble.yaml``.
+The generated ``ramble.yaml`` for the above example would be look like::
+
+  experiments:
+    amg2023_{px}_{py}_{pz}_{groups}:
+      ...
+      variables:
+          px: 2
+          py: 2
+          pz: 2
+          groups: 16
+          n_gpus: 8
+      zips:
+        n_resources_dict:
+        - px
+        - py
+        - pz
+      matrix:
+        - n_resources_dict
+        - groups
+
+
+A variable also can be assigned a list of values, each individual value corresponding to a single experiment.
+Refer to the Ramble documentation for a detailed explanation of zip and matrix.
+
+
 compute_package_section
 ~~~~~~~~~~~~~~~~~~~~~~~
 In ``compute_package_section`` add the benchmark's package spec. Required packages for the benchmark should be defined in the ``package.py``. 
