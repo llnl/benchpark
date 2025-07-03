@@ -1,12 +1,26 @@
 variables:
   LLNL_SERVICE_USER: benchpark
-# Required information about GitHub repository
+  # Required information about GitHub repository
   GITHUB_PROJECT_NAME: benchpark
   GITHUB_PROJECT_ORG: LLNL
-# Override the pattern describing branches that will skip the "draft PR filter
-# test".  Add protected branches here. See default value in
-# preliminary-ignore-draft-pr.yml.
+  # Override the pattern describing branches that will skip the "draft PR filter
+  # test".  Add protected branches here. See default value in
+  # preliminary-ignore-draft-pr.yml.
   ALWAYS_RUN_PATTERN: ^develop$|^master$|^v[0-9.]*$|^releases/$
+  # Expand multi-line commands in logs
+  FF_SCRIPT_SECTIONS: 1
+  # Debugging logs on gitlab
+  # CI_DEBUG_TRACE: "true"
+  # Job variables
+  # LLNL_SLURM_SCHEDULER_PARAMETERS: "-N 1 -t 00:30:00 --exclusive --reservation=ci"
+  ALLOC_NAME: ${CI_PROJECT_NAME}_ci_${CI_PIPELINE_ID}
+  FLUX_ARGS: -N 1 --exclusive
+  # Dane
+  DANE_SHARED_ALLOC: -N 1 -t 24:00:00 --exclusive --reservation=ci
+  # Tuolumne (max 4hr policy)
+  TUOLUMNE_SHARED_ALLOC: -N 1 -t 4h --queue=pci --exclusive
+  # Tioga (max 2hr policy)
+  TIOGA_SHARED_ALLOC: -N 1 -t 2h --queue=pci --exclusive
 default:
   id_tokens:
     SITE_ID_TOKEN:
@@ -19,6 +33,14 @@ include:
     file:
       - utilities/preliminary-ignore-draft-pr.yml
       - utilities/skip-branch-not-a-pr.yml
-  - local: .gitlab/tests/test.yml
+  # Daily tests (from PRs)
+  - local: .gitlab/tests/shared_flux_clusters.yml
+  - local: .gitlab/tests/shared_slurm_clusters.yml
+  - local: .gitlab/tests/non_shared.yml
+  # Nightly tests
   - local: .gitlab/tests/nightly.yml
-stages: [test]
+stages:
+  - machine-checks
+  - allocate-resources
+  - test
+  - release-resources

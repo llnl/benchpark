@@ -7,20 +7,12 @@ import hashlib
 import os
 import packaging.version
 import yaml
-
-import benchpark.paths
-from benchpark.directives import ExperimentSystemBase
-import benchpark.repo
-from benchpark.runtime import RuntimeResources
-
+import sys
 from typing import Dict, Tuple
+
+from benchpark.directives import ExperimentSystemBase
 import benchpark.spec
 import benchpark.variant
-
-bootstrapper = RuntimeResources(benchpark.paths.benchpark_home)  # noqa
-bootstrapper.bootstrap()  # noqa
-
-_repo_path = benchpark.repo.paths[benchpark.repo.ObjectTypes.systems]
 
 
 def _hash_id(content_list):
@@ -43,8 +35,8 @@ class System(ExperimentSystemBase):
         self.external_resources = None
 
         self.sys_cores_per_node = None
-        self.sys_cores_os_reserved = None
-        self.sys_cores_os_reserved_list = None
+        self.sys_cores_os_reserved_per_node = None
+        self.sys_cores_os_reserved_per_node_list = None
         self.sys_gpus_per_node = None
         self.sys_mem_per_node = None
         self.scheduler = None
@@ -59,6 +51,7 @@ class System(ExperimentSystemBase):
                 "name": self.__class__.__name__,
                 "spec": str(self.spec),
                 "config-hash": self.system_uid(),
+                "benchpark_system_command": "benchpark " + " ".join(sys.argv[1:]),
             }
         }
 
@@ -118,8 +111,8 @@ class System(ExperimentSystemBase):
 
         optionals = {}
         for opt in [
-            "sys_cores_os_reserved",
-            "sys_cores_os_reserved_list",
+            "sys_cores_os_reserved_per_node",
+            "sys_cores_os_reserved_per_node_list",
             "sys_gpus_per_node",
             "sys_mem_per_node",
             "queue",
@@ -154,12 +147,19 @@ class System(ExperimentSystemBase):
 
     def compute_dict(self):
         # This can be overridden by any subclass that needs more flexibility
+        compilers = self.compute_compilers_section()
         return {
             "system_id": self.compute_system_id(),
             "variables": self.compute_variables_section(),
             "software": self.compute_software_section(),
             "auxiliary_software_files": {
-                "compilers": self.compute_compilers_section(),
+                "compilers": (
+                    # "'compilers:':" syntax is required to enforce spack to use benchpark-defined
+                    # compilers instead of external compilers defined by spack compiler search (from ramble).
+                    {"compilers:": compilers["compilers"]}
+                    if compilers
+                    else None
+                ),
                 "packages": self.compute_packages_section(),
             },
         }

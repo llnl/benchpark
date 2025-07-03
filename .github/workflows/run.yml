@@ -895,4 +895,4 @@ jobs:
           pip install -r ./requirements.txt
       - name: Run
         run: |-
-          python -m pytest
+          ./bin/benchpark unit-test

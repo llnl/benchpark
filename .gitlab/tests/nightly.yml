@@ -1,6 +1,5 @@
 include:
   - local: .gitlab/utils/status.yml
-  - local: .gitlab/utils/run-experiment.yml
 .test_clusters_nightly: &test_clusters_nightly
   parallel:
     matrix:
@@ -14,6 +13,8 @@ include:
           - laghos
           - lammps
           - osu-micro-benchmarks
+          - raja-perf
+          - remhos
         VARIANT: [+rocm]
         SYSTEM_ARGS: ['']
         DASHBOARD_NAME: Nightly [benchpark-develop]
@@ -27,8 +28,18 @@ include:
           - laghos
           - lammps
           - osu-micro-benchmarks
+          - raja-perf
+          - remhos
         VARIANT: [+rocm]
-        SYSTEM_ARGS: [gpumode=SPX, gpumode=TPX, gpumode=CPX]
+        SYSTEM_ARGS: [gpumode=SPX]
+        DASHBOARD_NAME: Nightly [benchpark-develop]
+      # Test TPX, CPX
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        SCHEDULER_PARAMETERS: -N 1 -t 60m --queue=pci --exclusive
+        BENCHMARK: [laghos, raja-perf]
+        VARIANT: [+rocm]
+        SYSTEM_ARGS: [gpumode=TPX, gpumode=CPX]
         DASHBOARD_NAME: Nightly [benchpark-develop]
       - HOST: dane
         ARCHCONFIG: llnl-cluster
@@ -79,7 +90,6 @@ nightly_test_run:
       when: never
   before_script:
     - !reference [.report_status, before_script]
-  script:
-    - !reference [.run_experiment, script]
+  script: [./.gitlab/utils/run-experiment.sh]
   after_script:
     - !reference [.report_status, after_script]
