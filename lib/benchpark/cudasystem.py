@@ -3,11 +3,11 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import provides
+from benchpark.directives import system_provides
 
 
 class CudaSystem:
-    provides("cuda")
+    system_provides("cuda")
 
     def verify(self, system):
         assert "cuda" in system.variants

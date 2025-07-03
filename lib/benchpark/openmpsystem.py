@@ -3,11 +3,11 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import provides
+from benchpark.directives import system_provides
 
 
 class OpenMPSystem:
-    provides("openmp")
+    system_provides("openmp")
 
     def system_specific_variables(self, system):
         return {}
