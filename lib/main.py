@@ -35,7 +35,7 @@ Subcommands:
     info                Get information about Systems and Experiments
     list                List experiments, systems, benchmarks, and modifiers
     bootstrap           Bootstrap benchpark or update an existing bootstrap
-    analyze             Perform canned analysis on the performance data (caliper files) after 'ramble on'"""
+    analyze             Perform pre-defined analysis on the performance data (caliper files) after 'ramble on'"""
 if "-h" == sys.argv[1] or "--help" == sys.argv[1]:
     print(helpstr)
     exit()
@@ -219,7 +219,7 @@ def init_commands(subparsers, actions_dict):
 
     analyze_parser = subparsers.add_parser(
         "analyze",
-        help="Perform canned analysis on the performance data (caliper files) after 'ramble on'",
+        help="Perform pre-defined analysis on the performance data (caliper files) after 'ramble on'",
     )
 
     actions_dict["system"] = benchpark.cmd.system.command

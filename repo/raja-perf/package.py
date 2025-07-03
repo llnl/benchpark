@@ -128,6 +128,7 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
 
     version("develop", branch="develop", submodules="True")
     version("main",  branch="main",  submodules="True")
+    version("2025.03.0", tag="v2025.03.0", submodules="True")
     version("2024.07.0", tag="v2024.07.0", submodules="True")
     version("2022.10.0", tag="v2022.10.0", submodules="True")
     version("0.12.0", tag="v0.12.0", submodules="True")
@@ -306,6 +307,9 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
             hip_for_radiuss_projects(entries, spec, compiler)
         else:
             entries.append(cmake_cache_option("ENABLE_HIP", False))
+
+        if "+cuda" in spec or "+rocm" in spec:
+            entries.append(cmake_cache_string("RAJA_PERFSUITE_GPU_BLOCKSIZES", "25,64,128,256,512,1024"))
 
         entries.append(cmake_cache_option("ENABLE_OPENMP_TARGET", "+openmp_target" in spec))
         if "+openmp_target" in spec:
