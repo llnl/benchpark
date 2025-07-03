@@ -308,6 +308,9 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
         else:
             entries.append(cmake_cache_option("ENABLE_HIP", False))
 
+        if "+cuda" in spec or "+rocm" in spec:
+            entries.append(cmake_cache_string("RAJA_PERFSUITE_GPU_BLOCKSIZES", "25,64,128,256,512,1024"))
+
         entries.append(cmake_cache_option("ENABLE_OPENMP_TARGET", "+openmp_target" in spec))
         if "+openmp_target" in spec:
             if ("%xl" in spec):
