@@ -1,51 +1,43 @@
 # Clusters listed here are native slurm clusters that we test using flux. See "non_shared.yaml"
 include:
   - local: .gitlab/utils/status.yml
+  - local: .gitlab/utils/machine_checks.yml
+  - local: .gitlab/utils/rules.yml
 workflow:
   auto_cancel:
     on_new_commit: conservative
-.on_host_dane:
+#############################
+# Resource Allocation Section
+#############################
+allocate_resources_dane:
   tags: [shell, dane]
-  rules:
-    # Advanced jobs can only run on master, develop or if ALL_TARGETS is ON.
-    # Set ADVANCED_JOB to ON in the job definition to make it an advanced job.
-    - if: $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH
-        != "develop" && $ALL_TARGETS != "ON"
-      when: never
-    # We should always release resources allocated in the pipeline.
-    - if: $CI_JOB_NAME =~ /release_resources/
-      when: always
-    # A true statement is expected to allow jobs to run. Here is the default.
-    - when: on_success
-allocate_resources_slurm:
-  resource_group: dane
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule"
-      when: never
-    - if: $CI_PIPELINE_SOURCE != "schedule"
-      when: always
+  needs: [dane-up-check]
   variables:
     GIT_STRATEGY: none
-  extends: .on_host_dane
+  extends: .on_host_template
   stage: allocate-resources
   script:
     - sbatch ${DANE_SHARED_ALLOC} --wait-all-nodes=1 --job-name=${ALLOC_NAME} --wrap="srun
       -N 1 -n 1 flux start sleep inf"
-release_resources_slurm:
-  resource_group: dane
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule"
-      when: never
-    - if: $CI_PIPELINE_SOURCE != "schedule"
-      when: always
+##########################
+# Resource Release Section
+##########################
+release_resources_dane:
+  tags: [shell, dane]
+  needs: [allocate_resources_dane, run_tests_dane]
   variables:
     GIT_STRATEGY: none
-  extends: .on_host_dane
+  extends: .on_host_template
   stage: release-resources
   script:
     - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
     - ([[ -n "${JOBID}" ]] && scancel ${JOBID} || exit 0)
+##################
+# Test Run Section
+##################
 .test_clusters_dane: &test_clusters_dane
+  resource_group: dane
+  extends: .on_host_template
   parallel:
     matrix:
       - HOST: dane
@@ -95,25 +87,11 @@ release_resources_slurm:
         SYSTEM_ARGS: [compiler=oneapi]
         DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
           llnl-cluster cluster=dane]
-run_tests_slurm:
-  extends: .on_host_dane
-  resource_group: $HOST
+run_tests_dane:
+  tags: [shell, dane]
+  needs: [allocate_resources_dane]
   stage: test
   <<: *test_clusters_dane
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule"
-      when: never
-    - if: $CI_PIPELINE_SOURCE != "schedule"
-      when: always
-    - changes:
-        - .gitlab-ci.yml
-        - .gitlab/**
-        - experiments/**
-        - systems/$ARCHCONFIG/**
-        - repo/$BENCHMARK/**
-        - modifiers/**
-        - var/**
-        - lib/**
   before_script:
     - !reference [.report_status, before_script]
   script:

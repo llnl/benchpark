@@ -25,8 +25,10 @@ cd ./workspace/${BENCHMARK}-benchmark/${HOST}-system/workspace/
 
 ramble --disable-logger --workspace-dir . workspace setup
 
-if [ "$HOST" == "dane" ]; then
-    # Using flux on dane (srun called in "ramble on")
+# Using flux on dane (srun called in "ramble on")
+if [ "$HOST" == "dane" ] && \
+    # Nightly testing still using slurm
+    [ $CI_PIPELINE_SOURCE != "schedule" ]; then
     find . -type f -name execute_experiment -exec sed -i 's/\bsrun\b/flux run --exclusive/g' {} +
 fi
 
