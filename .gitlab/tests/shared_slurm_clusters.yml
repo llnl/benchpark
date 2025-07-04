@@ -73,7 +73,7 @@ release_resources_dane:
         ARCHCONFIG: llnl-cluster
         SCHEDULER_PARAMETERS: -N 1 -t 01:00:00 --exclusive --reservation=ci
         BENCHMARK: [laghos]
-        VARIANT: [caliper=mpi scaling=strong scaling-iterations=2]
+        VARIANT: [caliper=mpi scaling=strong]
         SYSTEM_ARGS: [compiler=oneapi2023]
         DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
           llnl-cluster cluster=dane]
@@ -82,8 +82,8 @@ release_resources_dane:
         SCHEDULER_PARAMETERS: -N 1 -t 01:00:00 --exclusive --reservation=ci
         BENCHMARK: [amg2023]
         VARIANT:
-          - caliper=mpi scaling=strong scaling-iterations=2
-          - caliper=mpi scaling=weak scaling-iterations=2
+          - caliper=mpi scaling=strong
+          - caliper=mpi scaling=weak
         SYSTEM_ARGS: [compiler=oneapi]
         DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
           llnl-cluster cluster=dane]
