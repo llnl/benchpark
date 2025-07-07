@@ -244,6 +244,21 @@ def prepare_data(**kwargs):
         tk = tk.query(query)
 
     # Spec should not vary across runs
+    # col varies based on new_scaling/old_scaling
+    if "scaling" not in tk.metadata:
+        # This can be deprecated once all benchmarks are transitioned to new_scaling
+        if "benchpark_spec" in tk.metadata:
+            spec_series = tk.metadata["benchpark_spec"]
+            if not spec_series.apply(lambda x: x == spec_series.iloc[0]).all():
+                raise ValueError("Not all lists in the Series are equal.")
+            spec = spec_series.iloc[0][0]
+            for keyword in SCALING_TYPES:
+                if "+" + keyword in spec:
+                    tk.metadata["scaling"] = keyword
+        else:
+            raise ValueError(
+                "Expected either 'scaling' or 'benchpark_spec' in metadata"
+            )
     spec = tk.metadata["scaling"]
     scaling = get_scaling_type(spec)
 
