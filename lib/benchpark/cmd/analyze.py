@@ -72,7 +72,9 @@ def get_scaling_type(spec):
     scaling = scaling_list[0]
     if scaling in SCALING_TYPES:
         return scaling
-    raise ValueError(f"Unknown scaling type '{scaling}'. Must be one of {SCALING_TYPES}")
+    raise ValueError(
+        f"Unknown scaling type '{scaling}'. Must be one of {SCALING_TYPES}"
+    )
 
 
 def validate_single_metadata_value(column, tk):
