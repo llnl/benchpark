@@ -37,7 +37,7 @@ COLOR_PALETTE = [
     "#dbdb8d",  # Light Olive
     "#9edae5",  # Light Cyan
 ]
-SCALING_TYPES = ["+strong", "+throughput", "+weak"]
+SCALING_TYPES = ["strong", "throughput", "weak"]
 NAME_REMAP = {
     "total_problem_size": "Total Problem Size",
     "process_problem_size": "Process Problem Size",
@@ -66,10 +66,13 @@ def get_scaling_type(spec):
     Raises:
         ValueError: If no valid scaling type is found in the specification.
     """
-    for keyword in SCALING_TYPES:
-        if keyword in spec:
-            return keyword.lstrip("+")
-    raise ValueError(f"Unknown scaling type. Must be one of {SCALING_TYPES}")
+    scaling_list = spec.unique()
+    if len(scaling_list) != 1:
+        raise ValueError(f"Multiple scaling types found, expected 1. {scaling_list}")
+    scaling = scaling_list[0]
+    if scaling in SCALING_TYPES:
+        return scaling
+    raise ValueError(f"Unknown scaling type '{scaling}'. Must be one of {SCALING_TYPES}")
 
 
 def validate_single_metadata_value(column, tk):
@@ -239,7 +242,7 @@ def prepare_data(**kwargs):
         tk = tk.query(query)
 
     # Spec should not vary across runs
-    spec = tk.metadata["benchpark_spec"].iloc[0][0]
+    spec = tk.metadata["scaling"]
     scaling = get_scaling_type(spec)
 
     # What we are varying for each scaling type
