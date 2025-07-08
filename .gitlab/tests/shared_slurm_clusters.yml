@@ -22,7 +22,7 @@ allocate_resources_dane:
   after_script:
     - |-
       if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
-        .gitlab/utils/cancel-slurm.sh
+        . .gitlab/utils/cancel-slurm.sh
       fi
 ##########################
 # Resource Release Section
@@ -35,7 +35,7 @@ release_resources_dane:
   extends: .on_host_template
   stage: release-resources
   script:
-    - .gitlab/utils/cancel-slurm.sh
+    - . .gitlab/utils/cancel-slurm.sh
 ##################
 # Test Run Section
 ##################
@@ -108,5 +108,5 @@ run_tests_slurm_dane:
     - !reference [.report_status, after_script]
     - |-
       if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
-        .gitlab/utils/cancel-slurm.sh
+        . .gitlab/utils/cancel-slurm.sh
       fi
