@@ -24,7 +24,7 @@ allocate_resources_dane:
 ##########################
 release_resources_dane:
   tags: [shell, dane]
-  needs: [allocate_resources_dane, run_tests_dane]
+  needs: [allocate_resources_dane, run_tests_slurm_dane]
   variables:
     GIT_STRATEGY: none
   extends: .on_host_template
