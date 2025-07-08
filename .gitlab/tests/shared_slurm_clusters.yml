@@ -50,7 +50,7 @@ release_resources_dane:
       # Strong scaling runs for "benchpark analyze" test
       - HOST: dane
         ARCHCONFIG: llnl-cluster
-        BENCHMARK: [kripke]
+        BENCHMARK: [kripke, amg2023]
         VARIANT: ['scaling=strong caliper=mpi,time']
       # Test old_scaling
       - HOST: dane
@@ -62,16 +62,6 @@ release_resources_dane:
         ARCHCONFIG: llnl-cluster
         BENCHMARK: [kripke]
         VARIANT: ['caliper=mpi,time hwloc=on affinity=on']
-      - HOST: dane
-        ARCHCONFIG: llnl-cluster
-        BENCHMARK: [laghos]
-        VARIANT: [caliper=mpi scaling=strong]
-        SYSTEM_ARGS: [compiler=oneapi2023]
-      - HOST: dane
-        ARCHCONFIG: llnl-cluster
-        BENCHMARK: [amg2023]
-        VARIANT: [caliper=mpi scaling=strong, caliper=mpi scaling=weak]
-        SYSTEM_ARGS: [compiler=oneapi]
 run_tests_dane:
   tags: [shell, dane]
   needs: [allocate_resources_dane]
