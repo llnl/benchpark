@@ -14,6 +14,11 @@ workflow:
   script:
     - set -x
     - flux --parent alloc ${SHARED_ALLOC} --job-name=${ALLOC_NAME}${GPUMODE} --bg
+  after_script:
+    - |
+      if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
+        .gitlab/utils/cancel-flux.sh
+      fi
 allocate_resources_tuolumne:
   extends: .allocate_resources_flux
   parallel:

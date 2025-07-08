@@ -19,6 +19,11 @@ allocate_resources_dane:
   script:
     - sbatch ${DANE_SHARED_ALLOC} --wait-all-nodes=1 --job-name=${ALLOC_NAME} --wrap="srun
       -N 1 -n 1 flux start sleep inf"
+  after_script:
+    - |-
+      if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
+        .gitlab/utils/cancel-slurm.sh
+      fi
 ##########################
 # Resource Release Section
 ##########################
