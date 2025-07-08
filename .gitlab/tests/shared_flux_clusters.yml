@@ -105,7 +105,7 @@ run_tests_flux_tuolumne:
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK: [amg2023, kripke, laghos]
-        VARIANT: [+rocm scaling=strong]
+        VARIANT: [+rocm scaling=strong scaling-iterations=2]
         SYSTEM_ARGS: [gpumode=TPX]
         GPUMODE: TPX
         DASHBOARD_NAME: Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init
@@ -113,7 +113,7 @@ run_tests_flux_tuolumne:
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK: [amg2023, kripke, laghos]
-        VARIANT: [+rocm scaling=strong]
+        VARIANT: [+rocm scaling=strong scaling-iterations=2]
         SYSTEM_ARGS: [gpumode=CPX]
         GPUMODE: CPX
         DASHBOARD_NAME: Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init
