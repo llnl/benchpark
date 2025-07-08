@@ -18,9 +18,9 @@ allocate_resources_tuolumne:
   extends: .allocate_resources_flux
   parallel:
     matrix:
-      HOST: tuolumne
-      SHARED_ALLOC: $TUOLUMNE_SHARED_ALLOC
-      GPUMODE: [SPX, TPX, CPX]
+      - HOST: tuolumne
+        SHARED_ALLOC: $TUOLUMNE_SHARED_ALLOC
+        GPUMODE: [SPX, TPX, CPX]
   tags: [shell, tuolumne]
   needs: [tuolumne-up-check]
 allocate_resources_tioga:
@@ -47,8 +47,8 @@ release_resources_flux_tuolumne:
   needs: [allocate_resources_tuolumne, run_tests_flux_tuolumne]
   parallel:
     matrix:
-      GPUMODE: [SPX, TPX, CPX]
-      HOST: tuolumne
+      - GPUMODE: [SPX, TPX, CPX]
+        HOST: tuolumne
   tags: [shell, tuolumne]
 release_resources_flux_tioga:
   extends: .release_resources_flux
