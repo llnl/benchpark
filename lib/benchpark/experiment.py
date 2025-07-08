@@ -71,16 +71,17 @@ class ExperimentHelper:
         return self._expr_vars, self.env_vars
 
 
-class SingleNode:
+class ExecMode:
     variant(
-        "single_node",
-        default=True,
-        description="Single node execution mode",
+        "exec_mode",
+        default="test",
+        values=("test", "perf"),
+        description="Execution mode",
     )
 
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):
-            return "single_node" if self.spec.satisfies("+single_node") else ""
+            return self.spec.variants["exec_mode"][0]
 
 
 class Affinity:
@@ -169,7 +170,7 @@ class Hwloc:
             return modifier_list
 
 
-class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
+class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
     """This is the superclass for all benchpark experiments.
 
     ***The Experiment class***
