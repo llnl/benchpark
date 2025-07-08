@@ -62,6 +62,14 @@ release_resources_dane:
         SYSTEM_ARGS: ['']
         DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
           llnl-cluster cluster=dane]
+      # Test old_scaling
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        BENCHMARK: [hpcg]
+        VARIANT: ['+strong~single_node caliper=mpi,time']
+        SYSTEM_ARGS: ['']
+        DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
+          llnl-cluster cluster=dane]
       # Test affinity and hwloc with caliper on
       - HOST: dane
         ARCHCONFIG: llnl-cluster
