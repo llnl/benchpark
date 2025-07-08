@@ -37,8 +37,6 @@ allocate_resources_tioga:
   extends: .on_host_template
   stage: release-resources
   script:
-    - echo "Releasing ${ALLOC_NAME}${GPUMODE}"
-  after_script:
     - set -x
     - export URI=$(flux jobs -o "{id} {name}" | grep ${ALLOC_NAME}${GPUMODE} | awk '{print $1}')
     - ([[ -n "${URI}" ]] && flux job kill ${URI} || exit 0)
