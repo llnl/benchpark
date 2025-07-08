@@ -47,8 +47,8 @@ release_resources_flux_tuolumne:
   needs: [allocate_resources_tuolumne, run_tests_flux_tuolumne]
   parallel:
     matrix:
-      - GPUMODE: [SPX, TPX, CPX]
-        HOST: tuolumne
+      - HOST: tuolumne
+        GPUMODE: [SPX, TPX, CPX]
   tags: [shell, tuolumne]
 release_resources_flux_tioga:
   extends: .release_resources_flux
@@ -98,16 +98,16 @@ run_tests_flux_tuolumne:
       # Test TPX, CPX
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [laghos]
-        VARIANT: [+rocm]
+        BENCHMARK: [amg2023, kripke, laghos]
+        VARIANT: [+rocm scaling=strong]
         SYSTEM_ARGS: [gpumode=TPX]
         GPUMODE: TPX
         DASHBOARD_NAME: Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init
           --dest=tuolumne-system llnl-elcapitan cluster=tuolumne]
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [laghos]
-        VARIANT: [+rocm]
+        BENCHMARK: [amg2023, kripke, laghos]
+        VARIANT: [+rocm scaling=strong]
         SYSTEM_ARGS: [gpumode=CPX]
         GPUMODE: CPX
         DASHBOARD_NAME: Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init
