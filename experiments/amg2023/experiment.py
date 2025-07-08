@@ -40,7 +40,7 @@ class Amg2023(
             process_problem_size_dict = {"nx": 80, "ny": 80, "nz": 80}
             n_resources_dict = {"px": 2, "py": 2, "pz": 2}
         else:
-            process_problem_size_dict = {"nx": [160, 320], "ny": [160, 320], "nz": [160, 320]}
+            process_problem_size_dict = {"nx": [128, 256], "ny": [128, 256], "nz": [128, 256]}
             n_resources_dict = {"px": [2,2], "py": [2,2], "pz": [2,2]}
 
         # Per-process size (in zones) in each dimension
