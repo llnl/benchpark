@@ -30,12 +30,11 @@ release_resources_dane:
   extends: .on_host_template
   stage: release-resources
   script:
-    - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
-    - ([[ -n "${JOBID}" ]] && scancel ${JOBID} || exit 0)
+    - .gitlab/utils/cancel-slurm.sh
 ##################
 # Test Run Section
 ##################
-.test_clusters_dane: &test_clusters_dane
+.run_tests_slurm: &run_tests_slurm
   resource_group: dane
   extends: .on_host_template
   parallel:
@@ -85,11 +84,11 @@ release_resources_dane:
         SYSTEM_ARGS: [compiler=oneapi]
         DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
           llnl-cluster cluster=dane]
-run_tests_dane:
+run_tests_slurm_dane:
   tags: [shell, dane]
   needs: [allocate_resources_dane]
   stage: test
-  <<: *test_clusters_dane
+  <<: *run_tests_slurm
   before_script:
     - !reference [.report_status, before_script]
   script:
@@ -102,3 +101,7 @@ run_tests_dane:
       ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${FLUX_ARGS} .gitlab/utils/run-experiment.sh )
   after_script:
     - !reference [.report_status, after_script]
+    - |-
+      if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
+        .gitlab/utils/cancel-slurm.sh
+      fi

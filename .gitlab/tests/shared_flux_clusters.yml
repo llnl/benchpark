@@ -36,10 +36,7 @@ allocate_resources_tioga:
 .release_resources_flux:
   extends: .on_host_template
   stage: release-resources
-  script:
-    - set -x
-    - export URI=$(flux jobs -o "{id} {name}" | grep ${ALLOC_NAME}${GPUMODE} | awk '{print $1}')
-    - ([[ -n "${URI}" ]] && flux job kill ${URI} || exit 0)
+  script: [.gitlab/utils/cancel-flux.sh]
   variables:
     GIT_STRATEGY: none
 release_resources_flux_tuolumne:
@@ -75,9 +72,7 @@ release_resources_flux_tioga:
     - !reference [.report_status, after_script]
     - |
       if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
-        set -x
-        export URI=$(flux jobs -o "{id} {name}" | grep ${ALLOC_NAME}${GPUMODE} | awk '{print $1}')
-        ([[ -n "${URI}" ]] && flux job kill ${URI} || exit 0)
+        .gitlab/utils/cancel-flux.sh
       fi
 run_tests_flux_tuolumne:
   resource_group: tuolumne
