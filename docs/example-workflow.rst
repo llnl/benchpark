@@ -12,7 +12,7 @@ search the available benchmarks, systems, modifiers, and experiments in
 Benchpark::
 
     benchpark list
-    benchpark list experiments --experiment openmp rocm
+    benchpark list experiments --experiment kripke
 
 This tutorial will guide you through the process of using Benchpark in a
 container.  In this case, the ``system``, and the ``benchmark``
