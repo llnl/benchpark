@@ -7,6 +7,13 @@
 Hello Benchpark Example
 =========================
 
+
+search the available benchmarks, systems, modifiers, and experiments in
+Benchpark::
+
+    benchpark list
+    benchpark list experiments --experiment openmp rocm
+
 This tutorial will guide you through the process of using Benchpark in a
 container.  In this case, the ``system``, and the ``benchmark``
 and ``experiment`` are already configured and just need to be setup and run.
