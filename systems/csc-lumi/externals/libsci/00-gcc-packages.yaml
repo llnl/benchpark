@@ -1,5 +1,0 @@
-packages:
-  cray-libsci:
-    externals:
-    - spec: cray-libsci@23.09.1.1%gcc
-      prefix: /opt/cray/pe/libsci/23.09.1.1/gnu/10.3/x86_64

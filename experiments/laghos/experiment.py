@@ -5,18 +5,18 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
-from benchpark.scaling import StrongScaling
 from benchpark.caliper import Caliper
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
+from benchpark.new_scaling import Scaling, ScalingMode
 
 
 class Laghos(
     Experiment,
-    StrongScaling,
-    Caliper,
     CudaExperiment,
     ROCmExperiment,
+    Scaling(ScalingMode.Strong),
+    Caliper,
 ):
 
     variant(
@@ -34,58 +34,44 @@ class Laghos(
     maintainers("wdhawkins")
 
     def compute_applications_section(self):
+        # "zones" defined from mesh file, we are hardcoding it here
+        self.add_experiment_variable("zones", 1024, True)
 
-        # Number of initial nodes
-        n_resources = {"n_nodes": 1}
-        device = "n_ranks"
+        # resource_count is the number of resources used for this experiment:
+        self.add_experiment_variable("resource_count", 1, False)
+
+        # Set the variables required by the experiment
+        self.set_required_variables(
+            n_resources="{resource_count}",
+            process_problem_size="{zones} / {n_resources}",
+            total_problem_size="{zones}",
+        )
+
+        # Register the scaling variables and their respective scaling functions
+        # required to correctly scale the experiment for the given scaliing policy
+        # Strong scaling scales up resource_count by the specified scaling_factor
+        self.register_scaling_config(
+            {
+                ScalingMode.Strong: {
+                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                },
+            }
+        )
+
         if self.spec.satisfies("+cuda"):
             self.add_experiment_variable("device", "cuda", True)
         elif self.spec.satisfies("+rocm"):
             self.add_experiment_variable("device", "hip", True)
+        else:
+            self.add_experiment_variable("device", "cpu", True)
 
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
-            device = "n_gpus"
-        if self.spec.satisfies("+single_node"):
-            for pk, pv in n_resources.items():
-                self.add_experiment_variable(device, pv, True)
-        elif self.spec.satisfies("+strong"):
-            scaled_variables = self.generate_strong_scaling_params(
-                {tuple(n_resources.keys()): list(n_resources.values())},
-                int(self.spec.variants["scaling-factor"][0]),
-                int(self.spec.variants["scaling-iterations"][0]),
-            )
-            for pk, pv in scaled_variables.items():
-                self.add_experiment_variable(pk, pv, True)
-            num_resources = scaled_variables["n_nodes"]
-            self.add_experiment_variable(device, num_resources, True)
+            self.add_experiment_variable("n_gpus", "{n_resources}", True)
+        else:
+            self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-
-        # get system config options
-        # TODO: Get compiler/mpi/package handles directly from system.py
-        system_specs = {}
-        system_specs["compiler"] = "default-compiler"
-        system_specs["mpi"] = "default-mpi"
-        system_specs["lapack"] = "lapack"
-        system_specs["blas"] = "blas"
-
-        if self.spec.satisfies("+cuda"):
-            system_specs["cuda_version"] = "{default_cuda_version}"
-            system_specs["cuda_arch"] = "{cuda_arch}"
-        elif self.spec.satisfies("+rocm"):
-            system_specs["rocm_arch"] = "{rocm_arch}"
-
-        # set package spack specs
-        # empty package_specs value implies external package
-        self.add_package_spec(system_specs["mpi"])
-
-        # empty package_specs value implies external package
-        self.add_package_spec(system_specs["blas"])
-        self.add_package_spec(system_specs["lapack"])
-        self.add_package_spec(system_specs["mpi"])
-
-        self.add_package_spec(
-            self.name, [f"laghos@{app_version} +metis", system_specs["compiler"]]
-        )
+        self.add_package_spec(self.name, [f"laghos@{app_version} +metis"])

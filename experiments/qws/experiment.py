@@ -6,9 +6,10 @@
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
+from benchpark.caliper import Caliper
 
 
-class Qws(Experiment, OpenMPExperiment):
+class Qws(Experiment, OpenMPExperiment, Caliper):
 
     variant(
         "workload",
@@ -47,17 +48,13 @@ class Qws(Experiment, OpenMPExperiment):
             self.add_experiment_variable("omp_num_threads", ["48"])
             self.add_experiment_variable("arch", "OpenMP")
 
+        self.set_required_variables(
+            n_resources="{n_ranks}",
+            process_problem_size="{lx}*{ly}*{lz}/{n_ranks}",
+            total_problem_size="{lx}*{ly}*{lz}",
+        )
+
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-
-        system_specs = {}
-        system_specs["compiler"] = "default-compiler"
-        system_specs["mpi"] = "default-mpi"
-
-        # if package_spec left empty spack will use external
-        self.add_package_spec(system_specs["mpi"])
-
-        self.add_package_spec(
-            self.name, [f"qws@{app_version} +mpi", system_specs["compiler"]]
-        )
+        self.add_package_spec(self.name, [f"qws@{app_version} +mpi"])

@@ -16,9 +16,9 @@ class RajaPerf(ExecutableApplication):
             'atomics','simd','vectorization','register-pressure',
             'high-memory-bandwidth','regular-memory-access',
             'mpi','network-point-to-point','network-latency-bound',
-            'c++','raja','cuda','hip','openmp','sycl']
+            'c++','raja','sycl']
 
-    executable('run', 'raja-perf.exe', use_mpi=True)
+    executable('run', 'raja-perf.exe --size {size}', use_mpi=True)
 
     workload('suite', executables=['run'])
 

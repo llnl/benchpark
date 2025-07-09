@@ -3,11 +3,13 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import pathlib
 
 from benchpark.directives import variant, maintainers
+from benchpark.cudasystem import CudaSystem
+from benchpark.openmpsystem import OpenMPSystem
 from benchpark.system import System
 from benchpark.paths import hardware_descriptions
+from packaging.version import Version
 
 
 class LanlVenado(System):
@@ -16,9 +18,11 @@ class LanlVenado(System):
 
     id_to_resources = {
         "grace-hopper": {
+            "cuda_arch": 90,
             "sys_cores_per_node": 144,
             "sys_gpus_per_node": 4,
             "system_site": "lanl",
+            "extra_batch_opts": "-A llnl_ai_g -pgpu",
             "hardware_key": str(hardware_descriptions)
             + "/HPECray-neoverse-H100-Slingshot/hardware_description.yaml",
         },
@@ -36,95 +40,190 @@ class LanlVenado(System):
         values=("grace-hopper", "grace-grace"),
         description="Which cluster to run on",
     )
-
     variant(
         "cuda",
-        default="12-5",
+        default="12.5",
         values=("11.8", "12.5"),
         description="CUDA version",
     )
-
     variant(
         "compiler",
         default="cce",
         values=("gcc", "cce"),
         description="Which compiler to use",
     )
-
     variant(
         "gtl",
         default=False,
         values=(True, False),
         description="Use GTL-enabled MPI",
     )
-
     variant(
         "lapack",
-        default="cusolver",
-        values=("cusolver", "cray-libsci"),
+        default="cray-libsci",
+        values=("cray-libsci",),
         description="Which lapack to use",
     )
-
     variant(
         "blas",
-        default="cublas",
-        values=("cublas", "cray-libsci"),
+        default="cray-libsci",
+        values=("cray-libsci",),
         description="Which blas to use",
     )
 
-    def initialize(self):
-        super().initialize()
+    def __init__(self, spec):
+        super().__init__(spec)
+        if self.spec.variants["cluster"][0] == "grace-hopper":
+            self.programming_models = [CudaSystem()]
+            self.cuda_version = Version(self.spec.variants["cuda"][0])
+            self.gtl_flag = self.spec.variants["gtl"][0]
+        if self.spec.variants["cluster"][0] == "grace-grace":
+            self.programming_models = [OpenMPSystem()]
 
         self.scheduler = "slurm"
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
 
-    def generate_description(self, output_dir):
-        super().generate_description(output_dir)
-
-        sw_description = pathlib.Path(output_dir) / "software.yaml"
-
-        with open(sw_description, "w") as f:
-            f.write(self.sw_description())
-
-    def system_specific_variables(self):
-        return {
-            "cuda_arch": "90",
-            "default_cuda_version": self.spec.variants["cuda"][0],
-            "extra_batch_opts": '"-A llnl_ai_g -pgpu"',
+    def compute_packages_section(self):
+        selections = {
+            "packages": {
+                "tar": {
+                    "externals": [{"spec": "tar@1.34", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "cmake": {
+                    "externals": [
+                        {
+                            "spec": "cmake@3.29.6",
+                            "prefix": "/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/packages/cmake/cmake-3.29.6",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "gmake": {
+                    "externals": [{"spec": "gmake@4.2.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "automake": {
+                    "externals": [{"spec": "automake@1.15.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "autoconf": {
+                    "externals": [{"spec": "autoconf@2.69", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "fftw": {
+                    "externals": [
+                        {
+                            "spec": "fftw@3.3.10.8",
+                            "prefix": "/opt/cray/pe/fftw/3.3.10.8/arm_grace",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "python": {
+                    "externals": [
+                        {
+                            "spec": "python@3.10.9",
+                            "prefix": "/usr/projects/hpcsoft/common/aarch64/anaconda/2023.03-python-3.10",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "mpi": {"buildable": False},
+            }
         }
 
-    def external_pkg_configs(self):
-        externals = LanlVenado.resource_location / "externals"
+        selections["packages"] |= self.cuda_config(self.spec.variants["cuda"][0])[
+            "packages"
+        ]
 
-        selections = [externals / "base" / "00-packages.yaml"]
-
-        cuda_cfg_path = self.next_adhoc_cfg()
-        with open(cuda_cfg_path, "w") as f:
-            f.write(self.cuda_config(self.spec.variants["cuda"][0]))
-        selections.append(cuda_cfg_path)
-
-        mpi_cfg_path = self.next_adhoc_cfg()
-        with open(mpi_cfg_path, "w") as f:
-            f.write(self.mpi_config())
-        selections.append(mpi_cfg_path)
+        selections["packages"] |= self.mpi_config()["packages"]
 
         if self.spec.satisfies("compiler=cce"):
-            selections.append(externals / "libsci" / "01-cce-packages.yaml")
+            selections["packages"] |= {
+                "cray-libsci": {
+                    "externals": [
+                        {
+                            "spec": "cray-libsci@24.07.0%cce",
+                            "prefix": "/opt/cray/pe/libsci/24.07.0/cray/17.0/aarch64",
+                        }
+                    ]
+                }
+            }
         elif self.spec.satisfies("compiler=gcc"):
-            selections.append(externals / "libsci" / "00-gcc-packages.yaml")
+            selections["packages"] |= {
+                "cray-libsci": {
+                    "externals": [
+                        {
+                            "spec": "cray-libsci@24.07.0%gcc",
+                            "prefix": "/opt/cray/pe/libsci/24.07.0/gnu/12.3/aarch64",
+                        }
+                    ]
+                }
+            }
 
         return selections
 
-    def compiler_configs(self):
-        compilers = LanlVenado.resource_location / "compilers"
-
-        selections = []
+    def compute_compilers_section(self):
+        selections = {
+            "compilers": [
+                {
+                    "compiler": {
+                        "spec": "gcc@12.3.0",
+                        "paths": {
+                            "cc": "/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/bin/gcc",
+                            "cxx": "/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/bin/g++",
+                            "f77": "/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/bin/gfortran",
+                            "fc": "/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/bin/gfortran",
+                        },
+                        "flags": {},
+                        "operating_system": "sles15",
+                        "target": "aarch64",
+                        "modules": [],
+                        "environment": {},
+                        "extra_rpaths": [],
+                    }
+                }
+            ]
+        }
         # TODO: Construct/extract/customize compiler information from the working set
         if self.spec.satisfies("compiler=cce"):
-            selections.append(compilers / "cce" / "00-cce-18-compilers.yaml")
-        selections.append(compilers / "gcc" / "00-gcc-12-compilers.yaml")
+            selections["compilers"] += [
+                {
+                    "compiler": {
+                        "spec": "cce@18.0.0",
+                        "paths": {
+                            "cc": "/opt/cray/pe/cce/18.0.0/bin/craycc",
+                            "cxx": "/opt/cray/pe/cce/18.0.0/bin/crayCC",
+                            "f77": "/opt/cray/pe/cce/18.0.0/bin/crayftn",
+                            "fc": "/opt/cray/pe/cce/18.0.0/bin/crayftn",
+                        },
+                        "flags": {
+                            "cflags": "-g -O2 --gcc-toolchain=/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0",
+                            "cxxflags": "-g -O2 --gcc-toolchain=/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0",
+                            "fflags": "-g -O2 -hnopattern",
+                            "ldflags": "-ldl",
+                        },
+                        "operating_system": "sles15",
+                        "target": "aarch64",
+                        "modules": [],
+                        "environment": {
+                            "prepend_path": {
+                                "LD_LIBRARY_PATH": "/opt/cray/pe/cce/18.0.0/cce/aarch64/lib:/opt/cray/libfabric/1.20.1/lib64:/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/lib:/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/lib64:/opt/cray/pe/gcc-libs"
+                            }
+                        },
+                        "extra_rpaths": [
+                            "/opt/cray/pe/gcc-libs",
+                            "/opt/cray/pe/cce/18.0.0/cce/aarch64/lib",
+                            "/opt/cray/libfabric/1.20.1/lib64",
+                            "/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/lib",
+                            "/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/lib64",
+                        ],
+                    }
+                }
+            ]
 
         return selections
 
@@ -144,70 +243,96 @@ class LanlVenado(System):
             compiler = "gcc@12.3.0"
             mpi_compiler_suffix = "gnu/12.3"
 
-        return f"""\
-packages:
-  cray-mpich:
-    externals:
-    - spec: cray-mpich@{mpi_version}%{compiler} {gtl} +wrappers
-      prefix: /opt/cray/pe/mpich/{mpi_version}/ofi/{mpi_compiler_suffix}
-      extra_attributes:
-        gtl_lib_path: /opt/cray/pe/mpich/{mpi_version}/gtl/lib
-        gtl_libs: ["libmpi_gtl_cuda"]
-        ldflags: "-L/opt/cray/pe/mpich/{mpi_version}/ofi/{mpi_compiler_suffix}/lib -lmpi -L/opt/cray/pe/mpich/{mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{mpi_version}/gtl/lib -lmpi_gtl_cuda"
-"""
+        return {
+            "packages": {
+                "cray-mpich": {
+                    "externals": [
+                        {
+                            "spec": f"cray-mpich@{mpi_version}%{compiler} {gtl} +wrappers",
+                            "prefix": f"/opt/cray/pe/mpich/{mpi_version}/ofi/{mpi_compiler_suffix}",
+                            "extra_attributes": {
+                                "gtl_lib_path": f"/opt/cray/pe/mpich/{mpi_version}/gtl/lib",
+                                "gtl_libs": "libmpi_gtl_cuda",
+                                "ldflags": f"-L/opt/cray/pe/mpich/{mpi_version}/ofi/{mpi_compiler_suffix}/lib -lmpi -L/opt/cray/pe/mpich/{mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{mpi_version}/gtl/lib -lmpi_gtl_cuda",
+                            },
+                        }
+                    ]
+                }
+            }
+        }
 
     def cuda_config(self, cuda_version):
-        template = """\
-packages:
-  blas:
-    require:
-      - {blas}
-  lapack:
-    require:
-      - {lapack}
-  curand:
-    externals:
-    - spec: curand@{x}
-      prefix: /opt/nvidia/hpc_sdk/Linux_aarch64/24.7/cuda/{x}
-    buildable: false
-  cusparse:
-    externals:
-    - spec: cusparse@{x}
-      prefix: /opt/nvidia/hpc_sdk/Linux_aarch64/24.7/cuda/{x}
-    buildable: false
-  cuda:
-    externals:
-    - spec: cuda@{x}
-      prefix: /opt/nvidia/hpc_sdk/Linux_aarch64/24.7/cuda/{x}
-    buildable: false
-  cub:
-    externals:
-    - spec: cub@{x}
-      prefix: /opt/nvidia/hpc_sdk/Linux_aarch64/24.7/cuda/{x}
-    buildable: false
-  cublas:
-    externals:
-    - spec: cublas@{x}
-      prefix: /opt/nvidia/hpc_sdk/Linux_aarch64/24.7/math_libs/{x}
-    buildable: false
-  cusolver:
-    externals:
-    - spec: cusolver@{x}
-      prefix: /opt/nvidia/hpc_sdk/Linux_aarch64/24.7/math_libs/{x}
-    buildable: false
-  cufft:
-    externals:
-    - spec: cufft@{x}
-      prefix: /opt/nvidia/hpc_sdk/Linux_aarch64/24.7/math_libs/{x}
-    buildable: false
-"""
-        return template.format(
-            x=cuda_version,
-            blas=self.spec.variants["blas"][0],
-            lapack=self.spec.variants["lapack"][0],
-        )
+        return {
+            "packages": {
+                "blas": {"require": [f"{self.spec.variants['blas'][0]}"]},
+                "lapack": {"require": [f"{self.spec.variants['lapack'][0]}"]},
+                "curand": {
+                    "externals": [
+                        {
+                            "spec": f"curand@{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_aarch64/24.7/cuda/{cuda_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cusparse": {
+                    "externals": [
+                        {
+                            "spec": f"cusparse@{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_aarch64/24.7/cuda/{cuda_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cuda": {
+                    "externals": [
+                        {
+                            "spec": f"cuda@{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_aarch64/24.7/cuda/{cuda_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cub": {
+                    "externals": [
+                        {
+                            "spec": f"cub@{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_aarch64/24.7/cuda/{cuda_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cublas": {
+                    "externals": [
+                        {
+                            "spec": f"cublas@{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_aarch64/24.7/math_libs/{cuda_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cusolver": {
+                    "externals": [
+                        {
+                            "spec": f"cusolver@{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_aarch64/24.7/math_libs/{cuda_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cufft": {
+                    "externals": [
+                        {
+                            "spec": f"cufft@{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_aarch64/24.7/math_libs/{cuda_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+            }
+        }
 
-    def sw_description(self):
+    def compute_software_section(self):
         """This is somewhat vestigial: for the Tioga config that is committed
         to the repo, multiple instances of mpi/compilers are stored and
         and these variables were used to choose consistent dependencies.
@@ -216,15 +341,17 @@ packages:
         will fail if these variables are not defined though, so for now
         they are still generated (but with more-generic values).
         """
-        return f"""\
-software:
-  packages:
-    default-compiler:
-      pkg_spec: {self.spec.variants["compiler"][0]}
-    default-mpi:
-      pkg_spec: cray-mpich
-    default-lapack:
-      pkg_spec: {self.spec.variants["lapack"][0]}
-    default-blas:
-      pkg_spec: {self.spec.variants["blas"][0]}
-"""
+        return {
+            "software": {
+                "packages": {
+                    "default-compiler": {
+                        "pkg_spec": f"{self.spec.variants['compiler'][0]}"
+                    },
+                    "default-mpi": {"pkg_spec": "cray-mpich"},
+                    "default-lapack": {
+                        "pkg_spec": f"{self.spec.variants['lapack'][0]}"
+                    },
+                    "default-blas": {"pkg_spec": f"{self.spec.variants['blas'][0]}"},
+                }
+            }
+        }

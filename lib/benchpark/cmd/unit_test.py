@@ -204,7 +204,6 @@ def add_back_pytest_args(args, unknown_args):
 
 
 def command(args, unknown_args):
-    global pytest
 
     if args.pytest_help:
         # make the pytest.main help output more accurate
@@ -221,7 +220,7 @@ def command(args, unknown_args):
                 "--dist",
                 "loadfile",
                 "--tx",
-                f"{args.numprocesses}*popen//python=benchpark-tmpconfig benchpark-python",
+                f"{args.numprocesses}*popen//python=benchpark-tmpconfig benchpark-python -i",
             ]
         )
 

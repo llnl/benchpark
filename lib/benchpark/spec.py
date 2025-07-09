@@ -13,12 +13,7 @@ import re
 from typing import Iterable, Iterator, List, Match, Optional, Union
 
 from benchpark.error import BenchparkError
-import benchpark.paths
 import benchpark.repo
-import benchpark.runtime
-
-bootstrapper = benchpark.runtime.RuntimeResources(benchpark.paths.benchpark_home)
-bootstrapper.bootstrap()
 
 import llnl.util.lang  # noqa
 
@@ -53,7 +48,7 @@ class VariantMap(llnl.util.lang.HashableMap):
 
     def satisfies(self, other: "VariantMap") -> bool:
         if isinstance(other, ConcreteVariantMap):
-            self == other
+            return self == other
 
         return all(
             name in self and set(self[name]) >= set(other[name]) for name in other

@@ -1,0 +1,43 @@
+# Utility for pushing test status to GitHub CI and CDash
+.push_status: &push_status
+  # Max job name length 140 characters
+  - |
+    TRUNCATED_JOB_NAME=$(echo "${CI_JOB_NAME}" | cut -c1-140)
+    curl -X POST --url "https://api.github.com/repos/llnl/${CI_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+         --header 'Content-Type: application/json' \
+         --header "authorization: Bearer ${GITHUB_TOKEN}" \
+         --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_JOB_URL}\", \"description\": \"${TRUNCATED_JOB_NAME}\", \"context\": \"ci/gitlab/${CI_JOB_NAME}\" }"
+.report_status:
+  before_script:
+    - export pipeline_status="pending"
+    - *push_status
+  after_script:
+    - |
+      if [[ "$CI_JOB_STATUS" == "failed" ]]; then
+        export pipeline_status="failure"
+        export EXIT_CODE=false
+        export RUN_CTEST=true
+      elif [[ "$CI_JOB_STATUS" == "canceled" ]]; then
+        export pipeline_status="$CI_JOB_STATUS"
+        export RUN_CTEST=false
+      elif [[ "$CI_JOB_STATUS" == "success" ]]; then
+        export pipeline_status="$CI_JOB_STATUS"
+        export EXIT_CODE=true
+        export RUN_CTEST=true
+      else
+        echo "ERROR: Unexpected status CI_JOB_STATUS=$CI_JOB_STATUS"
+        export RUN_CTEST=false
+      fi
+    - |
+      if [[ $RUN_CTEST == "true" ]]; then
+        module load cmake/3.23.1
+        ctest -S CTestGitlab.cmake \
+          -DHOST="${HOST}" \
+          -DDASHBOARD_NAME="${DASHBOARD_NAME}" \
+          -DBUILD_NAME="${HOST}/${BENCHMARK}${VARIANT} ${SYSTEM_ARGS}" \
+          -DSITE="$(hostname)" \
+          -DTEST_TYPE="${TEST_TYPE}"
+      else
+        echo "Skipping ctest execution due to CI_JOB_STATUS=$CI_JOB_STATUS"
+      fi
+    - *push_status

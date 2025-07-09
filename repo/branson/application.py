@@ -14,7 +14,7 @@ class Branson(ExecutableApplication):
 
     tags = ['asc','montecarlo','particles',
             'high-branching','irregular-memory-access',
-            'mpi','c++','cuda']
+            'mpi','c++']
 
     executable('setup_experiment',
            template=[

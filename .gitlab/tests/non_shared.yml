@@ -1,0 +1,42 @@
+# Clusters tested here are unable to utilize shared allocation strategy.
+# For Slurm-only clusters, this is because we need to double srun, e.g. srun to get into the
+# shared allocation, and then srun during the test in "ramble on", which is not possible.
+# For these clusters we run separate allocations, which is significantly slower overall.
+include:
+  - local: .gitlab/utils/status.yml
+  - local: .gitlab/utils/machine_checks.yml
+  - local: .gitlab/utils/rules.yml
+workflow:
+  auto_cancel:
+    on_new_commit: conservative
+.test_clusters: &test_clusters
+  extends: .on_host_template
+  needs: [ruby-up-check, lassen-up-check]
+  parallel:
+    matrix:
+      - HOST: ruby
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: -N 1 -t 00:30:00 --exclusive --reservation=ci
+        BENCHMARK: [amg2023, kripke, laghos]
+        VARIANT: ['']
+        SYSTEM_ARGS: ['']
+        DASHBOARD_NAME: Ruby Supermicro-icelake-OmniPath [benchpark system init --dest=ruby-system
+          llnl-cluster cluster=ruby]
+      - HOST: lassen
+        ARCHCONFIG: llnl-sierra
+        SCHEDULER_PARAMETERS: -nnodes 1 -W 40 -q pci
+        BENCHMARK: [amg2023, kripke, raja-perf]
+        VARIANT: [+cuda]
+        SYSTEM_ARGS: ['']
+        DASHBOARD_NAME: Lassen IBM-power9-V100-Infiniband [benchpark system init --dest=lassen-system
+          llnl-sierra]
+run_tests_nonshared:
+  resource_group: $HOST
+  stage: test
+  tags: [$HOST, batch]
+  <<: *test_clusters
+  before_script:
+    - !reference [.report_status, before_script]
+  script: [./.gitlab/utils/run-experiment.sh]
+  after_script:
+    - !reference [.report_status, after_script]

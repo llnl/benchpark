@@ -33,16 +33,14 @@ class Smb(Experiment, StrongScaling):
             self.add_experiment_variable("n_nodes", "1")
             self.add_experiment_variable("n_ranks", "{n_nodes}*{sys_cores_per_node}")
 
+        self.set_required_variables(
+            n_resources="{n_ranks}", process_problem_size="", total_problem_size=""
+        )
+
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-
         spec_string = f"smb@{app_version} +mpi"
         if self.spec.satisfies("workload=rma_mt"):
             spec_string += "+rma"
-        system_specs = {}
-        system_specs["compiler"] = "default-compiler"
-        system_specs["mpi"] = "default-mpi"
-
-        self.add_package_spec(system_specs["mpi"])
-        self.add_package_spec(self.name, [spec_string, system_specs["compiler"]])
+        self.add_package_spec(self.name, [spec_string])

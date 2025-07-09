@@ -14,19 +14,16 @@
     :target: https://codecov.io/gh/llnl/benchpark
 
 .. image:: https://github.com/llnl/benchpark/workflows/ci/badge.svg
-    :target: https://github.com/llnl/benchpark/actions/workflows/ci.yaml
-
-.. image:: https://github.com/LLNL/benchpark/actions/workflows/run.yml/badge.svg
-    :target: https://github.com/LLNL/benchpark/actions/workflows/run.yml
+    :target: https://github.com/LLNL/benchpark/actions/workflows/ci.yml
 
 .. image:: https://github.com/llnl/benchpark/workflows/nightly/badge.svg
-    :target: https://github.com/llnl/benchpark/actions/workflows/nightly.yaml
-
-.. image:: https://github.com/LLNL/benchpark/actions/workflows/docs.yml/badge.svg
-    :target: https://github.com/LLNL/benchpark/actions/workflows/docs.yml
+    :target: https://github.com/LLNL/benchpark/actions/workflows/nightly.yml
 
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
     :target: https://github.com/psf/black
+
+.. image:: https://img.shields.io/badge/Dashboard-CDash-blue
+    :target: https://my.cdash.org/index.php?project=Benchpark
 
 Overview
 --------

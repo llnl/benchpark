@@ -53,23 +53,13 @@ class Babelstream(
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_experiment_variable("n_gpus", n_resources, True)
 
+        self.set_required_variables(
+            n_resources=f"{n_resources}",
+            process_problem_size="{n}/" + str(n_resources),
+            total_problem_size="{n}",
+        )
+
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-
-        # get system config options
-        # TODO: Get compiler/mpi/package handles directly from system.py
-        system_specs = {}
-        system_specs["compiler"] = "default-compiler"
-        system_specs["mpi"] = "default-mpi"
-        if self.spec.satisfies("+cuda"):
-            system_specs["cuda_version"] = "{default_cuda_version}"
-            system_specs["cuda_arch"] = "{cuda_arch}"
-        if self.spec.satisfies("+rocm"):
-            system_specs["rocm_arch"] = "{rocm_arch}"
-
-        # set package spack specs
-        self.add_package_spec(system_specs["mpi"])
-        self.add_package_spec(
-            self.name, [f"babelstream@{app_version}", system_specs["compiler"]]
-        )
+        self.add_package_spec(self.name, [f"babelstream@{app_version}"])

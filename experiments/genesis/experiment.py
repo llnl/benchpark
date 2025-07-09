@@ -48,23 +48,13 @@ class Genesis(Experiment, OpenMPExperiment):
             self.add_experiment_variable("omp_num_threads", ["12"])
             self.add_experiment_variable("arch", "OpenMP")
 
+        self.set_required_variables(
+            n_resources="{n_ranks}",
+            process_problem_size="{lx}*{ly}*{lz}/{n_ranks}",
+            total_problem_size="{lx}*{ly}*{lz}",
+        )
+
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-
-        system_specs = {}
-        system_specs["compiler"] = "default-compiler"
-        system_specs["mpi"] = "default-mpi"
-        system_specs["lapack"] = "lapack"
-
-        # if package_spec left empty spack will use external
-        self.add_package_spec(system_specs["mpi"])
-        self.add_package_spec(system_specs["lapack"])
-
-        self.add_package_spec(
-            self.name, [f"genesis@{app_version} +mpi", system_specs["compiler"]]
-        )
-        self.add_package_spec(
-            system_specs["lapack"],
-            [system_specs["lapack"], system_specs["compiler"]],
-        )
+        self.add_package_spec(self.name, [f"genesis@{app_version} +mpi"])

@@ -3,15 +3,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.error import BenchparkError
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
-from benchpark.scaling import StrongScaling
-from benchpark.scaling import WeakScaling
-from benchpark.scaling import ThroughputScaling
+from benchpark.new_scaling import ScalingMode, Scaling
 from benchpark.caliper import Caliper
 
 
@@ -20,9 +17,7 @@ class Amg2023(
     OpenMPExperiment,
     CudaExperiment,
     ROCmExperiment,
-    StrongScaling,
-    WeakScaling,
-    ThroughputScaling,
+    Scaling(ScalingMode.Strong, ScalingMode.Weak, ScalingMode.Throughput),
     Caliper,
 ):
     variant(
@@ -40,125 +35,73 @@ class Amg2023(
 
     maintainers("pearce8")
 
-    # requires("system+papi", when(caliper=topdown*))
-
-    # TODO: Support list of 3-tuples
-    # variant(
-    #     "p",
-    #     description="value of p",
-    # )
-
-    # TODO: Support list of 3-tuples
-    # variant(
-    #     "n",
-    #     description="value of n",
-    # )
-
     def compute_applications_section(self):
-        # TODO: Replace with conflicts clause
-        scaling_modes = {
-            "strong": self.spec.satisfies("+strong"),
-            "weak": self.spec.satisfies("+weak"),
-            "throughput": self.spec.satisfies("+throughput"),
-            "single_node": self.spec.satisfies("+single_node"),
-        }
-
-        scaling_mode_enabled = [key for key, value in scaling_modes.items() if value]
-        if len(scaling_mode_enabled) != 1:
-            raise BenchparkError(
-                f"Only one type of scaling per experiment is allowed for application package {self.name}"
-            )
-
         # Number of processes in each dimension
-        num_procs = {"px": 2, "py": 2, "pz": 2}
+        self.add_experiment_variable(
+            "n_resources_dict", {"px": 2, "py": 2, "pz": 2}, True
+        )
 
         # Per-process size (in zones) in each dimension
-        problem_sizes = {"nx": 80, "ny": 80, "nz": 80}
+        self.add_experiment_variable(
+            "process_problem_size_dict", {"nx": 80, "ny": 80, "nz": 80}, True
+        )
 
-        if self.spec.satisfies("+single_node"):
-            n_resources = 1
-            # TODO: Check if n_ranks / n_resources_per_node <= 1
-            for pk, pv in num_procs.items():
-                self.add_experiment_variable(pk, pv, True)
-                n_resources *= pv
-            for nk, nv in problem_sizes.items():
-                self.add_experiment_variable(nk, nv, True)
-        elif self.spec.satisfies("+throughput"):
-            n_resources = 1
-            for pk, pv in num_procs.items():
-                self.add_experiment_variable(pk, pv, True)
-                n_resources *= pv
-            scaled_variables = self.generate_throughput_scaling_params(
-                {tuple(problem_sizes.keys()): list(problem_sizes.values())},
-                int(self.spec.variants["scaling-factor"][0]),
-                int(self.spec.variants["scaling-iterations"][0]),
-            )
-            for nk, nv in scaled_variables.items():
-                self.add_experiment_variable(nk, nv, True)
-        elif self.spec.satisfies("+strong"):
-            scaled_variables = self.generate_strong_scaling_params(
-                {tuple(num_procs.keys()): list(num_procs.values())},
-                int(self.spec.variants["scaling-factor"][0]),
-                int(self.spec.variants["scaling-iterations"][0]),
-            )
-            for pk, pv in scaled_variables.items():
-                self.add_experiment_variable(pk, pv, True)
-            n_resources = [
-                x * y * z
-                for x, y, z in zip(
-                    *(scaled_variables[p] for p in num_procs if p in scaled_variables)
-                )
-            ]
-            for nk, nv in problem_sizes.items():
-                self.add_experiment_variable(nk, nv, True)
-        elif self.spec.satisfies("+weak"):
-            scaled_variables = self.generate_weak_scaling_params(
-                {tuple(num_procs.keys()): list(num_procs.values())},
-                {tuple(problem_sizes.keys()): list(problem_sizes.values())},
-                int(self.spec.variants["scaling-factor"][0]),
-                int(self.spec.variants["scaling-iterations"][0]),
-            )
-            n_resources = [
-                x * y * z
-                for x, y, z in zip(
-                    *(scaled_variables[p] for p in num_procs if p in scaled_variables)
-                )
-            ]
-            for k, v in scaled_variables.items():
-                self.add_experiment_variable(k, v, True)
+        # Set the variables required by the experiment
+        self.set_required_variables(
+            n_resources="{px}*{py}*{pz}",
+            process_problem_size="{nx}*{ny}*{nz}",
+            total_problem_size="{nx}*{ny}*{nz}*{px}*{py}*{pz}",
+        )
+
+        # In this application, since the input problem sizes (process_problem_size_dict)
+        # are per process sizes, strong scaling the problem implies that
+        # as n_resources_dict are scaled up, i.e. (x * scaling_factor),
+        # process_problem_size_dict are commensurately scaled down i.e. (x // scaling_factor)
+
+        # For weak scaling, only the n_resources_dict have to be scaled up,
+        # process_problem_size_dict remain the same
+
+        self.register_scaling_config(
+            {
+                ScalingMode.Strong: {
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
+                    * scaling_factor,
+                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
+                    // scaling_factor,
+                },
+                ScalingMode.Weak: {
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
+                    * scaling_factor,
+                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    ),
+                },
+                ScalingMode.Throughput: {
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    ),
+                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
+                    * scaling_factor,
+                },
+            }
+        )
 
         if self.spec.satisfies("+openmp"):
-            self.add_experiment_variable("n_ranks", n_resources, True)
             self.add_experiment_variable("n_threads_per_proc", 1, True)
-        elif self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
-            self.add_experiment_variable("n_gpus", n_resources, True)
+        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+            self.add_experiment_variable("n_gpus", "{n_resources}", True)
+        else:
+            self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-
-        # get system config options
-        # TODO: Get compiler/mpi/package handles directly from system.py
-        system_specs = {}
-        system_specs["compiler"] = "default-compiler"
-        system_specs["mpi"] = "default-mpi"
-        system_specs["lapack"] = "lapack"
-        system_specs["blas"] = "blas"
-
-        if self.spec.satisfies("+cuda"):
-            system_specs["cuda_version"] = "{default_cuda_version}"
-            system_specs["cuda_arch"] = "{cuda_arch}"
-        elif self.spec.satisfies("+rocm"):
-            system_specs["rocm_arch"] = "{rocm_arch}"
-
-        # set package spack specs
-        # empty package_specs value implies external package
-        self.add_package_spec(system_specs["mpi"])
-
-        # empty package_specs value implies external package
-        self.add_package_spec(system_specs["blas"])
-        self.add_package_spec(system_specs["lapack"])
-
-        self.add_package_spec(
-            self.name, [f"amg2023@{app_version} +mpi", system_specs["compiler"]]
-        )
+        self.add_package_spec(self.name, [f"amg2023@{app_version} +mpi"])
