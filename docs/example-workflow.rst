@@ -19,31 +19,37 @@ and ``experiment`` are already configured and just need to be setup and run.
 First, initialize the variant of the AWS system using the existing system
 specification in Benchpark::
 
-    benchpark system init --dest=aws-system aws-cluster
+    benchpark system init --dest=tutorial aws-tutorial instance_type=c7i.24xlarge
 
 To run the openmp, single node scaling version of the Kripke benchmark, initialize it for experiments::
 
-    benchpark experiment init --dest=kripke-benchmark kripke +openmp+strong~single_node caliper=time
+    benchpark experiment init --dest kripke-benchmark kripke scaling=strong caliper=time,mpi
 
 Then setup the workspace directory for the system and experiment together::
 
-    benchpark setup ./kripke-benchmark ./aws-system workspace/
+    benchpark setup kripke-benchmark/ tutorial/ wkp/
 
 Benchpark will provide next steps to the console but they are also provided here.
 Run the setup script for dependency software, Ramble and Spack::
 
-    . workspace/setup.sh
+    . /home/jovyan/benchpark/wkp/setup.sh
 
 Then setup the Ramble experiment workspace, this builds all software and may take some time::
 
-    cd ./workspace/kripke-benchmark/aws-system/workspace/
-    ramble --workspace-dir . --disable-progress-bar workspace setup
+    ramble --disable-progress-bar --workspace-dir /home/jovyan/benchpark/wkp/kripke-benchmark/tutorial/workspace workspace setup
 
 Next, we run the Kripke experiments, which will launch jobs through the
 scheduler on the AWS system::
 
-    ramble --workspace-dir . --disable-progress-bar on
+    ramble --disable-progress-bar --workspace-dir /home/jovyan/benchpark/wkp/kripke-benchmark/tutorial/workspace on
 
 After running the experiments, conduct pre-defined analyses with Benchpark::
 
-    benchpark analyze --workspace-dir workspace/kripke/openmp/aws/workspace/
+    benchpark analyze --workspace-dir ~/benchpark/wkp/kripke-benchmark/tutorial/workspace
+
+Navigate to benchpark/wkp/kripke-benchmark/tutorial/workspace/analyze and there should be a .PNG file of the graph after analysis
+
+    .. image:: ./kripke_mpi_strong_raw_exc.png
+       :alt: Kripke Analysis Graph
+       :width: 800px
+       :align: center
