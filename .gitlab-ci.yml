@@ -21,7 +21,7 @@ variables:
   TUOLUMNE_SHARED_ALLOC: -N 1 -t 4h --queue=pci --exclusive
   # Tioga (max 2hr policy)
   TIOGA_SHARED_ALLOC: -N 1 -t 2h --queue=pci --exclusive
-  CUSTOM_CI_BUILDS_DIR: ~/.jacamar-ci/builds/$CI_PROJECT_NAME/$CI_PIPELINE_ID/$CI_CONCURRENT_ID
+  CUSTOM_CI_BUILDS_DIR: /g/g0/benchpark/.jacamar-ci/builds/$CI_PROJECT_NAME/$CI_PIPELINE_ID/$CI_CONCURRENT_ID
   #/g/g0/benchpark/.jacamar-ci/builds/yxrvGpCU/001
 default:
   id_tokens:
