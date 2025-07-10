@@ -30,10 +30,19 @@
       fi
     - |
       if [[ $RUN_CTEST == "true" ]]; then
+        # associative array (Bash 4+)
+        declare -A DASHBOARD_NAMES
+        # Map cluster names to their full dashboard names
+        DASHBOARD_NAMES["tuolumne"]="Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init --dest=tuolumne-system llnl-elcapitan cluster=tuolumne]"
+        DASHBOARD_NAMES["tioga"]="Tioga HPECray-zen3-MI250X-Slingshot [benchpark system init --dest=tioga-system llnl-elcapitan cluster=tioga]"
+        DASHBOARD_NAMES["ruby"]="Ruby Supermicro-icelake-OmniPath [benchpark system init --dest=ruby-system llnl-cluster cluster=ruby]"
+        DASHBOARD_NAMES["lassen"]="Lassen IBM-power9-V100-Infiniband [benchpark system init --dest=lassen-system llnl-sierra]"
+        DASHBOARD_NAMES["dane"]="Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system llnl-cluster cluster=dane]"
+        # Run ctest
         module load cmake/3.23.1
         ctest -S CTestGitlab.cmake \
           -DHOST="${HOST}" \
-          -DDASHBOARD_NAME="${DASHBOARD_NAME}" \
+          -DDASHBOARD_NAME="${DASHBOARD_NAMES[$HOST]}" \
           -DBUILD_NAME="${HOST}/${BENCHMARK} ${VARIANT} ${SYSTEM_ARGS}" \
           -DSITE="$(hostname)" \
           -DTEST_TYPE="${TEST_TYPE}"

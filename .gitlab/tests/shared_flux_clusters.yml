@@ -90,16 +90,6 @@ run_tests_flux_tuolumne:
         BENCHMARK: [amg2023, kripke, laghos, raja-perf]
         VARIANT: [+rocm]
         GPUMODE: SPX
-        DASHBOARD_NAME: Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init
-          --dest=tuolumne-system llnl-elcapitan cluster=tuolumne]
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        SCHEDULER_PARAMETERS: -N 1 -t 30m --queue=pci --exclusive
-        BENCHMARK: [amg2023]
-        VARIANT: [+rocm scaling=strong]
-        GPUMODE: SPX
-        DASHBOARD_NAME: Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init
-          --dest=tuolumne-system llnl-elcapitan cluster=tuolumne]
       # Test TPX, CPX
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
@@ -107,16 +97,12 @@ run_tests_flux_tuolumne:
         VARIANT: [+rocm scaling=strong scaling-iterations=2]
         SYSTEM_ARGS: [gpumode=TPX]
         GPUMODE: TPX
-        DASHBOARD_NAME: Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init
-          --dest=tuolumne-system llnl-elcapitan cluster=tuolumne]
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK: [amg2023, kripke, laghos]
         VARIANT: [+rocm scaling=strong scaling-iterations=2]
         SYSTEM_ARGS: [gpumode=CPX]
         GPUMODE: CPX
-        DASHBOARD_NAME: Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init
-          --dest=tuolumne-system llnl-elcapitan cluster=tuolumne]
 run_tests_flux_tioga:
   extends: .run_tests_flux
   tags: [shell, tioga]
@@ -127,6 +113,3 @@ run_tests_flux_tioga:
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK: [amg2023, kripke, laghos]
         VARIANT: [+rocm]
-        SYSTEM_ARGS: ['']
-        DASHBOARD_NAME: Tioga HPECray-zen3-MI250X-Slingshot [benchpark system init
-          --dest=tioga-system llnl-elcapitan cluster=tioga]
