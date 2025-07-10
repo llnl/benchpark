@@ -39,7 +39,7 @@ def show_build_dump(args):
     env_root = _find_env_root(args.workspace)
 
     determine_exp = os.path.join(
-        benchpark.paths.benchpark_root, "lib", "scripts", "determine-exp.py"
+        benchpark.paths.benchpark_root, "lib", "scripts", "experiment-build-info.py"
     )
     out, err = run_command(f"spack -e {env_root} python {determine_exp}")
     exp_info = json.loads(out)
