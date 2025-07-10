@@ -2,6 +2,7 @@ import spack.environment as ev
 import json
 import sys
 
+
 def main():
     x = ev.active_environment()
     y = list(x.concrete_roots())
@@ -20,7 +21,7 @@ def main():
     result = {
         "root": z.name,
         "tree": z.tree(),
-        "info": [(w.name, w.package.install_env_path) for w in built_packages]
+        "info": [(w.name, w.package.install_env_path) for w in built_packages],
     }
     json.dump(result, sys.stdout)
 

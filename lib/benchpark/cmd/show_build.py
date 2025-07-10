@@ -80,7 +80,9 @@ def show_build_dump(args):
                 for cmd in build_cmds:
                     f.write(f"{cmd}\n")
 
-        env_vars_out = os.path.join(args.destdir, os.path.basename(f"{pkg_name}-build-env.txt"))
+        env_vars_out = os.path.join(
+            args.destdir, os.path.basename(f"{pkg_name}-build-env.txt")
+        )
         if not os.path.exists(env_vars_out):
             shutil.copy(build_env_file, env_vars_out)
 
