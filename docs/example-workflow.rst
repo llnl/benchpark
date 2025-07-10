@@ -68,7 +68,7 @@ Benchpark will provide next steps to the console but they are also provided here
 
 This command does 2 main things. First, it builds all necessary software using Spack. This process may take some time (2-3 minutes).
 Second, this command configures files (e.g. Flux submission script) needed to perform the runs that make up the current experiment.
-For each run, a directory will be created under ``benchpark/wkp3/kripke_exp/tuttest/workspace/experiments/kripke/kripke``. 
+For each run, a directory will be created under ``benchpark/wkp/kripke-benchmark/tutorial/workspace/experiments/kripke/kripke``. 
 If the setup is successfull, you will see something like this after the setup command::
 
     ==> Streaming details to log:
