@@ -60,6 +60,7 @@ release_resources_dane:
         BENCHMARK: [kripke]
         VARIANT: ['scaling=strong caliper=mpi,time']
         SYSTEM_ARGS: ['']
+        TEST_ANALYZE: ["true"]
         DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
           llnl-cluster cluster=dane]
       # Test old_scaling
