@@ -16,9 +16,16 @@ class RajaPerf(ExecutableApplication):
             'atomics','simd','vectorization','register-pressure',
             'high-memory-bandwidth','regular-memory-access',
             'mpi','network-point-to-point','network-latency-bound',
-            'c++','raja','sycl']
+            'c++','raja','sycl','builtin-caliper']
 
-    executable('run', 'raja-perf.exe --size {size}', use_mpi=True)
+    register_builtin("set_caliper_builtin", required=True, injection_mode="prepend")
+    def set_caliper_builtin(self):
+        self.caliper_builtin = True
+        print("gen file")
+        with open('.builtin-cali', 'w') as f: pass
+        return []
+
+    executable('run', 'raja-perf.exe --size {size} -atsc ${CALI_CONFIG_MODE} -atcc ${OTHER_CONFIG}', use_mpi=True)
 
     workload('suite', executables=['run'])
 
