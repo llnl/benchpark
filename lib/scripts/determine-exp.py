@@ -9,7 +9,14 @@ def main():
     # interest is the largest dag (every other root should just be an attempt
     # to constrain dependencies of this experiment).
     z = max(y, key=lambda i: sum(1 for _ in i.traverse()))
-    built_packages = list(dep for dep in z.traverse() if not dep.external)
+    built_packages = list()
+    for dep in z.traverse(deptype="link"):
+        if dep.external:
+            continue
+        if "runtime" in getattr(dep.package, "tags", []):
+            continue
+        built_packages.append(dep)
+
     result = {
         "root": z.name,
         "tree": z.tree(),
