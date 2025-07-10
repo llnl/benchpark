@@ -35,6 +35,15 @@ def extract_build_commands(log_file):
     return extracted
 
 
+def collect_experiments(workspace_dir):
+    experiments = list()
+    for dirpath, dirnames, filenames in os.walk(workspace_dir):
+        for fname in filenames:
+            if fname == "execute_experiment":
+                experiments.append(os.path.join(dirpath, fname))
+    return experiments
+
+
 def show_build_dump(args):
     env_root = _find_env_root(args.workspace)
 
@@ -74,6 +83,11 @@ def show_build_dump(args):
         env_vars_out = os.path.join(args.destdir, os.path.basename(f"{pkg_name}-build-env.txt"))
         if not os.path.exists(env_vars_out):
             shutil.copy(build_env_file, env_vars_out)
+
+    for i, exp in enumerate(collect_experiments(args.workspace)):
+        exp_out = os.path.join(args.destdir, f"exp-{i}")
+        if not os.path.exists(exp_out):
+            shutil.copy(exp, exp_out)
 
 
 def setup_parser(root_parser):
