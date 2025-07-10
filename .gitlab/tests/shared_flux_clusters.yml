@@ -70,7 +70,6 @@ release_resources_flux_tioga:
   after_script:
     - !reference [.report_status, after_script]
 run_tests_flux_tuolumne:
-  resource_group: tuolumne
   extends: .run_tests_flux
   tags: [shell, tuolumne]
   needs: [allocate_resources_tuolumne]
@@ -100,7 +99,6 @@ run_tests_flux_tuolumne:
         DASHBOARD_NAME: Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init
           --dest=tuolumne-system llnl-elcapitan cluster=tuolumne]
 run_tests_flux_tioga:
-  resource_group: tioga
   extends: .run_tests_flux
   tags: [shell, tioga]
   needs: [allocate_resources_tioga]

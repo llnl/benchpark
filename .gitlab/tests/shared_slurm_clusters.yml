@@ -36,7 +36,6 @@ release_resources_dane:
 # Test Run Section
 ##################
 .test_clusters_dane: &test_clusters_dane
-  resource_group: dane
   extends: .on_host_template
   parallel:
     matrix:
