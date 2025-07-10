@@ -66,7 +66,7 @@ Benchpark will provide next steps to the console but they are also provided here
 
     ramble --disable-progress-bar --workspace-dir /home/jovyan/benchpark/wkp/kripke-benchmark/tutorial/workspace workspace setup
 
-This command does 2 main things. First, it builds all necessary software using Spack. This process may take some time (5-10 minutes).
+This command does 2 main things. First, it builds all necessary software using Spack. This process may take some time (2-3 minutes).
 Second, this command configures files (e.g. Flux submission script) needed to perform the runs that make up the current experiment.
 For each run, a directory will be created under ``benchpark/wkp3/kripke_exp/tuttest/workspace/experiments/kripke/kripke``. 
 If the setup is successfull, you will see something like this after the setup command::
@@ -119,7 +119,13 @@ You should receive something like this on the terminal after running the command
 
 
 The experiments will run sequentially, and the total time to complete all four experiments should be 8-9 minutes. Upon completion, each
-experiment will generate a caliper file. 
+experiment will generate a caliper file. When all the experiments are finished, running the command :code:`flux jobs -a` will show all the
+jobs. A completed job will be green with ``CD`` as its status (Example below):
+
+    .. image:: ./finished_experiments_example.png
+       :alt: Example output of flux jobs -a when experiments are finished
+       :width: 750px
+       :align: center
 
 8. After running the experiments, conduct pre-defined analysis with Benchpark::
 
