@@ -12,7 +12,7 @@ else
 fi
 
 # Initialize Experiment
-./bin/benchpark experiment init --dest=${BENCHMARK}-benchmark ${BENCHMARK}${VARIANT}
+./bin/benchpark experiment init --dest=${BENCHMARK}-benchmark ${BENCHMARK} ${VARIANT}
 
 # Build Workspace
 ./bin/benchpark setup ${BENCHMARK}-benchmark ${HOST}-system workspace/
@@ -25,8 +25,10 @@ cd ./workspace/${BENCHMARK}-benchmark/${HOST}-system/workspace/
 
 ramble --disable-logger --workspace-dir . workspace setup
 
-if [ "$HOST" == "dane" ]; then
-    # Using flux on dane (srun called in "ramble on")
+# Using flux on dane (srun called in "ramble on")
+if [ "$HOST" == "dane" ] && \
+    # Nightly testing still using slurm
+    [ $CI_PIPELINE_SOURCE != "schedule" ]; then
     find . -type f -name execute_experiment -exec sed -i 's/\bsrun\b/flux run --exclusive/g' {} +
 fi
 
@@ -40,7 +42,7 @@ ramble --disable-logger --workspace-dir . workspace analyze --format json yaml t
 cd -
 
 # Benchpark Analyze experiments with "+strong"
-if [[ "$VARIANT" == *"+strong"* ]]; then
+if [[ "$VARIANT" == *"scaling=strong caliper=mpi,time"* ]] || [[ "$VARIANT" == *"+strong~single_node caliper=mpi,time"* ]]; then
     ./bin/benchpark analyze --workspace-dir ./workspace/${BENCHMARK}-benchmark/${HOST}-system/workspace/
 fi
 
