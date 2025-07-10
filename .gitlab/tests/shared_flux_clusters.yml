@@ -108,7 +108,7 @@ run_tests_flux_tioga:
     matrix:
       - HOST: tioga
         ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [amg2023, kripke, laghos]
+        BENCHMARK: [amg2023, kripke, laghos, raja-perf]
         VARIANT: [+rocm]
         SYSTEM_ARGS: ['']
         DASHBOARD_NAME: Tioga HPECray-zen3-MI250X-Slingshot [benchpark system init
