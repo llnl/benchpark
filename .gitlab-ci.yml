@@ -18,7 +18,7 @@ variables:
   ALLOC_NAME: ${CI_PROJECT_NAME}_ci_${CI_PIPELINE_ID}
   FLUX_ARGS: -N 1 --exclusive
   # Dane
-  DANE_SHARED_ALLOC: -N 1 -t 12:00:00 --exclusive --reservation=ci
+  DANE_SHARED_ALLOC: -N 1 -t 06:00:00 --exclusive --reservation=ci
   # Tuolumne (max 4hr policy)
   TUOLUMNE_SHARED_ALLOC: -N 1 -t 4h --queue=pci --exclusive --setattr=gpumode=${GPUMODE}
     --conf=resource.rediscover=true
