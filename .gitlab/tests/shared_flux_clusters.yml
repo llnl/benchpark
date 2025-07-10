@@ -13,12 +13,19 @@ workflow:
   stage: allocate-resources
   script:
     - set -x
-    - flux --parent alloc ${SHARED_ALLOC} --job-name=${ALLOC_NAME} --bg
+    - flux --parent alloc ${SHARED_ALLOC} --job-name=${ALLOC_NAME}${GPUMODE} --bg
+  after_script:
+    - |
+      if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
+        . .gitlab/utils/cancel-flux.sh
+      fi
 allocate_resources_tuolumne:
   extends: .allocate_resources_flux
-  variables:
-    HOST: tuolumne
-    SHARED_ALLOC: $TUOLUMNE_SHARED_ALLOC
+  parallel:
+    matrix:
+      - HOST: tuolumne
+        SHARED_ALLOC: $TUOLUMNE_SHARED_ALLOC
+        GPUMODE: [SPX, TPX, CPX]
   tags: [shell, tuolumne]
   needs: [tuolumne-up-check]
 allocate_resources_tioga:
@@ -34,17 +41,16 @@ allocate_resources_tioga:
 .release_resources_flux:
   extends: .on_host_template
   stage: release-resources
-  script:
-    - set -x
-    - export URI=$(flux jobs -o "{id} {name}" | grep ${ALLOC_NAME} | awk '{print $1}')
-    - ([[ -n "${URI}" ]] && flux job kill ${URI} || exit 0)
+  script: [. .gitlab/utils/cancel-flux.sh]
   variables:
     GIT_STRATEGY: none
 release_resources_flux_tuolumne:
   extends: .release_resources_flux
   needs: [allocate_resources_tuolumne, run_tests_flux_tuolumne]
-  variables:
-    HOST: tuolumne
+  parallel:
+    matrix:
+      - HOST: tuolumne
+        GPUMODE: [SPX, TPX, CPX]
   tags: [shell, tuolumne]
 release_resources_flux_tioga:
   extends: .release_resources_flux
@@ -62,13 +68,17 @@ release_resources_flux_tioga:
     - !reference [.report_status, before_script]
   script:
     - |
-      ALLOC_ID=$(flux jobs --name="${ALLOC_NAME}" -n -o "{id}")
+      ALLOC_ID=$(flux jobs --name="${ALLOC_NAME}${GPUMODE}" -n -o "{id}")
       echo -e "[Information]: Shared allocation ID = ${ALLOC_ID}"
       PROXY="$( [[ -n "${ALLOC_ID}" ]] && echo "flux proxy ${ALLOC_ID}" || echo "" )"
     - ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${FLUX_ARGS}
       .gitlab/utils/run-experiment.sh )
   after_script:
     - !reference [.report_status, after_script]
+    - |
+      if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
+        . .gitlab/utils/cancel-flux.sh
+      fi
 run_tests_flux_tuolumne:
   resource_group: tuolumne
   extends: .run_tests_flux
@@ -80,25 +90,20 @@ run_tests_flux_tuolumne:
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK: [amg2023, kripke, laghos, raja-perf]
         VARIANT: [+rocm]
-        SYSTEM_ARGS: [gpumode=SPX]
-        DASHBOARD_NAME: Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init
-          --dest=tuolumne-system llnl-elcapitan cluster=tuolumne]
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        SCHEDULER_PARAMETERS: -N 1 -t 30m --queue=pci --exclusive
-        BENCHMARK: [amg2023]
-        VARIANT: [+rocm scaling=strong]
-        SYSTEM_ARGS: ['']
-        DASHBOARD_NAME: Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init
-          --dest=tuolumne-system llnl-elcapitan cluster=tuolumne]
+        GPUMODE: SPX
       # Test TPX, CPX
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [laghos]
-        VARIANT: [+rocm]
-        SYSTEM_ARGS: [gpumode=TPX, gpumode=CPX]
-        DASHBOARD_NAME: Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init
-          --dest=tuolumne-system llnl-elcapitan cluster=tuolumne]
+        BENCHMARK: [amg2023, kripke, laghos]
+        VARIANT: [+rocm scaling=strong scaling-iterations=2]
+        SYSTEM_ARGS: [gpumode=TPX]
+        GPUMODE: TPX
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [amg2023, kripke, laghos]
+        VARIANT: [+rocm scaling=strong scaling-iterations=2]
+        SYSTEM_ARGS: [gpumode=CPX]
+        GPUMODE: CPX
 run_tests_flux_tioga:
   resource_group: tioga
   extends: .run_tests_flux
@@ -110,6 +115,3 @@ run_tests_flux_tioga:
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK: [amg2023, kripke, laghos]
         VARIANT: [+rocm]
-        SYSTEM_ARGS: ['']
-        DASHBOARD_NAME: Tioga HPECray-zen3-MI250X-Slingshot [benchpark system init
-          --dest=tioga-system llnl-elcapitan cluster=tioga]
