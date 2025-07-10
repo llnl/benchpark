@@ -620,14 +620,12 @@ class LlnlElcapitan(System):
         }
 
     def rocm_cce_compiler_cfg(self):
-        rpaths = (
-            [
-                f"/opt/rocm-{self.rocm_version}/lib",
-                "/opt/cray/pe/gcc-libs",
-                f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib",
-                f"/opt/cray/pe/cce/{self.cce_version}/cce-clang/x86_64/lib/",
-            ],
-        )
+        rpaths = [
+            f"/opt/rocm-{self.rocm_version}/lib",
+            "/opt/cray/pe/gcc-libs",
+            f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib",
+            f"/opt/cray/pe/cce/{self.cce_version}/cce-clang/x86_64/lib/",
+        ]
         if self.spec.satisfies("compiler=rocmcc"):
             return {
                 "compilers": [
