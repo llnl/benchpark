@@ -16,7 +16,6 @@ include:
           - raja-perf
           - remhos
         VARIANT: [+rocm]
-        SYSTEM_ARGS: ['']
         DASHBOARD_NAME: Nightly [benchpark-develop]
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
@@ -46,14 +45,12 @@ include:
         SCHEDULER_PARAMETERS: -N 1 -t 30m --queue=pci --exclusive
         BENCHMARK: [amg2023, kripke, laghos, remhos]
         VARIANT: [+rocm caliper=mpi scaling=strong scaling-iterations=2]
-        SYSTEM_ARGS: ['']
         DASHBOARD_NAME: Nightly [benchpark-develop]
       - HOST: dane
         ARCHCONFIG: llnl-cluster
         SCHEDULER_PARAMETERS: -N 1 -t 01:00:00 --exclusive --reservation=ci
         BENCHMARK: [amg2023, babelstream, kripke, lammps]
         VARIANT: [+openmp]
-        SYSTEM_ARGS: ['']
         DASHBOARD_NAME: Nightly [benchpark-develop]
       - HOST: dane
         ARCHCONFIG: llnl-cluster
@@ -70,15 +67,12 @@ include:
           - phloem
           - smb
           - stream
-        VARIANT: ['']  # MPI-only
-        SYSTEM_ARGS: ['']
         DASHBOARD_NAME: Nightly [benchpark-develop]
       - HOST: dane
         ARCHCONFIG: llnl-cluster
         SCHEDULER_PARAMETERS: -N 1 -t 01:00:00 --exclusive --reservation=ci
         BENCHMARK: [laghos, remhos]
         VARIANT: [caliper=mpi scaling=strong scaling-iterations=2]
-        SYSTEM_ARGS: [compiler=oneapi2023]
         DASHBOARD_NAME: Nightly [benchpark-develop]
       - HOST: dane
         ARCHCONFIG: llnl-cluster
@@ -99,7 +93,6 @@ include:
           - lammps
           - osu-micro-benchmarks
         VARIANT: [+cuda]
-        SYSTEM_ARGS: ['']
         DASHBOARD_NAME: Nightly [benchpark-develop]
 nightly_test_run:
   resource_group: $HOST
