@@ -366,7 +366,7 @@ class LlnlElcapitan(System):
                     "cray-mpich": {
                         "externals": [
                             {
-                                "spec": f"cray-mpich@{self.mpi_version}%cce@{self.cce_version} {gtl_spec} +wrappers",
+                                "spec": f"cray-mpich@{self.mpi_version}{gtl_spec}+wrappers %cce@{self.cce_version}",
                                 "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}",
                                 "extra_attributes": gtl_cfg,  # Assuming `gtl_cfg` is already defined elsewhere
                             }
@@ -404,7 +404,7 @@ class LlnlElcapitan(System):
                     "cray-mpich": {
                         "externals": [
                             {
-                                "spec": f"cray-mpich@{self.mpi_version}%cce@{self.cce_version} {gtl_spec} +wrappers",
+                                "spec": f"cray-mpich@{self.mpi_version}{gtl_spec}+wrappers %cce@{self.cce_version}",
                                 "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}",
                                 "extra_attributes": gtl_cfg,
                             }
@@ -419,7 +419,7 @@ class LlnlElcapitan(System):
                     "cray-mpich": {
                         "externals": [
                             {
-                                "spec": f"cray-mpich@{self.mpi_version}%gcc@{self.gcc_version} ~gtl +wrappers",
+                                "spec": f"cray-mpich@{self.mpi_version}~gtl+wrappers %gcc@{self.gcc_version}",
                                 "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/10.3",
                                 "extra_attributes": {
                                     "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
