@@ -44,30 +44,36 @@ def show_build_dump(args):
     out, err = run_command(f"spack -e {env_root} python {determine_exp}")
     exp_info = json.loads(out)
 
-    experiment_name = exp_info["root"]
+    root_name = exp_info["root"]
 
     if not os.path.exists(args.destdir):
         os.mkdir(args.destdir)
 
-    logs_out = os.path.join(args.destdir, f"build-{experiment_name}.log")
-    if not os.path.exists(logs_out):
-        with open(logs_out, "w") as f:
-            run_command(f"spack -e {env_root} logs {experiment_name}", stdout=f)
+    tree = os.path.join(args.destdir, f"{root_name}-tree.txt")
+    if not os.path.exists(tree):
+        with open(tree, "w") as f:
+            f.write(exp_info["tree"])
 
-    build_cmds = extract_build_commands(logs_out)
-    cmds_out = os.path.join(args.destdir, f"extracted-commands-{experiment_name}.txt")
-    if not os.path.exists(cmds_out):
-        with open(cmds_out, "w", encoding="utf-8") as f:
-            for cmd in build_cmds:
-                f.write(f"{cmd}\n")
+    root_run_vars_file = os.path.join(args.destdir, f"{root_name}-run-vars.txt")
+    with open(root_run_vars_file, "w") as f:
+        run_command(f"spack -e {env_root} load --sh {root_name}", stdout=f)
 
-    # Spack also stores env vars for the build in the install dir, copy them
-    out, err = run_command(f"spack -e {env_root} location -i {experiment_name}")
-    install_location = out.strip()
-    env_vars_path = os.path.join(install_location, ".spack", "spack-build-env.txt")
-    env_vars_out = os.path.join(args.destdir, os.path.basename(f"build-env-{experiment_name}.txt"))
-    if not os.path.exists(env_vars_out):
-        shutil.copy(env_vars_path, env_vars_out)
+    for pkg_name, build_env_file in exp_info["info"]:
+        logs_out = os.path.join(args.destdir, f"{pkg_name}-build.log")
+        if not os.path.exists(logs_out):
+            with open(logs_out, "w") as f:
+                run_command(f"spack -e {env_root} logs {pkg_name}", stdout=f)
+
+        build_cmds = extract_build_commands(logs_out)
+        cmds_out = os.path.join(args.destdir, f"{pkg_name}-extracted-commands.txt")
+        if not os.path.exists(cmds_out):
+            with open(cmds_out, "w", encoding="utf-8") as f:
+                for cmd in build_cmds:
+                    f.write(f"{cmd}\n")
+
+        env_vars_out = os.path.join(args.destdir, os.path.basename(f"{pkg_name}-build-env.txt"))
+        if not os.path.exists(env_vars_out):
+            shutil.copy(build_env_file, env_vars_out)
 
 
 def setup_parser(root_parser):
