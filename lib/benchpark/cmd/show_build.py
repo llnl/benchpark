@@ -43,6 +43,9 @@ def show_build_dump(args):
     out, err = run_command(f"spack -e {env_root} python {determine_exp}")
     experiment_name = out.strip()
 
+    if not os.path.exists(args.destdir):
+        os.mkdir(args.destdir)
+
     logs_out = os.path.join(args.destdir, f"build-{experiment_name}.log")
     if not os.path.exists(logs_out):
         with open(logs_out, "w") as f:
