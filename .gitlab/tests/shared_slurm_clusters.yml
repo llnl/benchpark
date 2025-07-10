@@ -69,6 +69,7 @@ release_resources_dane:
         BENCHMARK: [hpcg]
         VARIANT: ['+strong~single_node caliper=mpi,time']
         SYSTEM_ARGS: ['']
+        TEST_ANALYZE: ["true"]
         DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
           llnl-cluster cluster=dane]
       # Test affinity and hwloc with caliper on
