@@ -41,8 +41,8 @@ ramble --disable-logger --workspace-dir . workspace analyze --format json yaml t
 
 cd -
 
-# Benchpark Analyze experiments with "+strong"
-if [[ "$VARIANT" == *"scaling=strong caliper=mpi,time"* ]] || [[ "$VARIANT" == *"+strong~single_node caliper=mpi,time"* ]]; then
+# Test 'benchpark analyze' 
+if [[ "$TEST_ANALYZE" == "true" ]]; then
     ./bin/benchpark analyze --workspace-dir ./wkp/${BENCHMARK}/${HOST}/workspace/
 fi
 

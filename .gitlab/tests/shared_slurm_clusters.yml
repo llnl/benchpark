@@ -54,11 +54,13 @@ release_resources_dane:
         VARIANT:
           - scaling=strong caliper=mpi,time
           - scaling=weak caliper=mpi,time
+        TEST_ANALYZE: ['true']
       # Test old_scaling
       - HOST: dane
         ARCHCONFIG: llnl-cluster
         BENCHMARK: [hpcg]
         VARIANT: ['+strong~single_node caliper=mpi,time']
+        TEST_ANALYZE: ['true']
       # Test affinity and hwloc with caliper on
       - HOST: dane
         ARCHCONFIG: llnl-cluster
