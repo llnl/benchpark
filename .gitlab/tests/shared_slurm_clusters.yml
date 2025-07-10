@@ -55,7 +55,9 @@ release_resources_dane:
       - HOST: dane
         ARCHCONFIG: llnl-cluster
         BENCHMARK: [kripke, amg2023]
-        VARIANT: ['scaling=strong caliper=mpi,time', 'scaling=weak caliper=mpi,time']
+        VARIANT:
+          - scaling=strong caliper=mpi,time
+          - scaling=weak caliper=mpi,time
       # Test old_scaling
       - HOST: dane
         ARCHCONFIG: llnl-cluster
