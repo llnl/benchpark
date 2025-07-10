@@ -30,8 +30,9 @@ release_resources_dane:
   needs: [allocate_resources_dane, run_tests_slurm_dane]
   extends: .on_host_template
   stage: release-resources
+  # Do not cleanup dir yet
   script:
-    - . .gitlab/utils/cancel-slurm.sh
+    - . .gitlab/utils/cancel-slurm.sh --no-clean
 ##################
 # Test Run Section
 ##################

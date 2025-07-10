@@ -50,3 +50,13 @@ stages:
   - allocate-resources
   - test
   - release-resources
+  - cleanup-dir
+cleanup_pipeline_dir:
+  tags: [shell, oslic]
+  needs:
+    - release_resources_dane
+    - release_resources_flux_tioga
+    - release_resources_flux_tuolumne
+  extends: .on_host_template
+  stage: cleanup-dir
+  script: [rm -rf $CUSTOM_CI_BUILDS_DIR]
