@@ -15,13 +15,13 @@ fi
 ./bin/benchpark experiment init --dest=${BENCHMARK} ${BENCHMARK} ${VARIANT}
 
 # Build Workspace
-./bin/benchpark setup ${BENCHMARK} ${HOST} workspace/
+./bin/benchpark setup ${BENCHMARK} ${HOST} wkp/
 
 # Setup Ramble & Spack
-. workspace/setup.sh
+. wkp/setup.sh
 
 # Setup Workspace
-cd ./workspace/${BENCHMARK}/${HOST}/workspace/
+cd ./wkp/${BENCHMARK}/${HOST}/workspace/
 
 ramble --disable-logger --workspace-dir . workspace setup
 
@@ -43,8 +43,8 @@ cd -
 
 # Benchpark Analyze experiments with "+strong"
 if [[ "$VARIANT" == *"scaling=strong caliper=mpi,time"* ]] || [[ "$VARIANT" == *"+strong~single_node caliper=mpi,time"* ]]; then
-    ./bin/benchpark analyze --workspace-dir ./workspace/${BENCHMARK}/${HOST}/workspace/
+    ./bin/benchpark analyze --workspace-dir ./wkp/${BENCHMARK}/${HOST}/workspace/
 fi
 
 # Check Experiment Exit Codes
-python ./.gitlab/bin/exit-codes ./workspace/${BENCHMARK}/${HOST}/workspace/results.latest.json
+python ./.gitlab/bin/exit-codes ./wkp/${BENCHMARK}/${HOST}/workspace/results.latest.json
