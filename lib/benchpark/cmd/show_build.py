@@ -52,7 +52,7 @@ def show_build_dump(args):
             run_command(f"spack -e {env_root} logs {experiment_name}", stdout=f)
 
     build_cmds = extract_build_commands(logs_out)
-    cmds_out = os.path.join(args.destdir, "extracted-commands.txt")
+    cmds_out = os.path.join(args.destdir, f"extracted-commands-{experiment_name}.txt")
     if not os.path.exists(cmds_out):
         with open(cmds_out, "w", encoding="utf-8") as f:
             for cmd in build_cmds:
@@ -62,7 +62,7 @@ def show_build_dump(args):
     out, err = run_command(f"spack -e {env_root} location -i {experiment_name}")
     install_location = out.strip()
     env_vars_path = os.path.join(install_location, ".spack", "spack-build-env.txt")
-    env_vars_out = os.path.join(args.destdir, os.path.basename(env_vars_path))
+    env_vars_out = os.path.join(args.destdir, os.path.basename(f"build-env-{experiment_name}.txt"))
     if not os.path.exists(env_vars_out):
         shutil.copy(env_vars_path, env_vars_out)
 
