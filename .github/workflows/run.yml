@@ -885,13 +885,15 @@ jobs:
           benchmark_spec: salmon-tddft
           system_name: fugaku
           system_spec: riken-fugaku
-      - name: Combine cov
-        env:
-          CODECOV_TOKEN: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
-        run: |
-          python -m coverage combine coverage-data/
-          python -m coverage xml
-          python -m codecov -f coverage.xml
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
+          directory: ./coverage-data
+          #files: /home/runner/work/benchpark/benchpark/coverage.xml
+          flags: dynamicdryrun
+          verbose: true
+          fail_ci_if_error: true
   pytest:
     runs-on: ubuntu-24.04
     steps:

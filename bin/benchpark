@@ -18,7 +18,7 @@ def main():
     main_py = basedir / "lib" / "main.py"
     # Create a unique coverage data file name
     coverage_dir = basedir / "coverage-data"
-    coverage_dir.mkdir(exist_ok=True)
+    coverage_dir.mkdir(exist_ok=True, parents=True)
     unique_id = uuid.uuid4().hex
     coverage_file = coverage_dir / f".coverage.{unique_id}"
 
