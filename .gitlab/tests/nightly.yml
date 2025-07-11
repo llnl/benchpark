@@ -6,7 +6,7 @@ include:
     DASHBOARD_NAME: Nightly [benchpark-develop]
   parallel:
     matrix:
-      - HOST: tioga
+      - HOST: [tioga, tuolumne]
         ARCHCONFIG: llnl-elcapitan
         SCHEDULER_PARAMETERS: -N 1 -t 60m --queue=pci --exclusive  # ref: https://github.com/LLNL/radiuss-shared-ci/blob/main/customization/custom-jobs-and-variables.yml
         BENCHMARK:
@@ -19,27 +19,14 @@ include:
           - raja-perf
           - remhos
         VARIANT: [+rocm]
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        SCHEDULER_PARAMETERS: -N 1 -t 60m --queue=pci --exclusive
-        BENCHMARK:
-          - amg2023
-          - babelstream
-          - kripke
-          - laghos
-          - lammps
-          - osu-micro-benchmarks
-          - raja-perf
-          - remhos
-        VARIANT: [+rocm]
-        SYSTEM_ARGS: [gpumode=SPX]
       # Test TPX, CPX
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
-        SCHEDULER_PARAMETERS: -N 1 -t 60m --queue=pci --exclusive
-        BENCHMARK: [laghos, raja-perf]
+        SCHEDULER_PARAMETERS: -N 1 -t 60m --queue=pci --exclusive --setattr=gpumode=${GPUMODE} --conf=resource.rediscover=true
+        BENCHMARK: [amg2023, kripke, laghos, raja-perf]
         VARIANT: [+rocm]
-        SYSTEM_ARGS: [gpumode=TPX, gpumode=CPX]
+        GPUMODE: [TPX, CPX]
+        SYSTEM_ARGS: [gpumode=$GPUMODE]
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
         SCHEDULER_PARAMETERS: -N 1 -t 30m --queue=pci --exclusive
