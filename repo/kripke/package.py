@@ -67,7 +67,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("chai+cuda", when="+cuda")
     depends_on("chai~cuda", when="~cuda")
 
-    for arch in ("none", "50", "60", "70", "80"):
+    for arch in ("none", "50", "60", "70", "80", "90"):
         depends_on(f"chai cuda_arch={arch}", when=f"cuda_arch={arch}")
 
     depends_on("chai+rocm", when="+rocm")

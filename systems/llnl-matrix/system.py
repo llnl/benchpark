@@ -5,45 +5,32 @@
 
 
 from benchpark.directives import variant, maintainers
-from benchpark.system import System
-from benchpark.openmpsystem import OpenMPSystem
+from benchpark.cudasystem import CudaSystem
 from benchpark.paths import hardware_descriptions
+from benchpark.system import System
+from packaging.version import Version
 
 
-class LlnlCluster(System):
+class LlnlMatrix(System):
 
-    maintainers("nhanford", "rfhaque")
+    maintainers("pearce8", "michaelmckinsey1")
 
     id_to_resources = {
-        "ruby": {
-            "sys_cores_per_node": 56,
-            "sys_cores_os_reserved_per_node": 0,  # No core or thread reservation
-            "sys_cores_os_reserved_per_node_list": None,
-            "system_site": "llnl",
-            "hardware_key": str(hardware_descriptions)
-            + "/Supermicro-icelake-OmniPath/hardware_description.yaml",
-        },
-        "magma": {
-            "sys_cores_per_node": 96,
-            "system_site": "llnl",
-            "hardware_key": str(hardware_descriptions)
-            + "/Penguin-icelake-OmniPath/hardware_description.yaml",
-        },
-        "dane": {
+        "matrix": {
+            "cuda_arch": 90,
             "sys_cores_per_node": 112,
-            "sys_cores_os_reserved_per_node": 0,  # No explicit core reservation, first thread on each core reserved (2 threads per core)
-            "sys_cores_os_reserved_per_node_list": None,
+            "sys_gpus_per_node": 4,
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
-            + "/DELL-sapphirerapids-OmniPath/hardware_description.yaml",
+            + "/DELL-sapphirerapids-H100-Infiniband/hardware_description.yaml",
         },
     }
 
     variant(
-        "cluster",
-        default="ruby",
-        values=("ruby", "magma", "dane"),
-        description="Which cluster to run on",
+        "cuda",
+        default="12.6.0",
+        values=("12.6.0", "12.2.2", "11.8.0"),
+        description="CUDA version",
     )
 
     variant(
@@ -55,10 +42,12 @@ class LlnlCluster(System):
 
     def __init__(self, spec):
         super().__init__(spec)
-        self.programming_models = [OpenMPSystem()]
+        self.programming_models = [CudaSystem()]
+        self.cuda_version = Version(self.spec.variants["cuda"][0])
+        self.gtl_flag = False
 
         self.scheduler = "slurm"
-        attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
+        attrs = self.id_to_resources.get("matrix")
         for k, v in attrs.items():
             setattr(self, k, v)
 
@@ -82,12 +71,30 @@ class LlnlCluster(System):
                     "externals": [{"spec": "unwind@8.0.1", "prefix": "/usr"}],
                     "buildable": False,
                 },
+                "fftw": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "spec": "fftw@3.3.10",
+                            "prefix": "/usr/tce/packages/fftw/fftw-3.3.10",
+                        }
+                    ],
+                },
+                "intel-oneapi-mkl": {
+                    "externals": [
+                        {
+                            "spec": "intel-oneapi-mkl@2023.2.0",
+                            "prefix": "/opt/intel/oneapi",
+                        }
+                    ],
+                    "buildable": False,
+                },
                 "blas": {
                     "buildable": False,
                     "externals": [
                         {
-                            "spec": "intel-oneapi-mkl@2022.1.0",
-                            "prefix": "/usr/tce/backend/installations/linux-rhel8-x86_64/intel-19.0.4/intel-oneapi-mkl-2022.1.0-sksz67twjxftvwchnagedk36gf7plkrp",
+                            "spec": "intel-oneapi-mkl@2023.2.0",
+                            "prefix": "/opt/intel/oneapi",
                         }
                     ],
                 },
@@ -95,17 +102,8 @@ class LlnlCluster(System):
                     "buildable": False,
                     "externals": [
                         {
-                            "spec": "intel-oneapi-mkl@2022.1.0",
-                            "prefix": "/usr/tce/backend/installations/linux-rhel8-x86_64/intel-19.0.4/intel-oneapi-mkl-2022.1.0-sksz67twjxftvwchnagedk36gf7plkrp",
-                        }
-                    ],
-                },
-                "fftw": {
-                    "buildable": False,
-                    "externals": [
-                        {
-                            "spec": "fftw@3.3.10",
-                            "prefix": "/usr/tce/packages/fftw/fftw-3.3.10",
+                            "spec": "intel-oneapi-mkl@2023.2.0",
+                            "prefix": "/opt/intel/oneapi",
                         }
                     ],
                 },
@@ -131,18 +129,6 @@ class LlnlCluster(System):
                 "python": {
                     "externals": [
                         {
-                            "spec": "python@2.7.18+bz2+crypt+ctypes+dbm~lzma+pyexpat~pythoncmd+readline+sqlite3+ssl~tkinter+uuid+zlib",
-                            "prefix": "/usr",
-                        },
-                        {
-                            "spec": "python@3.6.8+bz2+crypt+ctypes+dbm+lzma+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
-                            "prefix": "/usr",
-                        },
-                        {
-                            "spec": "python@2.7.18+bz2+crypt+ctypes+dbm~lzma+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
-                            "prefix": "/usr/tce",
-                        },
-                        {
                             "spec": "python@3.9.12+bz2+crypt+ctypes+dbm+lzma+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
                             "prefix": "/usr/tce",
                         },
@@ -155,6 +141,10 @@ class LlnlCluster(System):
                 },
                 "gmake": {
                     "externals": [{"spec": "gmake@4.2.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "curl": {
+                    "externals": [{"spec": "curl@7.61.1", "prefix": "/usr"}],
                     "buildable": False,
                 },
             }
@@ -217,10 +207,16 @@ class LlnlCluster(System):
 
         selections["packages"] |= self.compiler_weighting_cfg()["packages"]
 
+        selections["packages"] |= self.cuda_config(self.spec.variants["cuda"][0])[
+            "packages"
+        ]
+
         return selections
 
     def compiler_weighting_cfg(self):
-        if self.spec.satisfies("compiler=oneapi"):
+        compiler = self.spec.variants["compiler"][0]
+
+        if compiler == "oneapi":
             return {"packages": {"all": {"require": [{"one_of": ["%oneapi", "%gcc"]}]}}}
         else:
             return {"packages": {}}
@@ -303,7 +299,9 @@ class LlnlCluster(System):
                             "flags": {},
                             "operating_system": "rhel8",
                             "target": "x86_64",
-                            "modules": [],
+                            "modules": [
+                                f"cuda/{self.cuda_version}",
+                            ],
                             "environment": {},
                             "extra_rpaths": [],
                         }
@@ -312,6 +310,77 @@ class LlnlCluster(System):
             }
 
         return selections
+
+    def cuda_config(self, cuda_version):
+        return {
+            "packages": {
+                "blas": {"require": "intel-oneapi-mkl"},
+                "lapack": {"require": "intel-oneapi-mkl"},
+                "curand": {
+                    "externals": [
+                        {
+                            "spec": f"curand@{cuda_version}",
+                            "prefix": f"/usr/tce/packages/cuda/cuda-{cuda_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cuda": {
+                    "externals": [
+                        {
+                            "spec": f"cuda@{cuda_version}+allow-unsupported-compilers",
+                            "prefix": f"/usr/tce/packages/cuda/cuda-{cuda_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cub": {
+                    "externals": [
+                        {
+                            "spec": f"cub@{cuda_version}",
+                            "prefix": f"/usr/tce/packages/cuda/cuda-{cuda_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cusparse": {
+                    "externals": [
+                        {
+                            "spec": f"cusparse@{cuda_version}",
+                            "prefix": f"/usr/tce/packages/cuda/cuda-{cuda_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cublas": {
+                    "externals": [
+                        {
+                            "spec": f"cublas@{cuda_version}",
+                            "prefix": f"/usr/tce/packages/cuda/cuda-{cuda_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cusolver": {
+                    "externals": [
+                        {
+                            "spec": f"cusolver@{cuda_version}",
+                            "prefix": f"/usr/tce/packages/cuda/cuda-{cuda_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cufft": {
+                    "externals": [
+                        {
+                            "spec": f"cufft@{cuda_version}",
+                            "prefix": f"/usr/tce/packages/cuda/cuda-{cuda_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+            }
+        }
 
     def compute_software_section(self):
         return {
