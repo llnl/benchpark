@@ -885,6 +885,13 @@ jobs:
           benchmark_spec: salmon-tddft
           system_name: fugaku
           system_spec: riken-fugaku
+      - name: Combine cov
+        env:
+          CODECOV_TOKEN: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
+        run: |
+          python -m coverage combine coverage-data/
+          python -m coverage xml
+          python -m codecov -f coverage.xml
   pytest:
     runs-on: ubuntu-24.04
     steps:
@@ -896,11 +903,4 @@ jobs:
       - name: Run
         run: |-
           ./bin/benchpark unit-test
-      - name: Combine cov
-        env:
-          CODECOV_TOKEN: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
-        run: |
-          python -m coverage combine coverage-data/
-          python -m coverage xml
-          python -m codecov -f coverage.xml
 
