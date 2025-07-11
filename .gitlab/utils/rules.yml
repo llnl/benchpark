@@ -16,3 +16,9 @@
         - modifiers/**
         - var/**
         - lib/**
+.nightly_rules:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: always
+    - if: $CI_PIPELINE_SOURCE != "schedule"
+      when: never

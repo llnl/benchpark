@@ -1,5 +1,6 @@
 include:
   - local: .gitlab/utils/status.yml
+  - local: .gitlab/utils/rules.yml
 .test_clusters_nightly: &test_clusters_nightly
   parallel:
     matrix:
@@ -95,15 +96,11 @@ include:
         VARIANT: [+cuda]
         DASHBOARD_NAME: Nightly [benchpark-develop]
 nightly_test_run:
+  extends: .nightly_rules
   resource_group: $HOST
   stage: test
   tags: [$HOST, batch]
   <<: *test_clusters_nightly
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule"
-      when: always
-    - if: $CI_PIPELINE_SOURCE != "schedule"
-      when: never
   before_script:
     - !reference [.report_status, before_script]
   script: [./.gitlab/utils/run-experiment.sh]
