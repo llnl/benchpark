@@ -18,7 +18,8 @@ class Phloem(Experiment, StrongScaling):
 
     variant(
         "version",
-        default="master",
+        default="1.4.5",
+        values=("master", "latest", "1.4.5"),
         description="app version",
     )
 
