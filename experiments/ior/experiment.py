@@ -23,7 +23,8 @@ class Ior(
 
     variant(
         "version",
-        default="3.3.0",
+        default="4.0.0",
+        values=("develop", "latest", "4.0.0"),
         description="app version",
     )
 
