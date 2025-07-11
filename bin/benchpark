@@ -9,21 +9,21 @@ import pathlib
 import subprocess
 import sys
 
-
 def main():
     if sys.version_info[0] < 3 or sys.version_info[1] < 8:
         raise Exception("\n\nERR: Must be using Python 3.8 or later!\n")
     basedir = pathlib.Path(__file__).resolve().parents[1]
     main_py = basedir / "lib" / "main.py"
-    # subprocess.run([sys.executable, main_py] + sys.argv[1:], check=True)
-    # Use coverage run instead of python
+    # Run the code with coverage
     subprocess.run(
         [sys.executable, "-m", "coverage", "run", "--source=lib", main_py]
         + sys.argv[1:],
         check=True,
     )
+    # Generate the XML report
+    subprocess.run([sys.executable, "-m", "coverage", "xml"], check=True)
+    # Upload to Codecov
     subprocess.run([sys.executable, "-m", "codecov", "-f", "coverage.xml"], check=True)
-
 
 if __name__ == "__main__":
     main()
