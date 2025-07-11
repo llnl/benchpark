@@ -59,4 +59,6 @@ cleanup_pipeline_dir:
     - release_resources_flux_tuolumne
   extends: .on_host_template
   stage: cleanup-dir
-  script: [rm -rf $CUSTOM_CI_BUILDS_DIR]
+  script:
+    - echo "Removing $CUSTOM_CI_BUILDS_DIR"
+    - rm -rf $CUSTOM_CI_BUILDS_DIR
