@@ -155,17 +155,12 @@ Step 7: Analyze Results
 
 1. **Conduct** pre-defined analysis with Benchpark::
 
-    benchpark analyze --workspace-dir /home/jovyan/benchpark/wkp/kripke-benchmark/hpdc-tutorial/workspace
+    benchpark analyze --workspace-dir /home/jovyan/benchpark/wkp/kripke-benchmark/hpdc-tutorial/workspace --no-mpi --chart-fontsize 15
 
 2. **Navigate** to ``/home/jovyan/benchpark/wkp/kripke-benchmark/hpdc-tutorial/workspace/analyze``. This directory will contain the results from the analysis,
-   including the graph below:
+   including the graph and tree below:
 
-.. image:: ./No-mpi.png
-   :width: 70%
-   :align: left
-
-.. image:: ./Tree.png
-   :width: 25%
-   :height: 450px
-   :align: right
+.. image:: ./graph-and-tree.png
+   :width: 900px
+   :align: center
 
