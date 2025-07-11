@@ -4,76 +4,116 @@ include:
 .test_clusters_nightly: &test_clusters_nightly
   variables:
     DASHBOARD_NAME: Nightly [benchpark-develop]
+    DANE_PARAMS: -N 1 -t 01:00:00 --exclusive --reservation=ci
+    ELCAP_PARAMS: -N 1 -t 60m --queue=pci --exclusive
   parallel:
     matrix:
+      # MPI-only tests
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: $DANE_PARAMS
+        BENCHMARK:
+          - ad
+          - amg2023
+          - babelstream
+          - genesis
+          - gpcnet
+          - gromacs
+          - hpcg
+          - hpl
+          - ior
+          - kripke
+          - laghos
+          - lammps
+          - md-test
+          - osu-micro-benchmarks
+          - phloem
+          - quicksilver
+          - qws
+          - raja-perf
+          - remhos
+          - salmon-tddft
+          - saxpy
+          - smb
+          - stream
+      # +rocm tests
       - HOST: [tioga, tuolumne]
         ARCHCONFIG: llnl-elcapitan
-        SCHEDULER_PARAMETERS: -N 1 -t 60m --queue=pci --exclusive  # ref: https://github.com/LLNL/radiuss-shared-ci/blob/main/customization/custom-jobs-and-variables.yml
+        SCHEDULER_PARAMETERS: $ELCAP_PARAMS
         BENCHMARK:
           - amg2023
           - babelstream
+          - gromacs
           - kripke
           - laghos
           - lammps
           - osu-micro-benchmarks
           - raja-perf
           - remhos
+          - saxpy
         VARIANT: [+rocm]
-      # Test TPX, CPX
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        SCHEDULER_PARAMETERS: -N 1 -t 60m --queue=pci --exclusive --setattr=gpumode=${GPUMODE} --conf=resource.rediscover=true
-        BENCHMARK: [amg2023, kripke, laghos, raja-perf]
-        VARIANT: [+rocm]
-        GPUMODE: [TPX, CPX]
-        SYSTEM_ARGS: [gpumode=$GPUMODE]
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        SCHEDULER_PARAMETERS: -N 1 -t 30m --queue=pci --exclusive
-        BENCHMARK: [amg2023, kripke, laghos, remhos]
-        VARIANT: [+rocm caliper=mpi scaling=strong scaling-iterations=2]
+      # +openmp tests
       - HOST: dane
         ARCHCONFIG: llnl-cluster
-        SCHEDULER_PARAMETERS: -N 1 -t 01:00:00 --exclusive --reservation=ci
-        BENCHMARK: [amg2023, babelstream, kripke, lammps]
-        VARIANT: [+openmp]
-      - HOST: dane
-        ARCHCONFIG: llnl-cluster
-        SCHEDULER_PARAMETERS: -N 1 -t 01:00:00 --exclusive --reservation=ci
+        SCHEDULER_PARAMETERS: $DANE_PARAMS
         BENCHMARK:
           - amg2023
-          - gpcnet
-          - ior
+          - babelstream
+          - genesis
+          - gromacs
+          - hpcg
+          - hpl
           - kripke
-          - laghos
-          - osu-micro-benchmarks
-          - phloem
-          - remhos
-          - phloem
-          - smb
-          - stream
-      - HOST: dane
-        ARCHCONFIG: llnl-cluster
-        SCHEDULER_PARAMETERS: -N 1 -t 01:00:00 --exclusive --reservation=ci
-        BENCHMARK: [laghos, remhos]
-        VARIANT: [caliper=mpi scaling=strong scaling-iterations=2]
-      - HOST: dane
-        ARCHCONFIG: llnl-cluster
-        SCHEDULER_PARAMETERS: -N 1 -t 01:00:00 --exclusive --reservation=ci
-        BENCHMARK: [amg2023, kripke]
-        VARIANT:
-          - caliper=mpi scaling=strong scaling-iterations=2
-          - caliper=mpi scaling=weak scaling-iterations=2
+          - lammps
+          - quicksilver
+          - qws
+          - raja-perf
+          - salmon-tddft
+          - saxpy
+        VARIANT: [+openmp]
       - HOST: lassen
         ARCHCONFIG: llnl-sierra
         SCHEDULER_PARAMETERS: -nnodes 1 -W 60 -q pci
         BENCHMARK:
           - amg2023
           - babelstream
+          - gromacs
           - kripke
+          - laghos
           - lammps
           - osu-micro-benchmarks
+          - raja-perf
+          - remhos
+          - saxpy
         VARIANT: [+cuda]
+      #############
+      # Other tests
+      #############
+      # Test TPX, CPX modes on tuo
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        SCHEDULER_PARAMETERS: $ELCAP_PARAMS --setattr=gpumode=${GPUMODE} --conf=resource.rediscover=true
+        BENCHMARK: [amg2023, kripke, laghos, raja-perf]
+        VARIANT: [+rocm]
+        GPUMODE: [TPX, CPX]
+        SYSTEM_ARGS: [gpumode=$GPUMODE]
+      # - HOST: tuolumne
+      #   ARCHCONFIG: llnl-elcapitan
+      #   SCHEDULER_PARAMETERS: $ELCAP_PARAMS
+      #   BENCHMARK: [amg2023, kripke, laghos, remhos]
+      #   VARIANT: [+rocm caliper=mpi scaling=strong]
+      # - HOST: dane
+      #   ARCHCONFIG: llnl-cluster
+      #   SCHEDULER_PARAMETERS: $DANE_PARAMS
+      #   BENCHMARK: [laghos, remhos]
+      #   VARIANT: [caliper=mpi scaling=strong]
+      # - HOST: dane
+      #   ARCHCONFIG: llnl-cluster
+      #   SCHEDULER_PARAMETERS: $DANE_PARAMS
+      #   BENCHMARK: [amg2023, kripke]
+      #   VARIANT:
+      #     - caliper=mpi scaling=strong
+      #     - caliper=mpi scaling=weak
 nightly_test_run:
   extends: .nightly_rules
   resource_group: $HOST
