@@ -27,7 +27,7 @@ class Babelstream(
     variant(
         "version",
         default="caliper",
-        values=("4.0", "develop", "caliper"),
+        values=("develop", "latest", "5.0", "caliper"),
         description="app version",
     )
 
