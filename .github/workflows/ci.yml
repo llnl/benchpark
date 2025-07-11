@@ -124,6 +124,8 @@ jobs:
     if: ${{ needs.changes.outputs.run == 'true' }}
     needs: changes
     uses: ./.github/workflows/run.yml
+    secrets:
+      BENCHPARK_CODECOV_TOKEN: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
   coverage:
     if: ${{ needs.changes.outputs.coverage == 'true' }}
     needs: changes
