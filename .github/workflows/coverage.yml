@@ -16,13 +16,13 @@ jobs:
       - name: Run unit tests with coverage
         run: |
           ./bin/benchpark unit-test --cov=./ --cov-branch --cov-report=xml --durations=20 -ra
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
-        if: true
-        with:
-          token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
-          directory: ./coverage/reports
-          files: /home/runner/work/benchpark/benchpark/coverage.xml
-          flags: unittests
-          verbose: true
-          fail_ci_if_error: true
+      # - name: Upload coverage to Codecov
+      #   uses: codecov/codecov-action@v4
+      #   if: true
+      #   with:
+      #     token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
+      #     directory: ./coverage/reports
+      #     files: /home/runner/work/benchpark/benchpark/coverage.xml
+      #     flags: unittests
+      #     verbose: true
+      #     fail_ci_if_error: true
