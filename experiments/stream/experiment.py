@@ -20,7 +20,8 @@ class Stream(
 
     variant(
         "version",
-        default="5.10",
+        default="5.10-caliper",
+        values=("develop", "latest", "5.10-caliper"),
         description="app version",
     )
 
