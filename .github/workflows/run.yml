@@ -890,6 +890,7 @@ jobs:
           system_spec: riken-fugaku
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
+        if: true
         with:
           token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
           directory: ./coverage-data
