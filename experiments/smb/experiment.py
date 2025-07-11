@@ -18,7 +18,8 @@ class Smb(Experiment, StrongScaling):
 
     variant(
         "version",
-        default="master",
+        default="1.1",
+        values=("master", "latest", "1.1"),
         description="app version",
     )
 

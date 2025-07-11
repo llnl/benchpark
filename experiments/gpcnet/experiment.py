@@ -18,7 +18,8 @@ class Gpcnet(Experiment, StrongScaling):
 
     variant(
         "version",
-        default="master",
+        default="1.2",
+        values=("master", "latest", "1.2"),
         description="app version",
     )
 
