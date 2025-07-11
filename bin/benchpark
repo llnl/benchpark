@@ -22,7 +22,7 @@ def main():
         + sys.argv[1:],
         check=True,
     )
-    subprocess.run(["codecov", "-f", "coverage.xml"], check=True)
+    subprocess.run([sys.executable, "-m", "codecov", "-f", "coverage.xml"], check=True)
 
 
 if __name__ == "__main__":
