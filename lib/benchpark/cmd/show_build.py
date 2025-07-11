@@ -67,6 +67,9 @@ def show_build_dump(args):
     with open(root_run_vars_file, "w") as f:
         run_command(f"spack -e {env_root} load --sh {root_name}", stdout=f)
 
+    out_mirror = os.path.join(args.destdir, "source-downloads")
+    run_command(f"spack -e {env_root} mirror create -d {out_mirror} --all")
+
     for pkg_name, build_env_file in exp_info["info"]:
         logs_out = os.path.join(args.destdir, f"{pkg_name}-build.log")
         if not os.path.exists(logs_out):
