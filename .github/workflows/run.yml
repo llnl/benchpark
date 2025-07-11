@@ -10,7 +10,6 @@ jobs:
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
-          pip install coverage codecov
       - name: Build Saxpy Workspace
         run: |
           ./bin/benchpark experiment init --dest=saxpy/openmp saxpy+openmp
