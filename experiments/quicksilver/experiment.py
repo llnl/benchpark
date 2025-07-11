@@ -59,6 +59,4 @@ class Quicksilver(
         )
 
     def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, [f"quicksilver@{app_version} +mpi"])
+        self.add_package_spec(self.name, [f"quicksilver{self.determine_version()} +mpi"])

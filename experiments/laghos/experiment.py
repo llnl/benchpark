@@ -72,6 +72,4 @@ class Laghos(
             self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
     def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, [f"laghos@{app_version} +metis"])
+        self.add_package_spec(self.name, [f"laghos{self.determine_version()} +metis"])

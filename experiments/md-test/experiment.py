@@ -52,12 +52,10 @@ class MdTest(
         )
 
     def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
         self.add_package_spec(
             "ior",
             [
                 "ior@3.3.0",
             ],
         )
-        self.add_package_spec(self.name, [f"mdtest@{app_version}"])
+        self.add_package_spec(self.name, [f"mdtest{self.determine_version()}"])

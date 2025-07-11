@@ -118,5 +118,4 @@ class RajaPerf(
         )
 
     def compute_package_section(self):
-        # get package version
         self.add_package_spec(self.name, [f"raja-perf{self.determine_version()}"])

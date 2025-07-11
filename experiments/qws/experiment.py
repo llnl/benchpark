@@ -55,6 +55,4 @@ class Qws(Experiment, OpenMPExperiment, Caliper):
         )
 
     def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, [f"qws@{app_version} +mpi"])
+        self.add_package_spec(self.name, [f"qws{self.determine_version()} +mpi"])
