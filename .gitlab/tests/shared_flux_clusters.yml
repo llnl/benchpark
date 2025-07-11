@@ -98,7 +98,7 @@ run_tests_flux_tuolumne:
         GPUMODE: TPX
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [kripke, laghos, raja-perf]
+        BENCHMARK: [kripke, laghos]
         VARIANT: [+rocm scaling=strong scaling-iterations=2]
         SYSTEM_ARGS: [gpumode=CPX]
         GPUMODE: CPX
