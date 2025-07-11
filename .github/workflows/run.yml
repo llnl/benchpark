@@ -896,3 +896,10 @@ jobs:
       - name: Run
         run: |-
           ./bin/benchpark unit-test
+      - name: Combine cov
+        run: |
+          python -m coverage combine coverage-data/
+          python -m coverage xml
+          python -m codecov -f coverage.xml
+        with:
+          token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}

@@ -8,22 +8,36 @@
 import pathlib
 import subprocess
 import sys
+import uuid
+
 
 def main():
     if sys.version_info[0] < 3 or sys.version_info[1] < 8:
         raise Exception("\n\nERR: Must be using Python 3.8 or later!\n")
     basedir = pathlib.Path(__file__).resolve().parents[1]
     main_py = basedir / "lib" / "main.py"
-    # Run the code with coverage
+    # Create a unique coverage data file name
+    coverage_dir = basedir / "coverage-data"
+    coverage_dir.mkdir(exist_ok=True)
+    unique_id = uuid.uuid4().hex
+    coverage_file = coverage_dir / f".coverage.{unique_id}"
+
+    # Run the code with coverage, writing to the unique file
     subprocess.run(
-        [sys.executable, "-m", "coverage", "run", "--source=lib", main_py]
+        [
+            sys.executable,
+            "-m",
+            "coverage",
+            "run",
+            f"--data-file={coverage_file}",
+            "--source=lib",
+            main_py,
+        ]
         + sys.argv[1:],
         check=True,
     )
-    # Generate the XML report
-    subprocess.run([sys.executable, "-m", "coverage", "xml"], check=True)
-    # Upload to Codecov
-    subprocess.run([sys.executable, "-m", "codecov", "-f", "coverage.xml"], check=True)
+    print(f"Coverage data written to {coverage_file}")
+
 
 if __name__ == "__main__":
     main()
