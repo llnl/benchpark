@@ -29,7 +29,7 @@ class Remhos(
     variant(
         "version",
         default="gpu-opt",
-        values=("1.0", "develop", "gpu-fom", "gpu-opt"),
+        values=("develop", "latest", "gpu-fom", "gpu-opt", "1.0"),
         description="app version",
     )
 
