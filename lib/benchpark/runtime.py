@@ -169,7 +169,7 @@ class RuntimeResources:
                 "config",
                 "--scope=site",
                 "add",
-                f"bootstrap:root:{bootstrap_cache_location}"
+                f"bootstrap:root:{bootstrap_cache_location}",
             )
         return spack, first_time
 
