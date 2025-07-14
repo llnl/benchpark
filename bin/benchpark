@@ -11,11 +11,10 @@ import subprocess
 import sys
 
 
-def main():
-    basedir = pathlib.Path(__file__).resolve().parents[1]
-    main_py = basedir / "lib" / "main.py"
-    subprocess.run([sys.executable, main_py] + sys.argv[1:], check=True)
+basedir = pathlib.Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(basedir) + "/lib")
 
+from main import main
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
