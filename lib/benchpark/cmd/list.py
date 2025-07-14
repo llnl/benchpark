@@ -81,6 +81,7 @@ def setup_parser(root_parser):
     list_subparser = root_parser.add_subparsers(
         dest="list_subcommand",
         help="List available experiments, systems, and modifiers",
+        required=True,
     )
 
     # Add subcommands
@@ -131,5 +132,3 @@ def command(args):
     }
     if args.list_subcommand in actions:
         actions[args.list_subcommand](args)
-    else:
-        raise ValueError(f"Unknown subcommand for 'list': {args.list_subcommand}")
