@@ -7,83 +7,189 @@
 Hello Benchpark Tutorial: Kripke Benchmark Example
 ===================================================
 
+**Objective:**
 
+This tutorial will guide you through using Benchpark to run a strong scaling
+experiment with the `Kripke benchmark <https://github.com/LLNL/Kripke>`_ on an AWS instance. By the end of
+this tutorial, you will be able to use Benchpark to:
+
+* Initialize the details of a system and scaling experiment with Benchpark
+* Run the scaling experiment with Ramble
+* Perform pre-defined performance analysis on the results of the scaling experiment with Benchpark
+
+**Prerequisites:**
+
+* Access to a terminal with Benchpark installed (provided automatically by the infrastructure in our `benchpark-tutorial repository <https://github.com/llnl/benchpark-tutorial>`_)
+* Basic familiarity with command-line interfaces
 
 --------------------------------------
 Step 1: Verify Benchpark Installation
 --------------------------------------
 
-First we will ensure Benchpark is installed and working correctly::
+First, ensure Benchpark is installed and working correctly by running:
+
+.. code-block:: bash
 
     benchpark --version
 
-Which will return the version of benchpark::
-
-    0.1.0
+You should see a version number like ``0.1.0``.
 
 
 ----------------------------------------------------
 Step 2: Explore Available Benchmarks and Experiments
 ----------------------------------------------------
 
-We will list all available benchmarks and experiments::
+Next, list all available benchmarks and experiments by running:
+
+.. code-block:: bash
+
+    benchpark list experiments
+
+You should see an output like:
+
+.. code-block:: text
+
+    Experiments:
+        ...
+        hpcg+single_node
+        hpcg+openmp
+        hpcg+strong
+        hpcg+weak
+        hpl+single_node
+        hpl+openmp
+        hpl+strong
+        hpl+weak
+        ior+single_node
+        ior+strong
+        ior+weak
+        kripke+single_node
+        kripke+openmp
+        kripke+cuda
+        kripke+rocm
+        laghos+single_node
+        laghos+cuda
+        laghos+rocm
+        lammps+single_node
+        lammps+openmp
+        lammps+cuda
+        lammps+rocm
+        lammps+strong
+        ...
+
+From this output, you can see that Benchpark experiments are represented
+with Spack-like specifications (i.e., specs). For example, the spec
+``kripke+single_node`` describes an experiment using the Kripke benchmark
+running on a single node.
+
+Additionally, you can get only the experiments associated with a particular
+benchmark by adding :code:`--experiment <experiment_name>` to the above command.
+For example, to get only the experiments associated with Kripke, run:
+
+.. code-block:: bash
 
     benchpark list experiments --experiment kripke
 
-We will use the **Kripke** experiment for this tutorial.
+You should see the following:
 
------------------------------------------------
-Step 3: Initialize Your Experiment Environment
------------------------------------------------
+.. code-block:: text
 
-We will set up an AWS instance type and Kripke benchmark variant.
+    Experiments:
+        kripke+single_node
+        kripke+openmp
+        kripke+cuda
+        kripke+rocm
 
-1. **Navigate** to your Benchpark directory::
+.. note::
 
-    cd benchpark
+    For Kripke, the default experiment is ``kripke+single_node``. Since single node runs are enabled by default, the ``+single_node``
+    variant will be excluded from the commands below. Instead, the instructions below that use experiment specs will
+    simply use ``kripke`` instead of ``kripke+single_node``.
 
-2. **Initialize** the AWS system environment::
+.. _step3_label:
+------------------------------------------
+Step 3: Initialize Your System Description
+------------------------------------------
 
-    benchpark system init --dest=hpdc-tutorial aws-tutorial instance_type=c7i.24xlarge
+Next, initialize the description of the AWS system by running the commands below:
 
-3. **Initialize** the Kripke benchmark experiment::
+.. code-block:: bash
+
+   cd benchpark
+   benchpark system init --dest=hpdc-tutorial aws-tutorial instance_type=c7i.12xlarge
+
+The :code:`benchpark system init` command generates Ramble and Spack configuration
+files that describe the system on which you are running. The system is specified using
+a Spack-like specification (i.e., spec). In the command above, the spec (i.e., :code:`aws-tutorial instance_type=c7i.12xlarge`)
+defines a system running with `our tutorial infrastructure on AWS <https://github.com/llnl/benchpark-tutorial>`_ that uses the `c7i.12xlarge instance type <https://aws.amazon.com/ec2/instance-types/c7i/>`_.
+
+After running the command above, you should see the following files in the ``hpdc-tutorial`` directory:
+
+* ``system_id.yaml``: a Benchpark configuration file that contains high-level metadata about the system
+* ``software.yaml``: a Ramble configuration file specifying the default packages to use for software like compilers and MPI
+* ``variables.yaml``: a Ramble configuration file defining variables that are needed for job script generation and scheduling (e.g., type of scheduler, number of cores per node)
+* ``auxiliary_software_files/compilers.yaml``: a Spack configuration file defining available compilers on the system
+* ``auxiliary_software_files/packages.yaml``: a Spack configuration file defining available software on the system
+
+----------------------------------
+Step 4: Initialize Your Experiment
+----------------------------------
+
+Next, initialize the Kripke scaling experiment used in this tutorial by running:
+
+.. code-block:: bash
 
     benchpark experiment init --dest=kripke-benchmark kripke scaling=strong caliper=time,mpi
 
----------------------------------------------------
-Step 4: Setup Your Workspace with Ramble and Spack
----------------------------------------------------
+Similar to :code:`benchpark system init`, the :code:`benchpark experiment init` command generates
+the Ramble configuration file to describe the experiment to be run. The experiment is specified
+using a Spack-like specification (i.e., spec). In the command above, the spec (i.e., :code:`kripke scaling=strong caliper=time,mpi`)
+defines a strong-scaling experiment running Kripke with Caliper support. The spec also enables Caliper's time measurement with MPI
+support at runtime.
 
-**Initialize** the workspace directory::
+After running the command above, you should see a ``ramble.yaml`` file in the ``kripke-benchmark`` directory.
 
-    benchpark setup kripke-benchmark/ hpdc-tutorial/ wkp/
+--------------------------------------
+Step 5: Setup Your Benchpark Workspace
+--------------------------------------
 
-.. note::
+After initializing the system description and experiment, setup a Benchpark workspace by running:
 
-    This command configures a Ramble workspace using the system specification from ``benchpark system init``
-    and experiment specification from ``benchpark experiment init``. Ramble can then use this workspace to
-    build, run, and configure the Kripke benchmark for the AWS System we are using for this tutorial.
+.. code-block:: bash
 
------------------------------------------
-Step 5: Build and Configure Dependencies
------------------------------------------
+   benchpark setup kripke-benchmark/ hpdc-tutorial/ wkp/
 
-.. note::
+This command takes the configuration files stored in the output directories of :code:`benchpark experiment init` (i.e., ``kripke-benchmark/``)
+and :code:`benchpark system init` (i.e., ``hpdc-tutorial/``) and combines them to generate a Benchpark workspace.
+A Benchpark workspace contains everything that Benchpark, Ramble, and Spack need to build and run your experiment, including:
 
-    Benchpark will provide next steps to the console but they are also provided here.
+* Clones of Spack and Ramble
+* A ``setup.sh`` script that calls Spack and Ramble's setup scripts
+* A Ramble workspace
 
-1. **Configure** the dependencies for Ramble and Spack::
+To start using your Benchpark workspace, run:
+
+.. code-block:: bash
 
     . /home/jovyan/benchpark/wkp/setup.sh
 
-2. **Build** the Ramble experiment workspace::
+.. _step6_label:
+-----------------------------------------------------------------
+Step 6: Build Software Dependencies and Generate Experiment Files
+-----------------------------------------------------------------
+
+Next, build any necessary software and generate all necessary files for the Kripke scaling experiment by running:
+
+.. code-block:: bash
 
     ramble --disable-progress-bar --workspace-dir /home/jovyan/benchpark/wkp/kripke-benchmark/hpdc-tutorial/workspace workspace setup
 
-This command does 2 main things. First, it builds all necessary software using Spack. This process may take some time (2-3 minutes).
-Second, this command configures files (e.g. Flux submission script) needed to perform the runs that make up the current experiment.
-For each run, a directory will be created under ``benchpark/wkp/kripke-benchmark/hpdc-tutorial/workspace/experiments/kripke/kripke``. 
-If the setup is successful, you will see something like this after the setup command::
+This command does 2 things. First, it builds all necessary software using Spack. Building the software may take a while to complete, depending
+on how many external packages are contained in the system definition from `Step 3 <step3_label>`_. For this tutorial, it should take roughly 5 minutes.
+Second, this command configures files (e.g. submission scripts) needed to perform the runs that make up the current experiment.
+For each run in the experiment, a directory containing the files necessary for the run will be created under ``/home/jovyan/benchpark/wkp/kripke-benchmark/hpdc-tutorial/workspace/experiments/kripke/kripke``. 
+If the command is successful, you should see something like:
+
+.. code-block:: text
 
     ==> Streaming details to log:
     ==>   /home/jovyan/benchpark/wkp/kripke-benchmark/hpdc-tutorial/workspace/logs/setup.2025-07-09_18.08.23.out
@@ -109,15 +215,23 @@ If the setup is successful, you will see something like this after the setup com
     ==>     log file: /home/jovyan/benchpark/wkp/kripke-benchmark/hpdc-tutorial/workspace/logs/setup.2025-07-09_18.08.23/kripke.kripke.kripke_kripke_single_node_strong_scaling_caliper_time_mpi_4_4_2_64_64_32_64_1_128_128_4_32.out
     ==>   Returning to log file: /home/jovyan/benchpark/wkp/kripke-benchmark/hpdc-tutorial/workspace/logs/setup.2025-07-09_18.08.23.out
 
------------------------------------------
-Step 6: Run Kripke Experiments with Flux
------------------------------------------
+------------------------------------------
+Step 7: Run Kripke Experiment using Ramble
+------------------------------------------
 
-**Run** the Kripke experiments, which will launch jobs through the `Flux resource manager <https://flux-framework.org/>`_::
+Next, run the Kripke scaling experiment by running the following command:
+
+.. code-block:: bash
 
     ramble --disable-progress-bar --workspace-dir /home/jovyan/benchpark/wkp/kripke-benchmark/hpdc-tutorial/workspace on
 
-This should return something like this on the terminal after running the command::
+This command simply passes the submission scripts generated in `Step 6 <step6_label>`_ to the system's resource manager (which is specified
+in the files generated by :code:`benchpark system init`). For the AWS
+infrastructure used in this tutorial, the resource manager is LLNL's `Flux resource manager <https://flux-framework.org/>`_.
+
+If the above command is successful, you should see something like:
+
+.. code-block:: bash
 
     ==> Streaming details to log:
     ==>   /home/jovyan/benchpark/wkp/kripke-benchmark/hpdc-tutorial/workspace/logs/execute.2025-07-09_18.14.08.out
@@ -129,37 +243,41 @@ This should return something like this on the terminal after running the command
     ƒV5ANUS6s  
     ƒV5D498h5
 
+The final lines printed by the :code:`ramble on` command are the job IDs produced by the system resource manager. You can use
+these IDs to track the progress of the jobs in your experiment. For example, with Flux, you can see job status by running:
+
+.. code-block:: bash
+
+   flux jobs -a
+
+This command will produce an output like:
+
+.. image:: ./flux_jobs_a_output.png
+   :alt: Example output of flux jobs -a
+   :width: 750px
+   :align: center
+
 .. note::
+    If you are running on our `AWS infrastructure <https://github.com/llnl/benchpark-tutorial>`_, it should take roughly 8-9 minutes for all jobs to finish running. Additionally,
+    only one job will run at a time under our infrastructure because each user only has 1 node. If you are running on an HPC system,
+    expect the jobs to complete faster.
 
-    You can check on the progress of your runs by running the command::
-
-        flux jobs [-a]
-
-    The -a is optional; adding it to the command will show all the jobs submitted including jobs that are pending, currently running, and completed jobs.
-
-
-The experiments will run sequentially, and the total time to complete all four experiments should be 8-9 minutes. Upon completion, each
-experiment will generate a caliper file. Running the command :code:`flux jobs -a` will show all the jobs including pending, running, and completed jobs. 
-A pending job will be colored black with ``S`` as its status, a running job will be colored blue with ``R`` as its status, and a completed job will 
-be green with ``CD`` as its status (Example below):
-
-    .. image:: ./flux_jobs_a_output.png
-       :alt: Example output of flux jobs -a
-       :width: 750px
-       :align: center
+After all the jobs are finished, each job directory (i.e., subdirectories of ``/home/jovyan/benchpark/wkp/kripke-benchmark/hpdc-tutorial/workspace/experiments/kripke/kripke``)
+will contain a Caliper output file (i.e., a ``.cali`` file) containing performance data for the job.
 
 ------------------------
-Step 7: Analyze Results
+Step 8: Analyze Results
 ------------------------
 
-1. **Conduct** pre-defined analysis with Benchpark::
+Finally, perform pre-defined analysis on the experiment by running:
+
+.. code-block:: bash
 
     benchpark analyze --workspace-dir /home/jovyan/benchpark/wkp/kripke-benchmark/hpdc-tutorial/workspace --no-mpi --chart-fontsize 15
 
-2. **Navigate** to ``/home/jovyan/benchpark/wkp/kripke-benchmark/hpdc-tutorial/workspace/analyze``. This directory will contain the results from the analysis,
-   including the graph and tree below:
+This command reads in the Caliper files generated by the experiment and generates several files, such as the plot and calling context tree shown below.
+These files can be found in ``/home/jovyan/benchpark/wkp/kripke-benchmark/hpdc-tutorial/workspace/analyze``.
 
 .. image:: ./graph-and-tree.png
    :width: 900px
    :align: center
-
