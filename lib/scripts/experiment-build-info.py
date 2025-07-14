@@ -22,7 +22,10 @@ def main():
     for spec in built_specs:
         x = spec.package.stage[0].default_fetcher
         if hasattr(x, "url"):
-            urls[spec.name] = {"url": x.url, "details": spec.package.versions[spec.version]}
+            urls[spec.name] = {
+                "url": x.url,
+                "details": spec.package.versions[spec.version],
+            }
         else:
             raise Exception(f"Unexpected: {spec.name} has no url attribute")
 
