@@ -16,7 +16,7 @@ __version__ = "0.1.0"
 if "-V" in sys.argv or "--version" in sys.argv:
     print(__version__)
     exit()
-helpstr = """usage: benchpark [-h] [-V] {tags,system,experiment,setup,unit-test,audit,info,list} ...
+helpstr = """usage: main.py [-h] [-V] {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze} ...
 
 Benchpark
 
@@ -25,14 +25,16 @@ options:
   -V, --version         show version number and exit
 
 Subcommands:
-  {tags,system,experiment,setup,unit-test,audit,info,list}
+  {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze}
     tags                Tags in Benchpark experiments
     system              Initialize a system config
     experiment          Interact with experiments
     setup               Set up an experiment and prepare it to build/run
     unit-test           Run benchpark unit tests
     audit               Look for problems in System/Experiment repos
+    mirror              Copy a benchpark workspace
     info                Get information about Systems and Experiments
+    show-build          Show how spack built a benchmark
     list                List experiments, systems, benchmarks, and modifiers
     bootstrap           Bootstrap benchpark or update an existing bootstrap
     analyze             Perform pre-defined analysis on the performance data (caliper files) after 'ramble on'"""
