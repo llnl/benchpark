@@ -257,6 +257,7 @@ This command will produce an output like:
    :width: 750px
    :align: center
 
+
 .. note::
     If you are running on our `AWS infrastructure <https://github.com/llnl/benchpark-tutorial>`_, it should take roughly 8-9 minutes for all jobs to finish running. Additionally,
     only one job will run at a time under our infrastructure because each user only has 1 node. If you are running on an HPC system,
@@ -281,3 +282,11 @@ These files can be found in ``/home/jovyan/benchpark/wkp/kripke-benchmark/hpdc-t
 .. image:: ./graph-and-tree.png
    :width: 900px
    :align: center
+
+----------
+Next Steps
+----------
+
+Now that you know how to initialize, run, and analyze the performance of an experiment, check out
+our :doc:`Benchpark Workflow <./benchpark-workflow>` page, which will walk you through the steps to take to use different systems
+benchmarks, and experiments.
