@@ -37,7 +37,7 @@ include:
           - smb
           - stream
       # +rocm tests
-      - HOST: [tioga, tuolumne]
+      - HOST: [tuolumne]
         ARCHCONFIG: llnl-elcapitan
         SCHEDULER_PARAMETERS: $ELCAP_PARAMS
         BENCHMARK:
