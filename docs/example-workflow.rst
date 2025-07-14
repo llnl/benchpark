@@ -28,7 +28,6 @@ Step 2: Explore Available Benchmarks and Experiments
 
 We will list all available benchmarks and experiments::
 
-    benchpark list
     benchpark list experiments --experiment kripke
 
 We will use the **Kripke** experiment for this tutorial.
