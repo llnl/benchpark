@@ -624,8 +624,11 @@ class LlnlElcapitan(System):
             f"/opt/rocm-{self.rocm_version}/lib",
             "/opt/cray/pe/gcc-libs",
             f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib",
-            f"/opt/cray/pe/cce/{self.cce_version}/cce-clang/x86_64/lib/",
         ]
+        # Avoid libunwind.so.1 error on tioga
+        if self.spec.variants["cluster"][0] == "tioga":
+            rpaths.append(f"/opt/cray/pe/cce/{self.cce_version}/cce-clang/x86_64/lib/")
+
         if self.spec.satisfies("compiler=rocmcc"):
             return {
                 "compilers": [
