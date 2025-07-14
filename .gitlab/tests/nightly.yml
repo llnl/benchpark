@@ -18,7 +18,6 @@ include:
           - babelstream
           - genesis
           - gpcnet
-          - gromacs
           - hpcg
           - hpl
           - ior
@@ -28,12 +27,10 @@ include:
           - md-test
           - osu-micro-benchmarks
           - phloem
-          - quicksilver
           - qws
           - raja-perf
           - remhos
           - salmon-tddft
-          - saxpy
           - smb
           - stream
       # +rocm tests
@@ -43,14 +40,12 @@ include:
         BENCHMARK:
           - amg2023
           - babelstream
-          - gromacs
           - kripke
           - laghos
           - lammps
           - osu-micro-benchmarks
           - raja-perf
           - remhos
-          - saxpy
         VARIANT: [+rocm]
       # +openmp tests
       - HOST: dane
@@ -60,16 +55,13 @@ include:
           - amg2023
           - babelstream
           - genesis
-          - gromacs
           - hpcg
           - hpl
           - kripke
           - lammps
-          - quicksilver
           - qws
           - raja-perf
           - salmon-tddft
-          - saxpy
         VARIANT: [+openmp]
       - HOST: lassen
         ARCHCONFIG: llnl-sierra
@@ -77,14 +69,12 @@ include:
         BENCHMARK:
           - amg2023
           - babelstream
-          - gromacs
           - kripke
           - laghos
           - lammps
           - osu-micro-benchmarks
           - raja-perf
           - remhos
-          - saxpy
         VARIANT: [+cuda]
       #############
       # Other tests
