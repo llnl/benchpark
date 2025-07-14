@@ -16,7 +16,7 @@ __version__ = "0.1.0"
 if "-V" in sys.argv or "--version" in sys.argv:
     print(__version__)
     exit()
-helpstr = """usage: main.py [-h] [-V] {tags,system,experiment,setup,unit-test,audit,info,list} ...
+helpstr = """usage: benchpark [-h] [-V] {tags,system,experiment,setup,unit-test,audit,info,list} ...
 
 Benchpark
 
@@ -36,7 +36,7 @@ Subcommands:
     list                List experiments, systems, benchmarks, and modifiers
     bootstrap           Bootstrap benchpark or update an existing bootstrap
     analyze             Perform pre-defined analysis on the performance data (caliper files) after 'ramble on'"""
-if "-h" == sys.argv[1] or "--help" == sys.argv[1]:
+if len(sys.argv) == 1 or "-h" == sys.argv[1] or "--help" == sys.argv[1]:
     print(helpstr)
     exit()
 
