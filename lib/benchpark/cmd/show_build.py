@@ -56,10 +56,17 @@ def show_build_dump(args):
     root_name = exp_info["root"]
 
     urls = exp_info["urls"]
-    import pdb; pdb.set_trace()
 
     if not os.path.exists(args.destdir):
         os.mkdir(args.destdir)
+
+    url_info = os.path.join(args.destdir, "url-info.txt")
+    if not os.path.exists(url_info):
+        with open(url_info, "w") as f:
+            for pkg_name, info in urls.items():
+                url = info["url"]
+                details = info["details"]
+                f.write(f"{pkg_name} ({url}): {str(details)}\n")
 
     tree = os.path.join(args.destdir, f"{root_name}-tree.txt")
     if not os.path.exists(tree):
