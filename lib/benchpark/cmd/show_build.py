@@ -55,6 +55,9 @@ def show_build_dump(args):
 
     root_name = exp_info["root"]
 
+    urls = exp_info["urls"]
+    import pdb; pdb.set_trace()
+
     if not os.path.exists(args.destdir):
         os.mkdir(args.destdir)
 
