@@ -77,8 +77,9 @@ def show_build_dump(args):
     with open(root_run_vars_file, "w") as f:
         run_command(f"spack -e {env_root} load --sh {root_name}", stdout=f)
 
-    out_mirror = os.path.join(args.destdir, "source-downloads")
-    run_command(f"spack -e {env_root} mirror create -d {out_mirror} --all")
+    if args.download:
+        out_mirror = os.path.join(args.destdir, "source-downloads")
+        run_command(f"spack -e {env_root} mirror create -d {out_mirror} --all")
 
     for pkg_name, build_env_file in exp_info["info"]:
         logs_out = os.path.join(args.destdir, f"{pkg_name}-build.log")
@@ -109,6 +110,11 @@ def setup_parser(root_parser):
     show_build_subparser = root_parser.add_subparsers(dest="show_build_subcommand")
 
     dump_parser = show_build_subparser.add_parser("dump")
+    dump_parser.add_argument(
+        "--download",
+        action="store_true",
+        help="Download the associated sources"
+    )
     dump_parser.add_argument(
         "workspace",
         help="A Ramble workspace you want to want to generate build instructions for",
