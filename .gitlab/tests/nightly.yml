@@ -97,23 +97,6 @@ include:
         VARIANT: [+rocm]
         GPUMODE: [TPX, CPX]
         SYSTEM_ARGS: [gpumode=$GPUMODE]
-      # - HOST: tuolumne
-      #   ARCHCONFIG: llnl-elcapitan
-      #   SCHEDULER_PARAMETERS: $ELCAP_PARAMS
-      #   BENCHMARK: [amg2023, kripke, laghos, remhos]
-      #   VARIANT: [+rocm caliper=mpi scaling=strong]
-      # - HOST: dane
-      #   ARCHCONFIG: llnl-cluster
-      #   SCHEDULER_PARAMETERS: $DANE_PARAMS
-      #   BENCHMARK: [laghos, remhos]
-      #   VARIANT: [caliper=mpi scaling=strong]
-      # - HOST: dane
-      #   ARCHCONFIG: llnl-cluster
-      #   SCHEDULER_PARAMETERS: $DANE_PARAMS
-      #   BENCHMARK: [amg2023, kripke]
-      #   VARIANT:
-      #     - caliper=mpi scaling=strong
-      #     - caliper=mpi scaling=weak
 nightly_test_run:
   extends: .nightly_rules
   resource_group: $HOST
