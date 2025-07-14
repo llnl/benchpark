@@ -111,9 +111,7 @@ def setup_parser(root_parser):
 
     dump_parser = show_build_subparser.add_parser("dump")
     dump_parser.add_argument(
-        "--download",
-        action="store_true",
-        help="Download the associated sources"
+        "--download", action="store_true", help="Download the associated sources"
     )
     dump_parser.add_argument(
         "workspace",
