@@ -186,7 +186,7 @@ Next, build any necessary software and generate all necessary files for the Krip
     workspace setup
 
 This command does two things. First, it builds all necessary software using Spack. Building the software may take a while to complete, depending
-on how many external packages are contained in the system definition from :ref:`Step 3 <step3_label>`. For this tutorial, it should take roughly 5 minutes.
+on how many external packages are contained in the system definition from :ref:`Step 3 <step3_label>`. For this tutorial, it should take roughly 2 minutes.
 Second, this command configures files (e.g. submission scripts) needed to perform the runs that make up the current experiment.
 For each run in the experiment, a directory containing the files necessary for the run will be created under ``/home/jovyan/benchpark/wkp/kripke-benchmark/hpdc-tutorial/workspace/experiments/kripke/kripke``. If the command is successful, you should see something like:
 
@@ -262,7 +262,7 @@ This command will produce an output like:
 
 
 .. note::
-    If you are running on our `AWS infrastructure <https://github.com/llnl/benchpark-tutorial>`_, it should take roughly 8-9 minutes for all jobs to finish running. Additionally,
+    If you are running on our `AWS infrastructure <https://github.com/llnl/benchpark-tutorial>`_, it should take roughly 8 minutes for all jobs to finish running. Additionally,
     only one job will run at a time under our infrastructure because each user only has 1 node. If you are running on an HPC system,
     expect the jobs to complete faster.
 
