@@ -366,7 +366,7 @@ class LlnlElcapitan(System):
                     "cray-mpich": {
                         "externals": [
                             {
-                                "spec": f"cray-mpich@{self.mpi_version}%cce@{self.cce_version} {gtl_spec} +wrappers",
+                                "spec": f"cray-mpich@{self.mpi_version}{gtl_spec}+wrappers %cce@{self.cce_version}",
                                 "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}",
                                 "extra_attributes": gtl_cfg,  # Assuming `gtl_cfg` is already defined elsewhere
                             }
@@ -404,7 +404,7 @@ class LlnlElcapitan(System):
                     "cray-mpich": {
                         "externals": [
                             {
-                                "spec": f"cray-mpich@{self.mpi_version}%cce@{self.cce_version} {gtl_spec} +wrappers",
+                                "spec": f"cray-mpich@{self.mpi_version}{gtl_spec}+wrappers %cce@{self.cce_version}",
                                 "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}",
                                 "extra_attributes": gtl_cfg,
                             }
@@ -419,7 +419,7 @@ class LlnlElcapitan(System):
                     "cray-mpich": {
                         "externals": [
                             {
-                                "spec": f"cray-mpich@{self.mpi_version}%gcc@{self.gcc_version} ~gtl +wrappers",
+                                "spec": f"cray-mpich@{self.mpi_version}~gtl+wrappers %gcc@{self.gcc_version}",
                                 "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/10.3",
                                 "extra_attributes": {
                                     "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
@@ -620,6 +620,15 @@ class LlnlElcapitan(System):
         }
 
     def rocm_cce_compiler_cfg(self):
+        rpaths = [
+            f"/opt/rocm-{self.rocm_version}/lib",
+            "/opt/cray/pe/gcc-libs",
+            f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib",
+        ]
+        # Avoid libunwind.so.1 error on tioga
+        if self.spec.variants["cluster"][0] == "tioga":
+            rpaths.append(f"/opt/cray/pe/cce/{self.cce_version}/cce-clang/x86_64/lib/")
+
         if self.spec.satisfies("compiler=rocmcc"):
             return {
                 "compilers": [
@@ -646,11 +655,7 @@ class LlnlElcapitan(System):
                                     "LIBRARY_PATH": f"/opt/rocm-{self.rocm_version}/lib",
                                 },
                             },
-                            "extra_rpaths": [
-                                f"/opt/rocm-{self.rocm_version}/lib",
-                                "/opt/cray/pe/gcc-libs",
-                                f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib",
-                            ],
+                            "extra_rpaths": rpaths,
                         }
                     }
                 ]
@@ -681,11 +686,7 @@ class LlnlElcapitan(System):
                                     "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/rocm-{self.rocm_version}/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib"
                                 }
                             },
-                            "extra_rpaths": [
-                                f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib/",
-                                "/opt/cray/pe/gcc-libs/",
-                                f"/opt/rocm-{self.rocm_version}/lib",
-                            ],
+                            "extra_rpaths": rpaths,
                         }
                     }
                 ]

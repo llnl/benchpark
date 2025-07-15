@@ -22,6 +22,13 @@ class Mfem(BuiltinMfem):
 
     requires("+caliper", when="^hypre+caliper")
 
+    def configure(self, spec, prefix):
+        if spec.satisfies('%oneapi'):
+            spec.compiler_flags["cxxflags"] = [flag for flag in spec.compiler_flags["cxxflags"] if not flag.startswith('-O')]
+            spec.compiler_flags["cxxflags"].append("-O2")
+            spec.compiler_flags["cxxflags"].append("-fp-speculation=safe")
+        super().configure(spec, prefix)
+
     def setup_build_environment(self, env):
         if "+cuda" in self.spec:
             env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")

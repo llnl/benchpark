@@ -30,6 +30,18 @@ class Hypre(BuiltinHypre):
         return configure_args
 
     def setup_build_environment(self, env):
+        if self.spec.satisfies('%oneapi'):
+            compiler_version = self.spec.compiler.version
+
+            # Convert to integer for comparison (e.g., 2023.1.0 -> 2023)
+            major_version = int(str(compiler_version).split('.')[0])
+
+            if major_version < 2023:
+                raise RuntimeError(
+                    "This package requires Intel oneAPI compiler version 2023 or newer. "
+                    "Detected version: {0}".format(compiler_version)
+                )
+
         super().setup_build_environment(env)
 
         spec = self.spec
