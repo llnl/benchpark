@@ -6,27 +6,29 @@ set -e
 
 # Initialize System
 if [ "$HOST" == "lassen" ]; then
-    ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} $SYSTEM_ARGS
+    ./bin/benchpark system init --dest=${HOST} ${ARCHCONFIG} $SYSTEM_ARGS
 else
-    ./bin/benchpark system init --dest=${HOST}-system ${ARCHCONFIG} cluster=$HOST $SYSTEM_ARGS
+    ./bin/benchpark system init --dest=${HOST} ${ARCHCONFIG} cluster=$HOST $SYSTEM_ARGS
 fi
 
 # Initialize Experiment
-./bin/benchpark experiment init --dest=${BENCHMARK}-benchmark ${BENCHMARK}${VARIANT}
+./bin/benchpark experiment init --dest=${BENCHMARK} ${BENCHMARK} ${VARIANT}
 
 # Build Workspace
-./bin/benchpark setup ${BENCHMARK}-benchmark ${HOST}-system workspace/
+./bin/benchpark setup ${BENCHMARK} ${HOST} wkp/
 
 # Setup Ramble & Spack
-. workspace/setup.sh
+. wkp/setup.sh
 
 # Setup Workspace
-cd ./workspace/${BENCHMARK}-benchmark/${HOST}-system/workspace/
+cd ./wkp/${BENCHMARK}/${HOST}/workspace/
 
 ramble --disable-logger --workspace-dir . workspace setup
 
-if [ "$HOST" == "dane" ]; then
-    # Using flux on dane (srun called in "ramble on")
+# Using flux on dane (srun called in "ramble on")
+if [ "$HOST" == "dane" ] && \
+    # Nightly testing still using slurm
+    [ $CI_PIPELINE_SOURCE != "schedule" ]; then
     find . -type f -name execute_experiment -exec sed -i 's/\bsrun\b/flux run --exclusive/g' {} +
 fi
 
@@ -39,10 +41,10 @@ ramble --disable-logger --workspace-dir . workspace analyze --format json yaml t
 
 cd -
 
-# Benchpark Analyze experiments with "+strong"
-if [[ "$VARIANT" == *"+strong"* ]]; then
-    ./bin/benchpark analyze --workspace-dir ./workspace/${BENCHMARK}-benchmark/${HOST}-system/workspace/
+# Test 'benchpark analyze' 
+if [[ "$TEST_ANALYZE" == "true" ]]; then
+    ./bin/benchpark analyze --workspace-dir ./wkp/${BENCHMARK}/${HOST}/workspace/
 fi
 
 # Check Experiment Exit Codes
-python ./.gitlab/bin/exit-codes ./workspace/${BENCHMARK}-benchmark/${HOST}-system/workspace/results.latest.json
+python ./.gitlab/bin/exit-codes ./wkp/${BENCHMARK}/${HOST}/workspace/results.latest.json

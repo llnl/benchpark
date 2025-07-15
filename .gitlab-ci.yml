@@ -9,18 +9,24 @@ variables:
   ALWAYS_RUN_PATTERN: ^develop$|^master$|^v[0-9.]*$|^releases/$
   # Expand multi-line commands in logs
   FF_SCRIPT_SECTIONS: 1
+  # clean up the repository after the job finishes
+  FF_ENABLE_JOB_CLEANUP: 'true'
+  GIT_STRATEGY: fetch
   # Debugging logs on gitlab
-  # CI_DEBUG_TRACE: "true"
+  # CI_DEBUG_TRACE: 'true'
   # Job variables
-  # LLNL_SLURM_SCHEDULER_PARAMETERS: "-N 1 -t 00:30:00 --exclusive --reservation=ci"
   ALLOC_NAME: ${CI_PROJECT_NAME}_ci_${CI_PIPELINE_ID}
   FLUX_ARGS: -N 1 --exclusive
   # Dane
-  DANE_SHARED_ALLOC: -N 1 -t 24:00:00 --exclusive --reservation=ci
+  DANE_SHARED_ALLOC: -N 1 -t 04:00:00 --exclusive --reservation=ci
   # Tuolumne (max 4hr policy)
-  TUOLUMNE_SHARED_ALLOC: -N 1 -t 4h --queue=pci --exclusive
+  TUOLUMNE_SHARED_ALLOC: -N 1 -t 2h --queue=pci --exclusive --setattr=gpumode=${GPUMODE}
+    --conf=resource.rediscover=true
   # Tioga (max 2hr policy)
   TIOGA_SHARED_ALLOC: -N 1 -t 2h --queue=pci --exclusive
+  CUSTOM_CI_BUILDS_DIR: /g/g0/benchpark/.jacamar-ci/bd/$CI_PIPELINE_ID
+  # Dir cleanup can take awhile
+  RUNNER_AFTER_SCRIPT_TIMEOUT: 20m
 default:
   id_tokens:
     SITE_ID_TOKEN:
@@ -39,4 +45,20 @@ include:
   - local: .gitlab/tests/non_shared.yml
   # Nightly tests
   - local: .gitlab/tests/nightly.yml
-stages: [allocate-resources, test, release-resources]
+stages:
+  - machine-checks
+  - allocate-resources
+  - test
+  - release-resources
+  - cleanup-dir
+cleanup_pipeline_dir:
+  tags: [shell, oslic]
+  needs:
+    - release_resources_dane
+    - release_resources_flux_tioga
+    - release_resources_flux_tuolumne
+  extends: .on_host_template
+  stage: cleanup-dir
+  script:
+    - echo "Removing $CUSTOM_CI_BUILDS_DIR"
+    - rm -rf $CUSTOM_CI_BUILDS_DIR
