@@ -3,9 +3,9 @@
 
    SPDX-License-Identifier: Apache-2.0
 
-===================================================
+==================================================
 Hello Benchpark Tutorial: Kripke Benchmark Example
-===================================================
+==================================================
 
 **Objective:**
 
@@ -19,7 +19,7 @@ this tutorial, you will be able to use Benchpark to:
 
 **Prerequisites:**
 
-* Access to a terminal with Benchpark installed (provided automatically by the infrastructure in our `benchpark-tutorial repository <https://github.com/llnl/benchpark-tutorial>`_)
+* Access to a terminal with Benchpark installed (provided automatically by the infrastructure in our `Benchpark Tutorial repository <https://github.com/llnl/benchpark-tutorial>`_)
 * Basic familiarity with command-line interfaces
 
 --------------------------------------
@@ -134,7 +134,7 @@ After running the command above, you should see the following files in the ``hpd
 Step 4: Initialize Your Experiment
 ----------------------------------
 
-Next, initialize the Kripke scaling experiment used in this tutorial by running:
+Next, initialize the Kripke strong scaling experiment used in this tutorial by running:
 
 .. code-block:: bash
 
@@ -143,7 +143,7 @@ Next, initialize the Kripke scaling experiment used in this tutorial by running:
 Similar to :code:`benchpark system init`, the :code:`benchpark experiment init` command generates
 the Ramble configuration file to describe the experiment to be run. The experiment is specified
 using a Spack-like specification (i.e., spec). In the command above, the spec (i.e., :code:`kripke scaling=strong caliper=time,mpi`)
-defines a strong-scaling experiment running Kripke with Caliper support. The spec also enables Caliper's time measurement with MPI
+defines a strong-scaling experiment running Kripke with `Caliper <https://github.com/llnl/caliper`>_ support. The spec also enables Caliper's time measurement with MPI
 support at runtime.
 
 After running the command above, you should see a ``ramble.yaml`` file in the ``kripke-benchmark`` directory.
@@ -185,11 +185,10 @@ Next, build any necessary software and generate all necessary files for the Krip
     --workspace-dir /home/jovyan/benchpark/wkp/kripke-benchmark/hpdc-tutorial/workspace \
     workspace setup
 
-This command does 2 things. First, it builds all necessary software using Spack. Building the software may take a while to complete, depending
+This command does two things. First, it builds all necessary software using Spack. Building the software may take a while to complete, depending
 on how many external packages are contained in the system definition from :ref:`Step 3 <step3_label>`. For this tutorial, it should take roughly 5 minutes.
 Second, this command configures files (e.g. submission scripts) needed to perform the runs that make up the current experiment.
-For each run in the experiment, a directory containing the files necessary for the run will be created under ``/home/jovyan/benchpark/wkp/kripke-benchmark/hpdc-tutorial/workspace/experiments/kripke/kripke``. 
-If the command is successful, you should see something like:
+For each run in the experiment, a directory containing the files necessary for the run will be created under ``/home/jovyan/benchpark/wkp/kripke-benchmark/hpdc-tutorial/workspace/experiments/kripke/kripke``. If the command is successful, you should see something like:
 
 .. code-block:: text
 
@@ -221,7 +220,7 @@ If the command is successful, you should see something like:
 Step 7: Run Kripke Experiment using Ramble
 ------------------------------------------
 
-Next, run the Kripke scaling experiment by running the following command:
+Next, run the Kripke strong scaling experiment by running the following command:
 
 .. code-block:: bash
 
@@ -302,5 +301,6 @@ Next Steps
 ----------
 
 Now that you know how to initialize, run, and analyze the performance of an experiment, check out
-our :doc:`Benchpark Workflow <./benchpark-workflow>` page, which will walk you through the steps to take to use different systems
-benchmarks, and experiments.
+our :doc:`Benchpark Workflow <./benchpark-workflow>` page for more information
+on how to interact with Benchpark. We have guides for users wanting to add or
+modify a system, add a new benchmark, or define a new experiment parameters for a benchmark.
