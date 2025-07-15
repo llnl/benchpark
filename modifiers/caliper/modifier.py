@@ -42,18 +42,23 @@ class Caliper(BasicModifier):
         description="Platform-independent collection of time (default mode)",
     )
 
-    # register_phase("verify_builtin", pipeline="setup", run_after=["get_inputs"])
-    register_builtin("verify_builtin", required=True, dependents=["env_vars"])
-
-    def verify_builtin(self):
+    def modify_experiment(self, app):
         """If app has built-in Caliper configuration, do not set CALI_CONFIG.
-        Config parameters are parsed out into SPOT_CONFIG and OTHER_CONFIG if the application still requires them.
+        Config parameters are parsed out into SPOT_CONFIG and OTHER_CALI_CONFIG if the application still requires them.
         """
-
         SPOT_CONFIG = r"spot(${CALI_CONFIG_MODE})"
-        OTHER_CONFIG = f"metadata(file={self._caliper_metadata_file}),metadata(file=/etc/node_info.json,keys=\"host.name,host.cluster,host.os\")"
-        import os
-        if os.path.exists('.builtin-cali'):
+        OTHER_CALI_CONFIG = f'metadata(file={self._caliper_metadata_file}),metadata(file=/etc/node_info.json,keys="host.name,host.cluster,host.os")'
+
+        if "builtin-caliper" not in app.tags:
+            # Normal mode
+            self.env_var_modification(
+                "CALI_CONFIG",
+                f"{SPOT_CONFIG},{OTHER_CALI_CONFIG}",
+                method="set",
+                modes=[self._default_mode],
+            )
+        else:
+            # Set env vars in case application can use them
             self.env_var_modification(
                 "SPOT_CONFIG",
                 SPOT_CONFIG,
@@ -61,21 +66,11 @@ class Caliper(BasicModifier):
                 modes=[self._default_mode],
             )
             self.env_var_modification(
-                "OTHER_CONFIG",
-                OTHER_CONFIG,
+                "OTHER_CALI_CONFIG",
+                OTHER_CALI_CONFIG,
                 method="set",
                 modes=[self._default_mode],
             )
-        else:
-            print("This shouldn't run")
-            self.env_var_modification(
-                "CALI_CONFIG",
-                f"{SPOT_CONFIG},{OTHER_CONFIG}",
-                method="set",
-                modes=[self._default_mode],
-            )
-
-        return []
 
     add_mode(
         mode_name="mpi",
@@ -151,11 +146,12 @@ class Caliper(BasicModifier):
         cali_metadata_file = self.expander.expand_var(self._caliper_metadata_file)
         with open(cali_metadata_file, "w") as f:
             f.write(json.dumps(cali_metadata))
-    
+
         import os
-        if os.path.exists('.builtin-cali'):
+
+        if os.path.exists(".builtin-cali"):
             print("rm file")
-            os.remove('.builtin-cali')
+            os.remove(".builtin-cali")
 
     software_spec("caliper", pkg_spec="caliper")
 

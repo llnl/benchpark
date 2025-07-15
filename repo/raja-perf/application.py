@@ -18,14 +18,7 @@ class RajaPerf(ExecutableApplication):
             'mpi','network-point-to-point','network-latency-bound',
             'c++','raja','sycl','builtin-caliper']
 
-    register_builtin("set_caliper_builtin", required=True, injection_mode="prepend")
-    def set_caliper_builtin(self):
-        self.caliper_builtin = True
-        print("gen file")
-        with open('.builtin-cali', 'w') as f: pass
-        return []
-
-    executable('run', 'raja-perf.exe --size {size} -atsc ${CALI_CONFIG_MODE} -atcc ${OTHER_CONFIG}', use_mpi=True)
+    executable('run', 'raja-perf.exe --size {size} -atsc ${CALI_CONFIG_MODE} -atcc ${OTHER_CALI_CONFIG}', use_mpi=True)
 
     workload('suite', executables=['run'])
 
