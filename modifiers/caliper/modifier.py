@@ -147,12 +147,6 @@ class Caliper(BasicModifier):
         with open(cali_metadata_file, "w") as f:
             f.write(json.dumps(cali_metadata))
 
-        import os
-
-        if os.path.exists(".builtin-cali"):
-            print("rm file")
-            os.remove(".builtin-cali")
-
     software_spec("caliper", pkg_spec="caliper")
 
     required_package("caliper")
