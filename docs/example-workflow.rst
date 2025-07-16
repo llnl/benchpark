@@ -76,8 +76,8 @@ You should see an output like:
         lammps+strong
         ...
 
-From this output, you can see that Benchpark experiments are represented
-with Spack-like specifications (i.e., specs). For example, the spec
+From this output, you can see that Benchpark experiments are specified
+using Spack-like conventions (e.g., ~, +). For example, the spec
 ``kripke+single_node`` describes an experiment using the Kripke benchmark
 running on a single node.
 
@@ -101,9 +101,9 @@ You should see the following:
 
 .. note::
 
-    For Kripke, the default experiment is ``kripke+single_node``. Since single node runs are enabled by default, the ``+single_node``
-    variant will be excluded from the commands below. Instead, the instructions below that use experiment specs will
-    simply use ``kripke`` instead of ``kripke+single_node``.
+    For Kripke, the default experiment is ``kripke+single_node``. For Kripke,
+    we specify the strong scaling experiment on the command line using ``kripke
+    scaling=strong``.
 
 .. _step3_label:
 ------------------------------------------
@@ -118,8 +118,8 @@ Next, initialize the description of the AWS system by running the commands below
    benchpark system init --dest=hpdc-tutorial aws-tutorial instance_type=c7i.12xlarge
 
 The :code:`benchpark system init` command generates configuration
-files that describe the system on which you are running. The system is specified using
-a Spack-like specification (i.e., spec). In the command above, the spec (i.e., :code:`aws-tutorial instance_type=c7i.12xlarge`)
+files that describe the system on which you are running. The system is
+specified in a system specification (``system.py``). In the command above, the spec (i.e., :code:`aws-tutorial instance_type=c7i.12xlarge`)
 defines a system running with `our tutorial infrastructure on AWS <https://github.com/llnl/benchpark-tutorial>`_ that uses the `c7i.12xlarge instance type <https://aws.amazon.com/ec2/instance-types/c7i/>`_.
 
 After running the command above, you should see the following files in the ``hpdc-tutorial`` directory:
@@ -142,9 +142,9 @@ Next, initialize the Kripke strong scaling experiment used in this tutorial by r
 
 Similar to :code:`benchpark system init`, the :code:`benchpark experiment init` command generates
 the Ramble configuration file to describe the experiment to be run. The experiment is specified
-using a Spack-like specification (i.e., spec). In the command above, the spec (i.e., :code:`kripke scaling=strong caliper=time,mpi`)
+in an experiment specification (``experiment.py``). In the command above, the spec (i.e., :code:`kripke scaling=strong caliper=time,mpi`)
 defines a strong-scaling experiment running Kripke with the performance
-measurement tool known as `Caliper <https://github.com/llnl/caliper`>_ enabled to collect performance metrics. The
+measurement tool known as `Caliper <https://github.com/llnl/caliper>`_ enabled to collect performance metrics. The
 ``caliper=time,mpi`` specification enables execution time measurement and MPI library
 instrumentation.
 
