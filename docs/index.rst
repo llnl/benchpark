@@ -46,6 +46,12 @@
 
 .. toctree::
    :maxdepth: 1
+   :caption: Developer Docs
+
+   developer-docs/benchpark-developer-docs.rst
+
+.. toctree::
+   :maxdepth: 1
    :caption: Contributing
 
    add-a-system-config
