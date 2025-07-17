@@ -3,6 +3,12 @@ name="benchpark"
 description="An open collaborative repository for cross site benchmarking environments"
 readme = "README.rst"
 requires-python = ">=3.8"
+dynamic = ["version"]
+
+[tool.setuptools]
+packages = [
+  "lib",
+]
 
 [tool.black]
 line-length = 88
@@ -59,3 +65,14 @@ per-file-ignores = """
 [tool.codespell]
 skip = './docs/_build,./docs/_static,./taxonomy.yaml,./repo/**/*.patch'
 ignore-words-list = 'fom'
+
+[tool.yamlfix]
+line-length = 88
+allow_duplicate_keys = true
+explicit_start = false
+
+[project.optional-dependencies]
+analyze = [
+  "llnl-thicket[plotting]",
+  "matplotlib"
+]

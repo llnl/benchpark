@@ -8,12 +8,10 @@
 name: label
 on:
   pull_request_target:
-    branches:
-      - develop
-
+    branches: [develop]
 jobs:
   pr:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       pull-requests: write

@@ -33,6 +33,10 @@ class Smb(Experiment, StrongScaling):
             self.add_experiment_variable("n_nodes", "1")
             self.add_experiment_variable("n_ranks", "{n_nodes}*{sys_cores_per_node}")
 
+        self.set_required_variables(
+            n_resources="{n_ranks}", process_problem_size="", total_problem_size=""
+        )
+
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]

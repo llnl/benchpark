@@ -65,9 +65,9 @@ class Hpl(
         self.add_experiment_variable(
             "n_ranks", "{sys_cores_per_node} * {n_nodes}", False
         )
-        self.add_experiment_variable("n_threads_per_proc", ["2"], True)
-
-        self.matrix_experiment_variables("n_threads_per_proc")
+        self.add_experiment_variable(
+            "n_threads_per_proc", ["2"], named=True, matrixed=True
+        )
 
         if self.spec.satisfies("+single_node"):
             for pk, pv in num_nodes.items():
@@ -97,6 +97,12 @@ class Hpl(
 
             problem_size = scaled_variables["Ns"]
             self.add_experiment_variable("Ns", problem_size, True)
+
+        self.set_required_variables(
+            n_resources="{n_ranks}",
+            process_problem_size="{Ns}/{n_ranks}",
+            total_problem_size="{Ns}",
+        )
 
     def compute_package_section(self):
         # get package version

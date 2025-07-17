@@ -13,9 +13,54 @@ specifications. Modifiers are intended to encapsulate reusable patterns that
 perform a specific configuration of an experiment. This may include injecting
 performance analysis or setting up system resources.
 
+Affinity Modifier: Linux Thread and GPU Affinity
+------------------------------------------------
+We are using (with permission) the following implementation of `affinity checks <https://github.com/bcumming/affinity>`_. The following checks are possible:
 
-Profiling with Caliper Modifier
--------------------------------
+- ``affinity.mpi`` : for testing thread affinity of each rank in an MPI job
+- ``affinity.rocm`` : for testing AMD GPU affinity of each rank an MPI job
+- ``affinity.cuda`` : for testing NVIDIA GPU affinity of each rank in an MPI job
+
+To use the Affinity modifier:
+
+- When you initialize your experiment, add ``affinity=on`` to ``experiment init``.
+- A small, separate run will execute in your allocation to record the information.
+- The Affinity modifier will output a text file in the experiment directory which will look like this for ``benchpark experiment init --dest=saxpy saxpy+openmp affinity=on`` on 8 ranks, 2 threads/proc, 1 node:
+
+.. code-block:: console
+
+  affinity.mpi.out
+
+  affinity test for 8 MPI ranks
+  rank      0 @ dane1514
+    thread   0 on cores [112]
+    thread   1 on cores [119]
+  rank      1 @ dane1514
+    thread   0 on cores [126]
+    thread   1 on cores [133]
+  rank      2 @ dane1514
+    thread   0 on cores [140]
+    thread   1 on cores [147]
+  rank      3 @ dane1514
+    thread   0 on cores [154]
+    thread   1 on cores [161]
+  rank      4 @ dane1514
+    thread   0 on cores [168]
+    thread   1 on cores [175]
+  rank      5 @ dane1514
+    thread   0 on cores [182]
+    thread   1 on cores [189]
+  rank      6 @ dane1514
+    thread   0 on cores [196]
+    thread   1 on cores [203]
+  rank      7 @ dane1514
+    thread   0 on cores [210]
+    thread   1 on cores [217]
+
+If also running with the ``caliper`` modifier, affinity information will be included in the Caliper metadata.
+
+Caliper Modifier: Profiling with Caliper
+----------------------------------------
 We have implemented a Caliper modifier to enable profiling of Caliper-instrumented
 benchmarks in Benchpark. More documentation on Caliper can be found `here
 <https://software.llnl.gov/Caliper>`_.
@@ -70,9 +115,8 @@ For example::
   
   class Amg2023(Experiment, Caliper):
 
-
-Requesting Resources with the Allocation Modifier
----------------------------------------------------
+Allocation Modifier: Requesting Resources
+-----------------------------------------
 Given:
 
   - an experiment that requests resources (nodes, cpus, gpus, etc.), and
@@ -144,3 +188,25 @@ If you do not specify values, it will assign the default values as listed below.
      - 0 
    * - n_threads_per_proc
      - 1 
+
+Hwloc Modifier: Capturing Underlying Topology with Hwloc
+--------------------------------------------------------
+The hwloc modifier enables capturing the underlying hardware infrastructure and
+hierarchical topology used for running the experiment. It's independent from
+the running experiment. More information on hwloc can be found `here
+<https://www.open-mpi.org/projects/hwloc/>`_.
+
+To turn on the hwloc modifier, add ``hwloc=on`` to the experiment init steup
+step. This modifier is disabled by default (``hwloc=none``). It is required
+that the caliper modifier be enabled as well.::
+
+    benchpark experiment init --dest=</path/to/experiment_root> <benchmark> caliper=<caliper_variant> hwloc=on
+
+To use the hwloc modifier:
+
+- The caliper modifier must also be enabled in the experiment to use the hwloc modifier.
+- The hwloc modifier outputs a flattened JSON file in the experiment
+  directory containing the topology of the underlying infrastructure the
+  experiment ran on.
+- Caliper appends metadata information collected by the hwloc modifier to its
+  output file, which can be analyzed post hoc.

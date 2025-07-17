@@ -1,20 +1,16 @@
 name: ci
 on:
   push:
-    branches:
-      - develop
+    branches: [develop]
   pull_request:
-    branches:
-      - develop
+    branches: [develop]
   merge_group:
-
 concurrency:
   group: ci-${{github.ref}}-${{github.event.pull_request.number || github.run_number}}
   cancel-in-progress: true
-
 jobs:
   changes:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     permissions:
       pull-requests: read
     outputs:
@@ -25,7 +21,6 @@ jobs:
       license: ${{ steps.filter.outputs.license }}
       diffpackages: ${{ steps.filter.outputs.diffpackages }}
       modified_repo_dirs: ${{ steps.get_modified_repo_dirs.outputs.modified_repo_dirs }}
-
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         if: ${{ github.event_name == 'push' || github.event_name == 'merge_group' || github.event_name == 'pull_request' }}
@@ -56,6 +51,7 @@ jobs:
               - 'pyproject.toml'
             style:
               - '.github/**'
+              - '.gitlab/**'
               - 'bin/**'
               - 'configs/**'
               - 'docs/conf.py'
@@ -66,8 +62,8 @@ jobs:
               - 'var/**'
               - 'pyproject.toml'
               - '.flake8'
+              - 'checkout-versions.yaml'
             run:
-              - '.github/**'
               - 'bin/**'
               - 'configs/**'
               - 'checkout-versions.yaml'
@@ -79,6 +75,7 @@ jobs:
               - 'var/**'
             coverage:
               - '.github/**'
+              - '.gitlab/**'
               - 'bin/**'
               - 'configs/**'
               - 'checkout-versions.yaml'
@@ -90,6 +87,7 @@ jobs:
               - 'pyproject.toml'
             license:
               - '.github/**'
+              - '.gitlab/**'
               - 'bin/**'
               - 'configs/**'
               - 'docs/**'
@@ -100,7 +98,6 @@ jobs:
               - 'var/**'
             diffpackages:
               - 'repo/**/package.py'
-
       - name: Get modified directories in repo/
         id: get_modified_repo_dirs
         run: |
@@ -115,22 +112,18 @@ jobs:
 
           # Output the modified directories as a GitHub Actions output
           echo "modified_repo_dirs=$MODIFIED_REPO_DIRS" >> $GITHUB_OUTPUT
-
   docs:
     if: ${{ needs.changes.outputs.docs == 'true' }}
     needs: changes
     uses: ./.github/workflows/docs.yml
-
   style:
     if: ${{ needs.changes.outputs.style == 'true' }}
     needs: changes
     uses: ./.github/workflows/style.yml
-
   run:
     if: ${{ needs.changes.outputs.run == 'true' }}
     needs: changes
     uses: ./.github/workflows/run.yml
-
   coverage:
     if: ${{ needs.changes.outputs.coverage == 'true' }}
     needs: changes
@@ -140,19 +133,16 @@ jobs:
     # settings in coverage.yml to pass the token on
     secrets:
       BENCHPARK_CODECOV_TOKEN: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
-
   license:
     if: ${{ needs.changes.outputs.license == 'true' }}
     needs: changes
     uses: ./.github/workflows/license.yml
-
   diffpackages:
     if: ${{ needs.changes.outputs.diffpackages == 'true' }}
     needs: changes
     uses: ./.github/workflows/diffpackages.yml
     with:
       modified_repo_dirs: ${{ needs.changes.outputs.modified_repo_dirs }}
-
   all:
     needs:
       - changes
@@ -165,11 +155,11 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
-    - name: Status summary
-      run: |
-        if [[ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
-          echo "One or more required jobs failed or were cancelled"
-          exit 1
-        else
-          echo "All jobs completed successfully"
-        fi
+      - name: Status summary
+        run: |-
+          if [[ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
+            echo "One or more required jobs failed or were cancelled"
+            exit 1
+          else
+            echo "All jobs completed successfully"
+          fi

@@ -26,7 +26,7 @@
    :maxdepth: 1
    :caption: Tutorials
 
-   example-workflow
+   basic-tutorial
    llnl-tutorial
    comparing-experiment-builds
 
@@ -38,21 +38,11 @@
    build-experiment
    run-experiment
    analyze-experiment
+   benchpark-analyze
    modifiers
    set-of-experiments
    run-binary
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Benchpark Utils
-
-   diffBuildSpecs
-   diffExperimentBuilds
-   diffExperimentSpecs
-   diffPackageCommits
-   diffSystemSpecs
-   scripts
-   developer-scripts
+   create-mirror
 
 .. toctree::
    :maxdepth: 1
@@ -65,13 +55,24 @@
    update-a-system-config
 
 .. toctree::
+   :maxdepth: 1
+   :caption: Developer Docs
+
+   developer-guide
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Benchpark Utils
+
+   diffBuildSpecs
+   diffExperimentBuilds
+   diffExperimentSpecs
+   diffPackageCommits
+   diffSystemSpecs
+   showBuild
+
+.. toctree::
    :maxdepth: 2
    :caption: API Docs
 
    Benchpark API Docs <source/benchpark>
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Legacy Workflow
-
-   legacy-getting-started

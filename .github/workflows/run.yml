@@ -1,8 +1,6 @@
 name: Run Benchpark and Simple Benchmark Suite
 on:
   workflow_call:
-
-
 jobs:
   generate-matrix:
     runs-on: ubuntu-22.04
@@ -17,15 +15,12 @@ jobs:
     steps:
       - name: Checkout Benchpark
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
-
       - name: Generate JSON
         run: |
           python3 ./.github/workflows/gen-dynamic-runs.py
-          
       - name: Generate Matrix Data
         id: generate-matrix
         run: |
@@ -37,7 +32,6 @@ jobs:
           echo "strong=$(cat matrix.json | jq -c '.strong')" >> $GITHUB_OUTPUT
           echo "single_node=$(cat matrix.json | jq -c '.single_node')" >> $GITHUB_OUTPUT
           echo "throughput=$(cat matrix.json | jq -c '.throughput')" >> $GITHUB_OUTPUT
-
       - run: |
           echo "OpenMP Matrix: ${{ steps.generate-matrix.outputs.openmp }}"
           echo "CUDA Matrix: ${{ steps.generate-matrix.outputs.cuda }}"
@@ -46,7 +40,6 @@ jobs:
           echo "Strong Matrix: ${{ steps.generate-matrix.outputs.strong }}"
           echo "Single Node Matrix: ${{ steps.generate-matrix.outputs.single_node }}"
           echo "Throughput Matrix: ${{ steps.generate-matrix.outputs.throughput }}"
-
   testallonce-openmp:
     needs: generate-matrix
     runs-on: ubuntu-22.04
@@ -55,17 +48,14 @@ jobs:
     steps:
       - name: Checkout Benchpark
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
-
       - name: Run OpenMP Benchmark
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_spec: ${{ matrix.benchmark_spec }}
           system_spec: ${{ matrix.system_spec }}
-
   testallonce-cuda:
     needs: generate-matrix
     runs-on: ubuntu-22.04
@@ -74,17 +64,14 @@ jobs:
     steps:
       - name: Checkout Benchpark
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
-
       - name: Run CUDA Benchmark
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_spec: ${{ matrix.benchmark_spec }}
           system_spec: ${{ matrix.system_spec }}
-
   testallonce-rocm:
     needs: generate-matrix
     runs-on: ubuntu-22.04
@@ -93,17 +80,14 @@ jobs:
     steps:
       - name: Checkout Benchpark
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
-
       - name: Run ROCM Benchmark
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_spec: ${{ matrix.benchmark_spec }}
           system_spec: ${{ matrix.system_spec }}
-
   testallonce-weak:
     needs: generate-matrix
     runs-on: ubuntu-22.04
@@ -112,17 +96,14 @@ jobs:
     steps:
       - name: Checkout Benchpark
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
-
       - name: Run Weak Benchmark
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_spec: ${{ matrix.benchmark_spec }}
           system_spec: ${{ matrix.system_spec }}
-
   testallonce-strong:
     needs: generate-matrix
     runs-on: ubuntu-22.04
@@ -131,17 +112,14 @@ jobs:
     steps:
       - name: Checkout Benchpark
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
-
       - name: Run Strong Benchmark
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_spec: ${{ matrix.benchmark_spec }}
           system_spec: ${{ matrix.system_spec }}
-
   testallonce-single-node:
     needs: generate-matrix
     runs-on: ubuntu-22.04
@@ -150,17 +128,14 @@ jobs:
     steps:
       - name: Checkout Benchpark
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
-
       - name: Run Single Node Benchmark
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_spec: ${{ matrix.benchmark_spec }}
           system_spec: ${{ matrix.system_spec }}
-
   testallonce-throughput:
     needs: generate-matrix
     runs-on: ubuntu-22.04
@@ -169,120 +144,98 @@ jobs:
     steps:
       - name: Checkout Benchpark
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
-
       - name: Run Throughput Benchmark
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_spec: ${{ matrix.benchmark_spec }}
           system_spec: ${{ matrix.system_spec }}
-
   manual-test-each-system:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout Benchpark
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
-
       - name: aws-pcluster
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_spec: saxpy+openmp
           system_spec: aws-pcluster
-
       - name: csc-lumi
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_spec: saxpy+openmp
           system_spec: csc-lumi
-
       - name: cscs-daint
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_spec: saxpy+openmp
           system_spec: cscs-daint
-
       - name: cscs-eiger
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_spec: saxpy+openmp
           system_spec: cscs-eiger
-
       - name: generic-x86
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_spec: saxpy+openmp
           system_spec: generic-x86
-
       - name: jsc-juwels
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_spec: saxpy+openmp
           system_spec: jsc-juwels
-
       - name: lanl-venado
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_spec: saxpy+openmp
           system_spec: lanl-venado
-
       - name: llnl-cluster
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_spec: saxpy+openmp
           system_spec: llnl-cluster
-
       - name: llnl-elcapitan
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_spec: saxpy+rocm
           system_spec: llnl-elcapitan
-
       - name: llnl-sierra
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_spec: saxpy+cuda
           system_spec: llnl-sierra
-
       - name: riken-fugaku
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_spec: saxpy+openmp
           system_spec: riken-fugaku
-
   saxpy:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout Benchpark
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
-
       - name: Build Saxpy Workspace
         run: |
           ./bin/benchpark experiment init --dest=saxpy/openmp saxpy+openmp
           ./bin/benchpark system init --dest=generic-x86 generic-x86
           ./bin/benchpark setup saxpy/openmp generic-x86 workspace/
-
       - name: Setup Ramble & Spack
         run: |
           . workspace/setup.sh
-
           spack mirror add ci-buildcache oci://ghcr.io/llnl/benchpark-binary-cache
           spack config add "packages:all:target:[x86_64_v3]"
-
           env | grep SPACK >> "$GITHUB_ENV"
           env | grep RAMBLE >> "$GITHUB_ENV"
           echo "PATH=$PATH" >> "$GITHUB_ENV"
-
       - name: Setup Saxpy Workspace
         working-directory: ./workspace/saxpy/openmp/generic-x86/workspace/
         run: |
@@ -292,7 +245,6 @@ jobs:
             --disable-logger \
             -c config:spack_flags:install:'--no-check-signature' \
             workspace setup
-
       - name: Run Saxpy Experiments
         working-directory: ./workspace/saxpy/openmp/generic-x86/workspace/
         run: |
@@ -303,7 +255,6 @@ jobs:
             on \
             --executor '{execute_experiment}' \
             --where '{n_nodes} == 1'
-
       - name: Analyze Saxpy Results
         working-directory: ./workspace/saxpy/openmp/generic-x86/workspace/
         run: |
@@ -312,7 +263,6 @@ jobs:
             --disable-progress-bar \
             --disable-logger \
             workspace analyze
-
       - name: Archive Experiment Workspace
         working-directory: ./workspace/saxpy/openmp/generic-x86/workspace/
         if: always()
@@ -322,14 +272,12 @@ jobs:
             --disable-progress-bar \
             --disable-logger \
             workspace archive
-
       - name: Upload Workspace Archive as CI Artifact
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: workspace-archive
-          path: './workspace/saxpy/openmp/generic-x86/workspace/archive/**'
-
+          path: ./workspace/saxpy/openmp/generic-x86/workspace/archive/**
       - name: Upload Binaries to CI Cache
         if: github.ref == 'refs/heads/develop'
         run: |
@@ -338,23 +286,19 @@ jobs:
             --oci-username ${{ github.actor }} \
             --oci-password "${{ secrets.GITHUB_TOKEN }}" \
             ci-buildcache
-
           spack buildcache push \
             -j $(($(nproc) + 1)) \
-            --base-image ubuntu:22.04 \
+            --base-image ubuntu:24.04 \
             --unsigned \
             --update-index ci-buildcache \
             $(spack find --format '/{hash}')
-      
       - name: Test Execution Using Binary
         run: |
           OUTPUT=$(spack find --paths saxpy)
           SAXPY_PATH=$(echo "$OUTPUT" | grep 'saxpy@' | awk '{print $2}')/bin/saxpy
           echo "Extracted Path: $SAXPY_PATH"
-
-          ./bin/benchpark experiment init --dest=saxpy/binary saxpy+openmp package_manager="environment-modules" append_path="$SAXPY_PATH"
+          ./bin/benchpark experiment init --dest=saxpy/binary saxpy+openmp package_manager="None" append_path="$SAXPY_PATH"
           ./bin/benchpark setup saxpy/openmp generic-x86 workspace-binary/
-
           ./workspace-binary/ramble/bin/ramble \
             --disable-progress-bar \
             --workspace-dir \
@@ -367,17 +311,14 @@ jobs:
             on \
             --executor '{execute_experiment}' \
             --where '{n_nodes} == 1'
-
   pytest:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout Benchpark
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
-
       - name: Run
-        run: |
-          python -m pytest
+        run: |-
+          ./bin/benchpark unit-test

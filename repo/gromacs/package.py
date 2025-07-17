@@ -7,6 +7,7 @@ import os
 
 import llnl.util.filesystem as fs
 
+import spack.build_systems.cmake
 from spack.package import *
 
 
@@ -298,8 +299,8 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
 
     depends_on("lapack")
     depends_on("blas")
-    depends_on("gcc", when="%oneapi ~intel_provided_gcc")
-    depends_on("gcc", when="%intel ~intel_provided_gcc")
+    depends_on("gcc", when="~intel_provided_gcc %oneapi")
+    depends_on("gcc", when="~intel_provided_gcc %intel")
 
     depends_on("hwloc@1.0:1", when="+hwloc@2016:2018")
     depends_on("hwloc", when="+hwloc@2019:")

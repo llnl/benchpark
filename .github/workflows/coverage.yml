@@ -4,24 +4,20 @@ on:
     secrets:
       BENCHPARK_CODECOV_TOKEN:
         required: true
-
 jobs:
   run_unit_tests:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout Benchpark
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
-
       - name: Run unit tests with coverage
         run: |
           ./bin/benchpark unit-test --cov=./ --cov-branch --cov-report=xml --durations=20 -ra
-
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5.4.0
+        uses: codecov/codecov-action@v4
         if: true
         with:
           token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}

@@ -35,8 +35,8 @@ class Phloem(ExecutableApplication):
                       description='Number of distinct neighbors to each rank on the core node.',
                       workloads=['sqmr'])
     #TODO: Determine FOMs
-    figure_of_merit('TBD',
-                    log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex=r'.*',
-                   group_name='fom', units='usec')
+    # figure_of_merit('TBD',
+    #                 log_file='{experiment_run_dir}/{experiment_name}.out',
+    #                 fom_regex=r'.*',
+    #                group_name='fom', units='usec')
     success_criteria('pass', mode='string', match=r'.*', file='{experiment_run_dir}/{experiment_name}.out')
