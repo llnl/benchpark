@@ -1,5 +1,6 @@
 import subprocess
 import time
+import sys
 
 def main():
 
@@ -120,6 +121,11 @@ def main():
     for key, value in errors.items():
         print(key)
         print(value)
+    
+    if fail_tests > 0:
+        sys.exit(1)
+    else:
+        sys.exit(0)
 
 if __name__ == "__main__":
     main()
