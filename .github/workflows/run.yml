@@ -108,7 +108,7 @@ jobs:
           pip install -r ./requirements.txt
       - name: Run Dryruns
         run: |
-          python .github/workflows/dryruns.py
+          python .github/workflows/utils/dryruns.py
   pytest:
     runs-on: ubuntu-24.04
     steps:

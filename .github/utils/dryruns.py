@@ -105,7 +105,7 @@ def main():
                 total_tests += 1
                 print(f"Running '{espec}' '{sspec}'")
                 try:
-                    cmd = f'source .github/workflows/dryrun.sh "{sspec}" "{espec}"'
+                    cmd = f'source .github/workflows/utils/dryrun.sh "{sspec}" "{espec}"'
                     result = subprocess.run(
                         ["bash", "-c", cmd],
                         capture_output=True,
