@@ -111,7 +111,7 @@ jobs:
           pip install -r ./requirements.txt
       - name: Run Dryruns
         run: |
-          python .github/workflows/utils/dryruns.py --test ${{ matrix.testtype }}
+          python .github/utils/dryruns.py --test ${{ matrix.testtype }}
   pytest:
     runs-on: ubuntu-24.04
     steps:
