@@ -12,7 +12,6 @@ from benchpark.accounting import (  # noqa: E402
     benchpark_modifiers,
     benchpark_systems,
 )
-from benchpark.accounting import sys_dict as accounting_sys_dict
 from benchpark.spec import SystemSpec
 
 
