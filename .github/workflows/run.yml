@@ -101,6 +101,8 @@ jobs:
   dryrunexperiments:
     runs-on: ubuntu-24.04
     strategy:
+      # Don't fail other running testtype tests
+      fail-fast: false
       matrix:
         testtype: [cuda, rocm, openmp, mpi, strong, weak, throughput]
     steps:
