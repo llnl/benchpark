@@ -26,7 +26,7 @@
    :maxdepth: 1
    :caption: Tutorials
 
-   example-workflow
+   basic-tutorial
    llnl-tutorial
    comparing-experiment-builds
 

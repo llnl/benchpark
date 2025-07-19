@@ -110,5 +110,5 @@ run_tests_flux_tioga:
     matrix:
       - HOST: tioga
         ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [amg2023, kripke, laghos]
+        BENCHMARK: [amg2023, kripke, laghos, raja-perf]
         VARIANT: [+rocm]
