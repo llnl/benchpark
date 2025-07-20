@@ -2,7 +2,6 @@
 # Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: Apache-2.0
-
 system_definition:
   name: HPECray-haswell-P100-Infiniband
   integrator:
@@ -30,4 +29,6 @@ system_definition:
       mpi: cray-mpich
       installation-year: 2017
   top500-system-instances:
-    - Piz Daint (CSCS) <https://www.top500.org/system/177824>
+    Piz Daint:
+      benchpark_system: cscs-daint
+      top500: <https://www.top500.org/system/177824>

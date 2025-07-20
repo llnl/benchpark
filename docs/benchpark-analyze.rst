@@ -1,0 +1,187 @@
+.. Copyright 2023 Lawrence Livermore National Security, LLC and other
+   Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+
+   SPDX-License-Identifier: Apache-2.0
+
+########################################
+Pre-Defined Analysis for Scaling Studies
+########################################
+
+The ``benchpark analyze`` command can be used to generate pre-defined
+charts for analysis of scaling studies using Caliper and Thicket.
+We generate Caliper performance data using the Caliper modifier ``caliper=time,mpi`` (:doc:`modifiers`).
+We use the `Thicket <https://github.com/LLNL/thicket>`_ performance analysis library to compose and visualize the Caliper performance data.
+Thicket is embedded into the ``benchpark analyze`` command, leveraging metadata to generate the scaling study figures.
+
+After running, ``ramble on``, run the ``benchpark analyze`` command on the ramble workspace directory to generate:
+
+1. A calltree of the regions that were executed in the benchmark.
+2. A scaling study figure, which can be configured with command-line arguments.
+3. A csv of the datapoints plotted on the figure.
+
+.. note::
+
+  This command required optional packages to be installed, which can be achieved with ``pip install .[analyze]`` (assuming you are in the benchpark directory)
+
+How to Run
+**********
+
+.. code:: console
+
+   $ benchpark analyze --workspace-dir RAMBLE_WORKSPACE_DIR <optional_arguments>
+
+Available Arguments
+*******************
+.. program-output:: ../bin/benchpark analyze -h
+
+Analysis of Strong, Weak, and Throughput Scaling of Kripke
+************************************************************
+
+Kripke Calltree
+
+.. code::
+
+   main
+  ├─  Generate
+  │  ├─  MPI_Allreduce
+  │  ├─  MPI_Comm_split
+  │  └─  MPI_Scan
+  ├─  MPI_Allreduce
+  ├─  MPI_Bcast
+  ├─  MPI_Comm_dup
+  ├─  MPI_Comm_free
+  ├─  MPI_Comm_split
+  ├─  MPI_Finalize
+  ├─  MPI_Finalized
+  ├─  MPI_Gather
+  ├─  MPI_Get_library_version
+  ├─  MPI_Initialized
+  └─  Solve
+    └─  solve
+        ├─  LPlusTimes
+        ├─  LTimes
+        ├─  Population
+        │  └─  MPI_Allreduce
+        ├─  Scattering
+        ├─  Source
+        └─  SweepSolver
+          ├─  MPI_Irecv
+          ├─  MPI_Isend
+          ├─  MPI_Testany
+          ├─  MPI_Waitall
+          └─  SweepSubdomain
+
+Strong
+------
+
+Generate the Strong dataset:
+
+.. code:: console
+
+  $ benchpark experiment init --dest=kripke/cuda/strong kripke+cuda+strong~single_node caliper=time,mpi
+  $ benchpark system init --dest=lassen llnl-sierra
+  $ benchpark setup kripke/cuda/strong lassen/ wkp
+  // Follow instructions for running Ramble ...
+
+Run pre-defined analysis:
+
+.. code:: console
+
+   $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/
+
+.. figure:: _static/images/kripke_cuda_strong_raw_exc.png
+  :width: 800
+  :align: center
+
+The default configuration will visualize a stacked area chart of:
+
+- The exclusive average time per rank ``Avg time/rank (exc)`` collected by the caliper modifier ``caliper=time``.
+- Number of nodes and number of MPI ranks on the x-axis, which are the parameters we vary in the experiment (for strong scaling).
+- Constant information will be contained in the title, such as benchmark, programming model, benchmark version, cluster, etc.
+- The legend will contain the regions and maximum calls out of all of the ranks (``Calls/rank (max)``).
+
+Weak
+----
+
+Generate the Weak dataset:
+
+.. code:: console
+
+  $ benchpark experiment init --dest=kripke/cuda/weak kripke+cuda+weak~single_node caliper=time,mpi
+  $ benchpark setup kripke/cuda/weak lassen/ wkp
+  // Follow instructions for running Ramble ...
+
+Run pre-defined analysis:
+
+.. code:: console
+
+   $ benchpark analyze --workspace-dir wkp/kripke/cuda/weak/lassen/workspace/
+
+.. figure:: _static/images/kripke_cuda_weak_raw_exc.png
+  :width: 800
+  :align: center
+
+Throughput
+----------
+
+Generate the Throughput dataset:
+
+.. code:: console
+
+  $ benchpark experiment init --dest=kripke/cuda/throughput kripke+cuda+throughput~single_node caliper=time,mpi
+  $ benchpark setup kripke/cuda/throughput lassen/ wkp
+  // Follow instructions for running Ramble ...
+
+Run pre-defined analysis:
+
+.. code:: console
+
+   $ benchpark analyze --workspace-dir wkp/kripke/cuda/throughput/lassen/workspace/
+
+.. figure:: _static/images/kripke_cuda_throughput_raw_exc.png
+  :width: 800
+  :align: center
+
+Percentage
+----------
+
+.. code:: console
+
+  $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/ --chart-type percentage
+
+The ``--chart-type percentage`` option, visualizes the y-axis metric, relative to the summation of the metric for all regions.
+This is useful in this example to visualize what percentage of the time each region is taking.
+
+.. figure:: _static/images/kripke_cuda_strong_percentage_exc.png
+  :width: 800
+  :align: center
+
+Inclusive Metrics
+-----------------
+
+.. code:: console
+
+  $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/ --yaxis-metric "Avg time/rank"
+
+We can also visualize any inclusive metrics by selecting them as the ``yaxis_metric``. Here we use ``Avg time/rank`` instead of ``Avg time/rank (exc)``.
+The ``main`` node is automatically removed from the figure, because this information is redundant for the inclusive metric.
+
+.. figure:: _static/images/kripke_cuda_strong_raw_inc.png
+  :width: 800
+  :align: center
+
+Arguments for Region Filtering
+------------------------------
+
+.. code:: console
+
+   $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/ --group-regions-name --top-n-regions 10
+
+An efficient way to filter out smaller regions quickly, is to use the ``--group-regions-name`` and ``--top-n-regions`` parameters. 
+``--group-regions-name`` computes the sum of the metric for all of the regions with the same name, so multiple regions are shown as a single region.
+``--top-n-regions`` filters the data to only show the ``n`` regions with the highest values for the given metric (based on the first profile).
+We can also add the ``--no-mpi`` argument to filter out all ``MPI_*`` regions.
+
+.. figure:: _static/images/kripke_cuda_strong_raw_exc-2.png
+  :width: 800
+  :align: center

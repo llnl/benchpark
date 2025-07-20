@@ -2,7 +2,6 @@
 # Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: Apache-2.0
-
 versions:
-  ramble: f5970aa     # develop on 1/08/2025 (newer than 0.5.0 release)
-  spack: 2bfcc69      # v0.23.1 (2025-02-19)
+  ramble: 6b4ecac  # develop on 5/06/2025 (newer than 0.6.0 release)
+  spack: 7e4b8aa  # develop on 2/22/2025 (pre-breaking changes on 1.0)

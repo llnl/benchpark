@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from ramble.modkit import *
+import json
 
 
 def add_mode(mode_name, mode_option, description):
@@ -30,9 +31,13 @@ class Caliper(BasicModifier):
 
     maintainers("pearce8")
 
-    _cali_datafile = "{experiment_run_dir}/{experiment_name}.cali"
+    # The filename for metadata forwarded from Benchpark to Caliper
+    _caliper_metadata_file = "{experiment_run_dir}/{experiment_name}_metadata.json"
 
     _default_mode = "time"
+
+    # Write out the metadata file once all variables are resolved
+    register_phase("build_metadata", pipeline="setup", run_after=["make_experiments"])
 
     add_mode(
         mode_name=_default_mode,
@@ -42,7 +47,9 @@ class Caliper(BasicModifier):
 
     env_var_modification(
         "CALI_CONFIG",
-        "spot(output={}{})".format(_cali_datafile, "${CALI_CONFIG_MODE}"),
+        'spot({}),metadata(file={}),metadata(file=/etc/node_info.json,keys="host.name,host.cluster,host.os")'.format(
+            "${CALI_CONFIG_MODE}", _caliper_metadata_file
+        ),
         method="set",
         modes=[_default_mode],
     )
@@ -83,7 +90,41 @@ class Caliper(BasicModifier):
         description="Top-down analysis for Intel CPUs (top level)",
     )
 
-    archive_pattern(_cali_datafile)
+    def _build_metadata(self, workspace, app_inst):
+        """Write the caliper metadata to json"""
+
+        cali_metadata = {}
+
+        # system metadata
+        system_metadata = [
+            "sys_cores_per_node",  # required
+            "scheduler",  # required
+            "rocm_arch",
+            "cuda_arch",
+            "sys_cores_os_reserved_per_node",
+            "sys_cores_os_reserved_per_node_list",
+            "sys_gpus_per_node",
+            "sys_mem_per_node",
+            "system_site",
+        ]
+        for key in system_metadata:
+            # Certain keys not required or may not be present
+            if key in app_inst.variables.keys():
+                cali_metadata[key] = app_inst.variables[key]
+
+        # Load the Caliper metadata variable from ramble.yaml
+        experiment_metadata = app_inst.expander.expand_var_name(
+            "caliper_metadata", typed=True, merge_used_stage=False
+        )
+        app_inst.expander.flush_used_variable_stage()
+        # rebuild dictionary with expanded variables
+        for key, val in experiment_metadata.items():
+            cali_metadata[key] = app_inst.expander.expand_var(val)
+
+        # Write to the Caliper metadata file
+        cali_metadata_file = self.expander.expand_var(self._caliper_metadata_file)
+        with open(cali_metadata_file, "w") as f:
+            f.write(json.dumps(cali_metadata))
 
     software_spec("caliper", pkg_spec="caliper")
 

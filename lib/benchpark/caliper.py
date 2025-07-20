@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-
+import warnings
 from benchpark.directives import variant
 from benchpark.experiment import ExperimentHelper
 
@@ -40,7 +40,7 @@ class Caliper:
                 modifier_list.append({"name": "caliper", "mode": "time"})
             return modifier_list
 
-        def compute_spack_section(self):
+        def compute_package_section(self):
             # set package versions
             caliper_version = "master"
 
@@ -103,3 +103,34 @@ class Caliper:
 
         def get_spack_variants(self):
             return "~caliper" if self.spec.satisfies("caliper=none") else "+caliper"
+
+        def compute_variables_section(self):
+            """Add Caliper metadata variables for the ramble.yaml"""
+            if not self.spec.satisfies("caliper=none"):
+                metadata_dict = {
+                    "application_name": "{application_name}",
+                    "experiment_name": "{experiment_name}",
+                    "n_nodes": "{n_nodes}",
+                    "n_ranks": "{n_ranks}",
+                    "n_threads_per_proc": "{n_threads_per_proc}",
+                    "n_resources": "{n_resources}",
+                    "process_problem_size": "{process_problem_size}",
+                    "total_problem_size": "{total_problem_size}",
+                }
+                # parse the spec for more metadata
+                for i, variant_spec in enumerate(str.split(str(self.spec.variants))):
+                    values = variant_spec.split("=")
+                    if len(values) == 1:
+                        if i == 0:
+                            metadata_dict["benchpark_spec"] = values
+                        elif values[0] == "'":
+                            pass
+                    elif len(values) == 2:
+                        metadata_dict[values[0]] = values[1]
+                    else:
+                        warnings.warn(
+                            "Possible incorrect values sent to Caliper as metadata"
+                        )
+                return {"caliper_metadata": metadata_dict}
+            else:
+                return {}

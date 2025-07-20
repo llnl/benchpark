@@ -15,8 +15,10 @@ class Babelstream(BuiltinBabel):
 
     variant("openmp", default=False, description = "wrapper for omp variant")
     variant("caliper", default=False, description = "Enable caliper performance tracking")
+    depends_on("caliper", when="+caliper")
+    depends_on("adiak", when="+caliper")
     
-class CMakeBuilder(BuiltinBuilder, spack.build_systems.cmake.CMakeBuilder):
+class CMakeBuilder(BuiltinBuilder):
     def cmake_args(self):
         args = super().cmake_args()
         #enable caliper

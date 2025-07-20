@@ -2,7 +2,6 @@
 # Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: Apache-2.0
-
 system_definition:
   name: HPECray-zen2-Slingshot
   integrator:
@@ -30,4 +29,6 @@ system_definition:
       mpi: cray-mpich
       installation-year: 2017
   top500-system-instances:
-    - Eiger (CSCS) <https://www.top500.org/system/177824>
+    Eiger:
+      benchpark_system: cscs-eiger
+      top500: <https://www.top500.org/system/177824>

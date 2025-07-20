@@ -38,4 +38,4 @@ To install this, you can use::
     pip install -r requirements.txt
 
 Now you are ready to look at the benchmarks and systems available in Benchpark, 
-and determine your workflow as described in :doc:`basic-usage`.
+and determine your workflow as described in :doc:`benchpark-commands`.

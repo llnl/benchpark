@@ -38,16 +38,10 @@ def experiment_init(args):
         raise
 
 
-def experiment_list(args):
-    experiments = benchpark.repo.all_object_names(
-        benchpark.repo.ObjectTypes.experiments
-    )
-    # TODO: prettier printing
-    print("    ".join(experiments))
-
-
 def setup_parser(root_parser):
-    system_subparser = root_parser.add_subparsers(dest="experiment_subcommand")
+    system_subparser = root_parser.add_subparsers(
+        dest="experiment_subcommand", required=True
+    )
 
     init_parser = system_subparser.add_parser("init")
     init_parser.add_argument("--dest", help="Place all system files here directly")
@@ -57,17 +51,10 @@ def setup_parser(root_parser):
 
     init_parser.add_argument("spec", nargs="+", help="Experiment spec")
 
-    system_subparser.add_parser("list")
-
 
 def command(args):
     actions = {
         "init": experiment_init,
-        "list": experiment_list,
     }
     if args.experiment_subcommand in actions:
         actions[args.experiment_subcommand](args)
-    else:
-        raise ValueError(
-            f"Unknown subcommand for 'experiment': {args.experiment_subcommand}"
-        )

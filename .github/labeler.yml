@@ -1,34 +1,24 @@
 application:
-- changed-files:
-  - any-glob-to-any-file:
-    - repo/**
-
+  - changed-files:
+      - any-glob-to-any-file: [repo/**]
 ci:
-- changed-files:
-  - any-glob-to-any-file:
-    - .github/**
-
-configs:
-- changed-files:
-  - any-glob-to-any-file:
-    - configs/**
-    - var/sys_repo/**    
-
+  - changed-files:
+      - any-glob-to-any-file: [.github/**]
 dependencies:
-- changed-files:
-  - any-glob-to-any-file:
-    - .github/worklflows/requirements/**
-    - pyproject.toml
-
+  - changed-files:
+      - any-glob-to-any-file:
+          - .github/worklflows/requirements/**
+          - pyproject.toml
+          - requirements.txt
 docs:
-- changed-files:
-  - any-glob-to-any-file:
-    - docs/**
-    - README.rst
-    - tags.yaml
-
+  - changed-files:
+      - any-glob-to-any-file: [docs/**, README.rst, taxonomy.yaml]
 experiment:
-- changed-files:
-  - any-glob-to-any-file:
-    - experiments/**
-    - var/exp_repo/**
+  - changed-files:
+      - any-glob-to-any-file: [experiments/**, var/exp_repo/**]
+feature:
+  - changed-files:
+      - any-glob-to-any-file: [bin/**, lib/**, modifiers/**]
+system:
+  - changed-files:
+      - any-glob-to-any-file: [systems/**]

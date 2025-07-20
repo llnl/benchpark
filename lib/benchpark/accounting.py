@@ -6,27 +6,52 @@
 import os
 
 import benchpark.paths
+import benchpark.spec
+
+exclude_exper = ["repo.yaml"]
+exp_dict = {
+    "OpenMPExperiment": "openmp",
+    "CudaExperiment": "cuda",
+    "ROCmExperiment": "rocm",
+    "SingleNode": "single_node",
+    "StrongScaling": "strong",
+    "ThroughputScaling": "throughput",
+    "WeakScaling": "weak",
+    "Caliper": "caliper",
+}
+sys_dict = {
+    "OpenMPSystem": "openmp",
+    "CudaSystem": "cuda",
+    "ROCmSystem": "rocm",
+}
+non_experiments = ["Caliper", "Affinity"]
 
 
-def benchpark_experiments():
+def benchpark_experiments(exclude_variants=non_experiments):
     source_dir = benchpark.paths.benchpark_root
     experiments = []
-    experiments_dir = source_dir / "legacy" / "experiments"
-    for x in os.listdir(experiments_dir):
-        for y in os.listdir(experiments_dir / x):
-            experiments.append(f"{x}/{y}")
+    experiments_dir = source_dir / "experiments"
+
+    for x in sorted(os.listdir(experiments_dir)):
+        if x not in exclude_exper:
+            expr_file = str(experiments_dir) + "/" + x + "/experiment.py"
+            if os.path.isfile(expr_file):
+                with open(expr_file, "r") as file:
+                    file_text = file.read()
+                    experiments.append(x + "+single_node")  # default expr
+                    for var in exp_dict.keys():
+                        if var in file_text and var not in exclude_variants:
+                            experiments.append(f"{x}+{exp_dict[var]}")
     return experiments
 
 
 def benchpark_modifiers():
     source_dir = benchpark.paths.benchpark_root
     modifiers = []
-    for x in os.listdir(source_dir / "modifiers"):
-        modifiers.append(x)
-
-    modifiers += [
-        x for x in os.listdir(source_dir / "legacy" / "modifiers") if x not in modifiers
-    ]
+    exclude = ["modifier_repo.yaml"]
+    for x in sorted(os.listdir(source_dir / "modifiers")):
+        if x not in exclude:
+            modifiers.append(x)
 
     return modifiers
 
@@ -34,9 +59,24 @@ def benchpark_modifiers():
 def benchpark_systems():
     source_dir = benchpark.paths.benchpark_root
     systems = []
-    for x in os.listdir(source_dir / "legacy" / "systems"):
-        if not (
-            os.path.isfile(os.path.join(source_dir / "configs", x)) or x == "common"
-        ):
-            systems.append(x)
+    exclude = ["all_hardware_descriptions", "common", "repo.yaml"]
+    for x in sorted(os.listdir(source_dir / "systems")):
+        if x not in exclude and "system.py" in os.listdir(source_dir / "systems" / x):
+            system_spec = benchpark.spec.SystemSpec(x)
+            system_class = system_spec.system_class
+            if hasattr(system_class, "id_to_resources"):
+                for c in system_class.id_to_resources.keys():
+                    systems.append(x + "/" + c)
+            else:
+                systems.append(x)
     return systems
+
+
+def benchpark_benchmarks():
+    source_dir = benchpark.paths.benchpark_root
+    benchmarks = []
+    experiments_dir = source_dir / "experiments"
+    for x in sorted(os.listdir(experiments_dir)):
+        if x not in exclude_exper:
+            benchmarks.append(f"{x}")
+    return benchmarks

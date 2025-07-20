@@ -3,102 +3,233 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import pathlib
-from benchpark.directives import variant
-
+from benchpark.directives import variant, maintainers
 from benchpark.system import System
+from benchpark.cudasystem import CudaSystem
 from packaging.version import Version
+from benchpark.paths import hardware_descriptions
 
 
 class JscJuwels(System):
 
+    maintainers("pearce8")
+
+    id_to_resources = {
+        "juwels": {
+            "sys_cores_per_node": 48,
+            "timeout": 120,
+            "sys_gpus_per_node": 4,
+            "cuda_arch": "80",
+            "system_site": "jsc",
+            "hardware_key": str(hardware_descriptions)
+            + "/Atos-rome-A100-Infiniband/hardware_description.yaml",
+        }
+    }
+
+    variant(
+        "cuda",
+        default="12.2.0",
+        values=("11.8.0", "12.2.0"),
+        description="CUDA version",
+    )
+    variant(
+        "gtl",
+        default=False,
+        values=(True, False),
+        description="Use GTL-enabled MPI",
+    )
     variant(
         "compiler",
         default="gcc",
         description="Which compiler to use",
     )
 
-    def initialize(self):
-        super().initialize()
-
-        self.cuda_version = Version("12.2.0")
+    def __init__(self, spec):
+        super().__init__(spec)
+        self.programming_models = [CudaSystem()]
+        self.cuda_version = Version(self.spec.variants["cuda"][0])
+        self.gtl_flag = self.spec.variants["gtl"][0]
 
         if self.spec.satisfies("compiler=gcc"):
             self.gcc_version = Version("12.3.0")
             self.nvhpc_version = Version("23.7")
-        sys_variables = {
-            "sys_cores_per_node": 48,
-            "timeout": 120,
-            "sys_gpus_per_node": 4,
-            "cuda_arch": '"80"',
-        }
 
         self.scheduler = "slurm"
-        for k, v in sys_variables.items():
+        attrs = self.id_to_resources.get("juwels")
+        for k, v in attrs.items():
             setattr(self, k, v)
 
-    def generate_description(self, output_dir):
-        super().generate_description(output_dir)
-
-        sw_description = pathlib.Path(output_dir) / "software.yaml"
-
-        with open(sw_description, "w") as f:
-            f.write(self.sw_description())
-
-    def system_specific_variables(self):
-        return {"cuda_arch": self.cuda_arch}
-
-    def compiler_configs(self):
-        selections = []
-        compilers = JscJuwels.resource_location / "compilers"
+    def compute_compilers_section(self):
+        selections = {
+            "compilers": [
+                {
+                    "compiler": {
+                        "spec": "nvhpc@23.7",
+                        "paths": {
+                            "cc": "/p/software/juwelsbooster/stages/2024/software/NVHPC/23.7-CUDA-12/Linux_aarch64/23.7/compilers/bin/nvc",
+                            "cxx": "/p/software/juwelsbooster/stages/2024/software/NVHPC/23.7-CUDA-12/Linux_aarch64/23.7/compilers/bin/nvc++",
+                            "f77": "/p/software/juwelsbooster/stages/2024/software/NVHPC/23.7-CUDA-12/Linux_aarch64/23.7/compilers/bin/nvfortran",
+                            "fc": "/p/software/juwelsbooster/stages/2024/software/NVHPC/23.7-CUDA-12/Linux_aarch64/23.7/compilers/bin/nvfortran",
+                        },
+                        "operating_system": "rocky8",
+                        "target": "x86_64",
+                        "modules": ["Stages/2024", "NVHPC/23.7"],
+                        "environment": {},
+                        "extra_rpaths": [],
+                    }
+                }
+            ]
+        }
 
         if self.spec.satisfies("compiler=gcc"):
-            selections.append(compilers / "00-gcc-12-compiler.yaml")
-        selections.append(compilers / "01-nvhpc-compiler.yaml")
+            selections["compilers"] += [
+                {
+                    "compiler": {
+                        "spec": "gcc@12.3.0",
+                        "paths": {
+                            "cc": "/p/software/juwelsbooster/stages/2024/software/GCCcore/12.3.0/bin/gcc",
+                            "cxx": "/p/software/juwelsbooster/stages/2024/software/GCCcore/12.3.0/bin/g++",
+                            "f77": "/p/software/juwelsbooster/stages/2024/software/GCCcore/12.3.0/bin/gfortran",
+                            "fc": "/p/software/juwelsbooster/stages/2024/software/GCCcore/12.3.0/bin/gfortran",
+                        },
+                        "operating_system": "rocky9",
+                        "target": "aarch64",
+                        "modules": ["Stages/2024", "GCC/12.3.0"],
+                        "environment": {},
+                        "extra_rpaths": [],
+                    }
+                }
+            ]
+
         return selections
 
-    def external_pkg_configs(self):
-        externals = JscJuwels.resource_location / "externals"
+    def compute_packages_section(self):
 
-        selections = [externals / "packages.yaml"]
+        selections = {
+            "packages": {
+                "tar": {
+                    "externals": [{"spec": "tar@1.30", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "cmake": {
+                    "externals": [
+                        {
+                            "spec": "cmake@3.26.3",
+                            "prefix": "/p/software/juwelsbooster/stages/2024/software/CMake/3.26.3-GCCcore-12.3.0",
+                            "modules": ["Stages/2024", "CMake"],
+                            "buildable": False,
+                        }
+                    ],
+                },
+                "gmake": {
+                    "externals": [{"spec": "gmake@4.2.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "automake": {
+                    "externals": [
+                        {
+                            "spec": "automake@1.16.5",
+                            "prefix": "/p/software/juwelsbooster/stages/2024/software/Automake/1.16.5-GCCcore-12.3.0",
+                        }
+                    ]
+                },
+                "autoconf": {
+                    "externals": [
+                        {
+                            "spec": "autoconf@2.71",
+                            "prefix": "/p/software/juwelsbooster/stages/2024/software/Autoconf/2.71-GCCcore-12.3.0",
+                        }
+                    ]
+                },
+                "openmpi": {
+                    "externals": [
+                        {
+                            "spec": "openmpi@4.1.5",
+                            "prefix": "/p/software/juwelsbooster/stages/2024/software/OpenMPI/4.1.5-NVHPC-23.7-CUDA-12",
+                            "modules": [
+                                "Stages/2024",
+                                "NVHPC/23.7-CUDA-12",
+                                "OpenMPI/4.1.5",
+                            ],
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "blas": {"buildable": False},
+                "lapack": {"buildable": False},
+                "openblas": {
+                    "externals": [
+                        {
+                            "spec": "openblas@0.3.23%gcc@12.3.0",
+                            "prefix": "/p/software/juwelsbooster/stages/2024/software/OpenBLAS/0.3.23-GCC-12.3.0",
+                            "modules": ["Stages/2024", "OpenBLAS"],
+                        }
+                    ]
+                },
+                "all": {"providers": {"mpi": ["openmpi"], "zlib-api": ["zlib"]}},
+                "zlib": {
+                    "externals": [
+                        {
+                            "spec": "zlib@1.2.13",
+                            "prefix": "/p/software/juwelsbooster/stages/2024/software/zlib/1.2.13-GCCcore-12.3.0",
+                        }
+                    ]
+                },
+            }
+        }
 
-        cuda_cfg_path = self.next_adhoc_cfg()
-        with open(cuda_cfg_path, "w") as f:
-            f.write(self.cuda_config())
-        selections.append(cuda_cfg_path)
+        selections["packages"] |= self.cuda_config()["packages"]
 
         return selections
 
     def cuda_config(self):
-        return """\
-packages:
-  cuda:
-    buildable: false
-    externals:
-    - spec: cuda@{self.cuda_version}
-      prefix: /p/software/juwelsbooster/stages/2024/software/CUDA/{self.cuda_version.major}
-      modules:
-          - Stages/2024
-          - CUDA/{self.cuda_version.major}
-          - NVHPC/23.7-CUDA-{self.cuda_version.major}
-  curand:
-    externals:
-    - spec: curand@{self.cuda_version}
-      prefix: /p/software/juwelsbooster/stages/2024/software/CUDA/{self.cuda_version.major}
-    buildable: false
-  cusparse:
-    externals:
-    - spec: cusparse@{self.cuda_version}
-      prefix: /p/software/juwelsbooster/stages/2024/software/CUDA/{self.cuda_version.major}
-    buildable: false
-  cublas:
-    externals:
-    - spec: cublas@{self.cuda_version}
-      prefix: /p/software/juwelsbooster/stages/2024/software/CUDA/{self.cuda_version.major}
-    buildable: false
-"""
+        return {
+            "packages": {
+                "cuda": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "spec": "cuda@{self.cuda_version}",
+                            "prefix": "/p/software/juwelsbooster/stages/2024/software/CUDA/{self.cuda_version.major}",
+                            "modules": [
+                                "Stages/2024",
+                                "CUDA/{self.cuda_version.major}",
+                                "NVHPC/23.7-CUDA-{self.cuda_version.major}",
+                            ],
+                        }
+                    ],
+                },
+                "curand": {
+                    "externals": [
+                        {
+                            "spec": "curand@{self.cuda_version}",
+                            "prefix": "/p/software/juwelsbooster/stages/2024/software/CUDA/{self.cuda_version.major}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cusparse": {
+                    "externals": [
+                        {
+                            "spec": "cusparse@{self.cuda_version}",
+                            "prefix": "/p/software/juwelsbooster/stages/2024/software/CUDA/{self.cuda_version.major}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cublas": {
+                    "externals": [
+                        {
+                            "spec": "cublas@{self.cuda_version}",
+                            "prefix": "/p/software/juwelsbooster/stages/2024/software/CUDA/{self.cuda_version.major}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+            }
+        }
 
-    def sw_description(self):
+    def compute_software_section(self):
         """This is somewhat vestigial: for the Tioga config that is committed
         to the repo, multiple instances of mpi/compilers are stored and
         and these variables were used to choose consistent dependencies.
@@ -107,19 +238,15 @@ packages:
         will fail if these variables are not defined though, so for now
         they are still generated (but with more-generic values).
         """
-        return f"""\
-software:
-  packages:
-    default-compiler:
-      pkg_spec: {self.spec.variants["compiler"][0]}
-    default-mpi:
-      pkg_spec: openmpi@4.1.5
-    compiler-gcc:
-      pkg_spec: gcc
-    cublas-cuda:
-      pkg_spec: cublas@{self.cuda_version}
-    blas:
-      pkg_spec: openblas@0.3.23
-    lapack:
-      pkg_spec: openblas@0.3.23
-"""
+        return {
+            "software": {
+                "packages": {
+                    "default-compiler": {"pkg_spec": self.spec.variants["compiler"][0]},
+                    "default-mpi": {"pkg_spec": "openmpi@4.1.5"},
+                    "compiler-gcc": {"pkg_spec": "gcc"},
+                    "cublas-cuda": {"pkg_spec": f"cublas@{self.cuda_version}"},
+                    "blas": {"pkg_spec": "openblas@0.3.23"},
+                    "lapack": {"pkg_spec": "openblas@0.3.23"},
+                }
+            }
+        }

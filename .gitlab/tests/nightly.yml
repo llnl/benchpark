@@ -1,0 +1,111 @@
+include:
+  - local: .gitlab/utils/status.yml
+.test_clusters_nightly: &test_clusters_nightly
+  parallel:
+    matrix:
+      - HOST: tioga
+        ARCHCONFIG: llnl-elcapitan
+        SCHEDULER_PARAMETERS: -N 1 -t 60m --queue=pci --exclusive  # ref: https://github.com/LLNL/radiuss-shared-ci/blob/main/customization/custom-jobs-and-variables.yml
+        BENCHMARK:
+          - amg2023
+          - babelstream
+          - kripke
+          - laghos
+          - lammps
+          - osu-micro-benchmarks
+          - raja-perf
+          - remhos
+        VARIANT: [+rocm]
+        DASHBOARD_NAME: Nightly [benchpark-develop]
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        SCHEDULER_PARAMETERS: -N 1 -t 60m --queue=pci --exclusive
+        BENCHMARK:
+          - amg2023
+          - babelstream
+          - kripke
+          - laghos
+          - lammps
+          - osu-micro-benchmarks
+          - raja-perf
+          - remhos
+        VARIANT: [+rocm]
+        SYSTEM_ARGS: [gpumode=SPX]
+        DASHBOARD_NAME: Nightly [benchpark-develop]
+      # Test TPX, CPX
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        SCHEDULER_PARAMETERS: -N 1 -t 60m --queue=pci --exclusive
+        BENCHMARK: [laghos, raja-perf]
+        VARIANT: [+rocm]
+        SYSTEM_ARGS: [gpumode=TPX, gpumode=CPX]
+        DASHBOARD_NAME: Nightly [benchpark-develop]
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        SCHEDULER_PARAMETERS: -N 1 -t 30m --queue=pci --exclusive
+        BENCHMARK: [amg2023, kripke, laghos, remhos]
+        VARIANT: [+rocm caliper=mpi scaling=strong scaling-iterations=2]
+        DASHBOARD_NAME: Nightly [benchpark-develop]
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: -N 1 -t 01:00:00 --exclusive --reservation=ci
+        BENCHMARK: [amg2023, babelstream, kripke, lammps]
+        VARIANT: [+openmp]
+        DASHBOARD_NAME: Nightly [benchpark-develop]
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: -N 1 -t 01:00:00 --exclusive --reservation=ci
+        BENCHMARK:
+          - amg2023
+          - gpcnet
+          - ior
+          - kripke
+          - laghos
+          - osu-micro-benchmarks
+          - phloem
+          - remhos
+          - phloem
+          - smb
+          - stream
+        DASHBOARD_NAME: Nightly [benchpark-develop]
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: -N 1 -t 01:00:00 --exclusive --reservation=ci
+        BENCHMARK: [laghos, remhos]
+        VARIANT: [caliper=mpi scaling=strong scaling-iterations=2]
+        DASHBOARD_NAME: Nightly [benchpark-develop]
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: -N 1 -t 01:00:00 --exclusive --reservation=ci
+        BENCHMARK: [amg2023, kripke]
+        VARIANT:
+          - caliper=mpi scaling=strong scaling-iterations=2
+          - caliper=mpi scaling=weak scaling-iterations=2
+        SYSTEM_ARGS: [compiler=oneapi]
+        DASHBOARD_NAME: Nightly [benchpark-develop]
+      - HOST: lassen
+        ARCHCONFIG: llnl-sierra
+        SCHEDULER_PARAMETERS: -nnodes 1 -W 60 -q pci
+        BENCHMARK:
+          - amg2023
+          - babelstream
+          - kripke
+          - lammps
+          - osu-micro-benchmarks
+        VARIANT: [+cuda]
+        DASHBOARD_NAME: Nightly [benchpark-develop]
+nightly_test_run:
+  resource_group: $HOST
+  stage: test
+  tags: [$HOST, batch]
+  <<: *test_clusters_nightly
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: always
+    - if: $CI_PIPELINE_SOURCE != "schedule"
+      when: never
+  before_script:
+    - !reference [.report_status, before_script]
+  script: [./.gitlab/utils/run-experiment.sh]
+  after_script:
+    - !reference [.report_status, after_script]

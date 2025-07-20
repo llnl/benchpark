@@ -12,7 +12,7 @@ class SalmonTddft(ExecutableApplication):
     """Salmon-tddft benchmark"""
     name = "salmon-tddft"
 
-    tags = ['mpi','openmp']
+    tags = ['mpi']
 
     executable('pre-process', 'cp {input_path}/* .', use_mpi=False)
 
@@ -20,8 +20,8 @@ class SalmonTddft(ExecutableApplication):
 
     executable('link-restart', 'ln -s -T {restart_data} restart', use_mpi=False)
                
-    executable('execute', '-stdin {input_data} ' +
-               'salmon' , use_mpi=True)
+    executable('execute', 'salmon ' +
+               '{input_data}' , use_mpi=True)
 
     input_file('salmon-v2_gs', url='http://salmon-tddft.jp/download/SALMON-v.2.2.0.tar.gz',
                md5='d71436df3a1ad507f665abb8453eee15',

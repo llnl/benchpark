@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.scaling import StrongScaling
 
@@ -24,6 +24,8 @@ class MdTest(
         description="app version",
     )
 
+    maintainers("rfhaque")
+
     def compute_applications_section(self):
 
         num_resources = {"n_ranks": 1}
@@ -43,20 +45,19 @@ class MdTest(
             for k, v in scaled_variables.items():
                 self.add_experiment_variable(k, v, True)
 
-    def compute_spack_section(self):
+        self.set_required_variables(
+            n_resources="{n_ranks}",
+            process_problem_size="{num-objects}/{n_ranks}",
+            total_problem_size="{num-objects}",
+        )
+
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-
-        # get system config options
-        # TODO: Get compiler/mpi/package handles directly from system.py
-        system_specs = {}
-        system_specs["compiler"] = "default-compiler"
-        system_specs["mpi"] = "default-mpi"
-
-        # set package spack specs
-        self.add_spack_spec(system_specs["mpi"])
-
-        self.add_spack_spec("ior", ["ior@3.3.0", system_specs["compiler"]])
-        self.add_spack_spec(
-            self.name, [f"mdtest@{app_version}", system_specs["compiler"]]
+        self.add_package_spec(
+            "ior",
+            [
+                "ior@3.3.0",
+            ],
         )
+        self.add_package_spec(self.name, [f"mdtest@{app_version}"])

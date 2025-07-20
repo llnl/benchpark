@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.scaling import StrongScaling
 from benchpark.scaling import WeakScaling
@@ -30,6 +30,8 @@ class Hpcg(
         values=("3.1", "develop", "caliper"),
         description="app version",
     )
+
+    maintainers("pearce8")
 
     def compute_applications_section(self):
 
@@ -79,21 +81,13 @@ class Hpcg(
 
         self.add_experiment_variable("iterations", "60", False)
 
-    def compute_spack_section(self):
+        self.set_required_variables(
+            n_resources="{n_ranks}",
+            process_problem_size="{mx}*{my}*{mz}/{n_ranks}",
+            total_problem_size="{mx}*{my}*{mz}",
+        )
+
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-
-        # get system config options
-        # TODO: Get compiler/mpi/package handles directly from system.py
-        system_specs = {}
-        system_specs["compiler"] = "default-compiler"
-        system_specs["mpi"] = "default-mpi"
-
-        # set package spack specs
-        # empty package_specs value implies external package
-        self.add_spack_spec(system_specs["mpi"])
-        # self.add_spack_spec(system_specs["blas"])
-
-        self.add_spack_spec(
-            self.name, [f"hpcg@{app_version}", system_specs["compiler"]]
-        )
+        self.add_package_spec(self.name, [f"hpcg@{app_version}"])

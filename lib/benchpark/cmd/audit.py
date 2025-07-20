@@ -8,14 +8,7 @@ import pathlib
 import re
 import sys
 
-import benchpark.paths
 import benchpark.repo
-
-import benchpark.system as system
-from benchpark.runtime import RuntimeResources
-
-bootstrapper = RuntimeResources(benchpark.paths.benchpark_home)  # noqa
-bootstrapper.bootstrap()  # noqa
 
 import ramble.config as cfg  # noqa
 
@@ -29,7 +22,7 @@ def setup_parser(subparser):
 
 
 def audit_experiment(exp_cls):
-    required_methods = ["compute_applications_section", "compute_spack_section"]
+    required_methods = ["compute_applications_section", "compute_package_section"]
 
     if exp_cls.__name__ == "Caliper":
         # Caliper is an abstract class, and is never directly instantiated
@@ -76,16 +69,19 @@ def _path_for_system_class(sys_cls):
 
 def audit_system(sys_cls):
     errors = list()
-    basedir = _path_for_system_class(sys_cls)
-    externals = basedir / "externals"
-    if externals.exists():
-        for f in _find_yaml_files(externals):
-            cfg.read_config_file(f, system.packages_schema.schema)
+    # (a) this is the only functionality in benchpark that uses spack imports
+    # (b) most configs are now generated dynamically, which this doesn't verify
+    # (c) this could be done with a spack-python script
+    # basedir = _path_for_system_class(sys_cls)
+    # externals = basedir / "externals"
+    # if externals.exists():
+    #    for f in _find_yaml_files(externals):
+    #        cfg.read_config_file(f, system.packages_schema.schema)
 
-    compilers = basedir / "compilers"
-    if compilers.exists():
-        for f in _find_yaml_files(compilers):
-            cfg.read_config_file(f, system.compilers_schema.schema)
+    # compilers = basedir / "compilers"
+    # if compilers.exists():
+    #    for f in _find_yaml_files(compilers):
+    #        cfg.read_config_file(f, system.compilers_schema.schema)
     return errors
 
 

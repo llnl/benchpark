@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.caliper import Caliper
 
@@ -24,34 +24,30 @@ class Stream(
         description="app version",
     )
 
+    maintainers("daboehme", "rfhaque")
+
     def compute_applications_section(self):
 
         array_size = {"s": 650000000}
 
-        self.add_experiment_variable("processes_per_node", "1", True)
+        self.add_experiment_variable("processes_per_node", "1", named=True)
         self.add_experiment_variable("n", "35", False)
         self.add_experiment_variable("o", "0", False)
         self.add_experiment_variable("n_ranks", 1, True)
-        self.add_experiment_variable("n_threads_per_proc", [16, 32], True)
-
-        self.matrix_experiment_variables("n_threads_per_proc")
+        self.add_experiment_variable(
+            "n_threads_per_proc", [16, 32], named=True, matrixed=True
+        )
 
         for pk, pv in array_size.items():
             self.add_experiment_variable(pk, pv, True)
 
-    def compute_spack_section(self):
+        self.set_required_variables(
+            n_resources="{n_ranks}",
+            process_problem_size="{n}/{n_ranks}",
+            total_problem_size="{n}",
+        )
+
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-
-        # get system config options
-        # TODO: Get compiler/mpi/package handles directly from system.py
-        system_specs = {}
-        system_specs["compiler"] = "default-compiler"
-        system_specs["mpi"] = "default-mpi"
-
-        # set package spack specs
-        self.add_spack_spec(system_specs["mpi"])
-
-        self.add_spack_spec(
-            self.name, [f"stream@{app_version}", system_specs["compiler"]]
-        )
+        self.add_package_spec(self.name, [f"stream@{app_version}"])

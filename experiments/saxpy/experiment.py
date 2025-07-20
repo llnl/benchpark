@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
@@ -12,7 +12,13 @@ from benchpark.rocm import ROCmExperiment
 from benchpark.caliper import Caliper
 
 
-class Saxpy(Experiment, OpenMPExperiment, CudaExperiment, ROCmExperiment, Caliper):
+class Saxpy(
+    Experiment,
+    OpenMPExperiment,
+    CudaExperiment,
+    ROCmExperiment,
+    Caliper,
+):
     variant(
         "workload",
         default="problem",
@@ -25,35 +31,37 @@ class Saxpy(Experiment, OpenMPExperiment, CudaExperiment, ROCmExperiment, Calipe
         description="app version",
     )
 
+    maintainers("rfhaque")
+
     def compute_applications_section(self):
         # GPU tests include some smaller sizes
         n = ["512", "1024"]
         if self.spec.satisfies("+openmp"):
-            self.add_experiment_variable("n_nodes", ["1", "2"], True)
-            self.add_experiment_variable("n_ranks", "8")
-            self.add_experiment_variable("n_threads_per_proc", ["2", "4"], True)
-            self.matrix_experiment_variables(["n", "n_threads_per_proc"])
+            self.add_experiment_variable("n_nodes", ["1", "2"], named=True)
+            # resource_count is the number of resources used for this experiment:
+            self.add_experiment_variable("resource_count", "8")
+            self.add_experiment_variable(
+                "n_threads_per_proc", ["2", "4"], named=True, matrixed=True
+            )
         else:
             n = ["128", "256"] + n
-            self.add_experiment_variable("n_gpus", "1", False)
-            self.matrix_experiment_variables("n")
+            # resource_count is the number of resources used for this experiment:
+            self.add_experiment_variable("resource_count", "1")
 
-        self.add_experiment_variable("n", n, True)
+        self.add_experiment_variable("n", n, named=True, matrixed=True)
 
-    def compute_spack_section(self):
+        self.set_required_variables(
+            n_resources="{resource_count}",
+            process_problem_size="{n}/{n_resources}",
+            total_problem_size="{n}",
+        )
+
+        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+            self.add_experiment_variable("n_gpus", "{n_resources}", True)
+        else:
+            self.add_experiment_variable("n_ranks", "{n_resources}", True)
+
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-
-        # TODO: express that we need certain variables from system
-        # Does not need to happen before merge, separate task
-        # TODO: Get compiler/mpi/package handles directly from system.py
-        system_specs = {}
-        system_specs["compiler"] = "default-compiler"
-        system_specs["mpi"] = "default-mpi"
-
-        # empty package_specs value implies external package
-        self.add_spack_spec(system_specs["mpi"])
-
-        self.add_spack_spec(
-            self.name, [f"saxpy@{app_version}", system_specs["compiler"]]
-        )
+        self.add_package_spec(self.name, [f"saxpy@{app_version}"])

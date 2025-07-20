@@ -5,6 +5,7 @@ flake8
 google-cloud-storage # for gcs fetch test
 google-api-core # for gcs fetch error .exceptions
 coverage
+pytest-cov
 pre-commit
 graphlib-backport;python_version<"3.9"
 urllib3==1.26.19;python_version<="3.6"
@@ -14,3 +15,5 @@ pyarrow==14.0.1;python_version<="3.6"
 google-cloud-bigquery
 tqdm
 deprecation
+deepdiff
+xmltodict

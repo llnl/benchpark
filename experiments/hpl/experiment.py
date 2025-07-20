@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from benchpark.error import BenchparkError
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.scaling import StrongScaling
 from benchpark.scaling import WeakScaling
@@ -31,6 +31,8 @@ class Hpl(
         default="2.3-caliper",
         description="app version",
     )
+
+    maintainers("daboehme")
 
     def compute_applications_section(self):
         # TODO: Replace with conflicts clause
@@ -63,9 +65,9 @@ class Hpl(
         self.add_experiment_variable(
             "n_ranks", "{sys_cores_per_node} * {n_nodes}", False
         )
-        self.add_experiment_variable("n_threads_per_proc", ["2"], True)
-
-        self.matrix_experiment_variables("n_threads_per_proc")
+        self.add_experiment_variable(
+            "n_threads_per_proc", ["2"], named=True, matrixed=True
+        )
 
         if self.spec.satisfies("+single_node"):
             for pk, pv in num_nodes.items():
@@ -96,20 +98,13 @@ class Hpl(
             problem_size = scaled_variables["Ns"]
             self.add_experiment_variable("Ns", problem_size, True)
 
-    def compute_spack_section(self):
+        self.set_required_variables(
+            n_resources="{n_ranks}",
+            process_problem_size="{Ns}/{n_ranks}",
+            total_problem_size="{Ns}",
+        )
+
+    def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-
-        # get system config options
-        # TODO: Get compiler/mpi/package handles directly from system.py
-        system_specs = {}
-        system_specs["compiler"] = "default-compiler"
-        system_specs["mpi"] = "default-mpi"
-        system_specs["blas"] = "blas"
-
-        # set package spack specs
-        # empty package_specs value implies external package
-        self.add_spack_spec(system_specs["mpi"])
-        self.add_spack_spec(system_specs["blas"])
-
-        self.add_spack_spec(self.name, [f"hpl@{app_version}", system_specs["compiler"]])
+        self.add_package_spec(self.name, [f"hpl@{app_version}"])

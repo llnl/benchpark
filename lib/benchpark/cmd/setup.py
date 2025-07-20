@@ -10,10 +10,11 @@ import pathlib
 import shutil
 import sys
 
+import ruamel.yaml as yaml
+
 import benchpark.paths
 from benchpark.debug import debug_print
 from benchpark.runtime import RuntimeResources
-import benchpark.system
 
 
 # Note: it would be nice to vendor spack.llnl.util.link_tree, but that
@@ -77,8 +78,8 @@ def command(args):
     debug_print(f"specified experiment = {experiment_id}")
     debug_print(f"specified system = {system_id}")
 
-    experiment_src_dir = benchpark.paths.benchpark_root / str(experiment_id)
-    configs_src_dir = benchpark.paths.benchpark_root / str(system_id)
+    experiment_src_dir = pathlib.Path(os.path.abspath(str(experiment_id)))
+    configs_src_dir = pathlib.Path(os.path.abspath(str(system_id)))
     workspace_dir = experiments_root / str(experiment_id) / str(system_id)
 
     if workspace_dir.exists():
@@ -118,7 +119,7 @@ def command(args):
     symlink_tree(configs_src_dir, ramble_configs_dir, include_fn)
     symlink_tree(experiment_src_dir, ramble_configs_dir, include_fn)
     symlink_tree(
-        source_dir / "legacy" / "systems" / "common",
+        source_dir / "systems" / "common",
         ramble_spack_experiment_configs_dir,
         include_fn,
     )
@@ -138,15 +139,39 @@ def command(args):
     )
 
     initializer_script = experiments_root / "setup.sh"
+    run_script = experiments_root / ".latest-experiment.sh"
 
-    per_workspace_setup = RuntimeResources(experiments_root)
+    per_workspace_setup = RuntimeResources(
+        experiments_root, upstream=RuntimeResources(benchpark.paths.benchpark_home)
+    )
 
-    spack, first_time_spack = per_workspace_setup.spack_first_time_setup()
+    # Parse experiment YAML for package_manager
+    def find(d, tag):
+        if tag in d:
+            return d[tag]
+        for k, v in d.items():
+            if isinstance(v, dict):
+                result = find(v, tag)
+                if result is not None:
+                    return result
+
+    with open(str(experiment_src_dir / "ramble.yaml"), "r") as file:
+        parsed_yaml = yaml.safe_load(file)
+    pkg_manager = find(parsed_yaml, "package_manager")
+
+    pkg_str = ""
+    if pkg_manager == "spack":
+        spack, first_time_spack = per_workspace_setup.spack_first_time_setup()
+        if first_time_spack:
+            spack("repo", "add", "--scope=site", f"{source_dir}/repo")
+
+        pkg_str = f"""\
+. {per_workspace_setup.spack_location}/share/spack/setup-env.sh
+
+export SPACK_DISABLE_LOCAL_CONFIG=1
+"""
+
     ramble, first_time_ramble = per_workspace_setup.ramble_first_time_setup()
-
-    if first_time_spack:
-        spack("repo", "add", "--scope=site", f"{source_dir}/repo")
-
     if first_time_ramble:
         ramble(f"repo add --scope=site {source_dir}/repo")
         ramble('config --scope=site add "config:disable_progress_bar:true"')
@@ -157,24 +182,25 @@ def command(args):
         with open(initializer_script, "w") as f:
             f.write(
                 f"""\
-if [ -n "${{_BENCHPARK_INITIALIZED:-}}" ]; then
-    return 0
-fi
-
-. {per_workspace_setup.spack_location}/share/spack/setup-env.sh
+{pkg_str}
 . {per_workspace_setup.ramble_location}/share/ramble/setup-env.sh
-
-export SPACK_DISABLE_LOCAL_CONFIG=1
-
-export _BENCHPARK_INITIALIZED=true
 """
             )
+
+    ramble_setup = f"ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} workspace setup"
+    ramble_run = (
+        f"ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} on"
+    )
 
     instructions = f"""\
 To complete the benchpark setup, do the following:
 
     . {initializer_script}
 
-Further steps are needed to build the experiments (ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} workspace setup) and run them (ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} on)
+Further steps are needed to build the experiments ({ramble_setup}) and run them ({ramble_run})
 """
     print(instructions)
+
+    # Generate shell script to setup and run latest experiment
+    with open(run_script, "w") as f:
+        f.write(f"{ramble_setup} && {ramble_run}\n")

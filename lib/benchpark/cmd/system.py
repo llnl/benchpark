@@ -7,22 +7,26 @@
 
 import os
 import shutil
+import subprocess
 import sys
+import yaml
+from pprint import pprint
+
+from deepdiff import DeepDiff
 
 import benchpark.system
 import benchpark.spec
+import benchpark.paths
+import llnl.util.tty.color as color
 
 
 def system_init(args):
-    system_spec = benchpark.spec.SystemSpec(" ".join(args.spec))
-    system_spec = system_spec.concretize()
-
+    system_spec = benchpark.spec.SystemSpec(" ".join(args.spec)).concretize()
     system = system_spec.system
-    system.initialize()
 
     if args.basedir:
         base = args.basedir
-        sysdir = system.system_uid()
+        sysdir = str(hash(system_spec))
         destdir = os.path.join(base, sysdir)
     elif args.dest:
         destdir = args.dest
@@ -30,8 +34,8 @@ def system_init(args):
         raise ValueError("Must specify one of: --dest, --basedir")
 
     try:
-        os.mkdir(destdir)
-        system.generate_description(destdir)
+        os.makedirs(destdir)
+        system.write_system_dict(destdir)
     except FileExistsError:
         print(f"Abort: system description dir already exists ({destdir})")
         sys.exit(1)
@@ -41,16 +45,74 @@ def system_init(args):
         raise
 
 
-def system_list(args):
-    raise NotImplementedError("'benchpark system list' is not available")
-
-
 def system_id(args):
-    print(benchpark.system.unique_dir_for_description(args.system_dir))
+    temp_sys = benchpark.system.System(args.system_dir)
+    data = temp_sys.compute_system_id()
+    name = data["system"]["name"]
+    spec_hash = data["system"]["config-hash"]
+    return f"{name}-{spec_hash[:7]}"
+
+
+def system_external(args):
+    if args.new_system:
+        subprocess.run(
+            [
+                benchpark.paths.benchpark_home / "spack/bin/spack",
+                "external",
+                "find",
+                "--not-buildable",
+            ]
+        )
+
+        with open(
+            benchpark.paths.benchpark_home / "../.spack/packages.yaml", "r"
+        ) as file:
+            new_packages = yaml.safe_load(file)["packages"]
+
+        color.cprint("@*rHere are all of the new packages:@.")
+        pprint(new_packages)
+        return
+
+    system_spec = benchpark.spec.SystemSpec(" ".join(args.spec)).concretize()
+    system = system_spec.system
+
+    packages = system.compute_packages_section()["packages"]
+    pkg_list = list(packages.keys())
+    subprocess.run(
+        [
+            benchpark.paths.benchpark_home / "spack/bin/spack",
+            "external",
+            "find",
+            "--not-buildable",
+        ]
+        + [pkg for pkg in pkg_list]
+    )
+
+    with open(benchpark.paths.benchpark_home / "../.spack/packages.yaml", "r") as file:
+        new_packages = yaml.safe_load(file)["packages"]
+
+    # Use DeepDiff to find differences
+    diff = DeepDiff(
+        packages,
+        new_packages,
+        verbose_level=1,
+        ignore_type_in_groups=[(int, str)],
+        ignore_string_type_changes=True,
+    )
+
+    if not diff:
+        color.cprint("@*gNo new packages.@.")
+    else:
+        color.cprint("@*rThe Packages are different. Here are the differences:@.")
+        pprint(diff)
+        color.cprint("@*rHere are all of the new packages:@.")
+        pprint(new_packages)
 
 
 def setup_parser(root_parser):
-    system_subparser = root_parser.add_subparsers(dest="system_subcommand")
+    system_subparser = root_parser.add_subparsers(
+        dest="system_subcommand", required=True
+    )
 
     init_parser = system_subparser.add_parser("init")
     init_parser.add_argument("--dest", help="Place all system files here directly")
@@ -60,19 +122,26 @@ def setup_parser(root_parser):
 
     init_parser.add_argument("spec", nargs="+", help="System spec")
 
-    system_subparser.add_parser("list")
-
     id_parser = system_subparser.add_parser("id")
     id_parser.add_argument("system_dir")
+
+    external_parser = system_subparser.add_parser(
+        "external",
+        help='Check packages using "spack external find" for current system against the definitions in benchpark.',
+    )
+    external_parser.add_argument("spec", nargs="+", help="System spec")
+    external_parser.add_argument(
+        "--new-system",
+        help="Flag if system does not exist in benchpark",
+        action="store_true",
+    )
 
 
 def command(args):
     actions = {
         "init": system_init,
-        "list": system_list,
         "id": system_id,
+        "external": system_external,
     }
     if args.system_subcommand in actions:
         actions[args.system_subcommand](args)
-    else:
-        raise ValueError(f"Unknown subcommand for 'system': {args.system_subcommand}")

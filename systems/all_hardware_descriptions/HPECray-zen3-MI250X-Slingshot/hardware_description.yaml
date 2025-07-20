@@ -2,7 +2,6 @@
 # Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: Apache-2.0
-
 system_definition:
   name: HPECray-zen3-MI250X-Slingshot
   integrator:
@@ -36,6 +35,12 @@ system_definition:
       runtime: rocm
       mpi: cray-mpich
   top500-system-instances:
-    - Frontier (ORNL)  <https://www.top500.org/system/180047>
-    - Lumi     (CSC)   <https://www.top500.org/system/180048>
-    - Tioga    (LLNL)  <https://www.top500.org/system/180052>
+    Frontier:
+      benchpark_system:
+      top500: <https://www.top500.org/system/180047>
+    Lumi:
+      benchpark_system: csc-lumi
+      top500: <https://www.top500.org/system/180048>
+    Tioga:
+      benchpark_system: llnl-elcapitan
+      top500: <https://www.top500.org/system/180052>
