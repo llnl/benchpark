@@ -27,6 +27,7 @@ variables:
   TIOGA_SHARED_ALLOC: -N 1 -t 2h --queue=pci --exclusive
   CUSTOM_CI_BUILDS_DIR: $$HOME/.jacamar-ci/bd/$CI_PIPELINE_ID
   CI_BUILDS_DIR: ${CUSTOM_CI_BUILDS_DIR}/${CI_RUNNER_SHORT_TOKEN}/${CI_CONCURRENT_ID}
+  CI_PROJECT_DIR: ${CI_BUILDS_DIR}/benchpark
   # Dir cleanup can take awhile
   RUNNER_AFTER_SCRIPT_TIMEOUT: 20m
 default:
