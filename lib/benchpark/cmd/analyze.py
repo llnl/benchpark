@@ -207,7 +207,13 @@ def prepare_data(**kwargs):
     )
     logger.info(f"Found {len(files)} .cali files for analysis.")
 
-    tk = th.Thicket.from_caliperreader(files, disable_tqdm=True)
+    if kwargs["calltree_unification"] == "intersection":
+        intersection = True
+    else:
+        intersection = False
+    tk = th.Thicket.from_caliperreader(
+        files, intersection=intersection, disable_tqdm=True
+    )
     tk.update_inclusive_columns()
 
     # Save tree before modification
@@ -225,7 +231,14 @@ def prepare_data(**kwargs):
     # Remove MPI regions, if necesasry
     if kwargs.get("no_mpi"):
         query = th.query.Query().match(
-            ".", lambda row: row["name"].apply(lambda n: "MPI_" not in n).all()
+            ".",
+            lambda row: row["name"]
+            .apply(
+                # 'n is None' avoid comparison for MPI in n (will cause error)
+                lambda n: n is None
+                or "MPI_" not in n
+            )
+            .all(),
         )
         tk = tk.query(query)
 
@@ -394,6 +407,13 @@ def setup_parser(root_parser):
         type=str,
         help="Directory of ramble workspace.",
         metavar="RAMBLE_WORKSPACE_DIR",
+    )
+    root_parser.add_argument(
+        "--calltree-unification",
+        default="union",
+        choices=["intersection", "union"],
+        type=str,
+        help="Type of unification operation to perform the Caliper calltrees.",
     )
     root_parser.add_argument(
         "--chart-type",
