@@ -44,7 +44,7 @@ include:
   #- local: .gitlab/tests/shared_slurm_clusters.yml
   - local: .gitlab/tests/non_shared.yml
   # Nightly tests
-  #- local: .gitlab/tests/nightly.yml
+  - local: .gitlab/tests/nightly.yml
 stages:
   - machine-checks
   - allocate-resources
