@@ -108,7 +108,7 @@ class LlnlElcapitan(System):
             self.gcc_version = Version("12.2.0")
             self.mpi_version = Version("8.1.26")
         else:
-            if self.rocm_version >= Version("6.3.0"):
+            if self.rocm_version >= Version("6.4.0"):
                 self.cce_version = Version("19.0.0")
                 self.mpi_version = Version("8.1.32")
                 self.short_cce_version = "18.0"
