@@ -614,7 +614,8 @@ jobs:
           benchmark_spec: babelstream+openmp caliper=mpi,time
           system_name: ruby
           system_spec: llnl-cluster cluster=ruby compiler=intel
-      - name: babelstream/openmp caliper=mpi,time dane llnl-cluster cluster=dane compiler=oneapi
+      - name: babelstream/openmp caliper=mpi,time dane llnl-cluster cluster=dane
+          compiler=oneapi
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: babelstream
@@ -630,7 +631,8 @@ jobs:
           benchmark_spec: babelstream+cuda caliper=cuda,time
           system_name: lassen
           system_spec: llnl-sierra cuda=11.8.0 compiler=clang-ibm
-      - name: babelstream/cuda caliper=cuda,time matrix llnl-matrix cuda=12.6.0 compiler=oneapi
+      - name: babelstream/cuda caliper=cuda,time matrix llnl-matrix cuda=12.6.0
+          compiler=oneapi
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: babelstream
@@ -638,24 +640,24 @@ jobs:
           benchmark_spec: babelstream+cuda caliper=cuda,time
           system_name: matrix
           system_spec: llnl-matrix cuda=12.6.0 compiler=oneapi
-      - name: babelstream/rocm caliper=mpi,time tioga llnl-elcapitan rocm=6.2.4 compiler=cce
-          +gtl
+      - name: babelstream/rocm caliper=mpi,time tioga llnl-elcapitan rocm=6.2.4
+          compiler=cce +gtl
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: babelstream
           benchmark_mode: rocm
           benchmark_spec: babelstream+rocm caliper=mpi,time
           system_name: tioga
-          system_spec: llnl-elcapitan rocm=6.2.4 compiler=cce +gtl
-      - name: babelstream/rocm caliper=mpi,time tuolumne llnl-elcapitan rocm=6.2.4 compiler=cce
-          +gtl
+          system_spec: llnl-elcapitan cluster=tioga rocm=6.2.4 compiler=cce +gtl
+      - name: babelstream/rocm caliper=mpi,time tuolumne llnl-elcapitan rocm=6.2.4
+          compiler=cce +gtl
         uses: ./.github/actions/dynamic-dry-run
         with:
           benchmark_name: babelstream
           benchmark_mode: rocm
           benchmark_spec: babelstream+rocm caliper=mpi,time
           system_name: tuolumne
-          system_spec: llnl-elcapitan rocm=6.2.4 compiler=cce +gtl
+          system_spec: llnl-elcapitan cluster=tuolumne rocm=6.2.4 compiler=cce +gtl
       - name: lammps/openmp ruby llnl-cluster cluster=ruby compiler=intel
         uses: ./.github/actions/dynamic-dry-run
         with:
