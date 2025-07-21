@@ -18,6 +18,9 @@ exp_dict = {
     "ThroughputScaling": "throughput",
     "WeakScaling": "weak",
     "Caliper": "caliper",
+    "ScalingMode.Strong": "scaling=strong",
+    "ScalingMode.Weak": "scaling=weak",
+    "ScalingMode.Throughput": "scaling=throughput",
 }
 sys_dict = {
     "OpenMPSystem": "openmp",
@@ -38,10 +41,14 @@ def benchpark_experiments(exclude_variants=non_experiments):
             if os.path.isfile(expr_file):
                 with open(expr_file, "r") as file:
                     file_text = file.read()
-                    experiments.append(x + "+single_node")  # default expr
+                    experiments.append(x)  # default expr
                     for var in exp_dict.keys():
                         if var in file_text and var not in exclude_variants:
-                            experiments.append(f"{x}+{exp_dict[var]}")
+                            if "=" in exp_dict[var]:
+                                joiner = " "
+                            else:
+                                joiner = "+"
+                            experiments.append(f"{x}{joiner}{exp_dict[var]}")
     return experiments
 
 
