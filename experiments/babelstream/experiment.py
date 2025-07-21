@@ -66,4 +66,6 @@ class Babelstream(
         app_version = self.spec.variants["version"][0]
         omp_spec = "+omp" if self.spec.satisfies("+openmp") else ""
         hip_spec = "+hip" if self.spec.satisfies("+rocm") else ""
-        self.add_package_spec(self.name, [f"babelstream@{app_version} {omp_spec} {hip_spec}"])
+        self.add_package_spec(
+            self.name, [f"babelstream@{app_version} {omp_spec} {hip_spec}"]
+        )
