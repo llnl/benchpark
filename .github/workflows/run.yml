@@ -150,6 +150,36 @@ jobs:
             --disable-progress-bar \
             --disable-logger \
             workspace setup --dry-run
+      - name: Dry run dynamic kripke/rocm on Tuolumne SPX with allocation modifier
+        run: |
+          ./bin/benchpark system init --dest=tuolumne/spx llnl-elcapitan cluster=tuolumne gpumode=SPX
+          ./bin/benchpark setup ./kripke/rocm tuolumne/spx workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/kripke/rocm/tuolumne/spx/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+      - name: Dry run dynamic kripke/rocm on Tuolumne TPX with allocation modifier
+        run: |
+          ./bin/benchpark system init --dest=tuolumne/tpx llnl-elcapitan cluster=tuolumne gpumode=TPX
+          ./bin/benchpark setup ./kripke/rocm tuolumne/tpx workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/kripke/rocm/tuolumne/tpx/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
+      - name: Dry run dynamic kripke/rocm on Tuolumne CPX with allocation modifier
+        run: |
+          ./bin/benchpark system init --dest=tuolumne/cpx llnl-elcapitan cluster=tuolumne gpumode=CPX
+          ./bin/benchpark setup ./kripke/rocm tuolumne/cpx workspace/
+          . workspace/setup.sh
+          ramble \
+            --workspace-dir workspace/kripke/rocm/tuolumne/cpx/workspace \
+            --disable-progress-bar \
+            --disable-logger \
+            workspace setup --dry-run
       - name: Dry run kripke/cuda on Sierra with allocation modifier
         run: |
           ./bin/benchpark experiment init --dest=kripke/cuda kripke+cuda
@@ -897,4 +927,4 @@ jobs:
           pip install -r ./requirements.txt
       - name: Run
         run: |-
-          python -m pytest
+          ./bin/benchpark unit-test

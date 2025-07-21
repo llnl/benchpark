@@ -582,16 +582,16 @@ class CscLumi(System):
                     "default-compiler": {
                         "pkg_spec": f"{self.spec.variants['compiler'][0]}"
                     },
-                    "default-mpi": {"pkg_spec": "cray-mpich@8.1%cce ~gtl"},
+                    "default-mpi": {"pkg_spec": "cray-mpich@8.1~gtl %cce"},
                     "compiler-rocm": {
                         "pkg_spec": f"{self.spec.variants['compiler'][0]}"
                     },
                     "blas-rocm": {"pkg_spec": f"rocblas@{self.rocm_version}"},
                     "blas": {"pkg_spec": "cray-libsci@23"},
                     "lapack": {"pkg_spec": "cray-libsci@23"},
-                    "mpi-rocm-gtl": {"pkg_spec": "cray-mpich@8.1%cce +gtl"},
-                    "mpi-rocm-no-gtl": {"pkg_spec": "cray-mpich@8.1%cce ~gtl"},
-                    "mpi-gcc": {"pkg_spec": "cray-mpich@8.1%gcc ~gtl"},
+                    "mpi-rocm-gtl": {"pkg_spec": "cray-mpich@8.1+gtl %cce"},
+                    "mpi-rocm-no-gtl": {"pkg_spec": "cray-mpich@8.1~gtl %cce"},
+                    "mpi-gcc": {"pkg_spec": "cray-mpich@8.1~gtl %gcc"},
                 }
             }
         }

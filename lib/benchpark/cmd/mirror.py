@@ -149,18 +149,12 @@ def mirror_create(args):
         with open(setup_dest, "w", encoding="utf-8") as f:
             f.write(
                 """\
-if [ -n "${_BENCHPARK_INITIALIZED:-}" ]; then
-    return 0
-fi
-
 this_script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 . $this_script_dir/spack/share/spack/setup-env.sh
 . $this_script_dir/ramble/share/ramble/setup-env.sh
 
 export SPACK_DISABLE_LOCAL_CONFIG=1
-
-export _BENCHPARK_INITIALIZED=true
 """
             )
 
@@ -230,7 +224,9 @@ ramble config --scope=site add \"config:spack:global:args:'-d'\"
 
 
 def setup_parser(root_parser):
-    mirror_subparser = root_parser.add_subparsers(dest="system_subcommand")
+    mirror_subparser = root_parser.add_subparsers(
+        dest="system_subcommand", required=True
+    )
 
     create_parser = mirror_subparser.add_parser("create")
     create_parser.add_argument(
@@ -248,5 +244,3 @@ def command(args):
     }
     if args.system_subcommand in actions:
         actions[args.system_subcommand](args)
-    else:
-        raise ValueError(f"Unknown subcommand for 'system': {args.system_subcommand}")

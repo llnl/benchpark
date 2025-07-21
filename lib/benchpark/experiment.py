@@ -5,18 +5,15 @@
 
 from typing import Dict
 import yaml  # TODO: some way to ensure yaml available
+import sys
+from enum import Enum
 
 from benchpark.error import BenchparkError
 from benchpark.directives import ExperimentSystemBase
 from benchpark.directives import variant
+from benchpark.variables import VariableDict
 import benchpark.spec
-import benchpark.paths
-import benchpark.repo
-import benchpark.runtime
 import benchpark.variant
-
-bootstrapper = benchpark.runtime.RuntimeResources(benchpark.paths.benchpark_home)
-bootstrapper.bootstrap()
 
 import ramble.language.language_base  # noqa
 import ramble.language.language_helpers  # noqa
@@ -25,7 +22,7 @@ import ramble.language.language_helpers  # noqa
 class ExperimentHelper:
     def __init__(self, exp):
         self.spec = exp.spec
-        self.variables = {}
+        self._expr_vars = VariableDict()
         self.env_vars = {
             "set": {},
             "append": [{"paths": {}, "vars": {}}],
@@ -71,7 +68,7 @@ class ExperimentHelper:
 
     def compute_config_variables_wrapper(self):
         self.compute_config_variables()
-        return self.variables, self.env_vars
+        return self._expr_vars, self.env_vars
 
 
 class SingleNode:
@@ -145,7 +142,34 @@ class Affinity:
             }
 
 
-class Experiment(ExperimentSystemBase, SingleNode, Affinity):
+class HwlocVariantValues(str, Enum):
+    NONE = "none"
+    ON = "on"
+
+
+class Hwloc:
+    variant(
+        "hwloc",
+        default=HwlocVariantValues.NONE.value,
+        values=tuple(v.value for v in HwlocVariantValues),
+        multi=False,
+        description="Get underlying infrastructure topology",
+    )
+
+    class Helper(ExperimentHelper):
+        def compute_modifiers_section(self):
+            modifier_list = []
+
+            if not self.spec.satisfies(f"hwloc={HwlocVariantValues.NONE.value}"):
+                affinity_modifier_modes = {}
+                affinity_modifier_modes["name"] = "hwloc"
+                affinity_modifier_modes["mode"] = self.spec.variants["hwloc"][0]
+                modifier_list.append(affinity_modifier_modes)
+
+            return modifier_list
+
+
+class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
     """This is the superclass for all benchpark experiments.
 
     ***The Experiment class***
@@ -194,6 +218,7 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity):
         self.helpers = []
         self._spack_name = None
         self._ramble_name = None
+        self._expr_vars = VariableDict()
         self.req_vars = [
             "n_resources",
             "process_problem_size",
@@ -234,6 +259,11 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity):
     def ramble_name(self, value: str):
         self._ramble_name = value
 
+    @property
+    def expr_vars(self):
+        """Dictionary of experiment variables"""
+        return self._expr_vars
+
     def set_required_variables(self, **kwargs):
         """Helper function to set required variables."""
         self.add_experiment_variable("device_type", self.device_type, False)
@@ -258,6 +288,7 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity):
         # default configs for all experiments
         default_config = {
             "deprecated": True,
+            "benchpark_experiment_command": "benchpark " + " ".join(sys.argv[1:]),
         }
         if self.spec.variants["package_manager"][0] == "spack":
             default_config["spack_flags"] = {
@@ -277,13 +308,16 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity):
             modifier_list += cls.compute_modifiers_section()
         return modifier_list
 
-    def add_experiment_name_prefix(self, prefix):
-        self.expr_name = [prefix] + self.expr_name
-
-    def add_experiment_variable(self, name, values, use_in_expr_name=False):
-        self.variables[name] = values
-        if use_in_expr_name:
-            self.expr_name.append(f"{{{name}}}")
+    def add_experiment_variable(self, name, values, named=False, matrixed=False):
+        if isinstance(values, dict):
+            self.expr_vars.add_dimensional_variable(name, values, named, True, matrixed)
+            self.zips[name] = list(values.keys())
+            if matrixed:
+                self.matrix.append(name)
+        else:
+            self.expr_vars.add_scalar_variable(name, values, named, False, matrixed)
+            if matrixed:
+                self.matrix.append(name)
 
     def set_environment_variable(self, name, values):
         """Set value of environment variable"""
@@ -299,17 +333,6 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity):
 
         self.env_vars["append"][0][target][name] = values
 
-    def zip_experiment_variables(self, name, variable_names):
-        self.zips[name] = list(variable_names)
-
-    def matrix_experiment_variables(self, variable_names):
-        if isinstance(variable_names, str):
-            self.matrix.append(variable_names)
-        elif isinstance(variable_names, list):
-            self.matrix.extend(variable_names)
-        else:
-            raise ValueError("Variable list must be of type str or list[str].")
-
     def add_experiment_exclude(self, exclude_clause):
         self.excludes.append(exclude_clause)
 
@@ -319,7 +342,7 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity):
         )
 
     def compute_applications_section_wrapper(self):
-        self.expr_name = []
+        self.expr_var_names = []
         self.env_vars = {
             "set": {},
             "append": [{"paths": {}, "vars": {}}],
@@ -331,18 +354,30 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity):
 
         for cls in self.helpers:
             variables, env_vars = cls.compute_config_variables_wrapper()
-            self.variables |= variables
+            self.expr_vars.extend(variables)
             self.env_vars["set"] |= env_vars["set"]
             self.env_vars["append"][0] |= env_vars["append"][0]
 
         self.compute_applications_section()
+
+        if "scaling" in self.spec.variants and not self.spec.satisfies("scaling=off"):
+            self.expr_vars.extend(self.scale())
+
+        for var in self.expr_vars.values():
+            for dim in var.dims():
+                if var.is_named:
+                    self.expr_var_names.append(f"{{{dim}}}")
+                if len(var[dim]) == 1 and not var.is_zipped and not var.is_matrixed:
+                    self.variables[dim] = var[dim][0]
+                else:
+                    self.variables[dim] = var[dim]
 
         expr_helper_list = []
         for cls in self.helpers:
             helper_prefix = cls.get_helper_name_prefix()
             if helper_prefix:
                 expr_helper_list.append(helper_prefix)
-        expr_name_suffix = "_".join(expr_helper_list + self.expr_name)
+        expr_name_suffix = "_".join(expr_helper_list + self.expr_var_names)
 
         self.check_required_variables()
 

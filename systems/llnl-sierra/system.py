@@ -17,7 +17,14 @@ class LlnlSierra(System):
     id_to_resources = {
         "lassen": {
             "cuda_arch": 70,
-            "sys_cores_per_node": 44,
+            "sys_cores_per_node": 40,
+            "sys_cores_os_reserved_per_node": 4,
+            "sys_cores_os_reserved_per_node_list": [
+                0,
+                1,
+                22,
+                23,
+            ],  # First two cores on each socket reserved.
             "sys_gpus_per_node": 4,
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
@@ -423,7 +430,7 @@ class LlnlSierra(System):
                         },
                         "flags": {
                             "cflags": "-g -O2",
-                            "cxxflags": "-g -O2 -std=c++14",
+                            "cxxflags": "-g -O2",
                             "fflags": "-g -O2",
                         },
                         "operating_system": "rhel7",
@@ -452,7 +459,7 @@ class LlnlSierra(System):
                         },
                         "flags": {
                             "cflags": "-g -O2",
-                            "cxxflags": "-g -O2 -std=c++14",
+                            "cxxflags": "-g -O2",
                             "fflags": "-g -O2",
                         },
                         "operating_system": "rhel7",
@@ -481,7 +488,7 @@ class LlnlSierra(System):
                         },
                         "flags": {
                             "cflags": "-g -O2",
-                            "cxxflags": "-g -O2 -std=c++14",
+                            "cxxflags": "-g -O2",
                             "fflags": "-g -O2",
                         },
                         "operating_system": "rhel7",
@@ -507,7 +514,7 @@ class LlnlSierra(System):
                         },
                         "flags": {
                             "cflags": "-g -O2",
-                            "cxxflags": "-g -O2 -std=c++14",
+                            "cxxflags": "-g -O2",
                             "fflags": "-g -O2",
                         },
                         "operating_system": "rhel7",
@@ -533,7 +540,7 @@ class LlnlSierra(System):
                         },
                         "flags": {
                             "cflags": "-g -O2",
-                            "cxxflags": "-g -O2 -std=c++14",
+                            "cxxflags": "-g -O2",
                             "fflags": "",
                         },
                         "operating_system": "rhel7",

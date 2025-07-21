@@ -13,12 +13,7 @@ import re
 from typing import Iterable, Iterator, List, Match, Optional, Union
 
 from benchpark.error import BenchparkError
-import benchpark.paths
 import benchpark.repo
-import benchpark.runtime
-
-bootstrapper = benchpark.runtime.RuntimeResources(benchpark.paths.benchpark_home)
-bootstrapper.bootstrap()
 
 import llnl.util.lang  # noqa
 
