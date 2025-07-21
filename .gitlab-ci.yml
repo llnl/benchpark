@@ -13,7 +13,7 @@ variables:
   FF_ENABLE_JOB_CLEANUP: 'true'
   GIT_STRATEGY: fetch
   # Debugging logs on gitlab
-  # CI_DEBUG_TRACE: 'true'
+  CI_DEBUG_TRACE: 'true'
   # Job variables
   ALLOC_NAME: ${CI_PROJECT_NAME}_ci_${CI_PIPELINE_ID}
   FLUX_ARGS: -N 1 --exclusive
