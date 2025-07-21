@@ -47,18 +47,18 @@ include:
   - local: .gitlab/tests/nightly.yml
 stages:
   - machine-checks
-  - allocate-resources
+  #- allocate-resources
   - test
-  - release-resources
-  - cleanup-dir
-cleanup_pipeline_dir:
-  tags: [shell, oslic]
-  needs:
-    - release_resources_dane
-    - release_resources_flux_tioga
-    - release_resources_flux_tuolumne
-  extends: .on_host_template
-  stage: cleanup-dir
-  script:
-    - echo "Removing $CUSTOM_CI_BUILDS_DIR"
-    - rm -rf $CUSTOM_CI_BUILDS_DIR
+  #- release-resources
+  #- cleanup-dir
+# cleanup_pipeline_dir:
+#   tags: [shell, oslic]
+#   needs:
+#     - release_resources_dane
+#     - release_resources_flux_tioga
+#     - release_resources_flux_tuolumne
+#   extends: .on_host_template
+#   stage: cleanup-dir
+#   script:
+#     - echo "Removing $CUSTOM_CI_BUILDS_DIR"
+#     - rm -rf $CUSTOM_CI_BUILDS_DIR
