@@ -17,6 +17,17 @@ class Babelstream(BuiltinBabel):
     variant("caliper", default=False, description = "Enable caliper performance tracking")
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
+
+    def setup_build_environment(self, env):
+        super().setup_build_environment(env)
+        if "+cuda" in self.spec:
+            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
+
+    def setup_run_environment(self, env):
+        super().setup_run_environment(env)
+        if "+cuda" in self.spec:
+            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
+
     
 class CMakeBuilder(BuiltinBuilder):
     def cmake_args(self):
@@ -26,3 +37,12 @@ class CMakeBuilder(BuiltinBuilder):
             args.append(self.define_from_variant("ENABLE_CALIPER", "caliper"))
         return args
 
+    def setup_build_environment(self, env):
+        super().setup_build_environment(env)
+        if "+cuda" in self.spec:
+            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
+
+    def setup_run_environment(self, env):
+        super().setup_run_environment(env)
+        if "+cuda" in self.spec:
+            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
