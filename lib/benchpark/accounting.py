@@ -64,8 +64,16 @@ def benchpark_systems():
         if x not in exclude and "system.py" in os.listdir(source_dir / "systems" / x):
             system_spec = benchpark.spec.SystemSpec(x)
             system_class = system_spec.system_class
-            if hasattr(system_class, "id_to_resources"):
-                for c in system_class.id_to_resources.keys():
+            # aws uses 'instance_type' not 'cluster'
+            cluster_variant = "instance_type" if "aws" in x else "cluster"
+            variants = list(system_class.variants.values())
+            if len(variants) > 0:
+                variants = variants[0]
+            clusters = None
+            if cluster_variant in variants:
+                clusters = list(variants[cluster_variant].values)
+            if clusters:
+                for c in clusters:
                     systems.append(x + "/" + c)
             else:
                 systems.append(x)
