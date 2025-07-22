@@ -154,6 +154,7 @@ class RuntimeResources:
         env = {"SPACK_DISABLE_LOCAL_CONFIG": "1"}
         spack = Command(self.spack_location / "bin" / "spack", env)
         spack_cache_location = self.spack_location / "misc-cache"
+        bootstrap_cache_location = self.spack_location / "bootstrap-cache"
         first_time = False
         if not self.spack_location.exists():
             first_time = True
@@ -163,6 +164,12 @@ class RuntimeResources:
                 "--scope=site",
                 "add",
                 f"config:misc_cache:{spack_cache_location}",
+            )
+            spack(
+                "config",
+                "--scope=site",
+                "add",
+                f"bootstrap:root:{bootstrap_cache_location}",
             )
         return spack, first_time
 
