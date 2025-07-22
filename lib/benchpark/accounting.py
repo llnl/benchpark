@@ -6,7 +6,6 @@
 import os
 
 import benchpark.paths
-import benchpark.spec
 
 exclude_exper = ["repo.yaml"]
 exp_dict = {
@@ -57,6 +56,8 @@ def benchpark_modifiers():
 
 
 def benchpark_systems():
+    import benchpark.spec
+
     source_dir = benchpark.paths.benchpark_root
     systems = []
     exclude = ["all_hardware_descriptions", "common", "repo.yaml"]

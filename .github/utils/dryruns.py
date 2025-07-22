@@ -8,13 +8,24 @@ import time
 import sys
 import argparse
 
+import benchpark.paths
+
+sys.path.append(str(benchpark.paths.benchpark_home) + "/spack/lib/spack")
+from lib.benchpark.accounting import benchpark_experiments
+
+DEFAULT_SYSTEM="llnl-cluster cluster=dane"
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--test",
-        choices=["cuda", "rocm", "openmp", "mpi", "strong", "weak", "throughput"],
+        choices=["cuda", "rocm", "openmp", "mpi", "strong", "weak", "throughput", "modifiers"],
         help="Only run tests of this type",
+    )
+    parser.add_argument(
+        "--dryrun",
+        action="store_true",
+        help="Dry runs this script for testing."
     )
     args = parser.parse_args()
 
@@ -97,6 +108,29 @@ def main():
             if i != ""
         ]
 
+    try:
+        mods = subprocess.run(
+            [
+                "./bin/benchpark",
+                "list",
+                "modifiers",
+                "--no-title",
+            ],
+            capture_output=True,
+            check=True,
+        )
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(f"Output: {e.stdout}\nError: {e.stderr}")
+    temp_mods = mods.stdout.decode("utf-8")
+    nmods = [
+            i
+            for i in temp_mods.replace(" " * 4, "").replace("\t", "").split("\n")
+            if i != "" and i not in ["allocation", "caliper"]
+        ]
+
+    caliper_exp = [e for e in benchpark_experiments(exclude_variants=[]) if "+caliper" in e]
+    modifiers_expr = caliper_exp + [e+"+"+m for e in mpi_only_expr for m in nmods]
+
     # Map test types to (expr_list, sys_list)
     exprs_to_sys = [
         ("mpi", mpi_only_expr, str_dict["mpi"]),
@@ -106,6 +140,7 @@ def main():
         ("strong", strong_expr, str_dict["mpi"]),
         ("weak", weak_expr, str_dict["mpi"]),
         ("throughput", throughput_expr, str_dict["mpi"]),
+        ("modifiers", modifiers_expr, [DEFAULT_SYSTEM])
     ]
 
     # Filter based on --test argument
@@ -128,16 +163,19 @@ def main():
             for sspec in sys_spec_list:
                 ran_tests += 1
                 print(f"Running '{espec}' '{sspec}'")
-                try:
-                    cmd = f'source .github/utils/dryrun.sh "{sspec}" "{espec}"'
-                    subprocess.run(
-                        ["bash", "-c", cmd],
-                        capture_output=True,
-                        check=True,
-                    )
-                except subprocess.CalledProcessError as e:
-                    errors[f"{espec} {sspec}"] = e.stderr.decode()
-                    fail_tests += 1
+                if args.dryrun:
+                    pass
+                else:
+                    try:
+                        cmd = f'source .github/utils/dryrun.sh "{sspec}" "{espec}"'
+                        subprocess.run(
+                            ["bash", "-c", cmd],
+                            capture_output=True,
+                            check=True,
+                        )
+                    except subprocess.CalledProcessError as e:
+                        errors[f"{espec} {sspec}"] = e.stderr.decode()
+                        fail_tests += 1
     end = time.time()
     print(f"Elapsed: {(end-start)/60:.2f} minutes")
 

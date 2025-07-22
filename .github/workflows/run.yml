@@ -104,7 +104,7 @@ jobs:
       # Don't fail other running testtype tests
       fail-fast: false
       matrix:
-        testtype: [cuda, rocm, openmp, mpi, strong, weak, throughput]
+        testtype: [cuda, rocm, openmp, mpi, strong, weak, throughput, modifiers]
     steps:
       - name: Checkout Benchpark
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -113,7 +113,7 @@ jobs:
           pip install -r ./requirements.txt
       - name: Run Dryruns
         run: |
-          python .github/utils/dryruns.py --test ${{ matrix.testtype }}
+          benchpark-python .github/utils/dryruns.py --test ${{ matrix.testtype }}
   pytest:
     runs-on: ubuntu-24.04
     steps:
