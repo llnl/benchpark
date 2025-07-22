@@ -12,6 +12,7 @@ variables:
   # clean up the repository after the job finishes
   FF_ENABLE_JOB_CLEANUP: 'true'
   FF_CUSTOM_DATA_DIR: 'true'
+  FF_CUSTOM_BUILD_DIR: 'true'
   GIT_STRATEGY: fetch
   # Debugging logs on gitlab
   CI_DEBUG_TRACE: 'true'
