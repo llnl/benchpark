@@ -19,7 +19,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--test",
-        choices=["cuda", "rocm", "openmp", "mpi", "strong", "weak", "throughput", "modifiers"],
+        choices=["mpi", "cuda", "rocm", "openmp", "strong", "weak", "throughput", "modifiers"],
         help="Only run tests of this type",
     )
     parser.add_argument(
@@ -59,18 +59,18 @@ def main():
         mpi_only_expr.add(name)
 
         if "cuda" in e:
-            cuda_expr.append(name)
+            cuda_expr.append(e)
         elif "rocm" in e:
-            rocm_expr.append(name)
+            rocm_expr.append(e)
         elif "openmp" in e:
-            openmp_expr.append(name)
+            openmp_expr.append(e)
 
         elif "strong" in e:
-            strong_expr.append(name)
+            strong_expr.append(e)
         elif "weak" in e:
-            weak_expr.append(name)
+            weak_expr.append(e)
         elif "throughput" in e:
-            throughput_expr.append(name)
+            throughput_expr.append(e)
 
     sys_dict = {}
     try:
@@ -181,6 +181,7 @@ def main():
 
     print(f"{ran_tests-fail_tests} Passing. {fail_tests} Failing.")
     for key, value in errors.items():
+        print("="*50)
         print(key)
         print(value)
 
