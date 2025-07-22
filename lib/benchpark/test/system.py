@@ -39,7 +39,7 @@ def test_system_compute_variables_section(monkeypatch):
             ],
             "sys_gpus_per_node": 4,
             "rocm_arch": "gfx942",
-            "rocm_version": "6.2.4",
+            "rocm_version": "6.4.0",
             "gtl_flag": True,
             "gpu_factor": 1,
             "extra_batch_opts": "--setattr=gpumode=SPX\n--conf=resource.rediscover=true",
