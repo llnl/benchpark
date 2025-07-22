@@ -13,36 +13,43 @@ import benchpark.paths
 sys.path.append(str(benchpark.paths.benchpark_home) + "/spack/lib/spack")
 from lib.benchpark.accounting import benchpark_experiments
 
-DEFAULT_SYSTEM="llnl-cluster cluster=dane"
+DEFAULT_SYSTEM = "llnl-cluster cluster=dane"
+
+
+def run_subprocess_cmd(cmd_list, decode=False):
+    try:
+        result = subprocess.run(cmd_list, capture_output=True, check=True)
+        return result.stdout.decode("utf-8") if decode else result
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(
+            f"Command: {' '.join(cmd_list)}\nOutput: {e.stdout}\nError: {e.stderr}"
+        )
+
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--test",
-        choices=["mpi", "cuda", "rocm", "openmp", "strong", "weak", "throughput", "modifiers"],
+        choices=[
+            "mpi",
+            "cuda",
+            "rocm",
+            "openmp",
+            "strong",
+            "weak",
+            "throughput",
+            "modifiers",
+        ],
         help="Only run tests of this type",
     )
     parser.add_argument(
-        "--dryrun",
-        action="store_true",
-        help="Dry runs this script for testing."
+        "--dryrun", action="store_true", help="Dry runs this script for testing."
     )
     args = parser.parse_args()
 
-    try:
-        expr_cmd = subprocess.run(
-            [
-                "./bin/benchpark",
-                "list",
-                "experiments",
-                "--no-title",
-            ],
-            capture_output=True,
-            check=True,
-        )
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError(f"Output: {e.stdout}\nError: {e.stderr}")
-    expr_str = expr_cmd.stdout.decode("utf-8")
+    expr_str = run_subprocess_cmd(
+        ["./bin/benchpark", "list", "experiments", "--no-title"], decode=True
+    )
     experiments = expr_str.replace(" ", "").replace("\t", "").split("\n")
     experiments = [item for item in experiments if "+" in item]
 
@@ -64,7 +71,6 @@ def main():
             rocm_expr.append(e)
         elif "openmp" in e:
             openmp_expr.append(e)
-
         elif "strong" in e:
             strong_expr.append(e)
         elif "weak" in e:
@@ -72,66 +78,32 @@ def main():
         elif "throughput" in e:
             throughput_expr.append(e)
 
-    sys_dict = {}
-    try:
-        sys_dict["mpi"] = subprocess.run(
-            [
-                "./bin/benchpark",
-                "list",
-                "systems",
-                "--no-title",
-            ],
-            capture_output=True,
-            check=True,
-        )
-        for pmodel in ["cuda", "rocm", "openmp"]:
-            sys_dict[pmodel] = subprocess.run(
-                [
-                    "./bin/benchpark",
-                    "list",
-                    "systems",
-                    "--no-title",
-                    "-p",
-                    pmodel,
-                ],
-                capture_output=True,
-                check=True,
-            )
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError(f"Output: {e.stdout}\nError: {e.stderr}")
     str_dict = {}
-    for key in sys_dict:
-        temp_str = sys_dict[key].stdout.decode("utf-8")
-        str_dict[key] = [
+    for pmodel in ["mpi", "cuda", "rocm", "openmp"]:
+        cmd = ["./bin/benchpark", "list", "systems", "--no-title"]
+        if pmodel != "mpi":
+            cmd += ["-p", pmodel]
+        output = run_subprocess_cmd(cmd, decode=True)
+        str_dict[pmodel] = [
             i
-            for i in temp_str.replace(" " * 4, "").replace("\t", "").split("\n")
+            for i in output.replace(" " * 4, "").replace("\t", "").split("\n")
             if i != ""
         ]
 
-    try:
-        mods = subprocess.run(
-            [
-                "./bin/benchpark",
-                "list",
-                "modifiers",
-                "--no-title",
-            ],
-            capture_output=True,
-            check=True,
-        )
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError(f"Output: {e.stdout}\nError: {e.stderr}")
-    temp_mods = mods.stdout.decode("utf-8")
+    mods_str = run_subprocess_cmd(
+        ["./bin/benchpark", "list", "modifiers", "--no-title"], decode=True
+    )
     nmods = [
-            i
-            for i in temp_mods.replace(" " * 4, "").replace("\t", "").split("\n")
-            if i != "" and i not in ["allocation", "caliper"]
-        ]
+        i
+        for i in mods_str.replace(" " * 4, "").replace("\t", "").split("\n")
+        if i != "" and i not in ["allocation", "caliper"]
+    ]
 
-    caliper_exp = [e for e in benchpark_experiments(exclude_variants=[]) if "+caliper" in e]
-    modifiers_expr = caliper_exp + [e+"+"+m for e in mpi_only_expr for m in nmods]
+    caliper_exp = [
+        e for e in benchpark_experiments(exclude_variants=[]) if "+caliper" in e
+    ]
+    modifiers_expr = caliper_exp + [e + "+" + m for e in mpi_only_expr for m in nmods]
 
-    # Map test types to (expr_list, sys_list)
     exprs_to_sys = [
         ("mpi", mpi_only_expr, str_dict["mpi"]),
         ("cuda", cuda_expr, str_dict["cuda"]),
@@ -140,14 +112,12 @@ def main():
         ("strong", strong_expr, str_dict["mpi"]),
         ("weak", weak_expr, str_dict["mpi"]),
         ("throughput", throughput_expr, str_dict["mpi"]),
-        ("modifiers", modifiers_expr, [DEFAULT_SYSTEM])
+        ("modifiers", modifiers_expr, [DEFAULT_SYSTEM]),
     ]
 
-    # Filter based on --test argument
     if args.test:
         exprs_to_sys = [tup for tup in exprs_to_sys if tup[0] == args.test]
 
-    # Calculate total number of tests before running
     total_tests = sum(
         len(expr_spec_list) * len(sys_spec_list)
         for _, expr_spec_list, sys_spec_list in exprs_to_sys
@@ -164,31 +134,23 @@ def main():
                 ran_tests += 1
                 print(f"Running '{espec}' '{sspec}'")
                 if args.dryrun:
-                    pass
-                else:
-                    try:
-                        cmd = f'source .github/utils/dryrun.sh "{sspec}" "{espec}"'
-                        subprocess.run(
-                            ["bash", "-c", cmd],
-                            capture_output=True,
-                            check=True,
-                        )
-                    except subprocess.CalledProcessError as e:
-                        errors[f"{espec} {sspec}"] = e.stderr.decode()
-                        fail_tests += 1
+                    continue
+                try:
+                    cmd = f'source .github/utils/dryrun.sh "{sspec}" "{espec}"'
+                    subprocess.run(["bash", "-c", cmd], capture_output=True, check=True)
+                except subprocess.CalledProcessError as e:
+                    errors[f"{espec} {sspec}"] = e.stderr.decode()
+                    fail_tests += 1
     end = time.time()
-    print(f"Elapsed: {(end-start)/60:.2f} minutes")
+    print(f"Elapsed: {(end - start) / 60:.2f} minutes")
 
-    print(f"{ran_tests-fail_tests} Passing. {fail_tests} Failing.")
+    print(f"{ran_tests - fail_tests} Passing. {fail_tests} Failing.")
     for key, value in errors.items():
-        print("="*50)
+        print("=" * 50)
         print(key)
         print(value)
 
-    if fail_tests > 0:
-        sys.exit(1)
-    else:
-        sys.exit(0)
+    sys.exit(1 if fail_tests > 0 else 0)
 
 
 if __name__ == "__main__":
