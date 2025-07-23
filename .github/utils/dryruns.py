@@ -66,7 +66,7 @@ def main():
         if "+strong" in e or "+weak" in e or "+throughput" in e:
             e = e.replace(e, e + "~single_node")
         else:
-            mpi_only_expr.add(e)
+            mpi_only_expr.add(e.split("+")[0] if "+" in e else e)
 
         if "cuda" in e:
             cuda_expr.append(e)
@@ -103,9 +103,9 @@ def main():
     ]
 
     caliper_exp = [
-        e for e in benchpark_experiments(exclude_variants=[]) if "+caliper" in e
+        e.replace("+caliper", " caliper=time") for e in benchpark_experiments(exclude_variants=[]) if "+caliper" in e
     ]
-    modifiers_expr = caliper_exp + [e + "+" + m for e in mpi_only_expr for m in nmods]
+    modifiers_expr = caliper_exp + [e + " " + m + "=on" for e in mpi_only_expr for m in nmods]
 
     exprs_to_sys = [
         ("mpi", mpi_only_expr, str_dict["mpi"]),
@@ -145,13 +145,14 @@ def main():
                     errors[f"{espec} {sspec}"] = e.stderr.decode()
                     fail_tests += 1
     end = time.time()
-    print(f"Elapsed: {(end - start) / 60:.2f} minutes")
 
-    print(f"{ran_tests - fail_tests} Passing. {fail_tests} Failing.")
     for key, value in errors.items():
         print("=" * 100)
         print(key)
         print(value)
+
+    print(f"Elapsed: {(end - start) / 60:.2f} minutes")
+    print(f"{ran_tests - fail_tests} Passing. {fail_tests} Failing.")
 
     sys.exit(1 if fail_tests > 0 else 0)
 
