@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       pull-requests: read
+      pages: write
+      id-token: write
     outputs:
       docs: ${{ steps.filter.outputs.docs }}
       style: ${{ steps.filter.outputs.style }}
