@@ -149,7 +149,7 @@ def main():
 
     print(f"{ran_tests - fail_tests} Passing. {fail_tests} Failing.")
     for key, value in errors.items():
-        print("=" * 50)
+        print("=" * 100)
         print(key)
         print(value)
 
