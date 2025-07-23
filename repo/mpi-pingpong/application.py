@@ -11,7 +11,7 @@ from ramble.appkit import *
 class MpiPingpong(ExecutableApplication):
     name = "mpi-pingpong"
 
-    tags = ['single-node']
+    tags = ['single-node', 'builtin-caliper']
 
 
     executable("pingpong", "pingpong -i {iterations} -m {msg_size} -p 0,{partner_rank} -n {experiment_run_dir}/{experiment_name}_metadata.json", use_mpi=True)
