@@ -65,7 +65,9 @@ def show_build_dump(args):
 
 
 def setup_parser(root_parser):
-    show_build_subparser = root_parser.add_subparsers(dest="show_build_subcommand")
+    show_build_subparser = root_parser.add_subparsers(
+        dest="show_build_subcommand", required=True
+    )
 
     dump_parser = show_build_subparser.add_parser("dump")
     dump_parser.add_argument(
@@ -81,7 +83,3 @@ def command(args):
     }
     if args.show_build_subcommand in actions:
         actions[args.show_build_subcommand](args)
-    else:
-        raise ValueError(
-            f"Unknown subcommand for 'show-build': {args.show_build_subcommand}"
-        )

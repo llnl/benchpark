@@ -16,7 +16,7 @@ __version__ = "0.1.0"
 if "-V" in sys.argv or "--version" in sys.argv:
     print(__version__)
     exit()
-helpstr = """usage: main.py [-h] [-V] {tags,system,experiment,setup,unit-test,audit,info,list} ...
+helpstr = """usage: main.py [-h] [-V] {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze} ...
 
 Benchpark
 
@@ -25,19 +25,28 @@ options:
   -V, --version         show version number and exit
 
 Subcommands:
-  {tags,system,experiment,setup,unit-test,audit,info,list}
+  {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze}
     tags                Tags in Benchpark experiments
     system              Initialize a system config
     experiment          Interact with experiments
     setup               Set up an experiment and prepare it to build/run
     unit-test           Run benchpark unit tests
     audit               Look for problems in System/Experiment repos
+    mirror              Copy a benchpark workspace
     info                Get information about Systems and Experiments
+    show-build          Show how spack built a benchmark
     list                List experiments, systems, benchmarks, and modifiers
-    analyze             Perform canned analysis on the performance data (caliper files) after 'ramble on'"""
-if "-h" == sys.argv[1] or "--help" == sys.argv[1]:
+    bootstrap           Bootstrap benchpark or update an existing bootstrap
+    analyze             Perform pre-defined analysis on the performance data (caliper files) after 'ramble on'"""
+if len(sys.argv) == 1 or "-h" == sys.argv[1] or "--help" == sys.argv[1]:
     print(helpstr)
     exit()
+
+import benchpark.paths  # noqa: E402
+from benchpark.runtime import RuntimeResources  # noqa: E402
+
+bootstrapper = RuntimeResources(benchpark.paths.benchpark_home)  # noqa
+bootstrapper.bootstrap()  # noqa
 
 import benchpark.cmd.audit  # noqa: E402
 import benchpark.cmd.system  # noqa: E402
@@ -48,7 +57,7 @@ import benchpark.cmd.unit_test  # noqa: E402
 import benchpark.cmd.mirror  # noqa: E402
 import benchpark.cmd.info  # noqa: E402
 import benchpark.cmd.list  # noqa: E402
-import benchpark.paths  # noqa: E402
+import benchpark.cmd.bootstrap  # noqa: E402
 from benchpark.accounting import benchpark_benchmarks  # noqa: E402
 
 try:
@@ -205,9 +214,14 @@ def init_commands(subparsers, actions_dict):
     )
     benchpark.cmd.list.setup_parser(list_parser)
 
+    bootstrap_parser = subparsers.add_parser(
+        "bootstrap", help="Bootstrap benchpark or update an existing bootstrap"
+    )
+    benchpark.cmd.bootstrap.setup_parser(bootstrap_parser)
+
     analyze_parser = subparsers.add_parser(
         "analyze",
-        help="Perform canned analysis on the performance data (caliper files) after 'ramble on'",
+        help="Perform pre-defined analysis on the performance data (caliper files) after 'ramble on'",
     )
 
     actions_dict["system"] = benchpark.cmd.system.command
@@ -219,6 +233,7 @@ def init_commands(subparsers, actions_dict):
     actions_dict["info"] = benchpark.cmd.info.command
     actions_dict["show-build"] = benchpark.cmd.show_build.command
     actions_dict["list"] = benchpark.cmd.list.command
+    actions_dict["bootstrap"] = benchpark.cmd.bootstrap.command
     if analyze_installed:
         benchpark.cmd.analyze.setup_parser(analyze_parser)
         actions_dict["analyze"] = benchpark.cmd.analyze.command

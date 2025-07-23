@@ -40,6 +40,7 @@ class Qws(MakefilePackage):
             filter_file("^omp", "#omp", makefile)
         if spec.satisfies("%fj"):
             filter_file(r"^compiler.*=.*", "compiler = fujitsu_native", makefile)
+            filter_file(r"^clang.*=.*", "clang =1", makefile)
         if spec.satisfies("%clang") or spec.satisfies("%gcc"):
             filter_file(r"^compiler.*=.*", f"compiler = {'openmpi-' if '+mpi' in spec else ''}gnu", makefile)
             filter_file(r"\s+CFLAGS\s+=.*", f"CFLAGS = -O3 -ffast-math -Wno-implicit-function-declaration", makefile)

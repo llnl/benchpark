@@ -48,8 +48,8 @@ class LlnlCluster(System):
 
     variant(
         "compiler",
-        default="gcc",
-        values=("gcc", "intel", "oneapi"),
+        default="oneapi",
+        values=("oneapi", "gcc", "intel"),
         description="Which compiler to use",
     )
 
@@ -204,10 +204,10 @@ class LlnlCluster(System):
                         "buildable": False,
                         "externals": [
                             {
-                                "spec": "mvapich2@2.3.7-intel202210",
-                                "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2022.1.0",
+                                "spec": "mvapich2@2.3.7-intel202321",
+                                "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2023.2.1",
                                 "extra_attributes": {
-                                    "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2022.1.0/lib -lmpi"
+                                    "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2023.2.1/lib -lmpi"
                                 },
                             }
                         ],
@@ -220,9 +220,7 @@ class LlnlCluster(System):
         return selections
 
     def compiler_weighting_cfg(self):
-        compiler = self.spec.variants["compiler"][0]
-
-        if compiler == "oneapi":
+        if self.spec.satisfies("compiler=oneapi"):
             return {"packages": {"all": {"require": [{"one_of": ["%oneapi", "%gcc"]}]}}}
         else:
             return {"packages": {}}
@@ -295,12 +293,12 @@ class LlnlCluster(System):
                     },
                     {
                         "compiler": {
-                            "spec": "oneapi@2022.1.0",
+                            "spec": "oneapi@2023.2.1",
                             "paths": {
-                                "cc": "/usr/tce/packages/intel/intel-2022.1.0/compiler/2022.1.0/linux/bin/icx",
-                                "cxx": "/usr/tce/packages/intel/intel-2022.1.0/compiler/2022.1.0/linux/bin/icpx",
-                                "f77": "/usr/tce/packages/intel/intel-2022.1.0/compiler/2022.1.0/linux/bin/ifx",
-                                "fc": "/usr/tce/packages/intel/intel-2022.1.0/compiler/2022.1.0/linux/bin/ifx",
+                                "cc": "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/bin/icx",
+                                "cxx": "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/bin/icpx",
+                                "f77": "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/bin/ifx",
+                                "fc": "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/bin/ifx",
                             },
                             "flags": {},
                             "operating_system": "rhel8",

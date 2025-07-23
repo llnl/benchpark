@@ -37,7 +37,7 @@ COLOR_PALETTE = [
     "#dbdb8d",  # Light Olive
     "#9edae5",  # Light Cyan
 ]
-SCALING_TYPES = ["+strong", "+throughput", "+weak"]
+SCALING_TYPES = ["strong", "throughput", "weak"]
 NAME_REMAP = {
     "total_problem_size": "Total Problem Size",
     "process_problem_size": "Process Problem Size",
@@ -66,10 +66,15 @@ def get_scaling_type(spec):
     Raises:
         ValueError: If no valid scaling type is found in the specification.
     """
-    for keyword in SCALING_TYPES:
-        if keyword in spec:
-            return keyword.lstrip("+")
-    raise ValueError(f"Unknown scaling type. Must be one of {SCALING_TYPES}")
+    scaling_list = spec.unique()
+    if len(scaling_list) != 1:
+        raise ValueError(f"Multiple scaling types found, expected 1. {scaling_list}")
+    scaling = scaling_list[0]
+    if scaling in SCALING_TYPES:
+        return scaling
+    raise ValueError(
+        f"Unknown scaling type '{scaling}'. Must be one of {SCALING_TYPES}"
+    )
 
 
 def validate_single_metadata_value(column, tk):
@@ -153,6 +158,9 @@ def make_stacked_line_chart(**kwargs):
         figsize=kwargs["chart_figsize"] if kwargs["chart_figsize"] else (12, 7),
         ax=ax,
     )
+    y_axis_limits = kwargs.get("chart_yaxis_limits")
+    if y_axis_limits is not None:
+        ax.set_ylim(y_axis_limits[0], y_axis_limits[1])
 
     handles, labels = ax.get_legend_handles_labels()
     handles = list(reversed(handles))
@@ -193,10 +201,19 @@ def prepare_data(**kwargs):
     Processes .cali files from a Ramble workspace to generate performance charts.
     """
     workspace_dir = kwargs["workspace_dir"]
-    files = glob(os.path.join(workspace_dir, "**/*.cali"), recursive=True)
+    files = glob(
+        os.path.join(workspace_dir, f"**/*{kwargs['file_name_match']}.cali"),
+        recursive=True,
+    )
     logger.info(f"Found {len(files)} .cali files for analysis.")
 
-    tk = th.Thicket.from_caliperreader(files, disable_tqdm=True)
+    if kwargs["calltree_unification"] == "intersection":
+        intersection = True
+    else:
+        intersection = False
+    tk = th.Thicket.from_caliperreader(
+        files, intersection=intersection, disable_tqdm=True
+    )
     tk.update_inclusive_columns()
 
     # Save tree before modification
@@ -214,7 +231,14 @@ def prepare_data(**kwargs):
     # Remove MPI regions, if necesasry
     if kwargs.get("no_mpi"):
         query = th.query.Query().match(
-            ".", lambda row: row["name"].apply(lambda n: "MPI_" not in n).all()
+            ".",
+            lambda row: row["name"]
+            .apply(
+                # 'n is None' avoid comparison for MPI in n (will cause error)
+                lambda n: n is None
+                or "MPI_" not in n
+            )
+            .all(),
         )
         tk = tk.query(query)
 
@@ -233,7 +257,22 @@ def prepare_data(**kwargs):
         tk = tk.query(query)
 
     # Spec should not vary across runs
-    spec = tk.metadata["benchpark_spec"].iloc[0][0]
+    # col varies based on new_scaling/old_scaling
+    if "scaling" not in tk.metadata:
+        # This can be deprecated once all benchmarks are transitioned to new_scaling
+        if "benchpark_spec" in tk.metadata:
+            spec_series = tk.metadata["benchpark_spec"]
+            if not spec_series.apply(lambda x: x == spec_series.iloc[0]).all():
+                raise ValueError("Not all lists in the Series are equal.")
+            spec = spec_series.iloc[0][0]
+            for keyword in SCALING_TYPES:
+                if "+" + keyword in spec:
+                    tk.metadata["scaling"] = keyword
+        else:
+            raise ValueError(
+                "Expected either 'scaling' or 'benchpark_spec' in metadata"
+            )
+    spec = tk.metadata["scaling"]
     scaling = get_scaling_type(spec)
 
     # What we are varying for each scaling type
@@ -370,6 +409,13 @@ def setup_parser(root_parser):
         metavar="RAMBLE_WORKSPACE_DIR",
     )
     root_parser.add_argument(
+        "--calltree-unification",
+        default="union",
+        choices=["intersection", "union"],
+        type=str,
+        help="Type of unification operation to perform the Caliper calltrees.",
+    )
+    root_parser.add_argument(
         "--chart-type",
         default="raw",
         choices=["raw", "percentage"],
@@ -428,6 +474,20 @@ def setup_parser(root_parser):
     )
     root_parser.add_argument(
         "--chart-fontsize", type=int, help="Font size of the output chart."
+    )
+    root_parser.add_argument(
+        "--chart-yaxis-limits",
+        type=float,
+        nargs=2,
+        metavar=("YMIN", "YMAX"),
+        default=None,
+        help="Set both y-axis limits: --chart-yaxis-limits YMIN YMAX",
+    )
+    root_parser.add_argument(
+        "--file-name-match",
+        type=str,
+        default="",
+        help="Set optional cali file name to match. Useful if multiple caliper files are generated per experiment (e.g. RAJAPerf)",
     )
 
 
