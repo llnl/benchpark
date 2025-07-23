@@ -113,7 +113,7 @@ jobs:
           pip install -r ./requirements.txt
       - name: Run Dryruns
         run: |
-          benchpark-python .github/utils/dryruns.py --test ${{ matrix.testtype }}
+          ./bin/benchpark-python .github/utils/dryruns.py --test ${{ matrix.testtype }}
   pytest:
     runs-on: ubuntu-24.04
     steps:
