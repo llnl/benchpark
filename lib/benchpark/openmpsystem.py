@@ -9,5 +9,7 @@ from benchpark.directives import provides
 class OpenMPSystem:
     provides("openmp")
 
+    name = "openmp"
+
     def system_specific_variables(self, system):
         return {}

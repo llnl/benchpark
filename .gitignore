@@ -6,3 +6,4 @@ _build
 spack.lock
 .spack-env
 .env
+.DS_Store
