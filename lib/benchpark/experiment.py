@@ -358,6 +358,9 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
             self.env_vars["set"] |= env_vars["set"]
             self.env_vars["append"][0] |= env_vars["append"][0]
 
+        if self.spec.variants["package_manager"][0] == "user-managed":
+            self.add_experiment_variable(self.name+"_path", self.spec.variants["append_path"][0])
+
         self.compute_applications_section()
 
         if "scaling" in self.spec.variants and not self.spec.satisfies("scaling=off"):
@@ -444,7 +447,7 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
                 spack_variants
             ).strip()
 
-        if "append_path" in self.spec.variants:
+        if "append_path" in self.spec.variants and self.spec.variants["append_path"][0] != " ":
             self.append_environment_variable(
                 "PATH", self.spec.variants["append_path"][0]
             )
