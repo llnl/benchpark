@@ -12,31 +12,31 @@ workflow:
 allocate_resources_dane:
   tags: [shell, dane]
   needs: [dane-up-check]
-  variables:
-    GIT_STRATEGY: none
   extends: .on_host_template
   stage: allocate-resources
   script:
     - sbatch ${DANE_SHARED_ALLOC} --wait-all-nodes=1 --job-name=${ALLOC_NAME} --wrap="srun
       -N 1 -n 1 flux start sleep inf"
+  after_script:
+    - |-
+      if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
+        . .gitlab/utils/cancel-slurm.sh
+      fi
 ##########################
 # Resource Release Section
 ##########################
 release_resources_dane:
   tags: [shell, dane]
-  needs: [allocate_resources_dane, run_tests_dane]
-  variables:
-    GIT_STRATEGY: none
+  needs: [allocate_resources_dane, run_tests_slurm_dane]
   extends: .on_host_template
   stage: release-resources
+  # Do not cleanup dir yet
   script:
-    - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
-    - ([[ -n "${JOBID}" ]] && scancel ${JOBID} || exit 0)
+    - . .gitlab/utils/cancel-slurm.sh --no-clean
 ##################
 # Test Run Section
 ##################
-.test_clusters_dane: &test_clusters_dane
-  resource_group: dane
+.run_tests_slurm: &run_tests_slurm
   extends: .on_host_template
   parallel:
     matrix:
@@ -44,36 +44,33 @@ release_resources_dane:
         ARCHCONFIG: llnl-cluster
         BENCHMARK: [hpl, hpcg, amg2023, kripke]
         VARIANT: [+openmp, '']
-        SYSTEM_ARGS: ['']
-        DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
-          llnl-cluster cluster=dane]
       - HOST: dane
         ARCHCONFIG: llnl-cluster
         BENCHMARK: [laghos, raja-perf, phloem]
-        VARIANT: ['']
-        SYSTEM_ARGS: ['']
-        DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
-          llnl-cluster cluster=dane]
       # Strong scaling runs for "benchpark analyze" test
       - HOST: dane
         ARCHCONFIG: llnl-cluster
-        BENCHMARK: [kripke]
+        BENCHMARK: [kripke, amg2023]
+        VARIANT:
+          - scaling=strong caliper=mpi,time
+          - scaling=weak caliper=mpi,time
+        TEST_ANALYZE: ['true']
+      # Test old_scaling
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        BENCHMARK: [hpcg]
         VARIANT: ['+strong~single_node caliper=mpi,time']
-        SYSTEM_ARGS: ['']
-        DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
-          llnl-cluster cluster=dane]
+        TEST_ANALYZE: ['true']
       # Test affinity and hwloc with caliper on
       - HOST: dane
         ARCHCONFIG: llnl-cluster
         BENCHMARK: [kripke]
-        VARIANT: ['+single_node caliper=mpi,time hwloc=on affinity=on']
-        DASHBOARD_NAME: Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system
-          llnl-cluster cluster=dane]
-run_tests_dane:
+        VARIANT: ['caliper=mpi,time hwloc=on affinity=on']
+run_tests_slurm_dane:
   tags: [shell, dane]
   needs: [allocate_resources_dane]
   stage: test
-  <<: *test_clusters_dane
+  <<: *run_tests_slurm
   before_script:
     - !reference [.report_status, before_script]
   script:
@@ -86,3 +83,7 @@ run_tests_dane:
       ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${FLUX_ARGS} .gitlab/utils/run-experiment.sh )
   after_script:
     - !reference [.report_status, after_script]
+    - |-
+      if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
+        . .gitlab/utils/cancel-slurm.sh
+      fi

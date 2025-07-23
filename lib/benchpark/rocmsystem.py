@@ -9,6 +9,8 @@ from benchpark.directives import system_provides
 class ROCmSystem:
     system_provides("rocm")
 
+    name = "rocm"
+
     def verify(self, system):
         assert "rocm" in system.variants
         assert "gtl" in system.variants

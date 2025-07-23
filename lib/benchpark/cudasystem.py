@@ -9,6 +9,8 @@ from benchpark.directives import system_provides
 class CudaSystem:
     system_provides("cuda")
 
+    name = "cuda"
+
     def verify(self, system):
         assert "cuda" in system.variants
         assert "gtl" in system.variants
