@@ -8,13 +8,14 @@ on:
 concurrency:
   group: ci-${{github.ref}}-${{github.event.pull_request.number || github.run_number}}
   cancel-in-progress: true
+permissions:
+  pull-requests: read
+  contents: read
+  pages: write
+  id-token: write
 jobs:
   changes:
     runs-on: ubuntu-24.04
-    permissions:
-      pull-requests: read
-      pages: write
-      id-token: write
     outputs:
       docs: ${{ steps.filter.outputs.docs }}
       style: ${{ steps.filter.outputs.style }}
