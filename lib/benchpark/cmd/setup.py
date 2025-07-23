@@ -15,7 +15,6 @@ import ruamel.yaml as yaml
 import benchpark.paths
 from benchpark.debug import debug_print
 from benchpark.runtime import RuntimeResources
-import benchpark.system
 
 
 # Note: it would be nice to vendor spack.llnl.util.link_tree, but that
@@ -142,7 +141,9 @@ def command(args):
     initializer_script = experiments_root / "setup.sh"
     run_script = experiments_root / ".latest-experiment.sh"
 
-    per_workspace_setup = RuntimeResources(experiments_root)
+    per_workspace_setup = RuntimeResources(
+        experiments_root, upstream=RuntimeResources(benchpark.paths.benchpark_home)
+    )
 
     # Parse experiment YAML for package_manager
     def find(d, tag):
@@ -181,14 +182,8 @@ export SPACK_DISABLE_LOCAL_CONFIG=1
         with open(initializer_script, "w") as f:
             f.write(
                 f"""\
-if [ -n "${{_BENCHPARK_INITIALIZED:-}}" ]; then
-    return 0
-fi
-
 {pkg_str}
 . {per_workspace_setup.ramble_location}/share/ramble/setup-env.sh
-
-export _BENCHPARK_INITIALIZED=true
 """
             )
 
@@ -208,4 +203,4 @@ Further steps are needed to build the experiments ({ramble_setup}) and run them 
 
     # Generate shell script to setup and run latest experiment
     with open(run_script, "w") as f:
-        f.write(f"{ramble_setup}\n{ramble_run}\n")
+        f.write(f"{ramble_setup} && {ramble_run}\n")

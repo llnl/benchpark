@@ -88,7 +88,7 @@ def cuda_for_radiuss_projects(options, spec):
             cmake_cache_string("CMAKE_CUDA_ARCHITECTURES", "{0}".format(cuda_arch[0])))
     if spec_uses_toolchain(spec):
         cuda_flags.append("-Xcompiler {}".format(spec_uses_toolchain(spec)[0]))
-    if (spec.satisfies("%gcc@8.1: target=ppc64le")):
+    if (spec.satisfies("target=ppc64le %gcc@8.1:")):
         cuda_flags.append("-Xcompiler -mno-float128")
     options.append(cmake_cache_string("CMAKE_CUDA_FLAGS", " ".join(cuda_flags)))
 
@@ -128,6 +128,8 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
 
     version("develop", branch="develop", submodules="True")
     version("main",  branch="main",  submodules="True")
+    version("2025.03.0", tag="v2025.03.0", submodules="True")
+    version("2024.07.0", tag="v2024.07.0", submodules="True")
     version("2022.10.0", tag="v2022.10.0", submodules="True")
     version("0.12.0", tag="v0.12.0", submodules="True")
     version("0.11.0", tag="v0.11.0", submodules="True")
@@ -306,6 +308,9 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
         else:
             entries.append(cmake_cache_option("ENABLE_HIP", False))
 
+        if "+cuda" in spec or "+rocm" in spec:
+            entries.append(cmake_cache_string("RAJA_PERFSUITE_GPU_BLOCKSIZES", "25,64,128,256,512,1024"))
+
         entries.append(cmake_cache_option("ENABLE_OPENMP_TARGET", "+openmp_target" in spec))
         if "+openmp_target" in spec:
             if ("%xl" in spec):
@@ -360,3 +365,10 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
     def cmake_args(self):
         options = [f"-DMPI_CXX_LINK_FLAGS='{self.spec['mpi'].libs.ld_flags}'"]
         return options
+
+    def setup_run_environment(self, env):
+        super().setup_run_environment(env)
+
+        if self.compiler.extra_rpaths:
+            for rpath in self.compiler.extra_rpaths:
+                env.prepend_path("LD_LIBRARY_PATH", rpath)

@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.scaling import StrongScaling
 from benchpark.scaling import WeakScaling
@@ -30,6 +30,8 @@ class Hpcg(
         values=("3.1", "develop", "caliper"),
         description="app version",
     )
+
+    maintainers("pearce8")
 
     def compute_applications_section(self):
 
@@ -78,6 +80,12 @@ class Hpcg(
         self.add_experiment_variable("matrix_size", "{mx} {my} {mz}", False)
 
         self.add_experiment_variable("iterations", "60", False)
+
+        self.set_required_variables(
+            n_resources="{n_ranks}",
+            process_problem_size="{mx}*{my}*{mz}/{n_ranks}",
+            total_problem_size="{mx}*{my}*{mz}",
+        )
 
     def compute_package_section(self):
         # get package version

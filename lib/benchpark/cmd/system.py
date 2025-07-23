@@ -34,7 +34,7 @@ def system_init(args):
         raise ValueError("Must specify one of: --dest, --basedir")
 
     try:
-        os.mkdir(destdir)
+        os.makedirs(destdir)
         system.write_system_dict(destdir)
     except FileExistsError:
         print(f"Abort: system description dir already exists ({destdir})")
@@ -110,7 +110,9 @@ def system_external(args):
 
 
 def setup_parser(root_parser):
-    system_subparser = root_parser.add_subparsers(dest="system_subcommand")
+    system_subparser = root_parser.add_subparsers(
+        dest="system_subcommand", required=True
+    )
 
     init_parser = system_subparser.add_parser("init")
     init_parser.add_argument("--dest", help="Place all system files here directly")
@@ -143,5 +145,3 @@ def command(args):
     }
     if args.system_subcommand in actions:
         actions[args.system_subcommand](args)
-    else:
-        raise ValueError(f"Unknown subcommand for 'system': {args.system_subcommand}")

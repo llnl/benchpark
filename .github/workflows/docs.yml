@@ -31,7 +31,7 @@ jobs:
           make html WORKSPACE_PATH=/tmp/workspace
       - name: Check for Typos using Codespell
         run: |
-          codespell
+          codespell --ignore-words=.codespellignore
       - name: Upload artifact
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa
         if: github.ref == 'refs/heads/develop'

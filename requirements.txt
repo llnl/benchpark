@@ -16,3 +16,4 @@ google-cloud-bigquery
 tqdm
 deprecation
 deepdiff
+xmltodict

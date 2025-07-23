@@ -6,6 +6,7 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.system import System
+from benchpark.openmpsystem import OpenMPSystem
 from benchpark.paths import hardware_descriptions
 
 
@@ -32,6 +33,7 @@ class RikenFugaku(System):
 
     def __init__(self, spec):
         super().__init__(spec)
+        self.programming_models = [OpenMPSystem()]
 
         self.scheduler = "pjm"
         attrs = self.id_to_resources.get("fugaku")
@@ -57,7 +59,7 @@ class RikenFugaku(System):
                 "python": {
                     "externals": [
                         {
-                            "spec": "python@3.11.6%fj@4.10.0 arch=linux-rhel8-a64fx",
+                            "spec": "python@3.11.6 arch=linux-rhel8-a64fx %fj@4.10.0",
                             "prefix": "/vol0004/apps/oss/spack-v0.21/opt/spack/linux-rhel8-a64fx/fj-4.10.0/python-3.11.6-qbmpmn2uxu4oe3qoawxbizp7awqlgkcq",
                         }
                     ]
@@ -67,15 +69,15 @@ class RikenFugaku(System):
                     "buildable": False,
                     "externals": [
                         {
-                            "spec": "fujitsu-mpi@4.10.0%clang@17.0.2 arch=linux-rhel8-a64fx",
+                            "spec": "fujitsu-mpi@4.10.0 arch=linux-rhel8-a64fx %clang@17.0.2",
                             "prefix": "/opt/FJSVxtclanga/tcsds-mpi-1.2.38",
                         },
                         {
-                            "spec": "fujitsu-mpi@4.10.0%fj@4.10.0 arch=linux-rhel8-a64fx",
+                            "spec": "fujitsu-mpi@4.10.0 arch=linux-rhel8-a64fx %fj@4.10.0",
                             "prefix": "/opt/FJSVxtclanga/tcsds-mpi-1.2.38",
                         },
                         {
-                            "spec": "fujitsu-mpi@4.10.0%gcc@13.2.0 arch=linux-rhel8-a64fx",
+                            "spec": "fujitsu-mpi@4.10.0 arch=linux-rhel8-a64fx %gcc@13.2.0",
                             "prefix": "/vol0004/apps/oss/mpigcc/fjmpi-gcc12",
                         },
                     ],
@@ -84,15 +86,15 @@ class RikenFugaku(System):
                     "buildable": False,
                     "externals": [
                         {
-                            "spec": "fujitsu-ssl2@4.10.0%clang@17.0.2 arch=linux-rhel8-a64fx",
+                            "spec": "fujitsu-ssl2@4.10.0 arch=linux-rhel8-a64fx %clang@17.0.2",
                             "prefix": "/vol0004/apps/oss/llvm-v17.0.2/compute_node",
                         },
                         {
-                            "spec": "fujitsu-ssl2@4.10.0%fj@4.10.0 arch=linux-rhel8-a64fx",
+                            "spec": "fujitsu-ssl2@4.10.0 arch=linux-rhel8-a64fx %fj@4.10.0",
                             "prefix": "/opt/FJSVxtclanga/tcsds-ssl2-1.2.38",
                         },
                         {
-                            "spec": "fujitsu-ssl2@4.10.0%gcc@13.2.0 arch=linux-rhel8-a64fx",
+                            "spec": "fujitsu-ssl2@4.10.0 arch=linux-rhel8-a64fx %gcc@13.2.0",
                             "prefix": "/opt/FJSVxtclanga/tcsds-ssl2-1.2.38",
                         },
                     ],

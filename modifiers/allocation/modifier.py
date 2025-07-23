@@ -36,6 +36,7 @@ class AllocOpt(Enum):
     EXTRA_CMD_OPTS = 301
     POST_EXEC_CMDS = 302
     PRE_EXEC_CMDS = 303
+    GPU_FACTOR = 304
 
     @staticmethod
     def as_type(enumval, input):
@@ -371,11 +372,14 @@ class Allocation(BasicModifier):
     def flux_instructions(self, v):
         batch_opts, cmd_opts = Allocation._init_batch_and_cmd_opts(v)
 
+        # Always run exclusive for mpibind + flux.
+        # Otherwise, binding may oversubscribe cores before all cores are allocated.
+        cmd_opts.append("--exclusive")
+        # Required for '--exclusive'. Will be computed, if not defined, from initialization
+        cmd_opts.append(f"-N {v.n_nodes}")
+
         if v.n_ranks:
-            cmd_opts.append(f"-n {v.n_ranks}")
-        if v.n_nodes:
-            cmd_opts.append(f"-N {v.n_nodes}")
-            cmd_opts.append("--exclusive")
+            cmd_ranks = f"-n {v.n_ranks}"
         if v.n_gpus:
             gpus_per_rank = 1  # self.gpus_as_gpus_per_rank(v)
             cmd_opts.append(f"-g={gpus_per_rank}")
@@ -385,7 +389,7 @@ class Allocation(BasicModifier):
 
         batch_directives = list(f"# flux: {x}" for x in (cmd_opts + batch_opts))
 
-        v.mpi_command = f"flux run {' '.join(cmd_opts)}"
+        v.mpi_command = f"flux run {' '.join([cmd_ranks] + cmd_opts)}"
         v.batch_submit = "flux batch {execute_experiment}"
         v.allocation_directives = "\n".join(batch_directives)
 

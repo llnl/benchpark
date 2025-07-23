@@ -6,6 +6,7 @@
 import os
 
 import benchpark.paths
+import benchpark.spec
 
 exclude_exper = ["repo.yaml"]
 exp_dict = {
@@ -17,26 +18,37 @@ exp_dict = {
     "ThroughputScaling": "throughput",
     "WeakScaling": "weak",
     "Caliper": "caliper",
+    "ScalingMode.Strong": "scaling=strong",
+    "ScalingMode.Weak": "scaling=weak",
+    "ScalingMode.Throughput": "scaling=throughput",
 }
-non_experiments = ["Caliper"]
+sys_dict = {
+    "OpenMPSystem": "openmp",
+    "CudaSystem": "cuda",
+    "ROCmSystem": "rocm",
+}
+non_experiments = ["Caliper", "Affinity"]
 
 
 def benchpark_experiments(exclude_variants=non_experiments):
     source_dir = benchpark.paths.benchpark_root
     experiments = []
     experiments_dir = source_dir / "experiments"
-    exclude_variants = ["Caliper", "Affinity"]
 
     for x in sorted(os.listdir(experiments_dir)):
         if x not in exclude_exper:
-            experiment_spec = benchpark.spec.ExperimentSpec(x)
-            conc = experiment_spec.concretize()
-            experiment_class = conc.experiment
-            for h in experiment_class.__dict__["helpers"]:
-                variant = str(h).split(".")[2]
-                if variant not in exclude_variants:
-                    variant = variant.replace(variant, exp_dict[variant])
-                    experiments.append(f"{x}+{variant}")
+            expr_file = str(experiments_dir) + "/" + x + "/experiment.py"
+            if os.path.isfile(expr_file):
+                with open(expr_file, "r") as file:
+                    file_text = file.read()
+                    experiments.append(x)  # default expr
+                    for var in exp_dict.keys():
+                        if var in file_text and var not in exclude_variants:
+                            if "=" in exp_dict[var]:
+                                joiner = " "
+                            else:
+                                joiner = "+"
+                            experiments.append(f"{x}{joiner}{exp_dict[var]}")
     return experiments
 
 
@@ -59,8 +71,16 @@ def benchpark_systems():
         if x not in exclude and "system.py" in os.listdir(source_dir / "systems" / x):
             system_spec = benchpark.spec.SystemSpec(x)
             system_class = system_spec.system_class
-            if hasattr(system_class, "id_to_resources"):
-                for c in system_class.id_to_resources.keys():
+            # aws uses 'instance_type' not 'cluster'
+            cluster_variant = "instance_type" if "aws" in x else "cluster"
+            variants = list(system_class.variants.values())
+            if len(variants) > 0:
+                variants = variants[0]
+            clusters = None
+            if cluster_variant in variants:
+                clusters = list(variants[cluster_variant].values)
+            if clusters:
+                for c in clusters:
                     systems.append(x + "/" + c)
             else:
                 systems.append(x)
