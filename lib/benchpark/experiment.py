@@ -200,7 +200,7 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
     variant(
         "package_manager",
         default="spack",
-        values=("spack", "environment-modules", "user-managed", "None"),
+        values=("spack", "environment-modules", "user-managed"),
         description="package manager to use",
     )
 
