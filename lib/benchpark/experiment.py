@@ -358,10 +358,9 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
             self.env_vars["set"] |= env_vars["set"]
             self.env_vars["append"][0] |= env_vars["append"][0]
 
+        # Set required variable for package manager (we are not using this variable)
         if self.spec.variants["package_manager"][0] == "user-managed":
-            self.add_experiment_variable(
-                self.name + "_path", self.spec.variants["append_path"][0]
-            )
+            self.add_experiment_variable(self.name + "_path", "None")
 
         self.compute_applications_section()
 
