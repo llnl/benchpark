@@ -51,7 +51,6 @@ def main():
         ["./bin/benchpark", "list", "experiments", "--no-title"], decode=True
     )
     experiments = expr_str.replace(" ", "").replace("\t", "").split("\n")
-    experiments = [item for item in experiments if "+" in item]
 
     mpi_only_expr = set()
     cuda_expr = []
@@ -62,8 +61,12 @@ def main():
     throughput_expr = []
 
     for e in experiments:
-        name = e.split("+")[0]
-        mpi_only_expr.add(name)
+        if "scaling" in e:
+            e = e.replace("scaling=", " scaling=")
+        if "+strong" in e or "+weak" in e or "+throughput" in e:
+            e = e.replace(e, e+"~single_node")
+        else:
+            mpi_only_expr.add(e)
 
         if "cuda" in e:
             cuda_expr.append(e)
