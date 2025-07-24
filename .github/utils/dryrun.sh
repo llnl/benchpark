@@ -5,8 +5,8 @@
 
 #!/bin/bash
 
-system_spec="$1"
-benchmark_spec="$2"
+benchmark_spec="$1"
+system_spec="$2"
 
 timestamp=$(date +%s)
 benchmark="b-$timestamp"

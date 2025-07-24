@@ -14,6 +14,15 @@ sys.path.append(str(benchpark.paths.benchpark_home) + "/spack/lib/spack")
 from lib.benchpark.accounting import benchpark_experiments  # noqa: E402
 
 DEFAULT_SYSTEM = "llnl-cluster cluster=dane"
+# Skip experiments
+SKIP_EXPR=[
+    # System not enough cores/node
+    "gromacs+openmp aws-pcluster instance_type=c6g.xlarge",
+    # System not enough cores/node
+    "gromacs+openmp aws-pcluster instance_type=c4.xlarge",
+    # System not enough cores/node
+    "gromacs+openmp generic-x86",
+]
 
 
 def run_subprocess_cmd(cmd_list, decode=False):
@@ -103,7 +112,7 @@ def main():
     ]
 
     caliper_exp = [
-        e.replace("+caliper", " caliper=time") for e in benchpark_experiments(exclude_variants=[]) if "+caliper" in e
+        e.replace("+caliper", " caliper=time") for e in benchpark_experiments(exclude_variants=[]) if "+caliper" in e and e.split("+")[0] in mpi_only_expr
     ]
     modifiers_expr = caliper_exp + [e + " " + m + "=on" for e in mpi_only_expr for m in nmods]
 
@@ -131,6 +140,7 @@ def main():
     errors = {}
     fail_tests = 0
     ran_tests = 0
+    skip_tests = 0
     for _, expr_spec_list, sys_spec_list in exprs_to_sys:
         for espec in expr_spec_list:
             for sspec in sys_spec_list:
@@ -139,7 +149,12 @@ def main():
                 if args.dryrun:
                     continue
                 try:
-                    cmd = f'source .github/utils/dryrun.sh "{sspec}" "{espec}"'
+                    expr = f"{espec} {sspec}"
+                    if expr in SKIP_EXPR:
+                        skip_tests += 1
+                        print(f'Skipping "{expr}"')
+                        continue
+                    cmd = f'source .github/utils/dryrun.sh "{espec}" "{sspec}"'
                     subprocess.run(["bash", "-c", cmd], capture_output=True, check=True)
                 except subprocess.CalledProcessError as e:
                     errors[f"{espec} {sspec}"] = e.stderr.decode()
@@ -152,7 +167,7 @@ def main():
         print(value)
 
     print(f"Elapsed: {(end - start) / 60:.2f} minutes")
-    print(f"{ran_tests - fail_tests} Passing. {fail_tests} Failing.")
+    print(f"{ran_tests - fail_tests} Passing. {fail_tests} Failing. {skip_tests} Skipped.")
 
     sys.exit(1 if fail_tests > 0 else 0)
 
