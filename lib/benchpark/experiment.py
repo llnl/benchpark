@@ -85,6 +85,16 @@ class SingleNode:
             return "single_node" if self.spec.satisfies("+single_node") else ""
 
 
+class NonMpiOnlyExperiment:
+    def __init__(self):
+        super().__init__()
+        models = ["+openmp", "+cuda", "+rocm"]
+        if not any(self.spec.satisfies(model) for model in models):
+            raise NotImplementedError(
+                f"Running with MPI only is not a valid choice for this experiment. Choose from {models}"
+            )
+
+
 class Affinity:
     variant(
         "affinity",

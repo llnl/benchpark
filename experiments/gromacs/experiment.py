@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from benchpark.directives import variant, maintainers
-from benchpark.experiment import Experiment
+from benchpark.experiment import Experiment, NonMpiOnlyExperiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
@@ -15,6 +15,7 @@ class Gromacs(
     OpenMPExperiment,
     CudaExperiment,
     ROCmExperiment,
+    NonMpiOnlyExperiment,
 ):
     variant(
         "workload",

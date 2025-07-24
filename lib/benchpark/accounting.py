@@ -40,7 +40,8 @@ def benchpark_experiments(exclude_variants=non_experiments):
             if os.path.isfile(expr_file):
                 with open(expr_file, "r") as file:
                     file_text = file.read()
-                    experiments.append(x)  # default expr
+                    if "NonMpiOnlyExperiment" not in file_text:
+                        experiments.append(x)  # default expr
                     for var in exp_dict.keys():
                         if var in file_text and var not in exclude_variants:
                             if "=" in exp_dict[var]:

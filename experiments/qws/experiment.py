@@ -4,12 +4,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from benchpark.directives import variant, maintainers
-from benchpark.experiment import Experiment
+from benchpark.experiment import Experiment, NonMpiOnlyExperiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.caliper import Caliper
 
 
-class Qws(Experiment, OpenMPExperiment, Caliper):
+class Qws(Experiment, OpenMPExperiment, Caliper, NonMpiOnlyExperiment):
 
     variant(
         "workload",
