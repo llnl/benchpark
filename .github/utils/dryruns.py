@@ -144,16 +144,16 @@ def main():
     for _, expr_spec_list, sys_spec_list in exprs_to_sys:
         for espec in expr_spec_list:
             for sspec in sys_spec_list:
+                expr = f"{espec} {sspec}"
+                if expr in SKIP_EXPR:
+                    skip_tests += 1
+                    print(f'Skipping "{expr}"')
+                    continue
                 ran_tests += 1
-                print(f"Running '{espec}' '{sspec}'")
+                print(f'Running "{expr}"')
                 if args.dryrun:
                     continue
                 try:
-                    expr = f"{espec} {sspec}"
-                    if expr in SKIP_EXPR:
-                        skip_tests += 1
-                        print(f'Skipping "{expr}"')
-                        continue
                     cmd = f'source .github/utils/dryrun.sh "{espec}" "{sspec}"'
                     subprocess.run(["bash", "-c", cmd], capture_output=True, check=True)
                 except subprocess.CalledProcessError as e:
