@@ -15,7 +15,7 @@ from lib.benchpark.accounting import benchpark_experiments  # noqa: E402
 
 DEFAULT_SYSTEM = "llnl-cluster cluster=dane"
 # Skip experiments
-SKIP_EXPR=[
+SKIP_EXPR = [
     # System not enough cores/node
     "gromacs+openmp aws-pcluster instance_type=c6g.xlarge",
     # System not enough cores/node
