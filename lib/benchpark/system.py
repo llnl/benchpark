@@ -80,7 +80,7 @@ class System(ExperimentSystemBase):
 
     def enforce(self, attr):
         if attr not in self.provides:
-            raise AttributeError(f'"{attr}" not valid for this system. Choose from {self.system_provides}')
+            raise AttributeError(f'{self.spec.name} does not provide "{attr}"')
 
     def system_specific_variables(self):
         vars = {}
