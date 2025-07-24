@@ -148,7 +148,7 @@ def main():
 
     for i, (key, value) in enumerate(errors.items()):
         print("=" * 100)
-        print((i + 1) + ". " + key)
+        print(str(i + 1) + ". " + key)
         print(value)
 
     print(f"Elapsed: {(end - start) / 60:.2f} minutes")
