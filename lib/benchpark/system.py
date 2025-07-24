@@ -79,7 +79,7 @@ class System(ExperimentSystemBase):
             pm.verify(self)
 
     def enforce(self, attr):
-        if attr not in self.system_provides:
+        if attr not in self.provides:
             raise AttributeError(f'"{attr}" not valid for this system. Choose from {self.system_provides}')
 
     def system_specific_variables(self):

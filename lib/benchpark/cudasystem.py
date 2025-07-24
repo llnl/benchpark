@@ -3,11 +3,11 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import system_provides
+from benchpark.directives import provides
 
 
 class CudaSystem:
-    system_provides("cuda")
+    provides("cuda")
 
     name = "cuda"
 

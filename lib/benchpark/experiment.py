@@ -486,7 +486,7 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
         # Here you can do self.system_spec.system.sys_gpus_per_node
         if hasattr(self, "system_spec"):
             # i.e. the user ran `experiment init` with `--system`
-            for when, needs in self.system_depends.items():
+            for when, needs in self.requires.items():
                 if self.spec.satisfies(when):
                     for need in needs:
                         self.system_spec.system.enforce(need)

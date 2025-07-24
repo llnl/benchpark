@@ -118,26 +118,26 @@ def maintainers(*names: str):
     return _execute_maintainers
 
 
-@benchpark_directive("system_depends")
-def system_depends(
+@benchpark_directive("requires")
+def requires(
     need: str,
     when: Optional[Union[str, bool]] = None,
 ):
-    def _execute_system_depends(cls):
+    def _execute_requires(cls):
         when_spec = _make_when_spec(when)
 
-        system_depends_when = cls.system_depends.setdefault(when_spec, [])
-        system_depends_when.append(need)
+        requires_when = cls.requires.setdefault(when_spec, [])
+        requires_when.append(need)
 
-    return _execute_system_depends
+    return _execute_requires
 
 
-@benchpark_directive("system_provides")
-def system_provides(*attrs: str):
-    def _execute_system_provides(cls):
-        cls.system_provides = attrs
+@benchpark_directive("provides")
+def provides(*attrs: str):
+    def _execute_provides(cls):
+        cls.provides = attrs
 
-    return _execute_system_provides
+    return _execute_provides
 
 
 @benchpark_directive("variants")

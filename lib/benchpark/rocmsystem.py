@@ -3,11 +3,11 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import system_provides
+from benchpark.directives import provides
 
 
 class ROCmSystem:
-    system_provides("rocm")
+    provides("rocm")
 
     name = "rocm"
 

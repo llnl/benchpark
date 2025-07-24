@@ -4,12 +4,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.directives import system_depends, variant
+from benchpark.directives import requires, variant
 from benchpark.experiment import ExperimentHelper
 
 
 class ROCmExperiment:
-    system_depends("rocm", when="+rocm")
+    requires("rocm", when="+rocm")
     variant("rocm", default=False, description="Build and run with ROCm")
 
     def __init__(self):
