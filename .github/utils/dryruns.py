@@ -50,7 +50,7 @@ def main():
     expr_str = run_subprocess_cmd(
         ["./bin/benchpark", "list", "experiments", "--no-title"], decode=True
     )
-    experiments = expr_str.replace(" ", "").replace("\t", "").split("\n")
+    experiments = [e for e in expr_str.replace(" ", "").replace("\t", "").split("\n") if e != ""]
 
     mpi_only_expr = set()
     cuda_expr = []
