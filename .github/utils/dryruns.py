@@ -65,8 +65,8 @@ def main():
             e = e.replace("scaling=", " scaling=")
         if "+strong" in e or "+weak" in e or "+throughput" in e:
             e = e.replace(e, e + "~single_node")
-        else:
-            mpi_only_expr.add(e.split("+")[0] if "+" in e else e)
+        elif "+" not in e and "=" not in e:
+            mpi_only_expr.add(e)
 
         if "cuda" in e:
             cuda_expr.append(e)
