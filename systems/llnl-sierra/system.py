@@ -25,6 +25,7 @@ class LlnlSierra(System):
                 22,
                 23,
             ],  # First two cores on each socket reserved.
+            "sys_sockets_per_node": 2,
             "sys_gpus_per_node": 4,
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)

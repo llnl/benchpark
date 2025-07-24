@@ -19,6 +19,7 @@ class LlnlCluster(System):
             "sys_cores_per_node": 56,
             "sys_cores_os_reserved_per_node": 0,  # No core or thread reservation
             "sys_cores_os_reserved_per_node_list": None,
+            "sys_sockets_per_node": 2,
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/Supermicro-icelake-OmniPath/hardware_description.yaml",
@@ -32,6 +33,7 @@ class LlnlCluster(System):
         "dane": {
             "sys_cores_per_node": 112,
             "sys_cores_os_reserved_per_node": 0,  # No explicit core reservation, first thread on each core reserved (2 threads per core)
+            "sys_sockets_per_node": 2,
             "sys_cores_os_reserved_per_node_list": None,
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)

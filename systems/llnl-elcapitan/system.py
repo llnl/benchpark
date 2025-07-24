@@ -21,6 +21,7 @@ class LlnlElcapitan(System):
             "sys_cores_per_node": 56,
             "sys_cores_os_reserved_per_node": 8,
             "sys_cores_os_reserved_per_node_list": [0, 8, 16, 24, 32, 40, 48, 56],
+            "sys_sockets_per_node": 2,
             "sys_gpus_per_node": 8,
             "system_site": "llnl",
             "scheduler": "flux",
@@ -46,6 +47,7 @@ class LlnlElcapitan(System):
                 88,
             ],  # 3 cores reserved per socket
             "sys_gpus_per_node": None,  # Determined by "gpumode" variant
+            "sys_sockets_per_node": 4,
             "system_site": "llnl",
             "scheduler": "flux",
             "hardware_key": str(hardware_descriptions)
