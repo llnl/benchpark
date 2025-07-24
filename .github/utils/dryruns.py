@@ -18,10 +18,12 @@ DEFAULT_SYSTEM = "llnl-cluster cluster=dane"
 SKIP_EXPR = [
     # System not enough cores/node
     "gromacs+openmp aws-pcluster instance_type=c6g.xlarge",
-    # System not enough cores/node
     "gromacs+openmp aws-pcluster instance_type=c4.xlarge",
-    # System not enough cores/node
     "gromacs+openmp generic-x86",
+    "stream aws-pcluster instance_type=c6g.xlarge",
+    "stream aws-pcluster instance_type=c4.xlarge",
+    "stream cscs-daint",
+    "stream generic-x86",
 ]
 
 
