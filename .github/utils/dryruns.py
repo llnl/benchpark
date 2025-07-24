@@ -146,9 +146,9 @@ def main():
                     fail_tests += 1
     end = time.time()
 
-    for key, value in errors.items():
+    for i, (key, value) in enumerate(errors.items()):
         print("=" * 100)
-        print(key)
+        print((i + 1) + ". " + key)
         print(value)
 
     print(f"Elapsed: {(end - start) / 60:.2f} minutes")
