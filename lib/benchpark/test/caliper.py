@@ -40,6 +40,7 @@ def test_experiment_compute_variables_section_caliper(monkeypatch):
             "append_path": "'",
             "caliper": "time",
             "package_manager": "spack",
+            'prepend_path': "'",
             "version": "1.0.0",
             "workload": "problem",
             "n_resources": "{n_resources}",
@@ -117,6 +118,7 @@ def test_caliper_modifier(monkeypatch):
         "caliper": "time",
         "hwloc": "none",
         "package_manager": "spack",
+        'prepend_path': "'",
         "version": "1.0.0",
         "workload": "problem",
     }
