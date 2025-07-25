@@ -52,9 +52,16 @@ GitLab configuration files are located under the ``.gitlab`` folder and specifie
 --------
 GitHub
 --------
-?
+TBD
 
 -------
 CDash
 -------
-?
+The successes/failures of our GitLab tests are posted to our CDash dashboard `CDash dashboard <https://my.cdash.org/index.php?project=Benchpark>`_. There is a dashboard for the nightly tests on the develop branch, and several dashboards for each system for daily PRs.
+
+The following files are related to CDash:
+
+1. ``CTestGitlab.cmake`` configures CTest variables, the dashboard names and runs the tests and submits the results.
+2. ``CTestConfig.cmake`` sets the cdash token and configuration variables.
+3. ``CMakeLists.txt`` enables CTest and adds the gitlab test.
+4. ``.gitlab/utils/status.yml`` Contains the logic to run CTest after a test completes and upload the status to the Benchpark CDash dashboard.
