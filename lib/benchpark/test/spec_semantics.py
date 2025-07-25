@@ -3,15 +3,7 @@
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
-import pytest
-
-from benchpark.spec import (
-    Spec,
-    SpecParser,
-    SpecTokenizationError,
-    Token,
-    TokenType,
-)
+from benchpark.spec import Spec
 
 
 def test_spec_hashing_and_eq():
