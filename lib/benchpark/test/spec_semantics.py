@@ -13,10 +13,10 @@ from benchpark.spec import (
     TokenType,
 )
 
+
 def test_spec_hashing_and_eq():
     x = Spec("+x")
     y = Spec("+y")
 
     items = set([x])
     assert y not in items
-
