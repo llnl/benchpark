@@ -118,6 +118,14 @@ def maintainers(*names: str):
     return _execute_maintainers
 
 
+@benchpark_directive("provides")
+def provides(*attrs: str):
+    def _execute_provides(cls):
+        cls.provides = attrs
+
+    return _execute_provides
+
+
 @benchpark_directive("requires")
 def requires(
     need: str,
@@ -130,14 +138,6 @@ def requires(
         requires_when.append(need)
 
     return _execute_requires
-
-
-@benchpark_directive("provides")
-def provides(*attrs: str):
-    def _execute_provides(cls):
-        cls.provides = attrs
-
-    return _execute_provides
 
 
 @benchpark_directive("variants")
