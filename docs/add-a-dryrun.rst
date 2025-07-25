@@ -4,51 +4,27 @@
 
    SPDX-License-Identifier: Apache-2.0
 
-====================
-Adding a Dryrun
-====================
+=========================
+Testing Your Contribution
+=========================
 
-If you are contributing a system or experiment to our code repository you must add a passing dryrun test to the ``.github/workflows/run.yml`` file before
-your pull request will be merged. 
+.. figure:: _static/images/dryruns.png
+   :align: left
+   :alt: Slide Preview
 
-Recommended systems/experiments to use as tests:
+   Fig. 1: Example Dryruns
 
-* genericx86
-* tioga
-* saxpy
-* amg2023
+If you are contributing a system or experiment to benchpark you must check that it is passing the dryrun tests before your pull request will be merged. 
+These tests are indicated by the GitHub ``ci/run/dryrunexperiments`` (Figure 1) tests in the pull request.
+Dry run tests **do not** build your benchmark or run your experiments, they do:
+1. Verify that your experiment/system is able to be initialized based on the programming models and scaling types you have included in your experiment class.
+2. Verify that you have defined the necessary experiment variables for benchpark and ramble to generate your experiment.
 
-For example, if you are contributing a system called foo you would test it with existing Saxpy experiment, the hash ID will be generated for you during setup and output by benchpark:
+1. If adding an experiment:
+  
+  a. Your experiment will be tested for each system that supports those programming models and for each scaling type that your experiment inherits.
+2. If adding a system:
 
-.. code-block:: yaml
+  a. Your system will be tested for each experiment in benchpark that is able to run for the programming models in ``self.programming_models``.
 
-  - name: Dry run dynamic saxpy on dynamic foo
-    run: |
-      benchpark system init --dest=foo-system foo
-      benchpark experiment init --dest=saxpy-openmp saxpy +openmp
-      benchpark setup ./saxpy ./foo-system workspace/
-      . workspace/setup.sh
-      ramble \
-        --workspace-dir workspace/saxpy/foo-{hashID}/workspace \
-        --disable-progress-bar \
-        --disable-logger \
-        workspace setup --dry-run
-
-
-If you are contributing a benchmark and/or experiments to our code repository you can use an existing system to test your benchmark and experiments. 
-
-For example, if you are contributing a new benchmark called bar:
-
-.. code-block:: yaml
-
-  - name: Dry run dynamic bar on dynamic genericx86
-    run: |
-      benchpark system init --dest=x86-system genericx86 
-      benchpark experiment init --dest=bar-benchmark bar
-      benchpark setup ./bar-benchmark ./x86-system workspace/
-      . workspace/setup.sh
-      ramble \
-        --workspace-dir workspace/new-benchmark/genericx86-{hashID}/workspace \
-        --disable-progress-bar \
-        --disable-logger \
-        workspace setup --dry-run
+If all of the ``dryrunexperiments`` tests pass, your experiment/system has been successfully tested.
