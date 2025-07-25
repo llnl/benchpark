@@ -15,8 +15,6 @@ include:
         BENCHMARK:
           - ad
           - amg2023
-          - babelstream
-          - genesis
           - gpcnet
           - hpcg
           - hpl
@@ -27,7 +25,6 @@ include:
           - md-test
           - osu-micro-benchmarks
           - phloem
-          - qws
           - raja-perf
           - remhos
           - salmon-tddft
