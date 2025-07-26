@@ -7,7 +7,7 @@
 from benchpark.directives import variant, maintainers
 from benchpark.paths import hardware_descriptions
 from benchpark.rocmsystem import ROCmSystem
-from benchpark.system import System
+from benchpark.system import System, compiler_def, compiler_section_for
 from packaging.version import Version
 
 
@@ -312,49 +312,21 @@ class LlnlElcapitan(System):
             raise ValueError(f"Unexpected value for compiler: {compiler}")
 
     def compute_compilers_section(self):
-        selections = compiler_section_for(
+        cfg = compiler_section_for(
             "gcc",
-            [compiler_def("gcc@12.2.0", "/opt/cray/pe/gcc/12.2.0/", {"c": "gcc", "cxx": "g++", "fortran": "gfortran"})]
+            [compiler_def(
+                "gcc@12.2.0",
+                "/opt/cray/pe/gcc/12.2.0/",
+                {"c": "gcc", "cxx": "g++", "fortran": "gfortran"}
+            )]
         )
 
         if self.spec.satisfies("compiler=cce") or self.spec.satisfies(
             "compiler=rocmcc"
         ):
-            selections["compilers"] += self.rocm_cce_compiler_cfg()["compilers"]
+            cfg["packages"].update(self.rocm_cce_compiler_cfg()["packages"])
 
-
-        return selections
-
-    def compiler_section_for(name, entries):
-        return {
-            "packages": {
-                name: {
-                    "externals": entries
-                }
-            }
-        }
-
-    def compiler_def(spec, prefix, exes, env=None, extra_rpaths=None, modules=None):
-        lang_map = {}
-        for lang, exe in exes.items():
-            if os.path.isabs(exe):
-                lang_map[lang] = exe
-            else:
-                lang_map[lang] = os.path.join(prefix, "bin", exe)
-        entry = {
-            "spec": spec,
-            "prefix": prefix,
-            "extra_attributes": {
-                "compilers" lang_map
-            }
-        }
-        if env:
-            entry["environment"] = env
-        if extra_rpaths:
-            entry["extra_rpaths"] = extra_rpaths
-        if modules:
-            entry["modules"] = modules
-        return entry
+        return cfg
 
     def mpi_config(self):
         gtl = self.spec.variants["gtl"][0]
@@ -651,49 +623,46 @@ class LlnlElcapitan(System):
 
         compilers = list()
         if self.spec.satisfies("compiler=rocmcc"):
-            compilers.sppend((
-                "llvm-amdgpu",
-                compiler_def(
-                    f"rocmcc@{self.rocm_version}",
-                    f"/opt/rocm-{self.rocm_version}/",
-                    {"c": "gcc", "cxx": "g++", "fortran": "gfortran"}
-                    modules=[f"cce/{self.cce_version}"],
-                    flags={"cflags": "-g -O2", "cxxflags": "-g -O2"},
-                    extra_rpaths=rpaths,
-                    env={
-                        "set": {"RFE_811452_DISABLE": "1"},
-                        "append_path": {
-                            "LD_LIBRARY_PATH": "/opt/cray/pe/gcc-libs"
-                        },
-                        "prepend_path": {
-                            "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib",
-                            "LIBRARY_PATH": f"/opt/rocm-{self.rocm_version}/lib",
-                        },
+            entry = compiler_def(
+                f"rocmcc@{self.rocm_version}",
+                f"/opt/rocm-{self.rocm_version}/",
+                {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                modules=[f"cce/{self.cce_version}"],
+                flags={"cflags": "-g -O2", "cxxflags": "-g -O2"},
+                extra_rpaths=rpaths,
+                env={
+                    "set": {"RFE_811452_DISABLE": "1"},
+                    "append_path": {
+                        "LD_LIBRARY_PATH": "/opt/cray/pe/gcc-libs"
                     },
-                )
-            ))
+                    "prepend_path": {
+                        "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib",
+                        "LIBRARY_PATH": f"/opt/rocm-{self.rocm_version}/lib",
+                    },
+                },
+            )
+            return compiler_section_for("llvm-amdgpu", [entry])
         else:
-            compilers.append((
-                "cce",
-                compiler_def(
-                    f"cce@{self.cce_version}-rocm{self.rocm_version}",
-                    f"/opt/cray/pe/cce/{self.cce_version}/",
-                    {"c": "craycc", "cxx": "crayCC", "fortran": "crayftn"}
-                    modules=[f"cce/{self.cce_version}"],
-                    extra_rpaths=rpaths,
-                    env={
-                        "prepend_path": {
-                            "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/rocm-{self.rocm_version}/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib"
-                        }
-                    },
-                    flags={
-                        "cflags": "-g -O2",
-                        "cxxflags": "-g -O2 -std=c++14",
-                        "fflags": "-g -O2 -hnopattern",
-                        "ldflags": "-ldl",
+            entry = compiler_def(
+                f"cce@{self.cce_version}-rocm{self.rocm_version}",
+                f"/opt/cray/pe/cce/{self.cce_version}/",
+                {"c": "craycc", "cxx": "crayCC", "fortran": "crayftn"},
+                modules=[f"cce/{self.cce_version}"],
+                extra_rpaths=rpaths,
+                env={
+                    "prepend_path": {
+                        "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/rocm-{self.rocm_version}/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib"
                     }
-                )
-            ))
+                },
+                flags={
+                    "cflags": "-g -O2",
+                    "cxxflags": "-g -O2 -std=c++14",
+                    "fflags": "-g -O2 -hnopattern",
+                    "ldflags": "-ldl",
+                }
+            )
+            return compiler_section_for("cce", [entry])
+
 
     def system_specific_variables(self):
         opts = super().system_specific_variables()

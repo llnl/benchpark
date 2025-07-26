@@ -144,20 +144,18 @@ class System(ExperimentSystemBase):
 
     def compute_dict(self):
         # This can be overridden by any subclass that needs more flexibility
-        compilers = self.compute_compilers_section()
+        pkg_cfg = self.compute_packages_section() or {}
+        compiler_cfg = self.compute_compilers_section()
+        if compiler_cfg:
+            pkg_cfg["packages"].update(compiler_cfg["packages"])
         return {
             "system_id": self.compute_system_id(),
             "variables": self.compute_variables_section(),
             "software": self.compute_software_section(),
             "auxiliary_software_files": {
-                "compilers": (
-                    # "'compilers:':" syntax is required to enforce spack to use benchpark-defined
-                    # compilers instead of external compilers defined by spack compiler search (from ramble).
-                    {"compilers:": compilers["compilers"]}
-                    if compilers
-                    else None
-                ),
-                "packages": self.compute_packages_section(),
+                # "'packages:':" syntax is required to enforce spack to use benchpark-defined
+                # compilers instead of external compilers defined by spack compiler search (from ramble).
+                "packages:": pkg_cfg["packages"],
             },
         }
 
@@ -174,3 +172,38 @@ class System(ExperimentSystemBase):
                     _write_key_file(destdir + "/" + key, k, system_dict[key])
             else:
                 _write_key_file(destdir, key, system_dict)
+
+
+def compiler_section_for(name, entries):
+    return {
+        "packages": {
+            name: {
+                "externals": entries
+            }
+        }
+    }
+
+
+def compiler_def(spec, prefix, exes, env=None, extra_rpaths=None, modules=None, flags=None):
+    lang_map = {}
+    for lang, exe in exes.items():
+        if os.path.isabs(exe):
+            lang_map[lang] = exe
+        else:
+            lang_map[lang] = os.path.join(prefix, "bin", exe)
+    entry = {
+        "spec": spec,
+        "prefix": prefix,
+        "extra_attributes": {
+            "compilers": lang_map
+        }
+    }
+    if env:
+        entry["environment"] = env
+    if extra_rpaths:
+        entry["extra_rpaths"] = extra_rpaths
+    if modules:
+        entry["modules"] = modules
+    if flags:
+        entry["flags"] = flags
+    return entry
