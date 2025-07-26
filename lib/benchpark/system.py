@@ -148,14 +148,15 @@ class System(ExperimentSystemBase):
         compiler_cfg = self.compute_compilers_section()
         if compiler_cfg:
             pkg_cfg["packages"].update(compiler_cfg["packages"])
+        # "'packages:':" syntax is required to enforce spack to use benchpark-defined
+        # compilers instead of external compilers defined by spack compiler search (from ramble).
+        pkg_cfg = {"packages:": pkg_cfg["packages"]}
         return {
             "system_id": self.compute_system_id(),
             "variables": self.compute_variables_section(),
             "software": self.compute_software_section(),
             "auxiliary_software_files": {
-                # "'packages:':" syntax is required to enforce spack to use benchpark-defined
-                # compilers instead of external compilers defined by spack compiler search (from ramble).
-                "packages:": pkg_cfg["packages"],
+                "packages": pkg_cfg,
             },
         }
 
