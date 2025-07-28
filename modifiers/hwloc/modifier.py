@@ -71,22 +71,12 @@ class Hwloc(BasicModifier):
                 ],
             )
         )
-        # pre_exec.append(
-        #     CommandExecutable(
-        #         "lstopo-to-get-underlying-infrastructure",
-        #         template=[
-        #             f"lstopo --of xml --whole-system --whole-io --verbose {hwloc_output_xml_file} 2> /dev/null"
-        #         ],
-        #     )
-        # )
 
         caliper_modifier = any(
             [modifier["name"] == "caliper" for modifier in app_inst.modifiers]
         )
         if caliper_modifier:
             os_reserved_metadata = self.get_os_reserved_data(app_inst)
-            # print("os_reserved_metadata:", os_reserved_metadata)
-            # Convert the .xml file from hwloc output to equivalent .json format
             pre_exec.append(
                 CommandExecutable(
                     "parse-lstopo-output",

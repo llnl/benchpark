@@ -193,37 +193,6 @@ def extract_commons(shortened_dict):
     return result
 
 
-# def extract_commons(shortened_dict):
-#     result = {}
-
-#     resource_fields = {
-#         "L1Cache": ["cache_size", "cache_linesize"],
-#         "L2Cache": ["cache_size", "cache_linesize"],
-#         "L3Cache": ["cache_size", "cache_linesize"],
-#         "NUMANode": ["local_memory"],
-#         "Package": [],
-#         "Core": [],
-#         "Machine": ["OSName", "OSRelease", "OSVersion", "HostName", "Architecture"],
-#         "GPU": ["GPUVendor", "GPUModel", "RSMIVRAMSize", "RSMIVisibleVRAMSize"]
-#     }
-
-#     for rtype, fields_to_check in resource_fields.items():
-#         entries = [v for k, v in shortened_dict.items() if v.get("type") == rtype]
-#         if not entries:
-#             continue
-
-#         result[rtype] = {"count": len(entries)}
-
-#         for key in fields_to_check:
-#             values = {entry.get(key) for entry in entries if key in entry}
-#             if len(values) == 1:
-#                 result[rtype][key] = values.pop()
-#             else:
-#                 result[rtype][key] = "error"
-
-#     return result
-
-
 def parse_lstopo_summary(hwloc_xml_file_path, hwloc_output_json_file_path, os_reserved_metadata):
     try:
         with open(hwloc_xml_file_path, "r") as xml_file:
@@ -278,10 +247,8 @@ if __name__ == "__main__":
         "hwloc_json_log_file", type=str, help="hwloc output in json format"
     )
     parser.add_argument("mode", type=str, help="hwloc mode(text)")
-    parser.add_argument("os_reserved", type=str, help="hwloc mode(text)")
+    parser.add_argument("os_reserved", type=str, help="machine os_reserved information")
 
     args = parser.parse_args()
-
-    print("os_reserved:", )
 
     parse_lstopo_summary(args.hwloc_xml_log_file, args.hwloc_json_log_file, json.loads(args.os_reserved))
