@@ -140,7 +140,7 @@ def test_programming_model_checks():
     # babelstream mpi-only not valid
     with pytest.raises(NotImplementedError, match="cannot run with MPI only"):
         spec = benchpark.spec.ExperimentSpec("babelstream").concretize()
-        experiment = spec.experiment
+        spec.experiment
 
     # stream+openmp not valid
     with pytest.raises(Exception, match="not a valid variant"):
