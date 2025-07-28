@@ -46,7 +46,7 @@ release_resources_dane:
         VARIANT: [+openmp, '']
       - HOST: dane
         ARCHCONFIG: llnl-cluster
-        BENCHMARK: [laghos, raja-perf, phloem, mpi-pingpong]
+        BENCHMARK: [laghos, raja-perf, phloem]
       # Strong scaling runs for "benchpark analyze" test
       - HOST: dane
         ARCHCONFIG: llnl-cluster
