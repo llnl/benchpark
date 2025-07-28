@@ -27,9 +27,15 @@ include:
           - phloem
           - raja-perf
           - remhos
-          - salmon-tddft
           - smb
           - stream
+      # MPI-only (not oneapi)
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: $DANE_PARAMS
+        BENCHMARK:
+          - salmon-tddft
+        SYSTEM_ARGS: [compiler=gcc]
       # +rocm tests
       - HOST: [tuolumne]
         ARCHCONFIG: llnl-elcapitan
@@ -56,10 +62,16 @@ include:
           - hpl
           - kripke
           - lammps
-          - qws
           - raja-perf
+        VARIANT: [+openmp]
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: $DANE_PARAMS
+        BENCHMARK:
+          - qws
           - salmon-tddft
         VARIANT: [+openmp]
+        SYSTEM_ARGS: [compiler=gcc]
       - HOST: lassen
         ARCHCONFIG: llnl-sierra
         SCHEDULER_PARAMETERS: -nnodes 1 -W 60 -q pci
