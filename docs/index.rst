@@ -59,6 +59,7 @@
    :caption: Developer Docs
 
    developer-guide
+   ci-developer-guide
 
 .. toctree::
    :maxdepth: 1
