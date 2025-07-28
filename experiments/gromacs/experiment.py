@@ -4,7 +4,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from benchpark.directives import variant, maintainers
-from benchpark.experiment import Experiment, NonMpiOnlyExperiment
+from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
@@ -12,10 +13,10 @@ from benchpark.rocm import ROCmExperiment
 
 class Gromacs(
     Experiment,
+    MpiOnlyExperiment,
     OpenMPExperiment,
     CudaExperiment,
     ROCmExperiment,
-    NonMpiOnlyExperiment,
 ):
     variant(
         "workload",
@@ -97,7 +98,7 @@ class Gromacs(
         # get package version
         app_version = self.spec.variants["version"][0]
 
-        spack_specs = "+mpi~hwloc"
+        spack_specs = "~hwloc"
         spack_specs += "+sycl" if self.spec.satisfies("+rocm") else "~sycl"
 
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):

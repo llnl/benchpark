@@ -4,11 +4,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from benchpark.directives import variant, maintainers
-from benchpark.experiment import Experiment, NonMpiOnlyExperiment
+from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.openmp import OpenMPExperiment
 
 
-class Genesis(Experiment, OpenMPExperiment, NonMpiOnlyExperiment):
+class Genesis(Experiment, MpiOnlyExperiment, OpenMPExperiment):
 
     variant(
         "workload",
@@ -57,4 +58,4 @@ class Genesis(Experiment, OpenMPExperiment, NonMpiOnlyExperiment):
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, [f"genesis@{app_version} +mpi"])
+        self.add_package_spec(self.name, [f"genesis@{app_version} "])

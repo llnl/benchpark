@@ -2,10 +2,11 @@
 # Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: Apache-2.0
+
+import pytest
 import yaml
 import sys
 
-import benchpark.experiment
 import benchpark.spec
 
 
@@ -102,7 +103,7 @@ def test_compute_ramble_dict_caliper(monkeypatch):
 
 def test_default_include_section():
     spec = benchpark.spec.ExperimentSpec("saxpy").concretize()
-    experiment = benchpark.experiment.Experiment(spec)
+    experiment = spec.experiment
 
     include_section = experiment.compute_include_section()
 
@@ -111,7 +112,7 @@ def test_default_include_section():
 
 def test_default_config_section():
     spec = benchpark.spec.ExperimentSpec("saxpy").concretize()
-    experiment = benchpark.experiment.Experiment(spec)
+    experiment = spec.experiment
 
     config_section = experiment.compute_config_section()
 
@@ -128,8 +129,21 @@ def test_default_config_section():
 
 def test_default_modifiers_section():
     spec = benchpark.spec.ExperimentSpec("saxpy").concretize()
-    experiment = benchpark.experiment.Experiment(spec)
+    experiment = spec.experiment
 
     modifiers_section = experiment.compute_modifiers_section_wrapper()
 
     assert modifiers_section == [{"name": "allocation"}, {"name": "exit-code"}]
+
+
+def test_programming_model_checks():
+    # babelstream mpi-only not valid
+    with pytest.raises(NotImplementedError, match="cannot run with MPI only"):
+        spec = benchpark.spec.ExperimentSpec("babelstream").concretize()
+        experiment = spec.experiment
+
+    # stream+openmp not valid
+    with pytest.raises(Exception, match="not a valid variant"):
+        spec = benchpark.spec.ExperimentSpec(
+            "stream+openmp workload=stream"
+        ).concretize()

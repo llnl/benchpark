@@ -16,6 +16,7 @@ class OpenMPExperiment:
         super().__init__()
         if self.spec.variants["openmp"][0]:
             self.device_type = "cpu"
+        self.programming_models.append("openmp")
 
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):
