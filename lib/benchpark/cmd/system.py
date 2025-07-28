@@ -6,6 +6,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+import pickle
 import shutil
 import subprocess
 import sys
@@ -43,6 +44,10 @@ def system_init(args):
         # If there was a failure, remove any partially-generated resources
         shutil.rmtree(destdir)
         raise
+
+    system_pickle = os.path.join(destdir, "system.pkl")
+    with open(system_pickle, "wb") as f:
+        pickle.dump(system_spec, f)
 
 
 def system_id(args):

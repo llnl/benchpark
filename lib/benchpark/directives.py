@@ -119,29 +119,23 @@ def maintainers(*names: str):
 
 
 @benchpark_directive("provides")
-def provides(*runtimes: str):
-    """Define what runtime the system provides.
-
-    Arguments:
-        runtimes: openmp, cuda, rocm
-    """
-
-    def _execute_provides(pkg):
-        pkg.provides = runtimes
+def provides(*attrs: str):
+    def _execute_provides(cls):
+        cls.provides = attrs
 
     return _execute_provides
 
 
 @benchpark_directive("requires")
-def requires(*runtimes: str):
-    """Define what runtime the experiment requires.
+def requires(
+    need: str,
+    when: Optional[Union[str, bool]] = None,
+):
+    def _execute_requires(cls):
+        when_spec = _make_when_spec(when)
 
-    Arguments:
-        runtimes: openmp, cuda, rocm
-    """
-
-    def _execute_requires(pkg):
-        pkg.requires = runtimes
+        requires_when = cls.requires.setdefault(when_spec, [])
+        requires_when.append(need)
 
     return _execute_requires
 

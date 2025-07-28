@@ -513,6 +513,14 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
         return ramble_dict
 
     def write_ramble_dict(self, filepath):
+        # Here you can do self.system_spec.system.sys_gpus_per_node
+        if hasattr(self, "system_spec"):
+            # i.e. the user ran `experiment init` with `--system`
+            for when, needs in self.requires.items():
+                if self.spec.satisfies(when):
+                    for need in needs:
+                        self.system_spec.system.enforce(need)
+
         ramble_dict = self.compute_ramble_dict()
         with open(filepath, "w") as f:
             yaml.dump(ramble_dict, f)
