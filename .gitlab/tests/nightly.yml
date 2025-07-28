@@ -33,8 +33,7 @@ include:
       - HOST: dane
         ARCHCONFIG: llnl-cluster
         SCHEDULER_PARAMETERS: $DANE_PARAMS
-        BENCHMARK:
-          - salmon-tddft
+        BENCHMARK: [salmon-tddft]
         SYSTEM_ARGS: [compiler=gcc]
       # +rocm tests
       - HOST: [tuolumne]
@@ -67,9 +66,7 @@ include:
       - HOST: dane
         ARCHCONFIG: llnl-cluster
         SCHEDULER_PARAMETERS: $DANE_PARAMS
-        BENCHMARK:
-          - qws
-          - salmon-tddft
+        BENCHMARK: [qws, salmon-tddft]
         VARIANT: [+openmp]
         SYSTEM_ARGS: [compiler=gcc]
       - HOST: lassen
