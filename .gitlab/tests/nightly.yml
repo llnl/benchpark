@@ -1,88 +1,65 @@
 include:
   - local: .gitlab/utils/status.yml
+  - local: .gitlab/utils/rules.yml
 .test_clusters_nightly: &test_clusters_nightly
+  variables:
+    DASHBOARD_NAME: Nightly [benchpark-develop]
+    DANE_PARAMS: -N 1 -t 01:00:00 --exclusive --reservation=ci
+    ELCAP_PARAMS: -N 1 -t 60m --queue=pci --exclusive
   parallel:
     matrix:
-      - HOST: tioga
-        ARCHCONFIG: llnl-elcapitan
-        SCHEDULER_PARAMETERS: -N 1 -t 60m --queue=pci --exclusive  # ref: https://github.com/LLNL/radiuss-shared-ci/blob/main/customization/custom-jobs-and-variables.yml
-        BENCHMARK:
-          - amg2023
-          - babelstream
-          - kripke
-          - laghos
-          - lammps
-          - osu-micro-benchmarks
-          - raja-perf
-          - remhos
-        VARIANT: [+rocm]
-        DASHBOARD_NAME: Nightly [benchpark-develop]
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        SCHEDULER_PARAMETERS: -N 1 -t 60m --queue=pci --exclusive
-        BENCHMARK:
-          - amg2023
-          - babelstream
-          - kripke
-          - laghos
-          - lammps
-          - osu-micro-benchmarks
-          - raja-perf
-          - remhos
-        VARIANT: [+rocm]
-        SYSTEM_ARGS: [gpumode=SPX]
-        DASHBOARD_NAME: Nightly [benchpark-develop]
-      # Test TPX, CPX
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        SCHEDULER_PARAMETERS: -N 1 -t 60m --queue=pci --exclusive
-        BENCHMARK: [laghos, raja-perf]
-        VARIANT: [+rocm]
-        SYSTEM_ARGS: [gpumode=TPX, gpumode=CPX]
-        DASHBOARD_NAME: Nightly [benchpark-develop]
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        SCHEDULER_PARAMETERS: -N 1 -t 30m --queue=pci --exclusive
-        BENCHMARK: [amg2023, kripke, laghos, remhos]
-        VARIANT: [+rocm caliper=mpi scaling=strong scaling-iterations=2]
-        DASHBOARD_NAME: Nightly [benchpark-develop]
+      # MPI-only tests
       - HOST: dane
         ARCHCONFIG: llnl-cluster
-        SCHEDULER_PARAMETERS: -N 1 -t 01:00:00 --exclusive --reservation=ci
-        BENCHMARK: [amg2023, babelstream, kripke, lammps]
-        VARIANT: [+openmp]
-        DASHBOARD_NAME: Nightly [benchpark-develop]
-      - HOST: dane
-        ARCHCONFIG: llnl-cluster
-        SCHEDULER_PARAMETERS: -N 1 -t 01:00:00 --exclusive --reservation=ci
+        SCHEDULER_PARAMETERS: $DANE_PARAMS
         BENCHMARK:
+          - ad
           - amg2023
           - gpcnet
+          - hpcg
+          - hpl
           - ior
           - kripke
           - laghos
+          - lammps
+          - md-test
           - osu-micro-benchmarks
           - phloem
+          - raja-perf
           - remhos
-          - phloem
+          - salmon-tddft
           - smb
           - stream
-        DASHBOARD_NAME: Nightly [benchpark-develop]
+      # +rocm tests
+      - HOST: [tuolumne]
+        ARCHCONFIG: llnl-elcapitan
+        SCHEDULER_PARAMETERS: $ELCAP_PARAMS
+        BENCHMARK:
+          - amg2023
+          - babelstream
+          - kripke
+          - laghos
+          - lammps
+          - osu-micro-benchmarks
+          - raja-perf
+          - remhos
+        VARIANT: [+rocm]
+      # +openmp tests
       - HOST: dane
         ARCHCONFIG: llnl-cluster
-        SCHEDULER_PARAMETERS: -N 1 -t 01:00:00 --exclusive --reservation=ci
-        BENCHMARK: [laghos, remhos]
-        VARIANT: [caliper=mpi scaling=strong scaling-iterations=2]
-        DASHBOARD_NAME: Nightly [benchpark-develop]
-      - HOST: dane
-        ARCHCONFIG: llnl-cluster
-        SCHEDULER_PARAMETERS: -N 1 -t 01:00:00 --exclusive --reservation=ci
-        BENCHMARK: [amg2023, kripke]
-        VARIANT:
-          - caliper=mpi scaling=strong scaling-iterations=2
-          - caliper=mpi scaling=weak scaling-iterations=2
-        SYSTEM_ARGS: [compiler=oneapi]
-        DASHBOARD_NAME: Nightly [benchpark-develop]
+        SCHEDULER_PARAMETERS: $DANE_PARAMS
+        BENCHMARK:
+          - amg2023
+          - babelstream
+          - genesis
+          - hpcg
+          - hpl
+          - kripke
+          - lammps
+          - qws
+          - raja-perf
+          - salmon-tddft
+        VARIANT: [+openmp]
       - HOST: lassen
         ARCHCONFIG: llnl-sierra
         SCHEDULER_PARAMETERS: -nnodes 1 -W 60 -q pci
@@ -90,20 +67,29 @@ include:
           - amg2023
           - babelstream
           - kripke
+          - laghos
           - lammps
           - osu-micro-benchmarks
+          - raja-perf
+          - remhos
         VARIANT: [+cuda]
-        DASHBOARD_NAME: Nightly [benchpark-develop]
+      #############
+      # Other tests
+      #############
+      # Test TPX, CPX modes on tuo
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        SCHEDULER_PARAMETERS: $ELCAP_PARAMS --setattr=gpumode=${GPUMODE} --conf=resource.rediscover=true
+        BENCHMARK: [amg2023, kripke, laghos, raja-perf]
+        VARIANT: [+rocm]
+        GPUMODE: [TPX, CPX]
+        SYSTEM_ARGS: [gpumode=$GPUMODE]
 nightly_test_run:
+  extends: .nightly_rules
   resource_group: $HOST
   stage: test
   tags: [$HOST, batch]
   <<: *test_clusters_nightly
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule"
-      when: always
-    - if: $CI_PIPELINE_SOURCE != "schedule"
-      when: never
   before_script:
     - !reference [.report_status, before_script]
   script: [./.gitlab/utils/run-experiment.sh]

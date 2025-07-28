@@ -9,7 +9,7 @@ from benchpark.experiment import ExperimentHelper
 
 
 class OpenMPExperiment:
-    requires("openmp")
+    requires("openmp", when="+openmp")
     variant("openmp", default=False, description="Build and run with OpenMP")
 
     def __init__(self):

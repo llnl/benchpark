@@ -383,8 +383,6 @@ class Allocation(BasicModifier):
         if v.n_gpus:
             gpus_per_rank = 1  # self.gpus_as_gpus_per_rank(v)
             cmd_opts.append(f"-g={gpus_per_rank}")
-        
-        cmd_opts.append("--setopt=mpibind=verbose:1")
 
         if v.timeout:
             batch_opts.append(f"-t {v.timeout}m")
