@@ -44,6 +44,12 @@ class Gromacs(
     )
 
     def compute_applications_section(self):
+        # MPI-only defaults
+        self.add_experiment_variable("n_ranks", 8, True)
+        target = "cpu"
+        bonded_target = "cpu"
+        npme = "0"
+
         if self.spec.satisfies("+openmp"):
             self.set_environment_variable("OMP_PROC_BIND", "close")
             self.set_environment_variable("OMP_PLACES", "cores")
