@@ -48,6 +48,8 @@ class Qws(Experiment, MpiOnlyExperiment, OpenMPExperiment, Caliper):
             self.add_experiment_variable("n_ranks", "{processes_per_node} * {n_nodes}")
             self.add_experiment_variable("omp_num_threads", ["48"])
             self.add_experiment_variable("arch", "OpenMP")
+        else:
+            self.add_experiment_variable("n_nodes", ["1"], True)
 
         self.set_required_variables(
             n_resources="{n_ranks}",
