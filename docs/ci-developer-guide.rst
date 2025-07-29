@@ -72,7 +72,7 @@ Dryruns are mainly for verifying that a given experiment/system is able to be in
 Saxpy
 =====
 
-There is a singular job that builds and runs the ``saxpy`` experiment on a GitHub virtual machine runner. This step additionally tests ramble workspace analyze & archive, uploading the binary as a CI cache, and the benchpark functionality to run a pre-built binary (re-using the spack-built binary).
+There is a singular job that builds and runs the ``saxpy`` experiment on a GitHub virtual machine runner. This step additionally tests ramble workspace analyze & archive, uploading the binary as a CI cache, and the benchpark functionality to run a pre-built binary (reusing the spack-built binary).
 
 Pytest
 ======
