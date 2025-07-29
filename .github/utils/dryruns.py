@@ -24,6 +24,8 @@ SKIP_EXPR = [
     "stream aws-pcluster instance_type=c4.xlarge",
     "stream cscs-daint",
     "stream generic-x86",
+    # Broken URL's in application.py going to cause dryrun failure
+    "genesis",
 ]
 
 
