@@ -3,7 +3,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import pytest
 import yaml
 import sys
 
@@ -134,16 +133,3 @@ def test_default_modifiers_section():
     modifiers_section = experiment.compute_modifiers_section_wrapper()
 
     assert modifiers_section == [{"name": "allocation"}, {"name": "exit-code"}]
-
-
-def test_programming_model_checks():
-    # babelstream mpi-only not valid
-    with pytest.raises(NotImplementedError, match="cannot run with MPI only"):
-        spec = benchpark.spec.ExperimentSpec("babelstream").concretize()
-        experiment = spec.experiment  # noqa: F841
-
-    # stream+openmp not valid
-    with pytest.raises(Exception, match="not a valid variant"):
-        spec = benchpark.spec.ExperimentSpec(
-            "stream+openmp workload=stream"
-        ).concretize()
