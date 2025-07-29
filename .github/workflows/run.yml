@@ -84,7 +84,7 @@ jobs:
           OUTPUT=$(spack find --paths saxpy)
           SAXPY_PATH=$(echo "$OUTPUT" | grep 'saxpy@' | awk '{print $2}')/bin/saxpy
           echo "Extracted Path: $SAXPY_PATH"
-          ./bin/benchpark experiment init --dest=saxpy/binary saxpy+openmp package_manager="None" append_path="$SAXPY_PATH"
+          ./bin/benchpark experiment init --dest=saxpy/binary saxpy+openmp package_manager="user-managed" append_path="$SAXPY_PATH"
           ./bin/benchpark setup saxpy/openmp generic-x86 workspace-binary/
           ./workspace-binary/ramble/bin/ramble \
             --disable-progress-bar \

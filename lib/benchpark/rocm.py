@@ -9,7 +9,7 @@ from benchpark.experiment import ExperimentHelper
 
 
 class ROCmExperiment:
-    requires("rocm")
+    requires("rocm", when="+rocm")
     variant("rocm", default=False, description="Build and run with ROCm")
 
     def __init__(self):

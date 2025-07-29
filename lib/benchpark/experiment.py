@@ -26,6 +26,7 @@ class ExperimentHelper:
         self.env_vars = {
             "set": {},
             "append": [{"paths": {}, "vars": {}}],
+            "prepend": [{"paths": {}, "vars": {}}],
         }
 
     def compute_include_section(self):
@@ -57,11 +58,12 @@ class ExperimentHelper:
         self.env_vars["set"][name] = value
 
     def append_environment_variable(self, name, value, target="paths"):
-        """Append to existing environment variable PATH ('paths') or other variable ('vars')
-        Matches expected ramble format. Example:
-        https://ramble.readthedocs.io/en/latest/workspace_config.html#environment-variable-control
-        """
+        """Append to existing environment variable PATH ('paths') or other variable ('vars')"""
         self.env_vars["append"][0][target][name] = value
+
+    def prepend_environment_variable(self, name, value, target="paths"):
+        """Prepend to existing environment variable PATH ('paths') or other variable ('vars')"""
+        self.env_vars["prepend"][0][target][name] = value
 
     def compute_config_variables(self):
         pass
@@ -200,7 +202,7 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
     variant(
         "package_manager",
         default="spack",
-        values=("spack", "environment-modules", "None"),
+        values=("spack", "environment-modules", "user-managed"),
         description="package manager to use",
     )
 
@@ -208,6 +210,12 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
         "append_path",
         default=" ",
         description="Append to environment PATH during experiment execution",
+    )
+
+    variant(
+        "prepend_path",
+        default=" ",
+        description="Prepend to environment PATH during experiment execution",
     )
 
     def __init__(self, spec):
@@ -324,14 +332,18 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
         self.env_vars["set"][name] = values
 
     def append_environment_variable(self, name, values, target="paths"):
-        """Append to existing environment variable PATH ('paths') or other variable ('vars')
-        Matches expected ramble format. Example:
-        https://ramble.readthedocs.io/en/latest/workspace_config.html#environment-variable-control
-        """
+        """Append to existing environment variable PATH ('paths') or other variable ('vars')"""
         if target not in ["paths", "vars"]:
             raise ValueError("Invalid target specified. Must be 'paths' or 'vars'.")
 
         self.env_vars["append"][0][target][name] = values
+
+    def prepend_environment_variable(self, name, values, target="paths"):
+        """Prepend to existing environment variable PATH ('paths') or other variable ('vars')"""
+        if target not in ["paths", "vars"]:
+            raise ValueError("Invalid target specified. Must be 'paths' or 'vars'.")
+
+        self.env_vars["prepend"][0][target][name] = values
 
     def add_experiment_exclude(self, exclude_clause):
         self.excludes.append(exclude_clause)
@@ -346,6 +358,7 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
         self.env_vars = {
             "set": {},
             "append": [{"paths": {}, "vars": {}}],
+            "prepend": [{"paths": {}, "vars": {}}],
         }
         self.variables = {}
         self.zips = {}
@@ -357,6 +370,11 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
             self.expr_vars.extend(variables)
             self.env_vars["set"] |= env_vars["set"]
             self.env_vars["append"][0] |= env_vars["append"][0]
+            self.env_vars["prepend"][0] |= env_vars["prepend"][0]
+
+        # Set required variable for package manager (we are not using this variable)
+        if self.spec.variants["package_manager"][0] == "user-managed":
+            self.add_experiment_variable(self.name + "_path", "None")
 
         self.compute_applications_section()
 
@@ -444,9 +462,21 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
                 spack_variants
             ).strip()
 
-        if "append_path" in self.spec.variants:
+        if "append_path" in self.spec.variants and (
+            # Don't append " " to path (default value)
+            self.spec.variants["append_path"][0]
+            != " "
+        ):
             self.append_environment_variable(
                 "PATH", self.spec.variants["append_path"][0]
+            )
+        if "prepend_path" in self.spec.variants and (
+            # Don't append " " to path (default value)
+            self.spec.variants["prepend_path"][0]
+            != " "
+        ):
+            self.prepend_environment_variable(
+                "PATH", self.spec.variants["prepend_path"][0]
             )
 
         return {
@@ -483,6 +513,14 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
         return ramble_dict
 
     def write_ramble_dict(self, filepath):
+        # Here you can do self.system_spec.system.sys_gpus_per_node
+        if hasattr(self, "system_spec"):
+            # i.e. the user ran `experiment init` with `--system`
+            for when, needs in self.requires.items():
+                if self.spec.satisfies(when):
+                    for need in needs:
+                        self.system_spec.system.enforce(need)
+
         ramble_dict = self.compute_ramble_dict()
         with open(filepath, "w") as f:
             yaml.dump(ramble_dict, f)
