@@ -52,7 +52,44 @@ GitLab configuration files are located under the ``.gitlab`` folder and specifie
 --------
 GitHub
 --------
-TBD
+Although the GitLab tests cover the most critical step (building and running the benchmarks across multiple LC systems) they do not test all of the benchmarks/systems or library functionality in benchpark. The GitHub tests use the GitHub virtual machine runners to test mostly python functionality, which is platform independent. The following is a description of the different types of GitHub testing:
+
+********
+run.yml
+********
+
+Dryruns
+=======
+
+Dryruns can be thought of similarly to the GitLab tests, but only involve testing up to the ``ramble workspace setup`` step with the ``--dry-run`` flag, which sets up the ramble workspace, but does not build the benchmark. The dryruns are automatically enumerated using the output from the ``benchpark list`` command, which is used to list experiments for all programming models and scaling options, as well as enumerating the modifiers. For each programming model that a benchmark implements, a dryrun will be executed on every system in benchpark that contains that programming model in ``self.programming_models``.
+
+- ``.github/utils/dryruns.py`` contains the main script that enumerates all of the dryruns cases, and executes them in a ``subprocess`` call.
+- ``.github/utils/dryrun.sh`` executes a single dryrun, provided a ``benchmark_spec`` and ``system_spec``.
+- ``.github/workflows/run.yml`` defines the ``dryrunexperiments`` job, that will be executed by a GitHub runner. Runs are separated by programming model, scaling type, and modifiers, and are executed in parallel.
+
+Dryruns are mainly for verifying that a given experiment/system is able to be initialized based on the programming models and scaling types have been included in the experiment class. Simple errors such as syntax errors will be caught by the linter instead. While much of the testing covered by dryruns is likely redundant, they are relatively inexpensive to run.
+
+Saxpy
+=====
+
+There is a singular job that builds and runs the ``saxpy`` experiment on a GitHub virtual machine runner. This step additionally tests ramble workspace analyze & archive, uploading the binary as a CI cache, and the benchpark functionality to run a pre-built binary (re-using the spack-built binary).
+
+Pytest
+======
+
+The Pytest unit tests are designed to cover as many different cases of the benchpark library as possible, useful for checking Python object properties that cannot be checked from the command line. Additionally, we can easily check that certain errors are raised under specific conditions to ensure our error checking is working properly. Notice that our Pytest coverage is not comprehensive on its own, since we have other testing, i.e. GitLab and GitHub (dryruns), that covers many cases.
+
+****************
+style.yml - Lint
+****************
+
+The linter step checks:
+
+- Check Python code formatting using ``black``
+- Check spelling using ``codespell``
+- Sort imports using ``isort``
+- ``flake8`` for checking Python style enforcement
+- ``yamlfix`` for formatting ``.yaml``/``.yml`` files
 
 -------
 CDash
