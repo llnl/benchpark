@@ -18,12 +18,6 @@ class MpiOnlyExperiment:
             self.device_type = "cpu"
         self.programming_models.append("mpi")
 
-        # models = ["+openmp", "+cuda", "+rocm"]
-        # if not any(self.spec.satisfies(model) for model in models):
-        #     raise NotImplementedError(
-        #         f"Running with MPI only is not a valid choice for this experiment. Choose from {models}"
-        #     )
-
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):
             return "mpi" if self.spec.satisfies("+mpi") else ""
