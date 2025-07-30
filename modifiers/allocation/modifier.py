@@ -319,6 +319,8 @@ class Allocation(BasicModifier):
         if v.timeout:
             sbatch_opts.append(f"--time {v.timeout}")
 
+        sbatch_opts.append("--exclusive")
+
         sbatch_directives = list(f"#SBATCH {x}" for x in (srun_opts + sbatch_opts))
 
         v.mpi_command = f"srun {' '.join(srun_opts)}"
