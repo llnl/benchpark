@@ -8,7 +8,7 @@ from ramble.modkit import *
 
 
 class Hwloc(BasicModifier):
-    """Define a modifier for showing the underlying infrastructure topology"""
+    """Define a modifier for showing the hardware architecture"""
 
     name = "hwloc"
 
@@ -36,7 +36,7 @@ class Hwloc(BasicModifier):
             "system_site",
         ]
         os_reserved_metadata = {}
-        # print("app_inst.variables:", app_inst.variables.keys())
+
         for key in system_metadata:
             # Certain keys not required or may not be present
             if key in app_inst.variables.keys():
@@ -65,7 +65,7 @@ class Hwloc(BasicModifier):
         # Run the hwloc tool and save its output in XML format to a file
         pre_exec.append(
             CommandExecutable(
-                "lstopo-to-get-underlying-infrastructure",
+                "lstopo-to-get-hardware-architecture",
                 template=[
                     f"(lstopo --of xml --whole-system --whole-io --verbose > {hwloc_output_xml_file} 2> /dev/null)"
                 ],
