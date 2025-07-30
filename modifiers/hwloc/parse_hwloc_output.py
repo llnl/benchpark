@@ -68,22 +68,51 @@ def clean_keys(d):
     else:
         return d
 
+
 def extract_commons(shortened_dict):
     result = {}
 
     resource_fields = {
-        "L1Cache": ["cache_size", "cache_linesize", "cache_associativity", "cache_type"],
-        "L2Cache": ["cache_size", "cache_linesize", "cache_associativity", "cache_type"],
-        "L3Cache": ["cache_size", "cache_linesize", "cache_associativity", "cache_type"],
+        "L1Cache": [
+            "cache_size",
+            "cache_linesize",
+            "cache_associativity",
+            "cache_type",
+        ],
+        "L2Cache": [
+            "cache_size",
+            "cache_linesize",
+            "cache_associativity",
+            "cache_type",
+        ],
+        "L3Cache": [
+            "cache_size",
+            "cache_linesize",
+            "cache_associativity",
+            "cache_type",
+        ],
         "NUMANode": ["local_memory"],
         "Package": [],
         "Core": [],
         "Machine": ["OSName", "OSRelease", "OSVersion", "HostName", "Architecture"],
-        "OSDev": ["GPUVendor", "GPUModel", "RSMIVRAMSize", "RSMIVisibleVRAMSize", "subtype", "Backend"]
+        "OSDev": [
+            "GPUVendor",
+            "GPUModel",
+            "RSMIVRAMSize",
+            "RSMIVisibleVRAMSize",
+            "subtype",
+            "Backend",
+        ],
     }
 
     # Fields that should be renamed to per_resource
-    per_resource_fields = {"local_memory", "cache_size", "cache_linesize", "RSMIVRAMSize", "RSMIVisibleVRAMSize"}
+    per_resource_fields = {
+        "local_memory",
+        "cache_size",
+        "cache_linesize",
+        "RSMIVRAMSize",
+        "RSMIVisibleVRAMSize",
+    }
 
     def is_numeric(value):
         """Check if a value can be converted to a number"""
@@ -99,13 +128,13 @@ def extract_commons(shortened_dict):
         """Handle inconsistent values by providing min/max for numeric, list for strings"""
         # Filter out None values
         valid_values = [v for v in values if v is not None]
-        
+
         if not valid_values:
             return None
-        
+
         if len(valid_values) == 1:
             return valid_values[0]
-        
+
         # Check if all values are numeric
         numeric_values = []
         for val in valid_values:
@@ -113,20 +142,17 @@ def extract_commons(shortened_dict):
                 # Convert to appropriate numeric type
                 try:
                     # Try int first, then float
-                    if '.' not in str(val):
+                    if "." not in str(val):
                         numeric_values.append(int(val))
                     else:
                         numeric_values.append(float(val))
                 except (ValueError, TypeError):
                     pass
-        
+
         # If all values are numeric, return min/max
         if len(numeric_values) == len(valid_values):
-            return {
-                "min": min(numeric_values),
-                "max": max(numeric_values)
-            }
-        
+            return {"min": min(numeric_values), "max": max(numeric_values)}
+
         # For non-numeric or mixed values, return unique values as a list
         unique_values = sorted(list(set(str(v) for v in valid_values)))
         return unique_values
@@ -135,32 +161,35 @@ def extract_commons(shortened_dict):
         """Convert specific path to general pattern"""
         if not path:
             return ""
-        
+
         # Split path and remove instance numbers
         parts = path.split("/")
         general_parts = []
-        
+
         for part in parts:
             if part:
                 # Remove instance numbers in brackets: "Machine[0]" -> "Machine"
                 general_part = part.split("[")[0]
                 general_parts.append(general_part)
-        
+
         return "/".join(general_parts)
 
     for rtype, fields_to_check in resource_fields.items():
         if rtype == "OSDev":
             # For OSDev, only include entries that have GPUVendor attribute
-            entries = [v for k, v in shortened_dict.items() 
-                      if v.get("type") == rtype and "GPUVendor" in v]
+            entries = [
+                v
+                for k, v in shortened_dict.items()
+                if v.get("type") == rtype and "GPUVendor" in v
+            ]
         else:
             entries = [v for k, v in shortened_dict.items() if v.get("type") == rtype]
-            
+
         if not entries:
             continue
 
         result[rtype] = {"count": len(entries)}
-        
+
         # Add general path if available
         if entries:
             sample_path = entries[0].get("path", "")
@@ -170,19 +199,19 @@ def extract_commons(shortened_dict):
 
         for key in fields_to_check:
             values = [entry.get(key) for entry in entries if key in entry]
-            
+
             if not values:
                 continue
-                
+
             # Get unique values
             unique_values = set(values)
-            
+
             # Determine the key name
             if key in per_resource_fields:
                 result_key = f"{key}_per_resource"
             else:
                 result_key = key
-            
+
             if len(unique_values) == 1:
                 # All values are the same
                 result[rtype][result_key] = values[0]
@@ -193,7 +222,9 @@ def extract_commons(shortened_dict):
     return result
 
 
-def parse_lstopo_summary(hwloc_xml_file_path, hwloc_output_json_file_path, os_reserved_metadata):
+def parse_lstopo_summary(
+    hwloc_xml_file_path, hwloc_output_json_file_path, os_reserved_metadata
+):
     try:
         with open(hwloc_xml_file_path, "r") as xml_file:
             lines = xml_file.readlines()
@@ -251,4 +282,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    parse_lstopo_summary(args.hwloc_xml_log_file, args.hwloc_json_log_file, json.loads(args.os_reserved))
+    parse_lstopo_summary(
+        args.hwloc_xml_log_file, args.hwloc_json_log_file, json.loads(args.os_reserved)
+    )

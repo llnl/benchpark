@@ -6,7 +6,6 @@
 from typing import Dict
 import yaml  # TODO: some way to ensure yaml available
 import sys
-from enum import Enum
 
 from benchpark.error import BenchparkError
 from benchpark.directives import ExperimentSystemBase
@@ -143,6 +142,7 @@ class Affinity:
                 "environments": {"affinity": {"packages": list(package_specs.keys())}},
             }
 
+
 class Hwloc:
     variant(
         "hwloc",
@@ -159,7 +159,7 @@ class Hwloc:
         def compute_modifiers_section(self):
             hwloc_modifier_list = []
 
-            if not self.spec.satisfies(f"hwloc=none"):
+            if not self.spec.satisfies("hwloc=none"):
                 hwloc_modifier_modes = {}
                 hwloc_modifier_modes["name"] = "hwloc"
                 hwloc_modifier_modes["mode"] = self.spec.variants["hwloc"][0]

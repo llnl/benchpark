@@ -41,9 +41,8 @@ class Hwloc(BasicModifier):
             # Certain keys not required or may not be present
             if key in app_inst.variables.keys():
                 os_reserved_metadata[key] = app_inst.variables[key]
-        
-        return f"'{json.dumps(os_reserved_metadata)}'"
 
+        return f"'{json.dumps(os_reserved_metadata)}'"
 
     def hwloc(self, executable_name, executable, app_inst=None):
         import os
