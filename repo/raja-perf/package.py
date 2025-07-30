@@ -86,6 +86,9 @@ def cuda_for_radiuss_projects(options, spec):
             cmake_cache_string("CUDA_ARCH", "sm_{0}".format(cuda_arch[0])))
         options.append(
             cmake_cache_string("CMAKE_CUDA_ARCHITECTURES", "{0}".format(cuda_arch[0])))
+        # options.append(
+        #     cmake_cache_string(f"Kokkos_ARCH_{cuda_arch[0]}", "ON")
+        # )
     if spec_uses_toolchain(spec):
         cuda_flags.append("-Xcompiler {}".format(spec_uses_toolchain(spec)[0]))
     if (spec.satisfies("target=ppc64le %gcc@8.1:")):
@@ -151,6 +154,7 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
     variant("tests", default="basic", values=("none", "basic", "benchmarks"),
             multi=False, description="Tests to run")
     variant("caliper",default=False, description="Build with support for Caliper based profiling")
+    variant("kokkos", default=True, description="Include Kokkos implementations of the kernels in RAJAPerf")
 
     depends_on("blt")
     depends_on("blt@0.7.0:", type="build", when="@2025.03.0:")
@@ -159,6 +163,8 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
     depends_on("blt@0.4.1:", type="build", when="@0.11.0:")
     depends_on("blt@0.4.0:", type="build", when="@0.8.0:")
     depends_on("blt@0.3.0:", type="build", when="@:0.7.0")
+
+    depends_on("kokkos@3.7.02", type="build", when="@2025.03.0 +kokkos")
 
     depends_on("cmake@3.20:", when="@0.12.0:", type="build")
     depends_on("cmake@3.23:", when="@0.12.0: +rocm", type="build")
@@ -360,6 +366,14 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
         if "+caliper" in self.spec:
             entries.append(cmake_cache_path("caliper_DIR", spec["caliper"].prefix+"/share/cmake/caliper/"))
             entries.append(cmake_cache_path("adiak_DIR", spec["adiak"].prefix+"/lib/cmake/adiak/"))
+
+        entries.append(cmake_cache_option("ENABLE_KOKKOS", "+kokkos" in spec))
+        # if "+kokkos" in self.spec:
+        #     if not spec.satisfies("cuda_arch=none"):
+        #         cuda_arch = spec.variants["cuda_arch"].value
+        #         print(cuda_arch[0])
+        #         print(f"Kokkos_ARCH_{cuda_arch[0]}")
+        #         entries.append(cmake_cache_string(f"-DKokkos_ARCH_{cuda_arch[0]}=ON"))
 
         return entries
 
