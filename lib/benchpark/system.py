@@ -11,6 +11,7 @@ import sys
 from typing import Dict, Tuple
 
 from benchpark.directives import ExperimentSystemBase, provides
+from benchpark.openmpsystem import OpenMPSystem
 import benchpark.spec
 import benchpark.variant
 
@@ -52,8 +53,8 @@ class System(ExperimentSystemBase):
         self.timeout = "120"
         self.queue = None
 
-        # Assume every system is an MPI system
-        self._programming_models = [MPISystem()]
+        # Assume every system is an MPI/OpenMP system
+        self._programming_models = [MPISystem(), OpenMPSystem()]
 
         self.required = ["sys_cores_per_node", "scheduler", "timeout"]
 
