@@ -6,6 +6,7 @@
 from benchpark.error import BenchparkError
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.scaling import StrongScaling
 from benchpark.scaling import WeakScaling
 from benchpark.openmp import OpenMPExperiment
@@ -14,6 +15,7 @@ from benchpark.caliper import Caliper
 
 class Hpl(
     Experiment,
+    MpiOnlyExperiment,
     StrongScaling,
     WeakScaling,
     OpenMPExperiment,
@@ -65,9 +67,9 @@ class Hpl(
         self.add_experiment_variable(
             "n_ranks", "{sys_cores_per_node} * {n_nodes}", False
         )
-        self.add_experiment_variable("n_threads_per_proc", ["2"], True)
-
-        self.matrix_experiment_variables("n_threads_per_proc")
+        self.add_experiment_variable(
+            "n_threads_per_proc", ["2"], named=True, matrixed=True
+        )
 
         if self.spec.satisfies("+single_node"):
             for pk, pv in num_nodes.items():

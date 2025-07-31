@@ -6,6 +6,7 @@
 from benchpark.error import BenchparkError
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.scaling import StrongScaling
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
@@ -16,6 +17,7 @@ from benchpark.caliper import Caliper
 
 class RajaPerf(
     Experiment,
+    MpiOnlyExperiment,
     StrongScaling,
     CudaExperiment,
     ROCmExperiment,
@@ -32,6 +34,7 @@ class RajaPerf(
     variant(
         "version",
         default="develop",
+        values=("develop", "2025.03.0", "2024.07.0"),
         description="app version",
     )
 

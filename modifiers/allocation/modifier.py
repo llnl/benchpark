@@ -319,6 +319,8 @@ class Allocation(BasicModifier):
         if v.timeout:
             sbatch_opts.append(f"--time {v.timeout}")
 
+        sbatch_opts.append("--exclusive")
+
         sbatch_directives = list(f"#SBATCH {x}" for x in (srun_opts + sbatch_opts))
 
         v.mpi_command = f"srun {' '.join(srun_opts)}"
@@ -378,6 +380,7 @@ class Allocation(BasicModifier):
         # Required for '--exclusive'. Will be computed, if not defined, from initialization
         cmd_opts.append(f"-N {v.n_nodes}")
 
+        cmd_ranks = ""
         if v.n_ranks:
             cmd_ranks = f"-n {v.n_ranks}"
         if v.n_gpus:

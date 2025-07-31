@@ -12,7 +12,7 @@ class Smb(ExecutableApplication):
     """Sandia microbenchmarks"""
     name = "Sandia microbenchmarks"
 
-    executable('p1', 'mpi_overhead -v', use_mpi=True)
+    executable('p1', 'mpi_overhead', use_mpi=True)
     executable('p2', 'msgrate -n {ppn}', use_mpi=True)
 
     workload('mpi_overhead', executables=['p1'])
