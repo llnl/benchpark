@@ -23,6 +23,15 @@ class LlnlElcapitan(System):
             "sys_cores_os_reserved_per_node_list": [0, 8, 16, 24, 32, 40, 48, 56],
             "sys_sockets_per_node": 2,
             "sys_gpus_per_node": 8,
+            "sys_mem_per_node": 125, #either 125GB or ~128997MB
+            "sys_cpu_mem_per_node": 125,
+            "sys_gpu_mem_per_node": 68702699520, #in B
+            "sys_cpu_L1_size": 32, #32KB for L1d and 32KB for L1i
+            "sys_gpu_L1_size": 16,
+            "sys_gpu_num_L1": 1008,
+            "sys_cpu_L2_size": 512, #512 KB
+            "sys_gpu_L2_size": 8192,
+            "sys_cpu_L3_size": 32, #32MB
             "system_site": "llnl",
             "scheduler": "flux",
             "hardware_key": str(hardware_descriptions)
@@ -48,6 +57,17 @@ class LlnlElcapitan(System):
             ],  # 3 cores reserved per socket
             "sys_gpus_per_node": None,  # Determined by "gpumode" variant
             "sys_sockets_per_node": 4,
+            "sys_mem_per_node": 1024, #either 125GB or ~128997MB
+            "sys_cpu_mem_per_node": 1024,
+            "sys_gpu_mem_per_node": 137438953472, #in B
+            "sys_cpu_L1_size": 32, #32KB for L1d and 32KB for L1i
+            "sys_gpu_L1_size": 32,
+            "sys_gpu_num_L1": 1104,
+            "sys_cpu_L2_size": 1024, #512 KB
+            "sys_gpu_L2_size": 4096,
+            "sys_cpu_L3_size": 32, #32MB
+            "sys_gpu_L3_size": 262144, #262144KB
+            "sys_gpu_num_L3": 4,
             "system_site": "llnl",
             "scheduler": "flux",
             "hardware_key": str(hardware_descriptions)
