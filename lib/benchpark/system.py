@@ -78,6 +78,10 @@ class System(ExperimentSystemBase):
         for pm in self.programming_models:
             pm.verify(self)
 
+    def enforce(self, attr):
+        if attr not in self.provides:
+            raise AttributeError(f'{self.spec.name} does not provide "{attr}"')
+
     def system_specific_variables(self):
         vars = {}
         for pm in self.programming_models:

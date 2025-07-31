@@ -188,7 +188,7 @@ def info_experiment(args):
 
 
 def setup_parser(root_parser):
-    info_subparser = root_parser.add_subparsers(dest="info_subcommand")
+    info_subparser = root_parser.add_subparsers(dest="info_subcommand", required=True)
 
     system_parser = info_subparser.add_parser("system")
     system_parser.add_argument(
@@ -227,5 +227,3 @@ def command(args):
     }
     if args.info_subcommand in actions:
         actions[args.info_subcommand](args)
-    else:
-        raise ValueError(f"Unknown subcommand for 'info': {args.info_subcommand}")
