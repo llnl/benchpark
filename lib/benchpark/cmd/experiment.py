@@ -57,9 +57,7 @@ def setup_parser(root_parser):
     init_parser.add_argument(
         "--basedir", help="Generate a system dir under this, and place all files there"
     )
-    init_parser.add_argument(
-        "--system", help="The system this will be run on", required=True
-    )
+    init_parser.add_argument("--system", help="The system this will be run on")
 
     init_parser.add_argument("spec", nargs="+", help="Experiment spec")
 
