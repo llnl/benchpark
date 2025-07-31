@@ -8,12 +8,14 @@ from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.scaling import StrongScaling
 from benchpark.rocm import ROCmExperiment
+from benchpark.caliper import Caliper
 
 
 class Scaffold(
     Experiment,
     StrongScaling,
     ROCmExperiment,
+    Caliper,
 ):
 
     maintainers("michaelmckinsey1")
@@ -58,7 +60,7 @@ class Scaffold(
             self.add_experiment_variable(nk, nv, True)
 
         if self.spec.satisfies("+rocm"):
-            n_resources = {"n_gpus": 1}
+            n_resources = {"n_gpus": 4}
 
         if self.spec.satisfies("+single_node"):
             for pk, pv in n_resources.items():

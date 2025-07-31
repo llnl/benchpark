@@ -316,7 +316,7 @@ def prepare_data(**kwargs):
 
     # Check these values are constant
     app = validate_single_metadata_value("application_name", tk)
-    cluster = validate_single_metadata_value("cluster", tk)
+    cluster = validate_single_metadata_value("host.cluster", tk)
     version = validate_single_metadata_value("version", tk)
 
     # Find programming model from spec

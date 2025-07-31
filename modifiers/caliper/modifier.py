@@ -149,4 +149,4 @@ class Caliper(BasicModifier):
 
     software_spec("caliper", pkg_spec="caliper")
 
-    required_package("caliper")
+    # required_package("caliper")
