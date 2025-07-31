@@ -158,7 +158,7 @@ def main():
                 if args.dryrun:
                     continue
                 try:
-                    cmd = f'source .github/utils/dryrun.sh "{espec}" "{sspec}"'
+                    cmd = f'BENCHPARK_RUN_COVERAGE=true source .github/utils/dryrun.sh "{espec}" "{sspec}"'
                     subprocess.run(["bash", "-c", cmd], capture_output=True, check=True)
                 except subprocess.CalledProcessError as e:
                     errors[f"{espec} {sspec}"] = e.stderr.decode()
