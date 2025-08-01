@@ -15,7 +15,7 @@ class MpiPingpong(CMakePackage):
     variant("caliper", default=False, description="Enable Caliper/Adiak support")
 
     depends_on("caliper", when="+caliper")
-    depends_on("adiak", when="+caliper")    
+    depends_on("adiak", when="+caliper")
 
     def cmake_args(self):
         if self.spec.satisfies("+caliper"):
