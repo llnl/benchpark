@@ -200,11 +200,11 @@ def compiler_def(spec, prefix, exes, env=None, extra_rpaths=None, modules=None, 
         }
     }
     if env:
-        entry["environment"] = env
+        entry["extra_attributes"]["environment"] = env
     if extra_rpaths:
-        entry["extra_rpaths"] = extra_rpaths
+        entry["extra_attributes"]["extra_rpaths"] = extra_rpaths
     if modules:
         entry["modules"] = modules
     if flags:
-        entry["flags"] = flags
+        entry["extra_attributes"]["flags"] = flags
     return entry
