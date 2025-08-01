@@ -6,7 +6,7 @@
 from benchpark.directives import variant, maintainers
 from benchpark.cudasystem import CudaSystem
 from benchpark.paths import hardware_descriptions
-from benchpark.system import System
+from benchpark.system import System, compiler_def, compiler_section_for
 from packaging.version import Version
 
 
@@ -413,150 +413,104 @@ class LlnlSierra(System):
 
     def compute_compilers_section(self):
         # values=("clang-ibm", "xl", "xl-gcc", "clang"),
+        compiler = self.spec.variants["compiler"][0]
         # values=("11-8-0", "10-1-243"),
-        compiler_cfgs = {
-            (
-                "clang-ibm",
-                "11-8-0",
-            ): [
-                {
-                    "compiler": {
-                        "spec": "clang@16.0.6-ibm-cuda-11.8.0-gcc-11.2.1",
-                        "paths": {
-                            "cc": "/usr/tce/packages/clang/clang-ibm-16.0.6-cuda-11.8.0-gcc-11.2.1/bin/clang",
-                            "cxx": "/usr/tce/packages/clang/clang-ibm-16.0.6-cuda-11.8.0-gcc-11.2.1/bin/clang++",
-                            "f77": "/usr/tce/packages/xl/xl-2023.06.28-cuda-11.8.0-gcc-11.2.1/bin/xlf_r",
-                            "fc": "/usr/tce/packages/xl/xl-2023.06.28-cuda-11.8.0-gcc-11.2.1/bin/xlf_r",
-                        },
-                        "flags": {
-                            "cflags": "-g -O2",
-                            "cxxflags": "-g -O2",
-                            "fflags": "-g -O2",
-                        },
-                        "operating_system": "rhel7",
-                        "target": "ppc64le",
-                        "modules": [
-                            "cuda/11.8.0",
-                            "clang/ibm-16.0.6-cuda-11.8.0-gcc-11.2.1",
-                        ],
-                        "environment": {},
-                        "extra_rpaths": [],
-                    }
-                }
-            ],
-            (
-                "xl-gcc",
-                "11-8-0",
-            ): [
-                {
-                    "compiler": {
-                        "spec": "xl@16.1.1-2023.06.28-cuda-11.8.0-gcc-11.2.1",
-                        "paths": {
-                            "cc": "/usr/tce/packages/xl/xl-2023.06.28-cuda-11.8.0-gcc-11.2.1/bin/xlc",
-                            "cxx": "/usr/tce/packages/xl/xl-2023.06.28-cuda-11.8.0-gcc-11.2.1/bin/xlC",
-                            "f77": "/usr/tce/packages/xl/xl-2023.06.28-cuda-11.8.0-gcc-11.2.1/bin/xlf",
-                            "fc": "/usr/tce/packages/xl/xl-2023.06.28-cuda-11.8.0-gcc-11.2.1/bin/xlf",
-                        },
-                        "flags": {
-                            "cflags": "-g -O2",
-                            "cxxflags": "-g -O2",
-                            "fflags": "-g -O2",
-                        },
-                        "operating_system": "rhel7",
-                        "target": "ppc64le",
-                        "modules": [
-                            "cuda/11.8.0",
-                            "xl/2023.06.28-cuda-11.8.0-gcc-11.2.1",
-                        ],
-                        "environment": {},
-                        "extra_rpaths": [],
-                    }
-                }
-            ],
-            (
-                "xl",
-                "10-1-243",
-            ): [
-                {
-                    "compiler": {
-                        "spec": "xl@16.1.1-2022.08.19-cuda10.1.243",
-                        "paths": {
-                            "cc": "/usr/tce/packages/xl/xl-2022.08.19/bin/xlc",
-                            "cxx": "/usr/tce/packages/xl/xl-2022.08.19/bin/xlC",
-                            "f77": "/usr/tce/packages/xl/xl-2022.08.19/bin/xlf",
-                            "fc": "/usr/tce/packages/xl/xl-2022.08.19/bin/xlf",
-                        },
-                        "flags": {
-                            "cflags": "-g -O2",
-                            "cxxflags": "-g -O2",
-                            "fflags": "-g -O2",
-                        },
-                        "operating_system": "rhel7",
-                        "target": "ppc64le",
-                        "modules": ["cuda/10.1.243", "xl/2022.08.19"],
-                        "environment": {},
-                        "extra_rpaths": [],
-                    }
-                }
-            ],
-            (
-                "xl",
-                "11-8-0",
-            ): [
-                {
-                    "compiler": {
-                        "spec": "xl@16.1.1-2022.08.19-cuda11.8.0",
-                        "paths": {
-                            "cc": "/usr/tce/packages/xl/xl-2022.08.19-cuda-11.8.0/bin/xlc",
-                            "cxx": "/usr/tce/packages/xl/xl-2022.08.19-cuda-11.8.0/bin/xlC",
-                            "f77": "/usr/tce/packages/xl/xl-2022.08.19-cuda-11.8.0/bin/xlf",
-                            "fc": "/usr/tce/packages/xl/xl-2022.08.19-cuda-11.8.0/bin/xlf",
-                        },
-                        "flags": {
-                            "cflags": "-g -O2",
-                            "cxxflags": "-g -O2",
-                            "fflags": "-g -O2",
-                        },
-                        "operating_system": "rhel7",
-                        "target": "ppc64le",
-                        "modules": ["cuda/11.8.0", "xl/2022.08.19-cuda-11.8.0"],
-                        "environment": {},
-                        "extra_rpaths": [],
-                    }
-                }
-            ],
-            (
-                "clang",
-                "11-8-0",
-            ): [
-                {
-                    "compiler": {
-                        "spec": "clang@16.0.6-cuda11.8.0",
-                        "paths": {
-                            "cc": "/usr/tce/packages/clang/clang-16.0.6-cuda-11.8.0-gcc-11.2.1/bin/clang",
-                            "cxx": "/usr/tce/packages/clang/clang-16.0.6-cuda-11.8.0-gcc-11.2.1/bin/clang++",
-                            "f77": "/usr/tce/packages/gcc/gcc-11.2.1/bin/gfortran",
-                            "fc": "/usr/tce/packages/gcc/gcc-11.2.1/bin/gfortran",
-                        },
-                        "flags": {
-                            "cflags": "-g -O2",
-                            "cxxflags": "-g -O2",
-                            "fflags": "",
-                        },
-                        "operating_system": "rhel7",
-                        "target": "ppc64le",
-                        "modules": [],
-                        "environment": {},
-                        "extra_rpaths": [],
-                    }
-                }
-            ],
+        cuda_ver = self.spec.variants["cuda"][0].replace(".", "-")
+
+        cuda_module_map = {
+            "11-8-0": ["cuda/11.8.0"],
+            "10-1-243": ["cuda/10.1.243"],
+        }
+        cuda_modules = cuda_module_map[cuda_ver]
+
+        flags = {
+            "cflags": "-g -O2",
+            "cxxflags": "-g -O2",
+            "fflags": "-g -O2",
         }
 
-        compiler = self.spec.variants["compiler"][0]
-        cuda_ver = self.spec.variants["cuda"][0].replace(".", "-")
-        cfg = compiler_cfgs[(compiler, cuda_ver)]
-        return {"compilers": cfg}
+        if (compiler, cuda_ver) == ("clang-ibm", "11-8-0"):
+            cfg1 = compiler_section_for(
+                "clang",
+                [compiler_def(
+                    "clang@16.0.6",
+                    "/usr/tce/packages/clang/clang-ibm-16.0.6-cuda-11.8.0-gcc-11.2.1/",
+                    {"c": "clang", "cxx": "clang++"},
+                    flags=flags,
+                    modules=cuda_modules + ["clang/ibm-16.0.6-cuda-11.8.0-gcc-11.2.1"],
+                )]
+            )
+            cfg2 = compiler_section_for(
+                "xl",
+                [compiler_def(
+                    "xl@2023.06.28",
+                    "/usr/tce/packages/xl/xl-2023.06.28-cuda-11.8.0-gcc-11.2.1/",
+                    {"c": "xlc", "cxx": "xlC", "fortran": "xlf"},
+                    flags=flags,
+                )]
+            )
+        elif (compiler, cuda_ver) == ("xl-gcc", "11-8-0"):
+            cfg = compiler_section_for(
+                "xl",
+                [compiler_def(
+                    "xl@2023.06.28",
+                    "/usr/tce/packages/xl/xl-2023.06.28-cuda-11.8.0-gcc-11.2.1/",
+                    {"c": "xlc", "cxx": "xlC", "fortran": "xlf"},
+                    flags=flags,
+                    modules=cuda_modules + ["xl/2023.06.28-cuda-11.8.0-gcc-11.2.1"],
+                )]
+            )
+        elif (compiler, cuda_ver) == ("xl", "10-1-243"):
+            cfg = compiler_section_for(
+                "xl",
+                [compiler_def(
+                    "xl@16.1.1-2022.08.19-cuda10.1.243",
+                    "/usr/tce/packages/xl/xl-2022.08.19/",
+                    {"c": "xlc", "cxx": "xlC", "fortran": "xlf"},
+                    flags=flags,
+                    modules=cuda_modules + ["xl/2022.08.19"],
+                )]
+            )
+        elif (compiler, cuda_ver) == ("xl", "11-8-0"):
+            cfg = compiler_section_for(
+                "xl",
+                [compiler_def(
+                    "xl@16.1.1-2022.08.19-cuda11.8.0",
+                    "/usr/tce/packages/xl/xl-2022.08.19-cuda-11.8.0/",
+                    {"c": "xlc", "cxx": "xlC", "fortran": "xlf"},
+                    flags=flags,
+                    modules=cuda_modules + ["xl/2022.08.19-cuda-11.8.0"],
+                )]
+            )
+        elif (compiler, cuda_ver) == ("clang", "11-8-0"):
+            custom_flags = {
+                "cflags": "-g -O2",
+                "cxxflags": "-g -O2",
+            }
+            cfg1 = compiler_section_for(
+                "clang",
+                [compiler_def(
+                    "clang@16.0.6",
+                    "/usr/tce/packages/clang/clang-ibm-16.0.6-cuda-11.8.0-gcc-11.2.1/",
+                    {"c": "clang", "cxx": "clang++"},
+                    flags=custom_flags,
+                )]
+            )
+            cfg2 = compiler_section_for(
+                "gcc",
+                [compiler_def(
+                    "gcc-11.2.1 languages:=c,c++,fortran",
+                    "/usr/tce/packages/gcc/gcc-11.2.1/",
+                    {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                    flags=custom_flags,
+                )]
+            )
+
+        # fortran:
+        #   require: [xl]
+        # c:
+        #   require: [clang]
+        return cfg
 
     def compute_software_section(self):
         """This is somewhat vestigial: for the Tioga config that is committed
