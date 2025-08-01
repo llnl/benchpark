@@ -8,7 +8,7 @@ from spack.package import *
 
 class MpiPingpong(CMakePackage):
 
-    git = "/g/g16/lam44/Documents/pingpong/benchmark/"
+    git = "https://github.com/LLNL/microbenchmarks.git"
 
     version("main", branch="main")
 
