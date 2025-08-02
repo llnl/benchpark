@@ -233,10 +233,11 @@ def compiler_section_for(name, entries):
     }
 
 
-def compiler_def(spec, prefix, exes, env=None, extra_rpaths=None, modules=None, flags=None):
+def compiler_def(spec, prefix, exes, env=None, extra_rpaths=None, modules=None, flags=None,
+                 compilers_use_relative_paths=False):
     lang_map = {}
     for lang, exe in exes.items():
-        if os.path.isabs(exe):
+        if os.path.isabs(exe) or compilers_use_relative_paths:
             lang_map[lang] = exe
         else:
             lang_map[lang] = os.path.join(prefix, "bin", exe)
