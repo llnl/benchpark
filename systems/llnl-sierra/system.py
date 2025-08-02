@@ -6,7 +6,7 @@
 from benchpark.directives import variant, maintainers
 from benchpark.cudasystem import CudaSystem
 from benchpark.paths import hardware_descriptions
-from benchpark.system import System, compiler_def, compiler_section_for
+from benchpark.system import System, compiler_def, compiler_section_for, merge_dicts, hybrid_compiler_requirements
 from packaging.version import Version
 
 
@@ -449,6 +449,7 @@ class LlnlSierra(System):
                     flags=flags,
                 )]
             )
+            cfg = merge_dicts(cfg1, cfg2, hybrid_compiler_requirements("llvm", "xl"))
         elif (compiler, cuda_ver) == ("xl-gcc", "11-8-0"):
             cfg = compiler_section_for(
                 "xl",
@@ -505,11 +506,8 @@ class LlnlSierra(System):
                     flags=custom_flags,
                 )]
             )
+            cfg = merge_dicts(cfg1, cfg2, hybrid_compiler_requirements("llvm", "gcc"))
 
-        # fortran:
-        #   require: [xl]
-        # c:
-        #   require: [clang]
         return cfg
 
     def compute_software_section(self):

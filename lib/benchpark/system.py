@@ -175,6 +175,52 @@ class System(ExperimentSystemBase):
                 _write_key_file(destdir, key, system_dict)
 
 
+def merge_dicts(*dicts):
+    current = {}
+    for d in dicts:
+        if not d:
+            continue
+        current = _merge_dicts(current, d)
+    return current
+
+
+def _merge_dicts(d1, d2):
+    result = dict(d1)
+    for k, v2 in d2.items():
+        if k in result:
+            v1 = result[k]
+            if all(isinstance(x, dict) for x in (v1, v2)):
+                result[k] = merge_dicts(v1, v2)
+            else:
+                raise Exception("Bad merge: dict w/non-dict")
+        else:
+            result[k] = v2
+    return result
+
+
+def hybrid_compiler_requirements(c_cmp, f_cmp):
+    return {
+        "packages": {
+            "all": {
+                "require": [
+                    {
+                        "spec": rf"%[virtuals=c] {c_cmp}",
+                        "when": r"%c",
+                    },
+                    {
+                        "spec": rf"%[virtuals=cxx] {c_cmp}",
+                        "when": r"%cxx"
+                    },
+                    {
+                        "spec": rf"^[virtuals=fortran] {f_cmp}",
+                        "when": r"^fortran"
+                    }
+                ]
+            }
+        }
+    }
+
+
 def compiler_section_for(name, entries):
     return {
         "packages": {
