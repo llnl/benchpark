@@ -191,8 +191,10 @@ def _merge_dicts(d1, d2):
             v1 = result[k]
             if all(isinstance(x, dict) for x in (v1, v2)):
                 result[k] = merge_dicts(v1, v2)
+            elif all(isinstance(x, list) for x in (v1, v2)):
+                result[k] = v1 + v2
             else:
-                raise Exception("Bad merge: dict w/non-dict")
+                raise ValueError(f"{k} merge mismatch: {v1}/{v2}")
         else:
             result[k] = v2
     return result
