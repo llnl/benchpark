@@ -147,7 +147,7 @@ class System(ExperimentSystemBase):
         pkg_cfg = self.compute_packages_section() or {}
         compiler_cfg = self.compute_compilers_section()
         if compiler_cfg:
-            pkg_cfg["packages"].update(compiler_cfg["packages"])
+            pkg_cfg = merge_dicts(pkg_cfg, compiler_cfg)
         # "'packages:':" syntax is required to enforce spack to use benchpark-defined
         # compilers instead of external compilers defined by spack compiler search (from ramble).
         pkg_cfg = {"packages:": pkg_cfg["packages"]}
