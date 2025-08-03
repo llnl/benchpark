@@ -152,7 +152,7 @@ class LlnlElcapitan(System):
     def compute_packages_section(self):
         selections = {
             "packages": {
-                "all": {"require": "target=x86_64:"},
+                "all": {"require": [{"spec": "target=x86_64:"}]},
                 "tar": {"externals": [{"spec": "tar@1.30", "prefix": "/usr"}]},
                 "coreutils": {
                     "externals": [{"spec": "coreutils@8.30", "prefix": "/usr"}]

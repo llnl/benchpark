@@ -190,7 +190,7 @@ def _merge_dicts(d1, d2):
         if k in result:
             v1 = result[k]
             if all(isinstance(x, dict) for x in (v1, v2)):
-                result[k] = merge_dicts(v1, v2)
+                result[k] = _merge_dicts(v1, v2)
             elif all(isinstance(x, list) for x in (v1, v2)):
                 result[k] = v1 + v2
             else:
