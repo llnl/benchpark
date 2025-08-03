@@ -173,7 +173,7 @@ class CscLumi(System):
         return compiler_section_for(
             "llvm-amdgpu",
             [compiler_def(
-                f"rocmcc@{self.rocm_version}",
+                f"llvm-amdgpu@{self.rocm_version}",
                 f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/",
                 {"c": "amdclang", "cxx": "amdclang++", "fortran": "amdflang"},
                 env={
@@ -331,14 +331,14 @@ class CscLumi(System):
                         }
                     ],
                 },
-                "llvm-amdgpu": {
-                    "buildable": False,
-                    "externals": [
-                        {
-                            "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/llvm",
-                            "spec": f"llvm-amdgpu@{self.rocm_version}",
-                        }
-                    ],
+                #"llvm-amdgpu": {
+                #    "buildable": False,
+                #    "externals": [
+                #        {
+                #            "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/llvm",
+                #            "spec": f"llvm-amdgpu@{self.rocm_version}",
+                #        }
+                #    ],
                 },
                 "rccl": {
                     "buildable": False,
