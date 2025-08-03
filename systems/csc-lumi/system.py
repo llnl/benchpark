@@ -7,7 +7,7 @@
 from benchpark.directives import variant, maintainers
 from benchpark.paths import hardware_descriptions
 from benchpark.rocmsystem import ROCmSystem
-from benchpark.system import System
+from benchpark.system import System, compiler_def, compiler_section_for, merge_dicts
 from packaging.version import Version
 
 
@@ -161,107 +161,73 @@ class CscLumi(System):
         return selections
 
     def compute_compilers_section(self):
-        selections = self.rocmcc_cfg()
+        chosen = [self.rocmcc_cfg()]
         if "cce" in self.spec.variants["compiler"][0]:
-            selections["compilers"] += self.cce_compiler_cfg()["compilers"]
+            chosen.append(self.cce_compiler_cfg())
         else:
-            selections["compilers"] += self.gcc_compiler_cfg()["compilers"]
+            chosen.append(self.gcc_compiler_cfg())
 
-        return selections
+        return merge_dicts(*chosen)
 
     def rocmcc_cfg(self):
-        return {
-            "compilers": [
-                {
-                    "compiler": {
-                        "spec": f"rocmcc@{self.rocm_version}",
-                        "paths": {
-                            "cc": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/bin/amdclang",
-                            "cxx": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/bin/amdclang++",
-                            "f77": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/bin/amdflang",
-                            "fc": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/bin/amdflang",
-                        },
-                        # "flags": " ",  # Uncomment if needed
-                        "operating_system": "sles15",
-                        "target": "any",
-                        "modules": [],
-                        "environment": {
-                            "set": {"RFE_811452_DISABLE": "1"},
-                            "append_path": {"LD_LIBRARY_PATH": "/opt/cray/pe/gcc-libs"},
-                            "prepend_path": {
-                                "LD_LIBRARY_PATH": "/opt/cray/pe/pmi/6.1.12/lib",
-                                "LIBRARY_PATH": f"/appl/lumi/SW/CrayEnv/EB/rocm/5.6.1/lib:/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/lib64",
-                            },
-                        },
-                        "extra_rpaths": [
-                            f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/lib",
-                            f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/lib64",
-                            "/opt/cray/pe/gcc-libs",
-                        ],
-                    }
-                }
-            ]
-        }
+        return compiler_section_for(
+            "llvm-amdgpu",
+            [compiler_def(
+                f"rocmcc@{self.rocm_version}",
+                f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/",
+                {"c": "amdclang", "cxx": "amdclang++", "fortran": "amdflang"},
+                env={
+                    "set": {"RFE_811452_DISABLE": "1"},
+                    "append_path": {"LD_LIBRARY_PATH": "/opt/cray/pe/gcc-libs"},
+                    "prepend_path": {
+                        "LD_LIBRARY_PATH": "/opt/cray/pe/pmi/6.1.12/lib",
+                        "LIBRARY_PATH": f"/appl/lumi/SW/CrayEnv/EB/rocm/5.6.1/lib:/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/lib64",
+                    },
+                },
+                extra_rpaths=[
+                    f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/lib",
+                    f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/lib64",
+                    "/opt/cray/pe/gcc-libs",
+                ],
+            )]
+        )
 
     def cce_compiler_cfg(self):
-        return {
-            "compilers": [
-                {
-                    "compiler": {
-                        "spec": f"cce@{self.compiler_version}",
-                        "paths": {
-                            "cc": f"/opt/cray/pe/cce/{self.compiler_version}/bin/craycc",
-                            "cxx": f"/opt/cray/pe/cce/{self.compiler_version}/bin/crayCC",
-                            "f77": f"/opt/cray/pe/cce/{self.compiler_version}/bin/crayftn",
-                            "fc": f"/opt/cray/pe/cce/{self.compiler_version}/bin/crayftn",
-                        },
-                        # "flags": "",  # Uncomment if needed
-                        "operating_system": "sles15",
-                        "target": "any",
-                        "modules": [],
-                        "environment": {
-                            "set": {"RFE_811452_DISABLE": "1"},
-                            "prepend_path": {
-                                "LD_LIBRARY_PATH": "/opt/cray/pe/pmi/6.1.12/lib"
-                            },
-                            "append_path": {
-                                "LD_LIBRARY_PATH": "/opt/cray/pe/gcc-libs",
-                                "PKG_CONFIG_PATH": "/usr/lib64/pkgconfig",
-                            },
-                        },
-                        "extra_rpaths": ["/opt/cray/pe/gcc-libs"],
-                    }
-                }
-            ]
-        }
+        return compiler_section_for(
+            "cce",
+            [compiler_def(
+                f"cce@{self.compiler_version}",
+                f"/opt/cray/pe/cce/{self.compiler_version}/",
+                {"c": "craycc", "cxx": "crayCC", "fortran": "crayftn"},
+                env={
+                    "set": {"RFE_811452_DISABLE": "1"},
+                    "prepend_path": {
+                        "LD_LIBRARY_PATH": "/opt/cray/pe/pmi/6.1.12/lib"
+                    },
+                    "append_path": {
+                        "LD_LIBRARY_PATH": "/opt/cray/pe/gcc-libs",
+                        "PKG_CONFIG_PATH": "/usr/lib64/pkgconfig",
+                    },
+                },
+                extra_rpaths=["/opt/cray/pe/gcc-libs"],
+            )]
+        )
 
     def gcc_compiler_cfg(self):
-        return {
-            "compilers": [
-                {
-                    "compiler": {
-                        "spec": f"gcc@{self.compiler_version}",
-                        "paths": {
-                            "cc": f"/opt/cray/pe/gcc/{self.compiler_version}/bin/gcc",
-                            "cxx": f"/opt/cray/pe/gcc/{self.compiler_version}/bin/g++",
-                            "f77": f"/opt/cray/pe/gcc/{self.compiler_version}/bin/gfortran",
-                            "fc": f"/opt/cray/pe/gcc/{self.compiler_version}/bin/gfortran",
-                        },
-                        # "flags": "",  # Uncomment if needed
-                        "operating_system": "sles15",
-                        "target": "any",
-                        "modules": [],
-                        "environment": {
-                            "prepend_path": {
-                                "LD_LIBRARY_PATH": "/opt/cray/pe/pmi/6.1.12/lib:/opt/cray/libfabric/1.15.2.0/lib64",
-                                "PKG_CONFIG_PATH": "/usr/lib64/pkgconfig",
-                            }
-                        },
-                        "extra_rpaths": [],
+        return compiler_section_for(
+            "gcc",
+            [compiler_def(
+                f"gcc@{self.compiler_version}",
+                f"/opt/cray/pe/gcc/{self.compiler_version}/",
+                {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                env={
+                    "prepend_path": {
+                        "LD_LIBRARY_PATH": "/opt/cray/pe/pmi/6.1.12/lib:/opt/cray/libfabric/1.15.2.0/lib64",
+                        "PKG_CONFIG_PATH": "/usr/lib64/pkgconfig",
                     }
-                }
-            ]
-        }
+                },
+            )]
+        )
 
     def rocm_config(self):
         return {

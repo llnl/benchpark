@@ -626,7 +626,7 @@ class LlnlElcapitan(System):
             entry = compiler_def(
                 f"rocmcc@{self.rocm_version}",
                 f"/opt/rocm-{self.rocm_version}/",
-                {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                {"c": "amdclang", "cxx": "amdclang++", "fortran": "amdflang"},
                 modules=[f"cce/{self.cce_version}"],
                 flags={"cflags": "-g -O2", "cxxflags": "-g -O2"},
                 extra_rpaths=rpaths,
