@@ -579,15 +579,15 @@ class LlnlElcapitan(System):
                     ],
                     "buildable": False,
                 },
-                "llvm-amdgpu": {
-                    "externals": [
-                        {
-                            "spec": f"llvm-amdgpu@{self.rocm_version}",
-                            "prefix": f"/opt/rocm-{self.rocm_version}/llvm",
-                        }
-                    ],
-                    "buildable": False,
-                },
+                #"llvm-amdgpu": {
+                #    "externals": [
+                #        {
+                #            "spec": f"llvm-amdgpu@{self.rocm_version}",
+                #            "prefix": f"/opt/rocm-{self.rocm_version}/llvm",
+                #        }
+                #    ],
+                #    "buildable": False,
+                #},
                 "rocblas": {
                     "externals": [
                         {
@@ -622,7 +622,7 @@ class LlnlElcapitan(System):
         compilers = list()
         if self.spec.satisfies("compiler=rocmcc"):
             entry = compiler_def(
-                f"rocmcc@{self.rocm_version}",
+                f"llvm-amdgpu@{self.rocm_version}",
                 f"/opt/rocm-{self.rocm_version}/",
                 {"c": "amdclang", "cxx": "amdclang++", "fortran": "amdflang"},
                 modules=[f"cce/{self.cce_version}"],
