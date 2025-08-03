@@ -315,7 +315,7 @@ class LlnlElcapitan(System):
         cfg = compiler_section_for(
             "gcc",
             [compiler_def(
-                "gcc@12.2.0",
+                "gcc@12.2.0 languages=c,c++,fortran",
                 "/opt/cray/pe/gcc/12.2.0/",
                 {"c": "gcc", "cxx": "g++", "fortran": "gfortran"}
             )]
