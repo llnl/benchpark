@@ -7,7 +7,7 @@
 from benchpark.directives import variant, maintainers
 from benchpark.paths import hardware_descriptions
 from benchpark.rocmsystem import ROCmSystem
-from benchpark.system import System, compiler_def, compiler_section_for
+from benchpark.system import System, compiler_def, compiler_section_for, merge_dicts
 from packaging.version import Version
 
 
@@ -295,8 +295,6 @@ class LlnlElcapitan(System):
                 }
             }
 
-        selections["packages"] |= self.compiler_weighting_cfg()["packages"]
-
         return selections
 
     def compiler_weighting_cfg(self):
@@ -324,9 +322,9 @@ class LlnlElcapitan(System):
         if self.spec.satisfies("compiler=cce") or self.spec.satisfies(
             "compiler=rocmcc"
         ):
-            cfg["packages"].update(self.rocm_cce_compiler_cfg()["packages"])
+            cfg = merge_dicts(cfg, self.rocm_cce_compiler_cfg())
 
-        return cfg
+        return merge_dicts(cfg, self.compiler_weighting_cfg())
 
     def mpi_config(self):
         gtl = self.spec.variants["gtl"][0]
