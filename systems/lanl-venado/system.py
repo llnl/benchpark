@@ -170,7 +170,7 @@ class LanlVenado(System):
         gcc_cfg = compiler_section_for(
             "gcc",
             [compiler_def(
-                "gcc@12.3.0",
+                "gcc@12.3.0 languages:=c,c++,fortran",
                 "/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/",
                 {"c": "gcc", "cxx": "g++", "fortran": "gfortran"}
             )]

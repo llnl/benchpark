@@ -215,7 +215,7 @@ class LlnlMatrix(System):
         gcc_cfg = compiler_section_for(
             "gcc",
             [compiler_def(
-                "gcc@12.1.1",
+                "gcc@12.1.1 languages:=c,c++,fortran",
                 "/usr/tce/packages/gcc/gcc-12.1.1/",
                 {"c": "gcc", "cxx": "g++", "fortran": "gfortran"}
             )]

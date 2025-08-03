@@ -217,7 +217,7 @@ class CscLumi(System):
         return compiler_section_for(
             "gcc",
             [compiler_def(
-                f"gcc@{self.compiler_version}",
+                f"gcc@{self.compiler_version} languages:=c,c++,fortran",
                 f"/opt/cray/pe/gcc/{self.compiler_version}/",
                 {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
                 env={

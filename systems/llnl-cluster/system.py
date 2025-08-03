@@ -5,7 +5,7 @@
 
 
 from benchpark.directives import variant, maintainers
-from benchpark.system import System, compiler_def, compiler_section_for
+from benchpark.system import System, compiler_def, compiler_section_for, merge_dicts
 from benchpark.openmpsystem import OpenMPSystem
 from benchpark.paths import hardware_descriptions
 
@@ -215,22 +215,14 @@ class LlnlCluster(System):
                 }
             }
 
-        selections["packages"] |= self.compiler_weighting_cfg()["packages"]
-
         return selections
-
-    def compiler_weighting_cfg(self):
-        if self.spec.satisfies("compiler=oneapi"):
-            return {"packages": {"all": {"require": [{"one_of": ["%oneapi", "%gcc"]}]}}}
-        else:
-            return {"packages": {}}
 
     def compute_compilers_section(self):
         if self.spec.satisfies("compiler=gcc"):
             cfg = compiler_section_for(
                 "gcc",
                 [compiler_def(
-                    "gcc@12.1.1",
+                    "gcc@12.1.1 languages:=c,c++,fortran",
                     "/usr/tce/packages/gcc/gcc-12.1.1/",
                     {"c": "gcc", "cxx": "g++", "fortran": "gfortran"}
                 )]
@@ -245,7 +237,7 @@ class LlnlCluster(System):
                 )]
             )
         elif self.spec.satisfies("compiler=oneapi"):
-            cfg1 = compiler_section_for(
+            gcc_cfg = compiler_section_for(
                 "gcc",
                 [compiler_def(
                     "gcc@12.1.1",
@@ -253,7 +245,7 @@ class LlnlCluster(System):
                     {"c": "gcc", "cxx": "g++", "fortran": "gfortran"}
                 )]
             )
-            cfg2 = compiler_section_for(
+            oneapi_cfg = compiler_section_for(
                 "intel-oneapi-compilers",
                 [compiler_def(
                     "intel-oneapi-compilers@2023.2.1~envmods",
@@ -261,8 +253,8 @@ class LlnlCluster(System):
                     {"c": "icx", "cxx": "icpx", "fortran": "ifx"}
                 )]
             )
-            cfg = cfg1
-            cfg["packages"].update(cfg2["packages"])
+            weighting_cfg = {"packages": {"all": {"require": [{"one_of": ["%oneapi", "%gcc"]}]}}}
+            cfg = merge_dicts(gcc_cfg, oneapi_cfg, weighting_cfg)
 
         return cfg
 

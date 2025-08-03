@@ -45,7 +45,7 @@ class CscsEiger(System):
         return compiler_section_for(
             "gcc",
             [compiler_def(
-                "gcc@12.3.0",
+                "gcc@12.3.0 languages:=c,c++,fortran",
                 "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
                 {"c": "cc", "cxx": "CC", "fortran": "ftn"},
                 modules=["PrgEnv-gnu", "gcc/12.3.0"],

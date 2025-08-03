@@ -74,7 +74,7 @@ class JscJuwels(System):
             gcc_cfg = compiler_section_for(
                 "gcc",
                 [compiler_def(
-                    "gcc@12.3.0",
+                    "gcc@12.3.0 languages:=c,c++,fortran",
                     "/p/software/juwelsbooster/stages/2024/software/GCCcore/12.3.0/",
                     {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
                     modules=["Stages/2024", "GCC/12.3.0"],
@@ -82,7 +82,7 @@ class JscJuwels(System):
             )
             cfg = merge_dicts(nvhpc_cfg, gcc_cfg)
         else:
-            cfg = gcc_cfg
+            cfg = nvhpc_cfg
 
         return cfg
 

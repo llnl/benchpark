@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.system import System
+from benchpark.system import System, compiler_def, compiler_section_for
 from benchpark.directives import variant, maintainers
 from benchpark.openmpsystem import OpenMPSystem
 from benchpark.paths import hardware_descriptions

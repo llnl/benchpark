@@ -500,7 +500,7 @@ class LlnlSierra(System):
             cfg2 = compiler_section_for(
                 "gcc",
                 [compiler_def(
-                    "gcc-11.2.1 languages:=c,c++,fortran",
+                    "gcc@11.2.1 languages:=c,c++,fortran",
                     "/usr/tce/packages/gcc/gcc-11.2.1/",
                     {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
                     flags=custom_flags,

@@ -156,7 +156,7 @@ class CscsDaint(System):
         compiler_map["gcc9"] = compiler_section_for(
             "gcc",
             [compiler_def(
-                "gcc@9.3.0",
+                "gcc@9.3.0 languages:=c,c++,fortran",
                 "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
                 {"c": "cc", "cxx": "CC", "fortran": "ftn"},
                 modules=["PrgEnv-gnu", "gcc/9.3.0"],
@@ -166,7 +166,7 @@ class CscsDaint(System):
         compiler_map["gcc10"] = compiler_section_for(
             "gcc",
             [compiler_def(
-                "gcc@10.3.0",
+                "gcc@10.3.0 languages:=c,c++,fortran",
                 "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
                 {"c": "cc", "cxx": "CC", "fortran": "ftn"},
                 modules=["PrgEnv-gnu", "gcc/10.3.0"],
@@ -176,7 +176,7 @@ class CscsDaint(System):
         compiler_map["gcc11"] = compiler_section_for(
             "gcc",
             [compiler_def(
-                "gcc@11.2.0",
+                "gcc@11.2.0 languages:=c,c++,fortran",
                 "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
                 {"c": "cc", "cxx": "CC", "fortran": "ftn"},
                 modules=["PrgEnv-gnu", "gcc/11.2.0"],
