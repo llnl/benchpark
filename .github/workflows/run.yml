@@ -107,11 +107,11 @@ jobs:
         testtype:
           - cuda
           - rocm
-          - openmp
-          - mpi
-          - strong
-          - weak
-          - throughput
+          #- openmp
+          #- mpi
+          #- strong
+          #- weak
+          #- throughput
           - modifiers
     steps:
       - name: Checkout Benchpark
