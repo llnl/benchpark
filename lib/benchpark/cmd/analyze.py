@@ -217,6 +217,7 @@ def prepare_data(**kwargs):
     tk.update_inclusive_columns()
 
     clean_tree = tk.tree(kwargs["tree_metric"], render_header=True)
+    clean_tree = re.compile(r"\x1b\[([0-9;]*m)").sub("", clean_tree)
 
     # Remove MPI regions, if necesasry
     if kwargs.get("no_mpi"):
