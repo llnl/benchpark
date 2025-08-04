@@ -85,14 +85,38 @@ class SingleNode:
             return "single_node" if self.spec.satisfies("+single_node") else ""
 
 
+class AffinityVariantValues(str, Enum):
+    AFFINITY = "affinity"
+    NAME = "name"
+    MODE = "mode"
+    PKG_SPEC = "pkg_spec"
+    COMPILER = "compiler"
+
+    NONE = "none"
+    ON = "on"
+
+    CUDA = "cuda"
+    ROCM = "rocm"
+    MPI = "mpi"
+    MODE = "mode"
+
+
+    @classmethod
+    def tuple_values(cls):
+        """Return only the original values for tuple creation"""
+        return tuple(v.value for v in [cls.NONE, cls.ON])
+    
+    @classmethod
+    def variant(cls, name):
+        """Return variant name with + prefix"""
+        return f"+{name}"
+    
+
 class Affinity:
     variant(
-        "affinity",
-        default="none",
-        values=(
-            "none",
-            "on",
-        ),
+        AffinityVariantValues.AFFINITY.value,
+        default=AffinityVariantValues.NONE.value,
+        values=AffinityVariantValues.tuple_values(),
         multi=False,
         description="Build and run the affinity package",
     )
@@ -100,16 +124,20 @@ class Affinity:
     class Helper(ExperimentHelper):
         def compute_modifiers_section(self):
             modifier_list = []
-            if not self.spec.satisfies("affinity=none"):
+            if not self.spec.satisfies(f"{AffinityVariantValues.AFFINITY.value}={AffinityVariantValues.NONE.value}"):
                 affinity_modifier_modes = {}
-                affinity_modifier_modes["name"] = "affinity"
-                if self.spec.satisfies("+cuda"):
-                    affinity_modifier_modes["mode"] = "cuda"
-                elif self.spec.satisfies("+rocm"):
-                    affinity_modifier_modes["mode"] = "rocm"
+                affinity_modifier_modes[AffinityVariantValues.NAME.value] = AffinityVariantValues.AFFINITY.value
+                
+                if self.spec.satisfies(AffinityVariantValues.variant(AffinityVariantValues.CUDA.value)):
+                    affinity_modifier_modes[AffinityVariantValues.MODE.val] = AffinityVariantValues.CUDA.value
+                
+                elif self.spec.satisfies(AffinityVariantValues.variant(AffinityVariantValues.ROCM.value)):
+                    affinity_modifier_modes[AffinityVariantValues.MODE.val] = AffinityVariantValues.ROCM.value
+                
                 else:
-                    affinity_modifier_modes["mode"] = "mpi"
+                    affinity_modifier_modes[AffinityVariantValues.MODE.val] = AffinityVariantValues.MPI.value
                 modifier_list.append(affinity_modifier_modes)
+
             return modifier_list
 
         def compute_package_section(self):
@@ -119,39 +147,52 @@ class Affinity:
             # get system config options
             # TODO: Get compiler/mpi/package handles directly from system.py
             system_specs = {}
-            system_specs["compiler"] = "default-compiler"
-            if self.spec.satisfies("+cuda"):
+            system_specs[AffinityVariantValues.COMPILER.value] = "default-compiler"
+            
+            if self.spec.satisfies(AffinityVariantValues.variant(AffinityVariantValues.CUDA.value)):
                 system_specs["cuda_arch"] = "{cuda_arch}"
-            if self.spec.satisfies("+rocm"):
+            
+            if self.spec.satisfies(AffinityVariantValues.variant(AffinityVariantValues.ROCM.value)):
                 system_specs["rocm_arch"] = "{rocm_arch}"
 
             # set package spack specs
             package_specs = {}
 
-            if not self.spec.satisfies("affinity=none"):
-                package_specs["affinity"] = {
-                    "pkg_spec": f"affinity@{affinity_version}+mpi",
-                    "compiler": system_specs["compiler"],
+            if not self.spec.satisfies(f"{AffinityVariantValues.AFFINITY.value}={AffinityVariantValues.NONE.value}"):
+                package_specs[AffinityVariantValues.AFFINITY.value] = {
+                    AffinityVariantValues.PKG_SPEC.value: f"{AffinityVariantValues.AFFINITY.value}@{affinity_version}{AffinityVariantValues.variant(AffinityVariantValues.MPI.value)}",
+                    AffinityVariantValues.COMPILER.value: system_specs[AffinityVariantValues.COMPILER.value],
                 }
-                if self.spec.satisfies("+cuda"):
-                    package_specs["affinity"]["pkg_spec"] += "+cuda"
-                elif self.spec.satisfies("+rocm"):
-                    package_specs["affinity"]["pkg_spec"] += "+rocm"
+
+                if self.spec.satisfies(AffinityVariantValues.variant(AffinityVariantValues.CUDA.value)):
+                    package_specs[AffinityVariantValues.AFFINITY.value][AffinityVariantValues.PKG_SPEC.value] += AffinityVariantValues.variant(AffinityVariantValues.CUDA.value)
+                
+                elif self.spec.satisfies(AffinityVariantValues.variant(AffinityVariantValues.ROCM.value)):
+                    package_specs[AffinityVariantValues.AFFINITY.value][AffinityVariantValues.PKG_SPEC.value] += AffinityVariantValues.variant(AffinityVariantValues.ROCM.value)
 
             return {
                 "packages": {k: v for k, v in package_specs.items() if v},
-                "environments": {"affinity": {"packages": list(package_specs.keys())}},
+                "environments": {AffinityVariantValues.AFFINITY.value: {"packages": list(package_specs.keys())}},
             }
 
 
 class HwlocVariantValues(str, Enum):
+    HWLOC = "hwloc"
+    NAME = "name"
+    MODE = "mode"
+
     NONE = "none"
     ON = "on"
+
+    @classmethod
+    def tuple_values(cls):
+        """Return only the original values for tuple creation"""
+        return tuple(v.value for v in [cls.NONE, cls.ON])
 
 
 class Hwloc:
     variant(
-        "hwloc",
+        HwlocVariantValues.HWLOC.value,
         default=HwlocVariantValues.NONE.value,
         values=tuple(v.value for v in HwlocVariantValues),
         multi=False,
@@ -162,10 +203,10 @@ class Hwloc:
         def compute_modifiers_section(self):
             modifier_list = []
 
-            if not self.spec.satisfies(f"hwloc={HwlocVariantValues.NONE.value}"):
+            if not self.spec.satisfies(f"{HwlocVariantValues.HWLOC.value}={HwlocVariantValues.NONE.value}"):
                 affinity_modifier_modes = {}
-                affinity_modifier_modes["name"] = "hwloc"
-                affinity_modifier_modes["mode"] = self.spec.variants["hwloc"][0]
+                affinity_modifier_modes[HwlocVariantValues.NAME.value] = HwlocVariantValues.HWLOC.value
+                affinity_modifier_modes[HwlocVariantValues.MODE.value] = self.spec.variants[HwlocVariantValues.HWLOC.value][0]
                 modifier_list.append(affinity_modifier_modes)
 
             return modifier_list
