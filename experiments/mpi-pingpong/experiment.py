@@ -9,7 +9,7 @@ from benchpark.mpi import MpiOnlyExperiment
 from benchpark.caliper import Caliper
 
 
-class MpiPingpong(MpiOnlyExperiment, Experiment, Caliper):
+class MpiPingpong(Experiment, MpiOnlyExperiment, Caliper):
 
     variant(
         "workload",
