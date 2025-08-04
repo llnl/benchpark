@@ -109,7 +109,7 @@ jobs:
       matrix:
         testtype:
           - cuda
-          #- rocm
+          - rocm
           #- openmp
           #- mpi
           #- strong
@@ -125,7 +125,7 @@ jobs:
       - name: Run Dryruns
         run: |
           ./bin/benchpark bootstrap
-          BENCHPARK_RUN_COVERAGE=1 ./bin/benchpark-python .github/utils/dryruns.py --test ${{ matrix.testtype }}
+          BENCHPARK_RUN_COVERAGE=${{ matrix.testtype }} ./bin/benchpark-python .github/utils/dryruns.py --test ${{ matrix.testtype }}
       # - name: Upload coverage data
       #   if: always()
       #   uses: actions/upload-artifact@v4
@@ -149,7 +149,6 @@ jobs:
       #   with:
       #     name: coverage-data
       #     path: ./coverage-data
-
   pytest:
     runs-on: ubuntu-24.04
     steps:
