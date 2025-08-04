@@ -5,6 +5,7 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
@@ -14,6 +15,7 @@ from benchpark.caliper import Caliper
 
 class Amg2023(
     Experiment,
+    MpiOnlyExperiment,
     OpenMPExperiment,
     CudaExperiment,
     ROCmExperiment,
@@ -113,4 +115,4 @@ class Amg2023(
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, [f"amg2023@{app_version} +mpi"])
+        self.add_package_spec(self.name, [f"amg2023@{app_version} "])

@@ -51,7 +51,7 @@
    add-a-system-config
    add-a-benchmark
    add-an-experiment
-   add-a-dryrun
+   testing-your-contribution
    update-a-system-config
 
 .. toctree::
@@ -59,6 +59,7 @@
    :caption: Developer Docs
 
    developer-guide
+   ci-developer-guide
 
 .. toctree::
    :maxdepth: 1

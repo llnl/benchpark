@@ -6,7 +6,6 @@
 import os
 
 import benchpark.paths
-import benchpark.spec
 
 exclude_exper = ["repo.yaml"]
 exp_dict = {
@@ -41,7 +40,8 @@ def benchpark_experiments(exclude_variants=non_experiments):
             if os.path.isfile(expr_file):
                 with open(expr_file, "r") as file:
                     file_text = file.read()
-                    experiments.append(x)  # default expr
+                    if "MpiOnlyExperiment" in file_text:
+                        experiments.append(x)  # default expr
                     for var in exp_dict.keys():
                         if var in file_text and var not in exclude_variants:
                             if "=" in exp_dict[var]:
@@ -64,6 +64,8 @@ def benchpark_modifiers():
 
 
 def benchpark_systems():
+    import benchpark.spec
+
     source_dir = benchpark.paths.benchpark_root
     systems = []
     exclude = ["all_hardware_descriptions", "common", "repo.yaml"]
