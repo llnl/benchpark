@@ -40,6 +40,7 @@ def main():
         )
         print(f"Coverage data written to {coverage_file}")
     else:
+        print("No coverage")
         subprocess.run([sys.executable, main_py] + sys.argv[1:], check=True)
 
 
