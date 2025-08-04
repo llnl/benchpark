@@ -122,7 +122,7 @@ jobs:
       - name: Run Dryruns
         run: |
           ./bin/benchpark bootstrap
-          ./bin/benchpark-python .github/utils/dryruns.py --test ${{ matrix.testtype }}
+          BENCHPARK_RUN_COVERAGE=1 ./bin/benchpark-python .github/utils/dryruns.py --test ${{ matrix.testtype }}
   upload_coverage:
     needs: dryrunexperiments
     runs-on: ubuntu-24.04

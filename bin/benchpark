@@ -25,6 +25,7 @@ def main():
         unique_id = uuid.uuid4().hex
         coverage_file = coverage_dir / f".coverage.{unique_id}"
         # Run the code with coverage, writing to the unique file
+        print(f"Coverage data written to {coverage_file}")
         subprocess.run(
             [
                 sys.executable,
@@ -38,7 +39,6 @@ def main():
             + sys.argv[1:],
             check=True,
         )
-        print(f"Coverage data written to {coverage_file}")
     else:
         print("No coverage")
         subprocess.run([sys.executable, main_py] + sys.argv[1:], check=True)

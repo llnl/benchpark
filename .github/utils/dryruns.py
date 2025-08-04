@@ -161,7 +161,7 @@ def main():
                 try:
                     subprocess.run(
                         ["bash", ".github/utils/dryrun.sh", espec, sspec],
-                        env={**os.environ, "BENCHPARK_RUN_COVERAGE": "true"},
+                        env={**os.environ},
                         capture_output=True,
                         check=True
                     )
