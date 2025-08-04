@@ -53,8 +53,16 @@ class RajaPerf(
                 f"Only one type of scaling per experiment is allowed for application package {self.name}"
             )
 
-        n_resources = {"n_ranks": 1}
-        problem_sizes = {"size": 1048576}
+        # n_resources = {"n_ranks": 1}
+        # problem_sizes = {"size": 1048576}
+
+        ######
+        factor = 6
+        scale = 4 * factor
+        init_problem_size = 536870912
+        n_resources = {"n_ranks": scale}
+        problem_sizes = {"size": init_problem_size // scale}
+        ######
 
         if self.spec.satisfies("+single_node"):
             for pk, pv in n_resources.items():

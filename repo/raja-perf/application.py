@@ -18,7 +18,7 @@ class RajaPerf(ExecutableApplication):
             'mpi','network-point-to-point','network-latency-bound',
             'c++','raja','sycl','builtin-caliper']
 
-    executable('run', 'raja-perf.exe --size {size} -atsc ${CALI_CONFIG_MODE} -atcc ${OTHER_CALI_CONFIG}', use_mpi=True)
+    executable('run', 'raja-perf.exe --size {size} -v RAJA_HIP -t block_256 --kernels Polybench_JACOBI_1D --disable-warmup --npasses 5 -atsc ${CALI_CONFIG_MODE} -atcc ${OTHER_CALI_CONFIG}', use_mpi=True)
 
     workload('suite', executables=['run'])
 
