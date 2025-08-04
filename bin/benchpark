@@ -20,7 +20,7 @@ def main():
 
     if os.environ.get("BENCHPARK_RUN_COVERAGE"):
         # Create a unique coverage data file name
-        coverage_dir = basedir / f"coverage-data-{os.environ.get("BENCHPARK_RUN_COVERAGE")}"
+        coverage_dir = basedir / f"coverage-data-{os.environ.get('BENCHPARK_RUN_COVERAGE')}"
         coverage_dir.mkdir(exist_ok=True, parents=True)
         unique_id = uuid.uuid4().hex
         coverage_file = coverage_dir / f".coverage.{unique_id}"
