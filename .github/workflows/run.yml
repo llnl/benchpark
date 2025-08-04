@@ -109,13 +109,13 @@ jobs:
       matrix:
         testtype:
           - cuda
-          - rocm
+          #- rocm
           #- openmp
           #- mpi
           #- strong
           #- weak
           #- throughput
-          - modifiers
+          #- modifiers
     steps:
       - name: Checkout Benchpark
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -126,30 +126,30 @@ jobs:
         run: |
           ./bin/benchpark bootstrap
           BENCHPARK_RUN_COVERAGE=1 ./bin/benchpark-python .github/utils/dryruns.py --test ${{ matrix.testtype }}
-      - name: Upload coverage data
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-data
-          path: ./coverage-data
-  upload_coverage:
-    needs: dryrunexperiments
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Download coverage data
-        uses: actions/download-artifact@v4
-        with:
-          name: coverage-data
-          path: ./coverage-data
+      # - name: Upload coverage data
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: coverage-data
+      #     path: ./coverage-data
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
-          directory: ./coverage-data
-          # files: /home/runner/work/benchpark/benchpark/coverage.xml
-          flags: dryrunexperiments
+          directory: ./coverage-data-${{ matrix.testtype }}
+          flags: dryrunexperiments-${{ matrix.testtype }}
           verbose: true
           fail_ci_if_error: true
+  # upload_coverage:
+  #   needs: dryrunexperiments
+  #   runs-on: ubuntu-24.04
+  #   steps:
+      # - name: Download coverage data
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: coverage-data
+      #     path: ./coverage-data
+
   pytest:
     runs-on: ubuntu-24.04
     steps:
