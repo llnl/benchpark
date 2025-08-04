@@ -123,6 +123,19 @@ jobs:
         run: |
           ./bin/benchpark bootstrap
           ./bin/benchpark-python .github/utils/dryruns.py --test ${{ matrix.testtype }}
+  upload_coverage:
+    needs: dryrunexperiments
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
+          directory: ./coverage-data
+          # files: /home/runner/work/benchpark/benchpark/coverage.xml
+          flags: dryrunexperiments
+          verbose: true
+          fail_ci_if_error: true
   pytest:
     runs-on: ubuntu-24.04
     steps:
