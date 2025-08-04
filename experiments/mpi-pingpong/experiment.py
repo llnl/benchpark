@@ -7,8 +7,6 @@ from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.caliper import Caliper
 
-# from benchpark.affinity import Affinity
-
 
 class MpiPingpong(Experiment, Caliper):
 
@@ -23,11 +21,8 @@ class MpiPingpong(Experiment, Caliper):
         n_nodes = 16  # max number of nodes
         expr_vars = {
             "n_nodes": n_nodes,
-            # "iterations": [10]*5+[10000]*5+[100000]*5,
-            # "msg_size": [16,256,4096,65536,1048576]*3
-            # TODO: other expr vars?
-            "iterations": 1000000,  # 1000000,
-            "msg_size": 16384,  # [16,256,4096,65536,1048576]*1
+            "iterations": 1000000,
+            "msg_size": 16,
         }
 
         for pk, pv in expr_vars.items():
@@ -42,10 +37,6 @@ class MpiPingpong(Experiment, Caliper):
             process_problem_size="{msg_size}",
             total_problem_size="{msg_size}",
         )
-
-        # self.set_environment_variable(
-
-        # )
 
     def compute_package_section(self):
         self.add_package_spec(self.name, ["mpi-pingpong@develop"])
