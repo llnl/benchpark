@@ -87,7 +87,7 @@ jobs:
           OUTPUT=$(spack find --paths saxpy)
           SAXPY_PATH=$(echo "$OUTPUT" | grep 'saxpy@' | awk '{print $2}')/bin/saxpy
           echo "Extracted Path: $SAXPY_PATH"
-          ./bin/benchpark experiment init --dest=saxpy/binary saxpy+openmp package_manager="user-managed" append_path="$SAXPY_PATH"
+          BENCHPARK_RUN_COVERAGE=binary ./bin/benchpark experiment init --dest=saxpy/binary saxpy+openmp package_manager="user-managed" append_path="$SAXPY_PATH"
           ./bin/benchpark setup saxpy/openmp generic-x86 workspace-binary/
           ./workspace-binary/ramble/bin/ramble \
             --disable-progress-bar \
@@ -101,6 +101,14 @@ jobs:
             on \
             --executor '{execute_experiment}' \
             --where '{n_nodes} == 1'
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
+          directory: ./coverage-data-binary
+          flags: dryrunexperiments-binary
+          verbose: true
+          fail_ci_if_error: true
   dryrunexperiments:
     runs-on: ubuntu-24.04
     strategy:
@@ -126,12 +134,6 @@ jobs:
         run: |
           ./bin/benchpark bootstrap
           BENCHPARK_RUN_COVERAGE=${{ matrix.testtype }} ./bin/benchpark-python .github/utils/dryruns.py --test ${{ matrix.testtype }}
-      # - name: Upload coverage data
-      #   if: always()
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: coverage-data
-      #     path: ./coverage-data
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
@@ -140,15 +142,6 @@ jobs:
           flags: dryrunexperiments-${{ matrix.testtype }}
           verbose: true
           fail_ci_if_error: true
-  # upload_coverage:
-  #   needs: dryrunexperiments
-  #   runs-on: ubuntu-24.04
-  #   steps:
-      # - name: Download coverage data
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: coverage-data
-      #     path: ./coverage-data
   pytest:
     runs-on: ubuntu-24.04
     steps:
