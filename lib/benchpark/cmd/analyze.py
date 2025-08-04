@@ -486,7 +486,7 @@ def setup_parser(root_parser):
         "--output-filename",
         type=str,
         default=None,
-        help="Configure the output file names (the defaul value is already unique to the workspace).",
+        help="Configure the output file names (the default value is already unique to the workspace).",
     )
     root_parser.add_argument(
         "--tree-metric",
