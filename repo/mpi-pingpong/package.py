@@ -10,12 +10,14 @@ class MpiPingpong(CMakePackage):
 
     git = "https://github.com/LLNL/microbenchmarks.git"
 
-    version("main", branch="main")
+    version("develop", branch="develop")
 
     variant("caliper", default=False, description="Enable Caliper/Adiak support")
 
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
+
+    root_cmakelists_dir = "repo/pingpong"
 
     def cmake_args(self):
         if self.spec.satisfies("+caliper"):

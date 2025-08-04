@@ -20,7 +20,7 @@ class MpiPingpong(Experiment, Caliper):
     maintainers("stephanielam3211")
 
     def compute_applications_section(self):
-        n_nodes = 8  # max number of nodes
+        n_nodes = 16  # max number of nodes
         expr_vars = {
             "n_nodes": n_nodes,
             # "iterations": [10]*5+[10000]*5+[100000]*5,
@@ -48,4 +48,4 @@ class MpiPingpong(Experiment, Caliper):
         # )
 
     def compute_package_section(self):
-        self.add_package_spec(self.name, ["mpi-pingpong@main"])
+        self.add_package_spec(self.name, ["mpi-pingpong@develop"])
