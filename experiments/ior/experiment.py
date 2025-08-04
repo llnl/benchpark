@@ -6,12 +6,14 @@
 from benchpark.error import BenchparkError
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.scaling import StrongScaling
 from benchpark.scaling import WeakScaling
 
 
 class Ior(
     Experiment,
+    MpiOnlyExperiment,
     StrongScaling,
     WeakScaling,
 ):

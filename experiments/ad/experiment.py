@@ -5,9 +5,10 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 
 
-class Ad(Experiment):
+class Ad(Experiment, MpiOnlyExperiment):
     variant(
         "workload",
         default="ad",
