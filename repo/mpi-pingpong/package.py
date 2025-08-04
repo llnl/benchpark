@@ -8,14 +8,14 @@ from spack.package import *
 
 class MpiPingpong(CMakePackage):
 
-    git = "/g/g16/lam44/Documents/pingpong/benchmark/"
+    git = "https://github.com/LLNL/microbenchmarks.git"
 
     version("main", branch="main")
 
     variant("caliper", default=False, description="Enable Caliper/Adiak support")
 
     depends_on("caliper", when="+caliper")
-    depends_on("adiak", when="+caliper")    
+    depends_on("adiak", when="+caliper")
 
     def cmake_args(self):
         if self.spec.satisfies("+caliper"):
