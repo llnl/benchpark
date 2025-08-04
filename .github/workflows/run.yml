@@ -1,6 +1,9 @@
 name: Run Benchpark and Simple Benchmark Suite
 on:
   workflow_call:
+    secrets:
+      BENCHPARK_CODECOV_TOKEN:
+        required: true
 jobs:
   saxpy:
     runs-on: ubuntu-24.04
@@ -132,7 +135,7 @@ jobs:
         with:
           token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
           directory: ./coverage-data
-          files: /home/runner/work/benchpark/benchpark/coverage.xml
+          #files: /home/runner/work/benchpark/benchpark/coverage.xml
           flags: dryrunexperiments
           verbose: true
           fail_ci_if_error: true
