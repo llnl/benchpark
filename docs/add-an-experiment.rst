@@ -137,6 +137,10 @@ string variants defined in your experiment.py passed in as key-value pairs:
 For example, to run the AMG2023 strong scaling experiment for problem 1, using CUDA the command would be:
 ``benchpark experiment init --dest amg2023_experiment amg2023 +cuda workload=problem1 scaling=strong scaling-factor=2 scaling-iterations=4``
 
+.. note:
+  Use the ``benchpark info experiment {benchmark_name}`` to find additional variants that are available to all experiments.
+  This includes settings such as: the job timeout, turning on debug mode, setting the account/bank, and appending/prepending to ``$PATH`` during runtime.
+
 Initializing an experiment generates the following yaml files:
 
 - ``ramble.yaml`` defines the `Ramble specs <https://ramble.readthedocs.io/en/latest/workspace_config.html#>`_ for building, running, analyzing and archiving experiments.
