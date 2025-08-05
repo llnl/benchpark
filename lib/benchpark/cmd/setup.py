@@ -188,9 +188,7 @@ export SPACK_DISABLE_LOCAL_CONFIG=1
             )
 
     ramble_setup = f"ramble --workspace-dir {ramble_workspace_dir} workspace setup"
-    ramble_run = (
-        f"ramble --workspace-dir {ramble_workspace_dir} on"
-    )
+    ramble_run = f"ramble --workspace-dir {ramble_workspace_dir} on"
 
     instructions = f"""\
 To complete the benchpark setup, do the following:
