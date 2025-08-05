@@ -321,7 +321,7 @@ class Allocation(BasicModifier):
             srun_opts.append(f"-N {v.n_nodes}")
 
         if v.debug:
-            sbatch_opts.append(f"--time 60")
+            sbatch_opts.append("--time 60")
             sbatch_opts.append("-p pdebug")
         elif v.timeout:
             sbatch_opts.append(f"--time {v.timeout}")
@@ -398,7 +398,7 @@ class Allocation(BasicModifier):
             cmd_opts.append(f"-g={gpus_per_rank}")
 
         if v.debug:
-            batch_opts.append(f"-t 60m")
+            batch_opts.append("-t 60m")
             batch_opts.append("-q pdebug")
         elif v.timeout:
             batch_opts.append(f"-t {v.timeout}m")
