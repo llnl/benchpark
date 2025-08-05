@@ -218,6 +218,28 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
         description="Prepend to environment PATH during experiment execution",
     )
 
+    variant(
+        "bank",
+        default="none",
+        multi=False,
+        description="Submit a job to a specific named bank",
+    )
+
+    variant(
+        "debug",
+        default="off",
+        values=("off", "on"),
+        multi=False,
+        description="Submit to debug queue",
+    )
+
+    variant(
+        "timeout",
+        default="120",
+        multi=False,
+        description="Set job timeout limit",
+    )
+
     def __init__(self, spec):
         self.spec: "benchpark.spec.ConcreteExperimentSpec" = spec
         # Device type must be set before super with absence of mpionly experiment type
@@ -399,6 +421,16 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
             self.env_vars["set"] |= env_vars["set"]
             self.env_vars["append"][0] |= env_vars["append"][0]
             self.env_vars["prepend"][0] |= env_vars["prepend"][0]
+
+        # Set bank
+        if self.spec.variants["bank"][0] != "none":
+            self.add_experiment_variable("bank", self.spec.variants["bank"][0])
+
+        # Set debug
+        if self.spec.variants["debug"][0] != "off":
+            self.add_experiment_variable("debug", self.spec.variants["debug"][0])
+
+        self.add_experiment_variable("timeout", self.spec.variants["timeout"][0])
 
         # Set required variable for package manager (we are not using this variable)
         if self.spec.variants["package_manager"][0] == "user-managed":
