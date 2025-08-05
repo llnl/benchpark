@@ -152,6 +152,10 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
             multi=False, description="Tests to run")
     variant("caliper",default=False, description="Build with support for Caliper based profiling")
 
+    depends_on("c", type="build")
+    depends_on("cxx", type="build")
+    depends_on("fortran", type="build")
+
     depends_on("blt")
     depends_on("blt@0.5.2:", type="build", when="@2022.10.0:")
     depends_on("blt@0.5.0:", type="build", when="@0.12.0:")
@@ -167,8 +171,6 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
     depends_on("llvm-openmp", when="+openmp %apple-clang")
 
     depends_on("rocprim", when="+rocm")
-
-
 
     conflicts("~openmp", when="+openmp_target", msg="OpenMP target requires OpenMP")
     conflicts("+cuda", when="+openmp_target", msg="Cuda may not be activated when openmp_target is ON")

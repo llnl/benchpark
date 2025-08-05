@@ -86,6 +86,11 @@ class Babelstream(CMakePackage, CudaPackage, ROCmPackage):
         msg="RAJA implementation requires architecture to be specified by dir=",
     )
 
+    # Confirmed c++ and Fortran
+    depends_on("c", type="build")
+    depends_on("cxx", type="build")
+    depends_on("fortran", type="build")
+
     # Thrust Conflict
     # conflicts("~cuda", when="+thrust", msg="Thrust requires +cuda variant")
     depends_on("thrust", when="+thrust")

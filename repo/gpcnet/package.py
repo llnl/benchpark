@@ -19,7 +19,9 @@ class Gpcnet(MakefilePackage):
     version("master", branch="master")
 
     variant("mpi", default=False, description="Build with MPI support")
-    
+
+    depends_on("c", type="build")
+
     depends_on("mpi", when="+mpi")
 
     @property

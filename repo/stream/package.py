@@ -24,6 +24,10 @@ class Stream(CMakePackage):
 
     requires("@5.10-caliper", when="+caliper")
 
+    depends_on("c", type="build")
+    depends_on("cxx", type="build")
+    depends_on("fortran", type="build")
+
     depends_on("caliper", when="+caliper")
     depends_on("adiak@0.4:", when="+caliper")
 

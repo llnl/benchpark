@@ -53,6 +53,10 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     variant("openmp", default=False, description="Build with OpenMP enabled.")
     variant("caliper", default=False, description="Build with Caliper support enabled.")
 
+    depends_on("c", type="build")
+    depends_on("cxx", type="build")
+    depends_on("fortran", type="build")
+
     depends_on("chai@2024.07.0+raja", when="@develop")
     depends_on("fmt@9.1", when=f"^chai@2024.07.0")
 

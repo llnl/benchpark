@@ -28,6 +28,10 @@ class Hpl(AutotoolsPackage):
     variant("openmp", default=False, description="Enable OpenMP support")
     variant("caliper", default=False, description="Enable Caliper support")
 
+    depends_on("c", type="build")
+    depends_on("cxx", type="build")
+    depends_on("fortran", type="build")
+
     depends_on("mpi@1.1:")
     depends_on("blas")
 

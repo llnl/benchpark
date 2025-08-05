@@ -6,7 +6,7 @@
 import os
 
 from spack.package import *
-from spack.pkg.builtin.hypre import Hypre as BuiltinHypre
+from spack_repo.builtin.packages.hypre.package import Hypre as BuiltinHypre
 
 
 class Hypre(BuiltinHypre):
