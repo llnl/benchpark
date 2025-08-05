@@ -187,9 +187,9 @@ export SPACK_DISABLE_LOCAL_CONFIG=1
 """
             )
 
-    ramble_setup = f"ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} workspace setup"
+    ramble_setup = f"ramble --workspace-dir {ramble_workspace_dir} workspace setup"
     ramble_run = (
-        f"ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} on"
+        f"ramble --workspace-dir {ramble_workspace_dir} on"
     )
 
     instructions = f"""\

@@ -45,7 +45,7 @@ Building the Experiment in Benchpark
 ::
 
    cd <experiments_root>/<Benchmark/ProgrammingModel>/<System>/workspace
-   ramble --disable-progress-bar --workspace-dir . workspace setup
+   ramble --workspace-dir . workspace setup
 
 -----------------------------------
 Running the Experiment in Benchpark
@@ -53,7 +53,7 @@ Running the Experiment in Benchpark
 
 To run all of the experiments in the workspace::
 
-   ramble --disable-progress-bar --workspace-dir . on
+   ramble --workspace-dir . on
 
 To run a single experiment in the workspace, invoke the ``execute_experiment`` script for the specific experiment
 (e.g., ``$workspace/experiments/amg2023/problem1/amg2023_cuda11.8.0_problem1_1_8_2_2_2_10_10_10/execute_experiment``).
@@ -65,7 +65,7 @@ Analyzing Experiments in Benchpark
 
 Once the experiments completed running, the command::
 
-  ramble --disable-progress-bar --workspace-dir . workspace analyze 
+  ramble --workspace-dir . workspace analyze 
 
 can be used to analyze figures of merit and evaluate 
 `success/failure <https://ramble.readthedocs.io/en/latest/success_criteria.html#success-criteria>`_ 

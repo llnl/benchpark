@@ -62,12 +62,12 @@ Run the setup script for dependency software, Ramble and Spack::
 Then setup the Ramble experiment workspace, this builds all software and may take some time::
 
     cd ./workspace/amg2023-benchmark/ruby-system/workspace/
-    ramble --workspace-dir . --disable-progress-bar workspace setup
+    ramble --workspace-dir . workspace setup
 
 Next, we run the AMG2023 experiments, which will launch jobs through the
 scheduler on the CTS system::
 
-    ramble --workspace-dir . --disable-progress-bar on
+    ramble --workspace-dir . on
 
 ------
 Tioga
@@ -83,5 +83,5 @@ different variants defined for the system. For example, the variant ``~gtl`` tur
     benchpark setup ./saxpy-benchmark ./tioga-system workspace/
     . workspace/setup.sh
     cd ./workspace/saxpy-benchmark/Tioga-975af3c/workspace/
-    ramble --workspace-dir . --disable-progress-bar workspace setup
-    ramble --workspace-dir . --disable-progress-bar on
+    ramble --workspace-dir . workspace setup
+    ramble --workspace-dir . on

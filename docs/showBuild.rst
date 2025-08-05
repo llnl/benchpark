@@ -15,7 +15,7 @@ bin/benchpark experiment init --dest=def-raja-perf raja-perf
 bin/benchpark system init --dest=def-ruby llnl-cluster cluster=ruby compiler=gcc
 bin/benchpark setup def-raja-perf/ def-ruby/ workspace/
 . `pwd`/workspace/setup.sh
-ramble --disable-progress-bar --workspace-dir `pwd`/workspace/def-raja-perf/def-ruby/workspace workspace setup
+ramble --workspace-dir `pwd`/workspace/def-raja-perf/def-ruby/workspace workspace setup
 ```
 
 You will now be able to `benchpark show-build dump`, a command that will dump a log of how Spack built the experiment:
