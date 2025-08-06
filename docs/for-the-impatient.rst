@@ -19,14 +19,14 @@ You need git and Python 3.8+::
    
    pip install -r requirements.txt
 
---------------------------------
-Setting up a Benchpark workspace
---------------------------------
+------------------
+Set up a Workspace
+------------------
 
 ::
 
     benchpark system init --dest=</output/path/to/system_def_dir> <SystemName> compiler=<Compiler>
-    benchpark experiment init --dest=</output/path/to/experiment_def_dir> <Benchmark> +/~<Boolean Variant> <String Variant>=<value>
+    benchpark experiment init --dest=</output/path/to/experiment_def_dir> <Benchmark> +/~<Boolean Variant> <String Variant>=<value> --system=</output/path/to/system_def_dir>
     benchpark setup </output/path/to/experiment_def> </output/path/to/system_def> </output/path/to/workspace>
 
 where:
@@ -38,18 +38,18 @@ where:
 
    . <experiments_root>/setup.sh
 
-------------------------------------
-Building the Experiment in Benchpark
-------------------------------------
+-------------------
+Build an Experiment
+-------------------
 
 ::
 
    cd <experiments_root>/<Benchmark/ProgrammingModel>/<System>/workspace
    ramble --workspace-dir . workspace setup
 
------------------------------------
-Running the Experiment in Benchpark
------------------------------------
+------------------
+Run the Experiment
+------------------
 
 To run all of the experiments in the workspace::
 
@@ -59,9 +59,9 @@ To run a single experiment in the workspace, invoke the ``execute_experiment`` s
 (e.g., ``$workspace/experiments/amg2023/problem1/amg2023_cuda11.8.0_problem1_1_8_2_2_2_10_10_10/execute_experiment``).
 
 
-----------------------------------
-Analyzing Experiments in Benchpark
-----------------------------------
+--------------------
+Experiment pass/fail
+--------------------
 
 Once the experiments completed running, the command::
 
