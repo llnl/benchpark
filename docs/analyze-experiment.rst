@@ -9,7 +9,7 @@ Experiment pass/fail and FOMs
 
 Once the experiments completed running, the command::
 
-  ramble --disable-progress-bar --workspace-dir . workspace analyze 
+  ramble --workspace-dir . workspace analyze 
 
 can be used to analyze figures of merit and evaluate 
 `success/failure <https://ramble.readthedocs.io/en/latest/success_criteria.html#success-criteria>`_

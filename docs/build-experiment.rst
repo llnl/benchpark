@@ -11,7 +11,7 @@ Building an Experiment in Benchpark
 The next step is setting up the Ramble workspace and building the code::
 
    cd <experiments_root>/<Benchmark/ProgrammingModel>/<System>/workspace
-   ramble --disable-progress-bar --workspace-dir . workspace setup
+   ramble --workspace-dir . workspace setup
 
 
 Ramble will build the source code and set up the following workspace directory structure::

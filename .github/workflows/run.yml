@@ -31,7 +31,6 @@ jobs:
         run: |
           ramble \
             --workspace-dir . \
-            --disable-progress-bar \
             --disable-logger \
             -c config:spack_flags:install:'--no-check-signature' \
             workspace setup
@@ -40,7 +39,6 @@ jobs:
         run: |
           ramble \
             --workspace-dir . \
-            --disable-progress-bar \
             --disable-logger \
             on \
             --executor '{execute_experiment}' \
@@ -50,7 +48,6 @@ jobs:
         run: |
           ramble \
             --workspace-dir . \
-            --disable-progress-bar \
             --disable-logger \
             workspace analyze
       - name: Archive Experiment Workspace
@@ -59,7 +56,6 @@ jobs:
         run: |
           ramble \
             --workspace-dir . \
-            --disable-progress-bar \
             --disable-logger \
             workspace archive
       - name: Upload Workspace Archive as CI Artifact
@@ -90,12 +86,10 @@ jobs:
           BENCHPARK_RUN_COVERAGE=binary ./bin/benchpark experiment init --dest=saxpy/binary saxpy+openmp package_manager="user-managed" append_path="$SAXPY_PATH"
           ./bin/benchpark setup saxpy/openmp generic-x86 workspace-binary/
           ./workspace-binary/ramble/bin/ramble \
-            --disable-progress-bar \
             --workspace-dir \
             /home/runner/work/benchpark/benchpark/workspace-binary/saxpy/openmp/generic-x86/workspace \
             workspace setup
           ./workspace-binary/ramble/bin/ramble \
-            --disable-progress-bar \
             --workspace-dir \
             /home/runner/work/benchpark/benchpark/workspace-binary/saxpy/openmp/generic-x86/workspace \
             on \
