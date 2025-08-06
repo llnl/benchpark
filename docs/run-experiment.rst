@@ -3,9 +3,9 @@
 
    SPDX-License-Identifier: Apache-2.0
 
-==================================
-Running an Experiment in Benchpark
-==================================
+=================
+Run an Experiment 
+=================
 
 To run all of the experiments in the workspace::
 
