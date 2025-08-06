@@ -295,7 +295,6 @@ class Allocation(BasicModifier):
         if not v.n_threads_per_proc:
             v.n_threads_per_proc = 1
 
-        max_request = v.max_request or 1000
         # Final check, make sure the above arithmetic didn't result in an
         # unreasonable allocation request.
         for var, val in v.defined():
@@ -303,8 +302,6 @@ class Allocation(BasicModifier):
                 int(val)
             except (ValueError, TypeError):
                 continue
-            if val > max_request:
-                raise ValueError(f"Request exceeds maximum: {var}/{val}/{max_request}")
 
     def slurm_instructions(self, v):
         sbatch_opts, srun_opts = Allocation._init_batch_and_cmd_opts(v)

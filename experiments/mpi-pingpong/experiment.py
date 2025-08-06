@@ -29,13 +29,13 @@ class MpiPingpong(Experiment, MpiOnlyExperiment, Caliper):
         for pk, pv in expr_vars.items():
             self.add_experiment_variable(pk, pv, True)
 
-        # Intentionally do not use "n_ranks" as we are already setting n_nodes. Do not change this to n_ranks
-        self.add_experiment_variable("total_ranks", "{n_nodes}*{sys_cores_per_node}", True)
+        # "n_ranks" will be computed from n_nodes and this variable in allocation modifier
+        self.add_experiment_variable("n_ranks_per_node", "{sys_cores_per_node}", True)
 
-        self.add_experiment_variable("partner_rank", "{total_ranks}-1", True)
+        self.add_experiment_variable("partner_rank", "{n_ranks}-1", True)
 
         self.set_required_variables(
-            n_resources="{total_ranks}",
+            n_resources="{n_ranks}",
             process_problem_size="{msg_size}",
             total_problem_size="{msg_size}",
         )
