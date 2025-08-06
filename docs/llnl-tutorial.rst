@@ -3,9 +3,9 @@
 
    SPDX-License-Identifier: Apache-2.0
 
-==========================
-Running on an LLNL System
-==========================
+==================
+Run on LLNL System
+==================
 
 .. note
 
