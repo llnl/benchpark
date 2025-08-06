@@ -3,9 +3,9 @@
 
    SPDX-License-Identifier: Apache-2.0
 
-=============================
-Experiment pass/fail and FOMs
-=============================
+====================
+Experiment pass/fail
+====================
 
 Once the experiments completed running, the command::
 

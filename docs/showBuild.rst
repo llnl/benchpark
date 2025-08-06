@@ -4,11 +4,12 @@
    SPDX-License-Identifier: Apache-2.0
 
 
-=============================================
-Show how Benchpark/Spack Built the Experiment
-=============================================
+==========
+Show Build
+==========
 
-If you create a Ramble workspace with Benchpark:
+If you build an experiment with Benchpark,
+you can see exactly how the experiment was built.
 
 ```
 bin/benchpark experiment init --dest=def-raja-perf raja-perf

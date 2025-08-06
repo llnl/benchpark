@@ -4,9 +4,9 @@
    SPDX-License-Identifier: Apache-2.0
 
 
-==========================================
-Comparing two Experiments Within Benchpark
-==========================================
+=======================
+Compare two Experiments
+=======================
 
 This tutorial will guide you through the process of building and comparing distinct binaries of the same benchmark. 
 As an example, we will be using an experiment comparing two builds of the quicksilver benchmark, compiled with the ``gcc`` and ``intel`` compiler variants on LLNL's Ruby cluster.
