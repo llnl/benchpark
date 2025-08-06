@@ -3,9 +3,9 @@
 
    SPDX-License-Identifier: Apache-2.0
 
-==================================
-Create a mirror for another system
-==================================
+=============
+System Mirror
+=============
 
 If you build a benchmark on a networked system, you can use `benchpark mirror`
 to create a directory that bundles all  necessary resources to install and run
