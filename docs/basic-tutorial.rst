@@ -3,9 +3,9 @@
 
    SPDX-License-Identifier: Apache-2.0
 
-=======================
-Tutorial: Benchpark 101
-=======================
+=============
+"Hello World"
+=============
 
 This tutorial will guide you through using Benchpark to run a strong scaling
 experiment with the `Kripke benchmark <https://github.com/LLNL/Kripke>`_ on an
