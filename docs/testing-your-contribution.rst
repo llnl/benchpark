@@ -4,9 +4,9 @@
 
    SPDX-License-Identifier: Apache-2.0
 
-======================
-Test Your Contribution
-======================
+=========================
+Testing Your Contribution
+=========================
 
 .. figure:: _static/images/dryruns.png
    :align: left
