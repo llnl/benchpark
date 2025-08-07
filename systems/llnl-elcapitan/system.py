@@ -301,11 +301,17 @@ class LlnlElcapitan(System):
         compiler = self.spec.variants["compiler"][0]
 
         if compiler == "cce":
-            return {"packages": {"all": {"require": [{"one_of": ["%cce", "%gcc", "@:"]}]}}}
+            return {
+                "packages": {"all": {"require": [{"one_of": ["%cce", "%gcc", "@:"]}]}}
+            }
         elif compiler == "gcc":
             return {"packages": {}}
         elif compiler == "rocmcc":
-            return {"packages": {"all": {"require": [{"one_of": ["%rocmcc", "%gcc", "@:"]}]}}}
+            return {
+                "packages": {
+                    "all": {"require": [{"one_of": ["%rocmcc", "%gcc", "@:"]}]}
+                }
+            }
         else:
             raise ValueError(f"Unexpected value for compiler: {compiler}")
 
@@ -624,7 +630,8 @@ class LlnlElcapitan(System):
         cfgs = []
         # Always need an instance of llvm-gpu as an external. Sometimes as a compiler
         # and sometimes just for ROCm support
-        rocmcc_cfg = compiler_section_for("llvm-amdgpu",
+        rocmcc_cfg = compiler_section_for(
+            "llvm-amdgpu",
             compiler_def(
                 f"llvm-amdgpu@{self.rocm_version}",
                 f"/opt/rocm-{self.rocm_version}/",
@@ -640,11 +647,12 @@ class LlnlElcapitan(System):
                         "LIBRARY_PATH": f"/opt/rocm-{self.rocm_version}/lib",
                     },
                 },
-            )
+            ),
         )
         cfgs.append(rocmcc_cfg)
         if self.spec.satisfies("compiler=cce"):
-            cce_cfg = compiler_section_for("cce",
+            cce_cfg = compiler_section_for(
+                "cce",
                 compiler_def(
                     f"cce@{self.cce_version}-rocm{self.rocm_version}",
                     f"/opt/cray/pe/cce/{self.cce_version}/",
@@ -662,7 +670,7 @@ class LlnlElcapitan(System):
                         "fflags": "-g -O2 -hnopattern",
                         "ldflags": "-ldl",
                     },
-                )
+                ),
             )
             cfgs.append(cce_cfg)
         return merge_dicts(*cfgs)
