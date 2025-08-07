@@ -621,7 +621,6 @@ class LlnlElcapitan(System):
         if self.spec.variants["cluster"][0] == "tioga":
             rpaths.append(f"/opt/cray/pe/cce/{self.cce_version}/cce-clang/x86_64/lib/")
 
-        compilers = list()
         if self.spec.satisfies("compiler=rocmcc"):
             entry = compiler_def(
                 f"llvm-amdgpu@{self.rocm_version}",

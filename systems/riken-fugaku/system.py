@@ -555,12 +555,12 @@ class RikenFugaku(System):
         compiler = self.spec.variants["compiler"][0]
 
         if compiler == "clang":
-            maybe_flags = {
-                "cflags": {"-msve-vector-bits=scalable"},
-                "cxxflags": {"-msve-vector-bits=scalable"},
-                "fflags": {"-msve-vector-bits=scalable"},
-                "ldflags": {"-fuse-ld=lld"},
-            }
+            # maybe_flags = {
+            #    "cflags": {"-msve-vector-bits=scalable"},
+            #    "cxxflags": {"-msve-vector-bits=scalable"},
+            #    "fflags": {"-msve-vector-bits=scalable"},
+            #    "ldflags": {"-fuse-ld=lld"},
+            # }
             cfg = compiler_section_for(
                 "llvm",
                 [
