@@ -223,11 +223,10 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
     )
 
     variant(
-        "debug",
-        default="off",
-        values=("off", "on"),
+        "job_queue",
+        default="none",
         multi=False,
-        description="Submit to debug queue",
+        description="Submit to queue aside from the default queue (e.g. pdebug)",
     )
 
     variant(
@@ -423,9 +422,9 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
         if self.spec.variants["bank"][0] != "none":
             self.add_experiment_variable("bank", self.spec.variants["bank"][0])
 
-        # Set debug
-        if self.spec.variants["debug"][0] != "off":
-            self.add_experiment_variable("debug", self.spec.variants["debug"][0])
+        # Set queue
+        if self.spec.variants["job_queue"][0] != "none":
+            self.add_experiment_variable("job_queue", self.spec.variants["job_queue"][0])
 
         self.add_experiment_variable("timeout", self.spec.variants["timeout"][0])
 

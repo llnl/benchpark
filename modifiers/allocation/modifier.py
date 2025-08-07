@@ -30,7 +30,7 @@ class AllocOpt(Enum):
     MAX_REQUEST = 202
     QUEUE = 203
     BANK = 204
-    DEBUG = 205
+    JOB_QUEUE = 205
 
     # Exec customization for inserting arbitrary options and commands,
     # inserted verbatim
@@ -50,7 +50,7 @@ class AllocOpt(Enum):
             AllocOpt.POST_EXEC_CMDS,
             AllocOpt.PRE_EXEC_CMDS,
             AllocOpt.BANK,
-            AllocOpt.DEBUG,
+            AllocOpt.JOB_QUEUE,
         ]:
             return str(input)
         else:
@@ -320,10 +320,10 @@ class Allocation(BasicModifier):
         if v.n_nodes:
             srun_opts.append(f"-N {v.n_nodes}")
 
-        if v.debug:
-            sbatch_opts.append("--time 60")
-            sbatch_opts.append("-p pdebug")
-        elif v.timeout:
+        if v.job_queue:
+            sbatch_opts.append(f"-p {v.job_queue}")
+        
+        if v.timeout:
             sbatch_opts.append(f"--time {v.timeout}")
 
         if v.bank:
@@ -397,10 +397,10 @@ class Allocation(BasicModifier):
             gpus_per_rank = 1  # self.gpus_as_gpus_per_rank(v)
             cmd_opts.append(f"-g={gpus_per_rank}")
 
-        if v.debug:
-            batch_opts.append("-t 60m")
-            batch_opts.append("-q pdebug")
-        elif v.timeout:
+        if v.job_queue:
+            batch_opts.append(f"-q {v.job_queue}")
+        
+        if v.timeout:
             batch_opts.append(f"-t {v.timeout}m")
 
         if v.bank:

@@ -140,7 +140,7 @@ For example, to run the AMG2023 strong scaling experiment for problem 1, using C
 .. Note::
 
   Use the ``benchpark info experiment {benchmark_name}`` to find additional variants that are available to all experiments.
-  This includes settings such as: the job timeout, turning on debug mode, setting the account/bank, and appending/prepending to ``$PATH`` during runtime.
+  This includes settings such as: the job timeout, submitting to a different partition/queue, setting the account/bank, and appending/prepending to ``$PATH`` during runtime.
 
 Initializing an experiment generates the following yaml files:
 
