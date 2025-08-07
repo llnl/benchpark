@@ -638,7 +638,7 @@ class LlnlElcapitan(System):
                 {"c": "amdclang", "cxx": "amdclang++", "fortran": "amdflang"},
                 modules=[f"cce/{self.cce_version}"],
                 flags={"cflags": "-g -O2", "cxxflags": "-g -O2"},
-                extra_rpaths=rpaths,
+                extra_rpaths=list(rpaths),
                 env={
                     "set": {"RFE_811452_DISABLE": "1"},
                     "append_path": {"LD_LIBRARY_PATH": "/opt/cray/pe/gcc-libs"},
@@ -658,7 +658,7 @@ class LlnlElcapitan(System):
                     f"/opt/cray/pe/cce/{self.cce_version}/",
                     {"c": "craycc", "cxx": "crayCC", "fortran": "crayftn"},
                     modules=[f"cce/{self.cce_version}"],
-                    extra_rpaths=rpaths,
+                    extra_rpaths=list(rpaths),
                     env={
                         "prepend_path": {
                             "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/rocm-{self.rocm_version}/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib"
