@@ -103,9 +103,7 @@ class AttrDict(dict):
         # user wants us to set it.
         # For integers, values exceeding max_request are presumed to be
         # placeholders.
-        max_request_int = v.max_request or 1000
         placeholder_checks = {
-            int: lambda x: x > max_request_int,
             str: lambda x: x == SENTINEL_UNDEFINED_VALUE_STR,
         }
         for var, val in v.defined():
