@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from spack.package import *
-from spack.pkg.builtin.boost import Boost
+from spack_repo.builtin.packages.boost.package import Boost
 
 
 class Branson(CMakePackage):
