@@ -233,7 +233,7 @@ class CscsDaint(System):
         for key, cfg in compiler_map.items():
             if key in compiler_variant:
                 collected.append(cfg)
-        return merge_dicts(collected)
+        return merge_dicts(*collected)
 
     def cuda_config(self, cuda_version):
         if cuda_version == "10.2.89":
