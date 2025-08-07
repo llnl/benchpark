@@ -7,7 +7,7 @@ import os
 
 import llnl.util.filesystem as fs
 
-from spack_repo.builtin.build_systems.cmake import CMakePackage
+from spack_repo.builtin.build_systems.cmake import CMakePackage, CMakeBuilder
 from spack_repo.builtin.build_systems.cuda import CudaPackage
 from spack_repo.builtin.build_systems.rocm import ROCmPackage
 from spack.package import *
@@ -432,7 +432,7 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
             for rpath in self.compiler.extra_rpaths:
                 env.prepend_path("LD_LIBRARY_PATH", rpath)
 
-class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
+class CMakeBuilder(CMakeBuilder):
     @run_after("build")
     def build_test_binaries(self):
         """Build the test binaries.
