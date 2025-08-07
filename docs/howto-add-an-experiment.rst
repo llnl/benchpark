@@ -190,8 +190,8 @@ Step 4: Add a Package Manager Section
 
 In ``compute_package_section`` add the benchmark's package spec. Required packages for the benchmark should be defined:
   
-  - in the ``package.py`` (if using spack).
-  - in the ``pyproject.toml`` or ``setup.py`` (if using pip)
+  - in the ``package.py``, either in spack or ``benchpark/repo/`` (if using spack).
+  - in the ``pyproject.toml`` or ``setup.py`` of the python project (if using pip).
 
 .. code::
 
