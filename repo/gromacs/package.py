@@ -7,7 +7,7 @@ import os
 
 import llnl.util.filesystem as fs
 
-import spack.build_systems.cmake
+from spack_repo.builtin.build_systems.cmake import CMakePackage, CudaPackage, ROCmPackage
 from spack.package import *
 
 
