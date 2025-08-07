@@ -6,7 +6,6 @@
 from typing import Dict
 import yaml  # TODO: some way to ensure yaml available
 import sys
-from enum import Enum
 
 from benchpark.error import BenchparkError
 from benchpark.directives import ExperimentSystemBase
@@ -144,31 +143,29 @@ class Affinity:
             }
 
 
-class HwlocVariantValues(str, Enum):
-    NONE = "none"
-    ON = "on"
-
-
 class Hwloc:
     variant(
         "hwloc",
-        default=HwlocVariantValues.NONE.value,
-        values=tuple(v.value for v in HwlocVariantValues),
+        default="none",
+        values=(
+            "none",
+            "on",
+        ),
         multi=False,
         description="Get underlying infrastructure topology",
     )
 
     class Helper(ExperimentHelper):
         def compute_modifiers_section(self):
-            modifier_list = []
+            hwloc_modifier_list = []
 
-            if not self.spec.satisfies(f"hwloc={HwlocVariantValues.NONE.value}"):
-                affinity_modifier_modes = {}
-                affinity_modifier_modes["name"] = "hwloc"
-                affinity_modifier_modes["mode"] = self.spec.variants["hwloc"][0]
-                modifier_list.append(affinity_modifier_modes)
+            if not self.spec.satisfies("hwloc=none"):
+                hwloc_modifier_modes = {}
+                hwloc_modifier_modes["name"] = "hwloc"
+                hwloc_modifier_modes["mode"] = self.spec.variants["hwloc"][0]
+                hwloc_modifier_list.append(hwloc_modifier_modes)
 
-            return modifier_list
+            return hwloc_modifier_list
 
 
 class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):

@@ -3,27 +3,22 @@
 
    SPDX-License-Identifier: Apache-2.0
 
-=================================
-Setting Up a Benchpark Workspace
-=================================
+==================
+Set up a Workspace
+==================
 
-To setup an experiment workspace you must first initialize both an experiment and a system to use. 
-Any system or experiment variants are specified at the end of the command as shown below.
-The order of the two init commands does not matter, but they both need to be run before the setup command.::
+To setup an experiment workspace you must first initialize the system you will be running on.
+Next, initialize the experiment you plan to run with the appropriate programming model.
+Finally, set up the workspace in a directory for your experiment.::
 
     benchpark system init --dest=</output/path/to/system_def_dir> <SystemName> compiler=<Compiler>
-    benchpark experiment init --dest=</output/path/to/experiment_def_dir> <Benchmark> +/~<Boolean Variant> <String Variant>=<value>
-
-
-Once you have a benchmark experiment to run, along with the programming model to use, and a system to run them on.
-Also choose a directory for your experiment::
-
+    benchpark experiment init --dest=</output/path/to/experiment_def_dir> <Benchmark> +/~<Boolean Variant> <String Variant>=<value> --system=</output/path/to/system_def_dir>
     benchpark setup </output/path/to/experiment_def> </output/path/to/system_def> </output/path/to/workspace>
 
 where:
 
-- ``<Benchmark>``: amg2023 | saxpy | etc. (predefined choices in :doc:`benchmark-list`)
-- ``<System>``: Cts | Tioga | etc. (predefined systems in :doc:`system-list`)
+- ``<Benchmark>``: amg2023 | saxpy | etc. (specified choices in :doc:`benchmark-list`)
+- ``<System>``: Cts | Tioga | etc. (specified systems in :doc:`system-list`)
 
 This command will assemble a Ramble workspace per experiment
 with a configuration for the specified benchmark and system
