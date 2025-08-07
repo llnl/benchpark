@@ -150,7 +150,10 @@ class System(ExperimentSystemBase):
             pkg_cfg = merge_dicts(pkg_cfg, compiler_cfg)
         # "'packages:':" syntax is required to enforce spack to use benchpark-defined
         # compilers instead of external compilers defined by spack compiler search (from ramble).
-        pkg_cfg = {"packages:": pkg_cfg["packages"]}
+        if pkg_cfg:
+            pkg_cfg = {"packages:": pkg_cfg["packages"]}
+        else:
+            pkg_cfg = {"packages": {}}
         return {
             "system_id": self.compute_system_id(),
             "variables": self.compute_variables_section(),
