@@ -17,6 +17,5 @@ system="s-$timestamp"
 . workspace/setup.sh
 ramble \
     --workspace-dir "workspace/$benchmark/$system/workspace" \
-    --disable-progress-bar \
     --disable-logger \
     workspace setup --dry-run
