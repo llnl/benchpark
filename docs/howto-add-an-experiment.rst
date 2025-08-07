@@ -346,8 +346,8 @@ Refer to the Ramble documentation for a detailed explanation of zip and matrix.
 
 .. _scaling-configs:
 
-register_scaling_config
-~~~~~~~~~~~~~~~~~~~~~~~
+More on Scaling Configurations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For each scaling mode supported by an application, the ``register_scaling_config`` method must define the scaled variables and their
 corresponding scaling function.
