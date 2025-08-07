@@ -221,7 +221,7 @@ def hybrid_compiler_requirements(c_cmp, f_cmp):
 
 
 def compiler_section_for(name, entries):
-    return {"packages": {name: {"externals": entries}}}
+    return {"packages": {name: {"externals": entries, "buildable": False}}}
 
 
 def compiler_def(
