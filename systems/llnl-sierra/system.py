@@ -6,7 +6,13 @@
 from benchpark.directives import variant, maintainers
 from benchpark.cudasystem import CudaSystem
 from benchpark.paths import hardware_descriptions
-from benchpark.system import System, compiler_def, compiler_section_for, merge_dicts, hybrid_compiler_requirements
+from benchpark.system import (
+    System,
+    compiler_def,
+    compiler_section_for,
+    merge_dicts,
+    hybrid_compiler_requirements,
+)
 from packaging.version import Version
 
 
@@ -432,56 +438,67 @@ class LlnlSierra(System):
         if (compiler, cuda_ver) == ("clang-ibm", "11-8-0"):
             cfg1 = compiler_section_for(
                 "clang",
-                [compiler_def(
-                    "clang@16.0.6",
-                    "/usr/tce/packages/clang/clang-ibm-16.0.6-cuda-11.8.0-gcc-11.2.1/",
-                    {"c": "clang", "cxx": "clang++"},
-                    flags=flags,
-                    modules=cuda_modules + ["clang/ibm-16.0.6-cuda-11.8.0-gcc-11.2.1"],
-                )]
+                [
+                    compiler_def(
+                        "clang@16.0.6",
+                        "/usr/tce/packages/clang/clang-ibm-16.0.6-cuda-11.8.0-gcc-11.2.1/",
+                        {"c": "clang", "cxx": "clang++"},
+                        flags=flags,
+                        modules=cuda_modules
+                        + ["clang/ibm-16.0.6-cuda-11.8.0-gcc-11.2.1"],
+                    )
+                ],
             )
             cfg2 = compiler_section_for(
                 "xl",
-                [compiler_def(
-                    "xl@2023.06.28",
-                    "/usr/tce/packages/xl/xl-2023.06.28-cuda-11.8.0-gcc-11.2.1/",
-                    {"c": "xlc", "cxx": "xlC", "fortran": "xlf"},
-                    flags=flags,
-                )]
+                [
+                    compiler_def(
+                        "xl@2023.06.28",
+                        "/usr/tce/packages/xl/xl-2023.06.28-cuda-11.8.0-gcc-11.2.1/",
+                        {"c": "xlc", "cxx": "xlC", "fortran": "xlf"},
+                        flags=flags,
+                    )
+                ],
             )
             cfg = merge_dicts(cfg1, cfg2, hybrid_compiler_requirements("llvm", "xl"))
         elif (compiler, cuda_ver) == ("xl-gcc", "11-8-0"):
             cfg = compiler_section_for(
                 "xl",
-                [compiler_def(
-                    "xl@2023.06.28",
-                    "/usr/tce/packages/xl/xl-2023.06.28-cuda-11.8.0-gcc-11.2.1/",
-                    {"c": "xlc", "cxx": "xlC", "fortran": "xlf"},
-                    flags=flags,
-                    modules=cuda_modules + ["xl/2023.06.28-cuda-11.8.0-gcc-11.2.1"],
-                )]
+                [
+                    compiler_def(
+                        "xl@2023.06.28",
+                        "/usr/tce/packages/xl/xl-2023.06.28-cuda-11.8.0-gcc-11.2.1/",
+                        {"c": "xlc", "cxx": "xlC", "fortran": "xlf"},
+                        flags=flags,
+                        modules=cuda_modules + ["xl/2023.06.28-cuda-11.8.0-gcc-11.2.1"],
+                    )
+                ],
             )
         elif (compiler, cuda_ver) == ("xl", "10-1-243"):
             cfg = compiler_section_for(
                 "xl",
-                [compiler_def(
-                    "xl@16.1.1-2022.08.19-cuda10.1.243",
-                    "/usr/tce/packages/xl/xl-2022.08.19/",
-                    {"c": "xlc", "cxx": "xlC", "fortran": "xlf"},
-                    flags=flags,
-                    modules=cuda_modules + ["xl/2022.08.19"],
-                )]
+                [
+                    compiler_def(
+                        "xl@16.1.1-2022.08.19-cuda10.1.243",
+                        "/usr/tce/packages/xl/xl-2022.08.19/",
+                        {"c": "xlc", "cxx": "xlC", "fortran": "xlf"},
+                        flags=flags,
+                        modules=cuda_modules + ["xl/2022.08.19"],
+                    )
+                ],
             )
         elif (compiler, cuda_ver) == ("xl", "11-8-0"):
             cfg = compiler_section_for(
                 "xl",
-                [compiler_def(
-                    "xl@16.1.1-2022.08.19-cuda11.8.0",
-                    "/usr/tce/packages/xl/xl-2022.08.19-cuda-11.8.0/",
-                    {"c": "xlc", "cxx": "xlC", "fortran": "xlf"},
-                    flags=flags,
-                    modules=cuda_modules + ["xl/2022.08.19-cuda-11.8.0"],
-                )]
+                [
+                    compiler_def(
+                        "xl@16.1.1-2022.08.19-cuda11.8.0",
+                        "/usr/tce/packages/xl/xl-2022.08.19-cuda-11.8.0/",
+                        {"c": "xlc", "cxx": "xlC", "fortran": "xlf"},
+                        flags=flags,
+                        modules=cuda_modules + ["xl/2022.08.19-cuda-11.8.0"],
+                    )
+                ],
             )
         elif (compiler, cuda_ver) == ("clang", "11-8-0"):
             custom_flags = {
@@ -490,21 +507,25 @@ class LlnlSierra(System):
             }
             cfg1 = compiler_section_for(
                 "clang",
-                [compiler_def(
-                    "clang@16.0.6",
-                    "/usr/tce/packages/clang/clang-ibm-16.0.6-cuda-11.8.0-gcc-11.2.1/",
-                    {"c": "clang", "cxx": "clang++"},
-                    flags=custom_flags,
-                )]
+                [
+                    compiler_def(
+                        "clang@16.0.6",
+                        "/usr/tce/packages/clang/clang-ibm-16.0.6-cuda-11.8.0-gcc-11.2.1/",
+                        {"c": "clang", "cxx": "clang++"},
+                        flags=custom_flags,
+                    )
+                ],
             )
             cfg2 = compiler_section_for(
                 "gcc",
-                [compiler_def(
-                    "gcc@11.2.1 languages:=c,c++,fortran",
-                    "/usr/tce/packages/gcc/gcc-11.2.1/",
-                    {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
-                    flags=custom_flags,
-                )]
+                [
+                    compiler_def(
+                        "gcc@11.2.1 languages:=c,c++,fortran",
+                        "/usr/tce/packages/gcc/gcc-11.2.1/",
+                        {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                        flags=custom_flags,
+                    )
+                ],
             )
             cfg = merge_dicts(cfg1, cfg2, hybrid_compiler_requirements("llvm", "gcc"))
 

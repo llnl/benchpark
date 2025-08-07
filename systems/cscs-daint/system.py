@@ -145,73 +145,87 @@ class CscsDaint(System):
         compiler_map = {}
         compiler_map["cce"] = compiler_section_for(
             "cce",
-            [compiler_def(
-                "cce@12.0.3",
-                "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
-                {"c": "cc", "cxx": "CC", "fortran": "ftn"},
-                modules=["PrgEnv-cray", "cce/12.0.3"],
-                compilers_use_relative_paths=True,
-            )]
+            [
+                compiler_def(
+                    "cce@12.0.3",
+                    "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
+                    {"c": "cc", "cxx": "CC", "fortran": "ftn"},
+                    modules=["PrgEnv-cray", "cce/12.0.3"],
+                    compilers_use_relative_paths=True,
+                )
+            ],
         )
         compiler_map["gcc9"] = compiler_section_for(
             "gcc",
-            [compiler_def(
-                "gcc@9.3.0 languages:=c,c++,fortran",
-                "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
-                {"c": "cc", "cxx": "CC", "fortran": "ftn"},
-                modules=["PrgEnv-gnu", "gcc/9.3.0"],
-                compilers_use_relative_paths=True,
-            )]
+            [
+                compiler_def(
+                    "gcc@9.3.0 languages:=c,c++,fortran",
+                    "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
+                    {"c": "cc", "cxx": "CC", "fortran": "ftn"},
+                    modules=["PrgEnv-gnu", "gcc/9.3.0"],
+                    compilers_use_relative_paths=True,
+                )
+            ],
         )
         compiler_map["gcc10"] = compiler_section_for(
             "gcc",
-            [compiler_def(
-                "gcc@10.3.0 languages:=c,c++,fortran",
-                "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
-                {"c": "cc", "cxx": "CC", "fortran": "ftn"},
-                modules=["PrgEnv-gnu", "gcc/10.3.0"],
-                compilers_use_relative_paths=True,
-            )]
+            [
+                compiler_def(
+                    "gcc@10.3.0 languages:=c,c++,fortran",
+                    "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
+                    {"c": "cc", "cxx": "CC", "fortran": "ftn"},
+                    modules=["PrgEnv-gnu", "gcc/10.3.0"],
+                    compilers_use_relative_paths=True,
+                )
+            ],
         )
         compiler_map["gcc11"] = compiler_section_for(
             "gcc",
-            [compiler_def(
-                "gcc@11.2.0 languages:=c,c++,fortran",
-                "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
-                {"c": "cc", "cxx": "CC", "fortran": "ftn"},
-                modules=["PrgEnv-gnu", "gcc/11.2.0"],
-                compilers_use_relative_paths=True,
-            )]
+            [
+                compiler_def(
+                    "gcc@11.2.0 languages:=c,c++,fortran",
+                    "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
+                    {"c": "cc", "cxx": "CC", "fortran": "ftn"},
+                    modules=["PrgEnv-gnu", "gcc/11.2.0"],
+                    compilers_use_relative_paths=True,
+                )
+            ],
         )
         compiler_map["intel"] = compiler_section_for(
             "intel-oneapi-compilers",
-            [compiler_def(
-                "intel-oneapi-compilers@2021.3.0",
-                "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
-                {"c": "cc", "cxx": "CC", "fortran": "ftn"},
-                modules=["PrgEnv-intel", "intel/2021.3.0"],
-                compilers_use_relative_paths=True,
-            )]
+            [
+                compiler_def(
+                    "intel-oneapi-compilers@2021.3.0",
+                    "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
+                    {"c": "cc", "cxx": "CC", "fortran": "ftn"},
+                    modules=["PrgEnv-intel", "intel/2021.3.0"],
+                    compilers_use_relative_paths=True,
+                )
+            ],
         )
         compiler_map["pgi"] = compiler_section_for(
             "pgi",
-            [compiler_def(
-                "pgi@20.1.1",
-                "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
-                {"c": "cc", "cxx": "CC", "fortran": "ftn"},
-                modules=["PrgEnv-pgi", "pgi/20.1.1"],
-                compilers_use_relative_paths=True,
-            )]
+            [
+                compiler_def(
+                    "pgi@20.1.1",
+                    "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
+                    {"c": "cc", "cxx": "CC", "fortran": "ftn"},
+                    modules=["PrgEnv-pgi", "pgi/20.1.1"],
+                    compilers_use_relative_paths=True,
+                )
+            ],
         )
         compiler_map["nvhpc"] = compiler_section_for(
             "nvhpc",
-            [compiler_def(
-                "nvhpc@21.3",
-                "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
-                {"c": "cc", "cxx": "CC", "fortran": "ftn"},
-                modules=["PrgEnv-nvidia", "nvidia/21.3"],
-                compilers_use_relative_paths=True,
-            )]
+            [
+                compiler_def(
+                    "nvhpc@21.3",
+                    "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
+                    {"c": "cc", "cxx": "CC", "fortran": "ftn"},
+                    modules=["PrgEnv-nvidia", "nvidia/21.3"],
+                    compilers_use_relative_paths=True,
+                )
+            ],
         )
 
         collected = list()
@@ -220,8 +234,6 @@ class CscsDaint(System):
             if key in compiler_variant:
                 collected.append(cfg)
         return merge_dicts(collected)
-
-
 
     def cuda_config(self, cuda_version):
         if cuda_version == "10.2.89":

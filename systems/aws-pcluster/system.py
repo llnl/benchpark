@@ -103,11 +103,13 @@ class AwsPcluster(System):
     def compute_compilers_section(self):
         return compiler_section_for(
             "gcc",
-            [compiler_def(
-                "gcc@7.3.1 languages=c,c++,fortran",
-                "/usr/",
-                {"c": "gcc", "cxx": "g++", "fortran": "gfortran"}
-            )]
+            [
+                compiler_def(
+                    "gcc@7.3.1 languages=c,c++,fortran",
+                    "/usr/",
+                    {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                )
+            ],
         )
 
     def compute_software_section(self):

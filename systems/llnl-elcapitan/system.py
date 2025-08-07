@@ -312,11 +312,13 @@ class LlnlElcapitan(System):
     def compute_compilers_section(self):
         cfg = compiler_section_for(
             "gcc",
-            [compiler_def(
-                "gcc@12.2.0 languages=c,c++,fortran",
-                "/opt/cray/pe/gcc/12.2.0/",
-                {"c": "gcc", "cxx": "g++", "fortran": "gfortran"}
-            )]
+            [
+                compiler_def(
+                    "gcc@12.2.0 languages=c,c++,fortran",
+                    "/opt/cray/pe/gcc/12.2.0/",
+                    {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                )
+            ],
         )
 
         if self.spec.satisfies("compiler=cce") or self.spec.satisfies(
@@ -579,7 +581,7 @@ class LlnlElcapitan(System):
                     ],
                     "buildable": False,
                 },
-                #"llvm-amdgpu": {
+                # "llvm-amdgpu": {
                 #    "externals": [
                 #        {
                 #            "spec": f"llvm-amdgpu@{self.rocm_version}",
@@ -587,7 +589,7 @@ class LlnlElcapitan(System):
                 #        }
                 #    ],
                 #    "buildable": False,
-                #},
+                # },
                 "rocblas": {
                     "externals": [
                         {
@@ -630,9 +632,7 @@ class LlnlElcapitan(System):
                 extra_rpaths=rpaths,
                 env={
                     "set": {"RFE_811452_DISABLE": "1"},
-                    "append_path": {
-                        "LD_LIBRARY_PATH": "/opt/cray/pe/gcc-libs"
-                    },
+                    "append_path": {"LD_LIBRARY_PATH": "/opt/cray/pe/gcc-libs"},
                     "prepend_path": {
                         "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib",
                         "LIBRARY_PATH": f"/opt/rocm-{self.rocm_version}/lib",
@@ -657,10 +657,9 @@ class LlnlElcapitan(System):
                     "cxxflags": "-g -O2 -std=c++14",
                     "fflags": "-g -O2 -hnopattern",
                     "ldflags": "-ldl",
-                }
+                },
             )
             return compiler_section_for("cce", [entry])
-
 
     def system_specific_variables(self):
         opts = super().system_specific_variables()

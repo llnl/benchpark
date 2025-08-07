@@ -169,40 +169,44 @@ class LanlVenado(System):
     def compute_compilers_section(self):
         gcc_cfg = compiler_section_for(
             "gcc",
-            [compiler_def(
-                "gcc@12.3.0 languages:=c,c++,fortran",
-                "/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/",
-                {"c": "gcc", "cxx": "g++", "fortran": "gfortran"}
-            )]
+            [
+                compiler_def(
+                    "gcc@12.3.0 languages:=c,c++,fortran",
+                    "/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/",
+                    {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                )
+            ],
         )
 
         # TODO: Construct/extract/customize compiler information from the working set
         if self.spec.satisfies("compiler=cce"):
             cce_cfg = compiler_section_for(
                 "cce",
-                [compiler_def(
-                    "cce@18.0.0",
-                    "/opt/cray/pe/cce/18.0.0/",
-                    {"c": "cracc", "cxx": "crayCC", "fortran": "crayftn"},
-                    flags={
-                        "cflags": "-g -O2 --gcc-toolchain=/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0",
-                        "cxxflags": "-g -O2 --gcc-toolchain=/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0",
-                        "fflags": "-g -O2 -hnopattern",
-                        "ldflags": "-ldl",
-                    },
-                    env={
-                        "prepend_path": {
-                            "LD_LIBRARY_PATH": "/opt/cray/pe/cce/18.0.0/cce/aarch64/lib:/opt/cray/libfabric/1.20.1/lib64:/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/lib:/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/lib64:/opt/cray/pe/gcc-libs"
-                        }
-                    },
-                    extra_rpaths=[
-                        "/opt/cray/pe/gcc-libs",
-                        "/opt/cray/pe/cce/18.0.0/cce/aarch64/lib",
-                        "/opt/cray/libfabric/1.20.1/lib64",
-                        "/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/lib",
-                        "/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/lib64",
-                    ],
-                )]
+                [
+                    compiler_def(
+                        "cce@18.0.0",
+                        "/opt/cray/pe/cce/18.0.0/",
+                        {"c": "cracc", "cxx": "crayCC", "fortran": "crayftn"},
+                        flags={
+                            "cflags": "-g -O2 --gcc-toolchain=/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0",
+                            "cxxflags": "-g -O2 --gcc-toolchain=/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0",
+                            "fflags": "-g -O2 -hnopattern",
+                            "ldflags": "-ldl",
+                        },
+                        env={
+                            "prepend_path": {
+                                "LD_LIBRARY_PATH": "/opt/cray/pe/cce/18.0.0/cce/aarch64/lib:/opt/cray/libfabric/1.20.1/lib64:/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/lib:/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/lib64:/opt/cray/pe/gcc-libs"
+                            }
+                        },
+                        extra_rpaths=[
+                            "/opt/cray/pe/gcc-libs",
+                            "/opt/cray/pe/cce/18.0.0/cce/aarch64/lib",
+                            "/opt/cray/libfabric/1.20.1/lib64",
+                            "/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/lib",
+                            "/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/lib64",
+                        ],
+                    )
+                ],
             )
             cfg = merge_dicts(gcc_cfg, cce_cfg)
         else:

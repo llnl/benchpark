@@ -209,14 +209,8 @@ def hybrid_compiler_requirements(c_cmp, f_cmp):
                         "spec": rf"%[virtuals=c] {c_cmp}",
                         "when": r"%c",
                     },
-                    {
-                        "spec": rf"%[virtuals=cxx] {c_cmp}",
-                        "when": r"%cxx"
-                    },
-                    {
-                        "spec": rf"^[virtuals=fortran] {f_cmp}",
-                        "when": r"^fortran"
-                    }
+                    {"spec": rf"%[virtuals=cxx] {c_cmp}", "when": r"%cxx"},
+                    {"spec": rf"^[virtuals=fortran] {f_cmp}", "when": r"^fortran"},
                 ]
             }
         }
@@ -224,17 +218,19 @@ def hybrid_compiler_requirements(c_cmp, f_cmp):
 
 
 def compiler_section_for(name, entries):
-    return {
-        "packages": {
-            name: {
-                "externals": entries
-            }
-        }
-    }
+    return {"packages": {name: {"externals": entries}}}
 
 
-def compiler_def(spec, prefix, exes, env=None, extra_rpaths=None, modules=None, flags=None,
-                 compilers_use_relative_paths=False):
+def compiler_def(
+    spec,
+    prefix,
+    exes,
+    env=None,
+    extra_rpaths=None,
+    modules=None,
+    flags=None,
+    compilers_use_relative_paths=False,
+):
     lang_map = {}
     for lang, exe in exes.items():
         if os.path.isabs(exe) or compilers_use_relative_paths:
@@ -244,9 +240,7 @@ def compiler_def(spec, prefix, exes, env=None, extra_rpaths=None, modules=None, 
     entry = {
         "spec": spec,
         "prefix": prefix,
-        "extra_attributes": {
-            "compilers": lang_map
-        }
+        "extra_attributes": {"compilers": lang_map},
     }
     if env:
         entry["extra_attributes"]["environment"] = env

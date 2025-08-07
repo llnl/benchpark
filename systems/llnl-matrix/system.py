@@ -214,38 +214,46 @@ class LlnlMatrix(System):
     def compute_compilers_section(self):
         gcc_cfg = compiler_section_for(
             "gcc",
-            [compiler_def(
-                "gcc@12.1.1 languages:=c,c++,fortran",
-                "/usr/tce/packages/gcc/gcc-12.1.1/",
-                {"c": "gcc", "cxx": "g++", "fortran": "gfortran"}
-            )]
+            [
+                compiler_def(
+                    "gcc@12.1.1 languages:=c,c++,fortran",
+                    "/usr/tce/packages/gcc/gcc-12.1.1/",
+                    {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                )
+            ],
         )
         if self.spec.satisfies("compiler=gcc"):
             cfg = gcc_cfg
         elif self.spec.satisfies("compiler=intel"):
             cfg = compiler_section_for(
                 "intel-oneapi-compilers-classic",
-                [compiler_def(
-                    "intel-oneapi-compilers-classic@2021.6.0 ~envmods",
-                    "/usr/tce/packages/intel-classic/intel-classic-2021.6.0/",
-                    {"c": "icc", "cxx": "icpc", "fortran": "ifort"}
-                )]
+                [
+                    compiler_def(
+                        "intel-oneapi-compilers-classic@2021.6.0 ~envmods",
+                        "/usr/tce/packages/intel-classic/intel-classic-2021.6.0/",
+                        {"c": "icc", "cxx": "icpc", "fortran": "ifort"},
+                    )
+                ],
             )
         elif self.spec.satisfies("compiler=oneapi"):
             oneapi_cfg = compiler_section_for(
                 "intel-oneapi-compilers",
-                [compiler_def(
-                    "intel-oneapi-compilers@2023.2.1 ~envmods",
-                    "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/",
-                    {"c": "icx", "cxx": "icpx", "fortran": "ifx"},
-                    modules=[
-                        f"cuda/{self.cuda_version}",
-                    ],
-                )]
+                [
+                    compiler_def(
+                        "intel-oneapi-compilers@2023.2.1 ~envmods",
+                        "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/",
+                        {"c": "icx", "cxx": "icpx", "fortran": "ifx"},
+                        modules=[
+                            f"cuda/{self.cuda_version}",
+                        ],
+                    )
+                ],
             )
             # In this case 2 compilers are defined: create a preference for
             # oneAPI compiler
-            weighting_cfg = {"packages": {"all": {"require": [{"one_of": ["%oneapi", "%gcc"]}]}}}
+            weighting_cfg = {
+                "packages": {"all": {"require": [{"one_of": ["%oneapi", "%gcc"]}]}}
+            }
             cfg = merge_dicts(gcc_cfg, oneapi_cfg, weighting_cfg)
 
         return cfg

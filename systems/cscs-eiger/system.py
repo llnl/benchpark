@@ -44,13 +44,15 @@ class CscsEiger(System):
     def compute_compilers_section(self):
         return compiler_section_for(
             "gcc",
-            [compiler_def(
-                "gcc@12.3.0 languages:=c,c++,fortran",
-                "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
-                {"c": "cc", "cxx": "CC", "fortran": "ftn"},
-                modules=["PrgEnv-gnu", "gcc/12.3.0"],
-                compilers_use_relative_paths=True,
-            )]
+            [
+                compiler_def(
+                    "gcc@12.3.0 languages:=c,c++,fortran",
+                    "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
+                    {"c": "cc", "cxx": "CC", "fortran": "ftn"},
+                    modules=["PrgEnv-gnu", "gcc/12.3.0"],
+                    compilers_use_relative_paths=True,
+                )
+            ],
         )
 
     def compute_packages_section(self):

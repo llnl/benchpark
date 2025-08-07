@@ -563,54 +563,60 @@ class RikenFugaku(System):
             }
             cfg = compiler_section_for(
                 "llvm",
-                [compiler_def(
-                    "llvm@17.0.2",
-                    "/vol0004/apps/oss/llvm-v17.0.2/compute_node/",
-                    {"c": "clang", "cxx": "clang++", "fortran": "flang"},
-                    env={
-                        "append_path": {
-                            "LD_LIBRARY_PATH": "/opt/FJSVxtclanga/tcsds-1.2.38/lib64"
-                        }
-                    },
-                    #flags = maybe_flags
-                )]
+                [
+                    compiler_def(
+                        "llvm@17.0.2",
+                        "/vol0004/apps/oss/llvm-v17.0.2/compute_node/",
+                        {"c": "clang", "cxx": "clang++", "fortran": "flang"},
+                        env={
+                            "append_path": {
+                                "LD_LIBRARY_PATH": "/opt/FJSVxtclanga/tcsds-1.2.38/lib64"
+                            }
+                        },
+                        # flags = maybe_flags
+                    )
+                ],
             )
         elif compiler == "gcc":
             cfg = compiler_section_for(
                 "gcc",
-                [compiler_def(
-                    "gcc@13.2.0 languages:=c,c++,fortran",
-                    "/vol0004/apps/oss/spack-v0.21/opt/spack/linux-rhel8-a64fx/gcc-8.5.0/gcc-13.2.0-abihbe7ykvpedq54j6blfvfppy7ojbmd/",
-                    {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
-                    env={
-                        "set": {
-                            "OPAL_PREFIX": "/vol0004/apps/oss/mpigcc/fjmpi-gcc12"
+                [
+                    compiler_def(
+                        "gcc@13.2.0 languages:=c,c++,fortran",
+                        "/vol0004/apps/oss/spack-v0.21/opt/spack/linux-rhel8-a64fx/gcc-8.5.0/gcc-13.2.0-abihbe7ykvpedq54j6blfvfppy7ojbmd/",
+                        {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                        env={
+                            "set": {
+                                "OPAL_PREFIX": "/vol0004/apps/oss/mpigcc/fjmpi-gcc12"
+                            },
+                            "append_path": {
+                                "LD_LIBRARY_PATH": "/opt/FJSVxtclanga/tcsds-1.2.38/lib64"
+                            },
                         },
-                        "append_path": {
-                            "LD_LIBRARY_PATH": "/opt/FJSVxtclanga/tcsds-1.2.38/lib64"
-                        },
-                    },
-                    flags={"ldflags": {"-lelf -ldl"}},
-                )]
+                        flags={"ldflags": {"-lelf -ldl"}},
+                    )
+                ],
             )
         elif compiler == "fj":
             cfg = compiler_section_for(
                 "fj",
-                [compiler_def(
-                    "fj@4.10.0",
-                    "/opt/FJSVxtclanga/tcsds-1.2.38/",
-                    {"c": "fcc", "cxx": "FCC", "fortran": "frt"},
-                    env={
-                        "set": {
-                            "fcc_ENV": "-Nclang",
-                            "FCC_ENV": "-Nclang",
+                [
+                    compiler_def(
+                        "fj@4.10.0",
+                        "/opt/FJSVxtclanga/tcsds-1.2.38/",
+                        {"c": "fcc", "cxx": "FCC", "fortran": "frt"},
+                        env={
+                            "set": {
+                                "fcc_ENV": "-Nclang",
+                                "FCC_ENV": "-Nclang",
+                            },
+                            "prepend_path": {
+                                "PATH": "/opt/FJSVxtclanga/tcsds-1.2.38/bin",
+                                "LD_LIBRARY_PATH": "/opt/FJSVxtclanga/tcsds-1.2.38/lib64",
+                            },
                         },
-                        "prepend_path": {
-                            "PATH": "/opt/FJSVxtclanga/tcsds-1.2.38/bin",
-                            "LD_LIBRARY_PATH": "/opt/FJSVxtclanga/tcsds-1.2.38/lib64",
-                        },
-                    },
-                )]
+                    )
+                ],
             )
 
         return cfg

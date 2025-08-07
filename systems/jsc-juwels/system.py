@@ -62,23 +62,27 @@ class JscJuwels(System):
     def compute_compilers_section(self):
         nvhpc_cfg = compiler_section_for(
             "nvhpc",
-            [compiler_def(
-                "nvhpc@23.7",
-                "/p/software/juwelsbooster/stages/2024/software/NVHPC/23.7-CUDA-12/Linux_aarch64/23.7/compilers/",
-                {"c": "nvc", "cxx": "nvc++", "fortran": "nvfortran"},
-                modules=["Stages/2024", "NVHPC/23.7"],
-            )]
+            [
+                compiler_def(
+                    "nvhpc@23.7",
+                    "/p/software/juwelsbooster/stages/2024/software/NVHPC/23.7-CUDA-12/Linux_aarch64/23.7/compilers/",
+                    {"c": "nvc", "cxx": "nvc++", "fortran": "nvfortran"},
+                    modules=["Stages/2024", "NVHPC/23.7"],
+                )
+            ],
         )
 
         if self.spec.satisfies("compiler=gcc"):
             gcc_cfg = compiler_section_for(
                 "gcc",
-                [compiler_def(
-                    "gcc@12.3.0 languages:=c,c++,fortran",
-                    "/p/software/juwelsbooster/stages/2024/software/GCCcore/12.3.0/",
-                    {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
-                    modules=["Stages/2024", "GCC/12.3.0"],
-                )]
+                [
+                    compiler_def(
+                        "gcc@12.3.0 languages:=c,c++,fortran",
+                        "/p/software/juwelsbooster/stages/2024/software/GCCcore/12.3.0/",
+                        {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                        modules=["Stages/2024", "GCC/12.3.0"],
+                    )
+                ],
             )
             cfg = merge_dicts(nvhpc_cfg, gcc_cfg)
         else:
