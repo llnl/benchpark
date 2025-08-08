@@ -101,6 +101,14 @@ class LlnlElcapitan(System):
     )
 
     variant(
+        "bank",
+        default="none",
+        values=("none", "guests", "asccasc", "lc", "fractale"),
+        multi=False,
+        description="Submit a job to a specific named bank",
+    )
+
+    variant(
         "queue",
         default="none",
         values=("none", "pbatch", "pdebug"),

@@ -52,13 +52,6 @@ class System(ExperimentSystemBase):
     ]
 
     variant(
-        "bank",
-        default="none",
-        multi=False,
-        description="Submit a job to a specific named bank",
-    )
-
-    variant(
         "timeout",
         default="120",
         multi=False,
@@ -170,12 +163,12 @@ class System(ExperimentSystemBase):
             "timeout"
         ][0]
         # Set bank
-        if self.spec.variants["bank"][0] != "none":
+        if "bank" in self.spec.variants and self.spec.variants["bank"][0] != "none":
             self.bank = job_configuration_options["bank"] = self.spec.variants["bank"][
                 0
             ]
         # Set queue
-        if self.spec.variants["queue"][0] != "none":
+        if "queue" in self.spec.variants and self.spec.variants["queue"][0] != "none":
             self.queue = job_configuration_options["queue"] = queue_name = (
                 self.spec.variants["queue"][0]
             )

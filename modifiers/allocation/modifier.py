@@ -309,7 +309,7 @@ class Allocation(BasicModifier):
             if val > max_request:
                 raise ValueError(f"Request exceeds maximum: {var}/{val}/{max_request}")
 
-        if v.n_nodes > v.max_nodes:
+        if v.max_nodes and v.n_nodes > v.max_nodes:
             raise ValueError(
                 f"{v.n_nodes} nodes is unsatisfiable for queue '{v.queue}' (max {v.max_nodes})."
             )
