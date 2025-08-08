@@ -10,7 +10,7 @@ import yaml
 import sys
 from typing import Dict, Tuple
 
-from benchpark.directives import ExperimentSystemBase, variant
+from benchpark.directives import ExperimentSystemBase, provides, variant
 import benchpark.spec
 import benchpark.variant
 
@@ -20,6 +20,15 @@ def _hash_id(content_list):
     for x in content_list:
         sha256_hash.update(x.encode("utf-8"))
     return sha256_hash.hexdigest()
+
+
+class MPISystem:
+    provides("mpi")
+
+    name = "mpi"
+
+    def system_specific_variables(self, system):
+        return {}
 
 
 class System(ExperimentSystemBase):
@@ -64,6 +73,9 @@ class System(ExperimentSystemBase):
         self.timeout = "120"
         self.queue = None
 
+        # Assume every system is an MPI system
+        self._programming_models = [MPISystem()]
+
         self.required = ["sys_cores_per_node", "scheduler", "timeout"]
 
     def compute_system_id(self):
@@ -93,7 +105,7 @@ class System(ExperimentSystemBase):
     def programming_models(self, pm_list):
         if not isinstance(pm_list, list):
             raise ValueError("Value must be a list")
-        self._programming_models = pm_list
+        self._programming_models.extend(pm_list)
 
     def verify(self):
         for pm in self.programming_models:
