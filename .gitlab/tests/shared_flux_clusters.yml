@@ -111,7 +111,7 @@ run_tests_flux_tuolumne:
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK: [kripke]
-        VARIANT: [+rocm caliper=mpi,time,rocm]
+        VARIANT: ['+rocm caliper=mpi,time,rocm']
 run_tests_flux_tioga:
   extends: .run_tests_flux
   tags: [shell, tioga]
