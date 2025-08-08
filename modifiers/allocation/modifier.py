@@ -322,7 +322,7 @@ class Allocation(BasicModifier):
 
         if v.job_queue:
             sbatch_opts.append(f"-p {v.job_queue}")
-        
+
         if v.timeout:
             sbatch_opts.append(f"--time {v.timeout}")
 
@@ -399,7 +399,7 @@ class Allocation(BasicModifier):
 
         if v.job_queue:
             batch_opts.append(f"-q {v.job_queue}")
-        
+
         if v.timeout:
             batch_opts.append(f"-t {v.timeout}m")
 
