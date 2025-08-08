@@ -102,6 +102,11 @@ run_tests_flux_tuolumne:
         VARIANT: [+rocm scaling=strong scaling-iterations=2]
         SYSTEM_ARGS: [gpumode=CPX]
         GPUMODE: CPX
+      # Test openmp on tuolumne
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [kripke]
+        VARIANT: [+openmp]
 run_tests_flux_tioga:
   extends: .run_tests_flux
   tags: [shell, tioga]
