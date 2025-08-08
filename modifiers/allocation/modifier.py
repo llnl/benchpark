@@ -30,7 +30,7 @@ class AllocOpt(Enum):
     MAX_REQUEST = 202
     QUEUE = 203
     BANK = 204
-    QUEUE = 205
+    MAX_NODES = 205
 
     # Exec customization for inserting arbitrary options and commands,
     # inserted verbatim
@@ -50,7 +50,6 @@ class AllocOpt(Enum):
             AllocOpt.POST_EXEC_CMDS,
             AllocOpt.PRE_EXEC_CMDS,
             AllocOpt.BANK,
-            AllocOpt.QUEUE,
         ]:
             return str(input)
         else:
@@ -309,6 +308,11 @@ class Allocation(BasicModifier):
                 continue
             if val > max_request:
                 raise ValueError(f"Request exceeds maximum: {var}/{val}/{max_request}")
+
+        if v.n_nodes > v.max_nodes:
+            raise ValueError(
+                f"{v.n_nodes} nodes is unsatisfiable for queue '{v.queue}' (max {v.max_nodes})."
+            )
 
     def slurm_instructions(self, v):
         sbatch_opts, srun_opts = Allocation._init_batch_and_cmd_opts(v)
