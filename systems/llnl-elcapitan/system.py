@@ -630,49 +630,43 @@ class LlnlElcapitan(System):
         cfgs = []
         # Always need an instance of llvm-gpu as an external. Sometimes as a compiler
         # and sometimes just for ROCm support
-        rocmcc_cfg = compiler_section_for(
-            "llvm-amdgpu",
-            compiler_def(
-                f"llvm-amdgpu@{self.rocm_version}",
-                f"/opt/rocm-{self.rocm_version}/",
-                {"c": "amdclang", "cxx": "amdclang++", "fortran": "amdflang"},
+        rocmcc_entry = compiler_def(
+            f"llvm-amdgpu@{self.rocm_version}",
+            f"/opt/rocm-{self.rocm_version}/",
+            {"c": "amdclang", "cxx": "amdclang++", "fortran": "amdflang"},
+            modules=[f"cce/{self.cce_version}"],
+            flags={"cflags": "-g -O2", "cxxflags": "-g -O2"},
+            extra_rpaths=list(rpaths),
+            env={
+                "set": {"RFE_811452_DISABLE": "1"},
+                "append_path": {"LD_LIBRARY_PATH": "/opt/cray/pe/gcc-libs"},
+                "prepend_path": {
+                    "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib",
+                    "LIBRARY_PATH": f"/opt/rocm-{self.rocm_version}/lib",
+                },
+            },
+        )
+        cfgs.append(compiler_section_for("llvm-amdgpu", [rocmcc_entry]))
+        if self.spec.satisfies("compiler=cce"):
+            cce_entry = compiler_def(
+                f"cce@{self.cce_version}-rocm{self.rocm_version}",
+                f"/opt/cray/pe/cce/{self.cce_version}/",
+                {"c": "craycc", "cxx": "crayCC", "fortran": "crayftn"},
                 modules=[f"cce/{self.cce_version}"],
-                flags={"cflags": "-g -O2", "cxxflags": "-g -O2"},
                 extra_rpaths=list(rpaths),
                 env={
-                    "set": {"RFE_811452_DISABLE": "1"},
-                    "append_path": {"LD_LIBRARY_PATH": "/opt/cray/pe/gcc-libs"},
                     "prepend_path": {
-                        "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib",
-                        "LIBRARY_PATH": f"/opt/rocm-{self.rocm_version}/lib",
-                    },
+                        "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/rocm-{self.rocm_version}/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib"
+                    }
                 },
-            ),
-        )
-        cfgs.append(rocmcc_cfg)
-        if self.spec.satisfies("compiler=cce"):
-            cce_cfg = compiler_section_for(
-                "cce",
-                compiler_def(
-                    f"cce@{self.cce_version}-rocm{self.rocm_version}",
-                    f"/opt/cray/pe/cce/{self.cce_version}/",
-                    {"c": "craycc", "cxx": "crayCC", "fortran": "crayftn"},
-                    modules=[f"cce/{self.cce_version}"],
-                    extra_rpaths=list(rpaths),
-                    env={
-                        "prepend_path": {
-                            "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/rocm-{self.rocm_version}/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib"
-                        }
-                    },
-                    flags={
-                        "cflags": "-g -O2",
-                        "cxxflags": "-g -O2 -std=c++14",
-                        "fflags": "-g -O2 -hnopattern",
-                        "ldflags": "-ldl",
-                    },
-                ),
+                flags={
+                    "cflags": "-g -O2",
+                    "cxxflags": "-g -O2 -std=c++14",
+                    "fflags": "-g -O2 -hnopattern",
+                    "ldflags": "-ldl",
+                },
             )
-            cfgs.append(cce_cfg)
+            cfgs.append(compiler_section_for("cce", [cce_entry]))
         return merge_dicts(*cfgs)
 
     def system_specific_variables(self):
