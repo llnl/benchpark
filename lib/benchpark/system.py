@@ -39,7 +39,7 @@ class System(ExperimentSystemBase):
         "job_queue",
         default="none",
         multi=False,
-        description="Submit to queue aside from the default queue (e.g. pdebug)",
+        description="Submit to queue other than the default queue (e.g. pdebug)",
     )
 
     variant(
