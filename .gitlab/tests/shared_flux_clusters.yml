@@ -107,6 +107,13 @@ run_tests_flux_tuolumne:
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK: [kripke]
         VARIANT: [+openmp]
+        GPUMODE: SPX
+      # Test kripke+rocm+single_memory on tuolumne
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [kripke]
+        VARIANT: [+rocm+single_memory]
+        GPUMODE: SPX
 run_tests_flux_tioga:
   extends: .run_tests_flux
   tags: [shell, tioga]
