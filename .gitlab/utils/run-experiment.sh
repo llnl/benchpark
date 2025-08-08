@@ -12,7 +12,7 @@ else
 fi
 
 # Initialize Experiment
-./bin/benchpark experiment init --dest=${BENCHMARK} ${BENCHMARK} ${VARIANT}
+./bin/benchpark experiment init --dest=${BENCHMARK} --system=${HOST} ${BENCHMARK} ${VARIANT}
 
 # Build Workspace
 ./bin/benchpark setup ${BENCHMARK} ${HOST} wkp/

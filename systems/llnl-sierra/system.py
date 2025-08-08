@@ -7,6 +7,7 @@ from benchpark.directives import variant, maintainers
 from benchpark.cudasystem import CudaSystem
 from benchpark.paths import hardware_descriptions
 from benchpark.system import System
+from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from packaging.version import Version
 
 
@@ -66,7 +67,7 @@ class LlnlSierra(System):
 
     def __init__(self, spec):
         super().__init__(spec)
-        self.programming_models = [CudaSystem()]
+        self.programming_models = [CudaSystem(), OpenMPCPUOnlySystem()]
         self.cuda_version = Version(self.spec.variants["cuda"][0])
         self.gtl_flag = self.spec.variants["gtl"][0]
 
