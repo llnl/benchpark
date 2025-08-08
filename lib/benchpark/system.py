@@ -10,7 +10,7 @@ import yaml
 import sys
 from typing import Dict, Tuple
 
-from benchpark.directives import ExperimentSystemBase
+from benchpark.directives import ExperimentSystemBase, variant
 import benchpark.spec
 import benchpark.variant
 
@@ -27,6 +27,27 @@ class System(ExperimentSystemBase):
         str,
         Tuple["benchpark.variant.Variant", "benchpark.spec.ConcreteSystemSpec"],
     ]
+
+    variant(
+        "bank",
+        default="none",
+        multi=False,
+        description="Submit a job to a specific named bank",
+    )
+
+    variant(
+        "job_queue",
+        default="none",
+        multi=False,
+        description="Submit to queue aside from the default queue (e.g. pdebug)",
+    )
+
+    variant(
+        "timeout",
+        default="120",
+        multi=False,
+        description="Set job timeout limit (in minutes)",
+    )
 
     def __init__(self, spec):
         self.spec: "benchpark.spec.ConcreteSystemSpec" = spec
@@ -125,7 +146,16 @@ class System(ExperimentSystemBase):
         for k, v in self.system_specific_variables().items():
             system_specific[k] = v
 
-        extra_variables = optionals | system_specific
+        job_configuration_options = {}
+        # Set bank
+        if self.spec.variants["bank"][0] != "none":
+            job_configuration_options["bank"] = self.spec.variants["bank"][0]
+        # Set queue
+        if self.spec.variants["job_queue"][0] != "none":
+            job_configuration_options["job_queue"] = self.spec.variants["job_queue"][0]
+        job_configuration_options["timeout"] = self.spec.variants["timeout"][0]
+
+        extra_variables = optionals | system_specific | job_configuration_options
 
         return {
             "variables": {
