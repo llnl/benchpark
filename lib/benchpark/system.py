@@ -36,7 +36,7 @@ class System(ExperimentSystemBase):
     )
 
     variant(
-        "job_queue",
+        "queue",
         default="none",
         multi=False,
         description="Submit to queue other than the default queue (e.g. pdebug)",
@@ -151,8 +151,8 @@ class System(ExperimentSystemBase):
         if self.spec.variants["bank"][0] != "none":
             job_configuration_options["bank"] = self.spec.variants["bank"][0]
         # Set queue
-        if self.spec.variants["job_queue"][0] != "none":
-            job_configuration_options["job_queue"] = self.spec.variants["job_queue"][0]
+        if self.spec.variants["queue"][0] != "none":
+            job_configuration_options["queue"] = self.spec.variants["queue"][0]
         job_configuration_options["timeout"] = self.spec.variants["timeout"][0]
 
         extra_variables = optionals | system_specific | job_configuration_options
