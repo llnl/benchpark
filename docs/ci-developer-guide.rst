@@ -91,6 +91,27 @@ The linter step checks:
 - ``flake8`` for checking Python style enforcement
 - ``yamlfix`` for formatting ``.yaml``/``.yml`` files
 
+**************
+Code Coverage
+**************
+
+`Code coverage <https://about.codecov.io/>`_ measures the amount of lines that are "covered" by a given test, i.e. if a line was executed it counts as coverage. Code coverage should automatically report on all open pull requests.
+
+It is possible to run coverage for any test that uses ``bin/benchpark`` by providing ``BENCHPARK_RUN_COVERAGE=[YOUR_DIRNAME]`` and add an upload step which takes the following form.
+
+```
+- name: Upload coverage to Codecov
+   uses: codecov/codecov-action@v4
+   with:
+      token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
+      directory: ./coverage-data-$BENCHPARK_RUN_COVERAGE
+      flags: dryrunexperiments-$BENCHPARK_RUN_COVERAGE
+      verbose: true
+      fail_ci_if_error: true
+```
+
+Additionally, for each upload step added, ``after_n_builds`` in ``codecov.yml`` needs to be incremented by 1.
+
 -------
 CDash
 -------

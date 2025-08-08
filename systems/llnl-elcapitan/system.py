@@ -8,6 +8,7 @@ from benchpark.directives import variant, maintainers
 from benchpark.paths import hardware_descriptions
 from benchpark.rocmsystem import ROCmSystem
 from benchpark.system import System
+from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from packaging.version import Version
 
 
@@ -99,7 +100,7 @@ class LlnlElcapitan(System):
 
     def __init__(self, spec):
         super().__init__(spec)
-        self.programming_models = [ROCmSystem()]
+        self.programming_models = [ROCmSystem(), OpenMPCPUOnlySystem()]
         self.rocm_version = Version(self.spec.variants["rocm"][0])
         self.gtl_flag = self.spec.variants["gtl"][0]
 

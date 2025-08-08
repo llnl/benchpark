@@ -75,11 +75,11 @@ What to rerun after edits
    * - What I changed
      - Commands to rerun
    * - configs
-     - ``ramble --disable-progress-bar --workspace-dir . workspace setup``
+     - ``ramble --workspace-dir . workspace setup``
    * - benchmark's package.py
-     - ``ramble --disable-progress-bar --workspace-dir . workspace setup``
+     - ``ramble --workspace-dir . workspace setup``
    * - dependency of package.py
-     - ``ramble --disable-progress-bar --workspace-dir . workspace setup``
+     - ``ramble --workspace-dir . workspace setup``
    * - experiment parameters
      - delete ``workspace/experiments``
    * - wish to rerun experiments

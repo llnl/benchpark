@@ -3,9 +3,9 @@
 
    SPDX-License-Identifier: Apache-2.0
 
-=======================
-Tutorial: Benchpark 101
-=======================
+=============
+"Hello World"
+=============
 
 This tutorial will guide you through using Benchpark to run a strong scaling
 experiment with the `Kripke benchmark <https://github.com/LLNL/Kripke>`_ on an
@@ -199,7 +199,7 @@ Next, build any necessary software and generate all necessary files for the Krip
 
 .. code-block:: bash
 
-    ramble --disable-progress-bar \
+    ramble \
     --workspace-dir /home/jovyan/benchpark/wkp/kripke-benchmark/hpdc-tutorial/workspace \
     workspace setup
 
@@ -243,7 +243,7 @@ Next, run the Kripke strong scaling experiment by running the following command:
 
 .. code-block:: bash
 
-    ramble --disable-progress-bar \
+    ramble \
     --workspace-dir /home/jovyan/benchpark/wkp/kripke-benchmark/hpdc-tutorial/workspace \
     on
 

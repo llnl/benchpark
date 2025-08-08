@@ -7,6 +7,7 @@ import subprocess
 import time
 import sys
 import argparse
+import os
 
 import benchpark.paths
 
@@ -158,8 +159,12 @@ def main():
                 if args.dryrun:
                     continue
                 try:
-                    cmd = f'source .github/utils/dryrun.sh "{espec}" "{sspec}"'
-                    subprocess.run(["bash", "-c", cmd], capture_output=True, check=True)
+                    subprocess.run(
+                        ["bash", ".github/utils/dryrun.sh", espec, sspec],
+                        env={**os.environ},
+                        capture_output=True,
+                        check=True
+                    )
                 except subprocess.CalledProcessError as e:
                     errors[f"{espec} {sspec}"] = e.stderr.decode()
                     fail_tests += 1
