@@ -4,6 +4,19 @@ set -e
 # Activate Virtual Environment
 . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
 
+
+if [ "$HOST" == "lassen" ]; then
+    echo "./bin/benchpark system init --dest=${HOST} ${ARCHCONFIG} $SYSTEM_ARGS"
+else
+    echo "./bin/benchpark system init --dest=${HOST} ${ARCHCONFIG} cluster=$HOST $SYSTEM_ARGS"
+fi
+echo "./bin/benchpark experiment init --dest=${BENCHMARK} ${BENCHMARK} ${VARIANT}"
+echo "./bin/benchpark setup ${BENCHMARK} ${HOST} wkp/"
+echo ". wkp/setup.sh"
+echo "cd ./wkp/${BENCHMARK}/${HOST}/workspace/"
+echo "ramble --disable-logger --workspace-dir . workspace setup"
+echo "ramble --disable-logger --workspace-dir . on --executor '{execute_experiment}' --where '{n_nodes} == 1'"
+
 # Initialize System
 if [ "$HOST" == "lassen" ]; then
     ./bin/benchpark system init --dest=${HOST} ${ARCHCONFIG} $SYSTEM_ARGS
