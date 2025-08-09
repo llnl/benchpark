@@ -29,6 +29,8 @@ class AllocOpt(Enum):
     TIMEOUT = 201  # This is assumed to be in minutes
     MAX_REQUEST = 202
     QUEUE = 203
+    BANK = 204
+    MAX_NODES = 205
 
     # Exec customization for inserting arbitrary options and commands,
     # inserted verbatim
@@ -47,6 +49,7 @@ class AllocOpt(Enum):
             AllocOpt.EXTRA_CMD_OPTS,
             AllocOpt.POST_EXEC_CMDS,
             AllocOpt.PRE_EXEC_CMDS,
+            AllocOpt.BANK,
         ]:
             return str(input)
         else:
@@ -301,6 +304,11 @@ class Allocation(BasicModifier):
             except (ValueError, TypeError):
                 continue
 
+        if v.max_nodes and v.n_nodes > v.max_nodes:
+            raise ValueError(
+                f"{v.n_nodes} nodes is unsatisfiable for queue '{v.queue}' (max {v.max_nodes})."
+            )
+
     def slurm_instructions(self, v):
         sbatch_opts, srun_opts = Allocation._init_batch_and_cmd_opts(v)
 
@@ -311,8 +319,14 @@ class Allocation(BasicModifier):
         if v.n_nodes:
             srun_opts.append(f"-N {v.n_nodes}")
 
+        if v.queue:
+            sbatch_opts.append(f"-p {v.queue}")
+
         if v.timeout:
             sbatch_opts.append(f"--time {v.timeout}")
+
+        if v.bank:
+            sbatch_opts.append(f"--account {v.bank}")
 
         sbatch_opts.append("--exclusive")
 
@@ -382,8 +396,14 @@ class Allocation(BasicModifier):
             gpus_per_rank = 1  # self.gpus_as_gpus_per_rank(v)
             cmd_opts.append(f"-g={gpus_per_rank}")
 
+        if v.queue:
+            batch_opts.append(f"-q {v.queue}")
+
         if v.timeout:
             batch_opts.append(f"-t {v.timeout}m")
+
+        if v.bank:
+            batch_opts.append(f"-B {v.bank}")
 
         batch_directives = list(f"# flux: {x}" for x in (cmd_opts + batch_opts))
 
@@ -458,8 +478,5 @@ class Allocation(BasicModifier):
                 f"scheduler ({v.scheduler}) must be one of : "
                 + " ".join(handler.keys())
             )
-
-        if not v.timeout:
-            v.timeout = 120
 
         handler[v.scheduler](v)

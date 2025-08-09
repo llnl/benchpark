@@ -10,7 +10,7 @@ import yaml
 import sys
 from typing import Dict, Tuple
 
-from benchpark.directives import ExperimentSystemBase, provides
+from benchpark.directives import ExperimentSystemBase, provides, variant
 import benchpark.spec
 import benchpark.variant
 
@@ -31,11 +31,32 @@ class MPISystem:
         return {}
 
 
+class JobQueue:
+    def __init__(self, name, time_limit, max_nodes):
+        self.name = name
+        self.time_limit = time_limit
+        self.max_nodes = max_nodes
+
+    def satisfies_time_limit(self, time):
+        if int(time) > self.time_limit:
+            raise ValueError(
+                f"timeout={time} is unsatisfiable for the selected queue '{self.name}'. Max timeout is {self.time_limit}"
+            )
+        return True
+
+
 class System(ExperimentSystemBase):
     variants: Dict[
         str,
         Tuple["benchpark.variant.Variant", "benchpark.spec.ConcreteSystemSpec"],
     ]
+
+    variant(
+        "timeout",
+        default="120",
+        multi=False,
+        description="Set job timeout limit (in minutes). Has to be under the limit for selected 'queue'.",
+    )
 
     def __init__(self, spec):
         self.spec: "benchpark.spec.ConcreteSystemSpec" = spec
@@ -51,6 +72,7 @@ class System(ExperimentSystemBase):
         self.scheduler = None
         self.timeout = "120"
         self.queue = None
+        self.bank = None
 
         # Assume every system is an MPI system
         self._programming_models = [MPISystem()]
@@ -128,7 +150,6 @@ class System(ExperimentSystemBase):
             "sys_cores_os_reserved_per_node_list",
             "sys_gpus_per_node",
             "sys_mem_per_node",
-            "queue",
         ]:
             if getattr(self, opt, None):
                 optionals[opt] = getattr(self, opt)
@@ -137,7 +158,27 @@ class System(ExperimentSystemBase):
         for k, v in self.system_specific_variables().items():
             system_specific[k] = v
 
-        extra_variables = optionals | system_specific
+        job_configuration_options = {}
+        self.timeout = job_configuration_options["timeout"] = self.spec.variants[
+            "timeout"
+        ][0]
+        # Set bank
+        if "bank" in self.spec.variants and self.spec.variants["bank"][0] != "none":
+            self.bank = job_configuration_options["bank"] = self.spec.variants["bank"][
+                0
+            ]
+        # Set queue
+        if "queue" in self.spec.variants and self.spec.variants["queue"][0] != "none":
+            self.queue = job_configuration_options["queue"] = queue_name = (
+                self.spec.variants["queue"][0]
+            )
+            queue_obj = [q for q in self.queues if q.name == queue_name][0]
+            self.max_nodes = job_configuration_options["max_nodes"] = (
+                queue_obj.max_nodes
+            )
+            assert queue_obj.satisfies_time_limit(self.timeout)
+
+        extra_variables = optionals | system_specific | job_configuration_options
 
         return {
             "variables": {

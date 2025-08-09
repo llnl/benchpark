@@ -329,6 +329,12 @@ Once the modified system subclass is written, run:
 
 This will generate the required yaml configurations for your system and you can validate it works with a static experiment test.
 
+.. Note::
+
+  Use the ``benchpark info system {system_name}`` to find additional variants that are available to all systems.
+  This includes settings such as: the job timeout, submitting to a different partition/queue, and setting the account/bank.
+
+
 ------------------------
 3. Validating the System
 ------------------------
