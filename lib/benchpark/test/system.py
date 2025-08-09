@@ -51,5 +51,7 @@ def test_system_compute_variables_section(monkeypatch):
 
 def test_system_compute_variables_section(monkeypatch):
     with pytest.raises(ValueError, match="is unsatisfiable for the selected queue"):
-        sys_spec = benchpark.spec.SystemSpec("llnl-elcapitan cluster=tioga queue=pdebug timeout=9999").concretize()
+        sys_spec = benchpark.spec.SystemSpec(
+            "llnl-elcapitan cluster=tioga queue=pdebug timeout=9999"
+        ).concretize()
         sys_spec.system.compute_variables_section()
