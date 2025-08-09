@@ -7,7 +7,7 @@
 from benchpark.directives import variant, maintainers
 from benchpark.cudasystem import CudaSystem
 from benchpark.paths import hardware_descriptions
-from benchpark.system import System
+from benchpark.system import System, JobQueue
 from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from packaging.version import Version
 
@@ -24,6 +24,7 @@ class LlnlMatrix(System):
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/DELL-sapphirerapids-H100-Infiniband/hardware_description.yaml",
+            "queues": [JobQueue("pdebug", 60, 1), JobQueue("pbatch", 1440, 28)],
         },
     }
 
@@ -39,6 +40,14 @@ class LlnlMatrix(System):
         default="oneapi",
         values=("oneapi", "gcc", "intel"),
         description="Which compiler to use",
+    )
+
+    variant(
+        "bank",
+        default="none",
+        values=("none", "guests", "asccasc", "lc", "fractale"),
+        multi=False,
+        description="Submit a job to a specific named bank",
     )
 
     def __init__(self, spec):

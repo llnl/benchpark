@@ -5,7 +5,7 @@
 
 
 from benchpark.directives import variant, maintainers
-from benchpark.system import System
+from benchpark.system import System, JobQueue
 from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.paths import hardware_descriptions
 
@@ -22,12 +22,14 @@ class LlnlCluster(System):
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/Supermicro-icelake-OmniPath/hardware_description.yaml",
+            "queues": [JobQueue("pdebug", 60, 12), JobQueue("pbatch", 1440, 520)],
         },
         "magma": {
             "sys_cores_per_node": 96,
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/Penguin-icelake-OmniPath/hardware_description.yaml",
+            "queues": [JobQueue("pdebug", 60, 4), JobQueue("pbatch", 2160, 64)],
         },
         "dane": {
             "sys_cores_per_node": 112,
@@ -36,6 +38,7 @@ class LlnlCluster(System):
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/DELL-sapphirerapids-OmniPath/hardware_description.yaml",
+            "queues": [JobQueue("pdebug", 60, 20), JobQueue("pbatch", 1440, 520)],
         },
     }
 
@@ -51,6 +54,22 @@ class LlnlCluster(System):
         default="oneapi",
         values=("oneapi", "gcc", "intel"),
         description="Which compiler to use",
+    )
+
+    variant(
+        "bank",
+        default="none",
+        values=("none", "guests", "asccasc", "lc", "fractale"),
+        multi=False,
+        description="Submit a job to a specific named bank",
+    )
+
+    variant(
+        "queue",
+        default="none",
+        values=("none", "pbatch", "pdebug"),
+        multi=False,
+        description="Submit to queue other than the default queue (e.g. pdebug)",
     )
 
     def __init__(self, spec):
