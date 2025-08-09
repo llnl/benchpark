@@ -7,7 +7,7 @@
 from benchpark.directives import variant, maintainers
 from benchpark.paths import hardware_descriptions
 from benchpark.rocmsystem import ROCmSystem
-from benchpark.system import System
+from benchpark.system import System, JobQueue
 from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from packaging.version import Version
 
@@ -27,6 +27,7 @@ class LlnlElcapitan(System):
             "scheduler": "flux",
             "hardware_key": str(hardware_descriptions)
             + "/HPECray-zen3-MI250X-Slingshot/hardware_description.yaml",
+            "queues": [JobQueue("pdebug", 720, 24)],
         },
         "elcapitan": {
             "rocm_arch": "gfx942",
@@ -51,9 +52,18 @@ class LlnlElcapitan(System):
             "scheduler": "flux",
             "hardware_key": str(hardware_descriptions)
             + "/HPECray-zen4-MI300A-Slingshot/hardware_description.yaml",
+            "queues": [
+                JobQueue("pdebug", 120, 32),
+                JobQueue("pbatch", 1440, 4150),
+                JobQueue("plarge", 1440, 11040),
+            ],
         },
     }
     id_to_resources["tuolumne"] = id_to_resources["elcapitan"]
+    id_to_resources["tuolumne"]["queues"] = [
+        JobQueue("pdebug", 60, 16),
+        JobQueue("pbatch", 1440, 256),
+    ]
 
     variant(
         "cluster",
@@ -96,6 +106,22 @@ class LlnlElcapitan(System):
         default="intel-oneapi-mkl",
         values=("intel-oneapi-mkl",),
         description="Which blas to use",
+    )
+
+    variant(
+        "bank",
+        default="none",
+        values=("none", "guests", "asccasc", "lc", "fractale"),
+        multi=False,
+        description="Submit a job to a specific named bank",
+    )
+
+    variant(
+        "queue",
+        default="none",
+        values=("none", "pbatch", "pdebug"),
+        multi=False,
+        description="Submit to queue other than the default queue (e.g. pdebug)",
     )
 
     def __init__(self, spec):
