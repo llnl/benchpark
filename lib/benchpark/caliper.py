@@ -17,6 +17,7 @@ class Caliper:
             "time",
             "mpi",
             "cuda",
+            "rocm",
             "topdown-counters-all",
             "topdown-counters-toplevel",
             "topdown-all",
@@ -80,6 +81,18 @@ class Caliper:
                     else:
                         raise NotImplementedError(
                             "Target system does not support the cuda interface"
+                        )
+                elif self.spec.satisfies("caliper=rocm"):
+                    rocm_support = (
+                        self.spec.satisfies("caliper=rocm") and True
+                    )  # check if target system supports rocm
+                    if rocm_support:
+                        package_specs["caliper"][
+                            "pkg_spec"
+                        ] += "~papi+rocm amdgpu_target={}".format(system_specs["rocm_arch"])
+                    else:
+                        raise NotImplementedError(
+                            "Target system does not support the rocm interface"
                         )
                 elif self.spec.satisfies("caliper=time") or self.spec.satisfies(
                     "caliper=mpi"
