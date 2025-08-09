@@ -52,10 +52,18 @@ class LlnlElcapitan(System):
             "scheduler": "flux",
             "hardware_key": str(hardware_descriptions)
             + "/HPECray-zen4-MI300A-Slingshot/hardware_description.yaml",
-            "queues": [JobQueue("pdebug", 60, 16), JobQueue("pbatch", 1440, 256)],
+            "queues": [
+                JobQueue("pdebug", 120, 32),
+                JobQueue("pbatch", 1440, 4150),
+                JobQueue("plarge", 1440, 11040),
+            ],
         },
     }
     id_to_resources["tuolumne"] = id_to_resources["elcapitan"]
+    id_to_resources["tuolumne"]["queues"] = [
+        JobQueue("pdebug", 60, 16),
+        JobQueue("pbatch", 1440, 256),
+    ]
 
     variant(
         "cluster",
