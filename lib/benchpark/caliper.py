@@ -89,7 +89,9 @@ class Caliper:
                     if rocm_support:
                         package_specs["caliper"][
                             "pkg_spec"
-                        ] += "~papi+rocm amdgpu_target={}".format(system_specs["rocm_arch"])
+                        ] += "~papi+rocm amdgpu_target={}".format(
+                            system_specs["rocm_arch"]
+                        )
                     else:
                         raise NotImplementedError(
                             "Target system does not support the rocm interface"
