@@ -299,22 +299,26 @@ def prepare_data(**kwargs):
         tk.dataframe = grouped
         tk = tk.squash()
 
-    prefix = kwargs.get("filter_regions_name_prefix", "")
-    if prefix:
+    region_name = kwargs.get("query_region_byname", "")
+    if region_name:
         children = False
-        if prefix.endswith(":nochildren"):
-            prefix = prefix.rstrip(":nochildren")
+        if region_name.endswith(":nochildren"):
+            region_name = region_name.rstrip(":nochildren")
         else:
             children = True
 
         query = th.query.Query().match(
-            ".", lambda row: row["name"].apply(lambda n: n == prefix).all()
+            ".", lambda row: row["name"].apply(lambda n: n == region_name).all()
         )
 
         if children:
             query = query.rel("*")
 
         tk = tk.query(query)
+
+    prefix = kwargs.get("filter_regions_byname", "")
+    if prefix:
+        tk.dataframe = tk.dataframe.filter(like=prefix, axis=0)
 
     # Group by varied parameters
     grouped = tk.groupby(x_axis_metadata)
@@ -444,11 +448,18 @@ def setup_parser(root_parser):
         help="Performance metric to be visualized on the y-axis.",
     )
     root_parser.add_argument(
-        "--filter-regions-name-prefix",
+        "--filter-regions-byname",
         default="",
         type=str,
-        help="Filter for region names starting with PREFIX to be included in the chart. Includes children of region by default, for no children specify 'PREFIX:nochildren'.",
+        help="Filter for region names starting with PREFIX.",
         metavar="PREFIX",
+    )
+    root_parser.add_argument(
+        "--query-region-byname",
+        default="",
+        type=str,
+        help="Query for specific region REGION. Includes children of region by default, for no children specify 'REGION:nochildren'.",
+        metavar="REGION",
     )
     root_parser.add_argument(
         "--top-n-regions",
