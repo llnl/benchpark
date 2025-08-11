@@ -299,6 +299,23 @@ def prepare_data(**kwargs):
         tk.dataframe = grouped
         tk = tk.squash()
 
+    prefix = kwargs.get("filter_regions_name_prefix", "")
+    if prefix:
+        children = False
+        if prefix.endswith(":nochildren"):
+            prefix = prefix.rstrip(":nochildren")
+        else:
+            children = True
+
+        query = th.query.Query().match(
+            ".", lambda row: row["name"].apply(lambda n: n == prefix).all()
+        )
+
+        if children:
+            query = query.rel("*")
+
+        tk = tk.query(query)
+
     # Group by varied parameters
     grouped = tk.groupby(x_axis_metadata)
     ctk = th.Thicket.concat_thickets(
@@ -307,7 +324,7 @@ def prepare_data(**kwargs):
 
     # Check these values are constant
     app = validate_single_metadata_value("application_name", tk)
-    cluster = validate_single_metadata_value("cluster", tk)
+    cluster = validate_single_metadata_value("host.cluster", tk)
     version = validate_single_metadata_value("version", tk)
 
     # Find programming model from spec
@@ -351,10 +368,6 @@ def prepare_data(**kwargs):
         ctk.dataframe[(key, "perc")] = (
             ctk.dataframe[(key, metric)] / ctk.dataframe[(key, metric)].sum()
         ) * 100
-
-    prefix = kwargs.get("filter_regions_name_prefix", "")
-    if prefix:
-        ctk.dataframe = ctk.dataframe.filter(like=prefix, axis=0)
 
     top_n = kwargs.get("top_n_regions", -1)
     if top_n != -1:
@@ -434,7 +447,7 @@ def setup_parser(root_parser):
         "--filter-regions-name-prefix",
         default="",
         type=str,
-        help="Filter for region names starting with PREFIX to be included in the chart.",
+        help="Filter for region names starting with PREFIX to be included in the chart. Includes children of region by default, for no children specify 'PREFIX:nochildren'.",
         metavar="PREFIX",
     )
     root_parser.add_argument(
