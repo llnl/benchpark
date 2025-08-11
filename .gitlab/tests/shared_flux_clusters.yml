@@ -108,6 +108,12 @@ run_tests_flux_tuolumne:
         BENCHMARK: [kripke]
         VARIANT: [+openmp]
         GPUMODE: SPX
+      # Test kripke+rocm+single_memory on tuolumne
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [kripke]
+        VARIANT: [+rocm+single_memory]
+        GPUMODE: SPX
       # Caliper profile.hip
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
