@@ -6,7 +6,6 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.cudasystem import CudaSystem
-from benchpark.openmpsystem import OpenMPSystem
 from benchpark.system import System
 from benchpark.paths import hardware_descriptions
 from packaging.version import Version
@@ -77,8 +76,6 @@ class LanlVenado(System):
             self.programming_models = [CudaSystem()]
             self.cuda_version = Version(self.spec.variants["cuda"][0])
             self.gtl_flag = self.spec.variants["gtl"][0]
-        if self.spec.variants["cluster"][0] == "grace-grace":
-            self.programming_models = [OpenMPSystem()]
 
         self.scheduler = "slurm"
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])

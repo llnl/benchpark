@@ -207,25 +207,29 @@ def prepare_data(**kwargs):
     )
     logger.info(f"Found {len(files)} .cali files for analysis.")
 
-    tk = th.Thicket.from_caliperreader(files, disable_tqdm=True)
+    if kwargs["calltree_unification"] == "intersection":
+        intersection = True
+    else:
+        intersection = False
+    tk = th.Thicket.from_caliperreader(
+        files, intersection=intersection, disable_tqdm=True
+    )
     tk.update_inclusive_columns()
 
-    # Save tree before modification
-    # Cleans ANSI escape sequences and legend from a raw calltree string.
-    tk.dataframe["nothing"] = 0
-    raw_tree = tk.tree("nothing", render_header=False, precision=0)
-    ansi_escape = re.compile(r"\x1b\[([0-9;]*m)")
-    text = ansi_escape.sub("", raw_tree)
-    legend_index = text.find("Legend")
-    if legend_index != -1:
-        text = text[:legend_index]
-    clean_tree = text.replace("0", "")
-    kwargs["tree_str"] = clean_tree
+    clean_tree = tk.tree(kwargs["tree_metric"], render_header=True)
+    clean_tree = re.compile(r"\x1b\[([0-9;]*m)").sub("", clean_tree)
 
     # Remove MPI regions, if necesasry
     if kwargs.get("no_mpi"):
         query = th.query.Query().match(
-            ".", lambda row: row["name"].apply(lambda n: "MPI_" not in n).all()
+            ".",
+            lambda row: row["name"]
+            .apply(
+                # 'n is None' avoid comparison for MPI in n (will cause error)
+                lambda n: n is None
+                or "MPI_" not in n
+            )
+            .all(),
         )
         tk = tk.query(query)
 
@@ -330,9 +334,12 @@ def prepare_data(**kwargs):
             f"{app}+{programming_model}@{version} on {cluster} ({scaling} scaling)\n{constant_str}"
         )
 
-    kwargs["chart_file_name"] = (
-        f"{app}_{programming_model}_{scaling}_{kwargs['chart_type']}_{'inc' if metric in tk.inc_metrics else 'exc'}"
-    )
+    if kwargs["output_filename"]:
+        kwargs["chart_file_name"] = kwargs["output_filename"]
+    else:
+        kwargs["chart_file_name"] = (
+            f"{app}_{programming_model}_{scaling}_{kwargs['chart_type']}_{'inc' if metric in tk.inc_metrics else 'exc'}"
+        )
 
     # Save tree to file
     tree_file = os.path.join(kwargs["out_dir"], kwargs["chart_file_name"] + "-tree.txt")
@@ -394,6 +401,13 @@ def setup_parser(root_parser):
         type=str,
         help="Directory of ramble workspace.",
         metavar="RAMBLE_WORKSPACE_DIR",
+    )
+    root_parser.add_argument(
+        "--calltree-unification",
+        default="union",
+        choices=["intersection", "union"],
+        type=str,
+        help="Type of unification operation to perform the Caliper calltrees.",
     )
     root_parser.add_argument(
         "--chart-type",
@@ -468,6 +482,18 @@ def setup_parser(root_parser):
         type=str,
         default="",
         help="Set optional cali file name to match. Useful if multiple caliper files are generated per experiment (e.g. RAJAPerf)",
+    )
+    root_parser.add_argument(
+        "--output-filename",
+        type=str,
+        default=None,
+        help="Configure the output file names (the default value is already unique to the workspace).",
+    )
+    root_parser.add_argument(
+        "--tree-metric",
+        type=str,
+        default="Calls/rank (max)",
+        help="Metric to show on the tree output",
     )
 
 

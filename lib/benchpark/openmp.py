@@ -9,13 +9,14 @@ from benchpark.experiment import ExperimentHelper
 
 
 class OpenMPExperiment:
-    requires("openmp")
+    requires("openmp", when="+openmp")
     variant("openmp", default=False, description="Build and run with OpenMP")
 
     def __init__(self):
         super().__init__()
         if self.spec.variants["openmp"][0]:
             self.device_type = "cpu"
+        self.programming_models.append("openmp")
 
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):

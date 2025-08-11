@@ -6,7 +6,6 @@
 import os
 
 import benchpark.paths
-import benchpark.spec
 
 exclude_exper = ["repo.yaml"]
 exp_dict = {
@@ -18,6 +17,9 @@ exp_dict = {
     "ThroughputScaling": "throughput",
     "WeakScaling": "weak",
     "Caliper": "caliper",
+    "ScalingMode.Strong": "scaling=strong",
+    "ScalingMode.Weak": "scaling=weak",
+    "ScalingMode.Throughput": "scaling=throughput",
 }
 sys_dict = {
     "OpenMPSystem": "openmp",
@@ -38,10 +40,15 @@ def benchpark_experiments(exclude_variants=non_experiments):
             if os.path.isfile(expr_file):
                 with open(expr_file, "r") as file:
                     file_text = file.read()
-                    experiments.append(x + "+single_node")  # default expr
+                    if "MpiOnlyExperiment" in file_text:
+                        experiments.append(x)  # default expr
                     for var in exp_dict.keys():
                         if var in file_text and var not in exclude_variants:
-                            experiments.append(f"{x}+{exp_dict[var]}")
+                            if "=" in exp_dict[var]:
+                                joiner = " "
+                            else:
+                                joiner = "+"
+                            experiments.append(f"{x}{joiner}{exp_dict[var]}")
     return experiments
 
 
@@ -57,6 +64,8 @@ def benchpark_modifiers():
 
 
 def benchpark_systems():
+    import benchpark.spec
+
     source_dir = benchpark.paths.benchpark_root
     systems = []
     exclude = ["all_hardware_descriptions", "common", "repo.yaml"]
@@ -64,8 +73,16 @@ def benchpark_systems():
         if x not in exclude and "system.py" in os.listdir(source_dir / "systems" / x):
             system_spec = benchpark.spec.SystemSpec(x)
             system_class = system_spec.system_class
-            if hasattr(system_class, "id_to_resources"):
-                for c in system_class.id_to_resources.keys():
+            # aws uses 'instance_type' not 'cluster'
+            cluster_variant = "instance_type" if "aws" in x else "cluster"
+            variants = list(system_class.variants.values())
+            if len(variants) > 0:
+                variants = variants[0]
+            clusters = None
+            if cluster_variant in variants:
+                clusters = list(variants[cluster_variant].values)
+            if clusters:
+                for c in clusters:
                     systems.append(x + "/" + c)
             else:
                 systems.append(x)
