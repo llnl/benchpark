@@ -64,12 +64,16 @@ class Kripke(
         else:
             # Number of processes in each dimension
             self.add_experiment_variable(
-                "n_resources_dict", {"npx": [2,2,2], "npy": [2,2,2], "npz": [1,1,1]}, True
+                "n_resources_dict",
+                {"npx": [2, 2, 2], "npy": [2, 2, 2], "npz": [1, 1, 1]},
+                True,
             )
 
             # Per-process size (in zones) in each dimension
             self.add_experiment_variable(
-                "total_problem_size_dict", {"nzx": [64,64,64], "nzy": [64,64,64], "nzz": [32,32,32]}, True
+                "total_problem_size_dict",
+                {"nzx": [64, 64, 64], "nzy": [64, 64, 64], "nzz": [32, 32, 32]},
+                True,
             )
 
             self.add_experiment_variable("ngroups", [220, 320, 360], True)
