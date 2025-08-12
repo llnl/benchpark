@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import sys
 import math
 from enum import Enum
 from ramble.modkit import *
@@ -66,7 +67,7 @@ class AllocAlias:
 
 
 SENTINEL_UNDEFINED_VALUE_STR = "placeholder"
-SENTINEL_UNDEFINED_VALUE_INT = -1
+SENTINEL_UNDEFINED_VALUE_INT = sys.maxsize
 
 
 class AttrDict(dict):
