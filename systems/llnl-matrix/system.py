@@ -7,7 +7,13 @@
 from benchpark.directives import variant, maintainers
 from benchpark.cudasystem import CudaSystem
 from benchpark.paths import hardware_descriptions
-from benchpark.system import System, JobQueue, compiler_def, compiler_section_for, merge_dicts
+from benchpark.system import (
+    System,
+    JobQueue,
+    compiler_def,
+    compiler_section_for,
+    merge_dicts,
+)
 from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from packaging.version import Version
 
