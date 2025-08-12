@@ -12,7 +12,6 @@ exp_dict = {
     "OpenMPExperiment": "openmp",
     "CudaExperiment": "cuda",
     "ROCmExperiment": "rocm",
-    "SingleNode": "single_node",
     "StrongScaling": "strong",
     "ThroughputScaling": "throughput",
     "WeakScaling": "weak",
