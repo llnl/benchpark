@@ -57,7 +57,7 @@ class Hpl(
             "n_threads_per_proc", ["2"], named=True, matrixed=True
         )
 
-        if self.spec.satisfies("+single_node"):
+        if self.spec.satisfies("exec_mode=test"):
             for pk, pv in num_nodes.items():
                 self.add_experiment_variable(pk, pv, True)
             for pk, pv in problem_size.items():

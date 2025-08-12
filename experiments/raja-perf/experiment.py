@@ -44,7 +44,7 @@ class RajaPerf(
         n_resources = {"n_ranks": 1}
         problem_sizes = {"size": 1048576}
 
-        if self.spec.satisfies("+single_node"):
+        if self.spec.satisfies("exec_mode=test"):
             for pk, pv in n_resources.items():
                 n_resources = pv
             for nk, nv in problem_sizes.items():
