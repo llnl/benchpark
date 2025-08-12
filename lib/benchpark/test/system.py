@@ -6,6 +6,7 @@
 import pytest
 
 import benchpark.spec
+from modifiers.allocation.modifier import SENTINEL_UNDEFINED_VALUE_INT
 
 
 def test_system_compute_variables_section(monkeypatch):
@@ -19,8 +20,8 @@ def test_system_compute_variables_section(monkeypatch):
             "timeout": "120",
             "scheduler": "flux",
             "sys_cores_per_node": 84,
-            "n_ranks": 9223372036854775807,
-            "n_nodes": 9223372036854775807,
+            "n_ranks": SENTINEL_UNDEFINED_VALUE_INT,
+            "n_nodes": SENTINEL_UNDEFINED_VALUE_INT,
             "batch_submit": "placeholder",
             "mpi_command": "placeholder",
             "sys_cores_os_reserved_per_node": 12,

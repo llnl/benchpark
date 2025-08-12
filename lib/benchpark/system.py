@@ -13,6 +13,7 @@ from typing import Dict, Tuple
 from benchpark.directives import ExperimentSystemBase, provides, variant
 import benchpark.spec
 import benchpark.variant
+from modifiers.allocation.modifier import SENTINEL_UNDEFINED_VALUE_INT
 
 
 def _hash_id(content_list):
@@ -185,8 +186,8 @@ class System(ExperimentSystemBase):
                 "timeout": self.timeout,
                 "scheduler": self.scheduler,
                 "sys_cores_per_node": self.sys_cores_per_node,
-                "n_ranks": sys.maxsize,
-                "n_nodes": sys.maxsize,
+                "n_ranks": SENTINEL_UNDEFINED_VALUE_INT,
+                "n_nodes": SENTINEL_UNDEFINED_VALUE_INT,
                 "batch_submit": "placeholder",
                 "mpi_command": "placeholder",
             }
