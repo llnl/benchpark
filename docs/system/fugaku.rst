@@ -67,7 +67,7 @@ Build the benchmark:
     source ${WSDIR}/setup.sh
     export TMP=/local
     export TMPDIR=/local
-    ramble --disable-progress-bar --workspace-dir ${WSDIR}/${BM}-test/${SYS}-system/workspace workspace setup
+    ramble --workspace-dir ${WSDIR}/${BM}-test/${SYS}-system/workspace workspace setup
 
 
 Go back to login node and submit benchmarks:
@@ -84,7 +84,7 @@ Go back to login node and submit benchmarks:
     export BM="saxpy"
     export SYS="fugaku"
     export WSDIR="$(pwd)/workspace"
-    ${WSDIR}/ramble/bin/ramble --disable-progress-bar --workspace-dir ${WSDIR}/${BM}-test/${SYS}-system/workspace on
+    ${WSDIR}/ramble/bin/ramble --workspace-dir ${WSDIR}/${BM}-test/${SYS}-system/workspace on
 
 
 Finding the benchmark output (Fujitsu MPI does not write to STDOUT):

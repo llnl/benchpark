@@ -27,9 +27,9 @@ To specify a new system:
 4. If the same software stack description does not exist, determine if there is one that can be parameterized to match yours.
 5. If can't parameterize existing software description, add a new one.
 
-------------------------------
+-------------------------------
 1. Adding System Hardware Specs
-------------------------------
+-------------------------------
 
 We list hardware descriptions of Systems specified in Benchpark
 in the System Catalogue in :doc:`system-list`.
@@ -70,9 +70,9 @@ where::
 In the `systems/all_hardware_descriptions/system_name` directory, add a `hardware_description.yaml`
 which follows the yaml format of existing `hardware_description.yaml` files.
 
-------------------------------
-Adding or Parameterizing System Software Stack
-------------------------------
+-------------------------------------------------
+2. Adding or Parameterizing System Software Stack
+-------------------------------------------------
 ``system.py`` in Benchpark provides an API to represent a
 system software stack as a command line parameterizable object.
 If none of the available software stack specifications match your system,
@@ -329,8 +329,14 @@ Once the modified system subclass is written, run:
 
 This will generate the required yaml configurations for your system and you can validate it works with a static experiment test.
 
+.. Note::
+
+  Use the ``benchpark info system {system_name}`` to find additional variants that are available to all systems.
+  This includes settings such as: the job timeout, submitting to a different partition/queue, and setting the account/bank.
+
+
 ------------------------
-Validating the System
+3. Validating the System
 ------------------------
 
 To manually validate your new system, you should initialize it and run an existing experiment such as saxpy. For example::
@@ -384,9 +390,8 @@ file
     sys_cores_per_node: "48"
     sys_gpus_per_node: 2
     cuda_arch: 70
-    max_request: "1000"  # n_ranks/n_nodes cannot exceed this
-    n_ranks: '1000001'  # placeholder value
-    n_nodes: '1000001'  # placeholder value
+    n_ranks: -1  # placeholder value
+    n_nodes: -1  # placeholder value
     batch_submit: "placeholder"
     mpi_command: "placeholder"
 

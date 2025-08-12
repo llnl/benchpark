@@ -6,6 +6,7 @@
 from benchpark.error import BenchparkError
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.scaling import StrongScaling
 from benchpark.scaling import WeakScaling
 from benchpark.openmp import OpenMPExperiment
@@ -14,6 +15,7 @@ from benchpark.caliper import Caliper
 
 class Hpl(
     Experiment,
+    MpiOnlyExperiment,
     StrongScaling,
     WeakScaling,
     OpenMPExperiment,

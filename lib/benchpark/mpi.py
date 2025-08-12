@@ -8,19 +8,16 @@ from benchpark.directives import requires, variant
 from benchpark.experiment import ExperimentHelper
 
 
-class OpenMPExperiment:
-    requires("openmp", when="+openmp")
-    variant("openmp", default=False, description="Build and run with OpenMP")
+class MpiOnlyExperiment:
+    requires("mpi")
+    variant("mpi", default=True, description="Run with MPI only")
 
     def __init__(self):
         super().__init__()
-        if self.spec.variants["openmp"][0]:
+        if self.spec.variants["mpi"][0]:
             self.device_type = "cpu"
-        self.programming_models.append("openmp")
+        self.programming_models.append("mpi")
 
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):
-            return "openmp" if self.spec.satisfies("+openmp") else ""
-
-        def get_spack_variants(self):
-            return "+openmp" if self.spec.satisfies("+openmp") else "~openmp"
+            return "mpi" if self.spec.satisfies("+mpi") else ""

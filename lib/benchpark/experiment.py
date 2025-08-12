@@ -6,7 +6,6 @@
 from typing import Dict
 import yaml  # TODO: some way to ensure yaml available
 import sys
-from enum import Enum
 
 from benchpark.error import BenchparkError
 from benchpark.directives import ExperimentSystemBase
@@ -144,31 +143,29 @@ class Affinity:
             }
 
 
-class HwlocVariantValues(str, Enum):
-    NONE = "none"
-    ON = "on"
-
-
 class Hwloc:
     variant(
         "hwloc",
-        default=HwlocVariantValues.NONE.value,
-        values=tuple(v.value for v in HwlocVariantValues),
+        default="none",
+        values=(
+            "none",
+            "on",
+        ),
         multi=False,
         description="Get underlying infrastructure topology",
     )
 
     class Helper(ExperimentHelper):
         def compute_modifiers_section(self):
-            modifier_list = []
+            hwloc_modifier_list = []
 
-            if not self.spec.satisfies(f"hwloc={HwlocVariantValues.NONE.value}"):
-                affinity_modifier_modes = {}
-                affinity_modifier_modes["name"] = "hwloc"
-                affinity_modifier_modes["mode"] = self.spec.variants["hwloc"][0]
-                modifier_list.append(affinity_modifier_modes)
+            if not self.spec.satisfies("hwloc=none"):
+                hwloc_modifier_modes = {}
+                hwloc_modifier_modes["name"] = "hwloc"
+                hwloc_modifier_modes["mode"] = self.spec.variants["hwloc"][0]
+                hwloc_modifier_list.append(hwloc_modifier_modes)
 
-            return modifier_list
+            return hwloc_modifier_list
 
 
 class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
@@ -222,6 +219,7 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
         self.spec: "benchpark.spec.ConcreteExperimentSpec" = spec
         # Device type must be set before super with absence of mpionly experiment type
         self.device_type = "cpu"
+        self.programming_models = []
         super().__init__()
         self.helpers = []
         self._spack_name = None
@@ -248,6 +246,33 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
             raise BenchparkError(f"No workload variant defined for package {self.name}")
 
         self.package_specs = {}
+
+        # Explicitly ordered list. "mpi" first
+        models = ["mpi"] + ["openmp", "cuda", "rocm"]
+        invalid_models = []
+        for model in models:
+            # Experiment specifying model in add_package_spec that it doesn't implement
+            if (
+                self.spec.satisfies("+" + model)
+                and model not in self.programming_models
+            ):
+                invalid_models.append(model)
+        # Case where there are no experiments specified in experiment.py
+        if len(self.programming_models) == 0:
+            raise NotImplementedError(
+                f"Please specify a programming model in your {self.name}/experiment.py (e.g. MpiOnlyExperiment, OpenMPExperiment, CudaExperiment, ROCmExperiment). See other experiments for examples."
+            )
+        elif len(invalid_models) > 0:
+            raise NotImplementedError(
+                f'{invalid_models} are not valid programming models for "{self.name}". Choose from {self.programming_models}.'
+            )
+        # Check if experiment is trying to run in MpiOnly mode without being an MpiOnlyExperiment
+        elif "mpi" not in str(self.spec) and not any(
+            self.spec.satisfies("+" + model) for model in models[1:]
+        ):
+            raise NotImplementedError(
+                f'"{self.name}" cannot run with MPI only without inheriting from MpiOnlyExperiment. Choose from {self.programming_models}'
+            )
 
     @property
     def spack_name(self):
@@ -513,6 +538,14 @@ class Experiment(ExperimentSystemBase, SingleNode, Affinity, Hwloc):
         return ramble_dict
 
     def write_ramble_dict(self, filepath):
+        # Here you can do self.system_spec.system.sys_gpus_per_node
+        if hasattr(self, "system_spec"):
+            # i.e. the user ran `experiment init` with `--system`
+            for when, needs in self.requires.items():
+                if self.spec.satisfies(when):
+                    for need in needs:
+                        self.system_spec.system.enforce(need)
+
         ramble_dict = self.compute_ramble_dict()
         with open(filepath, "w") as f:
             yaml.dump(ramble_dict, f)
