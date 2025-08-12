@@ -10,9 +10,10 @@ class MpiPingpong(CMakePackage):
 
     git = "https://github.com/LLNL/microbenchmarks.git"
 
-    version("develop", branch="develop")
+    version("addHip", branch="addHip")
 
     variant("caliper", default=False, description="Enable Caliper/Adiak support")
+    variant("openmp", default=True, description="Enable OpenMP support")
 
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
@@ -28,8 +29,12 @@ class MpiPingpong(CMakePackage):
             args = [
                 "-DUSE_CALIPER=OFF"
             ]
-        return args
 
+        if '+openmp' in spec:
+            args.append('-DUSE_OPENMP=ON')
+
+        return args
+        
     def install(self, spec, prefix):
         mkdirp(prefix.bin)
         install(join_path(self.build_directory, "pingpong"), prefix.bin)
