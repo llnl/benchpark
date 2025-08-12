@@ -35,6 +35,12 @@ class Kripke(
         description="app version",
     )
 
+    variant(
+        "single_memory",
+        default=False,
+        description="Enable single memory space model in rocm",
+    )
+
     maintainers("pearce8")
 
     def compute_applications_section(self):
@@ -140,4 +146,9 @@ class Kripke(
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, [f"kripke@{app_version} "])
+        single_memory = (
+            "+single_memory"
+            if self.spec.variants["single_memory"][0]
+            else "~single_memory"
+        )
+        self.add_package_spec(self.name, [f"kripke@{app_version} {single_memory} "])

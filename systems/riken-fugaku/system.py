@@ -6,7 +6,7 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.system import System
-from benchpark.openmpsystem import OpenMPSystem
+from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.paths import hardware_descriptions
 
 
@@ -33,7 +33,7 @@ class RikenFugaku(System):
 
     def __init__(self, spec):
         super().__init__(spec)
-        self.programming_models = [OpenMPSystem()]
+        self.programming_models = [OpenMPCPUOnlySystem()]
 
         self.scheduler = "pjm"
         attrs = self.id_to_resources.get("fugaku")

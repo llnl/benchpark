@@ -219,7 +219,7 @@ ramble config --scope=site add \"config:spack:global:args:'-d'\"
     ramble_workspace_mirror_dest = os.path.join(dest, "ramble-workspace-mirror")
     if not os.path.exists(ramble_workspace_mirror_dest):
         run_command(
-            f"ramble --disable-progress-bar --workspace-dir {ramble_workspace} workspace mirror -d file://{ramble_workspace_mirror_dest}"
+            f"ramble --workspace-dir {ramble_workspace} workspace mirror -d file://{ramble_workspace_mirror_dest}"
         )
 
 

@@ -3,9 +3,9 @@
 
    SPDX-License-Identifier: Apache-2.0
 
-===============================
-Benchpark Suites of Experiments
-===============================
+==================
+Set of Experiments
+==================
 
 You may want to use the same experiments_root directory when setting up multiple experiments:
 
