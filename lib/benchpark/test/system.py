@@ -6,10 +6,9 @@
 import pytest
 
 import benchpark.spec
-from benchpark.accounting import (
-    SENTINEL_UNDEFINED_VALUE_INT,
-    SENTINEL_UNDEFINED_VALUE_STR,
-)
+
+SENTINEL_UNDEFINED_VALUE_STR = "placeholder"
+SENTINEL_UNDEFINED_VALUE_INT = 2**64 - 1
 
 
 def test_system_compute_variables_section(monkeypatch):

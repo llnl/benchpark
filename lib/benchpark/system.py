@@ -13,10 +13,9 @@ from typing import Dict, Tuple
 from benchpark.directives import ExperimentSystemBase, provides, variant
 import benchpark.spec
 import benchpark.variant
-from benchpark.accounting import (
-    SENTINEL_UNDEFINED_VALUE_INT,
-    SENTINEL_UNDEFINED_VALUE_STR,
-)
+
+SENTINEL_UNDEFINED_VALUE_STR = "placeholder"
+SENTINEL_UNDEFINED_VALUE_INT = 2**64 - 1
 
 
 def _hash_id(content_list):

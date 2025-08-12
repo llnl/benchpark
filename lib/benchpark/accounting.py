@@ -28,9 +28,6 @@ sys_dict = {
 }
 non_experiments = ["Caliper", "Affinity"]
 
-SENTINEL_UNDEFINED_VALUE_STR = "placeholder"
-SENTINEL_UNDEFINED_VALUE_INT = 2**64 - 1
-
 
 def benchpark_experiments(exclude_variants=non_experiments):
     source_dir = benchpark.paths.benchpark_root
