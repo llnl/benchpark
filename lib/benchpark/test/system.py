@@ -6,7 +6,7 @@
 import pytest
 
 import benchpark.spec
-from modifiers.allocation.modifier import SENTINEL_UNDEFINED_VALUE_INT
+from benchpark.accounting import SENTINEL_UNDEFINED_VALUE_INT, SENTINEL_UNDEFINED_VALUE_STR
 
 
 def test_system_compute_variables_section(monkeypatch):
@@ -22,8 +22,8 @@ def test_system_compute_variables_section(monkeypatch):
             "sys_cores_per_node": 84,
             "n_ranks": SENTINEL_UNDEFINED_VALUE_INT,
             "n_nodes": SENTINEL_UNDEFINED_VALUE_INT,
-            "batch_submit": "placeholder",
-            "mpi_command": "placeholder",
+            "batch_submit": SENTINEL_UNDEFINED_VALUE_STR,
+            "mpi_command": SENTINEL_UNDEFINED_VALUE_STR,
             "sys_cores_os_reserved_per_node": 12,
             "sys_cores_os_reserved_per_node_list": [
                 0,

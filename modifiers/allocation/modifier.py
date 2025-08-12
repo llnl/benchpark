@@ -7,6 +7,7 @@ import math
 from enum import Enum
 from ramble.modkit import *
 
+from benchpark.accounting import SENTINEL_UNDEFINED_VALUE_INT, SENTINEL_UNDEFINED_VALUE_STR
 
 class AllocOpt(Enum):
     # Experiment resource requests
@@ -63,10 +64,6 @@ class AllocAlias:
     match = {
         AllocOpt.OMP_NUM_THREADS: AllocOpt.N_THREADS_PER_PROC,
     }
-
-
-SENTINEL_UNDEFINED_VALUE_STR = "placeholder"
-SENTINEL_UNDEFINED_VALUE_INT = 2**64 - 1
 
 
 class AttrDict(dict):

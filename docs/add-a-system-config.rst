@@ -390,8 +390,8 @@ file
     sys_cores_per_node: "48"
     sys_gpus_per_node: 2
     cuda_arch: 70
-    n_ranks: -1  # placeholder value
-    n_nodes: -1  # placeholder value
+    n_ranks: 18446744073709551615  # placeholder value
+    n_nodes: 18446744073709551615  # placeholder value
     batch_submit: "placeholder"
     mpi_command: "placeholder"
 
