@@ -14,9 +14,6 @@ from benchpark.directives import ExperimentSystemBase, provides, variant
 import benchpark.spec
 import benchpark.variant
 
-SENTINEL_UNDEFINED_VALUE_STR = "placeholder"
-SENTINEL_UNDEFINED_VALUE_INT = 2**64 - 1
-
 
 def _hash_id(content_list):
     sha256_hash = hashlib.sha256()
@@ -188,10 +185,10 @@ class System(ExperimentSystemBase):
                 "timeout": self.timeout,
                 "scheduler": self.scheduler,
                 "sys_cores_per_node": self.sys_cores_per_node,
-                "n_ranks": SENTINEL_UNDEFINED_VALUE_INT,
-                "n_nodes": SENTINEL_UNDEFINED_VALUE_INT,
-                "batch_submit": SENTINEL_UNDEFINED_VALUE_STR,
-                "mpi_command": SENTINEL_UNDEFINED_VALUE_STR,
+                "n_ranks": 2**64 - 1,
+                "n_nodes": 2**64 - 1,
+                "batch_submit": "placeholder",
+                "mpi_command": "placeholder",
             }
             | extra_variables
         }

@@ -7,9 +7,6 @@ import pytest
 
 import benchpark.spec
 
-SENTINEL_UNDEFINED_VALUE_STR = "placeholder"
-SENTINEL_UNDEFINED_VALUE_INT = 2**64 - 1
-
 
 def test_system_compute_variables_section(monkeypatch):
     sys_spec = benchpark.spec.SystemSpec("llnl-elcapitan cluster=tuolumne").concretize()
@@ -22,10 +19,10 @@ def test_system_compute_variables_section(monkeypatch):
             "timeout": "120",
             "scheduler": "flux",
             "sys_cores_per_node": 84,
-            "n_ranks": SENTINEL_UNDEFINED_VALUE_INT,
-            "n_nodes": SENTINEL_UNDEFINED_VALUE_INT,
-            "batch_submit": SENTINEL_UNDEFINED_VALUE_STR,
-            "mpi_command": SENTINEL_UNDEFINED_VALUE_STR,
+            "n_ranks": 2**64 - 1,
+            "n_nodes": 2**64 - 1,
+            "batch_submit": "placeholder",
+            "mpi_command": "placeholder",
             "sys_cores_os_reserved_per_node": 12,
             "sys_cores_os_reserved_per_node_list": [
                 0,
