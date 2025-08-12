@@ -169,6 +169,7 @@ def command(args):
 . {per_workspace_setup.spack_location}/share/spack/setup-env.sh
 
 export SPACK_DISABLE_LOCAL_CONFIG=1
+export PYTHONPATH="{benchpark.paths.benchpark_root}/lib:$PYTHONPATH"
 """
 
     ramble, first_time_ramble = per_workspace_setup.ramble_first_time_setup()
