@@ -132,4 +132,4 @@ class Kripke(
             if self.spec.variants["single_memory"][0]
             else "~single_memory"
         )
-        self.add_package_spec(self.name, [f"kripke@{app_version} {single_memory} "])
+        self.add_package_spec(self.name, [f"kripke@{app_version} {single_memory} +mpi"])
