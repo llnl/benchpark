@@ -7,7 +7,11 @@ import math
 from enum import Enum
 from ramble.modkit import *
 
-from benchpark.accounting import SENTINEL_UNDEFINED_VALUE_INT, SENTINEL_UNDEFINED_VALUE_STR
+from benchpark.accounting import (
+    SENTINEL_UNDEFINED_VALUE_INT,
+    SENTINEL_UNDEFINED_VALUE_STR,
+)
+
 
 class AllocOpt(Enum):
     # Experiment resource requests
