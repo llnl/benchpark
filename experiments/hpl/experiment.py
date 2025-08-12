@@ -37,20 +37,6 @@ class Hpl(
     maintainers("daboehme")
 
     def compute_applications_section(self):
-        # TODO: Replace with conflicts clause
-        scaling_modes = {
-            "strong": self.spec.satisfies("+strong"),
-            "single_node": self.spec.satisfies("+single_node"),
-            "weak": self.spec.satisfies("+weak"),
-        }
-
-        scaling_mode_enabled = [key for key, value in scaling_modes.items() if value]
-        if len(scaling_mode_enabled) != 1:
-            print(scaling_mode_enabled)
-            raise BenchparkError(
-                f"Only one type of scaling per experiment is allowed for application package {self.name}"
-            )
-
         # Number of initial nodes
         num_nodes = {"n_nodes": 1}
         problem_size = {"Ns": 10000}
