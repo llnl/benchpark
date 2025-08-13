@@ -5,12 +5,14 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.rocm import ROCmExperiment
 from benchpark.cuda import CudaExperiment
 
 
 class OsuMicroBenchmarks(
     Experiment,
+    MpiOnlyExperiment,
     ROCmExperiment,
     CudaExperiment,
 ):

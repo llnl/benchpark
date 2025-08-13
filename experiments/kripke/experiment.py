@@ -5,6 +5,7 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
@@ -14,6 +15,7 @@ from benchpark.caliper import Caliper
 
 class Kripke(
     Experiment,
+    MpiOnlyExperiment,
     OpenMPExperiment,
     CudaExperiment,
     ROCmExperiment,
@@ -31,6 +33,12 @@ class Kripke(
         "version",
         default="develop",
         description="app version",
+    )
+
+    variant(
+        "single_memory",
+        default=False,
+        description="Enable single memory space model in rocm",
     )
 
     maintainers("pearce8")
@@ -119,4 +127,9 @@ class Kripke(
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, [f"kripke@{app_version} +mpi"])
+        single_memory = (
+            "+single_memory"
+            if self.spec.variants["single_memory"][0]
+            else "~single_memory"
+        )
+        self.add_package_spec(self.name, [f"kripke@{app_version} {single_memory} "])

@@ -16,6 +16,7 @@ class CudaExperiment:
         super().__init__()
         if self.spec.variants["cuda"][0]:
             self.device_type = "gpu"
+        self.programming_models.append("cuda")
 
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):

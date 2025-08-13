@@ -126,6 +126,7 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
     homepage = "http://software.llnl.gov/RAJAPerf/"
     git      = "https://github.com/LLNL/RAJAPerf.git"
 
+    version("temp-add-outer-loop-for-kernel", branch="temp-add-outer-loop-for-kernel", submodules="True")
     version("develop", branch="develop", submodules="True")
     version("main",  branch="main",  submodules="True")
     version("2025.03.0", tag="v2025.03.0", submodules="True")

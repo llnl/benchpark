@@ -16,6 +16,7 @@ class ROCmExperiment:
         super().__init__()
         if self.spec.variants["rocm"][0]:
             self.device_type = "gpu"
+        self.programming_models.append("rocm")
 
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):

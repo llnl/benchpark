@@ -216,17 +216,8 @@ def prepare_data(**kwargs):
     )
     tk.update_inclusive_columns()
 
-    # Save tree before modification
-    # Cleans ANSI escape sequences and legend from a raw calltree string.
-    tk.dataframe["nothing"] = 0
-    raw_tree = tk.tree("nothing", render_header=False, precision=0)
-    ansi_escape = re.compile(r"\x1b\[([0-9;]*m)")
-    text = ansi_escape.sub("", raw_tree)
-    legend_index = text.find("Legend")
-    if legend_index != -1:
-        text = text[:legend_index]
-    clean_tree = text.replace("0", "")
-    kwargs["tree_str"] = clean_tree
+    clean_tree = tk.tree(kwargs["tree_metric"], render_header=True)
+    clean_tree = re.compile(r"\x1b\[([0-9;]*m)").sub("", clean_tree)
 
     # Remove MPI regions, if necesasry
     if kwargs.get("no_mpi"):
@@ -308,6 +299,27 @@ def prepare_data(**kwargs):
         tk.dataframe = grouped
         tk = tk.squash()
 
+    region_name = kwargs.get("query_region_byname", "")
+    if region_name:
+        children = False
+        if region_name.endswith(":nochildren"):
+            region_name = region_name.rstrip(":nochildren")
+        else:
+            children = True
+
+        query = th.query.Query().match(
+            ".", lambda row: row["name"].apply(lambda n: n == region_name).all()
+        )
+
+        if children:
+            query = query.rel("*")
+
+        tk = tk.query(query)
+
+    prefix = kwargs.get("filter_regions_byname", "")
+    if prefix:
+        tk.dataframe = tk.dataframe.filter(like=prefix, axis=0)
+
     # Group by varied parameters
     grouped = tk.groupby(x_axis_metadata)
     ctk = th.Thicket.concat_thickets(
@@ -316,7 +328,7 @@ def prepare_data(**kwargs):
 
     # Check these values are constant
     app = validate_single_metadata_value("application_name", tk)
-    cluster = validate_single_metadata_value("cluster", tk)
+    cluster = validate_single_metadata_value("host.cluster", tk)
     version = validate_single_metadata_value("version", tk)
 
     # Find programming model from spec
@@ -343,9 +355,12 @@ def prepare_data(**kwargs):
             f"{app}+{programming_model}@{version} on {cluster} ({scaling} scaling)\n{constant_str}"
         )
 
-    kwargs["chart_file_name"] = (
-        f"{app}_{programming_model}_{scaling}_{kwargs['chart_type']}_{'inc' if metric in tk.inc_metrics else 'exc'}"
-    )
+    if kwargs["output_filename"]:
+        kwargs["chart_file_name"] = kwargs["output_filename"]
+    else:
+        kwargs["chart_file_name"] = (
+            f"{app}_{programming_model}_{scaling}_{kwargs['chart_type']}_{'inc' if metric in tk.inc_metrics else 'exc'}"
+        )
 
     # Save tree to file
     tree_file = os.path.join(kwargs["out_dir"], kwargs["chart_file_name"] + "-tree.txt")
@@ -357,10 +372,6 @@ def prepare_data(**kwargs):
         ctk.dataframe[(key, "perc")] = (
             ctk.dataframe[(key, metric)] / ctk.dataframe[(key, metric)].sum()
         ) * 100
-
-    prefix = kwargs.get("filter_regions_name_prefix", "")
-    if prefix:
-        ctk.dataframe = ctk.dataframe.filter(like=prefix, axis=0)
 
     top_n = kwargs.get("top_n_regions", -1)
     if top_n != -1:
@@ -437,11 +448,18 @@ def setup_parser(root_parser):
         help="Performance metric to be visualized on the y-axis.",
     )
     root_parser.add_argument(
-        "--filter-regions-name-prefix",
+        "--filter-regions-byname",
         default="",
         type=str,
-        help="Filter for region names starting with PREFIX to be included in the chart.",
+        help="Filter for region names starting with PREFIX.",
         metavar="PREFIX",
+    )
+    root_parser.add_argument(
+        "--query-region-byname",
+        default="",
+        type=str,
+        help="Query for specific region REGION. Includes children of region by default, for no children specify 'REGION:nochildren'.",
+        metavar="REGION",
     )
     root_parser.add_argument(
         "--top-n-regions",
@@ -488,6 +506,18 @@ def setup_parser(root_parser):
         type=str,
         default="",
         help="Set optional cali file name to match. Useful if multiple caliper files are generated per experiment (e.g. RAJAPerf)",
+    )
+    root_parser.add_argument(
+        "--output-filename",
+        type=str,
+        default=None,
+        help="Configure the output file names (the default value is already unique to the workspace).",
+    )
+    root_parser.add_argument(
+        "--tree-metric",
+        type=str,
+        default="Calls/rank (max)",
+        help="Metric to show on the tree output",
     )
 
 
