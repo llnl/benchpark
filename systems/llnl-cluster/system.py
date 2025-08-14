@@ -50,7 +50,7 @@ class LlnlCluster(System):
 
     variant(
         "cluster",
-        default="ruby",
+        default="dane",
         values=("ruby", "magma", "dane"),
         description="Which cluster to run on",
     )

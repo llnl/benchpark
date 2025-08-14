@@ -185,8 +185,8 @@ class System(ExperimentSystemBase):
                 "timeout": self.timeout,
                 "scheduler": self.scheduler,
                 "sys_cores_per_node": self.sys_cores_per_node,
-                "n_ranks": -1,
-                "n_nodes": -1,
+                "n_ranks": 2**64 - 1,
+                "n_nodes": 2**64 - 1,
                 "batch_submit": "placeholder",
                 "mpi_command": "placeholder",
             }
