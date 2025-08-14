@@ -42,10 +42,10 @@ class Kripke(
     )
 
     variant(
-        "system",
+        "config",
         default="tuolumne",
         values=("lassen", "matrix", "tioga", "tuolumne"),
-        description="target-system",
+        description="Target system config",
     )
 
     maintainers("pearce8")
@@ -75,19 +75,21 @@ class Kripke(
             )
 
             # Per-process size (in zones) in each dimension
-            if self.spec.satisfies("system=tuolumne"):
+            if self.spec.satisfies("config=tuolumne"):
                 self.add_experiment_variable(
-                    "total_problem_size_dict", {"nzx": 136, "nzy": 136, "nzz": 68}, True
+                    #"total_problem_size_dict", {"nzx": 108, "nzy": 108, "nzz": 54}, True
+                    "total_problem_size_dict", {"nzx": 64, "nzy": 64, "nzz": 32}, True
                 )
-            elif self.spec.satisfies("system=tioga"):
+                self.set_environment_variable("HSA_XNACK", "1")
+            elif self.spec.satisfies("config=tioga"):
                 self.add_experiment_variable(
                     "total_problem_size_dict", {"nzx": 68, "nzy": 68, "nzz": 68}, True
                 )
-            elif self.spec.satisfies("system=matrix"):
+            elif self.spec.satisfies("config=matrix"):
                 self.add_experiment_variable(
-                    "total_problem_size_dict", {"nzx": 110, "nzy": 110, "nzz": 55}, True
+                    "total_problem_size_dict", {"nzx": 108, "nzy": 108, "nzz": 54}, True
                 )
-            elif self.spec.satisfies("system=lassen"):
+            elif self.spec.satisfies("config=lassen"):
                 self.add_experiment_variable(
                     "total_problem_size_dict", {"nzx": 64, "nzy": 64, "nzz": 32}, True
                 )
