@@ -5,7 +5,7 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.system import System
-from benchpark.openmpsystem import OpenMPSystem
+from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from packaging.version import Version
 from benchpark.paths import hardware_descriptions
 
@@ -32,7 +32,7 @@ class CscsEiger(System):
 
     def __init__(self, spec):
         super().__init__(spec)
-        self.programming_models = [OpenMPSystem()]
+        self.programming_models = [OpenMPCPUOnlySystem()]
 
         self.gcc_version = Version("12.3.0")
 

@@ -85,6 +85,12 @@ class Caliper(BasicModifier):
     )
 
     add_mode(
+        mode_name="rocm",
+        mode_option="profile.hip",
+        description="Profile HIP API functions",
+    )
+
+    add_mode(
         mode_name="topdown-counters-all",
         mode_option="topdown-counters.all",
         description="Raw counter values for Intel top-down analysis (all levels)",

@@ -3,11 +3,11 @@
 
    SPDX-License-Identifier: Apache-2.0
 
-==================
-Benchpark Commands
-==================
+===============
+Benchpark Lists
+===============
 
-The easiest way to get started is to run existing experiments one existing systems, or 
+The easiest way to get started with Benchpark is to run already specified experiments on already specified systems, or 
 to modify one that is similar. You can search through the existing experiments and benchmarks with the below commands. 
 
 Search for available system and experiment specifications in Benchpark.
@@ -60,12 +60,9 @@ Benchpark also has a help menu::
 .. program-output:: ../bin/benchpark --help
 
 
-``benchpark list``
-------------------
+The ``benchpark list`` command is used to search the available benchmarks, systems, modifiers, and experiments in Benchpark.
 
 .. program-output:: ../bin/benchpark list -h
-
-The ``benchpark list`` command is used to search the available benchmarks, systems, modifiers, and experiments in Benchpark.
 
 .. program-output:: ../bin/benchpark list benchmarks
   :ellipsis: 10

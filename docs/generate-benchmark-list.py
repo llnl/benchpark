@@ -66,7 +66,6 @@ def main():
         for t in tags:
             for k, v in tag_dicts.items():
                 if t in v:
-                    print("appending", t, "at key", k)
                     tags_taggroups[bmark][k].append(t)
         main_dict[bmark] = tags_taggroups[bmark]
 
@@ -112,6 +111,7 @@ def main():
             "--experiment",
             "weak",
             "strong",
+            "throughput",
             "--no-title",
         ],
         check=True,
@@ -135,7 +135,14 @@ def main():
         if any([bmark in s for s in scaling]):
             for expr in scaling:
                 if bmark in expr:
-                    main_dict[bmark]["scaling-experiments"].append(expr.split("+")[1])
+                    op = None
+                    if "=" in expr:
+                        op = "="
+                    elif "+" in expr:
+                        op = "+"
+                    else:
+                        raise ValueError(f"Unexpected experiment {expr}")
+                    main_dict[bmark]["scaling-experiments"].append(expr.split(op)[1])
 
     df = pd.DataFrame(main_dict)
     df.to_csv("benchmark-list.csv")
