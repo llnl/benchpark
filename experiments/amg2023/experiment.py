@@ -35,6 +35,13 @@ class Amg2023(
         description="app version",
     )
 
+    variant(
+        "system",
+        default="tuolumne",
+        values=("lassen", "matrix", "tioga", "tuolumne"),
+        description="target-system",
+    )
+
     maintainers("pearce8")
 
     def compute_applications_section(self):
@@ -42,8 +49,16 @@ class Amg2023(
             process_problem_size_dict = {"nx": 80, "ny": 80, "nz": 80}
             n_resources_dict = {"px": 2, "py": 2, "pz": 2}
         else:
-            process_problem_size_dict = {"nx": [128, 256], "ny": [128, 256], "nz": [128, 256]}
-            n_resources_dict = {"px": [2,2], "py": [2,2], "pz": [2,2]}
+            if self.spec.satisfies("system=tuolumne"):
+                #process_problem_size_dict = {"nx": [277], "ny": [277], "nz": [277]}
+                process_problem_size_dict = {"nx": [215], "ny": [215], "nz": [215]}
+            elif self.spec.satisfies("system=tioga"):
+                process_problem_size_dict = {"nx": [277], "ny": [277], "nz": [277]}
+            elif self.spec.satisfies("system=matrix"):
+                process_problem_size_dict = {"nx": [215], "ny": [215], "nz": [215]}
+            elif self.spec.satisfies("system=lassen"):
+                process_problem_size_dict = {"nx": [215], "ny": [215], "nz": [215]}
+            n_resources_dict = {"px": 1, "py": 1, "pz": 1}
 
         # Per-process size (in zones) in each dimension
         self.add_experiment_variable(

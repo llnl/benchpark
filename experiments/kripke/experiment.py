@@ -41,6 +41,13 @@ class Kripke(
         description="Enable single memory space model in rocm",
     )
 
+    variant(
+        "system",
+        default="tuolumne",
+        values=("lassen", "matrix", "tioga", "tuolumne"),
+        description="target-system",
+    )
+
     maintainers("pearce8")
 
     def compute_applications_section(self):
@@ -64,18 +71,31 @@ class Kripke(
         else:
             # Number of processes in each dimension
             self.add_experiment_variable(
-                "n_resources_dict", {"npx": [2,2,2], "npy": [2,2,2], "npz": [1,1,1]}, True
+                "n_resources_dict", {"npx": 2, "npy": 2, "npz": 1}, True
             )
 
             # Per-process size (in zones) in each dimension
-            self.add_experiment_variable(
-                "total_problem_size_dict", {"nzx": [64,64,64], "nzy": [64,64,64], "nzz": [32,32,32]}, True
-            )
+            if self.spec.satisfies("system=tuolumne"):
+                self.add_experiment_variable(
+                    "total_problem_size_dict", {"nzx": 136, "nzy": 136, "nzz": 68}, True
+                )
+            elif self.spec.satisfies("system=tioga"):
+                self.add_experiment_variable(
+                    "total_problem_size_dict", {"nzx": 68, "nzy": 68, "nzz": 68}, True
+                )
+            elif self.spec.satisfies("system=matrix"):
+                self.add_experiment_variable(
+                    "total_problem_size_dict", {"nzx": 110, "nzy": 110, "nzz": 55}, True
+                )
+            elif self.spec.satisfies("system=lassen"):
+                self.add_experiment_variable(
+                    "total_problem_size_dict", {"nzx": 64, "nzy": 64, "nzz": 32}, True
+                )
 
-            self.add_experiment_variable("ngroups", [220, 320, 360], True)
+            self.add_experiment_variable("ngroups", [360], True, True)
             self.add_experiment_variable("gs", 1, True)
-            self.add_experiment_variable("nquad", 36, True)
-            self.add_experiment_variable("ds", 36, True)
+            self.add_experiment_variable("nquad", 40, True)
+            self.add_experiment_variable("ds", 40, True)
             self.add_experiment_variable("lorder", 4, True)
             self.add_experiment_variable("layout", "GDZ", True)
 
