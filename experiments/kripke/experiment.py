@@ -42,6 +42,12 @@ class Kripke(
     )
 
     variant(
+        "xnack",
+        default=True,
+        description="set HSA_XNACK",
+    )
+
+    variant(
         "config",
         default="tuolumne",
         values=("lassen", "matrix", "tioga", "tuolumne"),
@@ -80,11 +86,14 @@ class Kripke(
                     #"total_problem_size_dict", {"nzx": 108, "nzy": 108, "nzz": 54}, True
                     "total_problem_size_dict", {"nzx": 64, "nzy": 64, "nzz": 32}, True
                 )
-                self.set_environment_variable("HSA_XNACK", "1")
+                if self.spec.satisfies("+xnack"):
+                    self.set_environment_variable("HSA_XNACK", "1")
             elif self.spec.satisfies("config=tioga"):
                 self.add_experiment_variable(
                     "total_problem_size_dict", {"nzx": 68, "nzy": 68, "nzz": 68}, True
                 )
+                if self.spec.satisfies("+xnack"):
+                    self.set_environment_variable("HSA_XNACK", "1")
             elif self.spec.satisfies("config=matrix"):
                 self.add_experiment_variable(
                     "total_problem_size_dict", {"nzx": 108, "nzy": 108, "nzz": 54}, True
