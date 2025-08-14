@@ -326,9 +326,10 @@ def prepare_data(**kwargs):
         list(grouped.values()), headers=list(grouped.keys()), axis="columns"
     )
 
+    cluster_col = "cluster" if "cluster" in tk.metadata.columns else "host.cluster"
     # Check these values are constant
     app = validate_single_metadata_value("application_name", tk)
-    cluster = validate_single_metadata_value("host.cluster", tk)
+    cluster = validate_single_metadata_value(cluster_col, tk)
     version = validate_single_metadata_value("version", tk)
 
     # Find programming model from spec

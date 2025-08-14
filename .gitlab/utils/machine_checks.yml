@@ -28,11 +28,6 @@ dane-up-check:
   variables:
     CI_MACHINE: dane
   extends: [.machine-check]
-ruby-up-check:
-  stage: machine-checks
-  variables:
-    CI_MACHINE: ruby
-  extends: [.machine-check]
 lassen-up-check:
   stage: machine-checks
   variables:
