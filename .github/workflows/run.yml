@@ -5,6 +5,28 @@ on:
       BENCHPARK_CODECOV_TOKEN:
         required: true
 jobs:
+  check_errors:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Benchpark
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Add needed Python libs
+        run: |
+          pip install -r ./requirements.txt
+      - name: Build Saxpy Workspace
+        run: |
+          ./bin/benchpark system init --dest dane llnl-cluster
+          ./bin/benchpark system init --dest tuolumne llnl-elcapitan
+          ./bin/benchpark experiment init --dest stream --system dane stream
+          # Setup with different system than init
+          set +e
+          stderr_output="$(BENCHPARK_RUN_COVERAGE=errors ./bin/benchpark setup stream tuolumne wkp 2>&1 >/dev/null)"
+          status=$?
+          set -e
+          [[ $status -ne 0 ]] || fail "Expected non-zero exit status, got $status"
+          # Check for the specific BenchparkError message
+          expected="BenchparkError: The provided system 'tuolumne' differs from the system used to initialize the experiment 'dane'. Please use the same system."
+          grep -Fq "$expected" <<<"$stderr_output" || fail "Expected error message not found in stderr. Got: $stderr_output"
   saxpy:
     runs-on: ubuntu-24.04
     steps:
