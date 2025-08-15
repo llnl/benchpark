@@ -167,7 +167,9 @@ def command(args):
     expr_sys_config_hash = find(parsed_yaml, "config-hash")
     expr_sys_destdir = find(parsed_yaml, "destdir")
     if sys_config_hash != expr_sys_config_hash:
-        raise BenchparkError(f"The provided system '{system_id}' differs from the system used to initialize the experiment '{expr_sys_destdir}'. Please use the same system.")
+        raise BenchparkError(
+            f"The provided system '{system_id}' differs from the system used to initialize the experiment '{expr_sys_destdir}'. Please use the same system."
+        )
 
     pkg_str = ""
     if pkg_manager == "spack":

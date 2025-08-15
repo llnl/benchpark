@@ -532,7 +532,7 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
                 if self.spec.satisfies(when):
                     for need in needs:
                         self.system_spec.system.enforce(need)
-            
+
             system_dict = {
                 "config-hash": self.system_spec.system.config_hash,
                 "name": str(self.system_spec.system.__class__.__name__),

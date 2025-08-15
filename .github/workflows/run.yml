@@ -13,14 +13,14 @@ jobs:
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
-      - name: Build Saxpy Workspace
+      - name: Check Different System from Experiment Init
         run: |
           ./bin/benchpark system init --dest dane llnl-cluster
           ./bin/benchpark system init --dest tuolumne llnl-elcapitan
           ./bin/benchpark experiment init --dest stream --system dane stream
-          # Setup with different system than init
+          # Try setup with different system than init
           set +e
-          stderr_output="$(BENCHPARK_RUN_COVERAGE=errors ./bin/benchpark setup stream tuolumne wkp 2>&1 >/dev/null)"
+          stderr_output="$({ BENCHPARK_RUN_COVERAGE=errors "$bench" setup stream tuolumne wkp 1>/dev/null; } 2>&1)"
           status=$?
           set -e
           [[ $status -ne 0 ]] || fail "Expected non-zero exit status, got $status"
