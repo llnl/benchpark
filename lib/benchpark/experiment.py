@@ -43,6 +43,9 @@ class ExperimentHelper:
     def compute_package_section(self):
         return {}
 
+    def compute_system_section(self):
+        return {}
+
     def get_helper_name_prefix(self):
         return None
 
@@ -520,6 +523,18 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
             additional_vars.update(cls.compute_variables_section())
         return additional_vars
 
+    def compute_system_section(self):
+        # i.e. the user ran `experiment init` with `--system`
+        for when, needs in self.requires.items():
+            if self.spec.satisfies(when):
+                for need in needs:
+                    self.system_spec.system.enforce(need)
+        return {
+            "config-hash": self.system_spec.system.config_hash,
+            "name": str(self.system_spec.system.__class__.__name__),
+            "destdir": self.system_spec.destdir,
+        }
+
     def compute_ramble_dict(self):
         # This can be overridden by any subclass that needs more flexibility
         ramble_dict = {
@@ -529,6 +544,7 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
                 "modifiers": self.compute_modifiers_section_wrapper(),
                 "applications": self.compute_applications_section_wrapper(),
                 "software": self.compute_package_section_wrapper(),
+                "system": self.compute_system_section(),
             }
         }
         # Add any variables from helper classes if necessary
@@ -539,14 +555,6 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
         return ramble_dict
 
     def write_ramble_dict(self, filepath):
-        # Here you can do self.system_spec.system.sys_gpus_per_node
-        if hasattr(self, "system_spec"):
-            # i.e. the user ran `experiment init` with `--system`
-            for when, needs in self.requires.items():
-                if self.spec.satisfies(when):
-                    for need in needs:
-                        self.system_spec.system.enforce(need)
-
         ramble_dict = self.compute_ramble_dict()
         with open(filepath, "w") as f:
             yaml.dump(ramble_dict, f)
