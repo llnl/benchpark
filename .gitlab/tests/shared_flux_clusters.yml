@@ -41,9 +41,8 @@ allocate_resources_tioga:
 .release_resources_flux:
   extends: .on_host_template
   stage: release-resources
-  script: [. .gitlab/utils/cancel-flux.sh]
-  variables:
-    GIT_STRATEGY: none
+  # Do not cleanup dir yet
+  script: [. .gitlab/utils/cancel-flux.sh --no-clean]
 release_resources_flux_tuolumne:
   extends: .release_resources_flux
   needs: [allocate_resources_tuolumne, run_tests_flux_tuolumne]
@@ -80,7 +79,6 @@ release_resources_flux_tioga:
         . .gitlab/utils/cancel-flux.sh
       fi
 run_tests_flux_tuolumne:
-  resource_group: tuolumne
   extends: .run_tests_flux
   tags: [shell, tuolumne]
   needs: [allocate_resources_tuolumne]
@@ -100,12 +98,29 @@ run_tests_flux_tuolumne:
         GPUMODE: TPX
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [amg2023, kripke, laghos]
+        BENCHMARK: [kripke, laghos]
         VARIANT: [+rocm scaling=strong scaling-iterations=2]
         SYSTEM_ARGS: [gpumode=CPX]
         GPUMODE: CPX
+      # Test openmp on tuolumne
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [kripke]
+        VARIANT: [+openmp]
+        GPUMODE: SPX
+      # Test kripke+rocm+single_memory on tuolumne
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [kripke]
+        VARIANT: [+rocm+single_memory]
+        GPUMODE: SPX
+      # Caliper profile.hip
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [kripke]
+        VARIANT: ['+rocm caliper=mpi,time,rocm']
+        GPUMODE: SPX
 run_tests_flux_tioga:
-  resource_group: tioga
   extends: .run_tests_flux
   tags: [shell, tioga]
   needs: [allocate_resources_tioga]
@@ -113,5 +128,5 @@ run_tests_flux_tioga:
     matrix:
       - HOST: tioga
         ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [amg2023, kripke, laghos]
+        BENCHMARK: [amg2023, kripke, laghos, raja-perf]
         VARIANT: [+rocm]

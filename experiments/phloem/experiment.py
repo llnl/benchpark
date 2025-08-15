@@ -5,10 +5,11 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.scaling import StrongScaling
 
 
-class Phloem(Experiment, StrongScaling):
+class Phloem(Experiment, MpiOnlyExperiment, StrongScaling):
     variant(
         "workload",
         default="sqmr",
@@ -42,4 +43,4 @@ class Phloem(Experiment, StrongScaling):
         )
 
     def compute_package_section(self):
-        self.add_package_spec(self.name, [f"phloem{self.determine_version()} +mpi"])
+        self.add_package_spec(self.name, [f"phloem{self.determine_version()}"])

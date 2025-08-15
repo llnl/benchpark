@@ -5,10 +5,11 @@
 
 from benchpark.directives import variant
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.openmp import OpenMPExperiment
 
 
-class SalmonTddft(Experiment, OpenMPExperiment):
+class SalmonTddft(Experiment, MpiOnlyExperiment, OpenMPExperiment):
     variant(
         "workload",
         default="gs",

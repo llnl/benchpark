@@ -36,23 +36,41 @@ class Caliper(BasicModifier):
 
     _default_mode = "time"
 
-    # Write out the metadata file once all variables are resolved
-    register_phase("build_metadata", pipeline="setup", run_after=["make_experiments"])
-
     add_mode(
         mode_name=_default_mode,
         mode_option="time.exclusive",
         description="Platform-independent collection of time (default mode)",
     )
 
-    env_var_modification(
-        "CALI_CONFIG",
-        'spot({}),metadata(file={}),metadata(file=/etc/node_info.json,keys="host.name,host.cluster,host.os")'.format(
-            "${CALI_CONFIG_MODE}", _caliper_metadata_file
-        ),
-        method="set",
-        modes=[_default_mode],
-    )
+    def modify_experiment(self, app):
+        """If app has built-in Caliper configuration, do not set CALI_CONFIG.
+        Config parameters are parsed out into SPOT_CONFIG and OTHER_CALI_CONFIG if the application still requires them.
+        """
+        SPOT_CONFIG = r"spot(${CALI_CONFIG_MODE})"
+        OTHER_CALI_CONFIG = f'metadata(file={self._caliper_metadata_file}),metadata(file=/etc/node_info.json,keys="host.name,host.cluster,host.os")'
+
+        if "builtin-caliper" not in app.tags:
+            # Normal mode
+            self.env_var_modification(
+                "CALI_CONFIG",
+                f"{SPOT_CONFIG},{OTHER_CALI_CONFIG}",
+                method="set",
+                modes=[self._default_mode],
+            )
+        else:
+            # Set env vars in case application can use them
+            self.env_var_modification(
+                "SPOT_CONFIG",
+                SPOT_CONFIG,
+                method="set",
+                modes=[self._default_mode],
+            )
+            self.env_var_modification(
+                "OTHER_CALI_CONFIG",
+                OTHER_CALI_CONFIG,
+                method="set",
+                modes=[self._default_mode],
+            )
 
     add_mode(
         mode_name="mpi",
@@ -64,6 +82,12 @@ class Caliper(BasicModifier):
         mode_name="cuda",
         mode_option="profile.cuda",
         description="Profile CUDA API functions",
+    )
+
+    add_mode(
+        mode_name="rocm",
+        mode_option="profile.hip",
+        description="Profile HIP API functions",
     )
 
     add_mode(
@@ -89,6 +113,9 @@ class Caliper(BasicModifier):
         mode_option="topdown.toplevel",
         description="Top-down analysis for Intel CPUs (top level)",
     )
+
+    # Write out the metadata file once all variables are resolved
+    register_phase("build_metadata", pipeline="setup", run_after=["make_experiments"])
 
     def _build_metadata(self, workspace, app_inst):
         """Write the caliper metadata to json"""

@@ -5,10 +5,11 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.scaling import StrongScaling
 
 
-class Gpcnet(Experiment, StrongScaling):
+class Gpcnet(Experiment, MpiOnlyExperiment, StrongScaling):
     variant(
         "workload",
         default="network_test",
@@ -40,4 +41,4 @@ class Gpcnet(Experiment, StrongScaling):
         )
 
     def compute_package_section(self):
-        self.add_package_spec(self.name, [f"gpcnet{self.determine_version()} +mpi"])
+        self.add_package_spec(self.name, [f"gpcnet{self.determine_version()}"])

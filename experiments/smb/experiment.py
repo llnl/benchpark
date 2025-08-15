@@ -5,10 +5,11 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.scaling import StrongScaling
 
 
-class Smb(Experiment, StrongScaling):
+class Smb(Experiment, MpiOnlyExperiment, StrongScaling):
     variant(
         "workload",
         default="mpi_overhead",
@@ -39,7 +40,7 @@ class Smb(Experiment, StrongScaling):
         )
 
     def compute_package_section(self):
-        spec_string = f"smb{self.determine_version()} +mpi"
+        spec_string = f"smb{self.determine_version()}"
         if self.spec.satisfies("workload=rma_mt"):
             spec_string += "+rma"
         self.add_package_spec(self.name, [spec_string])

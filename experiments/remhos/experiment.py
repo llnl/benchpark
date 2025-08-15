@@ -5,6 +5,7 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.caliper import Caliper
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
@@ -13,6 +14,7 @@ from benchpark.new_scaling import Scaling, ScalingMode
 
 class Remhos(
     Experiment,
+    MpiOnlyExperiment,
     CudaExperiment,
     ROCmExperiment,
     Scaling(ScalingMode.Strong),

@@ -5,6 +5,7 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.scaling import StrongScaling
 from benchpark.scaling import WeakScaling
 from benchpark.openmp import OpenMPExperiment
@@ -13,6 +14,7 @@ from benchpark.caliper import Caliper
 
 class Hpcg(
     Experiment,
+    MpiOnlyExperiment,
     StrongScaling,
     WeakScaling,
     OpenMPExperiment,
@@ -39,7 +41,7 @@ class Hpcg(
         num_procs = {"x": 1, "y": 1, "z": 1}
         n_resources = 1
 
-        if self.spec.satisfies("+single_node"):
+        if self.spec.satisfies("exec_mode=test"):
             for k, v in problem_sizes.items():
                 self.add_experiment_variable(k, v, True)
 

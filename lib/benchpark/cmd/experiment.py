@@ -6,16 +6,25 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+import pickle
 import shutil
 import sys
 
 import benchpark.experiment
 import benchpark.spec
+import benchpark.system
 
 
 def experiment_init(args):
     experiment_spec = benchpark.spec.ExperimentSpec(" ".join(args.spec)).concretize()
     experiment = experiment_spec.experiment
+
+    if args.system:
+        system_file = os.path.join(args.system, "system.pkl")
+        with open(system_file, "rb") as f:
+            system_spec = pickle.load(f)
+
+        experiment.system_spec = system_spec
 
     if args.basedir:
         base = args.basedir
@@ -39,13 +48,16 @@ def experiment_init(args):
 
 
 def setup_parser(root_parser):
-    system_subparser = root_parser.add_subparsers(dest="experiment_subcommand")
+    system_subparser = root_parser.add_subparsers(
+        dest="experiment_subcommand", required=True
+    )
 
     init_parser = system_subparser.add_parser("init")
     init_parser.add_argument("--dest", help="Place all system files here directly")
     init_parser.add_argument(
         "--basedir", help="Generate a system dir under this, and place all files there"
     )
+    init_parser.add_argument("--system", help="The system this will be run on")
 
     init_parser.add_argument("spec", nargs="+", help="Experiment spec")
 
@@ -56,7 +68,3 @@ def command(args):
     }
     if args.experiment_subcommand in actions:
         actions[args.experiment_subcommand](args)
-    else:
-        raise ValueError(
-            f"Unknown subcommand for 'experiment': {args.experiment_subcommand}"
-        )

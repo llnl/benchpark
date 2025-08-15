@@ -7,7 +7,8 @@
 from benchpark.directives import variant, maintainers
 from benchpark.paths import hardware_descriptions
 from benchpark.rocmsystem import ROCmSystem
-from benchpark.system import System
+from benchpark.system import System, JobQueue
+from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from packaging.version import Version
 
 
@@ -26,6 +27,7 @@ class LlnlElcapitan(System):
             "scheduler": "flux",
             "hardware_key": str(hardware_descriptions)
             + "/HPECray-zen3-MI250X-Slingshot/hardware_description.yaml",
+            "queues": [JobQueue("pdebug", 720, 24)],
         },
         "elcapitan": {
             "rocm_arch": "gfx942",
@@ -50,9 +52,18 @@ class LlnlElcapitan(System):
             "scheduler": "flux",
             "hardware_key": str(hardware_descriptions)
             + "/HPECray-zen4-MI300A-Slingshot/hardware_description.yaml",
+            "queues": [
+                JobQueue("pdebug", 120, 32),
+                JobQueue("pbatch", 1440, 4150),
+                JobQueue("plarge", 1440, 11040),
+            ],
         },
     }
     id_to_resources["tuolumne"] = id_to_resources["elcapitan"]
+    id_to_resources["tuolumne"]["queues"] = [
+        JobQueue("pdebug", 60, 16),
+        JobQueue("pbatch", 1440, 256),
+    ]
 
     variant(
         "cluster",
@@ -68,8 +79,8 @@ class LlnlElcapitan(System):
     )
     variant(
         "rocm",
-        default="6.2.4",
-        values=("5.7.1", "6.2.4", "6.3.1"),
+        default="6.4.0",
+        values=("5.7.1", "6.2.4", "6.3.1", "6.4.0", "6.4.1"),
         description="ROCm version",
     )
     variant(
@@ -97,9 +108,25 @@ class LlnlElcapitan(System):
         description="Which blas to use",
     )
 
+    variant(
+        "bank",
+        default="none",
+        values=("none", "guests", "asccasc", "lc", "fractale"),
+        multi=False,
+        description="Submit a job to a specific named bank",
+    )
+
+    variant(
+        "queue",
+        default="none",
+        values=("none", "pbatch", "pdebug"),
+        multi=False,
+        description="Submit to queue other than the default queue (e.g. pdebug)",
+    )
+
     def __init__(self, spec):
         super().__init__(spec)
-        self.programming_models = [ROCmSystem()]
+        self.programming_models = [ROCmSystem(), OpenMPCPUOnlySystem()]
         self.rocm_version = Version(self.spec.variants["rocm"][0])
         self.gtl_flag = self.spec.variants["gtl"][0]
 
@@ -108,15 +135,22 @@ class LlnlElcapitan(System):
             self.gcc_version = Version("12.2.0")
             self.mpi_version = Version("8.1.26")
         else:
-            if self.rocm_version >= Version("6.0.0"):
+            if self.rocm_version >= Version("6.4.0"):
+                self.cce_version = Version("19.0.0")
+                self.mpi_version = Version("8.1.32")
+                self.short_cce_version = "18.0"
+            elif self.rocm_version >= Version("6.0.0"):
                 self.cce_version = Version("18.0.1")
                 self.mpi_version = Version("8.1.31")
+                self.short_cce_version = (
+                    f"{self.cce_version.major}.{self.cce_version.minor}"
+                )
             else:
                 self.cce_version = Version("16.0.0")
                 self.mpi_version = Version("8.1.26")
-            self.short_cce_version = (
-                f"{self.cce_version.major}.{self.cce_version.minor}"
-            )
+                self.short_cce_version = (
+                    f"{self.cce_version.major}.{self.cce_version.minor}"
+                )
         if self.rocm_version >= Version("6.0.0"):
             self.pmi_version = Version("6.1.15.6")
             self.pals_version = Version("1.2.12")
@@ -620,6 +654,15 @@ class LlnlElcapitan(System):
         }
 
     def rocm_cce_compiler_cfg(self):
+        rpaths = [
+            f"/opt/rocm-{self.rocm_version}/lib",
+            "/opt/cray/pe/gcc-libs",
+            f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib",
+        ]
+        # Avoid libunwind.so.1 error on tioga
+        if self.spec.variants["cluster"][0] == "tioga":
+            rpaths.append(f"/opt/cray/pe/cce/{self.cce_version}/cce-clang/x86_64/lib/")
+
         if self.spec.satisfies("compiler=rocmcc"):
             return {
                 "compilers": [
@@ -646,11 +689,7 @@ class LlnlElcapitan(System):
                                     "LIBRARY_PATH": f"/opt/rocm-{self.rocm_version}/lib",
                                 },
                             },
-                            "extra_rpaths": [
-                                f"/opt/rocm-{self.rocm_version}/lib",
-                                "/opt/cray/pe/gcc-libs",
-                                f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib",
-                            ],
+                            "extra_rpaths": rpaths,
                         }
                     }
                 ]
@@ -681,11 +720,7 @@ class LlnlElcapitan(System):
                                     "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/rocm-{self.rocm_version}/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib"
                                 }
                             },
-                            "extra_rpaths": [
-                                f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib/",
-                                "/opt/cray/pe/gcc-libs/",
-                                f"/opt/rocm-{self.rocm_version}/lib",
-                            ],
+                            "extra_rpaths": rpaths,
                         }
                     }
                 ]

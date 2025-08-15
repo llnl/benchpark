@@ -12,8 +12,6 @@ workflow:
 allocate_resources_dane:
   tags: [shell, dane]
   needs: [dane-up-check]
-  variables:
-    GIT_STRATEGY: none
   extends: .on_host_template
   stage: allocate-resources
   script:
@@ -30,17 +28,15 @@ allocate_resources_dane:
 release_resources_dane:
   tags: [shell, dane]
   needs: [allocate_resources_dane, run_tests_slurm_dane]
-  variables:
-    GIT_STRATEGY: none
   extends: .on_host_template
   stage: release-resources
+  # Do not cleanup dir yet
   script:
-    - . .gitlab/utils/cancel-slurm.sh
+    - . .gitlab/utils/cancel-slurm.sh --no-clean
 ##################
 # Test Run Section
 ##################
 .run_tests_slurm: &run_tests_slurm
-  resource_group: dane
   extends: .on_host_template
   parallel:
     matrix:
@@ -63,7 +59,7 @@ release_resources_dane:
       - HOST: dane
         ARCHCONFIG: llnl-cluster
         BENCHMARK: [hpcg]
-        VARIANT: ['+strong~single_node caliper=mpi,time']
+        VARIANT: ['+strong caliper=mpi,time']
         TEST_ANALYZE: ['true']
       # Test affinity and hwloc with caliper on
       - HOST: dane

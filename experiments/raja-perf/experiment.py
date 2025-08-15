@@ -3,9 +3,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.error import BenchparkError
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.scaling import StrongScaling
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
@@ -16,6 +16,7 @@ from benchpark.caliper import Caliper
 
 class RajaPerf(
     Experiment,
+    MpiOnlyExperiment,
     StrongScaling,
     CudaExperiment,
     ROCmExperiment,
@@ -39,24 +40,10 @@ class RajaPerf(
     maintainers("michaelmckinsey1")
 
     def compute_applications_section(self):
-        # TODO: Replace with conflicts clause
-        scaling_modes = {
-            "strong": self.spec.satisfies("+strong"),
-            "weak": self.spec.satisfies("+weak"),
-            "throughput": self.spec.satisfies("+throughput"),
-            "single_node": self.spec.satisfies("+single_node"),
-        }
-
-        scaling_mode_enabled = [key for key, value in scaling_modes.items() if value]
-        if len(scaling_mode_enabled) != 1:
-            raise BenchparkError(
-                f"Only one type of scaling per experiment is allowed for application package {self.name}"
-            )
-
         n_resources = {"n_ranks": 1}
         problem_sizes = {"size": 1048576}
 
-        if self.spec.satisfies("+single_node"):
+        if self.spec.satisfies("exec_mode=test"):
             for pk, pv in n_resources.items():
                 n_resources = pv
             for nk, nv in problem_sizes.items():

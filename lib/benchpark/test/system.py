@@ -3,6 +3,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import pytest
+
 import benchpark.spec
 
 
@@ -17,9 +19,8 @@ def test_system_compute_variables_section(monkeypatch):
             "timeout": "120",
             "scheduler": "flux",
             "sys_cores_per_node": 84,
-            "max_request": "1000",
-            "n_ranks": "1000001",
-            "n_nodes": "1000001",
+            "n_ranks": 2**64 - 1,
+            "n_nodes": 2**64 - 1,
             "batch_submit": "placeholder",
             "mpi_command": "placeholder",
             "sys_cores_os_reserved_per_node": 12,
@@ -39,9 +40,17 @@ def test_system_compute_variables_section(monkeypatch):
             ],
             "sys_gpus_per_node": 4,
             "rocm_arch": "gfx942",
-            "rocm_version": "6.2.4",
+            "rocm_version": "6.4.0",
             "gtl_flag": True,
             "gpu_factor": 1,
             "extra_batch_opts": "--setattr=gpumode=SPX\n--conf=resource.rediscover=true",
         }
     }
+
+
+def test_system_timeout():
+    with pytest.raises(ValueError, match="is unsatisfiable for the selected queue"):
+        sys_spec = benchpark.spec.SystemSpec(
+            "llnl-elcapitan cluster=tioga queue=pdebug timeout=9999"
+        ).concretize()
+        sys_spec.system.compute_variables_section()

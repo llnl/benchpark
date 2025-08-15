@@ -5,6 +5,7 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.scaling import StrongScaling
 from benchpark.scaling import WeakScaling
@@ -13,6 +14,7 @@ from benchpark.caliper import Caliper
 
 class Quicksilver(
     Experiment,
+    MpiOnlyExperiment,
     OpenMPExperiment,
     StrongScaling,
     WeakScaling,
@@ -59,4 +61,4 @@ class Quicksilver(
         )
 
     def compute_package_section(self):
-        self.add_package_spec(self.name, [f"quicksilver{self.determine_version()} +mpi"])
+        self.add_package_spec(self.name, [f"quicksilver{self.determine_version()}"])
