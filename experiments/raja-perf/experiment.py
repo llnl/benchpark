@@ -44,6 +44,10 @@ class RajaPerf(
             # Number of processes
             self.add_experiment_variable("n_resources", 1, False)
 
+        self.set_required_variables(
+            total_problem_size="{n_resources}*{process_problem_size}",
+        )
+
         # In this application (RAJAPerf), since the input problem sizes (process_problem_size)
         # are per process sizes, strong scaling the problem implies that
         # as n_resources are scaled up, i.e. (x * scaling_factor),
