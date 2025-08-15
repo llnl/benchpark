@@ -43,9 +43,6 @@ class ExperimentHelper:
     def compute_package_section(self):
         return {}
 
-    def compute_system_section(self):
-        return {}
-
     def get_helper_name_prefix(self):
         return None
 
@@ -322,10 +319,25 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
         return ["./configs"]
 
     def compute_config_section(self):
+        system_dict = {}
+        # Avoid needing system_spec when initializing from library
+        if hasattr(self, "system_spec"):
+            # i.e. the user ran `experiment init` with `--system`
+            for when, needs in self.requires.items():
+                if self.spec.satisfies(when):
+                    for need in needs:
+                        self.system_spec.system.enforce(need)
+
+            system_dict = {
+                "config-hash": self.system_spec.system.config_hash,
+                "name": str(self.system_spec.system.__class__.__name__),
+                "destdir": self.system_spec.destdir,
+            }
         # default configs for all experiments
         default_config = {
             "deprecated": True,
             "benchpark_experiment_command": "benchpark " + " ".join(sys.argv[1:]),
+            "system": system_dict,
         }
         if self.spec.variants["package_manager"][0] == "spack":
             default_config["spack_flags"] = {
@@ -523,24 +535,6 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
             additional_vars.update(cls.compute_variables_section())
         return additional_vars
 
-    def compute_system_section(self):
-        system_dict = {}
-        # Avoid needing system_spec when initializing from library
-        if hasattr(self, "system_spec"):
-            # i.e. the user ran `experiment init` with `--system`
-            for when, needs in self.requires.items():
-                if self.spec.satisfies(when):
-                    for need in needs:
-                        self.system_spec.system.enforce(need)
-
-            system_dict = {
-                "config-hash": self.system_spec.system.config_hash,
-                "name": str(self.system_spec.system.__class__.__name__),
-                "destdir": self.system_spec.destdir,
-            }
-
-        return system_dict
-
     def compute_ramble_dict(self):
         # This can be overridden by any subclass that needs more flexibility
         ramble_dict = {
@@ -550,7 +544,6 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
                 "modifiers": self.compute_modifiers_section_wrapper(),
                 "applications": self.compute_applications_section_wrapper(),
                 "software": self.compute_package_section_wrapper(),
-                "system": self.compute_system_section(),
             }
         }
         # Add any variables from helper classes if necessary
