@@ -20,7 +20,7 @@ jobs:
           ./bin/benchpark experiment init --dest stream --system dane stream
           # Try setup with different system than init
           set +e
-          stderr_output="$({ BENCHPARK_RUN_COVERAGE=errors "$bench" setup stream tuolumne wkp 1>/dev/null; } 2>&1)"
+          stderr_output="$({ BENCHPARK_RUN_COVERAGE=errors ./bin/benchpark setup stream tuolumne wkp 1>/dev/null; } 2>&1)"
           status=$?
           set -e
           [[ $status -ne 0 ]] || fail "Expected non-zero exit status, got $status"
