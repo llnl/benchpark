@@ -5,12 +5,14 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
-from benchpark.scaling import StrongScaling
+from benchpark.mpi import MpiOnlyExperiment
+from benchpark.new_scaling import ScalingMode, Scaling
 
 
 class MdTest(
     Experiment,
-    StrongScaling,
+    MpiOnlyExperiment,
+    Scaling(ScalingMode.Strong),
 ):
     variant(
         "workload",
@@ -33,17 +35,19 @@ class MdTest(
         self.add_experiment_variable("num-objects", "1000", True)
         self.add_experiment_variable("iterations", "10", True)
 
-        if self.spec.satisfies("+single_node"):
+        if self.spec.satisfies("exec_mode=test"):
             for pk, pv in num_resources.items():
                 self.add_experiment_variable(pk, pv, True)
-        elif self.spec.satisfies("+strong"):
-            scaled_variables = self.generate_strong_scaling_params(
-                {tuple(num_resources.keys()): list(num_resources.values())},
-                int(self.spec.variants["scaling-factor"][0]),
-                int(self.spec.variants["scaling-iterations"][0]),
-            )
-            for k, v in scaled_variables.items():
-                self.add_experiment_variable(k, v, True)
+
+        self.register_scaling_config(
+            {
+                ScalingMode.Strong: {
+                    "n_ranks": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "num-objects": lambda var, itr, dim, scaling_factor: var.val(dim),
+                },
+            }
+        )
 
         self.set_required_variables(
             n_resources="{n_ranks}",

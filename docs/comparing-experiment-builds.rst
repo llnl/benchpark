@@ -4,9 +4,9 @@
    SPDX-License-Identifier: Apache-2.0
 
 
-==========================================
-Comparing two Experiments Within Benchpark
-==========================================
+=======================
+Compare two Experiments
+=======================
 
 This tutorial will guide you through the process of building and comparing distinct binaries of the same benchmark. 
 As an example, we will be using an experiment comparing two builds of the quicksilver benchmark, compiled with the ``gcc`` and ``intel`` compiler variants on LLNL's Ruby cluster.
@@ -31,7 +31,7 @@ Parameters could include: version, scaling, etc.
 In this example, we are only changing the compiler. Because all experiment variables will be the same, we only need to generate a single experiment description.
 This command initializes a quicksilver experiment configuration in the ``quicksilver`` directory. We are doing weak scaling with openMP, and measuring MPI metrics with Caliper. 
 
-``benchpark experiment init --dest=quicksilver  quicksilver caliper=mpi +weak +openmp ~single_node``
+``benchpark experiment init --dest=quicksilver  quicksilver caliper=mpi +weak +openmp``
 
 
 .. Note::

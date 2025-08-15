@@ -5,12 +5,14 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.rocm import ROCmExperiment
 from benchpark.cuda import CudaExperiment
 
 
 class OsuMicroBenchmarks(
     Experiment,
+    MpiOnlyExperiment,
     ROCmExperiment,
     CudaExperiment,
 ):
@@ -100,7 +102,7 @@ class OsuMicroBenchmarks(
 
         num_nodes = {"n_nodes": 2}
 
-        if self.spec.satisfies("+single_node"):
+        if self.spec.satisfies("exec_mode=test"):
             for pk, pv in num_nodes.items():
                 self.add_experiment_variable(pk, pv, True)
 

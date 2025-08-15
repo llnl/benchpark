@@ -5,6 +5,7 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
@@ -14,6 +15,7 @@ from benchpark.caliper import Caliper
 
 class Amg2023(
     Experiment,
+    MpiOnlyExperiment,
     OpenMPExperiment,
     CudaExperiment,
     ROCmExperiment,
@@ -36,15 +38,24 @@ class Amg2023(
     maintainers("pearce8")
 
     def compute_applications_section(self):
-        # Number of processes in each dimension
-        self.add_experiment_variable(
-            "n_resources_dict", {"px": 2, "py": 2, "pz": 2}, True
-        )
+        if self.spec.satisfies("exec_mode=test"):
+            process_problem_size_dict = {"nx": 80, "ny": 80, "nz": 80}
+            n_resources_dict = {"px": 2, "py": 2, "pz": 2}
+        else:
+            process_problem_size_dict = {
+                "nx": [128, 256],
+                "ny": [128, 256],
+                "nz": [128, 256],
+            }
+            n_resources_dict = {"px": [2, 2], "py": [2, 2], "pz": [2, 2]}
 
         # Per-process size (in zones) in each dimension
         self.add_experiment_variable(
-            "process_problem_size_dict", {"nx": 80, "ny": 80, "nz": 80}, True
+            "process_problem_size_dict", process_problem_size_dict, True
         )
+
+        # Number of processes in each dimension
+        self.add_experiment_variable("n_resources_dict", n_resources_dict, True)
 
         # Set the variables required by the experiment
         self.set_required_variables(
@@ -104,4 +115,4 @@ class Amg2023(
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, [f"amg2023@{app_version} +mpi"])
+        self.add_package_spec(self.name, [f"amg2023@{app_version} "])
