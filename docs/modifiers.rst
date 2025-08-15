@@ -27,7 +27,7 @@ To use the Affinity modifier:
 
 - When you initialize your experiment, add ``affinity=on`` to ``experiment init``.
 - A small, separate run will execute in your allocation to record the information.
-- The Affinity modifier will output a text file in the experiment directory which will look like this for ``benchpark experiment init --dest=saxpy saxpy+openmp affinity=on`` on 8 ranks, 2 threads/proc, 1 node:
+- The Affinity modifier will output a text file in the experiment directory which will look like this for ``benchpark experiment init --dest=saxpy --system=system-name saxpy+openmp affinity=on`` on 8 ranks, 2 threads/proc, 1 node:
 
 .. code-block:: console
 
@@ -69,7 +69,7 @@ We have implemented a Caliper modifier to enable profiling of Caliper-instrument
 To turn on profiling with Caliper, add ``caliper=<caliper_variant>`` to the experiment init
 setup step::
 
-    benchpark experiment init --dest=</path/to/experiment_root> <benchmark> caliper=<caliper_variant>
+    benchpark experiment init --dest=</path/to/experiment_root> --system=</path/to/system> <benchmark> caliper=<caliper_variant>
 
 Valid values for ``<caliper_variant>`` are found in the **Caliper Variant**
 column of the table below.  Benchpark will link the experiment to Caliper,
@@ -200,7 +200,7 @@ processor sockets, processor cores, and processor threads.
 To use the hwloc modifier, add ``hwloc=on`` to the experiment init setup
 step. This modifier is disabled by default (``hwloc=none``).::
 
-    benchpark experiment init --dest=</path/to/experiment_root> <benchmark> caliper=<caliper_variant> hwloc=on
+    benchpark experiment init --dest=</path/to/experiment_root> --system=</path/to/system> <benchmark> caliper=<caliper_variant> hwloc=on
 
 The hwloc modifier will output the hardware information in a flattened JSON file 
 in the experiment directory.  
