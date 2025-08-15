@@ -34,17 +34,18 @@ class Hpl(
     maintainers("daboehme")
 
     def compute_applications_section(self):
-        self.add_experiment_variable("n_nodes", 1, True)
-        self.add_experiment_variable("Ns", 10000, True)
+        if self.spec.satisfies("exec_mode=test"):   
+            self.add_experiment_variable("n_nodes", 1, True)
+            self.add_experiment_variable("Ns", 10000, True)
 
-        self.add_experiment_variable("N-Grids", 1, False)
-        self.add_experiment_variable("Ps", "4 * {n_nodes}", True)
-        self.add_experiment_variable("Qs", "8", False)
+            self.add_experiment_variable("N-Grids", 1, False)
+            self.add_experiment_variable("Ps", "4 * {n_nodes}", True)
+            self.add_experiment_variable("Qs", "8", False)
 
-        self.add_experiment_variable("N-Ns", 1, False)
+            self.add_experiment_variable("N-Ns", 1, False)
 
-        self.add_experiment_variable("N-NBs", 1, False)
-        self.add_experiment_variable("NBs", 128, False)
+            self.add_experiment_variable("N-NBs", 1, False)
+            self.add_experiment_variable("NBs", 128, False)
 
         self.add_experiment_variable(
             "n_ranks", "{sys_cores_per_node} * {n_nodes}", False

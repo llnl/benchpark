@@ -44,21 +44,44 @@ class Kripke(
     maintainers("pearce8")
 
     def compute_applications_section(self):
-        # Number of processes in each dimension
-        self.add_experiment_variable(
-            "n_resources_dict", {"npx": 2, "npy": 2, "npz": 1}, True
-        )
+        if self.spec.satisfies("exec_mode=test"):
+            # Number of processes in each dimension
+            self.add_experiment_variable(
+                "n_resources_dict", {"npx": 2, "npy": 2, "npz": 1}, True
+            )
 
-        # Per-process size (in zones) in each dimension
-        self.add_experiment_variable(
-            "total_problem_size_dict", {"nzx": 64, "nzy": 64, "nzz": 32}, True
-        )
+            # Per-process size (in zones) in each dimension
+            self.add_experiment_variable(
+                "total_problem_size_dict", {"nzx": 64, "nzy": 64, "nzz": 32}, True
+            )
 
-        self.add_experiment_variable("ngroups", 64, True)
-        self.add_experiment_variable("gs", 1, True)
-        self.add_experiment_variable("nquad", 128, True)
-        self.add_experiment_variable("ds", 128, True)
-        self.add_experiment_variable("lorder", 4, True)
+            self.add_experiment_variable("ngroups", 64, True)
+            self.add_experiment_variable("gs", 1, True)
+            self.add_experiment_variable("nquad", 128, True)
+            self.add_experiment_variable("ds", 128, True)
+            self.add_experiment_variable("lorder", 4, True)
+        # Must be exec_mode=perf
+        else:
+            # Number of processes in each dimension
+            self.add_experiment_variable(
+                "n_resources_dict",
+                {"npx": [2, 2, 2], "npy": [2, 2, 2], "npz": [1, 1, 1]},
+                True,
+            )
+
+            # Per-process size (in zones) in each dimension
+            self.add_experiment_variable(
+                "total_problem_size_dict",
+                {"nzx": [64, 64, 64], "nzy": [64, 64, 64], "nzz": [32, 32, 32]},
+                True,
+            )
+
+            self.add_experiment_variable("ngroups", [220, 320, 360], True)
+            self.add_experiment_variable("gs", 1, True)
+            self.add_experiment_variable("nquad", 36, True)
+            self.add_experiment_variable("ds", 36, True)
+            self.add_experiment_variable("lorder", 4, True)
+            self.add_experiment_variable("layout", "GDZ", True)
 
         # Set the variables required by the experiment
         self.set_required_variables(

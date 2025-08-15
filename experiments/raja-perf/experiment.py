@@ -38,15 +38,11 @@ class RajaPerf(
     maintainers("michaelmckinsey1")
 
     def compute_applications_section(self):
-        # Per-process size
-        self.add_experiment_variable("process_problem_size", 1048576, True)
-
-        # Number of processes
-        self.add_experiment_variable("n_resources", 1, False)
-
-        self.set_required_variables(
-            total_problem_size="{n_resources}*{process_problem_size}",
-        )
+        if self.spec.satisfies("exec_mode=test"):
+            # Per-process size
+            self.add_experiment_variable("process_problem_size", 1048576, True)
+            # Number of processes
+            self.add_experiment_variable("n_resources", 1, False)
 
         # In this application (RAJAPerf), since the input problem sizes (process_problem_size)
         # are per process sizes, strong scaling the problem implies that
@@ -55,7 +51,6 @@ class RajaPerf(
 
         # For weak scaling, only the n_resources have to be scaled up,
         # process_problem_size remain the same
-
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {

@@ -34,10 +34,11 @@ class Hpcg(
     maintainers("pearce8")
 
     def compute_applications_section(self):
-        self.add_experiment_variable(
-            "problem_sizes", {"mx": 104, "my": 104, "mz": 104}, True
-        )
-        self.add_experiment_variable("num_procs", 1, True)
+        if self.spec.satisfies("exec_mode=test"):
+            self.add_experiment_variable(
+                "problem_sizes", {"mx": 104, "my": 104, "mz": 104}, True
+            )
+            self.add_experiment_variable("num_procs", 1, True)
 
         self.register_scaling_config(
             {
