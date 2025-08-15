@@ -524,16 +524,22 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
         return additional_vars
 
     def compute_system_section(self):
-        # i.e. the user ran `experiment init` with `--system`
-        for when, needs in self.requires.items():
-            if self.spec.satisfies(when):
-                for need in needs:
-                    self.system_spec.system.enforce(need)
-        return {
-            "config-hash": self.system_spec.system.config_hash,
-            "name": str(self.system_spec.system.__class__.__name__),
-            "destdir": self.system_spec.destdir,
-        }
+        system_dict = {}
+        # Avoid needing system_spec when initializing from library
+        if hasattr(self, "system_spec"):
+            # i.e. the user ran `experiment init` with `--system`
+            for when, needs in self.requires.items():
+                if self.spec.satisfies(when):
+                    for need in needs:
+                        self.system_spec.system.enforce(need)
+            
+            system_dict = {
+                "config-hash": self.system_spec.system.config_hash,
+                "name": str(self.system_spec.system.__class__.__name__),
+                "destdir": self.system_spec.destdir,
+            }
+
+        return system_dict
 
     def compute_ramble_dict(self):
         # This can be overridden by any subclass that needs more flexibility

@@ -13,7 +13,7 @@ def test_write_yaml(monkeypatch, tmpdir):
     spec = benchpark.spec.ExperimentSpec("saxpy").concretize()
     experiment = spec.experiment
 
-    section_names = ["include", "config"]
+    section_names = ["include", "config", "system"]
     section_wrapper_names = ["modifiers", "applications", "package"]
 
     for name in section_names + section_wrapper_names:
@@ -48,7 +48,7 @@ def test_compute_ramble_dict(monkeypatch):
     spec = benchpark.spec.ExperimentSpec("saxpy").concretize()
     experiment = spec.experiment
 
-    section_names = ["include", "config"]
+    section_names = ["include", "config", "system"]
     section_wrapper_names = ["modifiers", "applications", "package"]
 
     for name in section_names + section_wrapper_names:
@@ -76,7 +76,7 @@ def test_compute_ramble_dict_caliper(monkeypatch):
     spec = benchpark.spec.ExperimentSpec("saxpy caliper=time").concretize()
     experiment = spec.experiment
 
-    section_names = ["include", "config"]
+    section_names = ["include", "config", "system"]
     section_wrapper_names = ["modifiers", "applications", "package", "variables"]
 
     for name in section_names + section_wrapper_names:
