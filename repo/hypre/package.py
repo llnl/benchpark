@@ -21,8 +21,7 @@ class Hypre(BuiltinHypre):
     def configure_args(self):
         configure_args = super().configure_args()
 
-        if (self.compiler.fc and 'xlf' in self.compiler.fc) or (self.compiler.f77 and 'xlf' in self.compiler.f77):
-          if not "+fortran" in self.spec:        
+        if False:
             configure_args.append("--with-fmangle=no-underscores")
             configure_args.append("--with-fmangle-blas=no-underscores") 
             configure_args.append("--with-fmangle-lapack=no-underscores")
