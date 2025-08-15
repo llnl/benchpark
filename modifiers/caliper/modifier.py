@@ -79,7 +79,7 @@ class Caliper(BasicModifier):
     )
 
     add_mode(
-        mode_name="cuda-api-functions",
+        mode_name="cuda",
         mode_option="profile.cuda",
         description="Profile CUDA API functions",
     )
@@ -91,7 +91,7 @@ class Caliper(BasicModifier):
     )
 
     add_mode(
-        mode_name="hip-api-functions",
+        mode_name="hip",
         mode_option="profile.hip",
         description="Profile HIP API functions",
     )
