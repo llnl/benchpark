@@ -15,8 +15,8 @@ jobs:
           pip install -r ./requirements.txt
       - name: Build Saxpy Workspace
         run: |
-          ./bin/benchpark experiment init --dest=saxpy/openmp saxpy+openmp
           ./bin/benchpark system init --dest=generic-x86 generic-x86
+          ./bin/benchpark experiment init --dest=saxpy/openmp --system=generic-x86 saxpy+openmp
           ./bin/benchpark setup saxpy/openmp generic-x86 workspace/
       - name: Setup Ramble & Spack
         run: |
@@ -83,7 +83,7 @@ jobs:
           OUTPUT=$(spack find --paths saxpy)
           SAXPY_PATH=$(echo "$OUTPUT" | grep 'saxpy@' | awk '{print $2}')/bin/saxpy
           echo "Extracted Path: $SAXPY_PATH"
-          BENCHPARK_RUN_COVERAGE=binary ./bin/benchpark experiment init --dest=saxpy/binary saxpy+openmp package_manager="user-managed" append_path="$SAXPY_PATH"
+          BENCHPARK_RUN_COVERAGE=binary ./bin/benchpark experiment init --dest=saxpy/binary --system=generic-x86 saxpy+openmp package_manager="user-managed" append_path="$SAXPY_PATH"
           ./bin/benchpark setup saxpy/openmp generic-x86 workspace-binary/
           ./workspace-binary/ramble/bin/ramble \
             --workspace-dir \
