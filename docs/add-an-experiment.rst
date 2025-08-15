@@ -33,7 +33,7 @@ Some or all of the functions in the Experiment base class can be overridden to d
 
 compute_applications_section
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In ``compute_applications_section``, we define the experiment variables necessary to perform scaling runs (``single_node``, ``strong``, ``weak``, or ``throughput``) 
+In ``compute_applications_section``, we define the experiment variables necessary to perform scaling runs (``strong``, ``weak``, or ``throughput``)
 using ramble. We also define programming model (``CUDA``, ``ROCm``, or ``OpenMP``) specific variables, such as ``arch``, which may be used by the benchmark.
 
 We can specify experiment variables to benchpark using the ``Experiment.add_experiment_variable()`` member function.
@@ -231,7 +231,7 @@ To manually validate your new experiments work, you should initialize an existin
 For example if you just created a benchmark *baz* with OpenMP and strong scaling variants it may look like this:::
 
   benchpark system init --dest=genericx86-system genericx86 
-  benchpark experiment init --dest=baz-benchmark baz +openmp +strong ~single_node
+  benchpark experiment init --dest=baz-benchmark baz +openmp +strong
   benchpark setup ./baz-benchmark ./x86 workspace/
 
 

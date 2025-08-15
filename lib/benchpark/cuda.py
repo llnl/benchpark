@@ -9,13 +9,14 @@ from benchpark.experiment import ExperimentHelper
 
 
 class CudaExperiment:
-    requires("cuda")
+    requires("cuda", when="+cuda")
     variant("cuda", default=False, description="Build and run with CUDA")
 
     def __init__(self):
         super().__init__()
         if self.spec.variants["cuda"][0]:
             self.device_type = "gpu"
+        self.programming_models.append("cuda")
 
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):

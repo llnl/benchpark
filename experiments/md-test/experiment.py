@@ -5,11 +5,13 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.scaling import StrongScaling
 
 
 class MdTest(
     Experiment,
+    MpiOnlyExperiment,
     StrongScaling,
 ):
     variant(
@@ -33,7 +35,7 @@ class MdTest(
         self.add_experiment_variable("num-objects", "1000", True)
         self.add_experiment_variable("iterations", "10", True)
 
-        if self.spec.satisfies("+single_node"):
+        if self.spec.satisfies("exec_mode=test"):
             for pk, pv in num_resources.items():
                 self.add_experiment_variable(pk, pv, True)
         elif self.spec.satisfies("+strong"):

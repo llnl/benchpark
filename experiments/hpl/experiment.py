@@ -3,9 +3,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.error import BenchparkError
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.scaling import StrongScaling
 from benchpark.scaling import WeakScaling
 from benchpark.openmp import OpenMPExperiment
@@ -14,6 +14,7 @@ from benchpark.caliper import Caliper
 
 class Hpl(
     Experiment,
+    MpiOnlyExperiment,
     StrongScaling,
     WeakScaling,
     OpenMPExperiment,
@@ -35,20 +36,6 @@ class Hpl(
     maintainers("daboehme")
 
     def compute_applications_section(self):
-        # TODO: Replace with conflicts clause
-        scaling_modes = {
-            "strong": self.spec.satisfies("+strong"),
-            "single_node": self.spec.satisfies("+single_node"),
-            "weak": self.spec.satisfies("+weak"),
-        }
-
-        scaling_mode_enabled = [key for key, value in scaling_modes.items() if value]
-        if len(scaling_mode_enabled) != 1:
-            print(scaling_mode_enabled)
-            raise BenchparkError(
-                f"Only one type of scaling per experiment is allowed for application package {self.name}"
-            )
-
         # Number of initial nodes
         num_nodes = {"n_nodes": 1}
         problem_size = {"Ns": 10000}
@@ -69,7 +56,7 @@ class Hpl(
             "n_threads_per_proc", ["2"], named=True, matrixed=True
         )
 
-        if self.spec.satisfies("+single_node"):
+        if self.spec.satisfies("exec_mode=test"):
             for pk, pv in num_nodes.items():
                 self.add_experiment_variable(pk, pv, True)
             for pk, pv in problem_size.items():

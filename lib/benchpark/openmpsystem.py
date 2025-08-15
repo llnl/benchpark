@@ -6,7 +6,7 @@
 from benchpark.directives import provides
 
 
-class OpenMPSystem:
+class OpenMPCPUOnlySystem:
     provides("openmp")
 
     name = "openmp"
