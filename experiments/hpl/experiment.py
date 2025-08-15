@@ -34,7 +34,7 @@ class Hpl(
     maintainers("daboehme")
 
     def compute_applications_section(self):
-        if self.spec.satisfies("exec_mode=test"):   
+        if self.spec.satisfies("exec_mode=test"):
             self.add_experiment_variable("n_nodes", 1, True)
             self.add_experiment_variable("Ns", 10000, True)
 
