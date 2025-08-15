@@ -23,6 +23,7 @@ jobs:
           stderr_output="$({ BENCHPARK_RUN_COVERAGE=errors ./bin/benchpark setup stream tuolumne wkp 1>/dev/null; } 2>&1)"
           status=$?
           set -e
+          fail() { echo "TEST FAILED: $*" >&2; exit 1; }
           [[ $status -ne 0 ]] || fail "Expected non-zero exit status, got $status"
           # Check for the specific BenchparkError message
           expected="BenchparkError: The provided system 'tuolumne' differs from the system used to initialize the experiment 'dane'. Please use the same system."
