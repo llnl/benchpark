@@ -20,14 +20,14 @@ jobs:
           ./bin/benchpark experiment init --dest stream --system dane stream
           # Try setup with different system than init
           set +e
-          stderr_output="$({ BENCHPARK_RUN_COVERAGE=errors ./bin/benchpark setup stream dane wkp 1>/dev/null; } 2>&1)"
+          stderr_output="$({ BENCHPARK_RUN_COVERAGE=errors ./bin/benchpark setup stream tuolumne wkp 1>/dev/null; } 2>&1)"
           status=$?
           set -e
           fail() { echo "TEST FAILED: $*" >&2; exit 1; }
           [[ $status -ne 0 ]] || fail "Expected non-zero exit status, got $status"
           # Check for the specific BenchparkError message
           expected="BenchparkError: The provided system 'tuolumne' differs from the system used to initialize the experiment 'dane'. Please use the same system."
-          grep -Fq "$expected" <<<"$stderr_output" || fail "Expected error message not found in stderr. Got: $stderr_output"
+          grep -Fq "$expected" <<<"$stderr_output" && echo "failed as expected: $expected" || fail "Expected error message not found in stderr. Got: $stderr_output"
   saxpy:
     runs-on: ubuntu-24.04
     steps:
