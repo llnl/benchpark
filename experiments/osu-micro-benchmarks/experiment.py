@@ -130,4 +130,6 @@ class OsuMicroBenchmarks(
         )
 
     def compute_package_section(self):
-        self.add_package_spec(self.name, [f"osu-micro-benchmarks{self.determine_version()}"])
+        self.add_package_spec(
+            self.name, [f"osu-micro-benchmarks{self.determine_version()}"]
+        )
