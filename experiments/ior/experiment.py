@@ -9,11 +9,7 @@ from benchpark.mpi import MpiOnlyExperiment
 from benchpark.new_scaling import ScalingMode, Scaling
 
 
-class Ior(
-    Experiment,
-    MpiOnlyExperiment,
-    Scaling(ScalingMode.Strong, ScalingMode.Weak)
-):
+class Ior(Experiment, MpiOnlyExperiment, Scaling(ScalingMode.Strong, ScalingMode.Weak)):
     variant(
         "workload",
         default="ior",
