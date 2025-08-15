@@ -123,6 +123,7 @@ def test_default_config_section():
             "install": "--add --keep-stage",
             "concretize": "-U -f",
         },
+        "system": {},
     }
 
 
