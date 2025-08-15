@@ -80,26 +80,14 @@ class Caliper(BasicModifier):
 
     add_mode(
         mode_name="cuda",
-        mode_option="profile.cuda",
-        description="Profile CUDA API functions",
+        mode_option="profile.cuda,cuda.gputime",
+        description="Profile CUDA API functions, time spent on GPU",
     )
 
     add_mode(
-        mode_name="cuda-gputime",
-        mode_option="cuda.gputime",
-        description="Time spent on GPU",
-    )
-
-    add_mode(
-        mode_name="hip",
-        mode_option="profile.hip",
-        description="Profile HIP API functions",
-    )
-
-    add_mode(
-        mode_name="rocm-gputime",
-        mode_option="rocm.gputime",
-        description="Time spent on GPU",
+        mode_name="rocm",
+        mode_option="profile.hip,rocm.gputime",
+        description="Profile HIP API functions, time spent on GPU",
     )
 
     add_mode(
