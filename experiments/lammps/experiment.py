@@ -49,7 +49,9 @@ class Lammps(
         else:
             total_problem_sizes = {"x": 20, "y": 40, "z": 32}
 
-        self.add_experiment_variable("total_problem_size_dict", total_problem_sizes, True)
+        self.add_experiment_variable(
+            "total_problem_size_dict", total_problem_sizes, True
+        )
         input_sizes = " ".join(f"-v {k} {{{k}}}" for k in total_problem_sizes.keys())
 
         if self.spec.satisfies("+rocm") or self.spec.satisfies("+cuda"):
