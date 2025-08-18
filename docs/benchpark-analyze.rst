@@ -3,43 +3,41 @@
 
    SPDX-License-Identifier: Apache-2.0
 
-########################################
-Pre-Defined Analysis for Scaling Studies
-########################################
+=======================
+Analyze a Scaling Study
+=======================
 
 The ``benchpark analyze`` command can be used to generate pre-defined
 charts for analysis of scaling studies using Caliper and Thicket.
-We generate Caliper performance data using the Caliper modifier ``caliper=time,mpi`` (:doc:`modifiers`).
-We use the `Thicket <https://github.com/LLNL/thicket>`_ performance analysis library to compose and visualize the Caliper performance data.
-Thicket is embedded into the ``benchpark analyze`` command, leveraging metadata to generate the scaling study figures.
+The study must use the Caliper modifier ``caliper=time,mpi`` (:doc:`modifiers`) to collect the performance data.
+``benchpark analyze`` uses the `Thicket <https://github.com/LLNL/thicket>`_ performance analysis library to compose 
+and visualize the Caliper performance data.
 
-After running, ``ramble on``, run the ``benchpark analyze`` command on the ramble workspace directory to generate:
+``benchpark analyze`` will generate:
 
 1. A calltree of the regions that were executed in the benchmark.
 2. A scaling study figure, which can be configured with command-line arguments.
 3. A csv of the datapoints plotted on the figure.
 
-.. note::
+``benchpark analyze`` requires additional Python packages, which can be installed by running ``pip install .[analyze]`` in the benchpark directory.
 
-  This command required optional packages to be installed, which can be achieved with ``pip install .[analyze]`` (assuming you are in the benchpark directory)
-
-How to Run
-**********
+To run ``benchpark analyze``:
 
 .. code:: console
 
    $ benchpark analyze --workspace-dir RAMBLE_WORKSPACE_DIR <optional_arguments>
 
-Available Arguments
-*******************
+``benchpark analyze`` has many options, explained in the help menu for the command. 
+
 .. program-output:: ../bin/benchpark analyze -h
 
-Analysis of Strong, Weak, and Throughput Scaling of Kripke
-************************************************************
+Calltree
+--------
 
-Kripke Calltree
+We will use one of the experiments available in Benchpark, Kripke, to demonstrate
+the output of the ``benchpark analyze`` command.
 
-.. code::
+The output includes the Calltree of the benchmark::
 
    main
   ├─  Generate
@@ -71,19 +69,19 @@ Kripke Calltree
           ├─  MPI_Waitall
           └─  SweepSubdomain
 
-Strong
-------
+Strong Scaling
+--------------
 
-Generate the Strong dataset:
+To generate a strong scaling dataset, you would need to run the strong scaling scaling study of Kripke:
 
 .. code:: console
 
-  $ benchpark experiment init --dest=kripke/cuda/strong kripke+cuda+strong~single_node caliper=time,mpi
   $ benchpark system init --dest=lassen llnl-sierra
+  $ benchpark experiment init --dest=kripke/cuda/strong kripke+cuda+strong caliper=time,mpi --system=lassen
   $ benchpark setup kripke/cuda/strong lassen/ wkp
   // Follow instructions for running Ramble ...
 
-Run pre-defined analysis:
+Run ``benchpark analyze``:
 
 .. code:: console
 
@@ -100,18 +98,18 @@ The default configuration will visualize a stacked area chart of:
 - Constant information will be contained in the title, such as benchmark, programming model, benchmark version, cluster, etc.
 - The legend will contain the regions and maximum calls out of all of the ranks (``Calls/rank (max)``).
 
-Weak
-----
+Weak Scaling
+------------
 
-Generate the Weak dataset:
+To generate the weak scaling dataset:
 
 .. code:: console
 
-  $ benchpark experiment init --dest=kripke/cuda/weak kripke+cuda+weak~single_node caliper=time,mpi
+  $ benchpark experiment init --dest=kripke/cuda/weak kripke+cuda+weak caliper=time,mpi
   $ benchpark setup kripke/cuda/weak lassen/ wkp
   // Follow instructions for running Ramble ...
 
-Run pre-defined analysis:
+Run ``benchpark analyze``:
 
 .. code:: console
 
@@ -124,15 +122,15 @@ Run pre-defined analysis:
 Throughput
 ----------
 
-Generate the Throughput dataset:
+To generate the throughput dataset:
 
 .. code:: console
 
-  $ benchpark experiment init --dest=kripke/cuda/throughput kripke+cuda+throughput~single_node caliper=time,mpi
+  $ benchpark experiment init --dest=kripke/cuda/throughput kripke+cuda+throughput caliper=time,mpi
   $ benchpark setup kripke/cuda/throughput lassen/ wkp
   // Follow instructions for running Ramble ...
 
-Run pre-defined analysis:
+Run ``benchpark analyze``:
 
 .. code:: console
 
@@ -170,8 +168,8 @@ The ``main`` node is automatically removed from the figure, because this informa
   :width: 800
   :align: center
 
-Arguments for Region Filtering
-------------------------------
+Region Filtering
+----------------
 
 .. code:: console
 

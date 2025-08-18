@@ -5,6 +5,7 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.scaling import StrongScaling
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
@@ -13,6 +14,7 @@ from benchpark.rocm import ROCmExperiment
 
 class Lammps(
     Experiment,
+    MpiOnlyExperiment,
     StrongScaling,
     OpenMPExperiment,
     CudaExperiment,
@@ -79,7 +81,7 @@ class Lammps(
             n_resources = {"n_nodes": 1, "n_ranks_per_node": 36}
             self.add_experiment_variable("n_threads_per_proc", 1, True)
 
-        if self.spec.satisfies("+single_node"):
+        if self.spec.satisfies("exec_mode=test"):
             for pk, pv in n_resources.items():
                 self.add_experiment_variable(pk, pv, True)
         elif self.spec.satisfies("+strong"):
@@ -116,6 +118,6 @@ class Lammps(
         self.add_package_spec(
             self.name,
             [
-                f"lammps@{app_version} +mpi+opt+manybody+molecule+kspace+rigid+kokkos+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth+reaxff lammps_sizes=bigbig {fft_kokkos} "
+                f"lammps@{app_version} +opt+manybody+molecule+kspace+rigid+kokkos+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth+reaxff lammps_sizes=bigbig {fft_kokkos} "
             ],
         )

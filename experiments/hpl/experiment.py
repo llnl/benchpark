@@ -3,20 +3,19 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.error import BenchparkError
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
-from benchpark.scaling import StrongScaling
-from benchpark.scaling import WeakScaling
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.openmp import OpenMPExperiment
+from benchpark.new_scaling import ScalingMode, Scaling
 from benchpark.caliper import Caliper
 
 
 class Hpl(
     Experiment,
-    StrongScaling,
-    WeakScaling,
+    MpiOnlyExperiment,
     OpenMPExperiment,
+    Scaling(ScalingMode.Strong, ScalingMode.Weak),
     Caliper,
 ):
 
@@ -35,32 +34,18 @@ class Hpl(
     maintainers("daboehme")
 
     def compute_applications_section(self):
-        # TODO: Replace with conflicts clause
-        scaling_modes = {
-            "strong": self.spec.satisfies("+strong"),
-            "single_node": self.spec.satisfies("+single_node"),
-            "weak": self.spec.satisfies("+weak"),
-        }
+        if self.spec.satisfies("exec_mode=test"):
+            self.add_experiment_variable("n_nodes", 1, True)
+            self.add_experiment_variable("Ns", 10000, True)
 
-        scaling_mode_enabled = [key for key, value in scaling_modes.items() if value]
-        if len(scaling_mode_enabled) != 1:
-            print(scaling_mode_enabled)
-            raise BenchparkError(
-                f"Only one type of scaling per experiment is allowed for application package {self.name}"
-            )
+            self.add_experiment_variable("N-Grids", 1, False)
+            self.add_experiment_variable("Ps", "4 * {n_nodes}", True)
+            self.add_experiment_variable("Qs", "8", False)
 
-        # Number of initial nodes
-        num_nodes = {"n_nodes": 1}
-        problem_size = {"Ns": 10000}
+            self.add_experiment_variable("N-Ns", 1, False)
 
-        self.add_experiment_variable("N-Grids", 1, False)
-        self.add_experiment_variable("Ps", "4 * {n_nodes}", True)
-        self.add_experiment_variable("Qs", "8", False)
-
-        self.add_experiment_variable("N-Ns", 1, False)
-
-        self.add_experiment_variable("N-NBs", 1, False)
-        self.add_experiment_variable("NBs", 128, False)
+            self.add_experiment_variable("N-NBs", 1, False)
+            self.add_experiment_variable("NBs", 128, False)
 
         self.add_experiment_variable(
             "n_ranks", "{sys_cores_per_node} * {n_nodes}", False
@@ -69,34 +54,21 @@ class Hpl(
             "n_threads_per_proc", ["2"], named=True, matrixed=True
         )
 
-        if self.spec.satisfies("+single_node"):
-            for pk, pv in num_nodes.items():
-                self.add_experiment_variable(pk, pv, True)
-            for pk, pv in problem_size.items():
-                self.add_experiment_variable(pk, pv, True)
-
-        elif self.spec.satisfies("+strong"):
-            scaled_variables = self.generate_strong_scaling_params(
-                {tuple(num_nodes.keys()): list(num_nodes.values())},
-                int(self.spec.variants["scaling-factor"][0]),
-                int(self.spec.variants["scaling-iterations"][0]),
-            )
-            for pk, pv in scaled_variables.items():
-                self.add_experiment_variable(pk, pv, True)
-            for pk, pv in problem_size.items():
-                self.add_experiment_variable(pk, pv, True)
-        elif self.spec.satisfies("+weak"):
-            scaled_variables = self.generate_weak_scaling_params(
-                {tuple(num_nodes.keys()): list(num_nodes.values())},
-                {tuple(problem_size.keys()): list(problem_size.values())},
-                int(self.spec.variants["scaling-factor"][0]),
-                int(self.spec.variants["scaling-iterations"][0]),
-            )
-            num_resources = scaled_variables["n_nodes"]
-            self.add_experiment_variable("n_nodes", num_resources, True)
-
-            problem_size = scaled_variables["Ns"]
-            self.add_experiment_variable("Ns", problem_size, True)
+        self.register_scaling_config(
+            {
+                ScalingMode.Strong: {
+                    "n_nodes": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "Ns": lambda var, itr, dim, scaling_factor: var.val(dim),
+                },
+                ScalingMode.Weak: {
+                    "n_nodes": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "Ns": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                },
+            }
+        )
 
         self.set_required_variables(
             n_resources="{n_ranks}",
