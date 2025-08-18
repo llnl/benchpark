@@ -319,10 +319,25 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
         return ["./configs"]
 
     def compute_config_section(self):
+        system_dict = {}
+        # Avoid needing system_spec when initializing from library
+        if hasattr(self, "system_spec"):
+            # i.e. the user ran `experiment init` with `--system`
+            for when, needs in self.requires.items():
+                if self.spec.satisfies(when):
+                    for need in needs:
+                        self.system_spec.system.enforce(need)
+
+            system_dict = {
+                "config-hash": self.system_spec.system.config_hash,
+                "name": str(self.system_spec.system.__class__.__name__),
+                "destdir": self.system_spec.destdir,
+            }
         # default configs for all experiments
         default_config = {
             "deprecated": True,
             "benchpark_experiment_command": "benchpark " + " ".join(sys.argv[1:]),
+            "system": system_dict,
         }
         if self.spec.variants["package_manager"][0] == "spack":
             default_config["spack_flags"] = {
@@ -543,14 +558,6 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
         return ramble_dict
 
     def write_ramble_dict(self, filepath):
-        # Here you can do self.system_spec.system.sys_gpus_per_node
-        if hasattr(self, "system_spec"):
-            # i.e. the user ran `experiment init` with `--system`
-            for when, needs in self.requires.items():
-                if self.spec.satisfies(when):
-                    for need in needs:
-                        self.system_spec.system.enforce(need)
-
         ramble_dict = self.compute_ramble_dict()
         with open(filepath, "w") as f:
             yaml.dump(ramble_dict, f)
