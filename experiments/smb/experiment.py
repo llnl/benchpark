@@ -6,10 +6,9 @@
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.mpi import MpiOnlyExperiment
-from benchpark.scaling import StrongScaling
 
 
-class Smb(Experiment, MpiOnlyExperiment, StrongScaling):
+class Smb(Experiment, MpiOnlyExperiment):
     variant(
         "workload",
         default="mpi_overhead",

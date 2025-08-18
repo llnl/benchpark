@@ -7,8 +7,7 @@ from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.mpi import MpiOnlyExperiment
 from benchpark.openmp import OpenMPExperiment
-from benchpark.scaling import StrongScaling
-from benchpark.scaling import WeakScaling
+from benchpark.new_scaling import ScalingMode, Scaling
 from benchpark.caliper import Caliper
 
 
@@ -16,8 +15,7 @@ class Quicksilver(
     Experiment,
     MpiOnlyExperiment,
     OpenMPExperiment,
-    StrongScaling,
-    WeakScaling,
+    Scaling(ScalingMode.Strong, ScalingMode.Weak),
     Caliper,
 ):
     variant(
@@ -36,29 +34,60 @@ class Quicksilver(
     maintainers("rfhaque")
 
     def compute_applications_section(self):
-        self.add_experiment_variable("n_threads_per_proc", "1")
-        self.add_experiment_variable("n_ranks", "{I}*{J}*{K}", True)
+        if self.spec.satisfies("exec_mode=test"):
+            self.add_experiment_variable(
+                "n_resources_dict", {"I": 2, "J": 2, "K": 1}, True
+            )
+
+            self.add_experiment_variable(
+                "total_problem_size_dict", {"X": 16, "Y": 16, "Z": 8}, True
+            )
+        else:
+            self.add_experiment_variable(
+                "n_resources_dict", {"I": 2, "J": 2, "K": 1}, True
+            )
+
+            self.add_experiment_variable(
+                "total_problem_size_dict", {"X": 32, "Y": 32, "Z": 16}, True
+            )
+
+        self.register_scaling_config(
+            {
+                ScalingMode.Strong: {
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
+                    * scaling_factor,
+                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    ),
+                },
+                ScalingMode.Weak: {
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
+                    * scaling_factor,
+                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
+                    * scaling_factor,
+                },
+            }
+        )
+
         self.add_experiment_variable("n", "{x}*{y}*{z}*10")
         self.add_experiment_variable("x", "{X}")
         self.add_experiment_variable("y", "{Y}")
         self.add_experiment_variable("z", "{Z}")
-        if self.spec.satisfies("+weak"):
-            self.add_experiment_variable("X", ["32", "32", "64", "64"])
-            self.add_experiment_variable("Y", ["32", "32", "32", "64"])
-            self.add_experiment_variable("Z", ["16", "32", "32", "32"])
-        else:
-            self.add_experiment_variable("X", "32")
-            self.add_experiment_variable("Y", "32")
-            self.add_experiment_variable("Z", "16")
-        self.add_experiment_variable("I", ["2", "2", "4", "4"])
-        self.add_experiment_variable("J", ["2", "2", "2", "4"])
-        self.add_experiment_variable("K", ["1", "2", "2", "2"])
 
         self.set_required_variables(
-            n_resources="{n_ranks}",
-            process_problem_size="{n}/{n_ranks}",
+            n_resources="{I}*{J}*{K}",
+            process_problem_size="{n}/{n_resources}",
             total_problem_size="{n}",
         )
+
+        self.add_experiment_variable("n_threads_per_proc", "1")
+        self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
     def compute_package_section(self):
         # get package version
