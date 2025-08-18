@@ -94,7 +94,12 @@ is created which contains the collected performance metrics.
        | - Profiles MPI functions
    * - cuda
      - NVIDIA GPUs
-     - | - CUDA API functions (e.g., time.gpu)
+     - | - CUDA API functions 
+     - | - GPU time
+   * - rocm
+     - AMD GPUs
+     - | - HIP API functions 
+     - | - GPU time
    * - topdown-counters-all
      - x86 Intel CPUs
      - | - Raw counter values for Intel top-down analysis (all levels)
