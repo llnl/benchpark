@@ -27,6 +27,14 @@ It is possible to overwrite the benchmark specifications provided in the Spack a
 see :doc:`FAQ` for details.
 
 
+TODO: replace validate a benchmark
+
+source code, package.py, and application.py
+
+If adding a benchmark, then point them at ramble docs from this page
+Need to setup system description to test as Ramble does
+
+
 Validate a Benchmark 
 ------------------------
 
