@@ -35,7 +35,7 @@ def hip_repair_cache(options, spec):
     options.append(
         cmake_cache_path(
             "HIP_CLANG_INCLUDE_PATH",
-            glob.glob("{}/lib/clang/*/include".format(spec["llvm-amdgpu"].prefix))[0],
+            glob.glob("{}/llvm/lib/clang/*/include".format(spec["llvm-amdgpu"].prefix))[0],
         )
     )
 
