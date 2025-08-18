@@ -15,6 +15,7 @@ import ruamel.yaml as yaml
 import benchpark.paths
 from benchpark.debug import debug_print
 from benchpark.runtime import RuntimeResources
+from benchpark.error import BenchparkError
 
 
 # Note: it would be nice to vendor spack.llnl.util.link_tree, but that
@@ -158,6 +159,17 @@ def command(args):
     with open(str(experiment_src_dir / "ramble.yaml"), "r") as file:
         parsed_yaml = yaml.safe_load(file)
     pkg_manager = find(parsed_yaml, "package_manager")
+
+    # Check system hash matches sys-aware experiment init
+    with open(str(configs_src_dir / "system_id.yaml"), "r") as file:
+        systemid_yaml = yaml.safe_load(file)
+    sys_config_hash = find(systemid_yaml, "config-hash")
+    expr_sys_config_hash = find(parsed_yaml, "config-hash")
+    expr_sys_destdir = find(parsed_yaml, "destdir")
+    if sys_config_hash != expr_sys_config_hash:
+        raise BenchparkError(
+            f"The provided system '{system_id}' differs from the system used to initialize the experiment '{expr_sys_destdir}'. Please use the same system."
+        )
 
     pkg_str = ""
     if pkg_manager == "spack":

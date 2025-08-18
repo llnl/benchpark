@@ -684,8 +684,3 @@ class Mfem(BuiltinMfem):
             options.append("ADIAK_DIR=%s" % self.spec["adiak"].prefix)
 
         return options
-
-    def install(self, spec, prefix):
-        super().install(spec, prefix)
-
-        install(f"{self.stage.source_path}/fem/qinterp/det.cpp", f"{prefix.include}/mfem/fem/qinterp")

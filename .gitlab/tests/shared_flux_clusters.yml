@@ -102,6 +102,24 @@ run_tests_flux_tuolumne:
         VARIANT: [+rocm scaling=strong scaling-iterations=2]
         SYSTEM_ARGS: [gpumode=CPX]
         GPUMODE: CPX
+      # Test openmp on tuolumne
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [kripke]
+        VARIANT: [+openmp]
+        GPUMODE: SPX
+      # Test kripke+rocm+single_memory on tuolumne
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [kripke]
+        VARIANT: [+rocm+single_memory]
+        GPUMODE: SPX
+      # Caliper profile.hip
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [kripke]
+        VARIANT: ['+rocm caliper=mpi,time,rocm']
+        GPUMODE: SPX
 run_tests_flux_tioga:
   extends: .run_tests_flux
   tags: [shell, tioga]

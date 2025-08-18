@@ -121,7 +121,7 @@ def maintainers(*names: str):
 @benchpark_directive("provides")
 def provides(*attrs: str):
     def _execute_provides(cls):
-        cls.provides = attrs
+        cls.provides = cls.provides + attrs if cls.provides else attrs
 
     return _execute_provides
 
