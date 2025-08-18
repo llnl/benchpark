@@ -66,25 +66,25 @@ You should see an output like:
 
     Experiments:
         ...
-        hpcg+single_node
+        hpcg
         hpcg+openmp
         hpcg+strong
         hpcg+weak
-        hpl+single_node
+        hpl
         hpl+openmp
         hpl+strong
         hpl+weak
-        ior+single_node
+        ior
         ior+strong
         ior+weak
-        kripke+single_node
+        kripke
         kripke+openmp
         kripke+cuda
         kripke+rocm
-        laghos+single_node
+        laghos
         laghos+cuda
         laghos+rocm
-        lammps+single_node
+        lammps
         lammps+openmp
         lammps+cuda
         lammps+rocm
@@ -93,7 +93,7 @@ You should see an output like:
 
 From this output, you can see that Benchpark experiments are specified
 using Spack-like conventions (e.g., ~, +). For example, the spec
-``kripke+single_node`` describes an experiment using the Kripke benchmark
+``kripke`` describes an experiment using the Kripke benchmark
 running on a single node.
 
 Additionally, you can get only the experiments associated with a particular
@@ -109,14 +109,14 @@ You should see the following:
 .. code-block:: text
 
     Experiments:
-        kripke+single_node
+        kripke
         kripke+openmp
         kripke+cuda
         kripke+rocm
 
 .. note::
 
-    For Kripke, the default experiment is ``kripke+single_node``. For Kripke,
+    For Kripke, the default experiment is ``kripke``. For Kripke,
     we specify the strong scaling experiment on the command line using ``kripke
     scaling=strong`` as shown in Step 4.
 
@@ -153,7 +153,7 @@ Next, initialize the Kripke strong scaling experiment used in this tutorial by r
 
 .. code-block:: bash
 
-    benchpark experiment init --dest=kripke-benchmark kripke scaling=strong caliper=time,mpi
+    benchpark experiment init --dest=kripke-benchmark --system=hpdc-tutorial kripke scaling=strong caliper=time,mpi
 
 Similar to :code:`benchpark system init`, the :code:`benchpark experiment init` command generates
 the Ramble configuration file to describe the experiment to be run. The experiment is specified

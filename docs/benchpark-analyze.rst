@@ -77,7 +77,7 @@ To generate a strong scaling dataset, you would need to run the strong scaling s
 .. code:: console
 
   $ benchpark system init --dest=lassen llnl-sierra
-  $ benchpark experiment init --dest=kripke/cuda/strong kripke+cuda+strong~single_node caliper=time,mpi --system=lassen
+  $ benchpark experiment init --dest=kripke/cuda/strong --system=lassen kripke+cuda+strong caliper=time,mpi
   $ benchpark setup kripke/cuda/strong lassen/ wkp
   // Follow instructions for running Ramble ...
 
@@ -105,7 +105,7 @@ To generate the weak scaling dataset:
 
 .. code:: console
 
-  $ benchpark experiment init --dest=kripke/cuda/weak kripke+cuda+weak~single_node caliper=time,mpi
+  $ benchpark experiment init --dest=kripke/cuda/weak --system=lassen kripke+cuda+weak caliper=time,mpi
   $ benchpark setup kripke/cuda/weak lassen/ wkp
   // Follow instructions for running Ramble ...
 
@@ -126,7 +126,7 @@ To generate the throughput dataset:
 
 .. code:: console
 
-  $ benchpark experiment init --dest=kripke/cuda/throughput kripke+cuda+throughput~single_node caliper=time,mpi
+  $ benchpark experiment init --dest=kripke/cuda/throughput --system=lassen kripke+cuda+throughput caliper=time,mpi
   $ benchpark setup kripke/cuda/throughput lassen/ wkp
   // Follow instructions for running Ramble ...
 

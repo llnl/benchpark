@@ -81,7 +81,7 @@ class Lammps(
             n_resources = {"n_nodes": 1, "n_ranks_per_node": 36}
             self.add_experiment_variable("n_threads_per_proc", 1, True)
 
-        if self.spec.satisfies("+single_node"):
+        if self.spec.satisfies("exec_mode=test"):
             for pk, pv in n_resources.items():
                 self.add_experiment_variable(pk, pv, True)
         elif self.spec.satisfies("+strong"):

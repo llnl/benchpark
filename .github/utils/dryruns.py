@@ -77,9 +77,7 @@ def main():
     for e in experiments:
         if "scaling" in e:
             e = e.replace("scaling=", " scaling=")
-        if "+strong" in e or "+weak" in e or "+throughput" in e:
-            e = e.replace(e, e + "~single_node")
-        elif "+" not in e and "=" not in e:
+        if "+" not in e and "=" not in e:
             mpi_only_expr.add(e)
 
         if "cuda" in e:
