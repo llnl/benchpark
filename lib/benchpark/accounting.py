@@ -16,6 +16,7 @@ exp_dict = {
     "OpenMPExperiment": (PROGRAMMING_MODEL_CATEGORY, "openmp"),
     "CudaExperiment": (PROGRAMMING_MODEL_CATEGORY, "cuda"),
     "ROCmExperiment": (PROGRAMMING_MODEL_CATEGORY, "rocm"),
+    "MpiOnlyExperiment": (PROGRAMMING_MODEL_CATEGORY, "mpi"),
     "ScalingMode.Strong": (SCALING_CATEGORY, "strong"),
     "ScalingMode.Weak": (SCALING_CATEGORY, "weak"),
     "ScalingMode.Throughput": (SCALING_CATEGORY, "throughput"),

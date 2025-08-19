@@ -79,8 +79,9 @@ def main():
 
     for e in experiments:
         benchmark = e.split("+")[0]
-        mpi_only_expr.add(benchmark)
 
+        if "mpi" in e:
+            mpi_only_expr.add(benchmark)
         if "cuda" in e:
             cuda_expr.append(benchmark + "+cuda")
         if "rocm" in e:
