@@ -75,8 +75,6 @@ def main():
     throughput_expr = []
 
     for e in experiments:
-        if "scaling" in e:
-            e = e.replace("scaling=", " scaling=")
         if "+" not in e and "=" not in e:
             mpi_only_expr.add(e)
 
