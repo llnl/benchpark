@@ -38,7 +38,10 @@ def test_list():
         ), f"Title found for {subcmd} in output without title"
 
         if subcmd == "modifiers":
-            assert "amg2023" in result_with_title.stdout and "amg2023" in result_no_title.stdout
+            assert (
+                "amg2023" in result_with_title.stdout
+                and "amg2023" in result_no_title.stdout
+            )
 
     # Check filtering
     check_cuda = subprocess.run(
