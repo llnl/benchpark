@@ -153,7 +153,7 @@ Next, initialize the Kripke strong scaling experiment used in this tutorial by r
 
 .. code-block:: bash
 
-    benchpark experiment init --dest=kripke-benchmark kripke scaling=strong caliper=time,mpi
+    benchpark experiment init --dest=kripke-benchmark --system=hpdc-tutorial kripke scaling=strong caliper=time,mpi
 
 Similar to :code:`benchpark system init`, the :code:`benchpark experiment init` command generates
 the Ramble configuration file to describe the experiment to be run. The experiment is specified
