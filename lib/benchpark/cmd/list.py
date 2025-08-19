@@ -25,12 +25,22 @@ def _print_helper(name, collection, filter=None):
                                 Only items containing this substring will be displayed.
                                 If None, all items in the collection are displayed.
     """
-    if name:
-        name = "@*b" + name + "@."
-        color.cprint(name)
-
     strs = ["@*r", "@*c", "@*m"]
     end = "@."
+
+    if name:
+        if isinstance(name, list):
+            name = (
+                "@*b"
+                + name[0]
+                + "@."
+                + "".join([strs[i - 1] + name[i] + end for i in range(1, len(name))])
+            )
+        elif isinstance(name, str):
+            name = "@*b" + name + "@."
+        else:
+            raise ValueError(f"'name' is type {type(name)}. Must be list or str.")
+        color.cprint(name)
 
     # Compute filtering
     if filter:
@@ -53,7 +63,11 @@ def list_benchmarks(args):
 
 def list_experiments(args):
     _print_helper(
-        "Experiments:" if not args.no_title else None,
+        (
+            ["Experiments - ", "BENCHMARK@.+", "PROGRAMMING_MODEL@.+", "SCALING"]
+            if not args.no_title
+            else None
+        ),
         benchpark_experiments(),
         filter=args.experiment,
     )
@@ -61,7 +75,11 @@ def list_experiments(args):
 
 def list_systems(args):
     _print_helper(
-        "Systems:" if not args.no_title else None,
+        (
+            ["Systems - ", "SYSTEM_DEFINITION", " CLUSTER/INSTANCE"]
+            if not args.no_title
+            else None
+        ),
         benchpark_systems(args.programming_model),
     )
 
