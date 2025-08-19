@@ -67,19 +67,8 @@ def list_systems(args):
 
 
 def list_modifiers(args):
-    modifiers = benchpark_modifiers() if not args.name else [args.name]
-    if args.experiments:
-        collection = []
-        all_experiments = benchpark_experiments(exclude_variants=[])
-        for modifier in modifiers:
-            collection.append(modifier)
-            exprs = [e.split("+")[0] for e in all_experiments if modifier in e]
-            for benchmark in benchpark_benchmarks():
-                if any([benchmark == e for e in exprs]):
-                    collection.append("\t" + "@*c" + benchmark + "@.")
-        _print_helper("Modifiers:" if not args.no_title else None, collection)
-    else:
-        _print_helper("Modifiers:" if not args.no_title else None, modifiers)
+    modifiers = benchpark_modifiers()
+    _print_helper("Modifiers:" if not args.no_title else None, modifiers)
 
 
 def setup_parser(root_parser):
@@ -102,6 +91,7 @@ def setup_parser(root_parser):
         type=str,
         nargs="*",
         default=None,
+        choices=["cuda", "rocm", "openmp", "strong", "weak", "throughput"],
         help="Filter experiments containing a specific substring (e.g., 'cuda').",
     )
     experiments_parser.add_argument(
@@ -117,21 +107,13 @@ def setup_parser(root_parser):
         "-p",
         type=str,
         default=None,
+        choices=["cuda", "rocm", "openmp"],
         help="Filter systems that support a specific programming model (e.g., 'cuda').",
     )
 
     modifiers_parser = list_subparser.add_parser("modifiers")
     modifiers_parser.add_argument(
         "--no-title", action="store_true", help="Turn off printing title in output."
-    )
-    modifiers_parser.add_argument(
-        "--experiments",
-        "-e",
-        action="store_true",
-        help="See experiments for modifier, if applicable.",
-    )
-    modifiers_parser.add_argument(
-        "--name", default=None, type=str, help="Optional modifier name"
     )
 
 
