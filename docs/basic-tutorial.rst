@@ -174,7 +174,7 @@ After initializing the system description and experiment, setup a Benchpark work
 
 .. code-block:: bash
 
-   benchpark setup kripke-benchmark/ hpdc-tutorial/ wkp/
+   benchpark setup kripke-benchmark/ wkp/
 
 This command takes the configuration files stored in the output directories of :code:`benchpark experiment init` (i.e., ``kripke-benchmark/``)
 and :code:`benchpark system init` (i.e., ``hpdc-tutorial/``) and combines them to generate a Benchpark workspace.
