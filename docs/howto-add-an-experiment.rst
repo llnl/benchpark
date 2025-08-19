@@ -166,8 +166,16 @@ How you set ``process_problem_size`` or ``total_problem_size`` depends on how yo
   def compute_applications_section(self):
     ### Add experiment variables and required variables
     self.add_experiment_variable("n_procs", 1)
-
-    self.add_experiment_variable("my_problemsize", 1024)
+    
+    # exec_mode is a variant available for every experiment.
+    # This can be used to define a "testing" and "performance" set of experiment variables.
+    # The "performance" set of variables are usually a significantly larger workload.
+    # The default setting is "exec_mode=test".
+    if self.spec.satisfies("exec_mode=test"):
+      self.add_experiment_variable("my_problemsize", 1024)
+    # Must be exec_mode=perf
+    else:
+      self.add_experiment_variable("my_problemsize", 1024**2)
 
     # Set the variables required by the experiment
     self.set_required_variables(
