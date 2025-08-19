@@ -18,6 +18,9 @@ class Babelstream(BuiltinBabel):
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
 
+    requires("+omp", when="+openmp")
+    requires("~omp", when="~openmp")
+
     def setup_build_environment(self, env):
         super().setup_build_environment(env)
         if "+cuda" in self.spec:
