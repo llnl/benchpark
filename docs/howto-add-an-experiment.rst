@@ -254,15 +254,11 @@ In ``def compute_package_section()``, add the benchmark's package spec. Required
 Step 5: Validating the Benchmark/Experiment
 -------------------------------------------
 
-To manually validate your new experiment works, you should initialize an existing system, and run your experiments. For our example, we initialize a generic x86 system and run setup our experiments as follows::
+To manually validate your new experiment works, you should start by initializing your experiment::
 
-  benchpark system init --dest=genericx86-system genericx86 
-  benchpark experiment init --dest=my-experiment my-experiment +cuda scaling=strong
-  benchpark setup ./my-experiment ./x86 workspace/
+  benchpark experiment init --dest=my-experiment --system=my-system my-experiment
 
-TODO: Double check these are the current commands. Eventually will need to init the experiment and tie it to system
-
-When this is complete, you have successfully completed the :doc:`benchpark-setup` step and can run following the steps in the Benchpark output or following steps in :doc:`build-experiment`.
+If this completes without errors, you can continue testing by setting up a benchpark workspace as described in :doc:`testing-your-contribution`.
 
 --------
 Appendix
