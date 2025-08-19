@@ -71,28 +71,40 @@ class RuntimeResources:
         self.ramble_location, self.spack_location, self.pkgs_location = (
             self.dest / "ramble",
             self.dest / "spack",
-            self.dest / "spack-packages"
+            self.dest / "spack-packages",
         )
 
         # Read pinned versions of ramble and spack
         with open(benchpark.paths.checkout_versions, "r") as yaml_file:
             data = yaml.safe_load(yaml_file)["versions"]
-            self.ramble_commit, self.spack_commit, self.pkgs_commit = data["ramble"], data["spack"], data["spack-packages"]
+            self.ramble_commit, self.spack_commit, self.pkgs_commit = (
+                data["ramble"],
+                data["spack"],
+                data["spack-packages"],
+            )
 
         # Read remote urls for ramble and spack
         with open(benchpark.paths.remote_urls, "r") as yaml_file:
             data = yaml.safe_load(yaml_file)["urls"]
-            remote_ramble_url, remote_spack_url, remote_pkgs_url = data["ramble"], data["spack"], data["spack-packages"]
+            remote_ramble_url, remote_spack_url, remote_pkgs_url = (
+                data["ramble"],
+                data["spack"],
+                data["spack-packages"],
+            )
 
         # If this does not have an upstream, then we will be cloning from the URLs indicated in remote-urls.yaml
         if self.upstream is None:
-            self.ramble_url, self.spack_url, self.pkgs_url = remote_ramble_url, remote_spack_url, remote_pkgs_url
+            self.ramble_url, self.spack_url, self.pkgs_url = (
+                remote_ramble_url,
+                remote_spack_url,
+                remote_pkgs_url,
+            )
         else:
             # Clone from local "upstream" repository
             self.ramble_url, self.spack_url, self.pkgs_url = (
                 self.upstream.ramble_location,
                 self.upstream.spack_location,
-                self.upstream.pkgs_location
+                self.upstream.pkgs_location,
             )
 
     def _check_and_update_bootstrap(self, desired_commit, location):

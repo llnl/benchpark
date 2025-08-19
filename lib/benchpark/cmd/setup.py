@@ -175,13 +175,17 @@ def command(args):
     if pkg_manager == "spack":
         spack, first_time_spack = per_workspace_setup.spack_first_time_setup()
         if first_time_spack:
-            site_repos = per_workspace_setup.spack_location / "etc" / "spack" / "repos.yaml"
+            site_repos = (
+                per_workspace_setup.spack_location / "etc" / "spack" / "repos.yaml"
+            )
             with open(site_repos, "w") as f:
-                f.write(f"""\
+                f.write(
+                    f"""\
 repos::
   benchpark: {source_dir}/repo
   builtin: {per_workspace_setup.pkgs_location}
-""")
+"""
+                )
 
         pkg_str = f"""\
 . {per_workspace_setup.spack_location}/share/spack/setup-env.sh
