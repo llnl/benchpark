@@ -4,18 +4,22 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+from collections import defaultdict
 
 import benchpark.paths
 
+PROGRAMMING_MODEL_CATEGORY = "programming_model"
+SCALING_CATEGORY = "scaling"
+
 exclude_exper = ["repo.yaml"]
 exp_dict = {
-    "OpenMPExperiment": "openmp",
-    "CudaExperiment": "cuda",
-    "ROCmExperiment": "rocm",
-    "Caliper": "caliper",
-    "ScalingMode.Strong": "strong",
-    "ScalingMode.Weak": "weak",
-    "ScalingMode.Throughput": "throughput",
+    "OpenMPExperiment": (PROGRAMMING_MODEL_CATEGORY, "openmp"),
+    "CudaExperiment": (PROGRAMMING_MODEL_CATEGORY, "cuda"),
+    "ROCmExperiment": (PROGRAMMING_MODEL_CATEGORY, "rocm"),
+    "ScalingMode.Strong": (SCALING_CATEGORY, "strong"),
+    "ScalingMode.Weak": (SCALING_CATEGORY, "weak"),
+    "ScalingMode.Throughput": (SCALING_CATEGORY, "throughput"),
+    "Caliper": ("modifier", "caliper"),
 }
 sys_dict = {
     "OpenMPSystem": "openmp",
@@ -31,20 +35,25 @@ def benchpark_experiments(exclude_variants=non_experiments):
     experiments_dir = source_dir / "experiments"
 
     for x in sorted(os.listdir(experiments_dir)):
+        exp_pmodels_scaling = defaultdict(list)
         if x not in exclude_exper:
             expr_file = str(experiments_dir) + "/" + x + "/experiment.py"
             if os.path.isfile(expr_file):
                 with open(expr_file, "r") as file:
                     file_text = file.read()
-                    if "MpiOnlyExperiment" in file_text:
-                        experiments.append(x)  # default expr
                     for var in exp_dict.keys():
                         if var in file_text and var not in exclude_variants:
-                            if "=" in exp_dict[var]:
-                                joiner = " "
-                            else:
-                                joiner = "+"
-                            experiments.append(f"{x}{joiner}{exp_dict[var]}")
+                            category, option = exp_dict[var]
+                            exp_pmodels_scaling[category].append(option)
+        end_str = ""
+        for category in [PROGRAMMING_MODEL_CATEGORY, SCALING_CATEGORY]:
+            if len(exp_pmodels_scaling[category]) == 0:
+                break
+            cat_str = "+["
+            cat_str += "|".join(exp_pmodels_scaling[category])
+            cat_str += "]"
+            end_str += cat_str
+        experiments.append(x + end_str)
     return experiments
 
 

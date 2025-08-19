@@ -30,7 +30,7 @@ def _print_helper(name, collection, filter=None):
         name = "@*b" + name + "@."
         color.cprint(name)
 
-    strs = ["@*r", "@*c"]
+    strs = ["@*r", "@*c", "@*m"]
     end = "@."
 
     # Compute filtering
@@ -43,7 +43,9 @@ def _print_helper(name, collection, filter=None):
         else:
             char = "/" if "/" in item else "+"
             item = item.split(char)
-            color.cprint(f"    {strs[0]+item[0]+end+char+strs[1]+item[1]+end}")
+            color.cprint(
+                f"    {strs[0]+item[0]+end+'+'+char.join([strs[i]+item[i]+end for i in range(1,len(item))])}"
+            )
 
 
 def list_benchmarks(args):
