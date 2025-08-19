@@ -12,7 +12,6 @@ from benchpark.accounting import (  # noqa: E402
     benchpark_modifiers,
     benchpark_systems,
 )
-from benchpark.spec import SystemSpec
 
 
 def _print_helper(name, collection, filter=None):
@@ -38,13 +37,13 @@ def _print_helper(name, collection, filter=None):
         collection = [item for item in collection if any([f in item for f in filter])]
 
     for item in collection:
-        if "/" not in item and "+" not in item:
+        if "=" not in item and "+" not in item:
             color.cprint(f"    {strs[0]+item+end}")
         else:
-            char = "/" if "/" in item else "+"
+            char = "=" if "=" in item else "+"
             item = item.split(char)
             color.cprint(
-                f"    {strs[0]+item[0]+end+'+'+char.join([strs[i]+item[i]+end for i in range(1,len(item))])}"
+                f"    {strs[0]+item[0]+end+char+char.join([strs[i]+item[i]+end for i in range(1,len(item))])}"
             )
 
 
@@ -61,19 +60,10 @@ def list_experiments(args):
 
 
 def list_systems(args):
-    systems = benchpark_systems()
-    new_systems = []
-    for system in systems:
-        sspec, cluster = system.split("/") if "/" in system else (system, None)
-        cluster_variant = "instance_type" if "aws" in sspec else "cluster"
-        # List of valid programming models for system (MPI assumed to be valid)
-        fullspec = sspec if not cluster else f"{sspec} {cluster_variant}={cluster}"
-        p_models_list = SystemSpec(fullspec).concretize().system.programming_models
-        if not args.programming_model or any(
-            [args.programming_model == p.name for p in p_models_list]
-        ):
-            new_systems.append(fullspec)
-    _print_helper("Systems:" if not args.no_title else None, new_systems)
+    _print_helper(
+        "Systems:" if not args.no_title else None,
+        benchpark_systems(args.programming_model),
+    )
 
 
 def list_modifiers(args):

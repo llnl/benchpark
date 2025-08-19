@@ -7,6 +7,7 @@ import os
 from collections import defaultdict
 
 import benchpark.paths
+from benchpark.spec import SystemSpec
 
 PROGRAMMING_MODEL_CATEGORY = "programming_model"
 SCALING_CATEGORY = "scaling"
@@ -68,7 +69,7 @@ def benchpark_modifiers():
     return modifiers
 
 
-def benchpark_systems():
+def benchpark_systems(programming_model=None):
     import benchpark.spec
 
     source_dir = benchpark.paths.benchpark_root
@@ -84,13 +85,29 @@ def benchpark_systems():
             if len(variants) > 0:
                 variants = variants[0]
             clusters = None
+            has_clusters = True
             if cluster_variant in variants:
                 clusters = list(variants[cluster_variant].values)
-            if clusters:
-                for c in clusters:
-                    systems.append(x + "/" + c)
             else:
-                systems.append(x)
+                clusters = [x]
+                has_clusters = False
+            if programming_model:
+                new_clusters = []
+                for c in clusters:
+                    fullspec = f"{x} {cluster_variant}={c}" if has_clusters else x
+                    p_models_list = (
+                        SystemSpec(fullspec).concretize().system.programming_models
+                    )
+                    if any([programming_model == p.name for p in p_models_list]):
+                        new_clusters.append(c)
+                clusters = new_clusters
+            if len(clusters) > 0:
+                if has_clusters:
+                    systems.append(
+                        x + " " + cluster_variant + "=[" + "|".join(clusters) + "]"
+                    )
+                else:
+                    systems.append(x)
     return systems
 
 
