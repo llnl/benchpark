@@ -47,8 +47,12 @@ def _print_helper(name, collection, filter=None):
         collection = [item for item in collection if any([f in item for f in filter])]
 
     for item in collection:
+        idx = 0
+        if "!" in item:
+            item = item.replace("!", "")
+            idx = 1
         if "=" not in item and "+" not in item:
-            color.cprint(f"    {strs[0]+item+end}")
+            color.cprint(f"    {strs[idx]+item+end}")
         else:
             char = "=" if "=" in item else "+"
             item = item.split(char)

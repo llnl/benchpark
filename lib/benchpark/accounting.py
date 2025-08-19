@@ -59,12 +59,28 @@ def benchpark_experiments(exp_dict=EXP_DICT, exclude_variants=[]):
 
 
 def benchpark_modifiers():
+    all_benchmark_modifiers = ["affinity", "allocation", "hwloc"]
     source_dir = benchpark.paths.benchpark_root
+    experiments_dir = source_dir / "experiments"
     modifiers = []
     exclude = ["modifier_repo.yaml"]
     for x in sorted(os.listdir(source_dir / "modifiers")):
+        check_experiments = True
+        if x in all_benchmark_modifiers:
+            x = x + " (all benchmarks)"
+            check_experiments = False
         if x not in exclude:
             modifiers.append(x)
+        if check_experiments:
+            for exp in sorted(os.listdir(experiments_dir)):
+                if not os.path.isdir(experiments_dir / exp):
+                    continue
+                expr_file = str(experiments_dir) + "/" + exp + "/experiment.py"
+                if os.path.isfile(expr_file):
+                    with open(expr_file, "r") as file:
+                        file_text = file.read()
+                        if x in file_text:
+                            modifiers.append("\t" + "!" + exp)
 
     return modifiers
 
@@ -116,6 +132,7 @@ def benchpark_benchmarks():
     benchmarks = []
     experiments_dir = source_dir / "experiments"
     for x in sorted(os.listdir(experiments_dir)):
-        if x not in exclude_exper:
-            benchmarks.append(f"{x}")
+        if not os.path.isdir(experiments_dir / x):
+            continue
+        benchmarks.append(f"{x}")
     return benchmarks
