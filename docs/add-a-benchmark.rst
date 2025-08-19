@@ -21,3 +21,5 @@ By default, Benchpark will use ${Benchmark1} specifications (``application.py`` 
 provided in the Spack and Ramble repos.
 It is possible to overwrite the benchmark specifications provided in the Spack and Ramble repos;
 this is accomplished by adding the ``application.py`` and/or ``package.py`` to ``benchpark/repo/${Benchmark1}``, see :doc:`FAQ` for details.
+
+After satisfying the above prerequisites, in order to use your benchmark in Benchpark, you will need to create an experiment as described in :doc:`howto-add-an-experiment`.
