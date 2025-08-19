@@ -72,7 +72,7 @@ The benchpark setup step does not directly test any of the components, and shoul
 
 .. code::
 
-  benchpark setup ./my-experiment ./my-system workspace/
+  benchpark setup ./my-experiment workspace/
 
 4. ``application.py``/ ``package.py`` - Test Application and Package:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
