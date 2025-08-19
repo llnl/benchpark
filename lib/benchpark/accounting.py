@@ -10,9 +10,7 @@ import benchpark.paths
 
 PROGRAMMING_MODEL_CATEGORY = "programming_model"
 SCALING_CATEGORY = "scaling"
-
-exclude_exper = ["repo.yaml"]
-exp_dict = {
+EXP_DICT = {
     "OpenMPExperiment": (PROGRAMMING_MODEL_CATEGORY, "openmp"),
     "CudaExperiment": (PROGRAMMING_MODEL_CATEGORY, "cuda"),
     "ROCmExperiment": (PROGRAMMING_MODEL_CATEGORY, "rocm"),
@@ -20,17 +18,18 @@ exp_dict = {
     "ScalingMode.Strong": (SCALING_CATEGORY, "strong"),
     "ScalingMode.Weak": (SCALING_CATEGORY, "weak"),
     "ScalingMode.Throughput": (SCALING_CATEGORY, "throughput"),
-    "Caliper": ("modifier", "caliper"),
 }
-sys_dict = {
+SYS_DICT = {
     "OpenMPSystem": "openmp",
     "CudaSystem": "cuda",
     "ROCmSystem": "rocm",
 }
-non_experiments = ["Caliper", "Affinity"]
+MOD_DICT = {
+    "Caliper": ("modifier", "caliper"),
+}
 
 
-def benchpark_experiments(exclude_variants=non_experiments):
+def benchpark_experiments(exp_dict=EXP_DICT, exclude_variants=[]):
     source_dir = benchpark.paths.benchpark_root
     experiments = []
     experiments_dir = source_dir / "experiments"
@@ -39,15 +38,14 @@ def benchpark_experiments(exclude_variants=non_experiments):
         if not os.path.isdir(experiments_dir / x):
             continue
         exp_pmodels_scaling = defaultdict(list)
-        if x not in exclude_exper:
-            expr_file = str(experiments_dir) + "/" + x + "/experiment.py"
-            if os.path.isfile(expr_file):
-                with open(expr_file, "r") as file:
-                    file_text = file.read()
-                    for var in exp_dict.keys():
-                        if var in file_text and var not in exclude_variants:
-                            category, option = exp_dict[var]
-                            exp_pmodels_scaling[category].append(option)
+        expr_file = str(experiments_dir) + "/" + x + "/experiment.py"
+        if os.path.isfile(expr_file):
+            with open(expr_file, "r") as file:
+                file_text = file.read()
+                for var in exp_dict.keys():
+                    if var in file_text and var not in exclude_variants:
+                        category, option = exp_dict[var]
+                        exp_pmodels_scaling[category].append(option)
         end_str = ""
         for category in [PROGRAMMING_MODEL_CATEGORY, SCALING_CATEGORY]:
             if len(exp_pmodels_scaling[category]) == 0:
