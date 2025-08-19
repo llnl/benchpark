@@ -35,6 +35,8 @@ def benchpark_experiments(exclude_variants=non_experiments):
     experiments_dir = source_dir / "experiments"
 
     for x in sorted(os.listdir(experiments_dir)):
+        if not os.path.isdir(experiments_dir / x):
+            continue
         exp_pmodels_scaling = defaultdict(list)
         if x not in exclude_exper:
             expr_file = str(experiments_dir) + "/" + x + "/experiment.py"
