@@ -111,14 +111,11 @@ def main():
                     expanded_lines.append(f"{prefix}{key}={v}")
             else:
                 expanded_lines.append(line)
-        print(expanded_lines)
-        print("1")
         str_dict[pmodel] = [
             i
             for i in [j.replace(" " * 4, "").replace("\t", "") for j in expanded_lines]
             if i != ""
         ]
-        print(str_dict[pmodel])
 
     mods_str = run_subprocess_cmd(
         ["./bin/benchpark", "list", "modifiers", "--no-title"], decode=True
