@@ -50,8 +50,10 @@ def test_list():
         capture_output=True,
         text=True,
     )
-    assert "+cuda" in check_cuda.stdout
-    assert "+rocm" not in check_cuda.stdout
+    # CUDA benchmark
+    assert "amg2023" in check_cuda.stdout
+    # Non CUDA benchmark
+    assert "gpcnet" not in check_cuda.stdout
 
 
 def test_tags():
