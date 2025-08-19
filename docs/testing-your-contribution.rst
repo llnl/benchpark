@@ -77,7 +77,7 @@ The benchpark setup step does not directly test any of the components, and shoul
 4. ``application.py``/ ``package.py`` - Test Application and Package:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Setting up a Ramble workspace will test your ``application.py`` and if successfull, will attempt to build your application using \*Spack. We recommend first testing your ``package.py`` separately using Spack. This step will also indirectly test your ``experiment.py`` and will fail if your ``application.py`` expects experiment variables that you did not define in your experiment.
+Setting up a Ramble workspace will test your ``application.py`` and if successful, will attempt to build your application using \*Spack. We recommend first testing your ``package.py`` separately using Spack. This step will also indirectly test your ``experiment.py`` and will fail if your ``application.py`` expects experiment variables that you did not define in your experiment.
 
 \*If using Spack as your Benchpark package manager
 
