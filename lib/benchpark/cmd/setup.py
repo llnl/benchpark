@@ -183,7 +183,7 @@ def command(args):
                     f"""\
 repos::
   benchpark: {source_dir}/repo
-  builtin: {per_workspace_setup.pkgs_location}
+  builtin: {per_workspace_setup.pkgs_location}/repos/spack_repo/builtin/
 """
                 )
 
