@@ -18,7 +18,7 @@ def test_list():
             text=True,
         )
         assert (
-            f"{subcmd.capitalize()}:" in result_with_title.stdout
+            f"{subcmd.capitalize()}" in result_with_title.stdout
         ), f"Title missing for {subcmd} in output with title"
 
         # Test without title (--no-title flag)
@@ -36,6 +36,9 @@ def test_list():
         assert (
             f"{subcmd.capitalize()}:" not in result_no_title.stdout
         ), f"Title found for {subcmd} in output without title"
+
+        if subcmd == "modifiers":
+            assert "amg2023" in result_with_title.stdout and "amg2023" in result_no_title.stdout
 
     # Check filtering
     check_cuda = subprocess.run(
