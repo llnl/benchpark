@@ -13,12 +13,11 @@ jobs:
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
-      - name: Check Different System from Experiment Init
+      - name: Non-MPIOnlyExperiment Test
         run: |
           ./bin/benchpark system init --dest dane llnl-cluster
-          ./bin/benchpark system init --dest tuolumne llnl-elcapitan
-          ./bin/benchpark experiment init --dest stream --system dane stream
-          # Try setup with different system than init
+          # babelstream is not an MPIOnlyExperiment
+          ./bin/benchpark experiment init --dest babelstream --system dane babelstream
           set +e
           stderr_output="$({ BENCHPARK_RUN_COVERAGE=errors ./bin/benchpark setup stream tuolumne wkp 1>/dev/null; } 2>&1)"
           status=$?
@@ -26,7 +25,7 @@ jobs:
           fail() { echo "TEST FAILED: $*" >&2; exit 1; }
           [[ $status -ne 0 ]] || fail "Expected non-zero exit status, got $status"
           # Check for the specific BenchparkError message
-          expected="BenchparkError: The provided system 'tuolumne' differs from the system used to initialize the experiment 'dane'. Please use the same system."
+          expected="cannot run with MPI only"
           grep -Fq "$expected" <<<"$stderr_output" && echo "failed as expected: $expected" || fail "Expected error message not found in stderr. Got: $stderr_output"
   saxpy:
     runs-on: ubuntu-24.04
