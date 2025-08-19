@@ -48,9 +48,6 @@ def setup_parser(root_parser):
         help="The experiment (benchmark/ProgrammingModel) to run",
     )
     root_parser.add_argument(
-        "system", type=str, help="The system on which to run the experiment"
-    )
-    root_parser.add_argument(
         "experiments_root",
         type=str,
         help="Where to install packages and store results for the experiments. Benchpark expects to manage this directory, and it should be empty/nonexistent the first time you run benchpark setup experiments.",
@@ -70,16 +67,31 @@ def command(args):
                         (everything from source/experiments/<experiment>)
     """
 
+    # Parse experiment YAML for package_manager, system_id
+    def _find(d, tag):
+        if tag in d:
+            return d[tag]
+        for k, v in d.items():
+            if isinstance(v, dict):
+                result = _find(v, tag)
+                if result is not None:
+                    return result
+
     experiments_root = pathlib.Path(os.path.abspath(args.experiments_root))
     experiment_id = args.experiment
-    system_id = args.system
     source_dir = benchpark.paths.benchpark_root
+
+    experiment_src_dir = pathlib.Path(os.path.abspath(str(experiment_id)))
+
+    with open(str(experiment_src_dir / "ramble.yaml"), "r") as file:
+        parsed_yaml = yaml.safe_load(file)
+    pkg_manager = _find(parsed_yaml, "package_manager")
+    system_id = _find(parsed_yaml, "destdir")
 
     debug_print(f"source_dir = {source_dir}")
     debug_print(f"specified experiment = {experiment_id}")
     debug_print(f"specified system = {system_id}")
 
-    experiment_src_dir = pathlib.Path(os.path.abspath(str(experiment_id)))
     configs_src_dir = pathlib.Path(os.path.abspath(str(system_id)))
     workspace_dir = experiments_root / str(experiment_id) / str(system_id)
 
@@ -145,31 +157,6 @@ def command(args):
     per_workspace_setup = RuntimeResources(
         experiments_root, upstream=RuntimeResources(benchpark.paths.benchpark_home)
     )
-
-    # Parse experiment YAML for package_manager
-    def find(d, tag):
-        if tag in d:
-            return d[tag]
-        for k, v in d.items():
-            if isinstance(v, dict):
-                result = find(v, tag)
-                if result is not None:
-                    return result
-
-    with open(str(experiment_src_dir / "ramble.yaml"), "r") as file:
-        parsed_yaml = yaml.safe_load(file)
-    pkg_manager = find(parsed_yaml, "package_manager")
-
-    # Check system hash matches sys-aware experiment init
-    with open(str(configs_src_dir / "system_id.yaml"), "r") as file:
-        systemid_yaml = yaml.safe_load(file)
-    sys_config_hash = find(systemid_yaml, "config-hash")
-    expr_sys_config_hash = find(parsed_yaml, "config-hash")
-    expr_sys_destdir = find(parsed_yaml, "destdir")
-    if sys_config_hash != expr_sys_config_hash:
-        raise BenchparkError(
-            f"The provided system '{system_id}' differs from the system used to initialize the experiment '{expr_sys_destdir}'. Please use the same system."
-        )
 
     pkg_str = ""
     if pkg_manager == "spack":
