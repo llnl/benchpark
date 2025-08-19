@@ -12,13 +12,10 @@ exp_dict = {
     "OpenMPExperiment": "openmp",
     "CudaExperiment": "cuda",
     "ROCmExperiment": "rocm",
-    "StrongScaling": "strong",
-    "ThroughputScaling": "throughput",
-    "WeakScaling": "weak",
     "Caliper": "caliper",
-    "ScalingMode.Strong": "scaling=strong",
-    "ScalingMode.Weak": "scaling=weak",
-    "ScalingMode.Throughput": "scaling=throughput",
+    "ScalingMode.Strong": "strong",
+    "ScalingMode.Weak": "weak",
+    "ScalingMode.Throughput": "throughput",
 }
 sys_dict = {
     "OpenMPSystem": "openmp",

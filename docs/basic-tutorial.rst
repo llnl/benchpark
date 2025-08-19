@@ -118,7 +118,7 @@ You should see the following:
 
     For Kripke, the default experiment is ``kripke``. For Kripke,
     we specify the strong scaling experiment on the command line using ``kripke
-    scaling=strong`` as shown in Step 4.
+    +strong`` as shown in Step 4.
 
 .. _step3_label:
 ------------------------------------------
@@ -153,11 +153,11 @@ Next, initialize the Kripke strong scaling experiment used in this tutorial by r
 
 .. code-block:: bash
 
-    benchpark experiment init --dest=kripke-benchmark --system=hpdc-tutorial kripke scaling=strong caliper=time,mpi
+    benchpark experiment init --dest=kripke-benchmark --system=hpdc-tutorial kripke +strong caliper=time,mpi
 
 Similar to :code:`benchpark system init`, the :code:`benchpark experiment init` command generates
 the Ramble configuration file to describe the experiment to be run. The experiment is specified
-in an experiment specification (``experiment.py``). In the command above, the spec (i.e., :code:`kripke scaling=strong caliper=time,mpi`)
+in an experiment specification (``experiment.py``). In the command above, the spec (i.e., :code:`kripke +strong caliper=time,mpi`)
 defines a strong-scaling experiment running Kripke with the performance
 measurement tool known as `Caliper <https://github.com/llnl/caliper>`_ enabled to collect performance metrics. The
 ``caliper=time,mpi`` specification enables execution time measurement and MPI library
