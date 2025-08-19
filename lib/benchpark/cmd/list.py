@@ -20,7 +20,7 @@ def _print_helper(name, collection, filter=None):
     Args:
         name (str): The title to display above the collection. If None, no title is displayed.
         collection (list of str): A list of strings to display. Items can optionally contain
-                                  special characters (e.g., '/' or '+') for additional formatting.
+                                special characters (e.g., '/' or '+') for additional formatting.
         filter (list, optional): A substring to filter the items in the collection.
                                 Only items containing this substring will be displayed.
                                 If None, all items in the collection are displayed.
