@@ -8,6 +8,7 @@ import time
 import sys
 import argparse
 import os
+import re
 
 import benchpark.paths
 
@@ -64,7 +65,9 @@ def main():
     expr_str = run_subprocess_cmd(
         ["./bin/benchpark", "list", "experiments", "--no-title"], decode=True
     )
-    experiments = [e for e in expr_str.replace(" ", "").replace("\t", "").split("\n") if e != ""]
+    experiments = [
+        e for e in expr_str.replace(" ", "").replace("\t", "").split("\n") if e != ""
+    ]
 
     mpi_only_expr = set()
     cuda_expr = []
@@ -75,21 +78,21 @@ def main():
     throughput_expr = []
 
     for e in experiments:
-        if "+" not in e and "=" not in e:
-            mpi_only_expr.add(e)
+        benchmark = e.split("+")[0]
+        mpi_only_expr.add(benchmark)
 
         if "cuda" in e:
-            cuda_expr.append(e)
-        elif "rocm" in e:
-            rocm_expr.append(e)
-        elif "openmp" in e:
-            openmp_expr.append(e)
-        elif "strong" in e:
-            strong_expr.append(e)
-        elif "weak" in e:
-            weak_expr.append(e)
-        elif "throughput" in e:
-            throughput_expr.append(e)
+            cuda_expr.append(benchmark + "+cuda")
+        if "rocm" in e:
+            rocm_expr.append(benchmark + "+rocm")
+        if "openmp" in e:
+            openmp_expr.append(benchmark + "+openmp")
+        if "strong" in e:
+            strong_expr.append(benchmark + "+strong")
+        if "weak" in e:
+            weak_expr.append(benchmark + "+weak")
+        if "throughput" in e:
+            throughput_expr.append(benchmark + "+throughput")
 
     str_dict = {}
     for pmodel in ["mpi", "cuda", "rocm", "openmp"]:
@@ -97,11 +100,25 @@ def main():
         if pmodel != "mpi":
             cmd += ["-p", pmodel]
         output = run_subprocess_cmd(cmd, decode=True)
+        lines = output.splitlines()
+        expanded_lines = []
+        for line in lines:
+            # Match patterns like key= [a|b|c]
+            match = re.search(r"(.*?)(\w+)=\[(.*?)\]", line)
+            if match:
+                prefix, key, values = match.groups()
+                for v in values.split("|"):
+                    expanded_lines.append(f"{prefix}{key}={v}")
+            else:
+                expanded_lines.append(line)
+        print(expanded_lines)
+        print("1")
         str_dict[pmodel] = [
             i
-            for i in output.replace(" " * 4, "").replace("\t", "").split("\n")
+            for i in [j.replace(" " * 4, "").replace("\t", "") for j in expanded_lines]
             if i != ""
         ]
+        print(str_dict[pmodel])
 
     mods_str = run_subprocess_cmd(
         ["./bin/benchpark", "list", "modifiers", "--no-title"], decode=True
@@ -113,9 +130,13 @@ def main():
     ]
 
     caliper_exp = [
-        e.replace("+caliper", " caliper=time") for e in benchpark_experiments(exclude_variants=[]) if "+caliper" in e and e.split("+")[0] in mpi_only_expr
+        e.replace("+caliper", " caliper=time")
+        for e in benchpark_experiments(exclude_variants=[])
+        if "+caliper" in e and e.split("+")[0] in mpi_only_expr
     ]
-    modifiers_expr = caliper_exp + [e + " " + m + "=on" for e in mpi_only_expr for m in nmods]
+    modifiers_expr = caliper_exp + [
+        e + " " + m + "=on" for e in mpi_only_expr for m in nmods
+    ]
 
     exprs_to_sys = [
         ("mpi", mpi_only_expr, str_dict["mpi"]),
@@ -159,7 +180,7 @@ def main():
                         ["bash", ".github/utils/dryrun.sh", espec, sspec],
                         env={**os.environ},
                         capture_output=True,
-                        check=True
+                        check=True,
                     )
                 except subprocess.CalledProcessError as e:
                     errors[f"{espec} {sspec}"] = e.stderr.decode()
@@ -172,7 +193,9 @@ def main():
         print(value)
 
     print(f"Elapsed: {(end - start) / 60:.2f} minutes")
-    print(f"{ran_tests - fail_tests} Passing. {fail_tests} Failing. {skip_tests} Skipped.")
+    print(
+        f"{ran_tests - fail_tests} Passing. {fail_tests} Failing. {skip_tests} Skipped."
+    )
 
     sys.exit(1 if fail_tests > 0 else 0)
 
