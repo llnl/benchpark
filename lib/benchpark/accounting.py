@@ -7,7 +7,6 @@ import os
 from collections import defaultdict
 
 import benchpark.paths
-from benchpark.spec import SystemSpec
 
 PROGRAMMING_MODEL_CATEGORY = "programming_model"
 SCALING_CATEGORY = "scaling"
@@ -70,14 +69,14 @@ def benchpark_modifiers():
 
 
 def benchpark_systems(programming_model=None):
-    import benchpark.spec
+    from benchpark.spec import SystemSpec
 
     source_dir = benchpark.paths.benchpark_root
     systems = []
     exclude = ["all_hardware_descriptions", "common", "repo.yaml"]
     for x in sorted(os.listdir(source_dir / "systems")):
         if x not in exclude and "system.py" in os.listdir(source_dir / "systems" / x):
-            system_spec = benchpark.spec.SystemSpec(x)
+            system_spec = SystemSpec(x)
             system_class = system_spec.system_class
             # aws uses 'instance_type' not 'cluster'
             cluster_variant = "instance_type" if "aws" in x else "cluster"
