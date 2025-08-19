@@ -10,9 +10,7 @@ import pickle
 import shutil
 import sys
 
-import benchpark.experiment
 import benchpark.spec
-import benchpark.system
 from benchpark.error import BenchparkError
 
 
