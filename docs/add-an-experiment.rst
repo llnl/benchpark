@@ -135,7 +135,7 @@ string variants defined in your experiment.py passed in as key-value pairs:
 ``benchpark experiment init --dest {path/to/dest} --system {path/to/system} {benchmark_name} +/~{boolean variant} {string variant}={value} ``
 
 For example, to run the AMG2023 strong scaling experiment for problem 1, using CUDA the command would be:
-``benchpark experiment init --dest amg2023_experiment --system {path/to/system} amg2023 +cuda workload=problem1 scaling=strong scaling-factor=2 scaling-iterations=4``
+``benchpark experiment init --dest amg2023_experiment --system {path/to/system} amg2023 +cuda+strong workload=problem1 scaling-factor=2 scaling-iterations=4``
 
 Initializing an experiment generates the following yaml files:
 
