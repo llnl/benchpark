@@ -13,6 +13,7 @@ import sys
 import benchpark.experiment
 import benchpark.spec
 import benchpark.system
+from benchpark.error import BenchparkError
 
 
 def experiment_init(args):
@@ -20,6 +21,10 @@ def experiment_init(args):
     experiment = experiment_spec.experiment
 
     if args.system:
+        if not os.path.exists(args.system):
+            raise BenchparkError(
+                f"System '{args.system}' does not exist. Run 'benchpark system init --dest {args.system} ...'."
+            )
         system_file = os.path.join(args.system, "system.pkl")
         with open(system_file, "rb") as f:
             system_spec = pickle.load(f)
