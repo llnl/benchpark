@@ -47,7 +47,8 @@ You can manually test a system, experiment, or application using the following s
 
   Spack ``package.py`` packages can be tested independently from Benchpark (see `Spack Package Creation Tutorial <https://spack-tutorial.readthedocs.io/en/latest/tutorial_packaging.html>`_).
 
-1. Test System ``system.py`` Initialization:
+1. ``system.py`` - Test System Initialization:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This step will test the ``system.py`` you have created by attempting to create system configuration files from your system definition.
 
@@ -55,7 +56,8 @@ This step will test the ``system.py`` you have created by attempting to create s
 
   benchpark system init --dest=my-system my-system
 
-2. Test Experiment ``experiment.py`` Initialization:
+2. ``experiment.py`` - Test Experiment Initialization:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This step requires an existing system and will test the ``experiment.py`` you have created by attempting to create an experiment configuration file ``ramble.yaml`` from your experiment definition. If you also created an ``application.py`` the experiment variables you defined in your ``experiment.py`` will be used by Ramble during the ``workspace setup`` step.
 
@@ -64,6 +66,7 @@ This step requires an existing system and will test the ``experiment.py`` you ha
   benchpark experiment init --dest=my-experiment --system=my-system my-experiment
 
 3. Setup Benchpark Workspace:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The benchpark setup step does not directly test any of the components, and should complete as long as you have completed the prior steps.
 
@@ -71,9 +74,10 @@ The benchpark setup step does not directly test any of the components, and shoul
 
   benchpark setup ./my-experiment ./my-system workspace/
 
-4. Test Application ``application.py`` and Package ``package.py``
+4. ``application.py``/ ``package.py`` - Test Application and Package:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Setting up a Ramble workspace will test your ``application.py`` and if successfull, will attempt to build your application using \*Spack. We recommend testing your ``package.py`` separately using Spack. This step will also indirectly test your ``experiment.py`` and will fail if your ``application.py`` expects experiment variables that you did not define in your experiment.
+Setting up a Ramble workspace will test your ``application.py`` and if successfull, will attempt to build your application using \*Spack. We recommend first testing your ``package.py`` separately using Spack. This step will also indirectly test your ``experiment.py`` and will fail if your ``application.py`` expects experiment variables that you did not define in your experiment.
 
 \*If using Spack as your Benchpark package manager
 
@@ -83,6 +87,7 @@ Setting up a Ramble workspace will test your ``application.py`` and if successfu
   ramble --workspace-dir workspace/my-experiment/my-system/workspace workspace setup
 
 5. Test Your Benchmark
+~~~~~~~~~~~~~~~~~~~~~~
 
 If built successfully, the ``ramble on`` command will submit your experiments (job scripts that ramble has generated) to the scheduler. Runtime errors at this point are likely source code issues.
 
