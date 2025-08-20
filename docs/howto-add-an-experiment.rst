@@ -26,43 +26,59 @@ These ``experiment.py`` files inherit from the Experiment base class in
 and package/application repositories, are used to generate a set of concrete Ramble experiments for
 the target system and programming model.
 
+In this example, we will show how to create an experiment for the `High Performance Computing Linpack Benchmark <https://www.netlib.org/benchmark/hpl/>`__.
+This benchmark has a `Spack package <https://github.com/LLNL/benchpark/blob/develop/repo/hpl/package.py>`__ and `Ramble application <https://github.com/LLNL/benchpark/blob/develop/repo/hpl/application.py>`__
+defined in Benchpark, so Benchpark will use these over the upstream `Spack package <https://github.com/spack/spack-packages/blob/develop/repos/spack_repo/builtin/packages/hpl/package.py>`__
+and `Ramble application <https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/applications/hpl/application.py>`__.
+For clarity, if ``benchpark/repo/hpl`` did not exist, benchpark will use the upstream versions. Additionally, the Benchpark HPL ``application.py``
+inherits from the Ramble upstream, so they are equivalent aside from an extra Benchpark tag definition.
+
 -----------------------------
 Step 1: Create the Experiment
 -----------------------------
 
-Create the ``experiment.py`` file under ``benchpark/experiments/<benchmark>/experiment.py``. At
-minimum, your experiment should inherit from the base ``Experiment`` class.
+We create the ``experiment.py`` file under ``benchpark/experiments/hpl/experiment.py``.
+The naming of this directory will affect how the experiment is initialized, e.g. ``benchpark experiment init ... hpl``.
+There are multiple scaling options, modifiers, and programming models we can inherit from, but at minimum our experiment should inherit
+from the base ``Experiment`` class and ``MpiOnlyExperiment`` indicating that our experiment can be executed with MPI.
 
 .. code::
 
   from benchpark.experiment import Experiment
+  from benchpark.mpi import MpiOnlyExperiment
 
-  class MyExperiment(
+  class Hpl(
     Experiment,
+    MpiOnlyExperiment,
   ):
 
-Optionally your experiment can be configured to support different Benchpark experiment variants, which include:
+As we stated before, your experiment can be configured to support different Benchpark experiment variants, which include:
 
 #. programming models
 #. scaling modes (if the experiment will support scaling studies)
 #. modifiers
 
-In the following example experiment, we assume the benchmark supports the ``CUDA`` programming
-model, the benchmark can be strong scaled (using ``strong`` scaling option), and the benchmark can
-be profiled with the ``Caliper`` instrumentation and performance profiling library.  For more
-details on the configurability of experiment variants, see :ref:`experiment-variants`.
+For HPL we can add the ``OpenMP`` programming
+model, define ``strong`` and ``weak`` scaling, and enable the ``caliper`` modifier, since HPL is
+profiled with the ``Caliper`` instrumentation and performance profiling library.  
+
+Notice enabling the options only requires our experiment to inherit from pre-defined classes.
+We will define ``strong`` and ``weak`` scaling for the HPL experiment later on in this guide, since this varies per-experiment.
+For more details on the configurability of experiment variants, see :ref:`experiment-variants`.
 
 .. code::
 
   from benchpark.experiment import Experiment
-  from benchpark.cuda import CudaExperiment
+  from benchpark.mpi import MpiOnlyExperiment
+  from benchpark.openmp import OpenMPExperiment
   from benchpark.scaling import ScalingMode, Scaling
   from benchpark.caliper import Caliper
 
-  class MyExperiment(
+  class Hpl(
     Experiment,
-    CudaExperiment,
-    Scaling(ScalingMode.Strong),
+    MpiOnlyExperiment,
+    OpenMPExperiment,
+    Scaling(ScalingMode.Strong, ScalingMode.Weak),
     Caliper,
   ):
 
@@ -79,51 +95,54 @@ Continuing with our example, we add two variants. The first is a ``workload`` va
 which Ramble workload we are going to use. The second is a version of our benchmark, which should
 take the possible values (e.g., ``"NAME_OF_DEVELOPMENT_BRANCH"``, ``"latest"``, ``"rc1"``,
 ``"rc2"``). ``latest`` is a keyword that will automatically choose the latest release version from
-the ``package.py``. Additionally, we add our GitHub username, or multiple usernames in the tuple,
+the ``package.py``. 
+For HPL, the source is a ``tar.gz``, so we are not tracking a development branch.
+Additionally, we add our GitHub username, or multiple usernames in the tuple,
 to record the ``maintainers`` of this experiment.
 
 .. code::
 
   from benchpark.experiment import Experiment
-  from benchpark.cuda import CudaExperiment
+  from benchpark.mpi import MpiOnlyExperiment
+  from benchpark.openmp import OpenMPExperiment
   from benchpark.scaling import ScalingMode, Scaling
   from benchpark.caliper import Caliper
   from benchpark.directives import variant, maintainers
 
-  class MyExperiment(
+  class Hpl(
     Experiment,
-    CudaExperiment,
-    Scaling(ScalingMode.Strong),
+    MpiOnlyExperiment,
+    OpenMPExperiment,
+    Scaling(ScalingMode.Strong, ScalingMode.Weak),
     Caliper,
   ):
 
-  variant(
-    "workload",
-    default="problem1",
-    values=("problem1", "problem2"),
-    description="Which ramble workload to execute.",
-  )
+    variant(
+      "workload",
+      default="standard",
+      description="Which ramble workload to execute.",
+    )
 
-  variant(
-    "version",
-    default="v2025",
-    values=("develop", "latest", "v2025"),
-    description="Which benchmark version to use.",
-  )
+    variant(
+      "version",
+      default="2.3-caliper",
+      values=("latest", "2.3-caliper", "2.3", "2.2"),
+      description="Which benchmark version to use.",
+    )
 
-  maintainers("your_github_username")
+    maintainers("daboehme")
 
 ----------------------------------------
 Step 3: Add a Ramble Application Section
 ----------------------------------------
 
-The ``def compute_applications_section()`` is for defining experiment variables necessary for the
-programming model (``CUDA``, ``ROCm``, or ``OpenMP``). One such variable is ``arch``, which may be
-used by the benchmark to perform scaling runs (``strong``, ``weak``, or ``throughput``) using
-Ramble.
+The ``def compute_applications_section()`` is for:
 
-Continuing with our example, we will be using the ``CUDA`` programming model and ``strong``
-scaling. :ref:`This section <scaling-configs>` contains more information on how to write Benchpark scaling
+  1. Defining experiment variables that your ``application.py`` is expecting (workload variables).
+  2. Defining a scaling configuration for each of the scaling options the class inherits from.
+
+Continuing with our example, we will define HPL-specific experiment variables , and writing ``strong`` and ``weak`` scaling configurations.
+:ref:`This section <scaling-configs>` contains more information on how to write Benchpark scaling
 configurations.
 
 We can specify experiment variables to Benchpark using the ``Experiment.add_experiment_variable()`` member function.
@@ -135,79 +154,100 @@ How you set ``process_problem_size`` or ``total_problem_size`` depends on how yo
 .. code::
 
   from benchpark.experiment import Experiment
-  from benchpark.cuda import CudaExperiment
+  from benchpark.mpi import MpiOnlyExperiment
+  from benchpark.openmp import OpenMPExperiment
   from benchpark.scaling import ScalingMode, Scaling
   from benchpark.caliper import Caliper
   from benchpark.directives import variant, maintainers
 
-  class MyExperiment(
+  class Hpl(
     Experiment,
-    CudaExperiment,
-    Scaling(ScalingMode.Strong),
+    MpiOnlyExperiment,
+    OpenMPExperiment,
+    Scaling(ScalingMode.Strong, ScalingMode.Weak),
     Caliper,
   ):
 
-  variant(
-    "workload",
-    default="problem1",
-    values=("problem1", "problem2"),
-    description="Which ramble workload to execute.",
-  )
-
-  variant(
-    "version",
-    default="v2025",
-    values=("develop", "latest", "v2025"),
-    description="Which benchmark version to use.",
-  )
-
-  maintainers("your_github_username")
-
-  def compute_applications_section(self):
-    ### Add experiment variables and required variables
-    self.add_experiment_variable("n_procs", 1)
-    
-    # exec_mode is a variant available for every experiment.
-    # This can be used to define a "testing" and "performance" set of experiment variables.
-    # The "performance" set of variables are usually a significantly larger workload.
-    # The default setting is "exec_mode=test".
-    if self.spec.satisfies("exec_mode=test"):
-      self.add_experiment_variable("my_problemsize", 1024)
-    # Must be exec_mode=perf
-    else:
-      self.add_experiment_variable("my_problemsize", 1024**2)
-
-    # Set the variables required by the experiment
-    self.set_required_variables(
-      n_resources="{n_procs}",
-      process_problem_size="{my_problemsize}/{n_procs}",
-      total_problem_size="{my_problemsize}",
+    variant(
+      "workload",
+      default="standard",
+      description="Which ramble workload to execute.",
     )
 
-    ### Add strong scaling definition
-    # Register the scaling variables and their respective scaling functions
-    # required to correctly scale the experiment for the given scaliing policy
-    # Strong scaling scales up n_procs by the specified scaling_factor
-    self.register_scaling_config(
-      {
-          ScalingMode.Strong: {
-            "n_procs": lambda var, itr, dim, scaling_factor: var.val(dim)
-            * scaling_factor,
-          },
-      }
+    variant(
+      "version",
+      default="2.3-caliper",
+      values=("latest", "2.3-caliper", "2.3", "2.2"),
+      description="Which benchmark version to use.",
     )
 
-    ### CUDA specific logic
-    if self.spec.satisfies("+cuda"):
-      self.add_experiment_variable("n_gpus", "{n_resources}", named=True)
-      # Benchmark-specific variable
-      # Your benchmark may not need this
-      self.add_experiment_variable("arch", "CUDA")
-    else:
-      self.add_experiment_variable("n_ranks", "{n_resources}")
-      # Benchmark-specific variable
-      # Your benchmark may not need this
-      self.add_experiment_variable("arch", "Sequential")
+    maintainers("daboehme")
+
+    def compute_applications_section(self):
+      
+      # exec_mode is a variant available for every experiment.
+      # This can be used to define a "testing" and "performance" set of experiment variables.
+      # The "performance" set of variables are usually a significantly larger workload.
+      # The default setting is "exec_mode=test".
+      if self.spec.satisfies("exec_mode=test"):
+        self.add_experiment_variable("n_nodes", 1, True)
+
+        # Overwrite values in application (https://github.com/GoogleCloudPlatform/ramble/blob/3c3e6b7c58270397ad10dfbe9c52bfad790c0631/var/ramble/repos/builtin/base_applications/hpl/base_application.py#L411-L419)
+        self.add_experiment_variable("Ns", 10000, True)
+        self.add_experiment_variable("N-Grids", 1, False)
+        self.add_experiment_variable("Ps", "4 * {n_nodes}", True)
+        self.add_experiment_variable("Qs", "8", False)
+        self.add_experiment_variable("N-Ns", 1, False)
+        self.add_experiment_variable("N-NBs", 1, False)
+        self.add_experiment_variable("NBs", 128, False)
+      # Must be exec_mode=perf if not test mode.
+      # We can increase the magnitude of some/all the experiment variables for performance testing. 
+      else:
+        self.add_experiment_variable("n_nodes", 16, True)
+
+        self.add_experiment_variable("Ns", 100000, True)
+        self.add_experiment_variable("N-Grids", 1, False)
+        self.add_experiment_variable("Ps", "4 * {n_nodes}", True)
+        self.add_experiment_variable("Qs", "8", False)
+        self.add_experiment_variable("N-Ns", 1, False)
+        self.add_experiment_variable("N-NBs", 1, False)
+        self.add_experiment_variable("NBs", 128, False)
+
+      # "sys_cores_per_node" will be defined by your system.py
+      self.add_experiment_variable(
+        "n_ranks", "{sys_cores_per_node} * {n_nodes}", False
+      )
+      self.add_experiment_variable(
+        "n_threads_per_proc", ["2"], named=True, matrixed=True
+      )
+
+      # Set the variables required by the experiment
+      self.set_required_variables(
+        n_resources="{n_procs}",
+        process_problem_size="{my_problemsize}/{n_procs}",
+        total_problem_size="{my_problemsize}",
+      )
+
+      ### Add strong scaling definition
+      # Register the scaling variables and their respective scaling functions
+      # required to correctly scale the experiment for the given scaling policy
+      # Strong scaling: scales up n_nodes by the specified scaling_factor, problem size is constant
+      # Weak scaling: scales n_nodes and Ns problem size by scaling_factor
+      self.register_scaling_config(
+          {
+              ScalingMode.Strong: {
+                  "n_nodes": lambda var, itr, dim, scaling_factor: var.val(dim)
+                  * scaling_factor,
+                  "Ns": lambda var, itr, dim, scaling_factor: var.val(dim),
+              },
+              ScalingMode.Weak: {
+                  "n_nodes": lambda var, itr, dim, scaling_factor: var.val(dim)
+                  * scaling_factor,
+                  "Ns": lambda var, itr, dim, scaling_factor: var.val(dim)
+                  * scaling_factor,
+              },
+          }
+      )
 
 For more details on the ``add_experiment_variable`` function, see :ref:`add-expr-var`.
 
@@ -223,33 +263,34 @@ In ``def compute_package_section()``, add the benchmark's package spec. Required
 .. code::
 
   from benchpark.experiment import Experiment
-  from benchpark.cuda import CudaExperiment
+  from benchpark.mpi import MpiOnlyExperiment
+  from benchpark.openmp import OpenMPExperiment
   from benchpark.scaling import ScalingMode, Scaling
   from benchpark.caliper import Caliper
   from benchpark.directives import variant, maintainers
 
-  class MyExperiment(
+  class Hpl(
     Experiment,
-    CudaExperiment,
-    Scaling(ScalingMode.Strong),
+    MpiOnlyExperiment,
+    OpenMPExperiment,
+    Scaling(ScalingMode.Strong, ScalingMode.Weak),
     Caliper,
   ):
 
     variant(
       "workload",
-      default="problem1",
-      values=("problem1", "problem2"),
+      default="standard",
       description="Which ramble workload to execute.",
     )
 
     variant(
       "version",
-      default="v2025",
-      values=("develop", "latest", "v2025"),
+      default="2.3-caliper",
+      values=("latest", "2.3-caliper", "2.3", "2.2"),
       description="Which benchmark version to use.",
     )
 
-    maintainers("your_github_username")
+    maintainers("daboehme")
 
     def compute_applications_section(self):
       ...
@@ -284,6 +325,7 @@ or ``openmp`` for an experiment using OpenMP (on a CPU).::
 
     class Amg2023(
       Experiment,
+      MpiOnlyExperiment
       OpenMPExperiment,
       CudaExperiment,
       ROCmExperiment,
@@ -300,17 +342,17 @@ When implementing scaling, the following variants are available to the experimen
 
 Once an experiment class has been written, an experiment is initialized with the following command, with any boolean variants with +/~ or 
 string variants defined in your experiment.py passed in as key-value pairs: 
-``benchpark experiment init --dest {path/to/dest} {benchmark_name} +/~{boolean variant} {string variant}={value} ``
+``benchpark experiment init --dest {path/to/dest} {benchmark_name} +/~{boolean variant} {string variant}={value}``
 
 For example, to run the AMG2023 strong scaling experiment for problem 1, using CUDA the command would be:
 ``benchpark experiment init --dest amg2023_experiment amg2023 +cuda+strong workload=problem1 scaling-factor=2 scaling-iterations=4``
 
 Initializing an experiment generates the following yaml files:
 
-- ``ramble.yaml`` defines the `Ramble specs <https://ramble.readthedocs.io/en/latest/workspace_config.html#>`_ for building, running, analyzing and archiving experiments.
+- ``ramble.yaml`` defines the `Ramble specs <https://ramble.readthedocs.io/en/latest/workspace_config.html#>`__ for building, running, analyzing and archiving experiments.
 - ``execution_template.tpl`` serves as a template for the final experiment script that will be concretized and executed.
 
-A detailed description of Ramble configuration files is available at `Ramble workspace_config <https://ramble.readthedocs.io/en/latest/workspace_config.html#>`_.
+A detailed description of Ramble configuration files is available at `Ramble workspace_config <https://ramble.readthedocs.io/en/latest/workspace_config.html#>`__.
 
 For more advanced usage, such as customizing hardware allocation or performance profiling see :doc:`modifiers`.
 
