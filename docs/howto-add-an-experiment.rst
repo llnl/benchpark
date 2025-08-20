@@ -280,10 +280,8 @@ For more details on the ``add_experiment_variable`` function, see :ref:`add-expr
 ***************************************
 
 In ``def compute_package_section()``, add the benchmark's package spec. Required
-packages for the benchmark should be defined in one of two ways:
-
-#. in the ``package.py``, either in Spack or ``benchpark/repo/`` (if using Spack).
-#. in the ``pyproject.toml`` or ``setup.py`` of the Python project (if using pip).
+packages for the benchmark are not listed here, since they are already defined in the
+``package.py``.
 
 .. code::
 
