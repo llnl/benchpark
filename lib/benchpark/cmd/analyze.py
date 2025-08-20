@@ -66,15 +66,12 @@ def get_scaling_type(spec):
     Raises:
         ValueError: If no valid scaling type is found in the specification.
     """
-    scaling_list = spec.unique()
-    if len(scaling_list) != 1:
-        raise ValueError(f"Multiple scaling types found, expected 1. {scaling_list}")
-    scaling = scaling_list[0]
-    if scaling in SCALING_TYPES:
-        return scaling
-    raise ValueError(
-        f"Unknown scaling type '{scaling}'. Must be one of {SCALING_TYPES}"
-    )
+
+    for keyword in SCALING_TYPES:
+        if "+" + keyword in spec:
+            return keyword
+
+    raise ValueError(f"Unknown scaling type. Must be one of {SCALING_TYPES}")
 
 
 def validate_single_metadata_value(column, tk):
@@ -248,22 +245,7 @@ def prepare_data(**kwargs):
         tk = tk.query(query)
 
     # Spec should not vary across runs
-    # col varies based on new_scaling/old_scaling
-    if "scaling" not in tk.metadata:
-        # This can be deprecated once all benchmarks are transitioned to new_scaling
-        if "benchpark_spec" in tk.metadata:
-            spec_series = tk.metadata["benchpark_spec"]
-            if not spec_series.apply(lambda x: x == spec_series.iloc[0]).all():
-                raise ValueError("Not all lists in the Series are equal.")
-            spec = spec_series.iloc[0][0]
-            for keyword in SCALING_TYPES:
-                if "+" + keyword in spec:
-                    tk.metadata["scaling"] = keyword
-        else:
-            raise ValueError(
-                "Expected either 'scaling' or 'benchpark_spec' in metadata"
-            )
-    spec = tk.metadata["scaling"]
+    spec = tk.metadata["benchpark_spec"].iloc[0][0]
     scaling = get_scaling_type(spec)
 
     # What we are varying for each scaling type

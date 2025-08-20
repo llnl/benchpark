@@ -6,7 +6,7 @@
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.mpi import MpiOnlyExperiment
-from benchpark.new_scaling import ScalingMode, Scaling
+from benchpark.scaling import ScalingMode, Scaling
 
 
 class MdTest(

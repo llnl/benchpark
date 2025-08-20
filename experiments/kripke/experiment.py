@@ -9,7 +9,7 @@ from benchpark.mpi import MpiOnlyExperiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
-from benchpark.new_scaling import ScalingMode, Scaling
+from benchpark.scaling import ScalingMode, Scaling
 from benchpark.caliper import Caliper
 
 
@@ -53,7 +53,7 @@ class Kripke(
 
             # Per-process size (in zones) in each dimension
             self.add_experiment_variable(
-                "total_problem_size_dict", {"nzx": 64, "nzy": 64, "nzz": 32}, True
+                "total_problem_size_dict", {"nzx": 32, "nzy": 32, "nzz": 16}, True
             )
 
             self.add_experiment_variable("ngroups", 64, True)
