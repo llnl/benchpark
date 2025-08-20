@@ -31,8 +31,8 @@ class Kripke(
 
     variant(
         "version",
-        default="1.2.7",
-        values=("develop", "latest", "1.2.7"),
+        default="1.2.7.0",
+        values=("develop", "latest", "1.2.7.0"),
         description="app version",
     )
 
