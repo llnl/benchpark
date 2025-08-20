@@ -10,11 +10,6 @@ import argparse
 import os
 import re
 
-import benchpark.paths
-
-sys.path.append(str(benchpark.paths.benchpark_home) + "/spack/lib/spack")
-from lib.benchpark.accounting import benchpark_experiments  # noqa: E402
-
 DEFAULT_SYSTEM = "llnl-cluster cluster=dane"
 # Skip experiments
 SKIP_EXPR = [
