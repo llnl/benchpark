@@ -28,6 +28,7 @@ class Hpl(
     variant(
         "version",
         default="2.3-caliper",
+        values=("latest", "2.3-caliper", "2.3", "2.2"),
         description="app version",
     )
 
