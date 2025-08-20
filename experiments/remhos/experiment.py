@@ -9,7 +9,7 @@ from benchpark.mpi import MpiOnlyExperiment
 from benchpark.caliper import Caliper
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
-from benchpark.new_scaling import Scaling, ScalingMode
+from benchpark.scaling import Scaling, ScalingMode
 
 
 class Remhos(

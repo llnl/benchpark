@@ -374,11 +374,13 @@ the following variants are available to the experiment
 Once an experiment class has been written, an experiment is initialized with the
 following command, with any boolean variants with +/~ or string variants defined in your
 experiment.py passed in as key-value pairs: ``benchpark experiment init --dest
-{path/to/dest} {benchmark_name} +/~{boolean variant} {string variant}={value}``
+{path/to/dest} --system {path/to/system} {benchmark_name} +/~{boolean variant} {string
+variant}={value}``
 
 For example, to run the AMG2023 strong scaling experiment for problem 1, using CUDA the
-command would be: ``benchpark experiment init --dest amg2023_experiment amg2023
-+cuda+strong workload=problem1 scaling-factor=2 scaling-iterations=4``
+command would be: ``benchpark experiment init --dest amg2023_experiment --system
+{path/to/system} amg2023 +cuda+strong workload=problem1 scaling-factor=2
+scaling-iterations=4``
 
 Initializing an experiment generates the following yaml files:
 
