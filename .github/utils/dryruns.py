@@ -121,20 +121,28 @@ def main():
     mods_str = run_subprocess_cmd(
         ["./bin/benchpark", "list", "modifiers", "--no-title"], decode=True
     )
-    nmods = [
-        i
-        for i in mods_str.replace(" " * 4, "").replace("\t", "").split("\n")
-        if i != "" and i not in ["allocation", "caliper"]
-    ]
-
-    caliper_exp = [
-        e.replace("+caliper", " caliper=time")
-        for e in benchpark_experiments(exclude_variants=[])
-        if "+caliper" in e and e.split("+")[0] in mpi_only_expr
-    ]
-    modifiers_expr = caliper_exp + [
-        e + " " + m + "=on" for e in mpi_only_expr for m in nmods
-    ]
+    nmods = [i for i in mods_str.replace(" " * 4, "").split("\n") if i != ""]
+    modifiers_expr = []
+    exclude_mods = ["allocation"]
+    i = 0
+    while i < len(nmods):
+        if nmods[i] in exclude_mods:
+            # Skip modifier and "(all benchmarks) line"
+            i += 1
+            continue
+        if not nmods[i].startswith("\t"):
+            curmod = nmods[i]
+            if "(all benchmarks)" in nmods[i + 1]:
+                for b in mpi_only_expr:
+                    modifiers_expr.append(b + " " + curmod + "=on")
+                i += 1
+                continue
+            else:
+                i += 1
+                while nmods[i].startswith("\t"):
+                    modifiers_expr.append(nmods[i].lstrip("\t") + " " + curmod + "=on")
+                    i += 1
+        i += 1
 
     exprs_to_sys = [
         ("mpi", mpi_only_expr, str_dict["mpi"]),

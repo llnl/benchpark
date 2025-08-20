@@ -66,11 +66,11 @@ def benchpark_modifiers():
     exclude = ["modifier_repo.yaml"]
     for x in sorted(os.listdir(source_dir / "modifiers")):
         check_experiments = True
-        if x in all_benchmark_modifiers:
-            x = x + " (all benchmarks)"
-            check_experiments = False
         if x not in exclude:
             modifiers.append(x)
+        if x in all_benchmark_modifiers:
+            modifiers.append("\t!(all benchmarks)")
+            check_experiments = False
         if check_experiments:
             for exp in sorted(os.listdir(experiments_dir)):
                 if not os.path.isdir(experiments_dir / exp):

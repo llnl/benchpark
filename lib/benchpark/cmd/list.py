@@ -90,6 +90,8 @@ def list_systems(args):
 
 def list_modifiers(args):
     modifiers = benchpark_modifiers()
+    if args.hide_benchmarks:
+        modifiers = [m for m in modifiers if not m.startswith("\t")]
     _print_helper("Modifiers:" if not args.no_title else None, modifiers)
 
 
@@ -136,6 +138,11 @@ def setup_parser(root_parser):
     modifiers_parser = list_subparser.add_parser("modifiers")
     modifiers_parser.add_argument(
         "--no-title", action="store_true", help="Turn off printing title in output."
+    )
+    modifiers_parser.add_argument(
+        "--hide-benchmarks",
+        action="store_true",
+        help="Do not show benchmarks under each modifier in output.",
     )
 
 
