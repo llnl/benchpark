@@ -45,7 +45,7 @@ You can manually test a system, experiment, or application using the following s
 
 .. Note::
 
-  Spack ``package.py`` packages can be tested independently from Benchpark (see `Spack Package Creation Tutorial <https://spack-tutorial.readthedocs.io/en/latest/tutorial_packaging.html>`_).
+  Spack ``package.py`` packages and Ramble ``application.py`` applications can be tested independently from Benchpark (see `Spack Package Creation Tutorial <https://spack-tutorial.readthedocs.io/en/latest/tutorial_packaging.html>`_ and `Ramble Usage While Developing <https://ramble.readthedocs.io/en/latest/dev_guides/application_dev_guide.html#usage-while-developing>`_). 
 
 1. ``system.py`` - Test System Initialization:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
