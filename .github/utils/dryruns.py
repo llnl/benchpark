@@ -117,30 +117,31 @@ def main():
         ["./bin/benchpark", "list", "modifiers", "--no-title"], decode=True
     )
     nmods = [i for i in mods_str.replace(" " * 4, "").split("\n") if i != ""]
+    print(nmods)
     modifiers_expr = []
     exclude_mods = ["allocation"]
     i = 0
     while i < len(nmods):
         if nmods[i] in exclude_mods:
             # Skip modifier and "(all benchmarks) line"
-            i += 1
+            i += 2
             continue
         if not nmods[i].startswith("\t"):
             curmod = nmods[i]
+            print(curmod)
             end = "=on" if curmod != "caliper" else "=time"
             if "(all benchmarks)" in nmods[i + 1]:
                 for b in mpi_only_expr:
                     modifiers_expr.append(b + " " + curmod + end)
-                i += 1
+                i += 2
                 continue
             else:
                 i += 1
                 while nmods[i].startswith("\t"):
-                    modifiers_expr.append(nmods[i].lstrip("\t") + " " + curmod + end)
+                    bmark = nmods[i].lstrip("\t")
+                    if bmark in mpi_only_expr:
+                        modifiers_expr.append(bmark + " " + curmod + end)
                     i += 1
-        i += 1
-
-    print(modifiers_expr)
 
     exprs_to_sys = [
         ("mpi", mpi_only_expr, str_dict["mpi"]),
