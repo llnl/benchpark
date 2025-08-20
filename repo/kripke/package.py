@@ -57,7 +57,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     conflicts("+single_memory", when="~rocm")
     depends_on("chai+single_memory", when="+single_memory")
 
-    depends_on("chai@2024.07.0+raja", when="@develop")
+    depends_on("chai@2024.07.0+raja", when="@1.2.7.0:")
     depends_on("fmt@9.1", when=f"^chai@2024.07.0")
 
     depends_on("mpi", when="+mpi")
