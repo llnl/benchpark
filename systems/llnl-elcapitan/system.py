@@ -152,7 +152,7 @@ class LlnlElcapitan(System):
                 self.mpi_version = Version("8.1.26")
                 self.short_cce_version = (
                     f"{self.cce_version.major}.{self.cce_version.minor}"
-                
+                )
         if self.rocm_version >= Version("6.0.0"):
             self.pmi_version = Version("6.1.15.6")
             self.pals_version = Version("1.2.12")
