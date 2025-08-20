@@ -127,17 +127,20 @@ def main():
             continue
         if not nmods[i].startswith("\t"):
             curmod = nmods[i]
+            end = "=on" if curmod != "caliper" else "=time"
             if "(all benchmarks)" in nmods[i + 1]:
                 for b in mpi_only_expr:
-                    modifiers_expr.append(b + " " + curmod + "=on")
+                    modifiers_expr.append(b + " " + curmod + end)
                 i += 1
                 continue
             else:
                 i += 1
                 while nmods[i].startswith("\t"):
-                    modifiers_expr.append(nmods[i].lstrip("\t") + " " + curmod + "=on")
+                    modifiers_expr.append(nmods[i].lstrip("\t") + " " + curmod + end)
                     i += 1
         i += 1
+
+    print(modifiers_expr)
 
     exprs_to_sys = [
         ("mpi", mpi_only_expr, str_dict["mpi"]),
