@@ -116,3 +116,4 @@ class Amg2023(
         # get package version
         app_version = self.spec.variants["version"][0]
         self.add_package_spec(self.name, [f"amg2023@{app_version} "])
+        self.add_package_spec("hypre", ["hypre+lapack"])
