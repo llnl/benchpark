@@ -22,7 +22,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
 
     license("BSD-2-Clause")
 
-    version("caliper", branch="caliper")
+    version("develop", branch="caliper")
 
     variant("metis", default=True, description="Enable/disable METIS support")
     variant("caliper", default=False, description="Enable/disable Caliper support")
@@ -34,7 +34,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     depends_on("adiak~shared", when="+caliper")
 
     depends_on("zlib+optimize+pic~shared")
-    depends_on("mfem@develop", when="@caliper")
+    depends_on("mfem@develop", when="@develop")
     depends_on("mfem@4.2.0:", when="@3.1")
     depends_on("mfem@4.1.0:4.1", when="@3.0")
     # Recommended mfem version for laghos v2.0 is: ^mfem@3.4.1-laghos-v2.0
@@ -49,7 +49,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     depends_on("mpi")
     depends_on("hypre+mpi")
     depends_on("hypre+cuda+cublas+mpi", when="+cuda")
-    depends_on("hypre+mixedint~fortran", when="@caliper")
+    depends_on("hypre+mixedint~fortran", when="@develop")
     depends_on("hypre+caliper", when="+caliper")
 
     requires("+cuda", when="^hypre+cuda")

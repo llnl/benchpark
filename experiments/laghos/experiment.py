@@ -29,7 +29,7 @@ class Laghos(
 
     variant(
         "version",
-        default="caliper",
+        default="develop",
         description="app version",
     )
 
