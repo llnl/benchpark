@@ -69,6 +69,4 @@ class Hpcg(
         )
 
     def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, [f"hpcg@{app_version}"])
+        self.add_package_spec(self.name, [f"hpcg{self.determine_version()}"])
