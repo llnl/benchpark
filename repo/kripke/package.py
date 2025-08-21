@@ -21,6 +21,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     license("BSD-3-Clause")
 
     version("develop", branch="develop", submodules=False)
+    version("2025-07", submodules=False, commit="8cf38433a6a11e0dcd17864e649b2d045159ee9c")
     version(
         "1.2.7.0", submodules=False, commit="db920c1f5e1dcbb9e949d120e7d86efcdb777635"
     )
