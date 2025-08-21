@@ -232,7 +232,7 @@ For example if you just created a benchmark *baz* with OpenMP and strong scaling
 
   benchpark system init --dest=genericx86-system genericx86 
   benchpark experiment init --dest=baz-benchmark --system=genericx86-system baz +openmp +strong
-  benchpark setup ./baz-benchmark ./x86 workspace/
+  benchpark setup ./baz-benchmark workspace/
 
 
 When this is complete you have successfully completed the :doc:`benchpark-setup` step and can run and analyze following the Benchpark output or following steps in :doc:`build-experiment`.

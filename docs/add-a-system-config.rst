@@ -343,7 +343,7 @@ To manually validate your new system, you should initialize it and run an existi
 
   benchpark system init --dest=modifiedx86-system modifiedx86
   benchpark experiment init --dest=saxpy --system=modifiedx86-system saxpy +openmp
-  benchpark setup ./saxpy ./modifiedx86-system workspace/
+  benchpark setup ./saxpy workspace/
 
 Then you can run the commands provided by the output, the experiments should be built and run successfully without any errors.
 
