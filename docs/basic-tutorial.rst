@@ -64,61 +64,66 @@ You should see an output like:
 
 .. code-block:: text
 
-    Experiments:
-        ...
-        hpcg
-        hpcg+openmp
-        hpcg+strong
-        hpcg+weak
-        hpl
-        hpl+openmp
-        hpl+strong
-        hpl+weak
-        ior
-        ior+strong
-        ior+weak
-        kripke
-        kripke+openmp
-        kripke+cuda
-        kripke+rocm
-        laghos
-        laghos+cuda
-        laghos+rocm
-        lammps
-        lammps+openmp
-        lammps+cuda
-        lammps+rocm
-        lammps+strong
-        ...
+    Experiments - BENCHMARK+PROGRAMMING_MODEL+SCALING
+        ad+[mpi]
+        amg2023+[openmp|cuda|rocm|mpi]+[strong|weak|throughput]
+        babelstream+[openmp|cuda|rocm]
+        genesis+[openmp|mpi]
+        gpcnet+[mpi]
+        gromacs+[openmp|cuda|rocm|mpi]
+        hpcg+[openmp|mpi]+[strong|weak]
+        hpl+[openmp|mpi]+[strong|weak]
+        ior+[mpi]+[strong|weak]
+        kripke+[openmp|cuda|rocm|mpi]+[strong|weak|throughput]
+        laghos+[cuda|rocm|mpi]+[strong]
+        lammps+[openmp|cuda|rocm|mpi]+[strong]
+        md-test+[mpi]+[strong]
+        mpi-pingpong
+        osu-micro-benchmarks+[cuda|rocm|mpi]
+        phloem+[mpi]
+        quicksilver+[openmp|mpi]+[strong|weak]
+        qws+[openmp|mpi]
+        raja-perf+[openmp|cuda|rocm|mpi]+[strong|weak|throughput]
+        remhos+[cuda|rocm|mpi]+[strong]
+        salmon-tddft+[openmp|mpi]
+        saxpy+[openmp|cuda|rocm|mpi]
+        smb+[mpi]
+        stream+[mpi]
 
 From this output, you can see that Benchpark experiments are specified
 using Spack-like conventions (e.g., ~, +). For example, the spec
 ``kripke`` describes an experiment using the Kripke benchmark
 running on a single node.
 
-Additionally, you can get only the experiments associated with a particular
-benchmark by adding :code:`--experiment <experiment_name>` to the above command.
-For example, to get only the experiments associated with Kripke, run:
+Additionally, you can get only the benchmarks implementing a particular
+experiment by adding :code:`--experiment <experiment_name>` to the above command.
+For example, to get only CUDA benchmarks, run:
 
 .. code-block:: bash
 
-    benchpark list experiments --experiment kripke
+    benchpark list experiments --experiment cuda
 
 You should see the following:
 
 .. code-block:: text
 
-    Experiments:
-        kripke
-        kripke+openmp
-        kripke+cuda
-        kripke+rocm
+    Experiments - BENCHMARK+PROGRAMMING_MODEL+SCALING
+        amg2023+[openmp|cuda|rocm|mpi]+[strong|weak|throughput]
+        babelstream+[openmp|cuda|rocm]
+        gromacs+[openmp|cuda|rocm|mpi]
+        kripke+[openmp|cuda|rocm|mpi]+[strong|weak|throughput]
+        laghos+[cuda|rocm|mpi]+[strong]
+        lammps+[openmp|cuda|rocm|mpi]+[strong]
+        osu-micro-benchmarks+[cuda|rocm|mpi]
+        raja-perf+[openmp|cuda|rocm|mpi]+[strong|weak|throughput]
+        remhos+[cuda|rocm|mpi]+[strong]
+        saxpy+[openmp|cuda|rocm|mpi]
 
 .. note::
 
-    For Kripke, the default experiment is ``kripke``. For Kripke,
-    we specify the strong scaling experiment on the command line using ``kripke
-    +strong`` as shown in Step 4.
+    For all benchmarks, the default experiment is ``+mpi`` only without scaling. For Kripke,
+    we specify the strong scaling mpi experiment on the command line using ``kripke
+    +strong`` as shown in Step 4 (``+mpi`` is implied).
 
 .. _step3_label:
 ------------------------------------------
