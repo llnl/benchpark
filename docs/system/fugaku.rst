@@ -45,7 +45,7 @@ Set up the directory structure for your experiment:
     export WSDIR="$(pwd)/workspace"
     benchpark system init --dest ${SYS}-system ${SYS}
     benchpark experiment init --dest ${BM}-test --system ${SYS}-system ${BM} +openmp
-    benchpark setup ./${BM}-test ./${SYS}-system ${WSDIR}
+    benchpark setup ./${BM}-test ${WSDIR}
 
 
 Patch some files in various repos:

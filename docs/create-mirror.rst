@@ -16,7 +16,7 @@ On the networked system, if you created/built the benchmark with::
 
     benchpark system init --dest=def-ruby llnl-cluster cluster=ruby compiler=gcc
     benchpark experiment init --dest=def-raja-perf --system=def-ruby raja-perf
-    benchpark setup def-raja-perf/ def-ruby/ workspace/
+    benchpark setup def-raja-perf/ workspace/
     . `pwd`/workspace/setup.sh
     ramble --workspace-dir `pwd`/workspace/def-raja-perf/def-ruby/workspace workspace setup
 

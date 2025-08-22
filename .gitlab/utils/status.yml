@@ -41,10 +41,14 @@
         DASHBOARD_NAME="${DASHBOARD_NAME:-${DASHBOARD_NAMES[$HOST]}}"
         # Run ctest
         module load cmake/3.23.1
+        BV=""
+        if [[ -n "$BENCHMARK_VERSION" ]]; then
+          BV="@${BENCHMARK_VERSION}"
+        fi
         ctest -S CTestGitlab.cmake \
           -DHOST="${HOST}" \
           -DDASHBOARD_NAME="${DASHBOARD_NAME}" \
-          -DBUILD_NAME="${HOST}/${BENCHMARK} ${VARIANT} ${SYSTEM_ARGS}" \
+          -DBUILD_NAME="${HOST}/${BENCHMARK}${BV} ${VARIANT} ${SYSTEM_ARGS}" \
           -DSITE="$(hostname)" \
           -DTEST_TYPE="${TEST_TYPE}"
       else
