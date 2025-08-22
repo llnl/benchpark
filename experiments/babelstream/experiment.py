@@ -27,7 +27,7 @@ class Babelstream(
     variant(
         "version",
         default="caliper",
-        values=("4.0", "develop", "caliper"),
+        values=("develop", "latest", "5.0", "caliper"),
         description="app version",
     )
 
@@ -63,9 +63,8 @@ class Babelstream(
 
     def compute_package_section(self):
         # get package version
-        app_version = self.spec.variants["version"][0]
         omp_spec = "+omp" if self.spec.satisfies("+openmp") else ""
         hip_spec = "+hip" if self.spec.satisfies("+rocm") else ""
         self.add_package_spec(
-            self.name, [f"babelstream@{app_version} {omp_spec} {hip_spec}"]
+            self.name, [f"babelstream{self.determine_version()} {omp_spec} {hip_spec}"]
         )

@@ -47,8 +47,8 @@ This step will install the binary, and create the execute_experiment shell scrip
 
 .. code-block:: console
 
-  $ benchpark setup quicksilver-gcc ruby-gcc workspace
-  $ benchpark setup quicksilver-intel ruby-intel workspace
+  $ benchpark setup quicksilver-gcc workspace
+  $ benchpark setup quicksilver-intel workspace
 
   
 Now, we generate an execute_experiment shell script for each run, and install the benchmark along with all dependencies

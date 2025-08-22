@@ -83,9 +83,9 @@ Additionally, this command can be used to search for experiments with one or mor
 
 Or search which experiments have the Caliper modifier (see :doc:`modifiers`) available::
   
-  $ benchpark list modifiers --name caliper --experiments
+  $ benchpark list modifiers
 
-.. program-output:: ../bin/benchpark list modifiers --name caliper --experiments
+.. program-output:: ../bin/benchpark list modifiers
 
 
 Now that you know the existing benchmarks and systems, you can determine your necessary workflow in :doc:`benchpark-workflow`.

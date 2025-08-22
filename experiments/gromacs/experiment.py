@@ -101,9 +101,6 @@ class Gromacs(
         )
 
     def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
-
         spack_specs = "~hwloc"
         spack_specs += "+sycl" if self.spec.satisfies("+rocm") else "~sycl"
 
@@ -115,5 +112,5 @@ class Gromacs(
 
         self.add_package_spec(
             self.name,
-            [f"gromacs@{app_version} {spack_specs}"],
+            [f"gromacs{self.determine_version()} {spack_specs}"],
         )

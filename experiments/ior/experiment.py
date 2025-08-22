@@ -6,7 +6,7 @@
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.mpi import MpiOnlyExperiment
-from benchpark.new_scaling import ScalingMode, Scaling
+from benchpark.scaling import ScalingMode, Scaling
 
 
 class Ior(Experiment, MpiOnlyExperiment, Scaling(ScalingMode.Strong, ScalingMode.Weak)):
@@ -18,7 +18,8 @@ class Ior(Experiment, MpiOnlyExperiment, Scaling(ScalingMode.Strong, ScalingMode
 
     variant(
         "version",
-        default="3.3.0",
+        default="4.0.0",
+        values=("develop", "latest", "4.0.0"),
         description="app version",
     )
 
@@ -62,6 +63,4 @@ class Ior(Experiment, MpiOnlyExperiment, Scaling(ScalingMode.Strong, ScalingMode
         )
 
     def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, [f"ior@{app_version}"])
+        self.add_package_spec(self.name, [f"ior{self.determine_version()}"])

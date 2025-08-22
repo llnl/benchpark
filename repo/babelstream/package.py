@@ -11,6 +11,10 @@ from spack.pkg.builtin.babelstream import CMakeBuilder as BuiltinBuilder
 class Babelstream(BuiltinBabel):
 
     git = "https://github.com/august-knox/BabelStream.git"
+    version("5.0", tag="v5.0")
+    version("4.0", sha256="a9cd39277fb15d977d468435eb9b894f79f468233f0131509aa540ffda4f5953")
+    version("main", branch="main")
+    version("develop", branch="develop")
     version("caliper", branch="caliper-annotations")
 
     variant("openmp", default=False, description = "wrapper for omp variant")
