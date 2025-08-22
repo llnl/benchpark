@@ -96,6 +96,13 @@ class OsuMicroBenchmarks(
         description="workloads available",
     )
 
+    variant(
+        "version",
+        default="7.5",
+        values=("latest", "7.5"),
+        description="app version",
+    )
+
     maintainers("nhanford")
 
     def compute_applications_section(self):
@@ -123,4 +130,6 @@ class OsuMicroBenchmarks(
         )
 
     def compute_package_section(self):
-        self.add_package_spec(self.name, ["osu-micro-benchmarks"])
+        self.add_package_spec(
+            self.name, [f"osu-micro-benchmarks{self.determine_version()}"]
+        )

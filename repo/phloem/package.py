@@ -14,6 +14,7 @@ class Phloem(MakefilePackage):
     maintainers("knox10")
 
     version("master", branch="master")
+    version("1.4.5", tag="v1.4.5")
 
     variant("mpi", default=False, description="Build with MPI support")
     

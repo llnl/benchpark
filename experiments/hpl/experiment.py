@@ -28,6 +28,7 @@ class Hpl(
     variant(
         "version",
         default="2.3-caliper",
+        values=("latest", "2.3-caliper", "2.3", "2.2"),
         description="app version",
     )
 
@@ -77,6 +78,4 @@ class Hpl(
         )
 
     def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, [f"hpl@{app_version}"])
+        self.add_package_spec(self.name, [f"hpl{self.determine_version()}"])
