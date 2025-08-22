@@ -6,10 +6,17 @@
 import os
 import re
 import logging
+import sys
+import shlex
+import tarfile
+import shutil
+import warnings
 from glob import glob
+from datetime import datetime
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+import pandas as pd
 import thicket as th
 
 # -----------------------------
@@ -45,6 +52,7 @@ NAME_REMAP = {
     "n_nodes": "Node(s)",
 }
 
+warnings.filterwarnings("ignore")
 # Configure logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s: %(message)s")
@@ -92,6 +100,70 @@ def validate_single_metadata_value(column, tk):
     if len(unique_vals) != 1:
         raise ValueError(f"Expected one {column}, got: {list(unique_vals)}")
     return unique_vals[0]
+
+
+# -----------------------------
+# Workspace utils
+# -----------------------------
+def _validate_workspace_dir(workspace_dir):
+    if not os.path.isdir(workspace_dir):
+        raise ValueError(
+            f"Workspace dir '{workspace_dir}' does not exist or is not a directory"
+        )
+    if ".ramble-workspace" not in os.listdir(workspace_dir):
+        raise ValueError(
+            f"Directory '{workspace_dir}' must be a valid ramble workspace (missing .ramble-workspace)"
+        )
+    return os.path.abspath(workspace_dir)
+
+
+def _write_last_cmd(analyze_dir):
+    last_cmd_file = os.path.join(analyze_dir, ".last-command.sh")
+    with open(last_cmd_file, "w") as f:
+        f.write("#!/bin/bash\n")
+        f.write("benchpark " + " ".join([shlex.quote(arg) for arg in sys.argv[1:]]))
+
+
+def workspace_clean(workspace_dir, dry_run=False):
+    entries = [
+        os.path.join(workspace_dir, e)
+        for e in os.listdir(workspace_dir)
+        if e not in {".", ".."}
+    ]
+    logger.info("Cleaning workspace contents: %s", workspace_dir)
+    for path in entries:
+        if os.path.basename(path) == ".ramble-workspace":
+            continue
+        if dry_run:
+            logger.info("[dry-run] Would remove %s", path)
+            continue
+        try:
+            if os.path.isdir(path) and not os.path.islink(path):
+                shutil.rmtree(path)
+                logger.info("Removed directory %s", path)
+            else:
+                os.remove(path)
+                logger.info("Removed file %s", path)
+        except FileNotFoundError:
+            logger.debug("Already gone: %s", path)
+
+
+def analyze_archive(analyze_dir, cali_files, output=None):
+    if output is None:
+        ts = datetime.now().strftime("%Y%m%d-%H%M%S")
+        base = os.path.basename(os.path.normpath(analyze_dir))
+        output = os.path.join(analyze_dir, f"{base}-{ts}.tar.gz")
+    logger.info("Creating archive %s from %s", output, analyze_dir)
+    with tarfile.open(output, "w:gz") as tar:
+        tar.add(
+            analyze_dir,
+            arcname=os.path.basename(analyze_dir),
+            filter=lambda ti: None if ti.name.endswith(".tar.gz") else ti,
+        )
+        for f in cali_files:
+            tar.add(f, arcname=os.path.basename(f))
+    logger.info("Archive written: %s", output)
+    return output
 
 
 # -----------------------------
@@ -197,11 +269,7 @@ def prepare_data(**kwargs):
     """
     Processes .cali files from a Ramble workspace to generate performance charts.
     """
-    workspace_dir = kwargs["workspace_dir"]
-    files = glob(
-        os.path.join(workspace_dir, f"**/*{kwargs['file_name_match']}.cali"),
-        recursive=True,
-    )
+    files = kwargs["cali_files"]
     logger.info(f"Found {len(files)} .cali files for analysis.")
 
     if kwargs["calltree_unification"] == "intersection":
@@ -281,26 +349,21 @@ def prepare_data(**kwargs):
         tk.dataframe = grouped
         tk = tk.squash()
 
-    region_name = kwargs.get("query_region_byname", "")
-    if region_name:
-        children = False
-        if region_name.endswith(":nochildren"):
-            region_name = region_name.rstrip(":nochildren")
-        else:
-            children = True
-
-        query = th.query.Query().match(
-            ".", lambda row: row["name"].apply(lambda n: n == region_name).all()
+    region_names = kwargs.get("query_regions_byname", "")
+    if region_names:
+        query = (
+            th.query.Query()
+            .match(
+                ".", lambda row: row["name"].apply(lambda n: n in region_names).all()
+            )
+            .rel("*")
         )
-
-        if children:
-            query = query.rel("*")
 
         tk = tk.query(query)
 
     prefix = kwargs.get("filter_regions_byname", "")
     if prefix:
-        tk.dataframe = tk.dataframe.filter(like=prefix, axis=0)
+        tk.dataframe = pd.concat([tk.dataframe.filter(like=p, axis=0) for p in prefix])
 
     # Group by varied parameters
     grouped = tk.groupby(x_axis_metadata)
@@ -390,10 +453,8 @@ def prepare_data(**kwargs):
 
 def setup_parser(root_parser):
     """
-    Adds command-line arguments to the root parser.
-
-    Args:
-        root_parser (argparse.ArgumentParser): The root argument parser.
+    Adds command-line arguments to the analyze parser, and supports trailing
+    positional actions: `clean` and `archive`.
     """
     root_parser.add_argument(
         "--workspace-dir",
@@ -432,16 +493,18 @@ def setup_parser(root_parser):
     )
     root_parser.add_argument(
         "--filter-regions-byname",
-        default="",
+        default=[],
+        nargs="+",
         type=str,
-        help="Filter for region names starting with PREFIX.",
+        help="Filter for region names starting with one or more PREFIX values.",
         metavar="PREFIX",
     )
     root_parser.add_argument(
-        "--query-region-byname",
-        default="",
+        "--query-regions-byname",
+        default=[],
+        nargs="+",
         type=str,
-        help="Query for specific region REGION. Includes children of region by default, for no children specify 'REGION:nochildren'.",
+        help="Query for one or more regions REGION. Includes children of region.",
         metavar="REGION",
     )
     root_parser.add_argument(
@@ -503,25 +566,64 @@ def setup_parser(root_parser):
         help="Metric to show on the tree output",
     )
 
+    # Workspace commands
+    root_parser.add_argument(
+        "action",
+        nargs="?",
+        choices=["clean", "archive"],
+        help=(
+            "Optional trailing action to manage the workspace: 'clean' to remove contents, "
+            "'archive' to create a tar.gz of the workspace. If omitted, performs analysis."
+        ),
+    )
+    root_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="With 'clean', show items that would be removed without deleting.",
+    )
+    root_parser.add_argument(
+        "--archive-output",
+        type=str,
+        default=None,
+        help="With 'archive', path for the .tar.gz (defaults to CWD/<workspace>-<timestamp>.tar.gz)",
+    )
+
 
 def command(args):
     """
-    Validates the workspace directory and initiates data processing.
-
-    Args:
-        args (argparse.Namespace): Parsed command-line arguments.
+    Implements either analysis (default) or the trailing `clean`/`archive` actions
+    requested as positional arguments after `analyze`.
     """
-    if ".ramble-workspace" not in os.listdir(args.workspace_dir):
-        raise ValueError(
-            f"Directory '{args.workspace_dir}' must be a valid ramble workspace"
+
+    def _setup_dir(args):
+        wkp_dir = args.workspace_dir
+        if wkp_dir[-1] != "/":
+            wkp_dir += "/"
+        args.out_dir = wkp_dir + "analyze/"
+        if not os.path.isdir(args.out_dir):
+            os.mkdir(args.out_dir)
+        _validate_workspace_dir(wkp_dir)
+        args.cali_files = glob(
+            os.path.join(wkp_dir, f"**/*{args.file_name_match}.cali"),
+            recursive=True,
         )
+        return args
 
-    wkp_dir = args.workspace_dir
-    if wkp_dir[-1] != "/":
-        wkp_dir += "/"
-    args.out_dir = wkp_dir + "analyze/"
+    args = _setup_dir(args)
 
-    if not os.path.isdir(args.out_dir):
-        os.mkdir(args.out_dir)
+    # Handle workspace management actions first
+    if getattr(args, "action", None) == "clean":
+        workspace_clean(args.out_dir, dry_run=getattr(args, "dry_run", False))
+        return
+    if getattr(args, "action", None) == "archive":
+        out = analyze_archive(
+            args.out_dir, args.cali_files, output=getattr(args, "archive_output", None)
+        )
+        print(out)
+        return
+
+    _write_last_cmd(args.out_dir)
 
     prepare_data(**vars(args))
+
+    return 0
