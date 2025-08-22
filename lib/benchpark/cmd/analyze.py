@@ -18,6 +18,7 @@ warnings.filterwarnings("ignore")
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+import pandas as pd
 import thicket as th
 
 # -----------------------------
@@ -368,7 +369,7 @@ def prepare_data(**kwargs):
 
     prefix = kwargs.get("filter_regions_byname", "")
     if prefix:
-        tk.dataframe = tk.dataframe.filter(like=prefix, axis=0)
+        tk.dataframe = pd.concat([tk.dataframe.filter(like=p, axis=0) for p in prefix])
 
     # Group by varied parameters
     grouped = tk.groupby(x_axis_metadata)
@@ -498,9 +499,10 @@ def setup_parser(root_parser):
     )
     root_parser.add_argument(
         "--filter-regions-byname",
-        default="",
+        default=[],
+        nargs="+",            # accept one or more values
         type=str,
-        help="Filter for region names starting with PREFIX.",
+        help="Filter for region names starting with one or more PREFIX values.",
         metavar="PREFIX",
     )
     root_parser.add_argument(
