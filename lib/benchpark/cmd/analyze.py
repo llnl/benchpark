@@ -8,14 +8,11 @@ import re
 import logging
 import sys
 import shlex
-from glob import glob
 import tarfile
 import shutil
-from datetime import datetime
-
 import warnings
-
-warnings.filterwarnings("ignore")
+from glob import glob
+from datetime import datetime
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
@@ -55,6 +52,7 @@ NAME_REMAP = {
     "n_nodes": "Node(s)",
 }
 
+warnings.filterwarnings("ignore")
 # Configure logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s: %(message)s")
