@@ -6,17 +6,18 @@
 from spack.package import *
 
 
-class MpiPingpong(CMakePackage):
+class MpiPingpong(CMakePackage, ROCmPackage):
 
     git = "https://github.com/LLNL/microbenchmarks.git"
 
-    version("addHip", branch="addHip")
+    version("develop", branch="addHip")
 
     variant("caliper", default=False, description="Enable Caliper/Adiak support")
-    variant("openmp", default=True, description="Enable OpenMP support")
+    variant("rocm", default=True, description="Enable Rocm support")
 
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
+    depends_on("hip", when="+rocm")
 
     root_cmakelists_dir = "repo/pingpong"
 
@@ -30,9 +31,19 @@ class MpiPingpong(CMakePackage):
                 "-DUSE_CALIPER=OFF"
             ]
 
-        if '+openmp' in spec:
-            args.append('-DUSE_OPENMP=ON')
-
+        if '+rocm' in self.spec:
+            args.append('-DUSE_ROCM=ON')
+            args.append(self.define("ROCM_PATH", self.spec["hip"].prefix))
+            #rocm_arch_vals = self.spec.variants["amdgpu_target"].value
+            hip_vars = self.spec["hip"].variants
+            if "amdgpu_targets" in hip_vars:
+                vals = [t for t in hip_vars["amdgpu_targets"].value if t != "none"]
+                if vals:
+                    archs = ",".join(vals)
+                    args.append(self.define("CMAKE_HIP_ARCHITECTURES", archs))
+        else:
+            args.append('-DUSE_ROCM=OFF')
+        
         return args
         
     def install(self, spec, prefix):
