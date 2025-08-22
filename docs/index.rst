@@ -50,7 +50,7 @@
 
    add-a-system-config
    add-a-benchmark
-   howto-add-an-experiment
+   add-an-experiment
    testing-your-contribution
    update-a-system-config
 

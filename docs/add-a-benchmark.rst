@@ -40,4 +40,4 @@ the upstream definitions by adding the ``application.py`` and/or ``package.py`` 
 ``benchpark/repo/${Benchmark1}``, see :doc:`FAQ` for details.
 
 After satisfying the above prerequisites, in order to use your benchmark in Benchpark,
-you will need to create an experiment as described in :doc:`howto-add-an-experiment`.
+you will need to create an experiment as described in :doc:`add-an-experiment`.
