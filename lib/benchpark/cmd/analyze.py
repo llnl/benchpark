@@ -6,6 +6,8 @@
 import os
 import re
 import logging
+import sys
+import shlex
 from glob import glob
 
 import matplotlib.pyplot as plt
@@ -523,5 +525,10 @@ def command(args):
 
     if not os.path.isdir(args.out_dir):
         os.mkdir(args.out_dir)
+
+    last_cmd_file = os.path.join(args.out_dir, ".last-command.sh")
+    with open(last_cmd_file, "w") as f:
+        f.write("#!/bin/bash\n")
+        f.write("benchpark " + " ".join([shlex.quote(arg) for arg in sys.argv[1:]]))
 
     prepare_data(**vars(args))
