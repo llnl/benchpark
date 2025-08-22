@@ -14,6 +14,7 @@ import shutil
 from datetime import datetime
 
 import warnings
+
 warnings.filterwarnings("ignore")
 
 import matplotlib.pyplot as plt
@@ -350,20 +351,15 @@ def prepare_data(**kwargs):
         tk.dataframe = grouped
         tk = tk.squash()
 
-    region_name = kwargs.get("query_region_byname", "")
-    if region_name:
-        children = False
-        if region_name.endswith(":nochildren"):
-            region_name = region_name.rstrip(":nochildren")
-        else:
-            children = True
-
-        query = th.query.Query().match(
-            ".", lambda row: row["name"].apply(lambda n: n == region_name).all()
+    region_names = kwargs.get("query_regions_byname", "")
+    if region_names:
+        query = (
+            th.query.Query()
+            .match(
+                ".", lambda row: row["name"].apply(lambda n: n in region_names).all()
+            )
+            .rel("*")
         )
-
-        if children:
-            query = query.rel("*")
 
         tk = tk.query(query)
 
@@ -500,16 +496,17 @@ def setup_parser(root_parser):
     root_parser.add_argument(
         "--filter-regions-byname",
         default=[],
-        nargs="+",            # accept one or more values
+        nargs="+",
         type=str,
         help="Filter for region names starting with one or more PREFIX values.",
         metavar="PREFIX",
     )
     root_parser.add_argument(
-        "--query-region-byname",
-        default="",
+        "--query-regions-byname",
+        default=[],
+        nargs="+",
         type=str,
-        help="Query for specific region REGION. Includes children of region by default, for no children specify 'REGION:nochildren'.",
+        help="Query for one or more regions REGION. Includes children of region.",
         metavar="REGION",
     )
     root_parser.add_argument(
