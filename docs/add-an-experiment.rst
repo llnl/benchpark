@@ -33,7 +33,7 @@ Some or all of the functions in the Experiment base class can be overridden to d
 
 compute_applications_section
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In ``compute_applications_section``, we define the experiment variables necessary to perform scaling runs (``single_node``, ``strong``, ``weak``, or ``throughput``) 
+In ``compute_applications_section``, we define the experiment variables necessary to perform scaling runs (``strong``, ``weak``, or ``throughput``)
 using ramble. We also define programming model (``CUDA``, ``ROCm``, or ``OpenMP``) specific variables, such as ``arch``, which may be used by the benchmark.
 
 We can specify experiment variables to benchpark using the ``Experiment.add_experiment_variable()`` member function.
@@ -132,10 +132,10 @@ When implementing scaling, the following variants are available to the experimen
 
 Once an experiment class has been written, an experiment is initialized with the following command, with any boolean variants with +/~ or 
 string variants defined in your experiment.py passed in as key-value pairs: 
-``benchpark experiment init --dest {path/to/dest} {benchmark_name} +/~{boolean variant} {string variant}={value} ``
+``benchpark experiment init --dest {path/to/dest} --system {path/to/system} {benchmark_name} +/~{boolean variant} {string variant}={value} ``
 
 For example, to run the AMG2023 strong scaling experiment for problem 1, using CUDA the command would be:
-``benchpark experiment init --dest amg2023_experiment amg2023 +cuda workload=problem1 scaling=strong scaling-factor=2 scaling-iterations=4``
+``benchpark experiment init --dest amg2023_experiment --system {path/to/system} amg2023 +cuda+strong workload=problem1 scaling-factor=2 scaling-iterations=4``
 
 Initializing an experiment generates the following yaml files:
 
@@ -231,8 +231,8 @@ To manually validate your new experiments work, you should initialize an existin
 For example if you just created a benchmark *baz* with OpenMP and strong scaling variants it may look like this:::
 
   benchpark system init --dest=genericx86-system genericx86 
-  benchpark experiment init --dest=baz-benchmark baz +openmp +strong ~single_node
-  benchpark setup ./baz-benchmark ./x86 workspace/
+  benchpark experiment init --dest=baz-benchmark --system=genericx86-system baz +openmp +strong
+  benchpark setup ./baz-benchmark workspace/
 
 
 When this is complete you have successfully completed the :doc:`benchpark-setup` step and can run and analyze following the Benchpark output or following steps in :doc:`build-experiment`.

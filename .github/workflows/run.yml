@@ -5,6 +5,27 @@ on:
       BENCHPARK_CODECOV_TOKEN:
         required: true
 jobs:
+  check_errors:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Benchpark
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Add needed Python libs
+        run: |
+          pip install -r ./requirements.txt
+      - name: Non-MPIOnlyExperiment Test
+        run: |
+          ./bin/benchpark system init --dest dane llnl-cluster
+          set +e
+          # babelstream is not an MPIOnlyExperiment
+          stderr_output="$({ BENCHPARK_RUN_COVERAGE=errors ./bin/benchpark experiment init --dest babelstream --system dane babelstream 1>/dev/null; } 2>&1)"
+          status=$?
+          set -e
+          fail() { echo "TEST FAILED: $*" >&2; exit 1; }
+          [[ $status -ne 0 ]] || fail "Expected non-zero exit status, got $status"
+          # Check for the specific BenchparkError message
+          expected="cannot run with MPI only"
+          grep -Fq "$expected" <<<"$stderr_output" && echo "failed as expected: $expected" || fail "Expected error message not found in stderr. Got: $stderr_output"
   saxpy:
     runs-on: ubuntu-24.04
     steps:
@@ -15,9 +36,9 @@ jobs:
           pip install -r ./requirements.txt
       - name: Build Saxpy Workspace
         run: |
-          ./bin/benchpark experiment init --dest=saxpy/openmp saxpy+openmp
           ./bin/benchpark system init --dest=generic-x86 generic-x86
-          ./bin/benchpark setup saxpy/openmp generic-x86 workspace/
+          ./bin/benchpark experiment init --dest=saxpy/openmp --system=generic-x86 saxpy+openmp
+          ./bin/benchpark setup saxpy/openmp workspace/
       - name: Setup Ramble & Spack
         run: |
           . workspace/setup.sh
@@ -83,8 +104,8 @@ jobs:
           OUTPUT=$(spack find --paths saxpy)
           SAXPY_PATH=$(echo "$OUTPUT" | grep 'saxpy@' | awk '{print $2}')/bin/saxpy
           echo "Extracted Path: $SAXPY_PATH"
-          BENCHPARK_RUN_COVERAGE=binary ./bin/benchpark experiment init --dest=saxpy/binary saxpy+openmp package_manager="user-managed" append_path="$SAXPY_PATH"
-          ./bin/benchpark setup saxpy/openmp generic-x86 workspace-binary/
+          BENCHPARK_RUN_COVERAGE=binary ./bin/benchpark experiment init --dest=saxpy/binary --system=generic-x86 saxpy+openmp package_manager="user-managed" append_path="$SAXPY_PATH"
+          ./bin/benchpark setup saxpy/openmp workspace-binary/
           ./workspace-binary/ramble/bin/ramble \
             --workspace-dir \
             /home/runner/work/benchpark/benchpark/workspace-binary/saxpy/openmp/generic-x86/workspace \

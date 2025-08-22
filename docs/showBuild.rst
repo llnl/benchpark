@@ -14,7 +14,7 @@ you can see exactly how the experiment was built.
 ```
 bin/benchpark experiment init --dest=def-raja-perf raja-perf
 bin/benchpark system init --dest=def-ruby llnl-cluster cluster=ruby compiler=gcc
-bin/benchpark setup def-raja-perf/ def-ruby/ workspace/
+bin/benchpark setup def-raja-perf/ workspace/
 . `pwd`/workspace/setup.sh
 ramble --workspace-dir `pwd`/workspace/def-raja-perf/def-ruby/workspace workspace setup
 ```

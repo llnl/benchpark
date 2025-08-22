@@ -10,7 +10,7 @@ Build an Experiment
 ``benchpark setup`` has created the directory structure for your experiment.
 The next step is setting up the Ramble workspace and building the code::
 
-   cd <experiments_root>/<Benchmark/ProgrammingModel>/<System>/workspace
+   cd <experiments_root>/<Benchmark>/<System>/workspace
    ramble --workspace-dir . workspace setup
 
 
@@ -19,7 +19,7 @@ Ramble will build the source code and set up the following workspace directory s
     experiments_root/
         ramble/
         spack/
-        <Benchmark/ProgrammingModel>/
+        <Benchmark>/
             <System>/
                 workspace/
                     configs/
