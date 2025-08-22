@@ -13,6 +13,9 @@ import tarfile
 import shutil
 from datetime import datetime
 
+import warnings
+warnings.filterwarnings("ignore")
+
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import thicket as th
