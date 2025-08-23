@@ -64,61 +64,66 @@ You should see an output like:
 
 .. code-block:: text
 
-    Experiments:
-        ...
-        hpcg+single_node
-        hpcg+openmp
-        hpcg+strong
-        hpcg+weak
-        hpl+single_node
-        hpl+openmp
-        hpl+strong
-        hpl+weak
-        ior+single_node
-        ior+strong
-        ior+weak
-        kripke+single_node
-        kripke+openmp
-        kripke+cuda
-        kripke+rocm
-        laghos+single_node
-        laghos+cuda
-        laghos+rocm
-        lammps+single_node
-        lammps+openmp
-        lammps+cuda
-        lammps+rocm
-        lammps+strong
-        ...
+    Experiments - BENCHMARK+PROGRAMMING_MODEL+SCALING
+        ad+[mpi]
+        amg2023+[openmp|cuda|rocm|mpi]+[strong|weak|throughput]
+        babelstream+[openmp|cuda|rocm]
+        genesis+[openmp|mpi]
+        gpcnet+[mpi]
+        gromacs+[openmp|cuda|rocm|mpi]
+        hpcg+[openmp|mpi]+[strong|weak]
+        hpl+[openmp|mpi]+[strong|weak]
+        ior+[mpi]+[strong|weak]
+        kripke+[openmp|cuda|rocm|mpi]+[strong|weak|throughput]
+        laghos+[cuda|rocm|mpi]+[strong]
+        lammps+[openmp|cuda|rocm|mpi]+[strong]
+        md-test+[mpi]+[strong]
+        mpi-pingpong
+        osu-micro-benchmarks+[cuda|rocm|mpi]
+        phloem+[mpi]
+        quicksilver+[openmp|mpi]+[strong|weak]
+        qws+[openmp|mpi]
+        raja-perf+[openmp|cuda|rocm|mpi]+[strong|weak|throughput]
+        remhos+[cuda|rocm|mpi]+[strong]
+        salmon-tddft+[openmp|mpi]
+        saxpy+[openmp|cuda|rocm|mpi]
+        smb+[mpi]
+        stream+[mpi]
 
 From this output, you can see that Benchpark experiments are specified
 using Spack-like conventions (e.g., ~, +). For example, the spec
-``kripke+single_node`` describes an experiment using the Kripke benchmark
+``kripke`` describes an experiment using the Kripke benchmark
 running on a single node.
 
-Additionally, you can get only the experiments associated with a particular
-benchmark by adding :code:`--experiment <experiment_name>` to the above command.
-For example, to get only the experiments associated with Kripke, run:
+Additionally, you can get only the benchmarks implementing a particular
+experiment by adding :code:`--experiment <experiment_name>` to the above command.
+For example, to get only CUDA benchmarks, run:
 
 .. code-block:: bash
 
-    benchpark list experiments --experiment kripke
+    benchpark list experiments --experiment cuda
 
 You should see the following:
 
 .. code-block:: text
 
-    Experiments:
-        kripke+single_node
-        kripke+openmp
-        kripke+cuda
-        kripke+rocm
+    Experiments - BENCHMARK+PROGRAMMING_MODEL+SCALING
+        amg2023+[openmp|cuda|rocm|mpi]+[strong|weak|throughput]
+        babelstream+[openmp|cuda|rocm]
+        gromacs+[openmp|cuda|rocm|mpi]
+        kripke+[openmp|cuda|rocm|mpi]+[strong|weak|throughput]
+        laghos+[cuda|rocm|mpi]+[strong]
+        lammps+[openmp|cuda|rocm|mpi]+[strong]
+        osu-micro-benchmarks+[cuda|rocm|mpi]
+        raja-perf+[openmp|cuda|rocm|mpi]+[strong|weak|throughput]
+        remhos+[cuda|rocm|mpi]+[strong]
+        saxpy+[openmp|cuda|rocm|mpi]
 
 .. note::
 
-    For Kripke, the default experiment is ``kripke+single_node``. For Kripke,
-    we specify the strong scaling experiment on the command line using ``kripke
-    scaling=strong`` as shown in Step 4.
+    For all benchmarks, the default experiment is ``+mpi`` only without scaling. For Kripke,
+    we specify the strong scaling mpi experiment on the command line using ``kripke
+    +strong`` as shown in Step 4 (``+mpi`` is implied).
 
 .. _step3_label:
 ------------------------------------------
@@ -153,11 +158,11 @@ Next, initialize the Kripke strong scaling experiment used in this tutorial by r
 
 .. code-block:: bash
 
-    benchpark experiment init --dest=kripke-benchmark kripke scaling=strong caliper=time,mpi
+    benchpark experiment init --dest=kripke-benchmark --system=hpdc-tutorial kripke +strong caliper=time,mpi
 
 Similar to :code:`benchpark system init`, the :code:`benchpark experiment init` command generates
 the Ramble configuration file to describe the experiment to be run. The experiment is specified
-in an experiment specification (``experiment.py``). In the command above, the spec (i.e., :code:`kripke scaling=strong caliper=time,mpi`)
+in an experiment specification (``experiment.py``). In the command above, the spec (i.e., :code:`kripke +strong caliper=time,mpi`)
 defines a strong-scaling experiment running Kripke with the performance
 measurement tool known as `Caliper <https://github.com/llnl/caliper>`_ enabled to collect performance metrics. The
 ``caliper=time,mpi`` specification enables execution time measurement and MPI library
@@ -174,7 +179,7 @@ After initializing the system description and experiment, setup a Benchpark work
 
 .. code-block:: bash
 
-   benchpark setup kripke-benchmark/ hpdc-tutorial/ wkp/
+   benchpark setup kripke-benchmark/ wkp/
 
 This command takes the configuration files stored in the output directories of :code:`benchpark experiment init` (i.e., ``kripke-benchmark/``)
 and :code:`benchpark system init` (i.e., ``hpdc-tutorial/``) and combines them to generate a Benchpark workspace.

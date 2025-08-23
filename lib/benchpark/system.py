@@ -73,6 +73,8 @@ class System(ExperimentSystemBase):
         self.timeout = "120"
         self.queue = None
         self.bank = None
+        self.config_hash = self.system_uid()
+        self.destdir = None
 
         # Assume every system is an MPI system
         self._programming_models = [MPISystem()]
@@ -84,8 +86,9 @@ class System(ExperimentSystemBase):
             "system": {
                 "name": self.__class__.__name__,
                 "spec": str(self.spec),
-                "config-hash": self.system_uid(),
+                "config-hash": self.config_hash,
                 "benchpark_system_command": "benchpark " + " ".join(sys.argv[1:]),
+                "destdir": self.spec.destdir,
             }
         }
 

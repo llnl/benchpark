@@ -8,11 +8,7 @@ import time
 import sys
 import argparse
 import os
-
-import benchpark.paths
-
-sys.path.append(str(benchpark.paths.benchpark_home) + "/spack/lib/spack")
-from lib.benchpark.accounting import benchpark_experiments  # noqa: E402
+import re
 
 DEFAULT_SYSTEM = "llnl-cluster cluster=dane"
 # Skip experiments
@@ -64,7 +60,9 @@ def main():
     expr_str = run_subprocess_cmd(
         ["./bin/benchpark", "list", "experiments", "--no-title"], decode=True
     )
-    experiments = [e for e in expr_str.replace(" ", "").replace("\t", "").split("\n") if e != ""]
+    experiments = [
+        e for e in expr_str.replace(" ", "").replace("\t", "").split("\n") if e != ""
+    ]
 
     mpi_only_expr = set()
     cuda_expr = []
@@ -75,25 +73,22 @@ def main():
     throughput_expr = []
 
     for e in experiments:
-        if "scaling" in e:
-            e = e.replace("scaling=", " scaling=")
-        if "+strong" in e or "+weak" in e or "+throughput" in e:
-            e = e.replace(e, e + "~single_node")
-        elif "+" not in e and "=" not in e:
-            mpi_only_expr.add(e)
+        benchmark = e.split("+")[0]
 
+        if "mpi" in e:
+            mpi_only_expr.add(benchmark)
         if "cuda" in e:
-            cuda_expr.append(e)
-        elif "rocm" in e:
-            rocm_expr.append(e)
-        elif "openmp" in e:
-            openmp_expr.append(e)
-        elif "strong" in e:
-            strong_expr.append(e)
-        elif "weak" in e:
-            weak_expr.append(e)
-        elif "throughput" in e:
-            throughput_expr.append(e)
+            cuda_expr.append(benchmark + "+cuda")
+        if "rocm" in e:
+            rocm_expr.append(benchmark + "+rocm")
+        if "openmp" in e:
+            openmp_expr.append(benchmark + "+openmp")
+        if "strong" in e:
+            strong_expr.append(benchmark + "+strong")
+        if "weak" in e:
+            weak_expr.append(benchmark + "+weak")
+        if "throughput" in e:
+            throughput_expr.append(benchmark + "+throughput")
 
     str_dict = {}
     for pmodel in ["mpi", "cuda", "rocm", "openmp"]:
@@ -101,25 +96,52 @@ def main():
         if pmodel != "mpi":
             cmd += ["-p", pmodel]
         output = run_subprocess_cmd(cmd, decode=True)
+        lines = output.splitlines()
+        expanded_lines = []
+        for line in lines:
+            # Match patterns like key= [a|b|c]
+            match = re.search(r"(.*?)(\w+)=\[(.*?)\]", line)
+            if match:
+                prefix, key, values = match.groups()
+                for v in values.split("|"):
+                    expanded_lines.append(f"{prefix}{key}={v}")
+            else:
+                expanded_lines.append(line)
         str_dict[pmodel] = [
             i
-            for i in output.replace(" " * 4, "").replace("\t", "").split("\n")
+            for i in [j.replace(" " * 4, "").replace("\t", "") for j in expanded_lines]
             if i != ""
         ]
 
     mods_str = run_subprocess_cmd(
         ["./bin/benchpark", "list", "modifiers", "--no-title"], decode=True
     )
-    nmods = [
-        i
-        for i in mods_str.replace(" " * 4, "").replace("\t", "").split("\n")
-        if i != "" and i not in ["allocation", "caliper"]
-    ]
-
-    caliper_exp = [
-        e.replace("+caliper", " caliper=time") for e in benchpark_experiments(exclude_variants=[]) if "+caliper" in e and e.split("+")[0] in mpi_only_expr
-    ]
-    modifiers_expr = caliper_exp + [e + " " + m + "=on" for e in mpi_only_expr for m in nmods]
+    nmods = [i for i in mods_str.replace(" " * 4, "").split("\n") if i != ""]
+    print(nmods)
+    modifiers_expr = []
+    exclude_mods = ["allocation"]
+    i = 0
+    while i < len(nmods):
+        if nmods[i] in exclude_mods:
+            # Skip modifier and "(all benchmarks) line"
+            i += 2
+            continue
+        if not nmods[i].startswith("\t"):
+            curmod = nmods[i]
+            print(curmod)
+            end = "=on" if curmod != "caliper" else "=time"
+            if "(all benchmarks)" in nmods[i + 1]:
+                for b in mpi_only_expr:
+                    modifiers_expr.append(b + " " + curmod + end)
+                i += 2
+                continue
+            else:
+                i += 1
+                while nmods[i].startswith("\t"):
+                    bmark = nmods[i].lstrip("\t")
+                    if bmark in mpi_only_expr:
+                        modifiers_expr.append(bmark + " " + curmod + end)
+                    i += 1
 
     exprs_to_sys = [
         ("mpi", mpi_only_expr, str_dict["mpi"]),
@@ -163,7 +185,7 @@ def main():
                         ["bash", ".github/utils/dryrun.sh", espec, sspec],
                         env={**os.environ},
                         capture_output=True,
-                        check=True
+                        check=True,
                     )
                 except subprocess.CalledProcessError as e:
                     errors[f"{espec} {sspec}"] = e.stderr.decode()
@@ -176,7 +198,9 @@ def main():
         print(value)
 
     print(f"Elapsed: {(end - start) / 60:.2f} minutes")
-    print(f"{ran_tests - fail_tests} Passing. {fail_tests} Failing. {skip_tests} Skipped.")
+    print(
+        f"{ran_tests - fail_tests} Passing. {fail_tests} Failing. {skip_tests} Skipped."
+    )
 
     sys.exit(1 if fail_tests > 0 else 0)
 
