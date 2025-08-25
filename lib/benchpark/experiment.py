@@ -136,7 +136,7 @@ class Affinity:
                 if self.spec.satisfies("+cuda"):
                     package_specs["affinity"]["pkg_spec"] += "+cuda"
                 elif self.spec.satisfies("+rocm"):
-                    package_specs["affinity"]["pkg_spec"] += "+rocm"
+                    package_specs["affinity"]["pkg_spec"] += "+rocm amdgpu_target={rocm_arch}"
 
             return {
                 "packages": {k: v for k, v in package_specs.items() if v},
