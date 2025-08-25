@@ -6,7 +6,7 @@
 from spack.package import *
 
 
-class Affinity(CMakePackage, CudaPackage):
+class Affinity(CMakePackage, CudaPackage, ROCmPackage):
     """Simple applications for determining Linux thread and gpu affinity."""
 
     homepage = "https://github.com/bcumming/affinity"
@@ -31,12 +31,15 @@ class Affinity(CMakePackage, CudaPackage):
         if '+mpi' in spec:
             args.append('-DCMAKE_CXX_COMPILER={0}'.format(spec["mpi"].mpicxx))
             args.append("-DMPI_CXX_LINK_FLAGS={0}".format(spec["mpi"].libs.ld_flags))
+            args.append("-DAFFINITY_MPI=on")
 
         if '+cuda' in spec:
             args.append('-DCMAKE_CUDA_HOST_COMPILER={0}'.format(spec["mpi"].mpicxx))
             args.append('-DCMAKE_CUDA_COMPILER={0}'.format(spec["cuda"].prefix + "/bin/nvcc"))
+            args.append("-DAFFINITY_GPU_BACKEND=cuda")
 
         if '+rocm' in spec:
             args.append("-DROCM_PATH={0}".format(spec['hip'].prefix))
+            args.append("-DAFFINITY_GPU_BACKEND=rocm")
 
         return args
