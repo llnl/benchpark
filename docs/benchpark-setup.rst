@@ -13,7 +13,7 @@ Finally, set up the workspace in a directory for your experiment.::
 
     benchpark system init --dest=</output/path/to/system_def_dir> <SystemName> compiler=<Compiler>
     benchpark experiment init --dest=</output/path/to/experiment_def_dir> <Benchmark> +/~<Boolean Variant> <String Variant>=<value> --system=</output/path/to/system_def_dir>
-    benchpark setup </output/path/to/experiment_def> </output/path/to/system_def> </output/path/to/workspace>
+    benchpark setup </output/path/to/experiment_def> </output/path/to/workspace>
 
 where:
 

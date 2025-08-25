@@ -419,7 +419,7 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
 
         self.compute_applications_section()
 
-        if "scaling" in self.spec.variants and not self.spec.satisfies("scaling=off"):
+        if any([self.spec.satisfies(s) for s in ["+strong", "+weak", "+throughput"]]):
             self.expr_vars.extend(self.scale())
 
         for var in self.expr_vars.values():
@@ -471,6 +471,10 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
             }
         else:
             self.package_specs[package_name] = {}
+
+    def determine_version(self):
+        app_variant = self.spec.variants["version"][0]
+        return "" if app_variant == "latest" else "@" + app_variant
 
     def compute_package_section(self):
         raise NotImplementedError(

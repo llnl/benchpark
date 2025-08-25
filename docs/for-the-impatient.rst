@@ -27,7 +27,7 @@ Set up a Workspace
 
     benchpark system init --dest=</output/path/to/system_def_dir> <SystemName> compiler=<Compiler>
     benchpark experiment init --dest=</output/path/to/experiment_def_dir> <Benchmark> +/~<Boolean Variant> <String Variant>=<value> --system=</output/path/to/system_def_dir>
-    benchpark setup </output/path/to/experiment_def> </output/path/to/system_def> </output/path/to/workspace>
+    benchpark setup </output/path/to/experiment_def> </output/path/to/workspace>
 
 where:
 
@@ -44,7 +44,7 @@ Build an Experiment
 
 ::
 
-   cd <experiments_root>/<Benchmark/ProgrammingModel>/<System>/workspace
+   cd <experiments_root>/<Benchmark>/<System>/workspace
    ramble --workspace-dir . workspace setup
 
 ------------------

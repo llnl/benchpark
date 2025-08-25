@@ -20,6 +20,7 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     license("Apache-2.0")
 
     version("develop", branch="main")
+    version("20240511", commit="19bc10c925c4434da72a9cbb4fa1a009dbc52f33")
 
     variant("mpi", default=True, description="Enable MPI support")
     variant("openmp", default=False, description="Enable OpenMP support")

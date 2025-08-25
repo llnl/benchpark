@@ -19,7 +19,7 @@ The following system-independent specification is required for each ${Benchmark1
 
 During ``benchpark setup`` the user selects ${Benchmark1} to run as the following::
 
-     benchpark setup </output/path/to/experiments_root> </output/path/to/system_root> </output/path/to/workspace> 
+     benchpark setup </output/path/to/experiments_root> </output/path/to/workspace> 
 
 By default, Benchpark will use ${Benchmark1} specifications (``application.py`` and ``package.py``)
 provided in the Spack and Ramble repos.

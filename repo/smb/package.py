@@ -15,6 +15,7 @@ class Smb(MakefilePackage):
     maintainers("knox10")
 
     version("master", branch="master")
+    version("1.1", tag="1.1")
 
     variant("mpi", default=False, description="Build with MPI support")
     variant("rma", default=False, description="Build RMA-MT variant")    
