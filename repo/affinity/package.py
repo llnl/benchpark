@@ -41,5 +41,9 @@ class Affinity(CMakePackage, CudaPackage, ROCmPackage):
         if '+rocm' in spec:
             args.append("-DROCM_PATH={0}".format(spec['hip'].prefix))
             args.append("-DAFFINITY_GPU_BACKEND=rocm")
+            rocm_archs = spec.variants["amdgpu_target"].value
+            if "none" not in rocm_archs:
+                args.append("-DHIP_HIPCC_FLAGS=--amdgpu-target={0}".format(",".join(rocm_archs)))
+                args.append("-DCMAKE_HIP_ARCHITECTURES={0}".format(rocm_archs))
 
         return args
