@@ -26,6 +26,18 @@ jobs:
           # Check for the specific BenchparkError message
           expected="cannot run with MPI only"
           grep -Fq "$expected" <<<"$stderr_output" && echo "failed as expected: $expected" || fail "Expected error message not found in stderr. Got: $stderr_output"
+      - name: Test multiple scaling options
+        run: |
+          set +e
+          # Notice +strong+weak
+          stderr_output="$({ BENCHPARK_RUN_COVERAGE=errors2 ./bin/benchpark experiment init --dest kripke --system dane kripke+strong+weak 1>/dev/null; } 2>&1)"
+          status=$?
+          set -e
+          fail() { echo "TEST FAILED: $*" >&2; exit 1; }
+          [[ $status -ne 0 ]] || fail "Expected non-zero exit status, got $status"
+          # Check for the specific BenchparkError message
+          expected="spec cannot specify multiple scaling options"
+          grep -Fq "$expected" <<<"$stderr_output" && echo "failed as expected: $expected" || fail "Expected error message not found in stderr. Got: $stderr_output"
   saxpy:
     runs-on: ubuntu-24.04
     steps:

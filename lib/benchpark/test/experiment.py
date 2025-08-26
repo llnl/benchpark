@@ -6,6 +6,8 @@
 import yaml
 import sys
 
+import pytest
+
 import benchpark.spec
 
 
@@ -134,3 +136,12 @@ def test_default_modifiers_section():
     modifiers_section = experiment.compute_modifiers_section_wrapper()
 
     assert modifiers_section == [{"name": "allocation"}, {"name": "exit-code"}]
+
+
+def test_multiple_models():
+    with pytest.raises(
+        benchpark.error.BenchparkError,
+        match="spec cannot specify multiple mutually-exclusive programming models",
+    ):
+        spec = benchpark.spec.ExperimentSpec("saxpy+rocm+openmp").concretize()
+        experiment = spec.experiment
