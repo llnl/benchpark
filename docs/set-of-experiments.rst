@@ -18,9 +18,9 @@ You may want to use the same experiments_root directory when setting up multiple
 To use the same experiments directory when setting up multiple experiments,
 instruct benchpark to set them up in the same experiments_root::
 
-    benchpark setup ${Benchmark1}/${ProgrammingModel1} ${System1} /output/path/to/experiments_root
-    benchpark setup ${Benchmark1}/${ProgrammingModel2} ${System2} /output/path/to/experiments_root
-    benchpark setup ${Benchmark2}/${ProgrammingModel2} ${System1} /output/path/to/experiments_root
+    benchpark setup ${Benchmark1}/${ProgrammingModel1} /output/path/to/experiments_root
+    benchpark setup ${Benchmark1}/${ProgrammingModel2} /output/path/to/experiments_root
+    benchpark setup ${Benchmark2}/${ProgrammingModel2} /output/path/to/experiments_root
 
 This will result in the following directory structure::
 

@@ -342,8 +342,8 @@ This will generate the required yaml configurations for your system and you can 
 To manually validate your new system, you should initialize it and run an existing experiment such as saxpy. For example::
 
   benchpark system init --dest=modifiedx86-system modifiedx86
-  benchpark experiment init --dest=saxpy saxpy +openmp
-  benchpark setup ./saxpy ./modifiedx86-system workspace/
+  benchpark experiment init --dest=saxpy --system=modifiedx86-system saxpy +openmp
+  benchpark setup ./saxpy workspace/
 
 Then you can run the commands provided by the output, the experiments should be built and run successfully without any errors.
 

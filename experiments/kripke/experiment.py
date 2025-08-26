@@ -9,7 +9,7 @@ from benchpark.mpi import MpiOnlyExperiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
-from benchpark.new_scaling import ScalingMode, Scaling
+from benchpark.scaling import ScalingMode, Scaling
 from benchpark.caliper import Caliper
 
 
@@ -31,7 +31,8 @@ class Kripke(
 
     variant(
         "version",
-        default="develop",
+        default="2025-07",
+        values=("develop", "latest", "2025-07", "1.2.7.0"),
         description="app version",
     )
 
@@ -175,10 +176,11 @@ class Kripke(
 
     def compute_package_section(self):
         # get package version
-        app_version = self.spec.variants["version"][0]
         single_memory = (
             "+single_memory"
             if self.spec.variants["single_memory"][0]
             else "~single_memory"
         )
-        self.add_package_spec(self.name, [f"kripke@{app_version} {single_memory} "])
+        self.add_package_spec(
+            self.name, [f"kripke{self.determine_version()} {single_memory} "]
+        )
