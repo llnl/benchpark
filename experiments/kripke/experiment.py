@@ -83,8 +83,7 @@ class Kripke(
             # Per-process size (in zones) in each dimension
             if self.spec.satisfies("config=tuolumne"):
                 self.add_experiment_variable(
-                    #"total_problem_size_dict", {"nzx": 108, "nzy": 108, "nzz": 54}, True
-                    "total_problem_size_dict", {"nzx": 64, "nzy": 64, "nzz": 32}, True
+                    "total_problem_size_dict", {"nzx": 136, "nzy": 136, "nzz": 68}, True
                 )
                 if self.spec.satisfies("+xnack"):
                     self.set_environment_variable("HSA_XNACK", "1")
