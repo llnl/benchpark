@@ -660,7 +660,7 @@ class LlnlElcapitan(System):
             f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib",
         ]
         # Avoid libunwind.so.1 error on tioga
-        if self.spec.variants["cluster"][0] == "tioga":
+        if self.spec.variants["cluster"][0] in ["tioga", "tuolumne"]:
             rpaths.append(f"/opt/cray/pe/cce/{self.cce_version}/cce-clang/x86_64/lib/")
 
         cfgs = []
