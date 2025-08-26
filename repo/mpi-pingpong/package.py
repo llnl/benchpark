@@ -14,8 +14,9 @@ class MpiPingpong(CMakePackage, ROCmPackage):
 
     variant("caliper", default=False, description="Enable Caliper/Adiak support")
     variant("rocm", default=True, description="Enable Rocm support")
+    variant("mpi", default=True, description="Enable MPI support")
 
-    depends_on("mpi")
+    depends_on("mpi", when="+mpi")
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
     depends_on("hip", when="+rocm")
@@ -32,12 +33,11 @@ class MpiPingpong(CMakePackage, ROCmPackage):
                 "-DUSE_CALIPER=OFF"
             ]
 
-        if '+rocm' in self.spec:
-            if self.spec.satisfies("+rocm"):
-                args.append(self.define("CMAKE_EXE_LINKER_FLAGS", self.spec['mpi'].libs.ld_flags))
-                args.append('-DUSE_ROCM=ON')
-                args.append(self.define("ROCM_PATH", self.spec["hip"].prefix))
-                hip_vars = self.spec["hip"].variants
+        if self.spec.satisfies("+rocm"):
+            args.append(self.define("CMAKE_EXE_LINKER_FLAGS", self.spec['mpi'].libs.ld_flags))
+            args.append('-DUSE_ROCM=ON')
+            args.append(self.define("ROCM_PATH", self.spec["hip"].prefix))
+            hip_vars = self.spec["hip"].variants
             if "amdgpu_targets" in hip_vars:
                 vals = [t for t in hip_vars["amdgpu_targets"].value if t != "none"]
                 if vals:
