@@ -287,7 +287,7 @@ This command will produce an output like:
 
 
 .. note::
-    If you are running on our `AWS infrastructure <https://github.com/llnl/benchpark-tutorial>`_, it should take roughly 8 minutes for all jobs to finish running. Additionally,
+    If you are running on our `AWS infrastructure <https://github.com/llnl/benchpark-tutorial>`_, it should take roughly 1 minute for all jobs to finish running. Additionally,
     only one job will run at a time under our infrastructure because each user only has 1 node. If you are running on an HPC system,
     expect the jobs to complete faster.
 
