@@ -1,0 +1,31 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+system_definition:
+  name: AWS_Tutorial-c7i-EFA
+  integrator:
+    vendor: AWS
+    name: EKS
+  processor:
+    vendor: Intel
+    name: Xeon Sapphire Rapids
+    ISA: x86_64
+    uArch: SapphireRapids
+  accelerator:
+    vendor:
+    name:
+    ISA:
+    uArch:
+  interconnect:
+    vendor: AWS
+    name: EFA
+  systems-tested:
+    aws-pcluster:
+      os: ubuntu-22.04
+      scheduler: flux
+      compiler: gcc
+      runtime:
+      mpi: mpich
+  instance-types: https://aws.amazon.com/ec2/instance-types/c7i/
