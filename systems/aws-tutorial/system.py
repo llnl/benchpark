@@ -48,7 +48,13 @@ class AwsTutorial(System):
 
     variant(
         "instance_type",
-        values=("c7i.48xlarge", "c7i.metal-48xl", "c7i.24xlarge", "c7i.metal-24xl", "c7i.12xlarge"),
+        values=(
+            "c7i.48xlarge",
+            "c7i.metal-48xl",
+            "c7i.24xlarge",
+            "c7i.metal-24xl",
+            "c7i.12xlarge",
+        ),
         default="c7i.24xlarge",
         description="AWS instance type",
     )
