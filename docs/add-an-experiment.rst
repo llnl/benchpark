@@ -70,8 +70,7 @@ experiment variants, which include:
 #. modifiers
 
 For HPL we can add the ``OpenMP`` programming model, define ``strong`` and ``weak``
-scaling, and enable the ``caliper`` modifier, since HPL is profiled with the ``Caliper``
-instrumentation and performance profiling library.
+scaling, and enable the ``caliper`` modifier, since HPL is instrumented with the ``Caliper`` performance profiling library.
 
 Notice enabling the options only requires our experiment to inherit from pre-defined
 classes. We will define ``strong`` and ``weak`` scaling for the HPL experiment later on
