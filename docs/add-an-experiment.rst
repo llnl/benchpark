@@ -319,7 +319,7 @@ packages for the benchmark are not listed here, since they are already defined i
        ...
 
      def compute_package_section(self):
-       self.add_package_spec(self.name, [f"my-experiment{self.determine_version()}"])
+       self.add_package_spec(self.name, [f"hpl{self.determine_version()}"])
 
 *********************************************
  Step 5: Validating the Benchmark/Experiment
@@ -330,7 +330,7 @@ experiment:
 
 .. code::
 
-   benchpark experiment init --dest=my-experiment --system=my-system my-experiment
+   benchpark experiment init --dest=hpl --system=my-system hpl
 
 If this completes without errors, you can continue testing by setting up a benchpark
 workspace as described in :doc:`testing-your-contribution`.
