@@ -74,15 +74,9 @@ class AwsTutorial(System):
         self.programming_models = [OpenMPCPUOnlySystem()]
 
         self.scheduler = "flux"
-        # TODO: for some reason I have to index to get value, even if multi=False
         attrs = self.id_to_resources.get(self.spec.variants["instance_type"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
-
-    # def system_specific_variables(self):
-    #     return {
-    #         "extra_cmd_opts": '--mpi=pmix --export=ALL,FI_EFA_USE_DEVICE_RDMA=1,FI_PROVIDER="efa",OMPI_MCA_mtl_base_verbose=100',
-    #     }
 
     def compute_packages_section(self):
         return {
