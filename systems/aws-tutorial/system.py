@@ -21,26 +21,36 @@ class AwsTutorial(System):
     id_to_resources = {
         "c7i.48xlarge": {
             "system_site": "aws",
+            "sys_cores_per_node": 192,
+            "sys_mem_per_node": 384,
             "hardware_key": str(hardware_descriptions)
             + "/AWS_Tutorial-zen-EFA/hardware_description.yaml",
         },
         "c7i.metal-48xl": {
             "system_site": "aws",
+            "sys_cores_per_node": 192,
+            "sys_mem_per_node": 384,
             "hardware_key": str(hardware_descriptions)
             + "/AWS_Tutorial-zen-EFA/hardware_description.yaml",
         },
         "c7i.24xlarge": {
             "system_site": "aws",
+            "sys_cores_per_node": 96,
+            "sys_mem_per_node": 192,
             "hardware_key": str(hardware_descriptions)
             + "/AWS_Tutorial-zen-EFA/hardware_description.yaml",
         },
         "c7i.metal-24xl": {
             "system_site": "aws",
+            "sys_cores_per_node": 96,
+            "sys_mem_per_node": 192,
             "hardware_key": str(hardware_descriptions)
             + "/AWS_Tutorial-zen-EFA/hardware_description.yaml",
         },
         "c7i.12xlarge": {
             "system_site": "aws",
+            "sys_cores_per_node": 48,
+            "sys_mem_per_node": 96,
             "hardware_key": str(hardware_descriptions)
             + "/AWS_Tutorial-zen-EFA/hardware_description.yaml",
         },
@@ -68,19 +78,6 @@ class AwsTutorial(System):
         attrs = self.id_to_resources.get(self.spec.variants["instance_type"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
-
-        json_resource_spec = subprocess.check_output("flux resource R", shell=True)
-        resource_dict = json.loads(json_resource_spec)
-        self.sys_cores_per_node = resource_dict["execution"]["R_lite"][0]["children"][
-            "core"
-        ]
-        self.sys_cores_per_node = [int(c) for c in self.sys_cores_per_node.split("-")]
-        self.sys_cores_per_node[-1] += 1
-        self.sys_cores_per_node = len(list(range(*self.sys_cores_per_node)))
-        self.sys_nodes = resource_dict["execution"]["R_lite"][0]["rank"]
-        self.sys_nodes = [int(n) for n in self.sys_nodes.split("-")]
-        self.sys_nodes[-1] += 1
-        self.sys_nodes = len(list(range(*self.sys_nodes)))
 
     # def system_specific_variables(self):
     #     return {
