@@ -41,7 +41,7 @@ For clarity, if ``benchpark/repo/hpl`` did not exist, benchpark will use the ups
 versions. Additionally, the Benchpark HPL ``application.py`` inherits from the Ramble
 upstream, so they are equivalent aside from an extra Benchpark tag definition. Notice
 the HPL application in ramble also inherits from a `base HPL application
-<https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/base_applications/hpl/base_application.py>`_,
+<https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/base_applications/hpl/base_application.py>`__,
 which is relevant because it contains the workload variables that we will need to define
 in our Benchpark experiment.
 
@@ -67,11 +67,11 @@ experiment can be executed with MPI.
    ):
 
 Looking at the `HPL package
-<https://github.com/LLNL/benchpark/blob/develop/repo/hpl/package.py>`, we see that there
+<https://github.com/LLNL/benchpark/blob/develop/repo/hpl/package.py>`__, we see that there
 are ``OpenMP`` and ``Caliper`` variants defined. These are defined because the HPL
 benchmark supports the ``OpenMP`` programming model and is instrumented with the
 ``Caliper`` performance profiling library (via a `fork
-<https://github.com/daboehme/HPL-caliper.git>` of the source code).
+<https://github.com/daboehme/HPL-caliper.git>`__ of the source code).
 
 Notice enabling the variants in Benchpark only requires our experiment to inherit from
 pre-defined classes. For more details on the configurability of experiment variants, see
@@ -163,7 +163,7 @@ experiment variables here that will override the default values for the ``worklo
 variables`` in your ``application.py``. For HPL, we override the ``Ns``, ``N-Grids``,
 ``Ps``, ``Qs``, ``N-Ns``, ``N-NBs``, and ``NBs`` workload variables which are defined in
 the base `application
-<https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/base_applications/hpl/base_application.py>`.
+<https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/base_applications/hpl/base_application.py>`__.
 
 Additionally, all of ``n_resources``, ``process_problem_size``, and
 ``total_problem_size`` must be set, which can be accomplished using
