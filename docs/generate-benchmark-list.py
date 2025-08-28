@@ -83,7 +83,7 @@ def main():
     cali_bm_str = str(cali_benchmarks.stdout, "utf-8")
     cali_bm = cali_bm_str.replace(" ", "").split("\n")
     result = []
-    for item in cali_bm[cali_bm.index("caliper") + 1:]:
+    for item in cali_bm[cali_bm.index("caliper") + 1 :]:
         if item.startswith("\t"):
             result.append(item.strip())
         else:
