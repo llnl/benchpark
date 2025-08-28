@@ -452,10 +452,10 @@ class LlnlSierra(System):
 
         if (compiler, cuda_ver) == ("clang-ibm", "11-8-0"):
             cfg1 = compiler_section_for(
-                "clang",
+                "llvm",
                 [
                     compiler_def(
-                        "clang@16.0.6",
+                        "llvm@16.0.6",
                         "/usr/tce/packages/clang/clang-ibm-16.0.6-cuda-11.8.0-gcc-11.2.1/",
                         {"c": "clang", "cxx": "clang++"},
                         flags=flags,
@@ -521,10 +521,10 @@ class LlnlSierra(System):
                 "cxxflags": "-g -O2",
             }
             cfg1 = compiler_section_for(
-                "clang",
+                "llvm",
                 [
                     compiler_def(
-                        "clang@16.0.6",
+                        "llvm@16.0.6",
                         "/usr/tce/packages/clang/clang-ibm-16.0.6-cuda-11.8.0-gcc-11.2.1/",
                         {"c": "clang", "cxx": "clang++"},
                         flags=custom_flags,
