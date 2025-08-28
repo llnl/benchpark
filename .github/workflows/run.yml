@@ -13,31 +13,45 @@ jobs:
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
-      - name: Non-MPIOnlyExperiment Test
+      - name: Run negative tests via helper
+        shell: bash
         run: |
+          set -euo pipefail
+
+          fail() { echo "TEST FAILED: $*" >&2; exit 1; }
+
+          # run_expect_error "<name>" "<expected substring>" <cmd ...>
+          run_expect_error() {
+            local name="$1"; shift
+            local expected="$1"; shift
+
+            set +e
+            local stderr_output status
+            # capture only stderr, silence stdout
+            stderr_output="$("$@" 2>&1 >/dev/null)"
+            status=$?
+            set -e
+
+            [[ $status -ne 0 ]] || fail "$name: expected non-zero exit status, got $status"
+            if grep -Fq "$expected" <<<"$stderr_output"; then
+              echo "$name: failed as expected: $expected"
+            else
+              fail "$name: expected error message not found in stderr. got: $stderr_output"
+            fi
+          }
+
+          # one-time setup
           ./bin/benchpark system init --dest dane llnl-cluster
-          set +e
-          # babelstream is not an MPIOnlyExperiment
-          stderr_output="$({ BENCHPARK_RUN_COVERAGE=errors ./bin/benchpark experiment init --dest babelstream --system dane babelstream 1>/dev/null; } 2>&1)"
-          status=$?
-          set -e
-          fail() { echo "TEST FAILED: $*" >&2; exit 1; }
-          [[ $status -ne 0 ]] || fail "Expected non-zero exit status, got $status"
-          # Check for the specific BenchparkError message
-          expected="cannot run with MPI only"
-          grep -Fq "$expected" <<<"$stderr_output" && echo "failed as expected: $expected" || fail "Expected error message not found in stderr. Got: $stderr_output"
-      - name: Test multiple scaling options
-        run: |
-          set +e
-          # Notice +strong+weak
-          stderr_output="$({ BENCHPARK_RUN_COVERAGE=errors2 ./bin/benchpark experiment init --dest kripke --system dane kripke+strong+weak 1>/dev/null; } 2>&1)"
-          status=$?
-          set -e
-          fail() { echo "TEST FAILED: $*" >&2; exit 1; }
-          [[ $status -ne 0 ]] || fail "Expected non-zero exit status, got $status"
-          # Check for the specific BenchparkError message
-          expected="spec cannot specify multiple scaling options"
-          grep -Fq "$expected" <<<"$stderr_output" && echo "failed as expected: $expected" || fail "Expected error message not found in stderr. Got: $stderr_output"
+
+          # 1) Non-MPIOnlyExperiment Test
+          run_expect_error "Non-MPIOnlyExperiment Test" "cannot run with MPI only" \
+            BENCHPARK_RUN_COVERAGE=errors \
+            ./bin/benchpark experiment init --dest babelstream --system dane babelstream
+
+          # 2) Multiple scaling options
+          run_expect_error "Test multiple scaling options" "spec cannot specify multiple scaling options" \
+            BENCHPARK_RUN_COVERAGE=errors2 \
+            ./bin/benchpark experiment init --dest kripke --system dane kripke+strong+weak
   saxpy:
     runs-on: ubuntu-24.04
     steps:
