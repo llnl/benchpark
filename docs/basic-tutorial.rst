@@ -20,7 +20,7 @@ on September 3, 2025. The event was an online half-day tutorial along with Rambl
    :align: left
    :alt: Slide Preview
 
-:download:`Download Slides <_static/slides/ReproduciblePerfAnalysis-HPCIC25-Tutorial-Slides.pdf>`.
+:download:`Download Slides <_static/slides/HPCIC25-Tutorial-Slides.pdf>`.
 
 **Full citation:** Pearce, O., Scott, A., Becker, G., Haque, R., Hanford, N.,
 Brink, S., Jacobsen, D., Poxon, H., Domke, J., & Gamblin, T. (2023, November
