@@ -14,8 +14,8 @@ AWS instance.
 It was presented as part of the `HPCIC Tutorial Series <https://hpcic.llnl.gov/tutorials/2025-hpc-tutorials>`_
 on September 3, 2025. The event was an online half-day tutorial along with Ramble.
 
-.. image:: tutorial/ReproduciblePerfAnalysis-HPCIC25-Tutorial-Slide-Preview.jpg
-   :target: _static/slides/ReproduciblePerfAnalysis-HPCIC25-Tutorial-Slides.pdf
+.. image:: tutorial/HPCIC25-Tutorial-Slide-Preview.jpg
+   :target: _static/slides/HPCIC25-Tutorial-Slides.pdf
    :height: 72px
    :align: left
    :alt: Slide Preview
