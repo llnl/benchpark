@@ -191,6 +191,8 @@ class LlnlCluster(System):
                 | {
                     "mpi": {
                         "buildable": False,
+                    },
+                    "mvapich2": {
                         "externals": [
                             {
                                 "spec": "mvapich2@2.3.7-gcc1211",
@@ -209,6 +211,8 @@ class LlnlCluster(System):
                 | {
                     "mpi": {
                         "buildable": False,
+                    },
+                    "mvapich2": {
                         "externals": [
                             {
                                 "spec": "mvapich2@2.3.7-intel202160classic",
@@ -227,6 +231,8 @@ class LlnlCluster(System):
                 | {
                     "mpi": {
                         "buildable": False,
+                    },
+                    "mvapich2": {
                         "externals": [
                             {
                                 "spec": "mvapich2@2.3.7-intel202321",
