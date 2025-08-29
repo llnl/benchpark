@@ -281,7 +281,7 @@ class LlnlCluster(System):
                 [
                     compiler_def(
                         "intel-oneapi-compilers@2023.2.1~envmods",
-                        "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/bin/",
+                        "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/",
                         {"c": "icx", "cxx": "icpx", "fortran": "ifx"},
                     )
                 ],
