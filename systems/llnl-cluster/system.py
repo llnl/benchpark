@@ -292,9 +292,10 @@ class LlnlCluster(System):
                     )
                 ],
             )
+            prefs = {"one_of": ["%oneapi", "%gcc"], "when": "%c"}
             weighting_cfg = {
                 "packages": {
-                    "all": {"require": [{"one_of": ["%oneapi", "%gcc", "@:"]}]}
+                    "all": {"require": [prefs]}
                 }
             }
             cfg = merge_dicts(gcc_cfg, oneapi_cfg, weighting_cfg)
