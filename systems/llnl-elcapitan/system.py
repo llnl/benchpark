@@ -337,15 +337,17 @@ class LlnlElcapitan(System):
         compiler = self.spec.variants["compiler"][0]
 
         if compiler == "cce":
+            prefs = {"one_of": ["%cce", "%gcc"], "when": "%c"}
             return {
-                "packages": {"all": {"require": [{"one_of": ["%cce", "%gcc", "@:"]}]}}
+                "packages": {"all": {"require": [prefs]}}
             }
         elif compiler == "gcc":
             return {"packages": {}}
         elif compiler == "rocmcc":
+            prefs = {"one_of": ["%rocmcc", "%gcc"], "when": "%c"}
             return {
                 "packages": {
-                    "all": {"require": [{"one_of": ["%rocmcc", "%gcc", "@:"]}]}
+                    "all": {"require": [prefs]}
                 }
             }
         else:
