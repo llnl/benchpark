@@ -739,7 +739,7 @@ class LlnlElcapitan(System):
             "software": {
                 "packages": {
                     "default-compiler": {
-                        "pkg_spec": f"{self.spec.variants['compiler'][0]}"
+                        "pkg_spec": f"gcc"
                     },
                     "default-mpi": {"pkg_spec": "cray-mpich"},
                     "compiler-rocm": {"pkg_spec": "cce"},
