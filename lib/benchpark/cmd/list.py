@@ -12,7 +12,6 @@ from benchpark.accounting import (  # noqa: E402
     benchpark_modifiers,
     benchpark_systems,
 )
-from benchpark.spec import SystemSpec
 
 
 def _print_helper(name, collection, filter=None):
@@ -21,29 +20,45 @@ def _print_helper(name, collection, filter=None):
     Args:
         name (str): The title to display above the collection. If None, no title is displayed.
         collection (list of str): A list of strings to display. Items can optionally contain
-                                  special characters (e.g., '/' or '+') for additional formatting.
+                                special characters (e.g., '/' or '+') for additional formatting.
         filter (list, optional): A substring to filter the items in the collection.
                                 Only items containing this substring will be displayed.
                                 If None, all items in the collection are displayed.
     """
-    if name:
-        name = "@*b" + name + "@."
-        color.cprint(name)
-
-    strs = ["@*r", "@*c"]
+    strs = ["@*r", "@*c", "@*m"]
     end = "@."
+
+    if name:
+        if isinstance(name, list):
+            name = (
+                "@*b"
+                + name[0]
+                + "@."
+                + "".join([strs[i - 1] + name[i] + end for i in range(1, len(name))])
+            )
+        elif isinstance(name, str):
+            name = "@*b" + name + "@."
+        else:
+            raise ValueError(f"'name' is type {type(name)}. Must be list or str.")
+        color.cprint(name)
 
     # Compute filtering
     if filter:
         collection = [item for item in collection if any([f in item for f in filter])]
 
     for item in collection:
-        if "/" not in item and "+" not in item:
-            color.cprint(f"    {strs[0]+item+end}")
+        idx = 0
+        if "!" in item:
+            item = item.replace("!", "")
+            idx = 1
+        if "=" not in item and "+" not in item:
+            color.cprint(f"    {strs[idx]+item+end}")
         else:
-            char = "/" if "/" in item else "+"
+            char = "=" if "=" in item else "+"
             item = item.split(char)
-            color.cprint(f"    {strs[0]+item[0]+end+char+strs[1]+item[1]+end}")
+            color.cprint(
+                f"    {strs[0]+item[0]+end+char+char.join([strs[i]+item[i]+end for i in range(1,len(item))])}"
+            )
 
 
 def list_benchmarks(args):
@@ -52,42 +67,32 @@ def list_benchmarks(args):
 
 def list_experiments(args):
     _print_helper(
-        "Experiments:" if not args.no_title else None,
+        (
+            ["Experiments - ", "BENCHMARK@.+", "PROGRAMMING_MODEL@.+", "SCALING"]
+            if not args.no_title
+            else None
+        ),
         benchpark_experiments(),
         filter=args.experiment,
     )
 
 
 def list_systems(args):
-    systems = benchpark_systems()
-    new_systems = []
-    for system in systems:
-        sspec, cluster = system.split("/") if "/" in system else (system, None)
-        cluster_variant = "instance_type" if "aws" in sspec else "cluster"
-        # List of valid programming models for system (MPI assumed to be valid)
-        fullspec = sspec if not cluster else f"{sspec} {cluster_variant}={cluster}"
-        p_models_list = SystemSpec(fullspec).concretize().system.programming_models
-        if not args.programming_model or any(
-            [args.programming_model == p.name for p in p_models_list]
-        ):
-            new_systems.append(fullspec)
-    _print_helper("Systems:" if not args.no_title else None, new_systems)
+    _print_helper(
+        (
+            ["Systems - ", "SYSTEM_DEFINITION", " CLUSTER/INSTANCE"]
+            if not args.no_title
+            else None
+        ),
+        benchpark_systems(args.programming_model),
+    )
 
 
 def list_modifiers(args):
-    modifiers = benchpark_modifiers() if not args.name else [args.name]
-    if args.experiments:
-        collection = []
-        all_experiments = benchpark_experiments(exclude_variants=[])
-        for modifier in modifiers:
-            collection.append(modifier)
-            exprs = [e.split("+")[0] for e in all_experiments if modifier in e]
-            for benchmark in benchpark_benchmarks():
-                if any([benchmark == e for e in exprs]):
-                    collection.append("\t" + "@*c" + benchmark + "@.")
-        _print_helper("Modifiers:" if not args.no_title else None, collection)
-    else:
-        _print_helper("Modifiers:" if not args.no_title else None, modifiers)
+    modifiers = benchpark_modifiers()
+    if args.hide_benchmarks:
+        modifiers = [m for m in modifiers if not m.startswith("\t")]
+    _print_helper("Modifiers:" if not args.no_title else None, modifiers)
 
 
 def setup_parser(root_parser):
@@ -110,6 +115,7 @@ def setup_parser(root_parser):
         type=str,
         nargs="*",
         default=None,
+        choices=["cuda", "rocm", "openmp", "strong", "weak", "throughput"],
         help="Filter experiments containing a specific substring (e.g., 'cuda').",
     )
     experiments_parser.add_argument(
@@ -125,6 +131,7 @@ def setup_parser(root_parser):
         "-p",
         type=str,
         default=None,
+        choices=["cuda", "rocm", "openmp"],
         help="Filter systems that support a specific programming model (e.g., 'cuda').",
     )
 
@@ -133,13 +140,9 @@ def setup_parser(root_parser):
         "--no-title", action="store_true", help="Turn off printing title in output."
     )
     modifiers_parser.add_argument(
-        "--experiments",
-        "-e",
+        "--hide-benchmarks",
         action="store_true",
-        help="See experiments for modifier, if applicable.",
-    )
-    modifiers_parser.add_argument(
-        "--name", default=None, type=str, help="Optional modifier name"
+        help="Do not show benchmarks under each modifier in output.",
     )
 
 

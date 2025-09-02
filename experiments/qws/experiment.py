@@ -5,11 +5,12 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.caliper import Caliper
 
 
-class Qws(Experiment, OpenMPExperiment, Caliper):
+class Qws(Experiment, MpiOnlyExperiment, OpenMPExperiment, Caliper):
 
     variant(
         "workload",
@@ -47,6 +48,8 @@ class Qws(Experiment, OpenMPExperiment, Caliper):
             self.add_experiment_variable("n_ranks", "{processes_per_node} * {n_nodes}")
             self.add_experiment_variable("omp_num_threads", ["48"])
             self.add_experiment_variable("arch", "OpenMP")
+        else:
+            self.add_experiment_variable("n_nodes", ["1"], True)
 
         self.set_required_variables(
             n_resources="{n_ranks}",
@@ -55,6 +58,4 @@ class Qws(Experiment, OpenMPExperiment, Caliper):
         )
 
     def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, [f"qws@{app_version} +mpi"])
+        self.add_package_spec(self.name, [f"qws{self.determine_version()}"])
