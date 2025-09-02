@@ -92,7 +92,12 @@ def command(args):
     debug_print(f"specified system = {system_id}")
 
     configs_src_dir = pathlib.Path(os.path.abspath(str(system_id)))
-    workspace_dir = experiments_root / str(experiment_id) / str(system_id)
+
+    experiments_root = pathlib.Path(os.path.abspath(experiments_root))
+    experiment_id = pathlib.Path(os.path.abspath(experiment_id))
+    system_id = pathlib.Path(os.path.abspath(system_id))
+    common_root = pathlib.Path(os.path.commonpath([experiments_root, experiment_id, system_id]))
+    workspace_dir = common_root / experiments_root.relative_to(common_root) / experiment_id.relative_to(common_root) / system_id.relative_to(common_root)
 
     if workspace_dir.exists():
         if workspace_dir.is_dir():
