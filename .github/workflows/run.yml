@@ -20,24 +20,34 @@ jobs:
 
           fail() { echo "TEST FAILED: $*" >&2; exit 1; }
 
-          # run_expect_error "<name>" "<expected substring>" <cmd ...>
+          # run_expect_error "<name>" "<expected substring>" [VAR=VAL ...] [--] <cmd ...>
           run_expect_error() {
             local name="$1"; shift
             local expected="$1"; shift
 
+            # collect VAR=VAL pairs (until optional --)
+            local -a env_kv=()
+            while [[ $# -gt 0 && "$1" == *=* ]]; do
+              env_kv+=("$1")
+              shift
+            done
+            [[ ${1-} == "--" ]] && shift
+
             set +e
             local stderr_output status
-            # capture only stderr, silence stdout
-            stderr_output="$("$@" 2>&1 >/dev/null)"
+            if [[ ${#env_kv[@]} -gt 0 ]]; then
+              # pass env to the command safely
+              stderr_output="$(env "${env_kv[@]}" "$@" 2>&1 >/dev/null)"
+            else
+              stderr_output="$("$@" 2>&1 >/dev/null)"
+            fi
             status=$?
             set -e
 
             [[ $status -ne 0 ]] || fail "$name: expected non-zero exit status, got $status"
-            if grep -Fq "$expected" <<<"$stderr_output"; then
-              echo "$name: failed as expected: $expected"
-            else
-              fail "$name: expected error message not found in stderr. got: $stderr_output"
-            fi
+            grep -Fq "$expected" <<<"$stderr_output" \
+              && echo "$name: failed as expected: $expected" \
+              || fail "$name: expected error message not found in stderr. got: $stderr_output"
           }
 
           # one-time setup
@@ -45,12 +55,12 @@ jobs:
 
           # 1) Non-MPIOnlyExperiment Test
           run_expect_error "Non-MPIOnlyExperiment Test" "cannot run with MPI only" \
-            BENCHPARK_RUN_COVERAGE=errors \
+            BENCHPARK_RUN_COVERAGE=errors -- \
             ./bin/benchpark experiment init --dest babelstream --system dane babelstream
 
           # 2) Multiple scaling options
           run_expect_error "Test multiple scaling options" "spec cannot specify multiple scaling options" \
-            BENCHPARK_RUN_COVERAGE=errors2 \
+            BENCHPARK_RUN_COVERAGE=errors2 -- \
             ./bin/benchpark experiment init --dest kripke --system dane kripke+strong+weak
   saxpy:
     runs-on: ubuntu-24.04
