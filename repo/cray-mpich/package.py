@@ -16,7 +16,7 @@ class CrayMpich(BuiltinCM):
         libs = super().libs
 
         if self.spec.satisfies("+gtl"):
-            gtl_lib_prefix = self.spec.extra_attributes["gtl_lib_path"]
+            gtl_lib_prefix = self.spec.extra_attributes["gtl_path"] + "/lib"
             # gtl_libs, if set, must be a single string. You can pass multiple
             # libs by adding a space between each
             gtl_libs = self.spec.extra_attributes["gtl_libs"].split()
@@ -30,9 +30,9 @@ class CrayMpich(BuiltinCM):
 
         if self.spec.satisfies("+gtl"):
             env.set("MPICH_GPU_SUPPORT_ENABLED", "1")
-            env.prepend_path("LD_LIBRARY_PATH", self.spec.extra_attributes["gtl_lib_path"])
+            # env.prepend_path("LD_LIBRARY_PATH", self.spec.extra_attributes["gtl_lib_path"])
         else:
             env.set("MPICH_GPU_SUPPORT_ENABLED", "0")
-            gtl_path = self.spec.extra_attributes.get("gtl_lib_path", "")
-            if gtl_path:
-                env.prepend_path("LD_LIBRARY_PATH", gtl_path)
+            # gtl_path = self.spec.extra_attributes.get("gtl_lib_path", "")
+            # if gtl_path:
+            #     env.prepend_path("LD_LIBRARY_PATH", gtl_path)
