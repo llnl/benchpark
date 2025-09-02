@@ -17,7 +17,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
           fail() { echo "TEST FAILED: $*" >&2; exit 1; }
 
           # run_expect_error "<name>" "<expected substring>" [VAR=VAL ...] [--] <cmd ...>
@@ -32,7 +31,6 @@ jobs:
               shift
             done
             [[ ${1-} == "--" ]] && shift
-
             set +e
             local stderr_output status
             if [[ ${#env_kv[@]} -gt 0 ]]; then
@@ -43,7 +41,6 @@ jobs:
             fi
             status=$?
             set -e
-
             [[ $status -ne 0 ]] || fail "$name: expected non-zero exit status, got $status"
             grep -Fq "$expected" <<<"$stderr_output" \
               && echo "$name: failed as expected: $expected" \
