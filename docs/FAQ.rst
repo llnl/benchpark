@@ -3,7 +3,7 @@
 
    SPDX-License-Identifier: Apache-2.0
 
-This page contains answers to frequently asked questions about Benchpark. If you have questions that are not answered here, feel free to ask on `Slack benchpark-support channel <https://spackpm.slack.com/archives/C061R1M9HNJ>`_ or `GitHub Discussions <https://github.com/llnl/benchpark/discussions>`_. If you’ve learned the answer to a question that you think should be here, please consider contributing to this page.
+This page contains answers to frequently asked questions about Benchpark. If you have questions that are not answered here, feel free to ask on `#benchpark-support channel in Spack Slack <https://spackpm.slack.com/archives/C061R1M9HNJ>`_ or `GitHub Discussions <https://github.com/llnl/benchpark/discussions>`_. If you’ve learned the answer to a question that you think should be here, please consider contributing to this page.
 
 
 ==========================
