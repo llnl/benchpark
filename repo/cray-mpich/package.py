@@ -38,7 +38,7 @@ class CrayMpich(BuiltinCM):
                 env.prepend_path("LD_LIBRARY_PATH", gtl_path)
 
     def cmake_args(self):
-        args = []
+        args = super().cmake_args(self)
 
         if self.spec.satisfies("+gtl"):
             # Link GTL for MPICH GPU-aware
