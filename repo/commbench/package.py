@@ -5,9 +5,9 @@ class Commbench(CMakePackage, CudaPackage, ROCmPackage):
     """FIXME: Put a proper description of your package here."""
 
     # FIXME: Add a proper url for your package's homepage here.
-    homepage = "https://github.com/arhag23/CommBench"
+    homepage = "https://github.com/simongdg/CommBench"
     # url = "https://github.com/arhag23/CommBench/archive/cmake.tar.gz"
-    git = "https://github.com/arhag23/CommBench.git"
+    git = "https://github.com/simongdg/CommBench.git"
     
     version("0.1.0", commit="efed373")
 
