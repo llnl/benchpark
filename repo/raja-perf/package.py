@@ -154,7 +154,7 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
     variant("tests", default="basic", values=("none", "basic", "benchmarks"),
             multi=False, description="Tests to run")
     variant("caliper",default=False, description="Build with support for Caliper based profiling")
-    variant("kokkos", default=True, description="Include Kokkos implementations of the kernels in RAJAPerf")
+    variant("kokkos", default=False, description="Include Kokkos implementations of the kernels in RAJAPerf")
 
     depends_on("blt")
     depends_on("blt@0.7.0:", type="build", when="@2025.03.0:")
