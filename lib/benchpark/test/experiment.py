@@ -144,4 +144,4 @@ def test_multiple_models():
         match="spec cannot specify multiple mutually-exclusive programming models",
     ):
         spec = benchpark.spec.ExperimentSpec("saxpy+rocm+openmp").concretize()
-        experiment = spec.experiment
+        spec.experiment
