@@ -21,12 +21,11 @@ system_definition:
     vendor: HPECray
     name: Slingshot11
   systems-tested:
-    lanl-rocinante-oneapi:
+    lanl-rocinante:
       os: HPECrayOS
       scheduler: slurm
       compiler: oneapi
       runtime:
       mpi: cray-mpich
       installation-year: 2022
-  top500-system-instances:
 

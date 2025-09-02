@@ -10,7 +10,7 @@ from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.paths import hardware_descriptions
 
 
-class LanlCTS2(System):
+class LanlRocinante(System):
 
     maintainers("sriram")
 
@@ -35,16 +35,16 @@ class LanlCTS2(System):
     variant(
         "compiler",
         default="oneapi",
-        values=("oneapi"),
+        values=("oneapi", "gcc"),
         description="Which compiler to use",
     )
 
     variant(
-        "queue",
-        default="dev",
-        values=("standard", "dev", "debug"),
+        "queues",
+        default="standard",
+        values=("standard", "hbm", "debug"),
         multi=False,
-        description="Submit to queue other than the default queue (e.g. dev)",
+        description="Submit to queue other than the default queue (e.g. hbm)",
     )
 
     def __init__(self, spec):
@@ -157,8 +157,8 @@ class LanlCTS2(System):
                         "buildable": False,
                         "externals": [
                             {
-                                "spec": "cray-mpich@8.1.28"
-                                "prefix": "/cpe/23.12/mpich/8.1.28/ofi/intel/2022.1"
+                                "spec": "cray-mpich@8.1.28",
+                                "prefix": "/cpe/23.12/mpich/8.1.28/ofi/intel/2022.1",
                                 "extra_attributes": {
                                     "ldflags": "-L/cpe/23.12/mpich/8.1.28/ofi/intel/2022.1/lib -lmpi"
                                 },
@@ -179,13 +179,32 @@ class LanlCTS2(System):
             return {"packages": {}}
 
     def compute_compilers_section(self):
-        selections = {}
+        selections = {
+            "compilers": [
+                {
+                    "compiler": {
+                        "spec": "gcc@12.3.0",
+                        "paths": {
+                            "cc": "/usr/projects/hpcsoft/tce/23.12/cos3-x86_64/compilers/gcc/12.3.0/bin/gcc",
+                            "cxx": "/usr/projects/hpcsoft/tce/23.12/cos3-x86_64/compilers/gcc/12.3.0/bin/g++",
+                            "f77": "/usr/projects/hpcsoft/tce/23.12/cos3-x86_64/compilers/gcc/12.3.0/bin/gfortran",
+                            "fc": "/usr/projects/hpcsoft/tce/23.12/cos3-x86_64/compilers/gcc/12.3.0/bin/gfortran",
+                        },
+                        "flags": {},
+                        "operating_system": "sles15",
+                        "target": "x86_64",
+                        "modules": [],
+                        "environment": {},
+                        "extra_rpaths": [],
+                    }
+                }
+            ]
+        }
         if self.spec.satisfies("compiler=oneapi"):
-            selections = {
-                "compilers": [
+            selections["compilers"] += [
                     {
                         "compiler": {
-                            "spec": "gcc@12.1.1",
+                            "spec": "oneapi@2023.2.0",
                             "paths": {
                                 "cxx": "/usr/projects/hpcsoft/pe/installs/cos3-x86_64/oneapi/2023.2.0.49397/compiler/2023.2.0/linux/bin/icpx",
                                 "cc": "/usr/projects/hpcsoft/pe/installs/cos3-x86_64/oneapi/2023.2.0.49397/compiler/2023.2.0/linux/bin/icx",
@@ -201,7 +220,6 @@ class LanlCTS2(System):
                         }
                     },
                 ]
-            }
 
         return selections
 
