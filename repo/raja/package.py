@@ -9,7 +9,7 @@ from spack.pkg.builtin.raja import Raja as BuiltinRaja
 
 class Raja(BuiltinRaja):
 
-    version("2025.03.2", tag="v2025.03.2", submodules="True")
+    #version("2025.03.2", tag="v2025.03.2", submodules="True")
 
     #depends_on("camp+cuda@2025.03.0", when="@2025.03.2:")
 
