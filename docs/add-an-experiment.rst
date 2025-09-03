@@ -8,19 +8,17 @@
  Adding an Experiment
 ######################
 
-This guide is intended for those wanting to add a new experiment for a given benchmark.
-
-Similar to systems, Benchpark also provides an API where you can represent experiments
-as objects and customize their description with command line arguments.
-
-Experiment specifications are defined in ``experiment.py`` files located in the
-experiment repo for each benchmark: ``benchpark/experiments/<benchmark>``.
+This guide is intended for those who would like to add a new experiment for a specific benchmark.
+Similar to the systems API, Benchpark provides an API for representing experiments
+as objects and customizing their options with command line arguments. Experiment
+specifications are defined in ``experiment.py`` files located in the experiment directory for
+each benchmark: ``benchpark/experiments/<benchmark>``.
 
 -  If you are adding experiments to an existing benchmark, you should extend the current
    ``experiment.py`` for that benchmark in the experiments directory.
 
 -  If you are adding experiments to a new benchmark, create a directory for your
-   benchmark in the experiments directory, and move your ``experiment.py`` to this
+   benchmark in the experiments directory, and put your ``experiment.py`` in this
    directory.
 
 These ``experiment.py`` files inherit from the Experiment base class in
@@ -37,16 +35,20 @@ defined in Benchpark, so Benchpark will use these over the upstream `Spack packa
 <https://github.com/spack/spack-packages/blob/develop/repos/spack_repo/builtin/packages/hpl/package.py>`__
 and `Ramble application
 <https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/applications/hpl/application.py>`__.
-For clarity, if ``benchpark/repo/hpl`` did not exist, benchpark will use the upstream
+For clarity, if ``benchpark/repo/hpl`` did not exist, Benchpark would use the upstream
 versions. Additionally, the Benchpark HPL ``application.py`` inherits from the Ramble
-upstream, so they are equivalent aside from an extra Benchpark tag definition.
+upstream, so they are equivalent aside from an extra Benchpark tag definition. Notice
+the HPL application in Ramble also inherits from a `base HPL application
+<https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/base_applications/hpl/base_application.py>`__,
+which is relevant because it contains the workload variables that we will need to define
+in our Benchpark experiment.
 
-*******************************
- Step 1: Create the Experiment
-*******************************
+*************************************
+ Step 1: Create the Experiment class
+*************************************
 
 We create the ``experiment.py`` file under ``benchpark/experiments/hpl/experiment.py``.
-The naming of this directory will affect how the experiment is initialized, e.g.
+The naming of this directory will affect how the experiment is initialized, e.g.,
 ``benchpark experiment init ... hpl``. There are multiple scaling options, modifiers,
 and programming models we can inherit from, but at minimum our experiment should inherit
 from the base ``Experiment`` class and ``MpiOnlyExperiment`` indicating that our
@@ -62,35 +64,30 @@ experiment can be executed with MPI.
      MpiOnlyExperiment,
    ):
 
-As we stated before, your experiment can be configured to support different Benchpark
-experiment variants, which include:
-
-#. programming models
-#. scaling modes (if the experiment will support scaling studies)
-#. modifiers
-
-For HPL we can add the ``OpenMP`` programming model, define ``strong`` and ``weak``
-scaling, and enable the ``caliper`` modifier, since HPL is profiled with the ``Caliper``
-instrumentation and performance profiling library.
-
-Notice enabling the options only requires our experiment to inherit from pre-defined
-classes. We will define ``strong`` and ``weak`` scaling for the HPL experiment later on
-in this guide, since this varies per-experiment. For more details on the configurability
-of experiment variants, see :ref:`experiment-variants`.
+Looking at the `HPL package
+<https://github.com/LLNL/benchpark/blob/develop/repo/hpl/package.py>`__, we see that
+there are ``OpenMP`` and ``Caliper`` variants defined in the build specification. 
+The HPL package.py defines the ``OpenMP`` variant because the source of the HPL benchmark 
+supports the ``OpenMP`` programming model.
+The HPL package.py defines the ``Caliper`` variant because the HPL source code is instrumented 
+with the ``Caliper`` performance profiling library (via a `fork
+<https://github.com/daboehme/HPL-caliper.git>`__ of the source code)
+and the build links to Caliper.
+Enabling these variants in our Benchpark experiment only requires inheritance from the
+pre-defined ``OpenMPExperiment`` and ``Caliper`` classes. For more details on the
+configurability of experiment variants, see :ref:`experiment-variants`.
 
 .. code::
 
    from benchpark.experiment import Experiment
    from benchpark.mpi import MpiOnlyExperiment
    from benchpark.openmp import OpenMPExperiment
-   from benchpark.scaling import ScalingMode, Scaling
    from benchpark.caliper import Caliper
 
    class Hpl(
      Experiment,
      MpiOnlyExperiment,
      OpenMPExperiment,
-     Scaling(ScalingMode.Strong, ScalingMode.Weak),
      Caliper,
    ):
 
@@ -98,27 +95,26 @@ of experiment variants, see :ref:`experiment-variants`.
  Step 2: Add Variants and Maintainers
 **************************************
 
-Next, we add:
+Next, we add experiment variants and a maintainer:
 
-#. variants - which will provide configurability to the Spack package manager and Ramble
+#. variants - provide configurability to options in Spack and Ramble
 #. maintainer - the GitHub username of the person responsible of maintaining the
    experiment (likely you!)
 
-Continuing with our example, we add two variants. The first is a ``workload`` variant to
-configure which Ramble workload we are going to use. The second is a version of our
-benchmark, which should take the possible values (e.g.,
-``"NAME_OF_DEVELOPMENT_BRANCH"``, ``"latest"``, ``"rc1"``, ``"rc2"``). ``latest`` is a
-keyword that will automatically choose the latest release version from the
-``package.py``. For HPL, the source is a ``tar.gz``, so we are not tracking a
-development branch. Additionally, we add our GitHub username, or multiple usernames in
-the tuple, to record the ``maintainers`` of this experiment.
+For HPL, we add two variants. The first is a ``workload`` variant to configure which
+Ramble workload we are going to use. The second is a version of our benchmark, which
+should take the possible values (e.g., ``"NAME_OF_DEVELOPMENT_BRANCH"``, ``"latest"``,
+``"rc1"``, ``"rc2"``). ``latest`` is a keyword that will automatically choose the latest
+release version from the ``package.py``. For HPL, the source is a ``tar.gz`` instead of
+a repository, so we are not able to list a development branch. Additionally, we add our
+GitHub username, or multiple GitHub usernames, to record the ``maintainers`` of this
+experiment.
 
 .. code::
 
    from benchpark.experiment import Experiment
    from benchpark.mpi import MpiOnlyExperiment
    from benchpark.openmp import OpenMPExperiment
-   from benchpark.scaling import ScalingMode, Scaling
    from benchpark.caliper import Caliper
    from benchpark.directives import variant, maintainers
 
@@ -126,7 +122,6 @@ the tuple, to record the ``maintainers`` of this experiment.
      Experiment,
      MpiOnlyExperiment,
      OpenMPExperiment,
-     Scaling(ScalingMode.Strong, ScalingMode.Weak),
      Caliper,
    ):
 
@@ -149,38 +144,49 @@ the tuple, to record the ``maintainers`` of this experiment.
  Step 3: Add a Ramble Application Section
 ******************************************
 
-The ``def compute_applications_section()`` is for:
+The ``experiment.py::compute_applications_section()`` function in Benchpark exists to
+interface with the Ramble application for:
 
-   #. Defining experiment variables that your ``application.py`` is expecting (workload
-      variables).
-   #. Defining a scaling configuration for each of the scaling options the class
-      inherits from.
+   #. Defining experiment variables.
+   #. Defining a scaling configurations for ``strong``, ``weak``, and/or ``throughput``
+      scaling.
 
-Continuing with our example, we will define HPL-specific experiment variables , and
-writing ``strong`` and ``weak`` scaling configurations. :ref:`This section
-<scaling-configs>` contains more information on how to write Benchpark scaling
-configurations.
+Step 3a: Define Experiment Variables
+====================================
 
-We can specify experiment variables to Benchpark using the
+We can specify experiment variables in Benchpark using the
 ``Experiment.add_experiment_variable()`` member function. *One* of ``n_ranks``,
 ``n_nodes``, ``n_gpus`` must be set, using ``add_experiment_variable()`` for Benchpark
-to allocate the correct amount of resources for the experiment.
+to allocate the correct amount of resources for the experiment. You can also define
+experiment variables here that will override the default values for the ``workload
+variables`` in your ``application.py``. For HPL, we override the ``Ns``, ``N-Grids``,
+``Ps``, ``Qs``, ``N-Ns``, ``N-NBs``, and ``NBs`` workload variables which are defined in
+the base `application
+<https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/base_applications/hpl/base_application.py>`__.
 
 Additionally, all of ``n_resources``, ``process_problem_size``, and
 ``total_problem_size`` must be set, which can be accomplished using
-``Experiment.set_required_variables()``. How you set ``process_problem_size`` or
-``total_problem_size`` depends on how your benchmark defines problem size (either
-per-process or a global problem size that is divided among the processes in the
-application). For an example of a per-process problem size benchmark see
-``amg2023/experiment.py``, and for total problem size see ``kripke/experiment.py``. For
-our example benchmark, we will assume a total problem size.
+``Experiment.set_required_variables()``. These variables will not exist in the
+``application.py``, instead they are used by Benchpark to record important experiment
+metadata. How you set ``process_problem_size`` or ``total_problem_size`` depends on how
+your benchmark defines problem size (either per-process or a global/total problem size
+that is divided among the processes in the application). For an example of a
+"per-process problem size" benchmark see the ``amg2023/experiment.py``, and for "total
+problem size" see the ``kripke/experiment.py``. For our use case, HPL requires a total
+problem size.
+
+Notice that we define separate sets of experiment variables for the ``exec_mode=test``
+and ``exec_mode=perf`` cases. The difference between the variable definitions in these
+cases depends on if you want to perform a test execution (small amount of resources and
+problem difficulty) or a performance execution (relatively larger resource allocation
+and problem difficulty). The only mode that is required to define is ``exec_mode=test``
+by default.
 
 .. code::
 
    from benchpark.experiment import Experiment
    from benchpark.mpi import MpiOnlyExperiment
    from benchpark.openmp import OpenMPExperiment
-   from benchpark.scaling import ScalingMode, Scaling
    from benchpark.caliper import Caliper
    from benchpark.directives import variant, maintainers
 
@@ -188,7 +194,6 @@ our example benchmark, we will assume a total problem size.
      Experiment,
      MpiOnlyExperiment,
      OpenMPExperiment,
-     Scaling(ScalingMode.Strong, ScalingMode.Weak),
      Caliper,
    ):
 
@@ -252,6 +257,61 @@ our example benchmark, we will assume a total problem size.
          total_problem_size="{Ns}",
        )
 
+For more details on the ``add_experiment_variable`` function, see :ref:`add-expr-var`.
+
+Step 3b: Define Scaling Options
+===============================
+
+To complete our ``compute_applications_section()`` function, we import the scaling module,
+inherit from the appropriate scaling options, and write the scaling configuration in the
+``compute_applications_section()``.
+
+For HPL, we will be defining the ``strong`` and ``weak`` scaling configurations.
+
+   -  For ``strong`` scaling: we want to increase the resources experiment variable
+      ``n_nodes``, and keep the problem size experiment variable ``Ns`` constant.
+   -  For ``weak`` scaling: we want to increase both ``n_nodes`` and ``Ns`` by the same
+      factor, keeping the problem size per-process constant.
+
+The scaling factor and amount of times the factor is applied can be configured using the
+runtime parameters during experiment initialization, e.g., ``benchpark experiment init ...
+scaling-factor=2 scaling-iterations=4`` (i.e. 2x applied for 4 iterations).
+
+.. code::
+
+   from benchpark.experiment import Experiment
+   from benchpark.mpi import MpiOnlyExperiment
+   from benchpark.openmp import OpenMPExperiment
+   from benchpark.scaling import ScalingMode, Scaling
+   from benchpark.caliper import Caliper
+   from benchpark.directives import variant, maintainers
+
+   class Hpl(
+     Experiment,
+     MpiOnlyExperiment,
+     OpenMPExperiment,
+     Scaling(ScalingMode.Strong, ScalingMode.Weak),
+     Caliper,
+   ):
+
+     variant(
+       "workload",
+       default="standard",
+       description="Which ramble workload to execute.",
+     )
+
+     variant(
+       "version",
+       default="2.3-caliper",
+       values=("latest", "2.3-caliper", "2.3", "2.2"),
+       description="Which benchmark version to use.",
+     )
+
+     maintainers("daboehme")
+
+     def compute_applications_section(self):
+       ...
+
        ### Add strong scaling definition
        # Register the scaling variables and their respective scaling functions
        # required to correctly scale the experiment for the given scaling policy
@@ -273,14 +333,15 @@ our example benchmark, we will assume a total problem size.
            }
        )
 
-For more details on the ``add_experiment_variable`` function, see :ref:`add-expr-var`.
+See :ref:`this section <scaling-configs>` for more information on how to write Benchpark
+scaling configurations.
 
 ***************************************
  Step 4: Add a Package Manager Section
 ***************************************
 
-In ``def compute_package_section()``, add the benchmark's package spec. Required
-packages for the benchmark are not listed here, since they are already defined in the
+In ``experiment.py::compute_package_section()``, add the benchmark's package spec. We do
+not list required packages for the benchmark here, since they are already defined in the
 ``package.py``.
 
 .. code::
@@ -319,25 +380,28 @@ packages for the benchmark are not listed here, since they are already defined i
        ...
 
      def compute_package_section(self):
-       self.add_package_spec(self.name, [f"my-experiment{self.determine_version()}"])
+       self.add_package_spec(self.name, [f"hpl{self.determine_version()}"])
 
 *********************************************
  Step 5: Validating the Benchmark/Experiment
 *********************************************
 
-To manually validate your new experiment works, you should start by initializing your
+To manually validate that your new experiment works, you should start by initializing your
 experiment:
 
 .. code::
 
-   benchpark experiment init --dest=my-experiment --system=my-system my-experiment
+   # first - initialize some system: benchpark system init --dest=my-system ...
+
+   # second - initialize the experiment
+   benchpark experiment init --dest=hpl --system=my-system hpl
 
 If this completes without errors, you can continue testing by setting up a benchpark
 workspace as described in :doc:`testing-your-contribution`.
 
-********************
+*********************
  Experiment Appendix
-********************
+*********************
 
 .. _experiment-variants:
 
