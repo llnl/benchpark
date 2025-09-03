@@ -265,11 +265,8 @@ class LlnlMatrix(System):
                     )
                 ],
             )
-            # In this case 2 compilers are defined: create a preference for
-            # oneAPI compiler
-            weighting_cfg = {
-                "packages": {"all": {"require": [{"one_of": ["%oneapi", "%gcc"]}]}}
-            }
+            prefs = {"one_of": ["%oneapi", "%gcc"], "when": "%c"}
+            weighting_cfg = {"packages": {"all": {"require": [prefs]}}}
             cfg = merge_dicts(gcc_cfg, oneapi_cfg, weighting_cfg)
 
         return cfg
@@ -346,10 +343,16 @@ class LlnlMatrix(System):
         }
 
     def compute_software_section(self):
+        default_compiler = "gcc"
+        if self.spec.satisfies("compiler=intel"):
+            default_compiler = "intel-oneapi-compilers-classic"
+        elif self.spec.satisfies("compiler=oneapi"):
+            default_compiler = "intel-oneapi-compilers"
+
         return {
             "software": {
                 "packages": {
-                    "default-compiler": {"pkg_spec": self.spec.variants["compiler"][0]},
+                    "default-compiler": {"pkg_spec": default_compiler},
                     "default-mpi": {"pkg_spec": "mvapich2"},
                     "compiler-gcc": {"pkg_spec": "gcc"},
                     "compiler-intel": {"pkg_spec": "intel"},
