@@ -86,9 +86,6 @@ def cuda_for_radiuss_projects(options, spec):
             cmake_cache_string("CUDA_ARCH", "sm_{0}".format(cuda_arch[0])))
         options.append(
             cmake_cache_string("CMAKE_CUDA_ARCHITECTURES", "{0}".format(cuda_arch[0])))
-        # options.append(
-        #     cmake_cache_string(f"Kokkos_ARCH_{cuda_arch[0]}", "ON")
-        # )
     if spec_uses_toolchain(spec):
         cuda_flags.append("-Xcompiler {}".format(spec_uses_toolchain(spec)[0]))
     if (spec.satisfies("target=ppc64le %gcc@8.1:")):
@@ -164,8 +161,6 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
     depends_on("blt@0.4.0:", type="build", when="@0.8.0:")
     depends_on("blt@0.3.0:", type="build", when="@:0.7.0")
 
-    depends_on("kokkos@3.7.02", type="build", when="@2025.03.0 +kokkos")
-
     depends_on("cmake@3.20:", when="@0.12.0:", type="build")
     depends_on("cmake@3.23:", when="@0.12.0: +rocm", type="build")
     depends_on("cmake@3.23:", when="@0.12.0: +cuda")
@@ -174,8 +169,6 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
     depends_on("llvm-openmp", when="+openmp %apple-clang")
 
     depends_on("rocprim", when="+rocm")
-
-    #depends_on("raja+cuda@2025.03.2", when="@2025.03.0:")
 
     conflicts("~openmp", when="+openmp_target", msg="OpenMP target requires OpenMP")
     conflicts("+cuda", when="+openmp_target", msg="Cuda may not be activated when openmp_target is ON")
@@ -317,7 +310,6 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
 
         if "+cuda" in spec or "+rocm" in spec:
             entries.append(cmake_cache_string("RAJA_PERFSUITE_GPU_BLOCKSIZES", "64,128,256,512,1024"))
-            #entries.append(cmake_cache_string("RAJA_PERFSUITE_GPU_ITEMS_PER_THREAD", "1,2,4,8"))
 
         entries.append(cmake_cache_option("ENABLE_OPENMP_TARGET", "+openmp_target" in spec))
         if "+openmp_target" in spec:
@@ -369,12 +361,6 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
             entries.append(cmake_cache_path("adiak_DIR", spec["adiak"].prefix+"/lib/cmake/adiak/"))
 
         entries.append(cmake_cache_option("ENABLE_KOKKOS", "+kokkos" in spec))
-        # if "+kokkos" in self.spec:
-        #     if not spec.satisfies("cuda_arch=none"):
-        #         cuda_arch = spec.variants["cuda_arch"].value
-        #         print(cuda_arch[0])
-        #         print(f"Kokkos_ARCH_{cuda_arch[0]}")
-        #         entries.append(cmake_cache_string(f"-DKokkos_ARCH_{cuda_arch[0]}=ON"))
 
         return entries
 
