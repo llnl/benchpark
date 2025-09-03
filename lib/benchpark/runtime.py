@@ -185,7 +185,7 @@ class RuntimeResources:
         env = {"SPACK_DISABLE_LOCAL_CONFIG": "1"}
         spack = Command(self.spack_location / "bin" / "spack", env)
         spack_cache_location = self.spack_location / "misc-cache"
-        bootstrap_cache_location = self.spack_location / "b-c"
+        bootstrap_cache_location = self.dest / "sbc"
         first_time = False
         if not self.spack_location.exists():
             first_time = True
