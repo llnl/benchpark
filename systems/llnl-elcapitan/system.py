@@ -338,18 +338,12 @@ class LlnlElcapitan(System):
 
         if compiler == "cce":
             prefs = {"one_of": ["%cce", "%gcc"], "when": "%c"}
-            return {
-                "packages": {"all": {"require": [prefs]}}
-            }
+            return {"packages": {"all": {"require": [prefs]}}}
         elif compiler == "gcc":
             return {"packages": {}}
         elif compiler == "rocmcc":
             prefs = {"one_of": ["%rocmcc", "%gcc"], "when": "%c"}
-            return {
-                "packages": {
-                    "all": {"require": [prefs]}
-                }
-            }
+            return {"packages": {"all": {"require": [prefs]}}}
         else:
             raise ValueError(f"Unexpected value for compiler: {compiler}")
 

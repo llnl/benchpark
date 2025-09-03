@@ -202,7 +202,7 @@ class LlnlCluster(System):
                                 },
                             }
                         ],
-                    }
+                    },
                 }
             }
         elif self.spec.satisfies("compiler=intel"):
@@ -222,7 +222,7 @@ class LlnlCluster(System):
                                 },
                             }
                         ],
-                    }
+                    },
                 }
             }
         elif self.spec.satisfies("compiler=oneapi"):
@@ -242,7 +242,7 @@ class LlnlCluster(System):
                                 },
                             }
                         ],
-                    }
+                    },
                 }
             }
 
@@ -293,11 +293,7 @@ class LlnlCluster(System):
                 ],
             )
             prefs = {"one_of": ["%oneapi", "%gcc"], "when": "%c"}
-            weighting_cfg = {
-                "packages": {
-                    "all": {"require": [prefs]}
-                }
-            }
+            weighting_cfg = {"packages": {"all": {"require": [prefs]}}}
             cfg = merge_dicts(gcc_cfg, oneapi_cfg, weighting_cfg)
 
         return cfg
