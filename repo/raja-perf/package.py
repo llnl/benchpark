@@ -175,7 +175,7 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
 
     depends_on("rocprim", when="+rocm")
 
-
+    depends_on("raja@2025.03.2", when="@2025.03.0:")
 
     conflicts("~openmp", when="+openmp_target", msg="OpenMP target requires OpenMP")
     conflicts("+cuda", when="+openmp_target", msg="Cuda may not be activated when openmp_target is ON")

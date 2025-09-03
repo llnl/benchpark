@@ -9,6 +9,10 @@ from spack.pkg.builtin.raja import Raja as BuiltinRaja
 
 class Raja(BuiltinRaja):
 
+    version("2025.03.2", tag="v2025.03.2", submodules="True")
+
+    depends_on("camp@2025.03.0", when="@2025.03.2:")
+
     def setup_build_environment(self, env):
         super().setup_build_environment(env)
         if "+cuda" in self.spec:
