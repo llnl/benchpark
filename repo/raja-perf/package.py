@@ -175,7 +175,7 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
 
     depends_on("rocprim", when="+rocm")
 
-    depends_on("raja@2025.03.2", when="@2025.03.0:")
+    #depends_on("raja+cuda@2025.03.2", when="@2025.03.0:")
 
     conflicts("~openmp", when="+openmp_target", msg="OpenMP target requires OpenMP")
     conflicts("+cuda", when="+openmp_target", msg="Cuda may not be activated when openmp_target is ON")
@@ -316,7 +316,8 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
             entries.append(cmake_cache_option("ENABLE_HIP", False))
 
         if "+cuda" in spec or "+rocm" in spec:
-            entries.append(cmake_cache_string("RAJA_PERFSUITE_GPU_BLOCKSIZES", "25,64,128,256,512,1024"))
+            entries.append(cmake_cache_string("RAJA_PERFSUITE_GPU_BLOCKSIZES", "64,128,256,512,1024"))
+            #entries.append(cmake_cache_string("RAJA_PERFSUITE_GPU_ITEMS_PER_THREAD", "1,2,4,8"))
 
         entries.append(cmake_cache_option("ENABLE_OPENMP_TARGET", "+openmp_target" in spec))
         if "+openmp_target" in spec:
