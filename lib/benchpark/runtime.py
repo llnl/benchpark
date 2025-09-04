@@ -70,7 +70,7 @@ class RuntimeResources:
 
         self.ramble_location, self.spack_location, self.pkgs_location = (
             self.dest / "ramble",
-            self.dest / "spack",
+            self.dest / "spk",
             self.dest / "spack-packages",
         )
 
