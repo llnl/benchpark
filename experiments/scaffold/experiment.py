@@ -54,7 +54,7 @@ class Scaffold(
         )
         self.add_experiment_variable("timeout", 720, True)
 
-        problem_sizes = {"n_categories": 5}
+        problem_sizes = {"problem_scale": 6}
 
         for nk, nv in problem_sizes.items():
             self.add_experiment_variable(nk, nv, True)
@@ -76,8 +76,8 @@ class Scaffold(
 
         self.set_required_variables(
             n_resources="{n_gpus}",
-            process_problem_size="{n_categories}/{n_gpus}",
-            total_problem_size="{n_categories}",
+            process_problem_size="{problem_scale}/{n_gpus}",
+            total_problem_size="{problem_scale}",
         )
 
     def compute_package_section(self):

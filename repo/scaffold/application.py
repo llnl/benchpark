@@ -3,7 +3,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import os
 import yaml
 
 from ramble.appkit import *
@@ -37,7 +36,7 @@ class Scaffold(ExecutableApplication):
     )
     executable(
         "run",
-        "SCAFFOLD_REPO_ROOT={package_path} scaffold benchmark -c {package_path}ScaFFold/configs/benchmark_default.yml --parent -j --training-nodes-time 660 --num-ranks {n_gpus} --training-nodes {n_nodes} --n-categories {n_categories}",
+        "scaffold benchmark -c {package_path}ScaFFold/configs/benchmark_default.yml --problem-scale {problem_scale}",
     )
 
     workload("sweep", executables=["modules", "run"])
