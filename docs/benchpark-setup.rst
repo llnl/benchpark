@@ -74,6 +74,6 @@ For Experiments
    -  ``prepend_path`` - Prepend to environment PATH during experiment execution.
 
    -  ``n_repeats`` - number of times your experiment will be repeated (think of
-      trials). ``n_repeats=4`` will repeat your experiment 4 times, resulting in 5
+      trials). ``n_repeats=5`` will repeat your experiment 5 times, resulting in 5
       trials. These will be separate job submission scripts, so separate resource
       allocations. For combining these into the same allocation, see TBD.
