@@ -277,6 +277,18 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
                 f'"{self.name}" cannot run with MPI only without inheriting from MpiOnlyExperiment. Choose from {self.programming_models}'
             )
 
+        if (
+            sum([self.spec.satisfies(s) for s in ["+strong", "+weak", "+throughput"]])
+            > 1
+        ):
+            raise BenchparkError(
+                f"spec cannot specify multiple scaling options. {self.spec}"
+            )
+        if sum([self.spec.satisfies(s) for s in ["+cuda", "+rocm", "+openmp"]]) > 1:
+            raise BenchparkError(
+                f"spec cannot specify multiple mutually-exclusive programming models. {self.spec}"
+            )
+
     @property
     def spack_name(self):
         """The name of the spack package that is used to build this benchmark"""

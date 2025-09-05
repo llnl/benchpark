@@ -37,12 +37,6 @@ def Scaling(*modes):
             description="Number of experiments to be generated",
         )
 
-        # variant(
-        #     "scaling",
-        #     default="off",
-        #     values=("off",) + tuple(m.value for m in modes),
-        #     description="Scaling modes",
-        # )
         variant(
             "strong",
             default=False,
