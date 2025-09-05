@@ -44,7 +44,8 @@ def make_aggregate_script(script_path, batch_lines, to_aggregate):
 def collect_scheduler_options(experiment_script):
     # Should only take 1 line per scheduler to handle all schedulers
     batch_patterns = [
-        r"\s*#\s*(flux:.*$)"
+        r"\s*#\s*(flux:.*$)",
+        r"\s*#SBATCH\s+(.*)$",
     ]
     batch_opts = list()
     batch_lines = list()
