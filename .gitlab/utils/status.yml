@@ -1,0 +1,57 @@
+# Utility for pushing test status to GitHub CI and CDash
+.push_status: &push_status
+  # Max job name length 140 characters
+  - |
+    TRUNCATED_JOB_NAME=$(echo "${CI_JOB_NAME}" | cut -c1-140)
+    curl -X POST --url "https://api.github.com/repos/llnl/${CI_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+         --header 'Content-Type: application/json' \
+         --header "authorization: Bearer ${GITHUB_TOKEN}" \
+         --data "{ \"state\": \"${pipeline_status}\", \"target_url\": \"${CI_JOB_URL}\", \"description\": \"${TRUNCATED_JOB_NAME}\", \"context\": \"ci/gitlab/${CI_JOB_NAME}\" }"
+.report_status:
+  before_script:
+    - export pipeline_status="pending"
+    - *push_status
+  after_script:
+    - |
+      if [[ "$CI_JOB_STATUS" == "failed" ]]; then
+        export pipeline_status="failure"
+        export EXIT_CODE=false
+        export RUN_CTEST=true
+      elif [[ "$CI_JOB_STATUS" == "canceled" ]]; then
+        export pipeline_status="$CI_JOB_STATUS"
+        export RUN_CTEST=false
+      elif [[ "$CI_JOB_STATUS" == "success" ]]; then
+        export pipeline_status="$CI_JOB_STATUS"
+        export EXIT_CODE=true
+        export RUN_CTEST=true
+      else
+        echo "ERROR: Unexpected status CI_JOB_STATUS=$CI_JOB_STATUS"
+        export RUN_CTEST=false
+      fi
+    - |
+      if [[ $RUN_CTEST == "true" ]]; then
+        # associative array (Bash 4+)
+        declare -A DASHBOARD_NAMES
+        # Map cluster names to their full dashboard names
+        DASHBOARD_NAMES["tuolumne"]="Tuolumne HPECray-zen4-MI300A-Slingshot [benchpark system init --dest=tuolumne-system llnl-elcapitan cluster=tuolumne]"
+        DASHBOARD_NAMES["tioga"]="Tioga HPECray-zen3-MI250X-Slingshot [benchpark system init --dest=tioga-system llnl-elcapitan cluster=tioga]"
+        DASHBOARD_NAMES["lassen"]="Lassen IBM-power9-V100-Infiniband [benchpark system init --dest=lassen-system llnl-sierra]"
+        DASHBOARD_NAMES["dane"]="Dane DELL-sapphirerapids-OmniPath [benchpark system init --dest=dane-system llnl-cluster cluster=dane]"
+        # Set DASHBOARD_NAME to env var if set, otherwise from array
+        DASHBOARD_NAME="${DASHBOARD_NAME:-${DASHBOARD_NAMES[$HOST]}}"
+        # Run ctest
+        module load cmake/3.23.1
+        BV=""
+        if [[ -n "$BENCHMARK_VERSION" ]]; then
+          BV="@${BENCHMARK_VERSION}"
+        fi
+        ctest -S CTestGitlab.cmake \
+          -DHOST="${HOST}" \
+          -DDASHBOARD_NAME="${DASHBOARD_NAME}" \
+          -DBUILD_NAME="${HOST}/${BENCHMARK}${BV} ${VARIANT} ${SYSTEM_ARGS}" \
+          -DSITE="$(hostname)" \
+          -DTEST_TYPE="${TEST_TYPE}"
+      else
+        echo "Skipping ctest execution due to CI_JOB_STATUS=$CI_JOB_STATUS"
+      fi
+    - *push_status

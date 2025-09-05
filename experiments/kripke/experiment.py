@@ -3,131 +3,134 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.error import BenchparkError
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
-from benchpark.scaling import StrongScaling
-from benchpark.scaling import WeakScaling
-from benchpark.scaling import ThroughputScaling
+from benchpark.scaling import ScalingMode, Scaling
 from benchpark.caliper import Caliper
 
 
 class Kripke(
     Experiment,
+    MpiOnlyExperiment,
     OpenMPExperiment,
     CudaExperiment,
     ROCmExperiment,
-    StrongScaling,
-    WeakScaling,
-    ThroughputScaling,
+    Scaling(ScalingMode.Strong, ScalingMode.Weak, ScalingMode.Throughput),
     Caliper,
 ):
     variant(
         "workload",
         default="kripke",
+        values=("kripke",),
         description="problem1 or problem2",
     )
 
     variant(
         "version",
-        default="develop",
+        default="2025-07",
+        values=("develop", "latest", "2025-07", "1.2.7.0"),
         description="app version",
+    )
+
+    variant(
+        "single_memory",
+        default=False,
+        description="Enable single memory space model in rocm",
     )
 
     maintainers("pearce8")
 
     def compute_applications_section(self):
-        # TODO: Replace with conflicts clause
-        scaling_modes = {
-            "strong": self.spec.satisfies("+strong"),
-            "weak": self.spec.satisfies("+weak"),
-            "throughput": self.spec.satisfies("+throughput"),
-            "single_node": self.spec.satisfies("+single_node"),
-        }
-
-        scaling_mode_enabled = [key for key, value in scaling_modes.items() if value]
-        if len(scaling_mode_enabled) != 1:
-            raise BenchparkError(
-                f"Only one type of scaling per experiment is allowed for application package {self.name}"
+        if self.spec.satisfies("exec_mode=test"):
+            # Number of processes in each dimension
+            self.add_experiment_variable(
+                "n_resources_dict", {"npx": 2, "npy": 2, "npz": 1}, True
             )
 
-        input_variables = {
-            "ngroups": 64,
-            "gs": 1,
-            "nquad": 128,
-            "ds": 128,
-            "lorder": 4,
-        }
-
-        # Number of processes in each dimension
-        num_procs = {"npx": 2, "npy": 2, "npz": 1}
-
-        # Number of zones in each dimension, per process
-        problem_sizes = {"nzx": 64, "nzy": 64, "nzz": 32}
-
-        for k, v in input_variables.items():
-            self.add_experiment_variable(k, v, True)
-
-        if self.spec.satisfies("+single_node"):
-            n_resources = 1
-            # TODO: Check if n_ranks / n_resources_per_node <= 1
-            for pk, pv in num_procs.items():
-                self.add_experiment_variable(pk, pv, True)
-                n_resources *= pv
-            for nk, nv in problem_sizes.items():
-                self.add_experiment_variable(nk, nv, True)
-        elif self.spec.satisfies("+throughput"):
-            n_resources = 1
-            for pk, pv in num_procs.items():
-                self.add_experiment_variable(pk, pv, True)
-                n_resources *= pv
-            scaled_variables = self.generate_throughput_scaling_params(
-                {tuple(problem_sizes.keys()): list(problem_sizes.values())},
-                int(self.spec.variants["scaling-factor"][0]),
-                int(self.spec.variants["scaling-iterations"][0]),
+            # Per-process size (in zones) in each dimension
+            self.add_experiment_variable(
+                "total_problem_size_dict", {"nzx": 32, "nzy": 32, "nzz": 16}, True
             )
-            for nk, nv in scaled_variables.items():
-                self.add_experiment_variable(nk, nv, True)
-        elif self.spec.satisfies("+strong"):
-            scaled_variables = self.generate_strong_scaling_params(
-                {tuple(num_procs.keys()): list(num_procs.values())},
-                int(self.spec.variants["scaling-factor"][0]),
-                int(self.spec.variants["scaling-iterations"][0]),
-            )
-            for pk, pv in scaled_variables.items():
-                self.add_experiment_variable(pk, pv, True)
-            n_resources = [
-                x * y * z
-                for x, y, z in zip(
-                    *(scaled_variables[p] for p in num_procs if p in scaled_variables)
-                )
-            ]
-            for nk, nv in problem_sizes.items():
-                self.add_experiment_variable(nk, nv, True)
-        elif self.spec.satisfies("+weak"):
-            scaled_variables = self.generate_weak_scaling_params(
-                {tuple(num_procs.keys()): list(num_procs.values())},
-                {tuple(problem_sizes.keys()): list(problem_sizes.values())},
-                int(self.spec.variants["scaling-factor"][0]),
-                int(self.spec.variants["scaling-iterations"][0]),
-            )
-            n_resources = [
-                x * y * z
-                for x, y, z in zip(
-                    *(scaled_variables[p] for p in num_procs if p in scaled_variables)
-                )
-            ]
-            for k, v in scaled_variables.items():
-                self.add_experiment_variable(k, v, True)
 
-        if self.spec.satisfies("+openmp"):
-            self.add_experiment_variable("n_ranks", n_resources, True)
-            self.add_experiment_variable("n_threads_per_proc", 1, True)
-        elif self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
-            self.add_experiment_variable("n_gpus", n_resources, True)
+            self.add_experiment_variable("ngroups", 64, True)
+            self.add_experiment_variable("gs", 1, True)
+            self.add_experiment_variable("nquad", 128, True)
+            self.add_experiment_variable("ds", 128, True)
+            self.add_experiment_variable("lorder", 4, True)
+        # Must be exec_mode=perf
+        else:
+            # Number of processes in each dimension
+            self.add_experiment_variable(
+                "n_resources_dict",
+                {"npx": [2, 2, 2], "npy": [2, 2, 2], "npz": [1, 1, 1]},
+                True,
+            )
+
+            # Per-process size (in zones) in each dimension
+            self.add_experiment_variable(
+                "total_problem_size_dict",
+                {"nzx": [64, 64, 64], "nzy": [64, 64, 64], "nzz": [32, 32, 32]},
+                True,
+            )
+
+            self.add_experiment_variable("ngroups", [220, 320, 360], True)
+            self.add_experiment_variable("gs", 1, True)
+            self.add_experiment_variable("nquad", 36, True)
+            self.add_experiment_variable("ds", 36, True)
+            self.add_experiment_variable("lorder", 4, True)
+            self.add_experiment_variable("layout", "GDZ", True)
+
+        # Set the variables required by the experiment
+        self.set_required_variables(
+            n_resources="{npx}*{npy}*{npz}",
+            process_problem_size="({nzx}*{nzy}*{nzz})/({npx}*{npy}*{npz})",
+            total_problem_size="{nzx}*{nzy}*{nzz}",
+        )
+
+        # In this application, since the input problem sizes (total_problem_size_dict)
+        # are global process sizes, strong scaling the problem requires that
+        # only n_resources_dict are scaled up, i.e. (x * scaling_factor),
+        # total_problem_size_dict remain unchanged
+
+        # For weak scaling, both n_resources_dict and total_problem_size_dict
+        # have to be scaled up i.e. (x * scaling_factor)
+
+        self.register_scaling_config(
+            {
+                ScalingMode.Strong: {
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
+                    * scaling_factor,
+                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    ),
+                },
+                ScalingMode.Weak: {
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
+                    * scaling_factor,
+                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
+                    * scaling_factor,
+                },
+                ScalingMode.Throughput: {
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    ),
+                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
+                    * scaling_factor,
+                },
+            }
+        )
 
         if self.spec.satisfies("+openmp"):
             self.add_experiment_variable("arch", "OpenMP")
@@ -135,8 +138,23 @@ class Kripke(
             self.add_experiment_variable("arch", "CUDA")
         elif self.spec.satisfies("+rocm"):
             self.add_experiment_variable("arch", "HIP")
+        else:
+            self.add_experiment_variable("arch", "Sequential")
+
+        if self.spec.satisfies("+openmp"):
+            self.add_experiment_variable("n_threads_per_proc", 1, True)
+        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+            self.add_experiment_variable("n_gpus", "{n_resources}", True)
+        else:
+            self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
     def compute_package_section(self):
         # get package version
-        app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, [f"kripke@{app_version} +mpi"])
+        single_memory = (
+            "+single_memory"
+            if self.spec.variants["single_memory"][0]
+            else "~single_memory"
+        )
+        self.add_package_spec(
+            self.name, [f"kripke{self.determine_version()} {single_memory} "]
+        )

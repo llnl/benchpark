@@ -5,10 +5,11 @@
 
 from benchpark.directives import variant
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.openmp import OpenMPExperiment
 
 
-class SalmonTddft(Experiment, OpenMPExperiment):
+class SalmonTddft(Experiment, MpiOnlyExperiment, OpenMPExperiment):
     variant(
         "workload",
         default="gs",
@@ -43,8 +44,9 @@ class SalmonTddft(Experiment, OpenMPExperiment):
         self.add_experiment_variable("processes_per_node", ["4"])
         self.add_experiment_variable("n_nodes", ["1"], True)
 
-    def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
+        self.set_required_variables(
+            n_resources="{n_ranks}", process_problem_size="", total_problem_size=""
+        )
 
-        self.add_package_spec(self.name, [f"salmon-tddft@{app_version}"])
+    def compute_package_section(self):
+        self.add_package_spec(self.name, [f"salmon-tddft{self.determine_version()}"])

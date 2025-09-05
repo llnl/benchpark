@@ -29,6 +29,8 @@ class AllocOpt(Enum):
     TIMEOUT = 201  # This is assumed to be in minutes
     MAX_REQUEST = 202
     QUEUE = 203
+    BANK = 204
+    MAX_NODES = 205
 
     # Exec customization for inserting arbitrary options and commands,
     # inserted verbatim
@@ -36,6 +38,7 @@ class AllocOpt(Enum):
     EXTRA_CMD_OPTS = 301
     POST_EXEC_CMDS = 302
     PRE_EXEC_CMDS = 303
+    GPU_FACTOR = 304
 
     @staticmethod
     def as_type(enumval, input):
@@ -46,6 +49,7 @@ class AllocOpt(Enum):
             AllocOpt.EXTRA_CMD_OPTS,
             AllocOpt.POST_EXEC_CMDS,
             AllocOpt.PRE_EXEC_CMDS,
+            AllocOpt.BANK,
         ]:
             return str(input)
         else:
@@ -62,6 +66,7 @@ class AllocAlias:
 
 
 SENTINEL_UNDEFINED_VALUE_STR = "placeholder"
+SENTINEL_UNDEFINED_VALUE_INT = 2**64 - 1
 
 
 class AttrDict(dict):
@@ -100,11 +105,8 @@ class AttrDict(dict):
     def _nullify_placeholders(v):
         # If we see a string variable set to "placeholder" we assume the
         # user wants us to set it.
-        # For integers, values exceeding max_request are presumed to be
-        # placeholders.
-        max_request_int = v.max_request or 1000
         placeholder_checks = {
-            int: lambda x: x > max_request_int,
+            int: lambda x: x == SENTINEL_UNDEFINED_VALUE_INT,
             str: lambda x: x == SENTINEL_UNDEFINED_VALUE_STR,
         }
         for var, val in v.defined():
@@ -294,7 +296,6 @@ class Allocation(BasicModifier):
         if not v.n_threads_per_proc:
             v.n_threads_per_proc = 1
 
-        max_request = v.max_request or 1000
         # Final check, make sure the above arithmetic didn't result in an
         # unreasonable allocation request.
         for var, val in v.defined():
@@ -302,8 +303,11 @@ class Allocation(BasicModifier):
                 int(val)
             except (ValueError, TypeError):
                 continue
-            if val > max_request:
-                raise ValueError(f"Request exceeds maximum: {var}/{val}/{max_request}")
+
+        if v.max_nodes and v.n_nodes > v.max_nodes:
+            raise ValueError(
+                f"{v.n_nodes} nodes is unsatisfiable for queue '{v.queue}' (max {v.max_nodes})."
+            )
 
     def slurm_instructions(self, v):
         sbatch_opts, srun_opts = Allocation._init_batch_and_cmd_opts(v)
@@ -315,8 +319,16 @@ class Allocation(BasicModifier):
         if v.n_nodes:
             srun_opts.append(f"-N {v.n_nodes}")
 
+        if v.queue:
+            sbatch_opts.append(f"-p {v.queue}")
+
         if v.timeout:
             sbatch_opts.append(f"--time {v.timeout}")
+
+        if v.bank:
+            sbatch_opts.append(f"--account {v.bank}")
+
+        sbatch_opts.append("--exclusive")
 
         sbatch_directives = list(f"#SBATCH {x}" for x in (srun_opts + sbatch_opts))
 
@@ -371,21 +383,31 @@ class Allocation(BasicModifier):
     def flux_instructions(self, v):
         batch_opts, cmd_opts = Allocation._init_batch_and_cmd_opts(v)
 
+        # Always run exclusive for mpibind + flux.
+        # Otherwise, binding may oversubscribe cores before all cores are allocated.
+        cmd_opts.append("--exclusive")
+        # Required for '--exclusive'. Will be computed, if not defined, from initialization
+        cmd_opts.append(f"-N {v.n_nodes}")
+
+        cmd_ranks = ""
         if v.n_ranks:
-            cmd_opts.append(f"-n {v.n_ranks}")
-        if v.n_nodes:
-            cmd_opts.append(f"-N {v.n_nodes}")
-            cmd_opts.append("--exclusive")
+            cmd_ranks = f"-n {v.n_ranks}"
         if v.n_gpus:
             gpus_per_rank = 1  # self.gpus_as_gpus_per_rank(v)
             cmd_opts.append(f"-g={gpus_per_rank}")
 
+        if v.queue:
+            batch_opts.append(f"-q {v.queue}")
+
         if v.timeout:
             batch_opts.append(f"-t {v.timeout}m")
 
+        if v.bank:
+            batch_opts.append(f"-B {v.bank}")
+
         batch_directives = list(f"# flux: {x}" for x in (cmd_opts + batch_opts))
 
-        v.mpi_command = f"flux run {' '.join(cmd_opts)}"
+        v.mpi_command = f"flux run {' '.join([cmd_ranks] + cmd_opts)}"
         v.batch_submit = "flux batch {execute_experiment}"
         v.allocation_directives = "\n".join(batch_directives)
 
@@ -456,8 +478,5 @@ class Allocation(BasicModifier):
                 f"scheduler ({v.scheduler}) must be one of : "
                 + " ".join(handler.keys())
             )
-
-        if not v.timeout:
-            v.timeout = 120
 
         handler[v.scheduler](v)

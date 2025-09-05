@@ -20,6 +20,7 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     license("Apache-2.0")
 
     version("develop", branch="main")
+    version("20240511", commit="19bc10c925c4434da72a9cbb4fa1a009dbc52f33")
 
     variant("mpi", default=True, description="Enable MPI support")
     variant("openmp", default=False, description="Enable OpenMP support")
@@ -35,14 +36,19 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("hypre+mixedint~fortran")
 
     depends_on("hypre+cuda", when="+cuda")
+    depends_on("hypre+cublas", when="+cuda")
+    depends_on("hypre+openmp", when="+openmp")
     requires("+cuda", when="^hypre+cuda")
     for arch in ("none", "50", "60", "70", "80", "90"):
         depends_on(f"hypre cuda_arch={arch}", when=f"cuda_arch={arch}")
 
     depends_on("hypre+rocm", when="+rocm")
+    depends_on("hypre+rocblas", when="+rocm")
     requires("+rocm", when="^hypre+rocm")
     for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
         depends_on(f"hypre amdgpu_target={target}", when=f"amdgpu_target={target}")
+
+    depends_on("hypre+gpu-aware-mpi", when="^cray-mpich+gtl")
 
     def setup_build_environment(self, env):
         if "+cuda" in self.spec:

@@ -5,11 +5,13 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.caliper import Caliper
 
 
 class Stream(
     Experiment,
+    MpiOnlyExperiment,
     Caliper,
 ):
     variant(
@@ -20,7 +22,8 @@ class Stream(
 
     variant(
         "version",
-        default="5.10",
+        default="5.10-caliper",
+        values=("develop", "latest", "5.10-caliper"),
         description="app version",
     )
 
@@ -30,18 +33,22 @@ class Stream(
 
         array_size = {"s": 650000000}
 
-        self.add_experiment_variable("processes_per_node", "1", True)
+        self.add_experiment_variable("processes_per_node", "1", named=True)
         self.add_experiment_variable("n", "35", False)
         self.add_experiment_variable("o", "0", False)
         self.add_experiment_variable("n_ranks", 1, True)
-        self.add_experiment_variable("n_threads_per_proc", [16, 32], True)
-
-        self.matrix_experiment_variables("n_threads_per_proc")
+        self.add_experiment_variable(
+            "n_threads_per_proc", [16, 32], named=True, matrixed=True
+        )
 
         for pk, pv in array_size.items():
             self.add_experiment_variable(pk, pv, True)
 
+        self.set_required_variables(
+            n_resources="{n_ranks}",
+            process_problem_size="{n}/{n_ranks}",
+            total_problem_size="{n}",
+        )
+
     def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, [f"stream@{app_version}"])
+        self.add_package_spec(self.name, [f"stream{self.determine_version()}"])

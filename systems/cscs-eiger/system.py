@@ -3,14 +3,16 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant
-
+from benchpark.directives import variant, maintainers
 from benchpark.system import System
+from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from packaging.version import Version
 from benchpark.paths import hardware_descriptions
 
 
 class CscsEiger(System):
+
+    maintainers("pearce8")
 
     id_to_resources = {
         "eiger": {
@@ -30,6 +32,7 @@ class CscsEiger(System):
 
     def __init__(self, spec):
         super().__init__(spec)
+        self.programming_models = [OpenMPCPUOnlySystem()]
 
         self.gcc_version = Version("12.3.0")
 

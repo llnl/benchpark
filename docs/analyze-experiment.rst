@@ -3,13 +3,13 @@
 
    SPDX-License-Identifier: Apache-2.0
 
-=============================
-Experiment pass/fail and FOMs
-=============================
+====================
+Experiment pass/fail
+====================
 
 Once the experiments completed running, the command::
 
-  ramble --disable-progress-bar --workspace-dir . workspace analyze 
+  ramble --workspace-dir . workspace analyze 
 
 can be used to analyze figures of merit and evaluate 
 `success/failure <https://ramble.readthedocs.io/en/latest/success_criteria.html#success-criteria>`_

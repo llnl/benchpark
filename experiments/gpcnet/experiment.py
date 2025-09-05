@@ -3,12 +3,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
-from benchpark.scaling import StrongScaling
+from benchpark.mpi import MpiOnlyExperiment
 
 
-class Gpcnet(Experiment, StrongScaling):
+class Gpcnet(Experiment, MpiOnlyExperiment):
     variant(
         "workload",
         default="network_test",
@@ -18,9 +18,12 @@ class Gpcnet(Experiment, StrongScaling):
 
     variant(
         "version",
-        default="master",
+        default="1.2",
+        values=("master", "latest", "1.2"),
         description="app version",
     )
+
+    maintainers("rfhaque")
 
     def compute_applications_section(self):
         # TODO: Replace with conflicts clause
@@ -32,7 +35,9 @@ class Gpcnet(Experiment, StrongScaling):
         elif self.spec.satisfies("workload=network_load_test"):
             self.add_experiment_variable("n_nodes", "10")
 
+        self.set_required_variables(
+            n_resources="{n_ranks}", process_problem_size="", total_problem_size=""
+        )
+
     def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, [f"gpcnet@{app_version} +mpi"])
+        self.add_package_spec(self.name, [f"gpcnet{self.determine_version()}"])

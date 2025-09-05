@@ -22,6 +22,9 @@
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
     :target: https://github.com/psf/black
 
+.. image:: https://img.shields.io/badge/Dashboard-CDash-blue
+    :target: https://my.cdash.org/index.php?project=Benchpark
+
 Overview
 --------
 You can find detailed documentation at `software.llnl.gov/benchpark
@@ -88,6 +91,10 @@ In Workshops of The International Conference on High Performance Computing,
 Network, Storage, and Analysis (SC-W 2023), November 12–17, 2023, Denver, CO, USA.
 ACM, New York, NY, USA, 9 pages.
 `doi.org/10.1145/3624062.3624135 <https://doi.org/10.1145/3624062.3624135>`_.
+
+Olga Pearce, Gregory Becker, Stephanie Brink, Nathan Hanford, Dewi Yokelson, August Knox, and Barry Rountree.
+2025. HPC Benchmarking: Repeat, Replicate, Reproduce.
+ACM Conference on Reproducibility and Replicability, July 29-31, Vancouver, Canada.
 
 License
 -------

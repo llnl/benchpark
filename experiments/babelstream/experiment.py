@@ -27,7 +27,7 @@ class Babelstream(
     variant(
         "version",
         default="caliper",
-        values=("4.0", "develop", "caliper"),
+        values=("develop", "latest", "5.0", "caliper"),
         description="app version",
     )
 
@@ -53,7 +53,11 @@ class Babelstream(
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_experiment_variable("n_gpus", n_resources, True)
 
+        self.set_required_variables(
+            n_resources=f"{n_resources}",
+            process_problem_size="{n}/" + str(n_resources),
+            total_problem_size="{n}",
+        )
+
     def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, [f"babelstream@{app_version}"])
+        self.add_package_spec(self.name, [f"babelstream{self.determine_version()}"])

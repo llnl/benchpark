@@ -4,41 +4,54 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.directives import variant
+from benchpark.directives import variant, maintainers
+from benchpark.paths import hardware_descriptions
+from benchpark.rocmsystem import ROCmSystem
 from benchpark.system import System
 from packaging.version import Version
-from benchpark.paths import hardware_descriptions
 
 
 class CscLumi(System):
 
+    maintainers("mckinsey1")
+
     id_to_resources = {
         "lumi": {
+            "rocm_arch": "gfx90a",
+            "gtl_flag": "",
             "sys_cores_per_node": 64,
             "sys_gpus_per_node": 8,
             "sys_mem_per_node": 512,
             "system_site": "csc",
+            "scheduler": "slurm",
             "hardware_key": str(hardware_descriptions)
             + "/HPECray-zen3-MI250X-Slingshot/hardware_description.yaml",
         }
     }
 
     variant(
+        "rocm",
+        default="5.6.1",
+        description="ROCm version",
+    )
+    variant(
+        "gtl",
+        default=False,
+        values=(True, False),
+        description="Use GTL-enabled MPI",
+    )
+    variant(
         "compiler",
         default="cce15",
         values=("gcc11", "gcc12", "cce14", "cce15", "cce16"),
         description="Which compiler to use",
     )
-    variant(
-        "rocm",
-        default="5.6.1",
-        description="ROCm version",
-    )
 
     def __init__(self, spec):
         super().__init__(spec)
-
+        self.programming_models = [ROCmSystem()]
         self.rocm_version = Version(self.spec.variants["rocm"][0])
+        self.gtl_flag = self.spec.variants["gtl"][0]
 
         full_versions = {
             "cce16": "16.0.1",
@@ -51,16 +64,9 @@ class CscLumi(System):
             if key == self.spec.variants["compiler"][0]:
                 self.compiler_version = Version(value)
 
-        self.scheduler = "slurm"
         attrs = self.id_to_resources.get("lumi")
         for k, v in attrs.items():
             setattr(self, k, v)
-
-    def system_specific_variables(self):
-        return {
-            "rocm_arch": "gfx90a",
-            "gtl_flag": "",
-        }
 
     def compute_packages_section(self):
 
@@ -576,16 +582,16 @@ class CscLumi(System):
                     "default-compiler": {
                         "pkg_spec": f"{self.spec.variants['compiler'][0]}"
                     },
-                    "default-mpi": {"pkg_spec": "cray-mpich@8.1%cce ~gtl"},
+                    "default-mpi": {"pkg_spec": "cray-mpich@8.1~gtl %cce"},
                     "compiler-rocm": {
                         "pkg_spec": f"{self.spec.variants['compiler'][0]}"
                     },
                     "blas-rocm": {"pkg_spec": f"rocblas@{self.rocm_version}"},
                     "blas": {"pkg_spec": "cray-libsci@23"},
                     "lapack": {"pkg_spec": "cray-libsci@23"},
-                    "mpi-rocm-gtl": {"pkg_spec": "cray-mpich@8.1%cce +gtl"},
-                    "mpi-rocm-no-gtl": {"pkg_spec": "cray-mpich@8.1%cce ~gtl"},
-                    "mpi-gcc": {"pkg_spec": "cray-mpich@8.1%gcc ~gtl"},
+                    "mpi-rocm-gtl": {"pkg_spec": "cray-mpich@8.1+gtl %cce"},
+                    "mpi-rocm-no-gtl": {"pkg_spec": "cray-mpich@8.1~gtl %cce"},
+                    "mpi-gcc": {"pkg_spec": "cray-mpich@8.1~gtl %gcc"},
                 }
             }
         }

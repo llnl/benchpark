@@ -2,9 +2,12 @@
 # Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: Apache-2.0
-import yaml
 
-import benchpark.experiment
+import yaml
+import sys
+
+import pytest
+
 import benchpark.spec
 
 
@@ -101,7 +104,7 @@ def test_compute_ramble_dict_caliper(monkeypatch):
 
 def test_default_include_section():
     spec = benchpark.spec.ExperimentSpec("saxpy").concretize()
-    experiment = benchpark.experiment.Experiment(spec)
+    experiment = spec.experiment
 
     include_section = experiment.compute_include_section()
 
@@ -110,23 +113,35 @@ def test_default_include_section():
 
 def test_default_config_section():
     spec = benchpark.spec.ExperimentSpec("saxpy").concretize()
-    experiment = benchpark.experiment.Experiment(spec)
+    experiment = spec.experiment
 
     config_section = experiment.compute_config_section()
 
     assert config_section == {
+        "benchpark_experiment_command": "benchpark "
+        + " ".join(sys.argv[1:]),  # Not applicable here
         "deprecated": True,
         "spack_flags": {
             "install": "--add --keep-stage",
             "concretize": "-U -f",
         },
+        "system": {},
     }
 
 
 def test_default_modifiers_section():
     spec = benchpark.spec.ExperimentSpec("saxpy").concretize()
-    experiment = benchpark.experiment.Experiment(spec)
+    experiment = spec.experiment
 
     modifiers_section = experiment.compute_modifiers_section_wrapper()
 
     assert modifiers_section == [{"name": "allocation"}, {"name": "exit-code"}]
+
+
+def test_multiple_models():
+    with pytest.raises(
+        benchpark.error.BenchparkError,
+        match="spec cannot specify multiple mutually-exclusive programming models",
+    ):
+        spec = benchpark.spec.ExperimentSpec("saxpy+rocm+openmp").concretize()
+        spec.experiment

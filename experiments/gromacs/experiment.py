@@ -5,6 +5,7 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
@@ -12,6 +13,7 @@ from benchpark.rocm import ROCmExperiment
 
 class Gromacs(
     Experiment,
+    MpiOnlyExperiment,
     OpenMPExperiment,
     CudaExperiment,
     ROCmExperiment,
@@ -42,6 +44,12 @@ class Gromacs(
     )
 
     def compute_applications_section(self):
+        # MPI-only defaults
+        self.add_experiment_variable("n_ranks", 8, True)
+        target = "cpu"
+        bonded_target = "cpu"
+        npme = "0"
+
         if self.spec.satisfies("+openmp"):
             self.set_environment_variable("OMP_PROC_BIND", "close")
             self.set_environment_variable("OMP_PLACES", "cores")
@@ -86,11 +94,14 @@ class Gromacs(
         for k, v in other_input_variables.items():
             self.add_experiment_variable(k, v)
 
-    def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
+        self.set_required_variables(
+            n_resources="{n_ranks}",
+            process_problem_size="{size}/{n_ranks}",
+            total_problem_size="{size}",
+        )
 
-        spack_specs = "+mpi~hwloc"
+    def compute_package_section(self):
+        spack_specs = "~hwloc"
         spack_specs += "+sycl" if self.spec.satisfies("+rocm") else "~sycl"
 
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
@@ -101,5 +112,5 @@ class Gromacs(
 
         self.add_package_spec(
             self.name,
-            [f"gromacs@{app_version} {spack_specs}"],
+            [f"gromacs{self.determine_version()} {spack_specs}"],
         )

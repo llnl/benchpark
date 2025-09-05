@@ -3,10 +3,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-
 from benchpark.directives import variant, maintainers
-from benchpark.system import System
+from benchpark.cudasystem import CudaSystem
 from benchpark.paths import hardware_descriptions
+from benchpark.system import System, JobQueue
+from benchpark.openmpsystem import OpenMPCPUOnlySystem
+from packaging.version import Version
 
 
 class LlnlSierra(System):
@@ -15,56 +17,77 @@ class LlnlSierra(System):
 
     id_to_resources = {
         "lassen": {
-            "sys_cores_per_node": 44,
+            "cuda_arch": 70,
+            "sys_cores_per_node": 40,
+            "sys_cores_os_reserved_per_node": 4,
+            "sys_cores_os_reserved_per_node_list": [
+                0,
+                1,
+                22,
+                23,
+            ],  # First two cores on each socket reserved.
             "sys_gpus_per_node": 4,
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/IBM-power9-V100-Infiniband/hardware_description.yaml",
+            "queues": [JobQueue("pdebug", 120, 18), JobQueue("pbatch", 720, 256)],
         },
     }
     id_to_resources["sierra"] = id_to_resources["lassen"]
+    id_to_resources["sierra"]["queues"] = [
+        JobQueue("pdebug", 120, 18),
+        JobQueue("pbatch", 1440, 2048),
+    ]
 
     variant(
         "cuda",
-        default="11-8-0",
-        values=("11-8-0", "10-1-243"),
+        default="11.8.0",
+        values=("11.8.0", "10.1.243"),
         description="CUDA version",
     )
-
+    variant(
+        "gtl",
+        default=False,
+        values=(True, False),
+        description="Use GTL-enabled MPI",
+    )
     variant(
         "compiler",
         default="clang-ibm",
         values=("clang-ibm", "xl", "xl-gcc", "clang"),
         description="Which compiler to use",
     )
-
     variant(
         "lapack",
-        default="cusolver",
-        values=("cusolver", "essl"),
+        default="essl",
+        values=("essl",),
         description="Which lapack to use",
+    )
+    variant(
+        "blas",
+        default="essl",
+        values=("essl",),
+        description="Which blas to use",
     )
 
     variant(
-        "blas",
-        default="cublas",
-        values=("cublas", "essl"),
-        description="Which blas to use",
+        "bank",
+        default="none",
+        values=("none", "guests", "asccasc", "lc", "fractale"),
+        multi=False,
+        description="Submit a job to a specific named bank",
     )
 
     def __init__(self, spec):
         super().__init__(spec)
+        self.programming_models = [CudaSystem(), OpenMPCPUOnlySystem()]
+        self.cuda_version = Version(self.spec.variants["cuda"][0])
+        self.gtl_flag = self.spec.variants["gtl"][0]
 
         self.scheduler = "lsf"
         attrs = self.id_to_resources.get("lassen")
         for k, v in attrs.items():
             setattr(self, k, v)
-
-    def system_specific_variables(self):
-        return {
-            "cuda_arch": 70,
-            "default_cuda_version": self.spec.variants["cuda"][0].replace("-", "."),
-        }
 
     def compute_packages_section(self):
 
@@ -132,7 +155,7 @@ class LlnlSierra(System):
             }
         }
         # 00-version-10-1-243-packages.yaml  01-version-11-8-0-packages.yaml
-        if self.spec.satisfies("cuda=10-1-243"):
+        if self.spec.satisfies("cuda=10.1.243"):
             selections["packages"] |= {
                 "curand": {
                     "externals": [
@@ -189,7 +212,7 @@ class LlnlSierra(System):
                     "buildable": False,
                 },
             }
-        elif self.spec.satisfies("cuda=11-8-0"):
+        elif self.spec.satisfies("cuda=11.8.0"):
             selections["packages"] |= {
                 "curand": {
                     "externals": [
@@ -248,7 +271,7 @@ class LlnlSierra(System):
             }
 
         if self.spec.satisfies("lapack=cusolver"):
-            if self.spec.satisfies("cuda=10-1-243"):
+            if self.spec.satisfies("cuda=10.1.243"):
                 selections["packages"] |= {
                     "cusolver": {
                         "externals": [
@@ -260,7 +283,7 @@ class LlnlSierra(System):
                         "buildable": False,
                     }
                 }
-            elif self.spec.satisfies("cuda=11-8-0"):
+            elif self.spec.satisfies("cuda=11.8.0"):
                 selections["packages"] |= {
                     "cusolver": {
                         "externals": [
@@ -286,7 +309,7 @@ class LlnlSierra(System):
             }
 
         if self.spec.satisfies("blas=cublas"):
-            if self.spec.satisfies("cuda=10-1-243"):
+            if self.spec.satisfies("cuda=10.1.243"):
                 selections["packages"] |= {
                     "cublas": {
                         "externals": [
@@ -298,7 +321,7 @@ class LlnlSierra(System):
                         "buildable": False,
                     }
                 }
-            elif self.spec.satisfies("cuda=11-8-0"):
+            elif self.spec.satisfies("cuda=11.8.0"):
                 selections["packages"] |= {
                     "cublas": {
                         "externals": [
@@ -388,7 +411,7 @@ class LlnlSierra(System):
         }
 
         compiler = self.spec.variants["compiler"][0]
-        cuda_ver = self.spec.variants["cuda"][0]
+        cuda_ver = self.spec.variants["cuda"][0].replace(".", "-")
         cfg = mpi_cfgs[(compiler, cuda_ver)]
         selections["packages"] |= {
             "blas": {"require": [self.spec.variants["blas"][0]]},  # Replace dynamically
@@ -421,7 +444,7 @@ class LlnlSierra(System):
                         },
                         "flags": {
                             "cflags": "-g -O2",
-                            "cxxflags": "-g -O2 -std=c++14",
+                            "cxxflags": "-g -O2",
                             "fflags": "-g -O2",
                         },
                         "operating_system": "rhel7",
@@ -450,7 +473,7 @@ class LlnlSierra(System):
                         },
                         "flags": {
                             "cflags": "-g -O2",
-                            "cxxflags": "-g -O2 -std=c++14",
+                            "cxxflags": "-g -O2",
                             "fflags": "-g -O2",
                         },
                         "operating_system": "rhel7",
@@ -479,7 +502,7 @@ class LlnlSierra(System):
                         },
                         "flags": {
                             "cflags": "-g -O2",
-                            "cxxflags": "-g -O2 -std=c++14",
+                            "cxxflags": "-g -O2",
                             "fflags": "-g -O2",
                         },
                         "operating_system": "rhel7",
@@ -505,7 +528,7 @@ class LlnlSierra(System):
                         },
                         "flags": {
                             "cflags": "-g -O2",
-                            "cxxflags": "-g -O2 -std=c++14",
+                            "cxxflags": "-g -O2",
                             "fflags": "-g -O2",
                         },
                         "operating_system": "rhel7",
@@ -531,7 +554,7 @@ class LlnlSierra(System):
                         },
                         "flags": {
                             "cflags": "-g -O2",
-                            "cxxflags": "-g -O2 -std=c++14",
+                            "cxxflags": "-g -O2",
                             "fflags": "",
                         },
                         "operating_system": "rhel7",
@@ -545,7 +568,7 @@ class LlnlSierra(System):
         }
 
         compiler = self.spec.variants["compiler"][0]
-        cuda_ver = self.spec.variants["cuda"][0]
+        cuda_ver = self.spec.variants["cuda"][0].replace(".", "-")
         cfg = compiler_cfgs[(compiler, cuda_ver)]
         return {"compilers": cfg}
 

@@ -3,6 +3,8 @@
 
    SPDX-License-Identifier: Apache-2.0
 
+This page contains answers to frequently asked questions about Benchpark. If you have questions that are not answered here, feel free to ask on `#benchpark-support channel in Spack Slack <https://spackpm.slack.com/archives/C061R1M9HNJ>`_ or `GitHub Discussions <https://github.com/llnl/benchpark/discussions>`_. If you’ve learned the answer to a question that you think should be here, please consider contributing to this page.
+
 
 ==========================
 Frequently Asked Questions
@@ -73,11 +75,11 @@ What to rerun after edits
    * - What I changed
      - Commands to rerun
    * - configs
-     - ``ramble --disable-progress-bar --workspace-dir . workspace setup``
+     - ``ramble --workspace-dir . workspace setup``
    * - benchmark's package.py
-     - ``ramble --disable-progress-bar --workspace-dir . workspace setup``
+     - ``ramble --workspace-dir . workspace setup``
    * - dependency of package.py
-     - ``ramble --disable-progress-bar --workspace-dir . workspace setup``
+     - ``ramble --workspace-dir . workspace setup``
    * - experiment parameters
      - delete ``workspace/experiments``
    * - wish to rerun experiments

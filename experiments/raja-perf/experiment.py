@@ -5,19 +5,21 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
-from benchpark.scaling import StrongScaling
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
+from benchpark.scaling import ScalingMode, Scaling
 from benchpark.caliper import Caliper
 
 
 class RajaPerf(
     Experiment,
-    StrongScaling,
+    MpiOnlyExperiment,
     CudaExperiment,
     ROCmExperiment,
     OpenMPExperiment,
+    Scaling(ScalingMode.Strong, ScalingMode.Weak, ScalingMode.Throughput),
     Caliper,
 ):
     variant(
@@ -28,37 +30,65 @@ class RajaPerf(
 
     variant(
         "version",
-        default="develop",
+        default="2025.03.0",
+        values=("develop", "latest", "2025.03.0"),
         description="app version",
     )
 
     maintainers("michaelmckinsey1")
 
     def compute_applications_section(self):
+        if self.spec.satisfies("exec_mode=test"):
+            # Per-process size
+            self.add_experiment_variable("process_problem_size", 1048576, True)
+            # Number of processes
+            self.add_experiment_variable("n_resources", 1, False)
 
-        n_resources = {"n_ranks": 1}
+        self.set_required_variables(
+            total_problem_size="{n_resources}*{process_problem_size}",
+        )
 
-        if self.spec.satisfies("+single_node"):
-            for pk, pv in n_resources.items():
-                n_resources = pv
+        # In this application (RAJAPerf), since the input problem sizes (process_problem_size)
+        # are per process sizes, strong scaling the problem implies that
+        # as n_resources are scaled up, i.e. (x * scaling_factor),
+        # process_problem_size are commensurately scaled down i.e. (x // scaling_factor)
 
-        elif self.spec.satisfies("+strong"):
-            scaled_variables = self.generate_strong_scaling_params(
-                {tuple(n_resources.keys()): list(n_resources.values())},
-                int(self.spec.variants["scaling-factor"][0]),
-                int(self.spec.variants["scaling-iterations"][0]),
-            )
-            n_resources = scaled_variables["n_ranks"]
+        # For weak scaling, only the n_resources have to be scaled up,
+        # process_problem_size remain the same
+        self.register_scaling_config(
+            {
+                ScalingMode.Strong: {
+                    "n_resources": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "process_problem_size": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
+                    // scaling_factor,
+                },
+                ScalingMode.Weak: {
+                    "n_resources": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "process_problem_size": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    ),
+                },
+                ScalingMode.Throughput: {
+                    "n_resources": lambda var, itr, dim, scaling_factor: var.val(dim),
+                    "process_problem_size": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
+                    * scaling_factor,
+                },
+            }
+        )
 
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
-            self.add_experiment_variable("n_gpus", n_resources, True)
+            self.add_experiment_variable("n_gpus", "{n_resources}", True)
         elif self.spec.satisfies("+openmp"):
-            self.add_experiment_variable("n_ranks", n_resources, True)
+            self.add_experiment_variable("n_ranks", "{n_resources}", True)
             self.add_experiment_variable("n_threads_per_proc", 1, True)
         else:
-            self.add_experiment_variable("n_ranks", n_resources, True)
+            self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
     def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, [f"raja-perf@{app_version}"])
+        self.add_package_spec(self.name, [f"raja-perf{self.determine_version()}"])

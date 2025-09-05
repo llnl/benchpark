@@ -1,0 +1,110 @@
+include:
+  - local: .gitlab/utils/status.yml
+  - local: .gitlab/utils/rules.yml
+.test_clusters_nightly: &test_clusters_nightly
+  variables:
+    DASHBOARD_NAME: Nightly [benchpark-develop]
+    DANE_PARAMS: -N 1 -t 01:00:00 --exclusive --reservation=ci
+    ELCAP_PARAMS: -N 1 -t 60m --queue=pci --exclusive
+  parallel:
+    matrix:
+      # MPI-only tests
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: $DANE_PARAMS
+        BENCHMARK:
+          - ad
+          - amg2023
+          - gpcnet
+          - hpcg
+          - hpl
+          - ior
+          - kripke
+          - laghos
+          - lammps
+          - md-test
+          - osu-micro-benchmarks
+          - phloem
+          - raja-perf
+          - remhos
+          - salmon-tddft
+          - smb
+          - stream
+      # +rocm tests
+      - HOST: [tuolumne]
+        ARCHCONFIG: llnl-elcapitan
+        SCHEDULER_PARAMETERS: $ELCAP_PARAMS
+        BENCHMARK:
+          - amg2023
+          - babelstream
+          - kripke
+          - laghos
+          - lammps
+          - osu-micro-benchmarks
+          - raja-perf
+          - remhos
+        VARIANT: [+rocm]
+      # +openmp tests
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: $DANE_PARAMS
+        BENCHMARK:
+          - amg2023
+          - babelstream
+          - genesis
+          - hpcg
+          - hpl
+          - kripke
+          - lammps
+          - qws
+          - raja-perf
+          - salmon-tddft
+        VARIANT: [+openmp]
+      - HOST: lassen
+        ARCHCONFIG: llnl-sierra
+        SCHEDULER_PARAMETERS: -nnodes 1 -W 60 -q pci
+        BENCHMARK:
+          - amg2023
+          - babelstream
+          - kripke
+          - laghos
+          - lammps
+          - osu-micro-benchmarks
+          - raja-perf
+          - remhos
+        VARIANT: [+cuda]
+      #############
+      # Other tests
+      #############
+      # Test TPX, CPX modes on tuo
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        SCHEDULER_PARAMETERS: $ELCAP_PARAMS --setattr=gpumode=${GPUMODE} --conf=resource.rediscover=true
+        BENCHMARK: [amg2023, kripke, laghos, raja-perf]
+        VARIANT: [+rocm]
+        GPUMODE: [TPX, CPX]
+        SYSTEM_ARGS: [gpumode=$GPUMODE]
+      # Test benchmark@develop
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: $DANE_PARAMS
+        BENCHMARK:
+          - amg2023
+          - babelstream
+          - kripke
+          - lammps
+          - raja-perf
+          - remhos
+          - stream
+        BENCHMARK_VERSION: develop
+nightly_test_run:
+  extends: .nightly_rules
+  resource_group: $HOST
+  stage: test
+  tags: [$HOST, batch]
+  <<: *test_clusters_nightly
+  before_script:
+    - !reference [.report_status, before_script]
+  script: [./.gitlab/utils/run-experiment.sh]
+  after_script:
+    - !reference [.report_status, after_script]

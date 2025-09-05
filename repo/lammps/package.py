@@ -9,9 +9,11 @@ from spack.pkg.builtin.lammps import Lammps as BuiltinLammps
 
 class Lammps(BuiltinLammps):
 
+  version("stable_29Aug2024_update3", tag="stable_29Aug2024_update3")
+
   depends_on("kokkos+openmp cxxstd=17", when="+openmp")
   depends_on("kokkos+rocm", when="+rocm")
-  depends_on("kokkos@4.3.01 +cuda cxxstd=17", when="+cuda")
+  depends_on("kokkos+cuda cxxstd=17", when="+cuda")
   
   conflicts("+rocm", when="+cuda")
   conflicts("+cuda", when="+rocm")
@@ -38,3 +40,8 @@ class Lammps(BuiltinLammps):
     args.append(f"-DMPI_CXX_COMPILER={self.spec['mpi'].mpicxx}")
 
     return args
+ 
+  def install(self, spec, prefix):
+    super().install(spec, prefix)
+    mkdirp(prefix.src)
+    install_tree(self.stage.source_path, prefix.src)

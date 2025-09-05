@@ -1,26 +1,64 @@
 variables:
   LLNL_SERVICE_USER: benchpark
-# Required information about GitHub repository
-  GITHUB_PROJECT_NAME: "benchpark"
-  GITHUB_PROJECT_ORG: "LLNL"
-# Override the pattern describing branches that will skip the "draft PR filter
-# test".  Add protected branches here. See default value in
-# preliminary-ignore-draft-pr.yml.
-  ALWAYS_RUN_PATTERN: "^develop$|^master$|^v[0-9.]*$|^releases/$"
-
+  # Required information about GitHub repository
+  GITHUB_PROJECT_NAME: benchpark
+  GITHUB_PROJECT_ORG: LLNL
+  # Override the pattern describing branches that will skip the "draft PR filter
+  # test".  Add protected branches here. See default value in
+  # preliminary-ignore-draft-pr.yml.
+  ALWAYS_RUN_PATTERN: ^develop$|^master$|^v[0-9.]*$|^releases/$
+  # Expand multi-line commands in logs
+  FF_SCRIPT_SECTIONS: 1
+  # clean up the repository after the job finishes
+  FF_ENABLE_JOB_CLEANUP: 'true'
+  GIT_STRATEGY: fetch
+  # Debugging logs on gitlab
+  # CI_DEBUG_TRACE: 'true'
+  # Job variables
+  ALLOC_NAME: ${CI_PROJECT_NAME}_ci_${CI_PIPELINE_ID}
+  FLUX_ARGS: -N 1 --exclusive
+  # Dane
+  DANE_SHARED_ALLOC: -N 1 -t 04:00:00 --exclusive --reservation=ci
+  # Tuolumne (max 4hr policy)
+  TUOLUMNE_SHARED_ALLOC: -N 1 -t 2h --queue=pci --exclusive --setattr=gpumode=${GPUMODE}
+    --conf=resource.rediscover=true
+  # Tioga (max 2hr policy)
+  TIOGA_SHARED_ALLOC: -N 1 -t 2h --queue=pci --exclusive
+  CUSTOM_CI_BUILDS_DIR: $$HOME/.jacamar-ci/$CI_PIPELINE_ID
+  # Dir cleanup can take awhile
+  RUNNER_AFTER_SCRIPT_TIMEOUT: 20m
 default:
   id_tokens:
     SITE_ID_TOKEN:
       aud: https://lc.llnl.gov/gitlab
   interruptible: true
-
 include:
-  - local: '/.gitlab/ci/test.yml'
   # [Optional] checks preliminary to running the actual CI test
-  - project: 'radiuss/radiuss-shared-ci'
-    ref: 'v2024.07.0'
-    file: 'utilities/preliminary-ignore-draft-pr.yml'
-  - local: '/.gitlab/skip-branch-not-a-pr.yml'
-
+  - project: radiuss/radiuss-shared-ci
+    ref: v2024.12.0
+    file:
+      - utilities/preliminary-ignore-draft-pr.yml
+      - utilities/skip-branch-not-a-pr.yml
+  # Daily tests (from PRs)
+  - local: .gitlab/tests/shared_flux_clusters.yml
+  - local: .gitlab/tests/shared_slurm_clusters.yml
+  - local: .gitlab/tests/non_shared.yml
+  # Nightly tests
+  - local: .gitlab/tests/nightly.yml
 stages:
+  - machine-checks
+  - allocate-resources
   - test
+  - release-resources
+  - cleanup-dir
+cleanup_pipeline_dir:
+  tags: [shell, oslic]
+  needs:
+    - release_resources_dane
+    - release_resources_flux_tioga
+    - release_resources_flux_tuolumne
+  extends: .on_host_template
+  stage: cleanup-dir
+  script:
+    - echo "Removing $CUSTOM_CI_BUILDS_DIR"
+    - rm -rf $CUSTOM_CI_BUILDS_DIR

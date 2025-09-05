@@ -3,15 +3,15 @@
 
    SPDX-License-Identifier: Apache-2.0
 
-===================================
-Building an Experiment in Benchpark
-===================================
+===================
+Build an Experiment
+===================
 
-``benchpark setup`` has set up the directory structure for your experiment.
+``benchpark setup`` has created the directory structure for your experiment.
 The next step is setting up the Ramble workspace and building the code::
 
-   cd <experiments_root>/<Benchmark/ProgrammingModel>/<System>/workspace
-   ramble --disable-progress-bar --workspace-dir . workspace setup
+   cd <experiments_root>/<Benchmark>/<System>/workspace
+   ramble --workspace-dir . workspace setup
 
 
 Ramble will build the source code and set up the following workspace directory structure::
@@ -19,7 +19,7 @@ Ramble will build the source code and set up the following workspace directory s
     experiments_root/
         ramble/
         spack/
-        <Benchmark/ProgrammingModel>/
+        <Benchmark>/
             <System>/
                 workspace/
                     configs/
