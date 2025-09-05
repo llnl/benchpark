@@ -1,0 +1,39 @@
+# Copyright 2025 Benchpark Project Developers.
+# SPDX-License-Identifier: Apache-2.0
+system_definition:
+  name: HPECray-Milan-A100-Slingshot
+  integrator:
+    vendor: HPECray
+    name: Shasta/EX
+  processor:
+    vendor: AMD
+    name: EPYC-7763
+    ISA: x86_64
+    uArch: zen3
+  accelerator:
+    vendor: NVIDIA
+    name: A100
+    ISA: CUDA
+    uArch: sm80
+  interconnect:
+    vendor: HPECray
+    name: Slingshot11
+  systems-tested:
+    nersc-perlmutter-gpu:
+      os: CrayOS/PE
+      scheduler: slurm
+      compiler: cce
+      runtime: cuda
+      mpi: cray-mpich
+      installation-year: 2021
+    nersc-perlmutter-cpu:
+      os: CrayOS/PE
+      scheduler: slurm
+      compiler: cce
+      runtime: none
+      mpi: cray-mpich
+      installation-year: 2021
+  top500-system-instances:
+    Perlmutter:
+      benchpark_system: nersc-perlmutter-gpu
+      top500: https://www.top500.org/system/179842
