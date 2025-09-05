@@ -15,7 +15,6 @@ import ruamel.yaml as yaml
 import benchpark.paths
 from benchpark.debug import debug_print
 from benchpark.runtime import RuntimeResources
-import benchpark.system
 
 
 # Note: it would be nice to vendor spack.llnl.util.link_tree, but that
@@ -48,9 +47,6 @@ def setup_parser(root_parser):
         help="The experiment (benchmark/ProgrammingModel) to run",
     )
     root_parser.add_argument(
-        "system", type=str, help="The system on which to run the experiment"
-    )
-    root_parser.add_argument(
         "experiments_root",
         type=str,
         help="Where to install packages and store results for the experiments. Benchpark expects to manage this directory, and it should be empty/nonexistent the first time you run benchpark setup experiments.",
@@ -70,18 +66,45 @@ def command(args):
                         (everything from source/experiments/<experiment>)
     """
 
+    # Parse experiment YAML for package_manager, system_id
+    def _find(d, tag):
+        if tag in d:
+            return d[tag]
+        for k, v in d.items():
+            if isinstance(v, dict):
+                result = _find(v, tag)
+                if result is not None:
+                    return result
+
     experiments_root = pathlib.Path(os.path.abspath(args.experiments_root))
     experiment_id = args.experiment
-    system_id = args.system
     source_dir = benchpark.paths.benchpark_root
+
+    experiment_src_dir = pathlib.Path(os.path.abspath(str(experiment_id)))
+
+    with open(str(experiment_src_dir / "ramble.yaml"), "r") as file:
+        parsed_yaml = yaml.safe_load(file)
+    pkg_manager = _find(parsed_yaml, "package_manager")
+    system_id = _find(parsed_yaml, "destdir")
 
     debug_print(f"source_dir = {source_dir}")
     debug_print(f"specified experiment = {experiment_id}")
     debug_print(f"specified system = {system_id}")
 
-    experiment_src_dir = pathlib.Path(os.path.abspath(str(experiment_id)))
     configs_src_dir = pathlib.Path(os.path.abspath(str(system_id)))
-    workspace_dir = experiments_root / str(experiment_id) / str(system_id)
+
+    experiments_root = pathlib.Path(os.path.abspath(experiments_root))
+    experiment_id = pathlib.Path(os.path.abspath(experiment_id))
+    system_id = pathlib.Path(os.path.abspath(system_id))
+    common_root = pathlib.Path(
+        os.path.commonpath([experiments_root, experiment_id, system_id])
+    )
+    workspace_dir = (
+        common_root
+        / experiments_root.relative_to(common_root)
+        / experiment_id.relative_to(common_root)
+        / system_id.relative_to(common_root)
+    )
 
     if workspace_dir.exists():
         if workspace_dir.is_dir():
@@ -142,21 +165,9 @@ def command(args):
     initializer_script = experiments_root / "setup.sh"
     run_script = experiments_root / ".latest-experiment.sh"
 
-    per_workspace_setup = RuntimeResources(experiments_root)
-
-    # Parse experiment YAML for package_manager
-    def find(d, tag):
-        if tag in d:
-            return d[tag]
-        for k, v in d.items():
-            if isinstance(v, dict):
-                result = find(v, tag)
-                if result is not None:
-                    return result
-
-    with open(str(experiment_src_dir / "ramble.yaml"), "r") as file:
-        parsed_yaml = yaml.safe_load(file)
-    pkg_manager = find(parsed_yaml, "package_manager")
+    per_workspace_setup = RuntimeResources(
+        experiments_root, upstream=RuntimeResources(benchpark.paths.benchpark_home)
+    )
 
     pkg_str = ""
     if pkg_manager == "spack":
@@ -186,10 +197,8 @@ export SPACK_DISABLE_LOCAL_CONFIG=1
 """
             )
 
-    ramble_setup = f"ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} workspace setup"
-    ramble_run = (
-        f"ramble --disable-progress-bar --workspace-dir {ramble_workspace_dir} on"
-    )
+    ramble_setup = f"ramble --workspace-dir {ramble_workspace_dir} workspace setup"
+    ramble_run = f"ramble --workspace-dir {ramble_workspace_dir} on"
 
     instructions = f"""\
 To complete the benchpark setup, do the following:

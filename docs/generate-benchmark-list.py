@@ -66,7 +66,6 @@ def main():
         for t in tags:
             for k, v in tag_dicts.items():
                 if t in v:
-                    print("appending", t, "at key", k)
                     tags_taggroups[bmark][k].append(t)
         main_dict[bmark] = tags_taggroups[bmark]
 
@@ -76,26 +75,26 @@ def main():
             "../bin/benchpark",
             "list",
             "modifiers",
-            "--name",
-            "caliper",
-            "--experiments",
             "--no-title",
         ],
         check=True,
         capture_output=True,
     )
     cali_bm_str = str(cali_benchmarks.stdout, "utf-8")
-    cali_bm = cali_bm_str.replace(" ", "").replace("\t", "").split("\n")
+    cali_bm = cali_bm_str.replace(" ", "").split("\n")
+    result = []
+    for item in cali_bm[cali_bm.index("caliper") + 1 :]:
+        if item.startswith("\t"):
+            result.append(item.strip())
+        else:
+            break
+    cali_bm = result
     # Get available programming models for each benchmark
     pmodels_cmd = subprocess.run(
         [
             "../bin/benchpark",
             "list",
             "experiments",
-            "--experiment",
-            "cuda",
-            "rocm",
-            "openmp",
             "--no-title",
         ],
         check=True,
@@ -112,6 +111,7 @@ def main():
             "--experiment",
             "weak",
             "strong",
+            "throughput",
             "--no-title",
         ],
         check=True,
@@ -131,11 +131,15 @@ def main():
         if any([bmark in p for p in pmodels]):
             for expr in pmodels:
                 if bmark in expr:
-                    main_dict[bmark]["programming-model"].append(expr.split("+")[1])
+                    for p in ["openmp", "mpi", "cuda", "rocm"]:
+                        if p in expr:
+                            main_dict[bmark]["programming-model"].append(p)
         if any([bmark in s for s in scaling]):
             for expr in scaling:
                 if bmark in expr:
-                    main_dict[bmark]["scaling-experiments"].append(expr.split("+")[1])
+                    for s in ["strong", "weak", "throughput"]:
+                        if s in expr:
+                            main_dict[bmark]["scaling-experiments"].append(s)
 
     df = pd.DataFrame(main_dict)
     df.to_csv("benchmark-list.csv")

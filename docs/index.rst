@@ -26,7 +26,7 @@
    :maxdepth: 1
    :caption: Tutorials
 
-   example-workflow
+   basic-tutorial
    llnl-tutorial
    comparing-experiment-builds
 
@@ -51,8 +51,15 @@
    add-a-system-config
    add-a-benchmark
    add-an-experiment
-   add-a-dryrun
+   testing-your-contribution
    update-a-system-config
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Developer Docs
+
+   developer-guide
+   ci-developer-guide
 
 .. toctree::
    :maxdepth: 1

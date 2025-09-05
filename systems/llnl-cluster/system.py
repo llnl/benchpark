@@ -5,8 +5,8 @@
 
 
 from benchpark.directives import variant, maintainers
-from benchpark.system import System
-from benchpark.openmpsystem import OpenMPSystem
+from benchpark.system import System, JobQueue
+from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.paths import hardware_descriptions
 
 
@@ -22,12 +22,14 @@ class LlnlCluster(System):
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/Supermicro-icelake-OmniPath/hardware_description.yaml",
+            "queues": [JobQueue("pdebug", 60, 12), JobQueue("pbatch", 1440, 520)],
         },
         "magma": {
             "sys_cores_per_node": 96,
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/Penguin-icelake-OmniPath/hardware_description.yaml",
+            "queues": [JobQueue("pdebug", 60, 4), JobQueue("pbatch", 2160, 64)],
         },
         "dane": {
             "sys_cores_per_node": 112,
@@ -36,26 +38,43 @@ class LlnlCluster(System):
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/DELL-sapphirerapids-OmniPath/hardware_description.yaml",
+            "queues": [JobQueue("pdebug", 60, 20), JobQueue("pbatch", 1440, 520)],
         },
     }
 
     variant(
         "cluster",
-        default="ruby",
+        default="dane",
         values=("ruby", "magma", "dane"),
         description="Which cluster to run on",
     )
 
     variant(
         "compiler",
-        default="gcc",
-        values=("gcc", "intel", "oneapi"),
+        default="oneapi",
+        values=("oneapi", "gcc", "intel"),
         description="Which compiler to use",
+    )
+
+    variant(
+        "bank",
+        default="none",
+        values=("none", "guests", "asccasc", "lc", "fractale"),
+        multi=False,
+        description="Submit a job to a specific named bank",
+    )
+
+    variant(
+        "queue",
+        default="none",
+        values=("none", "pbatch", "pdebug"),
+        multi=False,
+        description="Submit to queue other than the default queue (e.g. pdebug)",
     )
 
     def __init__(self, spec):
         super().__init__(spec)
-        self.programming_models = [OpenMPSystem()]
+        self.programming_models = [OpenMPCPUOnlySystem()]
 
         self.scheduler = "slurm"
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
@@ -204,10 +223,10 @@ class LlnlCluster(System):
                         "buildable": False,
                         "externals": [
                             {
-                                "spec": "mvapich2@2.3.7-intel202210",
-                                "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2022.1.0",
+                                "spec": "mvapich2@2.3.7-intel202321",
+                                "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2023.2.1",
                                 "extra_attributes": {
-                                    "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2022.1.0/lib -lmpi"
+                                    "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2023.2.1/lib -lmpi"
                                 },
                             }
                         ],
@@ -220,9 +239,7 @@ class LlnlCluster(System):
         return selections
 
     def compiler_weighting_cfg(self):
-        compiler = self.spec.variants["compiler"][0]
-
-        if compiler == "oneapi":
+        if self.spec.satisfies("compiler=oneapi"):
             return {"packages": {"all": {"require": [{"one_of": ["%oneapi", "%gcc"]}]}}}
         else:
             return {"packages": {}}
@@ -295,12 +312,12 @@ class LlnlCluster(System):
                     },
                     {
                         "compiler": {
-                            "spec": "oneapi@2022.1.0",
+                            "spec": "oneapi@2023.2.1",
                             "paths": {
-                                "cc": "/usr/tce/packages/intel/intel-2022.1.0/compiler/2022.1.0/linux/bin/icx",
-                                "cxx": "/usr/tce/packages/intel/intel-2022.1.0/compiler/2022.1.0/linux/bin/icpx",
-                                "f77": "/usr/tce/packages/intel/intel-2022.1.0/compiler/2022.1.0/linux/bin/ifx",
-                                "fc": "/usr/tce/packages/intel/intel-2022.1.0/compiler/2022.1.0/linux/bin/ifx",
+                                "cc": "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/bin/icx",
+                                "cxx": "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/bin/icpx",
+                                "f77": "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/bin/ifx",
+                                "fc": "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/bin/ifx",
                             },
                             "flags": {},
                             "operating_system": "rhel8",

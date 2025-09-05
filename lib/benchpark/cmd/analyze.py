@@ -6,10 +6,17 @@
 import os
 import re
 import logging
+import sys
+import shlex
+import tarfile
+import shutil
+import warnings
 from glob import glob
+from datetime import datetime
 
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+import pandas as pd
 import thicket as th
 
 # -----------------------------
@@ -37,7 +44,7 @@ COLOR_PALETTE = [
     "#dbdb8d",  # Light Olive
     "#9edae5",  # Light Cyan
 ]
-SCALING_TYPES = ["+strong", "+throughput", "+weak"]
+SCALING_TYPES = ["strong", "throughput", "weak"]
 NAME_REMAP = {
     "total_problem_size": "Total Problem Size",
     "process_problem_size": "Process Problem Size",
@@ -45,6 +52,7 @@ NAME_REMAP = {
     "n_nodes": "Node(s)",
 }
 
+warnings.filterwarnings("ignore")
 # Configure logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s: %(message)s")
@@ -66,9 +74,11 @@ def get_scaling_type(spec):
     Raises:
         ValueError: If no valid scaling type is found in the specification.
     """
+
     for keyword in SCALING_TYPES:
-        if keyword in spec:
-            return keyword.lstrip("+")
+        if "+" + keyword in spec:
+            return keyword
+
     raise ValueError(f"Unknown scaling type. Must be one of {SCALING_TYPES}")
 
 
@@ -90,6 +100,70 @@ def validate_single_metadata_value(column, tk):
     if len(unique_vals) != 1:
         raise ValueError(f"Expected one {column}, got: {list(unique_vals)}")
     return unique_vals[0]
+
+
+# -----------------------------
+# Workspace utils
+# -----------------------------
+def _validate_workspace_dir(workspace_dir):
+    if not os.path.isdir(workspace_dir):
+        raise ValueError(
+            f"Workspace dir '{workspace_dir}' does not exist or is not a directory"
+        )
+    if ".ramble-workspace" not in os.listdir(workspace_dir):
+        raise ValueError(
+            f"Directory '{workspace_dir}' must be a valid ramble workspace (missing .ramble-workspace)"
+        )
+    return os.path.abspath(workspace_dir)
+
+
+def _write_last_cmd(analyze_dir):
+    last_cmd_file = os.path.join(analyze_dir, ".last-command.sh")
+    with open(last_cmd_file, "w") as f:
+        f.write("#!/bin/bash\n")
+        f.write("benchpark " + " ".join([shlex.quote(arg) for arg in sys.argv[1:]]))
+
+
+def workspace_clean(workspace_dir, dry_run=False):
+    entries = [
+        os.path.join(workspace_dir, e)
+        for e in os.listdir(workspace_dir)
+        if e not in {".", ".."}
+    ]
+    logger.info("Cleaning workspace contents: %s", workspace_dir)
+    for path in entries:
+        if os.path.basename(path) == ".ramble-workspace":
+            continue
+        if dry_run:
+            logger.info("[dry-run] Would remove %s", path)
+            continue
+        try:
+            if os.path.isdir(path) and not os.path.islink(path):
+                shutil.rmtree(path)
+                logger.info("Removed directory %s", path)
+            else:
+                os.remove(path)
+                logger.info("Removed file %s", path)
+        except FileNotFoundError:
+            logger.debug("Already gone: %s", path)
+
+
+def analyze_archive(analyze_dir, cali_files, output=None):
+    if output is None:
+        ts = datetime.now().strftime("%Y%m%d-%H%M%S")
+        base = os.path.basename(os.path.normpath(analyze_dir))
+        output = os.path.join(analyze_dir, f"{base}-{ts}.tar.gz")
+    logger.info("Creating archive %s from %s", output, analyze_dir)
+    with tarfile.open(output, "w:gz") as tar:
+        tar.add(
+            analyze_dir,
+            arcname=os.path.basename(analyze_dir),
+            filter=lambda ti: None if ti.name.endswith(".tar.gz") else ti,
+        )
+        for f in cali_files:
+            tar.add(f, arcname=os.path.basename(f))
+    logger.info("Archive written: %s", output)
+    return output
 
 
 # -----------------------------
@@ -153,6 +227,9 @@ def make_stacked_line_chart(**kwargs):
         figsize=kwargs["chart_figsize"] if kwargs["chart_figsize"] else (12, 7),
         ax=ax,
     )
+    y_axis_limits = kwargs.get("chart_yaxis_limits")
+    if y_axis_limits is not None:
+        ax.set_ylim(y_axis_limits[0], y_axis_limits[1])
 
     handles, labels = ax.get_legend_handles_labels()
     handles = list(reversed(handles))
@@ -192,29 +269,32 @@ def prepare_data(**kwargs):
     """
     Processes .cali files from a Ramble workspace to generate performance charts.
     """
-    workspace_dir = kwargs["workspace_dir"]
-    files = glob(os.path.join(workspace_dir, "**/*.cali"), recursive=True)
+    files = kwargs["cali_files"]
     logger.info(f"Found {len(files)} .cali files for analysis.")
 
-    tk = th.Thicket.from_caliperreader(files, disable_tqdm=True)
+    if kwargs["calltree_unification"] == "intersection":
+        intersection = True
+    else:
+        intersection = False
+    tk = th.Thicket.from_caliperreader(
+        files, intersection=intersection, disable_tqdm=True
+    )
     tk.update_inclusive_columns()
 
-    # Save tree before modification
-    # Cleans ANSI escape sequences and legend from a raw calltree string.
-    tk.dataframe["nothing"] = 0
-    raw_tree = tk.tree("nothing", render_header=False, precision=0)
-    ansi_escape = re.compile(r"\x1b\[([0-9;]*m)")
-    text = ansi_escape.sub("", raw_tree)
-    legend_index = text.find("Legend")
-    if legend_index != -1:
-        text = text[:legend_index]
-    clean_tree = text.replace("0", "")
-    kwargs["tree_str"] = clean_tree
+    clean_tree = tk.tree(kwargs["tree_metric"], render_header=True)
+    clean_tree = re.compile(r"\x1b\[([0-9;]*m)").sub("", clean_tree)
 
     # Remove MPI regions, if necesasry
     if kwargs.get("no_mpi"):
         query = th.query.Query().match(
-            ".", lambda row: row["name"].apply(lambda n: "MPI_" not in n).all()
+            ".",
+            lambda row: row["name"]
+            .apply(
+                # 'n is None' avoid comparison for MPI in n (will cause error)
+                lambda n: n is None
+                or "MPI_" not in n
+            )
+            .all(),
         )
         tk = tk.query(query)
 
@@ -269,15 +349,32 @@ def prepare_data(**kwargs):
         tk.dataframe = grouped
         tk = tk.squash()
 
+    region_names = kwargs.get("query_regions_byname", "")
+    if region_names:
+        query = (
+            th.query.Query()
+            .match(
+                ".", lambda row: row["name"].apply(lambda n: n in region_names).all()
+            )
+            .rel("*")
+        )
+
+        tk = tk.query(query)
+
+    prefix = kwargs.get("filter_regions_byname", "")
+    if prefix:
+        tk.dataframe = pd.concat([tk.dataframe.filter(like=p, axis=0) for p in prefix])
+
     # Group by varied parameters
     grouped = tk.groupby(x_axis_metadata)
     ctk = th.Thicket.concat_thickets(
         list(grouped.values()), headers=list(grouped.keys()), axis="columns"
     )
 
+    cluster_col = "cluster" if "cluster" in tk.metadata.columns else "host.cluster"
     # Check these values are constant
     app = validate_single_metadata_value("application_name", tk)
-    cluster = validate_single_metadata_value("cluster", tk)
+    cluster = validate_single_metadata_value(cluster_col, tk)
     version = validate_single_metadata_value("version", tk)
 
     # Find programming model from spec
@@ -304,9 +401,12 @@ def prepare_data(**kwargs):
             f"{app}+{programming_model}@{version} on {cluster} ({scaling} scaling)\n{constant_str}"
         )
 
-    kwargs["chart_file_name"] = (
-        f"{app}_{programming_model}_{scaling}_{kwargs['chart_type']}_{'inc' if metric in tk.inc_metrics else 'exc'}"
-    )
+    if kwargs["output_filename"]:
+        kwargs["chart_file_name"] = kwargs["output_filename"]
+    else:
+        kwargs["chart_file_name"] = (
+            f"{app}_{programming_model}_{scaling}_{kwargs['chart_type']}_{'inc' if metric in tk.inc_metrics else 'exc'}"
+        )
 
     # Save tree to file
     tree_file = os.path.join(kwargs["out_dir"], kwargs["chart_file_name"] + "-tree.txt")
@@ -318,10 +418,6 @@ def prepare_data(**kwargs):
         ctk.dataframe[(key, "perc")] = (
             ctk.dataframe[(key, metric)] / ctk.dataframe[(key, metric)].sum()
         ) * 100
-
-    prefix = kwargs.get("filter_regions_name_prefix", "")
-    if prefix:
-        ctk.dataframe = ctk.dataframe.filter(like=prefix, axis=0)
 
     top_n = kwargs.get("top_n_regions", -1)
     if top_n != -1:
@@ -357,10 +453,8 @@ def prepare_data(**kwargs):
 
 def setup_parser(root_parser):
     """
-    Adds command-line arguments to the root parser.
-
-    Args:
-        root_parser (argparse.ArgumentParser): The root argument parser.
+    Adds command-line arguments to the analyze parser, and supports trailing
+    positional actions: `clean` and `archive`.
     """
     root_parser.add_argument(
         "--workspace-dir",
@@ -368,6 +462,13 @@ def setup_parser(root_parser):
         type=str,
         help="Directory of ramble workspace.",
         metavar="RAMBLE_WORKSPACE_DIR",
+    )
+    root_parser.add_argument(
+        "--calltree-unification",
+        default="union",
+        choices=["intersection", "union"],
+        type=str,
+        help="Type of unification operation to perform the Caliper calltrees.",
     )
     root_parser.add_argument(
         "--chart-type",
@@ -391,11 +492,20 @@ def setup_parser(root_parser):
         help="Performance metric to be visualized on the y-axis.",
     )
     root_parser.add_argument(
-        "--filter-regions-name-prefix",
-        default="",
+        "--filter-regions-byname",
+        default=[],
+        nargs="+",
         type=str,
-        help="Filter for region names starting with PREFIX to be included in the chart.",
+        help="Filter for region names starting with one or more PREFIX values.",
         metavar="PREFIX",
+    )
+    root_parser.add_argument(
+        "--query-regions-byname",
+        default=[],
+        nargs="+",
+        type=str,
+        help="Query for one or more regions REGION. Includes children of region.",
+        metavar="REGION",
     )
     root_parser.add_argument(
         "--top-n-regions",
@@ -429,26 +539,91 @@ def setup_parser(root_parser):
     root_parser.add_argument(
         "--chart-fontsize", type=int, help="Font size of the output chart."
     )
+    root_parser.add_argument(
+        "--chart-yaxis-limits",
+        type=float,
+        nargs=2,
+        metavar=("YMIN", "YMAX"),
+        default=None,
+        help="Set both y-axis limits: --chart-yaxis-limits YMIN YMAX",
+    )
+    root_parser.add_argument(
+        "--file-name-match",
+        type=str,
+        default="",
+        help="Set optional cali file name to match. Useful if multiple caliper files are generated per experiment (e.g. RAJAPerf)",
+    )
+    root_parser.add_argument(
+        "--output-filename",
+        type=str,
+        default=None,
+        help="Configure the output file names (the default value is already unique to the workspace).",
+    )
+    root_parser.add_argument(
+        "--tree-metric",
+        type=str,
+        default="Calls/rank (max)",
+        help="Metric to show on the tree output",
+    )
+
+    # Workspace commands
+    root_parser.add_argument(
+        "action",
+        nargs="?",
+        choices=["clean", "archive"],
+        help=(
+            "Optional trailing action to manage the workspace: 'clean' to remove contents, "
+            "'archive' to create a tar.gz of the workspace. If omitted, performs analysis."
+        ),
+    )
+    root_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="With 'clean', show items that would be removed without deleting.",
+    )
+    root_parser.add_argument(
+        "--archive-output",
+        type=str,
+        default=None,
+        help="With 'archive', path for the .tar.gz (defaults to CWD/<workspace>-<timestamp>.tar.gz)",
+    )
 
 
 def command(args):
     """
-    Validates the workspace directory and initiates data processing.
-
-    Args:
-        args (argparse.Namespace): Parsed command-line arguments.
+    Implements either analysis (default) or the trailing `clean`/`archive` actions
+    requested as positional arguments after `analyze`.
     """
-    if ".ramble-workspace" not in os.listdir(args.workspace_dir):
-        raise ValueError(
-            f"Directory '{args.workspace_dir}' must be a valid ramble workspace"
+
+    def _setup_dir(args):
+        wkp_dir = args.workspace_dir
+        if wkp_dir[-1] != "/":
+            wkp_dir += "/"
+        args.out_dir = wkp_dir + "analyze/"
+        if not os.path.isdir(args.out_dir):
+            os.mkdir(args.out_dir)
+        _validate_workspace_dir(wkp_dir)
+        args.cali_files = glob(
+            os.path.join(wkp_dir, f"**/*{args.file_name_match}.cali"),
+            recursive=True,
         )
+        return args
 
-    wkp_dir = args.workspace_dir
-    if wkp_dir[-1] != "/":
-        wkp_dir += "/"
-    args.out_dir = wkp_dir + "analyze/"
+    args = _setup_dir(args)
 
-    if not os.path.isdir(args.out_dir):
-        os.mkdir(args.out_dir)
+    # Handle workspace management actions first
+    if getattr(args, "action", None) == "clean":
+        workspace_clean(args.out_dir, dry_run=getattr(args, "dry_run", False))
+        return
+    if getattr(args, "action", None) == "archive":
+        out = analyze_archive(
+            args.out_dir, args.cali_files, output=getattr(args, "archive_output", None)
+        )
+        print(out)
+        return
+
+    _write_last_cmd(args.out_dir)
 
     prepare_data(**vars(args))
+
+    return 0

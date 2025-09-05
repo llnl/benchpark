@@ -9,13 +9,14 @@ from benchpark.experiment import ExperimentHelper
 
 
 class ROCmExperiment:
-    requires("rocm")
+    requires("rocm", when="+rocm")
     variant("rocm", default=False, description="Build and run with ROCm")
 
     def __init__(self):
         super().__init__()
         if self.spec.variants["rocm"][0]:
             self.device_type = "gpu"
+        self.programming_models.append("rocm")
 
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):

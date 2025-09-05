@@ -1,0 +1,81 @@
+# Clusters listed here are native slurm clusters that we test using flux. See "non_shared.yaml"
+include:
+  - local: .gitlab/utils/status.yml
+  - local: .gitlab/utils/machine_checks.yml
+  - local: .gitlab/utils/rules.yml
+workflow:
+  auto_cancel:
+    on_new_commit: conservative
+#############################
+# Resource Allocation Section
+#############################
+allocate_resources_dane:
+  tags: [shell, dane]
+  needs: [dane-up-check]
+  extends: .on_host_template
+  stage: allocate-resources
+  script:
+    - sbatch ${DANE_SHARED_ALLOC} --wait-all-nodes=1 --job-name=${ALLOC_NAME} --wrap="srun
+      -N 1 -n 1 flux start sleep inf"
+  after_script:
+    - |-
+      if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
+        . .gitlab/utils/cancel-slurm.sh
+      fi
+##########################
+# Resource Release Section
+##########################
+release_resources_dane:
+  tags: [shell, dane]
+  needs: [allocate_resources_dane, run_tests_slurm_dane]
+  extends: .on_host_template
+  stage: release-resources
+  # Do not cleanup dir yet
+  script:
+    - . .gitlab/utils/cancel-slurm.sh --no-clean
+##################
+# Test Run Section
+##################
+.run_tests_slurm: &run_tests_slurm
+  extends: .on_host_template
+  parallel:
+    matrix:
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        BENCHMARK: [hpl, hpcg, amg2023, kripke]
+        VARIANT: [+openmp, '']
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        BENCHMARK: [laghos, raja-perf, phloem]
+      # Strong scaling runs for "benchpark analyze" test
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        BENCHMARK: [kripke, amg2023]
+        VARIANT: ['+strong caliper=mpi,time', '+weak caliper=mpi,time']
+        TEST_ANALYZE: ['true']
+      # Test affinity and hwloc with caliper on
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        BENCHMARK: [kripke]
+        VARIANT: ['caliper=mpi,time hwloc=on affinity=on']
+run_tests_slurm_dane:
+  tags: [shell, dane]
+  needs: [allocate_resources_dane]
+  stage: test
+  <<: *run_tests_slurm
+  before_script:
+    - !reference [.report_status, before_script]
+  script:
+    - |
+      echo -e "### Allocation name is ${ALLOC_NAME}"
+      export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
+      echo -e "### Job ID is ${JOBID}"
+    - |
+      PROXY="$( [[ -n "${JOBID}" ]] && echo "flux proxy slurm:${JOBID}" || echo "" )"
+      ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${FLUX_ARGS} .gitlab/utils/run-experiment.sh )
+  after_script:
+    - !reference [.report_status, after_script]
+    - |-
+      if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
+        . .gitlab/utils/cancel-slurm.sh
+      fi

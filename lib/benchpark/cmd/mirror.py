@@ -219,12 +219,14 @@ ramble config --scope=site add \"config:spack:global:args:'-d'\"
     ramble_workspace_mirror_dest = os.path.join(dest, "ramble-workspace-mirror")
     if not os.path.exists(ramble_workspace_mirror_dest):
         run_command(
-            f"ramble --disable-progress-bar --workspace-dir {ramble_workspace} workspace mirror -d file://{ramble_workspace_mirror_dest}"
+            f"ramble --workspace-dir {ramble_workspace} workspace mirror -d file://{ramble_workspace_mirror_dest}"
         )
 
 
 def setup_parser(root_parser):
-    mirror_subparser = root_parser.add_subparsers(dest="system_subcommand")
+    mirror_subparser = root_parser.add_subparsers(
+        dest="system_subcommand", required=True
+    )
 
     create_parser = mirror_subparser.add_parser("create")
     create_parser.add_argument(
@@ -242,5 +244,3 @@ def command(args):
     }
     if args.system_subcommand in actions:
         actions[args.system_subcommand](args)
-    else:
-        raise ValueError(f"Unknown subcommand for 'system': {args.system_subcommand}")

@@ -6,6 +6,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+import pickle
 import shutil
 import subprocess
 import sys
@@ -22,6 +23,7 @@ import llnl.util.tty.color as color
 
 def system_init(args):
     system_spec = benchpark.spec.SystemSpec(" ".join(args.spec)).concretize()
+    system_spec.destdir = args.dest
     system = system_spec.system
 
     if args.basedir:
@@ -43,6 +45,10 @@ def system_init(args):
         # If there was a failure, remove any partially-generated resources
         shutil.rmtree(destdir)
         raise
+
+    system_pickle = os.path.join(destdir, "system.pkl")
+    with open(system_pickle, "wb") as f:
+        pickle.dump(system_spec, f)
 
 
 def system_id(args):
@@ -110,7 +116,9 @@ def system_external(args):
 
 
 def setup_parser(root_parser):
-    system_subparser = root_parser.add_subparsers(dest="system_subcommand")
+    system_subparser = root_parser.add_subparsers(
+        dest="system_subcommand", required=True
+    )
 
     init_parser = system_subparser.add_parser("init")
     init_parser.add_argument("--dest", help="Place all system files here directly")
@@ -143,5 +151,3 @@ def command(args):
     }
     if args.system_subcommand in actions:
         actions[args.system_subcommand](args)
-    else:
-        raise ValueError(f"Unknown subcommand for 'system': {args.system_subcommand}")

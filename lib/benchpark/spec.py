@@ -13,12 +13,7 @@ import re
 from typing import Iterable, Iterator, List, Match, Optional, Union
 
 from benchpark.error import BenchparkError
-import benchpark.paths
 import benchpark.repo
-import benchpark.runtime
-
-bootstrapper = benchpark.runtime.RuntimeResources(benchpark.paths.benchpark_home)
-bootstrapper.bootstrap()
 
 import llnl.util.lang  # noqa
 
@@ -100,6 +95,10 @@ class VariantMap(llnl.util.lang.HashableMap):
         string.write(" ".join(self.stringify(key, self[key]) for key in kv_keys))
 
         return string.getvalue()
+
+    def _cmp_iter(self):
+        for k, v in sorted(self.items()):
+            yield (k, v)
 
 
 class ConcreteVariantMap(VariantMap):

@@ -5,9 +5,10 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 
 
-class Ad(Experiment):
+class Ad(Experiment, MpiOnlyExperiment):
     variant(
         "workload",
         default="ad",
@@ -31,6 +32,4 @@ class Ad(Experiment):
         )
 
     def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, [f"ad@{app_version}"])
+        self.add_package_spec(self.name, [f"ad{self.determine_version()}"])
