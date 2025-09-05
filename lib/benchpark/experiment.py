@@ -117,7 +117,7 @@ class Affinity:
             affinity_version = "master"
 
             # get system config options
-            # TODO: Get compiler/mpi/package handles directly from system.py.
+            # TODO: Get compiler/mpi/package handles directly from system.py
             system_specs = {}
             system_specs["compiler"] = "default-compiler"
             if self.spec.satisfies("+cuda"):

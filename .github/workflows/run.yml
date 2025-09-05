@@ -34,10 +34,9 @@ jobs:
             set +e
             local stderr_output status
             if [[ ${#env_kv[@]} -gt 0 ]]; then
-              # pass env to the command safely
-              stderr_output="$(env "${env_kv[@]}" "$@" 2>&1 >/dev/null)"
+              stderr_output="$({ env "${env_kv[@]}" "$@" 1>/dev/null; } 2>&1)"
             else
-              stderr_output="$("$@" 2>&1 >/dev/null)"
+              stderr_output="$({ "$@" 1>/dev/null; } 2>&1)"
             fi
             status=$?
             set -e
