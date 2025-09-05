@@ -218,6 +218,12 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
         description="Prepend to environment PATH during experiment execution",
     )
 
+    variant(
+        "n_repeats",
+        default=0,
+        description="Number of experiment repititions",
+    )
+
     def __init__(self, spec):
         self.spec: "benchpark.spec.ConcreteExperimentSpec" = spec
         # Device type must be set before super with absence of mpionly experiment type
@@ -349,6 +355,7 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
             }
         # default configs for all experiments
         default_config = {
+            "n_repeats": self.spec.variants["n_repeats"][0],
             "deprecated": True,
             "benchpark_experiment_command": "benchpark " + " ".join(sys.argv[1:]),
             "system": system_dict,
