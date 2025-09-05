@@ -24,7 +24,7 @@ jobs:
           # 1) Non-MPIOnlyExperiment Test
           set +e
           # babelstream is not an MPIOnlyExperiment
-          stderr_output="$({ BENCHPARK_RUN_COVERAGE=errors ./bin/benchpark experiment init --dest babelstream --system dane babelstream 1>/dev/null; } 2>&1)"
+          stderr_output="$({ BENCHPARK_RUN_COVERAGE=errors ./bin/benchpark experiment init --dest babelstream --system dane babelstream; } 2>&1)"
           status=$?
           set -e
           [[ $status -ne 0 ]] || fail "Expected non-zero exit status, got $status"
@@ -35,7 +35,7 @@ jobs:
           # 2) Multiple scaling options
           set +e
           # Cannot use both +strong and +weak
-          stderr_output="$({ BENCHPARK_RUN_COVERAGE=errors2 ./bin/benchpark experiment init --dest kripke --system dane kripke+strong+weak 1>/dev/null; } 2>&1)"
+          stderr_output="$({ BENCHPARK_RUN_COVERAGE=errors2 ./bin/benchpark experiment init --dest kripke --system dane kripke+strong+weak; } 2>&1)"
           status=$?
           set -e
           [[ $status -ne 0 ]] || fail "Expected non-zero exit status, got $status"
