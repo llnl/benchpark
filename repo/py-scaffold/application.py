@@ -8,7 +8,7 @@ import yaml
 from ramble.appkit import *
 
 
-class Scaffold(ExecutableApplication):
+class PyScaffold(ExecutableApplication):
     """Scaffold benchmark"""
 
     name = "scaffold"

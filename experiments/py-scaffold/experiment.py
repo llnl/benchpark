@@ -12,7 +12,7 @@ from benchpark.scaling import ScalingMode, Scaling
 from benchpark.caliper import Caliper
 
 
-class Scaffold(
+class PyScaffold(
     Experiment,
     CudaExperiment,
     ROCmExperiment,
@@ -71,6 +71,6 @@ class Scaffold(
         self.add_package_spec(
             self.name,
             [
-                "--extra-index-url https://download.pytorch.org/whl/\n{package_path}"
+                "py-scaffold@main"
             ],
         )

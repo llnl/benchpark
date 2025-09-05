@@ -153,7 +153,11 @@ class LlnlElcapitan(System):
                 self.short_cce_version = (
                     f"{self.cce_version.major}.{self.cce_version.minor}"
                 )
-        if self.rocm_version >= Version("6.0.0"):
+        if self.rocm_version >= Version("6.4.0"):
+            self.pmi_version = Version("6.1.15.6")
+            self.pals_version = Version("1.2.12")
+            self.llvm_version = Version("19.0.0")
+        elif self.rocm_version >= Version("6.0.0"):
             self.pmi_version = Version("6.1.15.6")
             self.pals_version = Version("1.2.12")
             self.llvm_version = Version("18.0.1")
@@ -257,8 +261,8 @@ class LlnlElcapitan(System):
                 "python": {
                     "externals": [
                         {
-                            "spec": "python@3.9.12",
-                            "prefix": "/usr/tce/packages/python/python-3.9.12",
+                            "spec": "python@3.11.5",
+                            "prefix": "/usr/tce/packages/python/python-3.11.5",
                             "buildable": False,
                         }
                     ]
@@ -291,6 +295,24 @@ class LlnlElcapitan(System):
                 "libfabric": {
                     "externals": [
                         {"spec": "libfabric@2.1", "prefix": "/opt/cray/libfabric/2.1"}
+                    ],
+                    "buildable": False,
+                },
+                "ncurses": {
+                    "externals": [
+                        {"spec": "ncurses@6.1.20180224", "prefix": "/usr"}
+                    ],
+                    "buildable": False,
+                },
+                "libxcrypt": {
+                    "externals": [
+                        {"spec": "libxcrypt@4.1.1", "prefix": "/usr"}
+                    ],
+                    "buildable": False,
+                },
+                "opengl": {
+                    "externals": [
+                        {"spec": "opengl@4.5", "prefix": "/usr"}
                     ],
                     "buildable": False,
                 },
@@ -623,7 +645,7 @@ class LlnlElcapitan(System):
                             "prefix": f"/opt/rocm-{self.rocm_version}/llvm",
                         }
                     ],
-                    "buildable": False,
+                    "buildable": True,
                 },
                 "llvm-amdgpu": {
                     "externals": [
