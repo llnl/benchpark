@@ -19,6 +19,7 @@ def main():
     main_py = basedir / "lib" / "main.py"
 
     if os.environ.get("BENCHPARK_RUN_COVERAGE"):
+        print(f"RUNNING123321 {os.environ.get("BENCHPARK_RUN_COVERAGE")}")
         # Create a unique coverage data file name
         coverage_dir = (
             basedir / f"coverage-data-{os.environ.get('BENCHPARK_RUN_COVERAGE')}"
@@ -41,6 +42,7 @@ def main():
             check=True,
         )
     else:
+        print("NOT RUNNING COVERAGE")
         subprocess.run([sys.executable, main_py] + sys.argv[1:], check=True)
 
 
