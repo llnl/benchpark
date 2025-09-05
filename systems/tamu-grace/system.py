@@ -15,7 +15,7 @@ class TamuGrace(System):
             "scheduler": "slurm",
             "interconnect": "hdr100",
             "hardware_key": str(hardware_descriptions)
-            + "/Dell-Intel-CascadeLake-NVIDIA-HDR100/hardware_description.yaml",
+            + "/DELL-cascadelake-Infiniband/hardware_description.yaml",
             "queues": [
                 JobQueue("short", 2 * 60, 32),       # 2 hours, up to 32 nodes
                 JobQueue("medium", 24 * 60, 128),    # 1 day, up to 128 nodes
