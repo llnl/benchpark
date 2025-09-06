@@ -35,8 +35,8 @@ class SpartaSnl(ExecutableApplication):
     executable(
         "set-timesteps",
         template=[
-            "sed 's/stats.*[0-9]+/stats               {stats}/g' -i {in}",
-            "sed 's/run.*[0-9]+/run                 {run}/g' -i {in}",
+            "sed 's/stats.*[0-9]\+/stats               {stats}/g' -i {in}",
+            "sed 's/run.*[0-9]\+/run                 {run}/g' -i {in}",
         ],
         use_mpi=False,
     )
