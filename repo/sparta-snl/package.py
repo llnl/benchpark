@@ -20,7 +20,6 @@ class SpartaSnl(CMakePackage, CudaPackage, ROCmPackage):
     variant("openmp", default=False, description="Enable OpenMP support")
     variant("jpeg", default=False, description="Build with jpeg support")
     variant("png", default=False, description="Build with png support")
-    variant("kokkos", default=False, description="BUild with kokkos")
 
     variant(
         "kokkos",
@@ -50,7 +49,7 @@ class SpartaSnl(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("kokkos", when="+kokkos")
     depends_on("kokkos+openmp cxxstd=17", when="+openmp")
     depends_on("kokkos+rocm", when="+rocm")
-    depends_on("kokkos+cuda cxxstd=17", when="+cuda")
+    depends_on("kokkos+wrapper+cuda cxxstd=17", when="+cuda")
   
     depends_on("jpeg", when="+jpeg")
     depends_on("libpng", when="+png")
@@ -58,7 +57,6 @@ class SpartaSnl(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("fftw-api@3", when="fft=fftw3")
     depends_on("mkl", when="fft=mkl")
 
-    depends_on("cufft", when="+kokkos+cuda fft_kokkos=cufft")
     depends_on("hipfft", when="+kokkos+rocm fft_kokkos=hipfft")
     depends_on("fftw-api@3", when="+kokkos fft_kokkos=fftw3")
     depends_on("mkl", when="+kokkos fft_kokkos=mkl")
