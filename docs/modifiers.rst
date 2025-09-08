@@ -152,7 +152,7 @@ the ``Allocation Modifier`` generates the appropriate scheduler request for thes
      - sys_gpus_per_node
      - (opt) n_gpus_per_node
    * - Memory per node
-     - sys_mem_per_node
+     - sys_mem_per_node_GB
      - (opt) n_mem_per_node
 
 
@@ -169,7 +169,7 @@ The system is required to specify:
 
   - sys_cores_per_node
   - sys_gpus_per_node (if it has GPUs)
-  - sys_mem_per_node
+  - sys_mem_per_node_GB
 
 The modifier checks the resources requested by the experiment,
 computes the values for the unspecified variables, and
