@@ -619,15 +619,6 @@ class LlnlElcapitan(System):
                     ],
                     "buildable": False,
                 },
-                # "llvm-amdgpu": {
-                #    "externals": [
-                #        {
-                #            "spec": f"llvm-amdgpu@{self.rocm_version}",
-                #            "prefix": f"/opt/rocm-{self.rocm_version}/llvm",
-                #        }
-                #    ],
-                #    "buildable": False,
-                # },
                 "rocblas": {
                     "externals": [
                         {
