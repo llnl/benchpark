@@ -3,3 +3,4 @@ flake8==7.3.0
 isort==6.0.1
 codespell==2.4.1
 yamlfix==1.17.0
+rstfmt==0.0.14
