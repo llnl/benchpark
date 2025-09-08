@@ -252,8 +252,8 @@ by default.
 
        # Set the variables required by the experiment
        self.set_required_variables(
-         n_resources="{n_procs}",
-         process_problem_size="{Ns}/{n_procs}",
+         n_resources="{n_ranks}",
+         process_problem_size="{Ns}/{n_ranks}",
          total_problem_size="{Ns}",
        )
 
