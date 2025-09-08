@@ -22,4 +22,4 @@ jobs:
           isort
           flake8
           yamlfix --check --verbose .
-          rstfmt --diff docs/
+          docstrfmt -p .github/workflows/requirements/docstrfmt.toml --check --verbose docs/
