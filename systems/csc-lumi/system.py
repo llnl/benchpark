@@ -21,7 +21,7 @@ class CscLumi(System):
             "gtl_flag": "",
             "sys_cores_per_node": 64,
             "sys_gpus_per_node": 8,
-            "sys_mem_per_node": 512,
+            "sys_mem_per_node_GB": 512,
             "system_site": "csc",
             "scheduler": "slurm",
             "hardware_key": str(hardware_descriptions)

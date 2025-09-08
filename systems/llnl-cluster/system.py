@@ -19,8 +19,8 @@ class LlnlCluster(System):
             "sys_cores_per_node": 56,
             "sys_cores_os_reserved_per_node": 0,  # No core or thread reservation
             "sys_cores_os_reserved_per_node_list": None,
-            "sys_mem_per_node": 94, #either 94GB or ~94981-96752MB
-            "sys_cpu_mem_per_node": 94,
+            "sys_mem_per_node_GB": 206,
+            "sys_cpu_mem_per_node_MB": 77,
             "sys_cpu_L1_KB": 32, #32KB for L1d and 32KB for L1i
             "sys_cpu_L2_KB": 1024,
             "sys_cpu_L3_MB": 38.5, #38.5 MB
@@ -41,8 +41,8 @@ class LlnlCluster(System):
             "sys_cores_per_node": 112,
             "sys_cores_os_reserved_per_node": 0,  # No explicit core reservation, first thread on each core reserved (2 threads per core)
             "sys_cores_os_reserved_per_node_list": None,
-            "sys_mem_per_node": 31, #either 31GB or ~32248MB
-            "sys_cpu_mem_per_node": 31,
+            "sys_mem_per_node_GB": 256,
+            "sys_cpu_mem_per_node_MB": 210,
             "sys_cpu_L1_KB": 48, #48KB for L1d and 32KB for L1i
             "sys_cpu_L2_KB": 2048,
             "sys_cpu_L3_MB": 105, #105MB
