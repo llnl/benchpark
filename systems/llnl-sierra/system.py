@@ -29,12 +29,12 @@ class LlnlSierra(System):
             "sys_mem_per_node": 256, #either 256GB or ~128997MB
             "sys_cpu_mem_per_node": 256,
             "sys_gpu_mem_per_node": 16384, #in MiB Fb Memory?
-            "sys_cpu_L1_size": 32, #32KB for L1d and 32KB for L1i
-            "sys_gpu_L1_size": 16, #not done
-            "sys_gpu_num_L1": 1008, #not done
-            "sys_cpu_L2_size": 512, #512 KB
-            "sys_gpu_L2_size": 8192, #not done
-            "sys_cpu_L3_size": 10, #10MB
+            "sys_cpu_L1_KB": 32, #32KB for L1d and 32KB for L1i
+            "sys_gpu_L1_KB": 128, #ranges from 128KB down to 32KB
+            "sys_gpu_num_L1": 80, #not done
+            "sys_cpu_L2_KB": 512, #512 KB
+            "sys_gpu_L2_KB": 6144, #6291456 B
+            "sys_cpu_L3_MB": 10, #10MB
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/IBM-power9-V100-Infiniband/hardware_description.yaml",

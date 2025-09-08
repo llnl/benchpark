@@ -21,9 +21,9 @@ class LlnlCluster(System):
             "sys_cores_os_reserved_per_node_list": None,
             "sys_mem_per_node": 94, #either 94GB or ~94981-96752MB
             "sys_cpu_mem_per_node": 94,
-            "sys_cpu_L1_size": 32, #32KB for L1d and 32KB for L1i
-            "sys_cpu_L2_size": 1024,
-            "sys_cpu_L3_size": 39, #105MB
+            "sys_cpu_L1_KB": 32, #32KB for L1d and 32KB for L1i
+            "sys_cpu_L2_KB": 1024,
+            "sys_cpu_L3_MB": 105, #105MB
             "sys_sockets_per_node": 2,
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
@@ -41,9 +41,9 @@ class LlnlCluster(System):
             "sys_cores_os_reserved_per_node_list": None,
             "sys_mem_per_node": 31, #either 31GB or ~32248MB
             "sys_cpu_mem_per_node": 31,
-            "sys_cpu_L1_size": 48, #48KB for L1d and 32KB for L1i
-            "sys_cpu_L2_size": 2048,
-            "sys_cpu_L3_size": 105, #105MB
+            "sys_cpu_L1_KB": 48, #48KB for L1d and 32KB for L1i
+            "sys_cpu_L2_KB": 2048,
+            "sys_cpu_L3_MB": 105, #105MB
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/DELL-sapphirerapids-OmniPath/hardware_description.yaml",
