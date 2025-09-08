@@ -30,8 +30,8 @@ class LlnlElcapitan(System):
             "sys_gpu_L1_KB": 16,
             "sys_gpu_L2_KB": 8192,
             "sys_cpu_L1_KB": 32,
-            "sys_cpu_L2_KB": 512, #512 KB
-            "sys_cpu_L3_MB": 32, #32MB
+            "sys_cpu_L2_KB": 512,  # 512 KB
+            "sys_cpu_L3_MB": 32,  # 32MB
             "system_site": "llnl",
             "scheduler": "flux",
             "hardware_key": str(hardware_descriptions)
@@ -65,9 +65,9 @@ class LlnlElcapitan(System):
             "sys_gpu_L1_KB": 32,
             "sys_gpu_L2_KB": 4096,
             "sys_gpu_L3_MB": 256,
-            "sys_cpu_L1_KB": 32, #32KB for L1d and 32KB for L1i
-            "sys_cpu_L2_KB": 1024, #512 KB
-            "sys_cpu_L3_MB": 32, #32MB
+            "sys_cpu_L1_KB": 32,  # 32KB for L1d and 32KB for L1i
+            "sys_cpu_L2_KB": 1024,  # 512 KB
+            "sys_cpu_L3_MB": 32,  # 32MB
             "system_site": "llnl",
             "scheduler": "flux",
             "hardware_key": str(hardware_descriptions)
