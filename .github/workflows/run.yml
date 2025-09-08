@@ -1,7 +1,47 @@
 name: Run Benchpark and Simple Benchmark Suite
 on:
   workflow_call:
+    secrets:
+      BENCHPARK_CODECOV_TOKEN:
+        required: true
 jobs:
+  check_errors:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Benchpark
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Add needed Python libs
+        run: |
+          pip install -r ./requirements.txt
+      - name: Run negative tests via helper
+        shell: bash
+        run: |
+          fail() { echo "TEST FAILED: $*" >&2; exit 1; }
+
+          # one-time setup
+          ./bin/benchpark system init --dest dane llnl-cluster
+
+          # 1) Non-MPIOnlyExperiment Test
+          set +e
+          # babelstream is not an MPIOnlyExperiment
+          stderr_output="$({ ./bin/benchpark experiment init --dest babelstream --system dane babelstream; } 2>&1)"
+          status=$?
+          set -e
+          [[ $status -ne 0 ]] || fail "Expected non-zero exit status, got $status"
+          # Check for the specific BenchparkError message
+          expected="cannot run with MPI only"
+          grep -Fq "$expected" <<< "$stderr_output" && echo "failed as expected: $expected" || fail "Expected error message not found in stderr. Got: $stderr_output"
+
+          # 2) Multiple scaling options
+          set +e
+          # Cannot use both +strong and +weak
+          stderr_output="$({ ./bin/benchpark experiment init --dest kripke --system dane kripke+strong+weak; } 2>&1)"
+          status=$?
+          set -e
+          [[ $status -ne 0 ]] || fail "Expected non-zero exit status, got $status"
+          # Check for the specific BenchparkError message
+          expected="spec cannot specify multiple scaling options"
+          grep -Fq "$expected" <<<"$stderr_output" && echo "failed as expected: $expected" || fail "Expected error message not found in stderr. Got: $stderr_output"
   saxpy:
     runs-on: ubuntu-24.04
     steps:
@@ -12,9 +52,9 @@ jobs:
           pip install -r ./requirements.txt
       - name: Build Saxpy Workspace
         run: |
-          ./bin/benchpark experiment init --dest=saxpy/openmp saxpy+openmp
           ./bin/benchpark system init --dest=generic-x86 generic-x86
-          ./bin/benchpark setup saxpy/openmp generic-x86 workspace/
+          ./bin/benchpark experiment init --dest=saxpy/openmp --system=generic-x86 saxpy+openmp
+          ./bin/benchpark setup saxpy/openmp workspace/
       - name: Setup Ramble & Spack
         run: |
           . workspace/setup.sh
@@ -28,7 +68,6 @@ jobs:
         run: |
           ramble \
             --workspace-dir . \
-            --disable-progress-bar \
             --disable-logger \
             -c config:spack_flags:install:'--no-check-signature' \
             workspace setup
@@ -37,7 +76,6 @@ jobs:
         run: |
           ramble \
             --workspace-dir . \
-            --disable-progress-bar \
             --disable-logger \
             on \
             --executor '{execute_experiment}' \
@@ -47,7 +85,6 @@ jobs:
         run: |
           ramble \
             --workspace-dir . \
-            --disable-progress-bar \
             --disable-logger \
             workspace analyze
       - name: Archive Experiment Workspace
@@ -56,7 +93,6 @@ jobs:
         run: |
           ramble \
             --workspace-dir . \
-            --disable-progress-bar \
             --disable-logger \
             workspace archive
       - name: Upload Workspace Archive as CI Artifact
@@ -84,839 +120,59 @@ jobs:
           OUTPUT=$(spack find --paths saxpy)
           SAXPY_PATH=$(echo "$OUTPUT" | grep 'saxpy@' | awk '{print $2}')/bin/saxpy
           echo "Extracted Path: $SAXPY_PATH"
-          ./bin/benchpark experiment init --dest=saxpy/binary saxpy+openmp package_manager="user-managed" append_path="$SAXPY_PATH"
-          ./bin/benchpark setup saxpy/openmp generic-x86 workspace-binary/
+          BENCHPARK_RUN_COVERAGE=binary ./bin/benchpark experiment init --dest=saxpy/binary --system=generic-x86 saxpy+openmp package_manager="user-managed" append_path="$SAXPY_PATH"
+          ./bin/benchpark setup saxpy/openmp workspace-binary/
           ./workspace-binary/ramble/bin/ramble \
-            --disable-progress-bar \
             --workspace-dir \
             /home/runner/work/benchpark/benchpark/workspace-binary/saxpy/openmp/generic-x86/workspace \
             workspace setup
           ./workspace-binary/ramble/bin/ramble \
-            --disable-progress-bar \
             --workspace-dir \
             /home/runner/work/benchpark/benchpark/workspace-binary/saxpy/openmp/generic-x86/workspace \
             on \
             --executor '{execute_experiment}' \
             --where '{n_nodes} == 1'
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
+          directory: ./coverage-data-binary
+          flags: dryrunexperiments-binary
+          verbose: true
+          fail_ci_if_error: true
   dryrunexperiments:
     runs-on: ubuntu-24.04
+    strategy:
+      # Don't fail other running testtype tests
+      fail-fast: false
+      matrix:
+        testtype:
+          - cuda
+          - rocm
+          - openmp
+          - mpi
+          - strong
+          - weak
+          - throughput
+          - modifiers
     steps:
       - name: Checkout Benchpark
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
-      - name: Dry run amg2023/openmp on Dane with allocation modifier
+      - name: Run Dryruns
         run: |
-          ./bin/benchpark experiment init --dest=amg2023/openmp amg2023+openmp
-          ./bin/benchpark system init --dest=dane llnl-cluster cluster=dane
-          ./bin/benchpark setup amg2023/openmp dane workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/amg2023/openmp/dane/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-      - name: Dry run amg2023/cuda on Sierra with allocation modifier
-        run: |
-          ./bin/benchpark experiment init --dest=amg2023/cuda amg2023+cuda
-          ./bin/benchpark system init --dest=llnl-sierra llnl-sierra
-          ./bin/benchpark setup amg2023/cuda llnl-sierra workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/amg2023/cuda/llnl-sierra/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-      - name: Dry run dynamic kripke/openmp on generic-x86 with allocation modifier
-        run: |
-          ./bin/benchpark experiment init --dest=kripke/openmp kripke+openmp caliper=mpi,time
-          ./bin/benchpark system init --dest=generic-x86 generic-x86
-          ./bin/benchpark setup ./kripke/openmp generic-x86 workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/kripke/openmp/generic-x86/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-      - name: Dry run dynamic kripke/rocm on Tioga with allocation modifier
-        run: |
-          ./bin/benchpark experiment init --dest=kripke/rocm kripke+rocm
-          ./bin/benchpark system init --dest=tioga llnl-elcapitan cluster=tioga
-          ./bin/benchpark setup ./kripke/rocm tioga workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/kripke/rocm/tioga/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-      - name: Dry run dynamic kripke/rocm on Tuolumne SPX with allocation modifier
-        run: |
-          ./bin/benchpark system init --dest=tuolumne/spx llnl-elcapitan cluster=tuolumne gpumode=SPX
-          ./bin/benchpark setup ./kripke/rocm tuolumne/spx workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/kripke/rocm/tuolumne/spx/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-      - name: Dry run dynamic kripke/rocm on Tuolumne TPX with allocation modifier
-        run: |
-          ./bin/benchpark system init --dest=tuolumne/tpx llnl-elcapitan cluster=tuolumne gpumode=TPX
-          ./bin/benchpark setup ./kripke/rocm tuolumne/tpx workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/kripke/rocm/tuolumne/tpx/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-      - name: Dry run dynamic kripke/rocm on Tuolumne CPX with allocation modifier
-        run: |
-          ./bin/benchpark system init --dest=tuolumne/cpx llnl-elcapitan cluster=tuolumne gpumode=CPX
-          ./bin/benchpark setup ./kripke/rocm tuolumne/cpx workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/kripke/rocm/tuolumne/cpx/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-      - name: Dry run kripke/cuda on Sierra with allocation modifier
-        run: |
-          ./bin/benchpark experiment init --dest=kripke/cuda kripke+cuda
-          ./bin/benchpark setup kripke/cuda llnl-sierra workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/kripke/cuda/llnl-sierra/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-      - name: Dry run kripke/rocm on dynamic Tioga with allocation modifier
-        run: |
-          ./bin/benchpark system init --dest=tioga/rocm6.2.4-cce llnl-elcapitan rocm=6.2.4 compiler=cce ~gtl
-          ./bin/benchpark setup kripke/rocm ./tioga/rocm6.2.4-cce workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir "workspace/kripke/rocm/tioga/rocm6.2.4-cce/workspace" \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-      - name: Dry run dynamic saxpy/rocm with static Tioga
-        run: |
-          ./bin/benchpark experiment init --dest=saxpy/rocm saxpy+rocm
-          ./bin/benchpark setup ./saxpy/rocm tioga workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/saxpy/rocm/tioga/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-      - name: Dry run dynamic lammps/openmp on static Ruby
-        run: |
-          ./bin/benchpark experiment init --dest=lammps/openmp lammps+openmp
-          ./bin/benchpark system init --dest=ruby llnl-cluster cluster=ruby
-          ./bin/benchpark setup ./lammps/openmp ruby workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/lammps/openmp/ruby/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-      - name: Dry run dynamic lammps/rocm on static Tioga
-        run: |
-          ./bin/benchpark experiment init --dest=lammps/rocm lammps+rocm
-          ./bin/benchpark setup ./lammps/rocm tioga workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/lammps/rocm/tioga/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-      - name: Dry run dynamic quicksilver/openmp on generic-x86 with allocation modifier
-        run: |
-          ./bin/benchpark experiment init --dest=quicksilver/openmp quicksilver+openmp +weak~single_node
-          ./bin/benchpark setup ./quicksilver/openmp generic-x86 workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/quicksilver/openmp/generic-x86/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-      - name: Dry run qws/openmp with allocation modifier on Fugaku
-        run: |
-          ./bin/benchpark experiment init --dest=qws/openmp qws+openmp
-          ./bin/benchpark system init --dest=riken-fugaku riken-fugaku
-          ./bin/benchpark setup qws/openmp riken-fugaku workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/qws/openmp/riken-fugaku/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-            
-      - name: Dry run qws/openmp with allocation modifier on generic-x86
-        run: |
-          ./bin/benchpark setup qws/openmp generic-x86 workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/qws/openmp/generic-x86/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-      - name: Dry run salmon/openmp with allocation modifier on generic-x86
-        run: |
-          ./bin/benchpark experiment init --dest=salmon/openmp salmon-tddft+openmp
-          ./bin/benchpark setup salmon/openmp generic-x86 workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/salmon/openmp/generic-x86/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-      - name: Dry run salmon/openmp with allocation modifier on Fugaku
-        run: |
-          ./bin/benchpark setup salmon/openmp riken-fugaku workspace/
-          . workspace/setup.sh
-          ramble \
-            --workspace-dir workspace/salmon/openmp/riken-fugaku/workspace \
-            --disable-progress-bar \
-            --disable-logger \
-            workspace setup --dry-run
-  dynamicdryrunexperiments:
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout Benchpark
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-      - name: Add needed Python libs
-        run: |
-          pip install -r ./requirements.txt
-      - name: saxpy/openmp ruby llnl-cluster cluster=ruby compiler=intel
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: saxpy
-          benchmark_mode: openmp
-          benchmark_spec: saxpy+openmp
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby compiler=intel
-      - name: saxpy/openmp dane affinity=on llnl-cluster cluster=dane
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: saxpy
-          benchmark_mode: openmp
-          benchmark_spec: saxpy+openmp affinity=on
-          system_name: dane
-          system_spec: llnl-cluster cluster=dane
-      - name: saxpy/openmp magma llnl-cluster cluster=magma
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: saxpy
-          benchmark_mode: openmp
-          benchmark_spec: saxpy+openmp
-          system_name: magma
-          system_spec: llnl-cluster cluster=magma
-      - name: saxpy/openmp aws aws-pcluster instance_type=hpc6a.48xlarge
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: saxpy
-          benchmark_mode: openmp
-          benchmark_spec: saxpy+openmp
-          system_name: aws
-          system_spec: aws-pcluster instance_type=hpc6a.48xlarge
-      - name: saxpy/openmp affinity=on venado lanl-venado cuda=12.5 compiler=cce +gtl
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: saxpy
-          benchmark_mode: openmp
-          benchmark_spec: saxpy+openmp affinity=on
-          system_name: venado
-          system_spec: lanl-venado cuda=12.5 compiler=cce +gtl
-      - name: saxpy/openmp lumi csc-lumi
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: saxpy
-          benchmark_mode: openmp
-          benchmark_spec: saxpy+openmp
-          system_name: lumi
-          system_spec: csc-lumi
-      - name: saxpy/cuda lassen llnl-sierra cuda=11.8.0 compiler=clang-ibm
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: saxpy
-          benchmark_mode: cuda
-          benchmark_spec: saxpy+cuda
-          system_name: lassen
-          system_spec: llnl-sierra cuda=11.8.0 compiler=clang-ibm
-      - name: saxpy/cuda venado lanl-venado cuda=12.5 compiler=cce +gtl
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: saxpy
-          benchmark_mode: cuda
-          benchmark_spec: saxpy+cuda
-          system_name: venado
-          system_spec: lanl-venado cuda=12.5 compiler=cce +gtl
-      - name: saxpy/rocm affinity=on tioga llnl-elcapitan rocm=6.2.4 compiler=cce
-          ~gtl
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: saxpy
-          benchmark_mode: rocm
-          benchmark_spec: saxpy+rocm affinity=on
-          system_name: tioga
-          system_spec: llnl-elcapitan rocm=6.2.4 compiler=cce ~gtl
-      - name: saxpy/openmp fugaku riken-fugaku
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: saxpy
-          benchmark_mode: openmp
-          benchmark_spec: saxpy+openmp
-          system_name: fugaku
-          system_spec: riken-fugaku
-      - name: saxpy/openmp juwels jsc-juwels
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: saxpy
-          benchmark_mode: openmp
-          benchmark_spec: saxpy+openmp
-          system_name: juwels
-          system_spec: jsc-juwels
-      - name: saxpy/openmp eiger cscs-eiger
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: saxpy
-          benchmark_mode: openmp
-          benchmark_spec: saxpy+openmp
-          system_name: eiger
-          system_spec: cscs-eiger
-      - name: saxpy/openmp daint cscs-daint
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: saxpy
-          benchmark_mode: openmp
-          benchmark_spec: saxpy+openmp
-          system_name: daint
-          system_spec: cscs-daint
-      - name: amg2023/openmp caliper=mpi,time generic-x86 generic-x86
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: amg2023
-          benchmark_mode: openmp
-          benchmark_spec: amg2023+openmp caliper=mpi,time
-          system_name: generic-x86
-          system_spec: generic-x86
-      - name: amg2023/openmp caliper=topdown-all,time ruby llnl-cluster cluster=ruby
-          compiler=intel
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: amg2023
-          benchmark_mode: openmp
-          benchmark_spec: amg2023+openmp caliper=mpi,time
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby compiler=intel
-      - name: amg2023/cuda caliper=cuda,time lassen llnl-sierra cuda=11.8.0 compiler=clang-ibm
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: amg2023
-          benchmark_mode: cuda
-          benchmark_spec: amg2023+cuda caliper=cuda,time
-          system_name: lassen
-          system_spec: llnl-sierra cuda=11.8.0 compiler=clang-ibm
-      - name: amg2023/rocm caliper=mpi,time tioga llnl-elcapitan rocm=6.2.4 compiler=cce
-          +gtl
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: amg2023
-          benchmark_mode: rocm
-          benchmark_spec: amg2023+rocm caliper=mpi,time
-          system_name: tioga
-          system_spec: llnl-elcapitan rocm=6.2.4 compiler=cce +gtl
-      - name: ior/mpi ruby llnl-cluster cluster=ruby compiler=intel
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: ior
-          benchmark_mode: mpi
-          benchmark_spec: ior
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby compiler=intel
-      - name: qws/openmp ruby llnl-cluster cluster=ruby compiler=intel caliper=mpi,time
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: qws
-          benchmark_mode: openmp
-          benchmark_spec: qws+openmp caliper=mpi,time
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby compiler=intel
-      - name: smb/mpi ruby llnl-cluster cluster=ruby compiler=intel
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: smb
-          benchmark_mode: mpi
-          benchmark_spec: smb
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby compiler=intel
-      - name: smb/mpi workload=msgrate ruby llnl-cluster cluster=ruby compiler=intel
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: smb
-          benchmark_mode: mpi
-          benchmark_spec: smb workload=msgrate
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby compiler=intel
-      - name: phloem/mpi ruby llnl-cluster cluster=ruby compiler=intel
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: phloem
-          benchmark_mode: mpi
-          benchmark_spec: phloem
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby compiler=intel
-      - name: laghos/mpi caliper=mpi,time ruby llnl-cluster cluster=ruby compiler=intel
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: laghos
-          benchmark_mode: mpi
-          benchmark_spec: laghos caliper=mpi,time
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby compiler=intel
-      - name: laghos/mpi caliper=mpi,time magma llnl-cluster cluster=magma
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: laghos
-          benchmark_mode: mpi
-          benchmark_spec: laghos caliper=mpi,time
-          system_name: magma
-          system_spec: llnl-cluster cluster=magma
-      - name: laghos/cuda caliper=cuda,time lassen llnl-sierra cuda=11.8.0 compiler=clang-ibm
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: laghos
-          benchmark_mode: cuda
-          benchmark_spec: laghos+cuda caliper=cuda,time
-          system_name: lassen
-          system_spec: llnl-sierra cuda=11.8.0 compiler=clang-ibm
-      - name: laghos/rocm caliper=mpi,time llnl-elcapitan rocm=6.2.4 compiler=cce
-          +gtl
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: laghos
-          benchmark_mode: rocm
-          benchmark_spec: laghos+rocm caliper=mpi,time
-          system_name: tioga
-          system_spec: llnl-elcapitan rocm=6.2.4 compiler=cce +gtl
-      - name: raja-perf/mpi caliper=mpi,time ruby llnl-cluster cluster=ruby compiler=intel
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: raja-perf
-          benchmark_mode: mpi
-          benchmark_spec: raja-perf caliper=mpi,time
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby compiler=intel
-      - name: raja-perf/mpi caliper=mpi,time lassen llnl-sierra cuda=11.8.0 compiler=clang-ibm
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: raja-perf
-          benchmark_mode: mpi
-          benchmark_spec: raja-perf
-          system_name: lassen
-          system_spec: llnl-sierra cuda=11.8.0 compiler=clang-ibm
-      - name: raja-perf/mpi caliper=mpi,time tioga llnl-elcapitan rocm=6.2.4 compiler=cce
-          +gtl
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: raja-perf
-          benchmark_mode: mpi
-          benchmark_spec: raja-perf
-          system_name: tioga
-          system_spec: llnl-elcapitan rocm=6.2.4 compiler=cce +gtl
-      - name: gromacs/openmp gpu-aware-mpi=off ruby llnl-cluster cluster=ruby compiler=gcc
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: gromacs
-          benchmark_mode: openmp
-          benchmark_spec: gromacs+openmp~cuda~rocm gpu-aware-mpi=off
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby compiler=gcc
-      - name: gromacs/cuda gpu-aware-mpi=on lassen llnl-sierra cuda=11.8.0 compiler=clang-ibm
-          lapack=essl blas=essl
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: gromacs
-          benchmark_mode: cuda
-          benchmark_spec: gromacs+openmp+cuda~rocm gpu-aware-mpi=on
-          system_name: lassen
-          system_spec: llnl-sierra cuda=11.8.0 compiler=clang-ibm lapack=essl blas=essl
-      - name: gromacs/rocm gpu-aware-mpi=force llnl-elcapitan rocm=6.2.4 compiler=cce
-          +gtl lapack=intel-oneapi-mkl blas=intel-oneapi-mkl
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: gromacs
-          benchmark_mode: rocm
-          benchmark_spec: gromacs+openmp+rocm~cuda gpu-aware-mpi=force
-          system_name: tioga
-          system_spec: llnl-elcapitan rocm=6.2.4 compiler=cce +gtl lapack=intel-oneapi-mkl
-            blas=intel-oneapi-mkl
-      - name: remhos/mpi caliper=mpi,time ruby llnl-cluster cluster=ruby compiler=gcc
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: remhos
-          benchmark_mode: mpi
-          benchmark_spec: remhos~cuda~rocm caliper=mpi,time
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby compiler=gcc
-      - name: remhos/mpi caliper=mpi,time tioga llnl-elcapitan rocm=6.2.4 compiler=cce
-          +gtl lapack=intel-oneapi-mkl blas=intel-oneapi-mkl
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: remhos
-          benchmark_mode: mpi
-          benchmark_spec: remhos~cuda~rocm caliper=mpi,time
-          system_name: tioga
-          system_spec: llnl-elcapitan rocm=6.2.4 compiler=cce +gtl lapack=intel-oneapi-mkl
-            blas=intel-oneapi-mkl
-      - name: remhos/cuda caliper=cuda,time lassen llnl-sierra cuda=11.8.0 compiler=clang-ibm
-          lapack=essl blas=essl
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: remhos
-          benchmark_mode: cuda
-          benchmark_spec: remhos+cuda~rocm caliper=cuda,time
-          system_name: lassen
-          system_spec: llnl-sierra cuda=11.8.0 compiler=clang-ibm lapack=essl blas=essl
-      - name: remhos/rocm caliper=mpi,time llnl-elcapitan rocm=6.2.4 compiler=cce
-          +gtl lapack=intel-oneapi-mkl blas=intel-oneapi-mkl
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: remhos
-          benchmark_mode: rocm
-          benchmark_spec: remhos~cuda+rocm caliper=mpi,time
-          system_name: tioga
-          system_spec: llnl-elcapitan rocm=6.2.4 compiler=cce +gtl lapack=intel-oneapi-mkl
-            blas=intel-oneapi-mkl
-      - name: genesis/openmp llnl-cluster cluster=ruby compiler=intel
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: genesis
-          benchmark_mode: openmp
-          benchmark_spec: genesis+openmp
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby compiler=intel
-      - name: genesis/openmp fugaku riken-fugaku
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: genesis
-          benchmark_mode: openmp
-          benchmark_spec: genesis+openmp
-          system_name: fugaku
-          system_spec: riken-fugaku
-      - name: babelstream/openmp caliper=mpi,time ruby llnl-cluster cluster=ruby compiler=intel
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: babelstream
-          benchmark_mode: openmp
-          benchmark_spec: babelstream+openmp caliper=mpi,time
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby compiler=intel
-      - name: babelstream/cuda caliper=cuda,time lassen llnl-sierra cuda=11.8.0 compiler=clang-ibm
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: babelstream
-          benchmark_mode: cuda
-          benchmark_spec: babelstream+cuda caliper=cuda,time
-          system_name: lassen
-          system_spec: llnl-sierra cuda=11.8.0 compiler=clang-ibm
-      - name: babelstream/rocm caliper=mpi,time llnl-elcapitan rocm=6.2.4 compiler=cce
-          +gtl
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: babelstream
-          benchmark_mode: rocm
-          benchmark_spec: babelstream+rocm caliper=mpi,time
-          system_name: tioga
-          system_spec: llnl-elcapitan rocm=6.2.4 compiler=cce +gtl
-      - name: lammps/openmp ruby llnl-cluster cluster=ruby compiler=intel
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: lammps
-          benchmark_mode: openmp
-          benchmark_spec: lammps+openmp
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby compiler=intel
-      - name: lammps/openmp lassen llnl-sierra cuda=11.8.0 compiler=clang-ibm
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: lammps
-          benchmark_mode: openmp
-          benchmark_spec: lammps+openmp
-          system_name: lassen
-          system_spec: llnl-sierra cuda=11.8.0 compiler=clang-ibm
-      - name: lammps/openmp llnl-elcapitan rocm=6.2.4 compiler=cce +gtl
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: lammps
-          benchmark_mode: openmp
-          benchmark_spec: lammps+openmp
-          system_name: tioga
-          system_spec: llnl-elcapitan rocm=6.2.4 compiler=cce +gtl
-      - name: lammps/cuda lassen llnl-sierra cuda=11.8.0 compiler=clang-ibm
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: lammps
-          benchmark_mode: cuda
-          benchmark_spec: lammps+cuda
-          system_name: lassen
-          system_spec: llnl-sierra cuda=11.8.0 compiler=clang-ibm
-      - name: lammps/rocm llnl-elcapitan rocm=6.2.4 compiler=cce +gtl
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: lammps
-          benchmark_mode: rocm
-          benchmark_spec: lammps+rocm
-          system_name: tioga
-          system_spec: llnl-elcapitan rocm=6.2.4 compiler=cce +gtl
-      - name: kripke/openmp caliper=mpi,time generic-x86 generic-x86
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: kripke
-          benchmark_mode: openmp
-          benchmark_spec: kripke+openmp caliper=mpi,time
-          system_name: generic-x86
-          system_spec: generic-x86
-      - name: kripke/openmp caliper=mpi,time ruby llnl-cluster cluster=ruby compiler=intel
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: kripke
-          benchmark_mode: openmp
-          benchmark_spec: kripke+openmp caliper=mpi,time
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby compiler=intel
-      - name: kripke/cuda caliper=cuda,time lassen llnl-sierra cuda=11.8.0 compiler=clang-ibm
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: kripke
-          benchmark_mode: cuda
-          benchmark_spec: kripke+cuda caliper=cuda,time
-          system_name: lassen
-          system_spec: llnl-sierra cuda=11.8.0 compiler=clang-ibm
-      - name: kripke/rocm caliper=mpi,time tioga llnl-elcapitan rocm=6.2.4 compiler=cce
-          +gtl
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: kripke
-          benchmark_mode: rocm
-          benchmark_spec: kripke+rocm caliper=mpi,time
-          system_name: tioga
-          system_spec: llnl-elcapitan rocm=6.2.4 compiler=cce +gtl
-      - name: gpcNet/mpi ruby llnl-cluster cluster=ruby compiler=intel
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: gpcnet
-          benchmark_mode: mpi
-          benchmark_spec: gpcnet
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby compiler=intel
-      - name: gpcNet/mpi lassen llnl-sierra cuda=11.8.0 compiler=clang-ibm
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: gpcnet
-          benchmark_mode: mpi
-          benchmark_spec: gpcnet
-          system_name: lassen
-          system_spec: llnl-sierra cuda=11.8.0 compiler=clang-ibm
-      - name: gpcNet/mpi tioga llnl-elcapitan rocm=6.2.4 compiler=cce +gtl
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: gpcnet
-          benchmark_mode: mpi
-          benchmark_spec: gpcnet
-          system_name: tioga
-          system_spec: llnl-elcapitan rocm=6.2.4 compiler=cce +gtl
-      - name: hpcg/openmp caliper=mpi,time tioga llnl-elcapitan compiler=cce
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: hpcg
-          benchmark_mode: openmp
-          benchmark_spec: hpcg+openmp caliper=mpi,time
-          system_name: tioga
-          system_spec: llnl-elcapitan compiler=cce
-      - name: hpcg/openmp caliper=time lassen llnl-sierra compiler=clang-ibm
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: hpcg
-          benchmark_mode: openmp
-          benchmark_spec: hpcg+openmp caliper=mpi,time
-          system_name: lassen
-          system_spec: llnl-sierra compiler=clang-ibm
-      - name: hpcg/openmp caliper=cuda,time ruby llnl-cluster cluster=ruby compiler=gcc
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: hpcg
-          benchmark_mode: openmp
-          benchmark_spec: hpcg+openmp caliper=mpi,time
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby compiler=gcc
-      - name: hpl/mpi caliper=mpi,time tioga llnl-elcapitan rocm=6.2.4 compiler=cce
-          +gtl blas=intel-oneapi-mkl
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: hpl
-          benchmark_mode: mpi
-          benchmark_spec: hpl caliper=mpi,time
-          system_name: tioga
-          system_spec: llnl-elcapitan rocm=6.2.4 compiler=cce +gtl blas=intel-oneapi-mkl
-      - name: hpl/mpi caliper=mpi,time ruby llnl-cluster cluster=ruby compiler=gcc
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: hpl
-          benchmark_mode: mpi
-          benchmark_spec: hpl caliper=mpi,time
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby compiler=gcc
-      - name: hpl/mpi caliper=mpi,time lassen llnl-sierra cuda=11.8.0 compiler=clang-ibm
-          blas=essl
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: hpl
-          benchmark_mode: mpi
-          benchmark_spec: hpl caliper=mpi,time
-          system_name: lassen
-          system_spec: llnl-sierra cuda=11.8.0 compiler=clang-ibm blas=essl
-      - name: hpl/openmp caliper=mpi,time tioga llnl-elcapitan rocm=6.2.4 compiler=cce
-          +gtl blas=intel-oneapi-mkl
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: hpl
-          benchmark_mode: openmp
-          benchmark_spec: hpl+openmp caliper=mpi,time
-          system_name: tioga
-          system_spec: llnl-elcapitan rocm=6.2.4 compiler=cce +gtl blas=intel-oneapi-mkl
-      - name: hpl/openmp caliper=mpi,time ruby llnl-cluster cluster=ruby compiler=gcc
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: hpl
-          benchmark_mode: openmp
-          benchmark_spec: hpl+openmp caliper=mpi,time
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby compiler=gcc
-      - name: hpl/openmp caliper=mpi,time lassen llnl-sierra cuda=11.8.0 compiler=clang-ibm
-          blas=essl
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: hpl
-          benchmark_mode: openmp
-          benchmark_spec: hpl+openmp caliper=mpi,time
-          system_name: lassen
-          system_spec: llnl-sierra cuda=11.8.0 compiler=clang-ibm blas=essl
-      - name: stream/mpi caliper=mpi,time ruby llnl-cluster cluster=ruby
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: stream
-          benchmark_mode: mpi
-          benchmark_spec: stream caliper=mpi,time
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby
-      - name: stream/mpi caliper=mpi,time lassen llnl-sierra cuda=11.8.0 compiler=clang-ibm
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: stream
-          benchmark_mode: mpi
-          benchmark_spec: stream caliper=mpi,time
-          system_name: lassen
-          system_spec: llnl-sierra cuda=11.8.0 compiler=clang-ibm
-      - name: stream/mpi caliper=mpi,time llnl-elcapitan rocm=6.2.4 compiler=cce
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: stream
-          benchmark_mode: mpi
-          benchmark_spec: stream caliper=mpi,time
-          system_name: tioga
-          system_spec: llnl-elcapitan rocm=6.2.4 compiler=cce
-      - name: ad/single-core llnl-elcapitan rocm=6.2.4 compiler=rocmcc
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: ad
-          benchmark_mode: single-core
-          benchmark_spec: ad
-          system_name: tioga
-          system_spec: llnl-elcapitan rocm=6.2.4 compiler=rocmcc
-      - name: branson/openmp caliper=mpi,time ruby llnl-cluster cluster=ruby compiler=intel
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: branson
-          benchmark_mode: openmp
-          benchmark_spec: branson+openmp caliper=mpi,time
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby compiler=intel
-      - name: branson/cuda caliper=cuda,time lassen llnl-sierra cuda=11.8.0 compiler=clang-ibm
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: branson
-          benchmark_mode: cuda
-          benchmark_spec: branson+cuda caliper=cuda,time
-          system_name: lassen
-          system_spec: llnl-sierra cuda=11.8.0 compiler=clang-ibm
-      - name: branson/cuda caliper=cuda,time venado lanl-venado cuda=12.5 compiler=cce +gtl
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: branson
-          benchmark_mode: cuda
-          benchmark_spec: branson+cuda caliper=cuda,time
-          system_name: venado
-          system_spec: lanl-venado cuda=12.5 compiler=cce +gtl
-      - name: branson/rocm caliper=mpi,time tioga llnl-elcapitan rocm=6.2.4 compiler=cce +gtl
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: branson
-          benchmark_mode: rocm
-          benchmark_spec: branson+rocm caliper=mpi,time
-          system_name: tioga
-          system_spec: llnl-elcapitan rocm=6.2.4 compiler=cce +gtl
-      - name: md-test/mpi llnl-elcapitan
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: md-test
-          benchmark_mode: mpi
-          benchmark_spec: md-test
-          system_name: tioga
-          system_spec: llnl-elcapitan
-      - name: md-test/mpi ruby llnl-cluster
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: md-test
-          benchmark_mode: mpi
-          benchmark_spec: md-test
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby
-      - name: osu-micro-benchmarks/mpi ruby llnl-cluster cluster=ruby compiler=intel
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: osu-micro-benchmarks
-          benchmark_mode: mpi
-          benchmark_spec: osu-micro-benchmarks workload=all
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby compiler=intel
-      - name: osu-micro-benchmarks/rocm tioga llnl-elcapitan cluster=tioga compiler=cce
-          +gtl
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: osu-micro-benchmarks
-          benchmark_mode: rocm
-          benchmark_spec: osu-micro-benchmarks+rocm workload=all
-          system_name: tioga
-          system_spec: llnl-elcapitan cluster=tioga compiler=cce +gtl
-      - name: salmon/openmp ruby llnl-cluster cluster=ruby compiler=intel
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: salmon-tddft
-          benchmark_mode: openmp
-          benchmark_spec: salmon-tddft
-          system_name: ruby
-          system_spec: llnl-cluster cluster=ruby compiler=intel
-      - name: salmon fugaku riken-fugaku
-        uses: ./.github/actions/dynamic-dry-run
-        with:
-          benchmark_name: salmon-tddft
-          benchmark_mode: openmp
-          benchmark_spec: salmon-tddft
-          system_name: fugaku
-          system_spec: riken-fugaku
+          ./bin/benchpark bootstrap
+          BENCHPARK_RUN_COVERAGE=${{ matrix.testtype }} ./bin/benchpark-python .github/utils/dryruns.py --test ${{ matrix.testtype }}
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
+          directory: ./coverage-data-${{ matrix.testtype }}
+          flags: dryrunexperiments-${{ matrix.testtype }}
+          verbose: true
+          fail_ci_if_error: true
   pytest:
     runs-on: ubuntu-24.04
     steps:

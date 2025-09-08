@@ -3,9 +3,9 @@
 
    SPDX-License-Identifier: Apache-2.0
 
-==================================
-Create a mirror for another system
-==================================
+=============
+System Mirror
+=============
 
 If you build a benchmark on a networked system, you can use `benchpark mirror`
 to create a directory that bundles all  necessary resources to install and run
@@ -14,11 +14,11 @@ need network access.
 
 On the networked system, if you created/built the benchmark with::
 
-    benchpark experiment init --dest=def-raja-perf raja-perf
     benchpark system init --dest=def-ruby llnl-cluster cluster=ruby compiler=gcc
-    benchpark setup def-raja-perf/ def-ruby/ workspace/
+    benchpark experiment init --dest=def-raja-perf --system=def-ruby raja-perf
+    benchpark setup def-raja-perf/ workspace/
     . `pwd`/workspace/setup.sh
-    ramble --disable-progress-bar --workspace-dir `pwd`/workspace/def-raja-perf/def-ruby/workspace workspace setup
+    ramble --workspace-dir `pwd`/workspace/def-raja-perf/def-ruby/workspace workspace setup
 
 You can then create a directory that bundles all the resources needed to build
 that benchmark with::

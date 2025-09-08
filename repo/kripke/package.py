@@ -21,6 +21,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     license("BSD-3-Clause")
 
     version("develop", branch="develop", submodules=False)
+    version("2025-07", submodules=False, commit="8cf38433a6a11e0dcd17864e649b2d045159ee9c")
     version(
         "1.2.7.0", submodules=False, commit="db920c1f5e1dcbb9e949d120e7d86efcdb777635"
     )
@@ -52,8 +53,12 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     variant("mpi", default=True, description="Build with MPI.")
     variant("openmp", default=False, description="Build with OpenMP enabled.")
     variant("caliper", default=False, description="Build with Caliper support enabled.")
+    variant("single_memory", default=False, description="Enable single memory space model in rocm")
 
-    depends_on("chai@2024.07.0+raja", when="@develop")
+    conflicts("+single_memory", when="~rocm")
+    depends_on("chai+single_memory", when="+single_memory")
+
+    depends_on("chai@2024.07.0+raja", when="@1.2.7.0:")
     depends_on("fmt@9.1", when=f"^chai@2024.07.0")
 
     depends_on("mpi", when="+mpi")

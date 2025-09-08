@@ -5,11 +5,13 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.caliper import Caliper
 
 
 class Stream(
     Experiment,
+    MpiOnlyExperiment,
     Caliper,
 ):
     variant(
@@ -20,7 +22,8 @@ class Stream(
 
     variant(
         "version",
-        default="5.10",
+        default="5.10-caliper",
+        values=("develop", "latest", "5.10-caliper"),
         description="app version",
     )
 
@@ -48,6 +51,4 @@ class Stream(
         )
 
     def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, [f"stream@{app_version}"])
+        self.add_package_spec(self.name, [f"stream{self.determine_version()}"])

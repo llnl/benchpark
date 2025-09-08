@@ -12,10 +12,14 @@ else
 fi
 
 # Initialize Experiment
-./bin/benchpark experiment init --dest=${BENCHMARK} ${BENCHMARK} ${VARIANT}
+BV=""
+if [[ -n "$BENCHMARK_VERSION" ]]; then
+    BV="version=$BENCHMARK_VERSION"
+fi
+./bin/benchpark experiment init --dest=${BENCHMARK} --system=${HOST} ${BENCHMARK} ${VARIANT} ${BV}
 
 # Build Workspace
-./bin/benchpark setup ${BENCHMARK} ${HOST} wkp/
+./bin/benchpark setup ${BENCHMARK} wkp/
 
 # Setup Ramble & Spack
 . wkp/setup.sh
