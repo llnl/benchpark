@@ -221,7 +221,7 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
     variant(
         "n_repeats",
         default=0,
-        description="Number of experiment repititions",
+        description="Number of experiment repetitions",
     )
 
     def __init__(self, spec):
