@@ -11,7 +11,7 @@ from spack.package import *
 class SpartaSnl(CMakePackage, CudaPackage, ROCmPackage):
 
     homepage = "https://sparta.github.io/"
-    git = "https://github.com/rfhaque/sparta.git"
+    git = "https://github.com/sparta/sparta.git"
 
     version("master", branch="master")
     version("20Jan2025", tag="20Jan2025")
