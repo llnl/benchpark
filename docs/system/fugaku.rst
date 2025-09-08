@@ -44,8 +44,8 @@ Set up the directory structure for your experiment:
     export SYS="fugaku"
     export WSDIR="$(pwd)/workspace"
     benchpark system init --dest ${SYS}-system ${SYS}
-    benchpark experiment init --dest ${BM}-test ${BM} +openmp
-    benchpark setup ./${BM}-test ./${SYS}-system ${WSDIR}
+    benchpark experiment init --dest ${BM}-test --system ${SYS}-system ${BM} +openmp
+    benchpark setup ./${BM}-test ${WSDIR}
 
 
 Patch some files in various repos:
@@ -67,7 +67,7 @@ Build the benchmark:
     source ${WSDIR}/setup.sh
     export TMP=/local
     export TMPDIR=/local
-    ramble --disable-progress-bar --workspace-dir ${WSDIR}/${BM}-test/${SYS}-system/workspace workspace setup
+    ramble --workspace-dir ${WSDIR}/${BM}-test/${SYS}-system/workspace workspace setup
 
 
 Go back to login node and submit benchmarks:
@@ -84,7 +84,7 @@ Go back to login node and submit benchmarks:
     export BM="saxpy"
     export SYS="fugaku"
     export WSDIR="$(pwd)/workspace"
-    ${WSDIR}/ramble/bin/ramble --disable-progress-bar --workspace-dir ${WSDIR}/${BM}-test/${SYS}-system/workspace on
+    ${WSDIR}/ramble/bin/ramble --workspace-dir ${WSDIR}/${BM}-test/${SYS}-system/workspace on
 
 
 Finding the benchmark output (Fujitsu MPI does not write to STDOUT):

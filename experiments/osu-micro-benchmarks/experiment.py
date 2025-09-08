@@ -96,13 +96,20 @@ class OsuMicroBenchmarks(
         description="workloads available",
     )
 
+    variant(
+        "version",
+        default="7.5",
+        values=("latest", "7.5"),
+        description="app version",
+    )
+
     maintainers("nhanford")
 
     def compute_applications_section(self):
 
         num_nodes = {"n_nodes": 2}
 
-        if self.spec.satisfies("+single_node"):
+        if self.spec.satisfies("exec_mode=test"):
             for pk, pv in num_nodes.items():
                 self.add_experiment_variable(pk, pv, True)
 
@@ -123,4 +130,6 @@ class OsuMicroBenchmarks(
         )
 
     def compute_package_section(self):
-        self.add_package_spec(self.name, ["osu-micro-benchmarks"])
+        self.add_package_spec(
+            self.name, [f"osu-micro-benchmarks{self.determine_version()}"]
+        )

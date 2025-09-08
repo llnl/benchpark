@@ -1,7 +1,47 @@
 name: Run Benchpark and Simple Benchmark Suite
 on:
   workflow_call:
+    secrets:
+      BENCHPARK_CODECOV_TOKEN:
+        required: true
 jobs:
+  check_errors:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Benchpark
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Add needed Python libs
+        run: |
+          pip install -r ./requirements.txt
+      - name: Run negative tests via helper
+        shell: bash
+        run: |
+          fail() { echo "TEST FAILED: $*" >&2; exit 1; }
+
+          # one-time setup
+          ./bin/benchpark system init --dest dane llnl-cluster
+
+          # 1) Non-MPIOnlyExperiment Test
+          set +e
+          # babelstream is not an MPIOnlyExperiment
+          stderr_output="$({ ./bin/benchpark experiment init --dest babelstream --system dane babelstream; } 2>&1)"
+          status=$?
+          set -e
+          [[ $status -ne 0 ]] || fail "Expected non-zero exit status, got $status"
+          # Check for the specific BenchparkError message
+          expected="cannot run with MPI only"
+          grep -Fq "$expected" <<< "$stderr_output" && echo "failed as expected: $expected" || fail "Expected error message not found in stderr. Got: $stderr_output"
+
+          # 2) Multiple scaling options
+          set +e
+          # Cannot use both +strong and +weak
+          stderr_output="$({ ./bin/benchpark experiment init --dest kripke --system dane kripke+strong+weak; } 2>&1)"
+          status=$?
+          set -e
+          [[ $status -ne 0 ]] || fail "Expected non-zero exit status, got $status"
+          # Check for the specific BenchparkError message
+          expected="spec cannot specify multiple scaling options"
+          grep -Fq "$expected" <<<"$stderr_output" && echo "failed as expected: $expected" || fail "Expected error message not found in stderr. Got: $stderr_output"
   saxpy:
     runs-on: ubuntu-24.04
     steps:
@@ -12,9 +52,9 @@ jobs:
           pip install -r ./requirements.txt
       - name: Build Saxpy Workspace
         run: |
-          ./bin/benchpark experiment init --dest=saxpy/openmp saxpy+openmp
           ./bin/benchpark system init --dest=generic-x86 generic-x86
-          ./bin/benchpark setup saxpy/openmp generic-x86 workspace/
+          ./bin/benchpark experiment init --dest=saxpy/openmp --system=generic-x86 saxpy+openmp
+          ./bin/benchpark setup saxpy/openmp workspace/
       - name: Setup Ramble & Spack
         run: |
           . workspace/setup.sh
@@ -28,7 +68,6 @@ jobs:
         run: |
           ramble \
             --workspace-dir . \
-            --disable-progress-bar \
             --disable-logger \
             -c config:spack_flags:install:'--no-check-signature' \
             workspace setup
@@ -37,7 +76,6 @@ jobs:
         run: |
           ramble \
             --workspace-dir . \
-            --disable-progress-bar \
             --disable-logger \
             on \
             --executor '{execute_experiment}' \
@@ -47,7 +85,6 @@ jobs:
         run: |
           ramble \
             --workspace-dir . \
-            --disable-progress-bar \
             --disable-logger \
             workspace analyze
       - name: Archive Experiment Workspace
@@ -56,7 +93,6 @@ jobs:
         run: |
           ramble \
             --workspace-dir . \
-            --disable-progress-bar \
             --disable-logger \
             workspace archive
       - name: Upload Workspace Archive as CI Artifact
@@ -84,20 +120,26 @@ jobs:
           OUTPUT=$(spack find --paths saxpy)
           SAXPY_PATH=$(echo "$OUTPUT" | grep 'saxpy@' | awk '{print $2}')/bin/saxpy
           echo "Extracted Path: $SAXPY_PATH"
-          ./bin/benchpark experiment init --dest=saxpy/binary saxpy+openmp package_manager="user-managed" append_path="$SAXPY_PATH"
-          ./bin/benchpark setup saxpy/openmp generic-x86 workspace-binary/
+          BENCHPARK_RUN_COVERAGE=binary ./bin/benchpark experiment init --dest=saxpy/binary --system=generic-x86 saxpy+openmp package_manager="user-managed" append_path="$SAXPY_PATH"
+          ./bin/benchpark setup saxpy/openmp workspace-binary/
           ./workspace-binary/ramble/bin/ramble \
-            --disable-progress-bar \
             --workspace-dir \
             /home/runner/work/benchpark/benchpark/workspace-binary/saxpy/openmp/generic-x86/workspace \
             workspace setup
           ./workspace-binary/ramble/bin/ramble \
-            --disable-progress-bar \
             --workspace-dir \
             /home/runner/work/benchpark/benchpark/workspace-binary/saxpy/openmp/generic-x86/workspace \
             on \
             --executor '{execute_experiment}' \
             --where '{n_nodes} == 1'
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
+          directory: ./coverage-data-binary
+          flags: dryrunexperiments-binary
+          verbose: true
+          fail_ci_if_error: true
   dryrunexperiments:
     runs-on: ubuntu-24.04
     strategy:
@@ -122,7 +164,15 @@ jobs:
       - name: Run Dryruns
         run: |
           ./bin/benchpark bootstrap
-          ./bin/benchpark-python .github/utils/dryruns.py --test ${{ matrix.testtype }}
+          BENCHPARK_RUN_COVERAGE=${{ matrix.testtype }} ./bin/benchpark-python .github/utils/dryruns.py --test ${{ matrix.testtype }}
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
+          directory: ./coverage-data-${{ matrix.testtype }}
+          flags: dryrunexperiments-${{ matrix.testtype }}
+          verbose: true
+          fail_ci_if_error: true
   pytest:
     runs-on: ubuntu-24.04
     steps:

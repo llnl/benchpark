@@ -9,6 +9,8 @@ from spack.pkg.builtin.lammps import Lammps as BuiltinLammps
 
 class Lammps(BuiltinLammps):
 
+  version("stable_29Aug2024_update3", tag="stable_29Aug2024_update3")
+
   depends_on("kokkos+openmp cxxstd=17", when="+openmp")
   depends_on("kokkos+rocm", when="+rocm")
   depends_on("kokkos+cuda cxxstd=17", when="+cuda")

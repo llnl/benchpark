@@ -8,7 +8,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: Setup Python
-        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c
         with:
           python-version: '3.11'
           cache: pip
@@ -20,9 +20,9 @@ jobs:
         run: |
           pip install -r .github/workflows/requirements/docs.txt
           # create a dummy workspace to get a working ramble
-          bin/benchpark experiment init --dest=saxpy saxpy
           bin/benchpark system init --dest=generic-x86 generic-x86
-          bin/benchpark setup saxpy generic-x86 /tmp/workspace
+          bin/benchpark experiment init --dest=saxpy --system=generic-x86 saxpy
+          bin/benchpark setup saxpy /tmp/workspace
           # this is gross and we should better setup ramble for people or make it a Spack package
           pip install -r /tmp/workspace/ramble/requirements.txt
       - name: Build with sphinx
@@ -33,7 +33,7 @@ jobs:
         run: |
           codespell --ignore-words=.codespellignore
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b
         if: github.ref == 'refs/heads/develop'
         with:
           path: ./docs/_build/html

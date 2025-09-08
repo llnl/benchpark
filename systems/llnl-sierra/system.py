@@ -6,7 +6,8 @@
 from benchpark.directives import variant, maintainers
 from benchpark.cudasystem import CudaSystem
 from benchpark.paths import hardware_descriptions
-from benchpark.system import System
+from benchpark.system import System, JobQueue
+from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from packaging.version import Version
 
 
@@ -38,9 +39,14 @@ class LlnlSierra(System):
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/IBM-power9-V100-Infiniband/hardware_description.yaml",
+            "queues": [JobQueue("pdebug", 120, 18), JobQueue("pbatch", 720, 256)],
         },
     }
     id_to_resources["sierra"] = id_to_resources["lassen"]
+    id_to_resources["sierra"]["queues"] = [
+        JobQueue("pdebug", 120, 18),
+        JobQueue("pbatch", 1440, 2048),
+    ]
 
     variant(
         "cuda",
@@ -73,9 +79,17 @@ class LlnlSierra(System):
         description="Which blas to use",
     )
 
+    variant(
+        "bank",
+        default="none",
+        values=("none", "guests", "asccasc", "lc", "fractale"),
+        multi=False,
+        description="Submit a job to a specific named bank",
+    )
+
     def __init__(self, spec):
         super().__init__(spec)
-        self.programming_models = [CudaSystem()]
+        self.programming_models = [CudaSystem(), OpenMPCPUOnlySystem()]
         self.cuda_version = Version(self.spec.variants["cuda"][0])
         self.gtl_flag = self.spec.variants["gtl"][0]
 
