@@ -18,16 +18,6 @@ class Hypre(BuiltinHypre):
         "gcc": "gnu",
     }
 
-    def configure_args(self):
-        configure_args = super().configure_args()
-
-        if False:
-            configure_args.append("--with-fmangle=no-underscores")
-            configure_args.append("--with-fmangle-blas=no-underscores") 
-            configure_args.append("--with-fmangle-lapack=no-underscores")
-
-        return configure_args
-
     def setup_build_environment(self, env):
         if self.spec.satisfies('%oneapi'):
             compiler_version = self.spec.compiler.version
