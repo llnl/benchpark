@@ -23,7 +23,7 @@ class LlnlCluster(System):
             "sys_cpu_mem_per_node": 94,
             "sys_cpu_L1_KB": 32, #32KB for L1d and 32KB for L1i
             "sys_cpu_L2_KB": 1024,
-            "sys_cpu_L3_MB": 105, #105MB
+            "sys_cpu_L3_MB": 38.5, #38.5 MB
             "sys_sockets_per_node": 2,
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
