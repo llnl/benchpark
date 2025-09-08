@@ -49,13 +49,13 @@ class SpartaSnl(
         multi=False,
     )
 
-    #variant(
-    #    "gpu-aware-mpi",
-    #    default=True,
-    #    values=(True, False),
-    #    when=("+cuda" or "+rocm"),
-    #    description="Enable GPU-aware MPI",
-    #)
+    # variant(
+    #     "gpu-aware-mpi",
+    #     default=True,
+    #     values=(True, False),
+    #     when=("+cuda" or "+rocm"),
+    #     description="Enable GPU-aware MPI",
+    # )
 
     maintainers("rfhaque")
 
@@ -66,7 +66,7 @@ class SpartaSnl(
             stats = 10
             run = 100
         else:
-            L = 2 # will increase problem size by 4X
+            L = 2  # will increase problem size by 4X
             ppc = 64
             stats = 10
             run = 100
@@ -102,7 +102,7 @@ class SpartaSnl(
             self.add_experiment_variable("in", "in.cylinder", False)
 
         self.set_required_variables(
-            process_problem_size="{L}*{ppc}*1000", # 1000 is a placeholder multiplier
+            process_problem_size="{L}*{ppc}*1000",  # 1000 is a placeholder multiplier
             total_problem_size="{process_problem_size}*{n_resources}",
         )
 
