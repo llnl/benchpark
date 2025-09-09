@@ -114,4 +114,7 @@ class Amg2023(
             self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
     def compute_package_section(self):
-        self.add_package_spec(self.name, [f"amg2023{self.determine_version()} +umpire"])
+        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+            self.add_package_spec(self.name, [f"amg2023{self.determine_version()} +umpire"])
+        else:
+            self.add_package_spec(self.name, [f"amg2023{self.determine_version()}"])
