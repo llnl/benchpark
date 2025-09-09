@@ -66,6 +66,7 @@ jobs:
               - 'pyproject.toml'
               - '.flake8'
               - 'checkout-versions.yaml'
+              - 'docs/**'
             run:
               - 'bin/**'
               - 'configs/**'
