@@ -9,7 +9,6 @@ from benchpark.mpi import MpiOnlyExperiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
-from benchpark.scaling import ScalingMode, Scaling
 
 
 class SpartaSnl(
