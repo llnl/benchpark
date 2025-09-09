@@ -2,5 +2,5 @@ black==25.1.0
 flake8==7.3.0
 isort==6.0.1
 codespell==2.4.1
-yamlfix==1.17.0
+yamlfix==1.18.0
 docstrfmt==1.11.1
