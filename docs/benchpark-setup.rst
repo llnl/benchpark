@@ -1,18 +1,17 @@
 ..
-   Copyright 2023 Lawrence Livermore National Security, LLC and other
-   Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+    Copyright 2023 Lawrence Livermore National Security, LLC and other
+    Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 
-   SPDX-License-Identifier: Apache-2.0
+    SPDX-License-Identifier: Apache-2.0
 
-####################
- Set up a Workspace
-####################
+Set up a Workspace
+==================
 
 To setup an experiment workspace you must first initialize the system you will be
 running on. Next, initialize the experiment you plan to run with the appropriate
 programming model. Finally, set up the workspace in a directory for your experiment.:
 
-.. code::
+::
 
    benchpark system init --dest=</output/path/to/system_def_dir> <SystemName> compiler=<Compiler>
    benchpark experiment init --dest=</output/path/to/experiment_def_dir> <Benchmark> +/~<Boolean Variant> <String Variant>=<value> --system=</output/path/to/system_def_dir>
@@ -26,7 +25,7 @@ where:
 This command will assemble a Ramble workspace per experiment with a configuration for
 the specified benchmark and system with the following directory structure:
 
-.. code::
+::
 
    experiments_root/
        ramble/
@@ -40,9 +39,9 @@ the specified benchmark and system with the following directory structure:
 
 ``benchpark setup`` will output instructions to follow:
 
-.. code::
+::
 
-   . <experiments_root>/setup.sh
+    . <experiments_root>/setup.sh
 
 The ``setup.sh`` script calls the Spack and Ramble setup scripts. It optionally accepts
 parameters to ``ramble workspace setup`` as `documented in Ramble
