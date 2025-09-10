@@ -5,7 +5,7 @@
 
 
 from benchpark.directives import variant, maintainers
-from benchpark.system import System
+from benchpark.system import System, compiler_def, compiler_section_for, merge_dicts
 from benchpark.cudasystem import CudaSystem
 from packaging.version import Version
 from benchpark.paths import hardware_descriptions
@@ -142,163 +142,98 @@ class CscsDaint(System):
         }
 
     def compute_compilers_section(self):
-        compiler_map = {
-            "cce": {
-                "compilers": [
-                    {
-                        "compiler": {
-                            "spec": "cce@12.0.3",
-                            "paths": {
-                                "cc": "cc",
-                                "cxx": "CC",
-                                "f77": "ftn",
-                                "fc": "ftn",
-                            },
-                            "flags": {},
-                            "operating_system": "cnl7",
-                            "target": "any",
-                            "modules": ["PrgEnv-cray", "cce/12.0.3"],
-                            "environment": {},
-                            "extra_rpaths": [],
-                        }
-                    }
-                ]
-            },
-            "gcc9": {
-                "compilers": [
-                    {
-                        "compiler": {
-                            "spec": "gcc@9.3.0",
-                            "paths": {
-                                "cc": "cc",
-                                "cxx": "CC",
-                                "f77": "ftn",
-                                "fc": "ftn",
-                            },
-                            "flags": {},
-                            "operating_system": "cnl7",
-                            "target": "any",
-                            "modules": ["PrgEnv-gnu", "gcc/9.3.0"],
-                            "environment": {},
-                            "extra_rpaths": [],
-                        }
-                    }
-                ]
-            },
-            "gcc10": {
-                "compilers": [
-                    {
-                        "compiler": {
-                            "spec": "gcc@10.3.0",
-                            "paths": {
-                                "cc": "cc",
-                                "cxx": "CC",
-                                "f77": "ftn",
-                                "fc": "ftn",
-                            },
-                            "flags": {},
-                            "operating_system": "cnl7",
-                            "target": "any",
-                            "modules": ["PrgEnv-gnu", "gcc/10.3.0"],
-                            "environment": {},
-                            "extra_rpaths": [],
-                        }
-                    }
-                ]
-            },
-            "gcc11": {
-                "compilers": [
-                    {
-                        "compiler": {
-                            "spec": "gcc@11.2.0",
-                            "paths": {
-                                "cc": "cc",
-                                "cxx": "CC",
-                                "f77": "ftn",
-                                "fc": "ftn",
-                            },
-                            "flags": {},
-                            "operating_system": "cnl7",
-                            "target": "any",
-                            "modules": ["PrgEnv-gnu", "gcc/11.2.0"],
-                            "environment": {},
-                            "extra_rpaths": [],
-                        }
-                    }
-                ]
-            },
-            "intel": {
-                "compilers": [
-                    {
-                        "compiler": {
-                            "spec": "intel@2021.3.0",
-                            "paths": {
-                                "cc": "cc",
-                                "cxx": "CC",
-                                "f77": "ftn",
-                                "fc": "ftn",
-                            },
-                            "flags": {},
-                            "operating_system": "cnl7",
-                            "target": "any",
-                            "modules": ["PrgEnv-intel", "intel/2021.3.0"],
-                            "environment": {},
-                            "extra_rpaths": [],
-                        }
-                    }
-                ]
-            },
-            "pgi": {
-                "compilers": [
-                    {
-                        "compiler": {
-                            "spec": "pgi@20.1.1",
-                            "paths": {
-                                "cc": "cc",
-                                "cxx": "CC",
-                                "f77": "ftn",
-                                "fc": "ftn",
-                            },
-                            "flags": {},
-                            "operating_system": "cnl7",
-                            "target": "any",
-                            "modules": ["PrgEnv-pgi", "pgi/20.1.1"],
-                            "environment": {},
-                            "extra_rpaths": [],
-                        }
-                    }
-                ]
-            },
-            "nvhpc": {
-                "compilers": [
-                    {
-                        "compiler": {
-                            "spec": "nvhpc@21.3",
-                            "paths": {
-                                "cc": "cc",
-                                "cxx": "CC",
-                                "f77": "ftn",
-                                "fc": "ftn",
-                            },
-                            "flags": {},
-                            "operating_system": "cnl7",
-                            "target": "any",
-                            "modules": ["PrgEnv-nvidia", "nvidia/21.3"],
-                            "environment": {},
-                            "extra_rpaths": [],
-                        }
-                    }
-                ]
-            },
-        }
+        compiler_map = {}
+        compiler_map["cce"] = compiler_section_for(
+            "cce",
+            [
+                compiler_def(
+                    "cce@12.0.3",
+                    "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
+                    {"c": "cc", "cxx": "CC", "fortran": "ftn"},
+                    modules=["PrgEnv-cray", "cce/12.0.3"],
+                    compilers_use_relative_paths=True,
+                )
+            ],
+        )
+        compiler_map["gcc9"] = compiler_section_for(
+            "gcc",
+            [
+                compiler_def(
+                    "gcc@9.3.0 languages:=c,c++,fortran",
+                    "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
+                    {"c": "cc", "cxx": "CC", "fortran": "ftn"},
+                    modules=["PrgEnv-gnu", "gcc/9.3.0"],
+                    compilers_use_relative_paths=True,
+                )
+            ],
+        )
+        compiler_map["gcc10"] = compiler_section_for(
+            "gcc",
+            [
+                compiler_def(
+                    "gcc@10.3.0 languages:=c,c++,fortran",
+                    "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
+                    {"c": "cc", "cxx": "CC", "fortran": "ftn"},
+                    modules=["PrgEnv-gnu", "gcc/10.3.0"],
+                    compilers_use_relative_paths=True,
+                )
+            ],
+        )
+        compiler_map["gcc11"] = compiler_section_for(
+            "gcc",
+            [
+                compiler_def(
+                    "gcc@11.2.0 languages:=c,c++,fortran",
+                    "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
+                    {"c": "cc", "cxx": "CC", "fortran": "ftn"},
+                    modules=["PrgEnv-gnu", "gcc/11.2.0"],
+                    compilers_use_relative_paths=True,
+                )
+            ],
+        )
+        compiler_map["intel"] = compiler_section_for(
+            "intel-oneapi-compilers",
+            [
+                compiler_def(
+                    "intel-oneapi-compilers@2021.3.0",
+                    "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
+                    {"c": "cc", "cxx": "CC", "fortran": "ftn"},
+                    modules=["PrgEnv-intel", "intel/2021.3.0"],
+                    compilers_use_relative_paths=True,
+                )
+            ],
+        )
+        compiler_map["pgi"] = compiler_section_for(
+            "pgi",
+            [
+                compiler_def(
+                    "pgi@20.1.1",
+                    "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
+                    {"c": "cc", "cxx": "CC", "fortran": "ftn"},
+                    modules=["PrgEnv-pgi", "pgi/20.1.1"],
+                    compilers_use_relative_paths=True,
+                )
+            ],
+        )
+        compiler_map["nvhpc"] = compiler_section_for(
+            "nvhpc",
+            [
+                compiler_def(
+                    "nvhpc@21.3",
+                    "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
+                    {"c": "cc", "cxx": "CC", "fortran": "ftn"},
+                    modules=["PrgEnv-nvidia", "nvidia/21.3"],
+                    compilers_use_relative_paths=True,
+                )
+            ],
+        )
 
+        collected = list()
         compiler_variant = self.spec.variants["compiler"][0]
-        selections = {"compilers": []}
-        for key, config in compiler_map.items():
+        for key, cfg in compiler_map.items():
             if key in compiler_variant:
-                selections["compilers"] += config["compilers"]
-
-        return selections
+                collected.append(cfg)
+        return merge_dicts(*collected)
 
     def cuda_config(self, cuda_version):
         if cuda_version == "10.2.89":
