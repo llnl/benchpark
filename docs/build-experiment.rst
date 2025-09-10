@@ -1,20 +1,24 @@
-.. Copyright 2023 Lawrence Livermore National Security, LLC and other
-   Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+..
+    Copyright 2023 Lawrence Livermore National Security, LLC and other
+    Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 
-   SPDX-License-Identifier: Apache-2.0
+    SPDX-License-Identifier: Apache-2.0
 
-===================
 Build an Experiment
 ===================
 
-``benchpark setup`` has created the directory structure for your experiment.
-The next step is setting up the Ramble workspace and building the code::
+``benchpark setup`` has created the directory structure for your experiment. The next
+step is setting up the Ramble workspace and building the code:
 
-   cd <experiments_root>/<Benchmark>/<System>/workspace
-   ramble --workspace-dir . workspace setup
+::
 
+    cd <experiments_root>/<Benchmark>/<System>/workspace
+    ramble --workspace-dir . workspace setup
 
-Ramble will build the source code and set up the following workspace directory structure::
+Ramble will build the source code and set up the following workspace directory
+structure:
+
+::
 
     experiments_root/
         ramble/
@@ -31,7 +35,7 @@ Ramble will build the source code and set up the following workspace directory s
                               <Benchmark>_<ProgrammingModel>_<Problem>
                                     execute_experiment
 
-If you edit any of the files, see :doc:`FAQ` to determine
-whether you need to re-do any of the previous steps.
+If you edit any of the files, see :doc:`FAQ` to determine whether you need to re-do any
+of the previous steps.
 
-Once that is complete, you are ready for :doc:`run-experiment`. 
+Once that is complete, you are ready for :doc:`run-experiment`.
