@@ -188,7 +188,6 @@ class LlnlElcapitan(System):
         selections = {
             "packages": {
                 "all": {"require": [{"spec": "target=x86_64:"}]},
-                "blt": {"require": "@0.6.2"},
                 "tar": {"externals": [{"spec": "tar@1.30", "prefix": "/usr"}]},
                 "coreutils": {
                     "externals": [{"spec": "coreutils@8.30", "prefix": "/usr"}]
