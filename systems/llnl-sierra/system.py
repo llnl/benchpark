@@ -27,6 +27,15 @@ class LlnlSierra(System):
                 23,
             ],  # First two cores on each socket reserved.
             "sys_gpus_per_node": 4,
+            "sys_mem_per_node_GB": 256,
+            "sys_cpu_mem_per_node_MB": 40,
+            "sys_gpu_mem_per_node_GB": 64,
+            "sys_gpu_num_L1": 80,
+            "sys_gpu_L1_KB": 128,
+            "sys_gpu_L2_KB": 6144,
+            "sys_cpu_L1_KB": 32,
+            "sys_cpu_L2_KB": 512,
+            "sys_cpu_L3_MB": 10,
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/IBM-power9-V100-Infiniband/hardware_description.yaml",

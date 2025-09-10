@@ -19,7 +19,7 @@ class CscsDaint(System):
         "daint": {
             "sys_cores_per_node": 12,
             "sys_gpus_per_node": 1,
-            "sys_mem_per_node": 64,
+            "sys_mem_per_node_GB": 64,
             "system_site": "cscs",
             "hardware_key": str(hardware_descriptions)
             + "/HPECray-haswell-P100-Infiniband/hardware_description.yaml",
