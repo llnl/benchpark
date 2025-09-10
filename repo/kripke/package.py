@@ -66,6 +66,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("caliper", when="+caliper")
     depends_on("adiak@0.4:", when="+caliper")
     conflicts("^blt@:0.3.6", when="+rocm")
+    conflicts("^blt@0.7.0")
 
     depends_on("blt@0.6.2:", type="build", when=f"@1.2.7:")
 
