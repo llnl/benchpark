@@ -11,8 +11,8 @@ This tutorial will guide you through using Benchpark to run a strong scaling exp
 with the `Kripke benchmark <https://github.com/LLNL/Kripke>`_ on an AWS instance.
 
 It was last presented at the `International Conference on eScience (eScience)
-<https://www.escience-conference.org/2025/>`_ on September 16, 2025. The event
-was a half-day tutorial along with Ramble.
+<https://www.escience-conference.org/2025/>`_ on September 16, 2025. The event was a
+half-day tutorial along with Ramble.
 
 .. image:: tutorial/eScience25-Tutorial-Slide-Preview.jpg
     :target: _static/slides/eScience25-Tutorial-Slides.pdf
