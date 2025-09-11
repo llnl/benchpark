@@ -217,6 +217,7 @@ def make_stacked_line_chart(**kwargs):
         "lassen": f"ats-2 {kwargs.get('cluster_to_ps')['lassen']}",
         "dane": f"cts-2 {kwargs.get('cluster_to_ps')['dane']}",
         "tuolumne": f"ats-4 {kwargs.get('cluster_to_ps')['tuolumne']}",
+        "rzgenie": f"cts-1 {kwargs.get('cluster_to_ps')['rzgenie']}",
     }
 
     tcol = tdf.columns[0]
@@ -236,6 +237,8 @@ def make_stacked_line_chart(**kwargs):
     ax.set_xlabel(xlabel)
     ax.set_ylabel(y_label)
     ax.legend(title="System")
+    # plt.xscale("log", base=2) 
+    plt.yscale("log", base=2) 
     plot_args = dict(
         data=tdf,
         # kind=kind,
@@ -251,6 +254,10 @@ def make_stacked_line_chart(**kwargs):
     y_axis_limits = kwargs.get("chart_yaxis_limits")
     if y_axis_limits is not None:
         ax.set_ylim(y_axis_limits[0], y_axis_limits[1])
+
+    from matplotlib.ticker import ScalarFormatter
+    plt.gca().yaxis.set_major_formatter(ScalarFormatter())
+    plt.gca().ticklabel_format(style="plain", axis="y")
 
     # handles, labels = ax.get_legend_handles_labels()
     # handles = list(reversed(handles))

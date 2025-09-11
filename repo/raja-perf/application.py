@@ -18,7 +18,7 @@ class RajaPerf(ExecutableApplication):
             'mpi','network-point-to-point','network-latency-bound',
             'c++','raja','sycl','builtin-caliper']
 
-    executable('run', 'raja-perf.exe --size {process_problem_size} -atsc ${CALI_CONFIG_MODE} -atcc ${OTHER_CALI_CONFIG} -v Base_Seq -t default -ek Apps_FEMSWEEP', use_mpi=True)
+    executable('run', 'raja-perf.exe --size {process_problem_size} -atsc ${CALI_CONFIG_MODE} -atcc ${OTHER_CALI_CONFIG} -v Base_Seq -t default -k Stream_TRIAD -ek Apps_FEMSWEEP', use_mpi=True)
 
     workload('suite', executables=['run'])
 

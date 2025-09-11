@@ -57,13 +57,20 @@ class LlnlCluster(System):
             "hardware_key": str(hardware_descriptions)
             + "/Penguin-haswell-OmniPath/hardware_description.yaml",
             "queues": [JobQueue("pdebug", 720, 43)],
-        }
+        },
+        "poodle": {
+            "sys_cores_per_node": 112,
+            "system_site": "llnl",
+            "hardware_key": str(hardware_descriptions)
+            + "/DELL-sapphirerapids-OmniPath/hardware_description.yaml",
+            "queues": [JobQueue("pdebug", 30, 3), JobQueue("pbatch", 12000, 29), JobQueue("phighmem", 12000, 4)],
+        },
     }
 
     variant(
         "cluster",
         default="dane",
-        values=("ruby", "magma", "dane", "rzgenie"),
+        values=("ruby", "magma", "dane", "rzgenie", "poodle"),
         description="Which cluster to run on",
     )
 
@@ -85,7 +92,7 @@ class LlnlCluster(System):
     variant(
         "queue",
         default="none",
-        values=("none", "pbatch", "pdebug"),
+        values=("none", "pbatch", "pdebug", "phighmem"),
         multi=False,
         description="Submit to queue other than the default queue (e.g. pdebug)",
     )
