@@ -51,12 +51,19 @@ class LlnlCluster(System):
             + "/DELL-sapphirerapids-OmniPath/hardware_description.yaml",
             "queues": [JobQueue("pdebug", 60, 20), JobQueue("pbatch", 1440, 520)],
         },
+        "rzgenie": {
+            "sys_cores_per_node": 36,
+            "system_site": "llnl",
+            "hardware_key": str(hardware_descriptions)
+            + "/Penguin-haswell-OmniPath/hardware_description.yaml",
+            "queues": [JobQueue("pdebug", 720, 43)],
+        }
     }
 
     variant(
         "cluster",
         default="dane",
-        values=("ruby", "magma", "dane"),
+        values=("ruby", "magma", "dane", "rzgenie"),
         description="Which cluster to run on",
     )
 

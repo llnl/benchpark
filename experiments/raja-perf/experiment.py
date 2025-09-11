@@ -42,7 +42,8 @@ class RajaPerf(
             # Per-process size
             #self.add_experiment_variable("process_problem_size", 134217728, True) #dane
             #self.add_experiment_variable("process_problem_size", 67108864, True) #lassen
-            self.add_experiment_variable("process_problem_size", 268435456, True) # tuo
+            #self.add_experiment_variable("process_problem_size", 268435456, True) # tuo
+            self.add_experiment_variable("process_problem_size", 32*1024*1024, True) # rzgenie
             # Number of processes
             self.add_experiment_variable("n_resources", 1, False)
 
