@@ -442,6 +442,8 @@ class Allocation(BasicModifier):
             batch_opts.append(f"-q {v.queue}")
         if v.timeout:
             batch_opts.append(f"-W {TimeFormat.as_hhmm(v.timeout)}")
+        if v.bank:
+            batch_opts.append(f"-P {v.bank}")
 
         batch_directives = list(f"#BSUB {x}" for x in batch_opts)
 

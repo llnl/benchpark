@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import pandas as pd
 import thicket as th
+import seaborn
 
 # -----------------------------
 # Constants
@@ -212,42 +213,62 @@ def make_stacked_line_chart(**kwargs):
     if kwargs.get("chart_fontsize"):
         mpl.rcParams.update({"font.size": kwargs.get("chart_fontsize")})
 
+    mapping = {
+        "lassen": f"ats-2 {kwargs.get('cluster_to_ps')['lassen']}",
+        "dane": f"cts-2 {kwargs.get('cluster_to_ps')['dane']}",
+        "tuolumne": f"ats-4 {kwargs.get('cluster_to_ps')['tuolumne']}",
+    }
+
+    tcol = tdf.columns[0]
+    tdf["cluster"] = tdf.index.map(lambda x: x[-1]).map(mapping)
+    tdf["profile"] = tdf.index.map(lambda x: str(x[:-1]))
+    tdf = tdf.reset_index(drop=True)
+
     xlabel = kwargs.get("chart_xlabel")
     if isinstance(xlabel, list):
         xlabel = ", ".join(NAME_REMAP[x] for x in xlabel)
     else:
         if xlabel in NAME_REMAP:
             xlabel = NAME_REMAP[xlabel]
-    fig, ax = plt.subplots()
-    tdf.plot(
-        kind="area",
-        title=kwargs.get("chart_title", ""),
-        xlabel=xlabel,
-        ylabel=y_label,
-        figsize=kwargs["chart_figsize"] if kwargs["chart_figsize"] else (12, 7),
+    fig, ax = plt.subplots(figsize=kwargs.get("chart_figsize", (12, 7)))
+    kind = kwargs.get("chart_kind", "line")
+    ax.set_title(kwargs.get("chart_title", ""))
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(y_label)
+    ax.legend(title="System")
+    plot_args = dict(
+        data=tdf,
+        # kind=kind,
         ax=ax,
+        hue=("cluster", ""),
+        x=("profile", ""),
+        y=tcol,
     )
+    # Add marker only if line plot
+    if kind == "line":
+        plot_args["marker"] = "o"
+    seaborn.lineplot(**plot_args)
     y_axis_limits = kwargs.get("chart_yaxis_limits")
     if y_axis_limits is not None:
         ax.set_ylim(y_axis_limits[0], y_axis_limits[1])
 
-    handles, labels = ax.get_legend_handles_labels()
-    handles = list(reversed(handles))
-    labels = list(reversed(labels))
-    calls_list = list(reversed(calls_list))
-    for i, label in enumerate(labels):
-        obj = calls_list[i][0]
-        name = obj if isinstance(obj, str) else obj[0].frame["name"]
-        if name not in label:
-            raise ValueError(f"Name '{name}' is not in label '{label}'")
-        labels[i] = str(name) + " (" + str(calls_list[i][1]) + ")"
-    ax.legend(
-        handles,
-        labels,
-        bbox_to_anchor=(1, 0.5),
-        loc="center left",
-        title="Region (Calls/rank (max))",
-    )
+    # handles, labels = ax.get_legend_handles_labels()
+    # handles = list(reversed(handles))
+    # labels = list(reversed(labels))
+    # calls_list = list(reversed(calls_list))
+    # for i, label in enumerate(labels):
+    #     obj = calls_list[i][0]
+    #     name = obj if isinstance(obj, str) else obj[0].frame["name"]
+    #     if name not in label:
+    #         raise ValueError(f"Name '{name}' is not in label '{label}'")
+    #     labels[i] = str(name) + " (" + str(calls_list[i][1]) + ")"
+    # ax.legend(
+    #     handles,
+    #     labels,
+    #     bbox_to_anchor=(1, 0.5),
+    #     loc="center left",
+    #     title="Region (Calls/rank (max))",
+    # )
 
     fig.autofmt_xdate()
     plt.tight_layout()
@@ -281,6 +302,8 @@ def prepare_data(**kwargs):
     )
     tk.update_inclusive_columns()
 
+    cluster_to_ps = dict(zip(tk.metadata["cluster"], tk.metadata["total_problem_size"]))
+
     clean_tree = tk.tree(kwargs["tree_metric"], render_header=True)
     clean_tree = re.compile(r"\x1b\[([0-9;]*m)").sub("", clean_tree)
 
@@ -300,6 +323,15 @@ def prepare_data(**kwargs):
 
     # Remove singular roots if inclusive metric
     metric = kwargs["yaxis_metric"]
+
+    tk.dataframe["Bandwidth (GB/s)"] = (
+        tk.dataframe["Bytes/Rep"]
+        / tk.dataframe["Avg time/rank (exc)"]
+        / 10**9
+        * tk.dataframe["Reps"]
+        * tk.metadata["mpi.world.size"]
+    )
+
     if metric in tk.inc_metrics and len(tk.graph.roots) == 1:
         root_name = tk.graph.roots[0].frame["name"]
         logger.info(
@@ -366,7 +398,7 @@ def prepare_data(**kwargs):
         tk.dataframe = pd.concat([tk.dataframe.filter(like=p, axis=0) for p in prefix])
 
     # Group by varied parameters
-    grouped = tk.groupby(x_axis_metadata)
+    grouped = tk.groupby(x_axis_metadata + ["cluster"])
     ctk = th.Thicket.concat_thickets(
         list(grouped.values()), headers=list(grouped.keys()), axis="columns"
     )
@@ -374,7 +406,8 @@ def prepare_data(**kwargs):
     cluster_col = "cluster" if "cluster" in tk.metadata.columns else "host.cluster"
     # Check these values are constant
     app = validate_single_metadata_value("application_name", tk)
-    cluster = validate_single_metadata_value(cluster_col, tk)
+    # cluster = validate_single_metadata_value(cluster_col, tk)
+    cluster = "multiple"
     version = validate_single_metadata_value("version", tk)
 
     # Find programming model from spec
@@ -389,12 +422,14 @@ def prepare_data(**kwargs):
         "weak": ["process_problem_size"],
         "throughput": ["n_resources", "n_nodes"],
     }[scaling]
-    constant_str = ", ".join(
-        f"{int(tk.metadata[key].iloc[0]):,} {NAME_REMAP[key]}" for key in constant_keys
-    )
+    # constant_str = ", ".join(
+    #     f"{int(tk.metadata[key].iloc[0]):,} {NAME_REMAP[key]}" for key in constant_keys
+    # )
+    constant_str = ""
     # Check constant
     for key in constant_keys:
-        validate_single_metadata_value(key, tk)
+        # validate_single_metadata_value(key, tk)
+        pass
 
     if not kwargs.get("chart_title"):
         kwargs["chart_title"] = (
@@ -447,6 +482,7 @@ def prepare_data(**kwargs):
             raise ValueError(
                 f"Expected one scaling factor, found: {list(scaling_factors)}"
             )
+    kwargs["cluster_to_ps"] = cluster_to_ps
 
     make_stacked_line_chart(df=ctk.dataframe, x_axis=list(grouped.keys()), **kwargs)
 
@@ -586,6 +622,13 @@ def setup_parser(root_parser):
         type=str,
         default=None,
         help="With 'archive', path for the .tar.gz (defaults to CWD/<workspace>-<timestamp>.tar.gz)",
+    )
+    root_parser.add_argument(
+        "--chart-kind",
+        type=str,
+        default="area",
+        choices=["area", "line", "bar", "scatter"],
+        help="Type of chart to generate",
     )
 
 

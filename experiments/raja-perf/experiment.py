@@ -40,7 +40,9 @@ class RajaPerf(
     def compute_applications_section(self):
         if self.spec.satisfies("exec_mode=test"):
             # Per-process size
-            self.add_experiment_variable("process_problem_size", 1048576, True)
+            #self.add_experiment_variable("process_problem_size", 134217728, True) #dane
+            #self.add_experiment_variable("process_problem_size", 67108864, True) #lassen
+            self.add_experiment_variable("process_problem_size", 268435456, True) # tuo
             # Number of processes
             self.add_experiment_variable("n_resources", 1, False)
 
