@@ -8,9 +8,10 @@ from benchpark.experiment import Experiment
 from benchpark.mpi import MpiOnlyExperiment
 from benchpark.caliper import Caliper
 from benchpark.rocm import ROCmExperiment
+from benchpark.cuda import CudaExperiment
 
 
-class MpiPingpong(Experiment, MpiOnlyExperiment, ROCmExperiment, Caliper):
+class MpiPingpong(Experiment, MpiOnlyExperiment, ROCmExperiment, CudaExperiment, Caliper):
 
     variant(
         "workload",
@@ -20,10 +21,10 @@ class MpiPingpong(Experiment, MpiOnlyExperiment, ROCmExperiment, Caliper):
     maintainers("stephanielam3211")
 
     def compute_applications_section(self):
-        n_nodes = 16  # max number of nodes
+        n_nodes = 32  # max number of nodes
         expr_vars = {
             "n_nodes": n_nodes,
-            "iterations": 1000000,
+            "iterations": 10000,
             "msg_size": 16,
         }
 

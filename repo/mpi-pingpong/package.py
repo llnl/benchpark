@@ -6,20 +6,24 @@
 from spack.package import *
 
 
-class MpiPingpong(CMakePackage, ROCmPackage):
+class MpiPingpong(CMakePackage, ROCmPackage, CudaPackage):
 
     git = "https://github.com/LLNL/microbenchmarks.git"
 
-    version("develop", branch="addHip")
+    version("develop", branch="add-cuda")
 
     variant("caliper", default=False, description="Enable Caliper/Adiak support")
-    variant("rocm", default=True, description="Enable Rocm support")
+    variant("rocm", default=False, description="Enable Rocm support")
+    variant("cuda", default=False, description="Enable CUDA support")
     variant("mpi", default=True, description="Enable MPI support")
 
     depends_on("mpi", when="+mpi")
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
     depends_on("hip", when="+rocm")
+    depends_on("cuda", when="+cuda")
+
+    conflicts("+cuda +rocm", msg="Enable only one of +cuda or +rocm")
 
     root_cmakelists_dir = "repo/pingpong"
 
@@ -45,6 +49,16 @@ class MpiPingpong(CMakePackage, ROCmPackage):
                     args.append(self.define("CMAKE_HIP_ARCHITECTURES", archs))
         else:
             args.append('-DUSE_ROCM=OFF')
+
+        if self.spec.satisfies("+cuda"):
+            args.append(self.define("USE_CUDA", "ON"))
+            v = self.spec.variants.get("cuda_arch", None)
+            if v:
+                vals = [a for a in v.value if a != "none"]
+                if vals:
+                    args.append(self.define("CMAKE_CUDA_ARCHITECTURES", ";".join(vals)))
+        else:
+            args.append(self.define("USE_CUDA", "OFF"))
         
         return args
         
