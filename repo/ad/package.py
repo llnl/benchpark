@@ -19,10 +19,6 @@ class Ad(CMakePackage):
 
     version("main", branch="main")
 
-    depends_on("c", type="build")
-    depends_on("cxx", type="build")
-    depends_on("fortran", type="build")
-
     depends_on("enzyme")
 
     def cmake_args(self):

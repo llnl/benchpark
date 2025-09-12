@@ -115,4 +115,3 @@ class Amg2023(
 
     def compute_package_section(self):
         self.add_package_spec(self.name, [f"amg2023{self.determine_version()}"])
-        self.add_package_spec("hypre", ["hypre+lapack"])

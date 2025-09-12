@@ -17,7 +17,7 @@ workflow:
       - HOST: lassen
         ARCHCONFIG: llnl-sierra
         SCHEDULER_PARAMETERS: -nnodes 1 -W 40 -q pci
-        BENCHMARK: [amg2023]
+        BENCHMARK: [amg2023, kripke]
         VARIANT: [+cuda, +openmp]
 run_tests_nonshared:
   resource_group: $HOST

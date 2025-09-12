@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from spack.package import *
-from spack_repo.builtin.packages.osu_micro_benchmarks.package import OsuMicroBenchmarks as BuiltinOsu
+from spack.pkg.builtin.osu_micro_benchmarks import OsuMicroBenchmarks as BuiltinOsu
 
 
 class OsuMicroBenchmarks(BuiltinOsu, ROCmPackage):

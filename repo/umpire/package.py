@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from spack.package import *
-from spack_repo.builtin.packages.umpire.package import Umpire as BuiltinUmpire
+from spack.pkg.builtin.umpire import Umpire as BuiltinUmpire
 
 
 class Umpire(BuiltinUmpire):

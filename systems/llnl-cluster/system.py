@@ -5,13 +5,7 @@
 
 
 from benchpark.directives import variant, maintainers
-from benchpark.system import (
-    System,
-    JobQueue,
-    compiler_def,
-    compiler_section_for,
-    merge_dicts,
-)
+from benchpark.system import System, JobQueue
 from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.paths import hardware_descriptions
 
@@ -203,8 +197,6 @@ class LlnlCluster(System):
                 | {
                     "mpi": {
                         "buildable": False,
-                    },
-                    "mvapich2": {
                         "externals": [
                             {
                                 "spec": "mvapich2@2.3.7-gcc1211",
@@ -214,7 +206,7 @@ class LlnlCluster(System):
                                 },
                             }
                         ],
-                    },
+                    }
                 }
             }
         elif self.spec.satisfies("compiler=intel"):
@@ -223,8 +215,6 @@ class LlnlCluster(System):
                 | {
                     "mpi": {
                         "buildable": False,
-                    },
-                    "mvapich2": {
                         "externals": [
                             {
                                 "spec": "mvapich2@2.3.7-intel202160classic",
@@ -234,7 +224,7 @@ class LlnlCluster(System):
                                 },
                             }
                         ],
-                    },
+                    }
                 }
             }
         elif self.spec.satisfies("compiler=oneapi"):
@@ -243,8 +233,6 @@ class LlnlCluster(System):
                 | {
                     "mpi": {
                         "buildable": False,
-                    },
-                    "mvapich2": {
                         "externals": [
                             {
                                 "spec": "mvapich2@2.3.7-intel202321",
@@ -254,73 +242,113 @@ class LlnlCluster(System):
                                 },
                             }
                         ],
-                    },
+                    }
                 }
+            }
+
+        selections["packages"] |= self.compiler_weighting_cfg()["packages"]
+
+        return selections
+
+    def compiler_weighting_cfg(self):
+        if self.spec.satisfies("compiler=oneapi"):
+            return {"packages": {"all": {"require": [{"one_of": ["%oneapi", "%gcc"]}]}}}
+        else:
+            return {"packages": {}}
+
+    def compute_compilers_section(self):
+        selections = {}
+        if self.spec.satisfies("compiler=gcc"):
+            selections = {
+                "compilers": [
+                    {
+                        "compiler": {
+                            "spec": "gcc@12.1.1",
+                            "paths": {
+                                "cc": "/usr/tce/packages/gcc/gcc-12.1.1/bin/gcc",
+                                "cxx": "/usr/tce/packages/gcc/gcc-12.1.1/bin/g++",
+                                "f77": "/usr/tce/packages/gcc/gcc-12.1.1/bin/gfortran",
+                                "fc": "/usr/tce/packages/gcc/gcc-12.1.1/bin/gfortran",
+                            },
+                            "flags": {},
+                            "operating_system": "rhel8",
+                            "target": "x86_64",
+                            "modules": [],
+                            "environment": {},
+                            "extra_rpaths": [],
+                        }
+                    }
+                ]
+            }
+        elif self.spec.satisfies("compiler=intel"):
+            selections = {
+                "compilers": [
+                    {
+                        "compiler": {
+                            "spec": "intel@2021.6.0-classic",
+                            "paths": {
+                                "cc": "/usr/tce/packages/intel-classic/intel-classic-2021.6.0/bin/icc",
+                                "cxx": "/usr/tce/packages/intel-classic/intel-classic-2021.6.0/bin/icpc",
+                                "f77": "/usr/tce/packages/intel-classic/intel-classic-2021.6.0/bin/ifort",
+                                "fc": "/usr/tce/packages/intel-classic/intel-classic-2021.6.0/bin/ifort",
+                            },
+                            "flags": {},
+                            "operating_system": "rhel8",
+                            "target": "x86_64",
+                            "modules": [],
+                            "environment": {},
+                            "extra_rpaths": [],
+                        }
+                    }
+                ]
+            }
+        elif self.spec.satisfies("compiler=oneapi"):
+            selections = {
+                "compilers": [
+                    {
+                        "compiler": {
+                            "spec": "gcc@12.1.1",
+                            "paths": {
+                                "cc": "/usr/tce/packages/gcc/gcc-12.1.1/bin/gcc",
+                                "cxx": "/usr/tce/packages/gcc/gcc-12.1.1/bin/g++",
+                                "f77": "/usr/tce/packages/gcc/gcc-12.1.1/bin/gfortran",
+                                "fc": "/usr/tce/packages/gcc/gcc-12.1.1/bin/gfortran",
+                            },
+                            "flags": {},
+                            "operating_system": "rhel8",
+                            "target": "x86_64",
+                            "modules": [],
+                            "environment": {},
+                            "extra_rpaths": [],
+                        }
+                    },
+                    {
+                        "compiler": {
+                            "spec": "oneapi@2023.2.1",
+                            "paths": {
+                                "cc": "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/bin/icx",
+                                "cxx": "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/bin/icpx",
+                                "f77": "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/bin/ifx",
+                                "fc": "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/bin/ifx",
+                            },
+                            "flags": {},
+                            "operating_system": "rhel8",
+                            "target": "x86_64",
+                            "modules": [],
+                            "environment": {},
+                            "extra_rpaths": [],
+                        }
+                    },
+                ]
             }
 
         return selections
 
-    def compute_compilers_section(self):
-        if self.spec.satisfies("compiler=gcc"):
-            cfg = compiler_section_for(
-                "gcc",
-                [
-                    compiler_def(
-                        "gcc@12.1.1 languages:=c,c++,fortran",
-                        "/usr/tce/packages/gcc/gcc-12.1.1/",
-                        {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
-                    )
-                ],
-            )
-        elif self.spec.satisfies("compiler=intel"):
-            cfg = compiler_section_for(
-                "intel-oneapi-compilers-classic",
-                [
-                    compiler_def(
-                        "intel-oneapi-compilers-classic@2021.6.0~envmods",
-                        "/usr/tce/packages/intel-classic/intel-classic-2021.6.0/",
-                        {"c": "icc", "cxx": "icpc", "fortran": "ifort"},
-                    )
-                ],
-            )
-        elif self.spec.satisfies("compiler=oneapi"):
-            gcc_cfg = compiler_section_for(
-                "gcc",
-                [
-                    compiler_def(
-                        "gcc@12.1.1",
-                        "/usr/tce/packages/gcc/gcc-12.1.1/",
-                        {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
-                    )
-                ],
-            )
-            oneapi_cfg = compiler_section_for(
-                "intel-oneapi-compilers",
-                [
-                    compiler_def(
-                        "intel-oneapi-compilers@2023.2.1~envmods",
-                        "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/",
-                        {"c": "icx", "cxx": "icpx", "fortran": "ifx"},
-                    )
-                ],
-            )
-            prefs = {"one_of": ["%oneapi", "%gcc"], "when": "%c"}
-            weighting_cfg = {"packages": {"all": {"require": [prefs]}}}
-            cfg = merge_dicts(gcc_cfg, oneapi_cfg, weighting_cfg)
-
-        return cfg
-
     def compute_software_section(self):
-        default_compiler = "gcc"
-        if self.spec.satisfies("compiler=intel"):
-            default_compiler = "intel-oneapi-compilers-classic"
-        elif self.spec.satisfies("compiler=oneapi"):
-            default_compiler = "intel-oneapi-compilers"
-
         return {
             "software": {
                 "packages": {
-                    "default-compiler": {"pkg_spec": default_compiler},
+                    "default-compiler": {"pkg_spec": self.spec.variants["compiler"][0]},
                     "default-mpi": {"pkg_spec": "mvapich2"},
                     "compiler-gcc": {"pkg_spec": "gcc"},
                     "compiler-intel": {"pkg_spec": "intel"},

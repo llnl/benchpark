@@ -19,10 +19,6 @@ class Enzyme(CMakePackage):
 
     version("patch-1", branch="patch-1")
 
-    depends_on("c", type="build")
-    depends_on("cxx", type="build")
-    depends_on("fortran", type="build")
-
     depends_on("llvm@18:")
 
     root_cmakelists_dir = "enzyme"

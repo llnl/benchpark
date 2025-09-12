@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from spack.package import *
-from spack_repo.builtin.packages.chai.package import Chai as BuiltinChai
+from spack.pkg.builtin.chai import Chai as BuiltinChai
 
 
 class Chai(BuiltinChai):

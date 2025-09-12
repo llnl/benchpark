@@ -19,11 +19,7 @@ class Smb(MakefilePackage):
 
     variant("mpi", default=False, description="Build with MPI support")
     variant("rma", default=False, description="Build RMA-MT variant")    
-
-    depends_on("c", type="build")
-
     depends_on("mpi", when="+mpi")
-
     build_directory = ["src/mpi_overhead"]
     
     def edit(self, spec, prefix):

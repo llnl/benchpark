@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from spack.package import *
-from spack_repo.builtin.packages.boost.package import Boost
+from spack.pkg.builtin.boost import Boost
 
 
 class Branson(CMakePackage):
@@ -30,10 +30,6 @@ class Branson(CMakePackage):
     )
     version("0.81", sha256="493f720904791f06b49ff48c17a681532c6a4d9fa59636522cf3f9700e77efe4")
     version("0.8", sha256="85ffee110f89be00c37798700508b66b0d15de1d98c54328b6d02a9eb2cf1cb8")
-
-    depends_on("c", type="build")
-    depends_on("cxx", type="build")
-
     #depends_on("mpi")
     depends_on("mpi@2:")
 

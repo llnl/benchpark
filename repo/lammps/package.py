@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from spack.package import *
-from spack_repo.builtin.packages.lammps.package import Lammps as BuiltinLammps
+from spack.pkg.builtin.lammps import Lammps as BuiltinLammps
 
 
 class Lammps(BuiltinLammps):

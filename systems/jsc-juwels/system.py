@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from benchpark.directives import variant, maintainers
-from benchpark.system import System, compiler_def, compiler_section_for, merge_dicts
+from benchpark.system import System
 from benchpark.cudasystem import CudaSystem
 from packaging.version import Version
 from benchpark.paths import hardware_descriptions
@@ -60,35 +60,48 @@ class JscJuwels(System):
             setattr(self, k, v)
 
     def compute_compilers_section(self):
-        nvhpc_cfg = compiler_section_for(
-            "nvhpc",
-            [
-                compiler_def(
-                    "nvhpc@23.7",
-                    "/p/software/juwelsbooster/stages/2024/software/NVHPC/23.7-CUDA-12/Linux_aarch64/23.7/compilers/",
-                    {"c": "nvc", "cxx": "nvc++", "fortran": "nvfortran"},
-                    modules=["Stages/2024", "NVHPC/23.7"],
-                )
-            ],
-        )
+        selections = {
+            "compilers": [
+                {
+                    "compiler": {
+                        "spec": "nvhpc@23.7",
+                        "paths": {
+                            "cc": "/p/software/juwelsbooster/stages/2024/software/NVHPC/23.7-CUDA-12/Linux_aarch64/23.7/compilers/bin/nvc",
+                            "cxx": "/p/software/juwelsbooster/stages/2024/software/NVHPC/23.7-CUDA-12/Linux_aarch64/23.7/compilers/bin/nvc++",
+                            "f77": "/p/software/juwelsbooster/stages/2024/software/NVHPC/23.7-CUDA-12/Linux_aarch64/23.7/compilers/bin/nvfortran",
+                            "fc": "/p/software/juwelsbooster/stages/2024/software/NVHPC/23.7-CUDA-12/Linux_aarch64/23.7/compilers/bin/nvfortran",
+                        },
+                        "operating_system": "rocky8",
+                        "target": "x86_64",
+                        "modules": ["Stages/2024", "NVHPC/23.7"],
+                        "environment": {},
+                        "extra_rpaths": [],
+                    }
+                }
+            ]
+        }
 
         if self.spec.satisfies("compiler=gcc"):
-            gcc_cfg = compiler_section_for(
-                "gcc",
-                [
-                    compiler_def(
-                        "gcc@12.3.0 languages:=c,c++,fortran",
-                        "/p/software/juwelsbooster/stages/2024/software/GCCcore/12.3.0/",
-                        {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
-                        modules=["Stages/2024", "GCC/12.3.0"],
-                    )
-                ],
-            )
-            cfg = merge_dicts(nvhpc_cfg, gcc_cfg)
-        else:
-            cfg = nvhpc_cfg
+            selections["compilers"] += [
+                {
+                    "compiler": {
+                        "spec": "gcc@12.3.0",
+                        "paths": {
+                            "cc": "/p/software/juwelsbooster/stages/2024/software/GCCcore/12.3.0/bin/gcc",
+                            "cxx": "/p/software/juwelsbooster/stages/2024/software/GCCcore/12.3.0/bin/g++",
+                            "f77": "/p/software/juwelsbooster/stages/2024/software/GCCcore/12.3.0/bin/gfortran",
+                            "fc": "/p/software/juwelsbooster/stages/2024/software/GCCcore/12.3.0/bin/gfortran",
+                        },
+                        "operating_system": "rocky9",
+                        "target": "aarch64",
+                        "modules": ["Stages/2024", "GCC/12.3.0"],
+                        "environment": {},
+                        "extra_rpaths": [],
+                    }
+                }
+            ]
 
-        return cfg
+        return selections
 
     def compute_packages_section(self):
 

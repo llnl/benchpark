@@ -91,4 +91,4 @@ class RajaPerf(
             self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
     def compute_package_section(self):
-        self.add_package_spec(self.name, [f"raja-perf{self.determine_version()} +mpi"])
+        self.add_package_spec(self.name, [f"raja-perf{self.determine_version()}"])

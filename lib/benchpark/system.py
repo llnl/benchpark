@@ -203,22 +203,20 @@ class System(ExperimentSystemBase):
 
     def compute_dict(self):
         # This can be overridden by any subclass that needs more flexibility
-        pkg_cfg = self.compute_packages_section() or {}
-        compiler_cfg = self.compute_compilers_section()
-        if compiler_cfg:
-            pkg_cfg = merge_dicts(pkg_cfg, compiler_cfg)
-        # "'packages:':" syntax is required to enforce spack to use benchpark-defined
-        # compilers instead of external compilers defined by spack compiler search (from ramble).
-        if pkg_cfg:
-            pkg_cfg = {"packages:": pkg_cfg["packages"]}
-        else:
-            pkg_cfg = {"packages": {}}
+        compilers = self.compute_compilers_section()
         return {
             "system_id": self.compute_system_id(),
             "variables": self.compute_variables_section(),
             "software": self.compute_software_section(),
             "auxiliary_software_files": {
-                "packages": pkg_cfg,
+                "compilers": (
+                    # "'compilers:':" syntax is required to enforce spack to use benchpark-defined
+                    # compilers instead of external compilers defined by spack compiler search (from ramble).
+                    {"compilers:": compilers["compilers"]}
+                    if compilers
+                    else None
+                ),
+                "packages": self.compute_packages_section(),
             },
         }
 
@@ -235,81 +233,3 @@ class System(ExperimentSystemBase):
                     _write_key_file(destdir + "/" + key, k, system_dict[key])
             else:
                 _write_key_file(destdir, key, system_dict)
-
-
-def merge_dicts(*dicts):
-    current = {}
-    for d in dicts:
-        if not d:
-            continue
-        current = _merge_dicts(current, d)
-    return current
-
-
-def _merge_dicts(d1, d2):
-    result = dict(d1)
-    for k, v2 in d2.items():
-        if k in result:
-            v1 = result[k]
-            if all(isinstance(x, dict) for x in (v1, v2)):
-                result[k] = _merge_dicts(v1, v2)
-            elif all(isinstance(x, list) for x in (v1, v2)):
-                result[k] = v1 + v2
-            else:
-                raise ValueError(f"{k} merge mismatch: {v1}/{v2}")
-        else:
-            result[k] = v2
-    return result
-
-
-def hybrid_compiler_requirements(c_cmp, f_cmp):
-    return {
-        "packages": {
-            "all": {
-                "require": [
-                    {
-                        "spec": rf"%[virtuals=c] {c_cmp}",
-                        "when": r"%c",
-                    },
-                    {"spec": rf"%[virtuals=cxx] {c_cmp}", "when": r"%cxx"},
-                    {"spec": rf"^[virtuals=fortran] {f_cmp}", "when": r"^fortran"},
-                ]
-            }
-        }
-    }
-
-
-def compiler_section_for(name, entries):
-    return {"packages": {name: {"externals": entries, "buildable": False}}}
-
-
-def compiler_def(
-    spec,
-    prefix,
-    exes,
-    env=None,
-    extra_rpaths=None,
-    modules=None,
-    flags=None,
-    compilers_use_relative_paths=False,
-):
-    lang_map = {}
-    for lang, exe in exes.items():
-        if os.path.isabs(exe) or compilers_use_relative_paths:
-            lang_map[lang] = exe
-        else:
-            lang_map[lang] = os.path.join(prefix, "bin", exe)
-    entry = {
-        "spec": spec,
-        "prefix": prefix,
-        "extra_attributes": {"compilers": lang_map},
-    }
-    if env:
-        entry["extra_attributes"]["environment"] = env
-    if extra_rpaths:
-        entry["extra_attributes"]["extra_rpaths"] = extra_rpaths
-    if modules:
-        entry["modules"] = modules
-    if flags:
-        entry["extra_attributes"]["flags"] = flags
-    return entry

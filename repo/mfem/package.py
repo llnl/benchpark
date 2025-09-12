@@ -8,7 +8,7 @@ import shutil
 import sys
 
 from spack.package import *
-from spack_repo.builtin.packages.mfem.package import Mfem as BuiltinMfem
+from spack.pkg.builtin.mfem import Mfem as BuiltinMfem
 
 
 class Mfem(BuiltinMfem):

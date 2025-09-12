@@ -20,9 +20,6 @@ class Affinity(CMakePackage, CudaPackage, ROCmPackage):
     variant("mpi", default=False, description="Build MPI support")
     variant("rocm", default=False, description="Build ROCm Support")
 
-    depends_on("c", type="build")
-    depends_on("cxx", type="build")
-
     depends_on("mpi", when="+mpi")
     depends_on("hip", when="+rocm")
     depends_on("cuda", when="+cuda")

@@ -7,7 +7,7 @@
 from benchpark.directives import variant, maintainers
 from benchpark.paths import hardware_descriptions
 from benchpark.rocmsystem import ROCmSystem
-from benchpark.system import System, compiler_def, compiler_section_for, merge_dicts
+from benchpark.system import System
 from packaging.version import Version
 
 
@@ -161,79 +161,107 @@ class CscLumi(System):
         return selections
 
     def compute_compilers_section(self):
-        chosen = [self.rocmcc_cfg()]
+        selections = self.rocmcc_cfg()
         if "cce" in self.spec.variants["compiler"][0]:
-            chosen.append(self.cce_compiler_cfg())
+            selections["compilers"] += self.cce_compiler_cfg()["compilers"]
         else:
-            chosen.append(self.gcc_compiler_cfg())
+            selections["compilers"] += self.gcc_compiler_cfg()["compilers"]
 
-        return merge_dicts(*chosen)
+        return selections
 
     def rocmcc_cfg(self):
-        return compiler_section_for(
-            "llvm-amdgpu",
-            [
-                compiler_def(
-                    f"llvm-amdgpu@{self.rocm_version}",
-                    f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/",
-                    {"c": "amdclang", "cxx": "amdclang++", "fortran": "amdflang"},
-                    env={
-                        "set": {"RFE_811452_DISABLE": "1"},
-                        "append_path": {"LD_LIBRARY_PATH": "/opt/cray/pe/gcc-libs"},
-                        "prepend_path": {
-                            "LD_LIBRARY_PATH": "/opt/cray/pe/pmi/6.1.12/lib",
-                            "LIBRARY_PATH": f"/appl/lumi/SW/CrayEnv/EB/rocm/5.6.1/lib:/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/lib64",
+        return {
+            "compilers": [
+                {
+                    "compiler": {
+                        "spec": f"rocmcc@{self.rocm_version}",
+                        "paths": {
+                            "cc": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/bin/amdclang",
+                            "cxx": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/bin/amdclang++",
+                            "f77": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/bin/amdflang",
+                            "fc": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/bin/amdflang",
                         },
-                    },
-                    extra_rpaths=[
-                        f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/lib",
-                        f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/lib64",
-                        "/opt/cray/pe/gcc-libs",
-                    ],
-                )
-            ],
-        )
+                        # "flags": " ",  # Uncomment if needed
+                        "operating_system": "sles15",
+                        "target": "any",
+                        "modules": [],
+                        "environment": {
+                            "set": {"RFE_811452_DISABLE": "1"},
+                            "append_path": {"LD_LIBRARY_PATH": "/opt/cray/pe/gcc-libs"},
+                            "prepend_path": {
+                                "LD_LIBRARY_PATH": "/opt/cray/pe/pmi/6.1.12/lib",
+                                "LIBRARY_PATH": f"/appl/lumi/SW/CrayEnv/EB/rocm/5.6.1/lib:/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/lib64",
+                            },
+                        },
+                        "extra_rpaths": [
+                            f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/lib",
+                            f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/lib64",
+                            "/opt/cray/pe/gcc-libs",
+                        ],
+                    }
+                }
+            ]
+        }
 
     def cce_compiler_cfg(self):
-        return compiler_section_for(
-            "cce",
-            [
-                compiler_def(
-                    f"cce@{self.compiler_version}",
-                    f"/opt/cray/pe/cce/{self.compiler_version}/",
-                    {"c": "craycc", "cxx": "crayCC", "fortran": "crayftn"},
-                    env={
-                        "set": {"RFE_811452_DISABLE": "1"},
-                        "prepend_path": {
-                            "LD_LIBRARY_PATH": "/opt/cray/pe/pmi/6.1.12/lib"
+        return {
+            "compilers": [
+                {
+                    "compiler": {
+                        "spec": f"cce@{self.compiler_version}",
+                        "paths": {
+                            "cc": f"/opt/cray/pe/cce/{self.compiler_version}/bin/craycc",
+                            "cxx": f"/opt/cray/pe/cce/{self.compiler_version}/bin/crayCC",
+                            "f77": f"/opt/cray/pe/cce/{self.compiler_version}/bin/crayftn",
+                            "fc": f"/opt/cray/pe/cce/{self.compiler_version}/bin/crayftn",
                         },
-                        "append_path": {
-                            "LD_LIBRARY_PATH": "/opt/cray/pe/gcc-libs",
-                            "PKG_CONFIG_PATH": "/usr/lib64/pkgconfig",
+                        # "flags": "",  # Uncomment if needed
+                        "operating_system": "sles15",
+                        "target": "any",
+                        "modules": [],
+                        "environment": {
+                            "set": {"RFE_811452_DISABLE": "1"},
+                            "prepend_path": {
+                                "LD_LIBRARY_PATH": "/opt/cray/pe/pmi/6.1.12/lib"
+                            },
+                            "append_path": {
+                                "LD_LIBRARY_PATH": "/opt/cray/pe/gcc-libs",
+                                "PKG_CONFIG_PATH": "/usr/lib64/pkgconfig",
+                            },
                         },
-                    },
-                    extra_rpaths=["/opt/cray/pe/gcc-libs"],
-                )
-            ],
-        )
+                        "extra_rpaths": ["/opt/cray/pe/gcc-libs"],
+                    }
+                }
+            ]
+        }
 
     def gcc_compiler_cfg(self):
-        return compiler_section_for(
-            "gcc",
-            [
-                compiler_def(
-                    f"gcc@{self.compiler_version} languages:=c,c++,fortran",
-                    f"/opt/cray/pe/gcc/{self.compiler_version}/",
-                    {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
-                    env={
-                        "prepend_path": {
-                            "LD_LIBRARY_PATH": "/opt/cray/pe/pmi/6.1.12/lib:/opt/cray/libfabric/1.15.2.0/lib64",
-                            "PKG_CONFIG_PATH": "/usr/lib64/pkgconfig",
-                        }
-                    },
-                )
-            ],
-        )
+        return {
+            "compilers": [
+                {
+                    "compiler": {
+                        "spec": f"gcc@{self.compiler_version}",
+                        "paths": {
+                            "cc": f"/opt/cray/pe/gcc/{self.compiler_version}/bin/gcc",
+                            "cxx": f"/opt/cray/pe/gcc/{self.compiler_version}/bin/g++",
+                            "f77": f"/opt/cray/pe/gcc/{self.compiler_version}/bin/gfortran",
+                            "fc": f"/opt/cray/pe/gcc/{self.compiler_version}/bin/gfortran",
+                        },
+                        # "flags": "",  # Uncomment if needed
+                        "operating_system": "sles15",
+                        "target": "any",
+                        "modules": [],
+                        "environment": {
+                            "prepend_path": {
+                                "LD_LIBRARY_PATH": "/opt/cray/pe/pmi/6.1.12/lib:/opt/cray/libfabric/1.15.2.0/lib64",
+                                "PKG_CONFIG_PATH": "/usr/lib64/pkgconfig",
+                            }
+                        },
+                        "extra_rpaths": [],
+                    }
+                }
+            ]
+        }
 
     def rocm_config(self):
         return {
@@ -337,205 +365,206 @@ class CscLumi(System):
                         }
                     ],
                 },
-                # "llvm-amdgpu": {
-                #    "buildable": False,
-                #    "externals": [
-                #        {
-                #            "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/llvm",
-                #            "spec": f"llvm-amdgpu@{self.rocm_version}",
-                #        }
-                #    ],
-            },
-            "rccl": {
-                "buildable": False,
-                "externals": [
-                    {
-                        "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
-                        "spec": f"rccl@{self.rocm_version}",
-                    }
-                ],
-            },
-            "rocalution": {
-                "buildable": False,
-                "externals": [
-                    {
-                        "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
-                        "spec": f"rocalution@{self.rocm_version}",
-                    }
-                ],
-            },
-            "rocblas": {
-                "buildable": False,
-                "externals": [
-                    {
-                        "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
-                        "spec": f"rocblas@{self.rocm_version}",
-                    }
-                ],
-            },
-            "rocfft": {
-                "buildable": False,
-                "externals": [
-                    {
-                        "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
-                        "spec": f"rocfft@{self.rocm_version}",
-                    }
-                ],
-                "variants": "amdgpu_target=auto amdgpu_target_sram_ecc=auto",
-            },
-            "rocm-clang-ocl": {
-                "buildable": False,
-                "externals": [
-                    {
-                        "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
-                        "spec": f"rocm-clang-ocl@{self.rocm_version}",
-                    }
-                ],
-            },
-            "rocm-cmake": {
-                "buildable": False,
-                "externals": [
-                    {
-                        "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
-                        "spec": f"rocm-cmake@{self.rocm_version}",
-                    }
-                ],
-            },
-            "rocm-device-libs": {
-                "buildable": False,
-                "externals": [
-                    {
-                        "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
-                        "spec": f"rocm-device-libs@{self.rocm_version}",
-                    }
-                ],
-            },
-            "rocm-gdb": {
-                "buildable": False,
-                "externals": [
-                    {
-                        "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
-                        "spec": f"rocm-gdb@{self.rocm_version}",
-                    }
-                ],
-            },
-            "rocm-opencl": {
-                "buildable": False,
-                "externals": [
-                    {
-                        "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/opencl",
-                        "spec": f"rocm-opencl@{self.rocm_version}",
-                    }
-                ],
-            },
-            "rocm-opencl-runtime": {
-                "buildable": False,
-                "externals": [
-                    {
-                        "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/opencl",
-                        "spec": f"rocm-opencl-runtime@{self.rocm_version}",
-                    }
-                ],
-            },
-            "rocm-openmp-extras": {
-                "buildable": False,
-                "externals": [
-                    {
-                        "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/llvm",
-                        "spec": f"rocm-openmp-extras@{self.rocm_version}",
-                    }
-                ],
-            },
-            "rocm-smi": {
-                "buildable": False,
-                "externals": [
-                    {
-                        "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/rocm_smi",
-                        "spec": f"rocmsmi@{self.rocm_version}",
-                    }
-                ],
-            },
-            "rocm-smi-lib": {
-                "buildable": False,
-                "externals": [
-                    {
-                        "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/rocm_smi",
-                        "spec": f"rocm-smi-lib@{self.rocm_version}",
-                    }
-                ],
-            },
-            "rocminfo": {
-                "buildable": False,
-                "externals": [
-                    {
-                        "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
-                        "spec": f"rocminfo@{self.rocm_version}",
-                    }
-                ],
-            },
-            "rocprim": {
-                "buildable": False,
-                "externals": [
-                    {
-                        "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
-                        "spec": f"rocprim@{self.rocm_version}",
-                    }
-                ],
-            },
-            "rocprofiler-dev": {
-                "buildable": False,
-                "externals": [
-                    {
-                        "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
-                        "spec": f"rocprofiler-dev@{self.rocm_version}",
-                    }
-                ],
-            },
-            "rocrand": {
-                "buildable": False,
-                "externals": [
-                    {
-                        "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
-                        "spec": f"rocrand@{self.rocm_version}",
-                    }
-                ],
-            },
-            "rocsolver": {
-                "buildable": False,
-                "externals": [
-                    {
-                        "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
-                        "spec": f"rocsolver@{self.rocm_version}",
-                    }
-                ],
-            },
-            "rocsparse": {
-                "buildable": False,
-                "externals": [
-                    {
-                        "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
-                        "spec": f"rocsparse@{self.rocm_version}",
-                    }
-                ],
-            },
-            "rocthrust": {
-                "buildable": False,
-                "externals": [
-                    {
-                        "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
-                        "spec": f"rocthrust@{self.rocm_version}",
-                    }
-                ],
-            },
-            "roctracer-dev": {
-                "buildable": False,
-                "externals": [
-                    {
-                        "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
-                        "spec": f"roctracer-dev@{self.rocm_version}",
-                    }
-                ],
-            },
+                "llvm-amdgpu": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/llvm",
+                            "spec": f"llvm-amdgpu@{self.rocm_version}",
+                        }
+                    ],
+                },
+                "rccl": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
+                            "spec": f"rccl@{self.rocm_version}",
+                        }
+                    ],
+                },
+                "rocalution": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
+                            "spec": f"rocalution@{self.rocm_version}",
+                        }
+                    ],
+                },
+                "rocblas": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
+                            "spec": f"rocblas@{self.rocm_version}",
+                        }
+                    ],
+                },
+                "rocfft": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
+                            "spec": f"rocfft@{self.rocm_version}",
+                        }
+                    ],
+                    "variants": "amdgpu_target=auto amdgpu_target_sram_ecc=auto",
+                },
+                "rocm-clang-ocl": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
+                            "spec": f"rocm-clang-ocl@{self.rocm_version}",
+                        }
+                    ],
+                },
+                "rocm-cmake": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
+                            "spec": f"rocm-cmake@{self.rocm_version}",
+                        }
+                    ],
+                },
+                "rocm-device-libs": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
+                            "spec": f"rocm-device-libs@{self.rocm_version}",
+                        }
+                    ],
+                },
+                "rocm-gdb": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
+                            "spec": f"rocm-gdb@{self.rocm_version}",
+                        }
+                    ],
+                },
+                "rocm-opencl": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/opencl",
+                            "spec": f"rocm-opencl@{self.rocm_version}",
+                        }
+                    ],
+                },
+                "rocm-opencl-runtime": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/opencl",
+                            "spec": f"rocm-opencl-runtime@{self.rocm_version}",
+                        }
+                    ],
+                },
+                "rocm-openmp-extras": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/llvm",
+                            "spec": f"rocm-openmp-extras@{self.rocm_version}",
+                        }
+                    ],
+                },
+                "rocm-smi": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/rocm_smi",
+                            "spec": f"rocmsmi@{self.rocm_version}",
+                        }
+                    ],
+                },
+                "rocm-smi-lib": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}/rocm_smi",
+                            "spec": f"rocm-smi-lib@{self.rocm_version}",
+                        }
+                    ],
+                },
+                "rocminfo": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
+                            "spec": f"rocminfo@{self.rocm_version}",
+                        }
+                    ],
+                },
+                "rocprim": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
+                            "spec": f"rocprim@{self.rocm_version}",
+                        }
+                    ],
+                },
+                "rocprofiler-dev": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
+                            "spec": f"rocprofiler-dev@{self.rocm_version}",
+                        }
+                    ],
+                },
+                "rocrand": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
+                            "spec": f"rocrand@{self.rocm_version}",
+                        }
+                    ],
+                },
+                "rocsolver": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
+                            "spec": f"rocsolver@{self.rocm_version}",
+                        }
+                    ],
+                },
+                "rocsparse": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
+                            "spec": f"rocsparse@{self.rocm_version}",
+                        }
+                    ],
+                },
+                "rocthrust": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
+                            "spec": f"rocthrust@{self.rocm_version}",
+                        }
+                    ],
+                },
+                "roctracer-dev": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "prefix": f"/appl/lumi/SW/CrayEnv/EB/rocm/{self.rocm_version}",
+                            "spec": f"roctracer-dev@{self.rocm_version}",
+                        }
+                    ],
+                },
+            }
         }
 
     def compute_software_section(self):

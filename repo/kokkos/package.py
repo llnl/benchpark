@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from spack.package import *
-from spack_repo.builtin.packages.kokkos.package import Kokkos as BuiltinKokkos
+from spack.pkg.builtin.kokkos import Kokkos as BuiltinKokkos
 
 
 class Kokkos(BuiltinKokkos):

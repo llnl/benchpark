@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from spack.package import *
-from spack_repo.builtin.packages.cray_mpich.package import CrayMpich as BuiltinCM
+from spack.pkg.builtin.cray_mpich import CrayMpich as BuiltinCM
 
 
 class CrayMpich(BuiltinCM):

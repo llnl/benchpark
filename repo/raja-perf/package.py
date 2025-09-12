@@ -35,7 +35,7 @@ def hip_repair_cache(options, spec):
     options.append(
         cmake_cache_path(
             "HIP_CLANG_INCLUDE_PATH",
-            glob.glob("{}/llvm/lib/clang/*/include".format(spec["llvm-amdgpu"].prefix))[0],
+            glob.glob("{}/lib/clang/*/include".format(spec["llvm-amdgpu"].prefix))[0],
         )
     )
 
@@ -152,10 +152,6 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
             multi=False, description="Tests to run")
     variant("caliper",default=False, description="Build with support for Caliper based profiling")
     variant("kokkos", default=False, description="Include Kokkos implementations of the kernels in RAJAPerf")
-
-    depends_on("c", type="build")
-    depends_on("cxx", type="build")
-    depends_on("fortran", type="build")
 
     depends_on("blt")
     depends_on("blt@0.7.0:", type="build", when="@2025.03.0:")

@@ -40,9 +40,6 @@ class Hipsycl(CMakePackage, CudaPackage, ROCmPackage):
     variant("sscp", default=False, description="Enable SSCP compiler")
     variant("intel", default=False, description="Enable Intel Level Zero backend for SYCL kernels")
 
-    depends_on("c", type="build")
-    depends_on("cxx", type="build")
-
     depends_on("cmake@3.5:", type="build")
     depends_on("boost +filesystem", when="@:0.8")
     depends_on("boost@1.67.0:1.69.0 +filesystem +fiber +context cxxstd=17", when="@0.9.1:")
