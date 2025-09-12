@@ -239,7 +239,8 @@ def make_stacked_line_chart(**kwargs):
     ax.set_ylabel(y_label)
     ax.legend(title="System")
     plt.xscale("log", base=2) 
-    plt.yscale("log", base=2) 
+    plt.yscale("log", base=2)
+    plt.grid(True)
     plot_args = dict(
         data=tdf,
         # kind=kind,
