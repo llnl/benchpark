@@ -114,6 +114,12 @@ class Caliper(BasicModifier):
         description="Top-down analysis for Intel CPUs (top level)",
     )
 
+    add_mode(
+        mode_name="variance",
+        mode_option="time.mpi",
+        description="Variance of time across ranks",
+    )
+
     # Write out the metadata file once all variables are resolved
     register_phase("build_metadata", pipeline="setup", run_after=["make_experiments"])
 

@@ -51,7 +51,7 @@ release_resources_dane:
       - HOST: dane
         ARCHCONFIG: llnl-cluster
         BENCHMARK: [kripke, amg2023]
-        VARIANT: ['+strong caliper=mpi,time', '+weak caliper=mpi,time']
+        VARIANT: ['+strong caliper=mpi,time,variance', '+weak caliper=mpi,time']
         TEST_ANALYZE: ['true']
       # Test affinity and hwloc with caliper on
       - HOST: dane
