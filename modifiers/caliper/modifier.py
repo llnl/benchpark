@@ -116,7 +116,7 @@ class Caliper(BasicModifier):
 
     add_mode(
         mode_name="variance",
-        mode_option="time.mpi",
+        mode_option="time.variance",
         description="Variance of time across ranks",
     )
 
