@@ -6,6 +6,8 @@
 import yaml
 import sys
 
+import pytest
+
 import benchpark.spec
 
 
@@ -119,6 +121,7 @@ def test_default_config_section():
         "benchpark_experiment_command": "benchpark "
         + " ".join(sys.argv[1:]),  # Not applicable here
         "deprecated": True,
+        "n_repeats": "0",
         "spack_flags": {
             "install": "--add --keep-stage",
             "concretize": "-U -f",
@@ -134,3 +137,12 @@ def test_default_modifiers_section():
     modifiers_section = experiment.compute_modifiers_section_wrapper()
 
     assert modifiers_section == [{"name": "allocation"}, {"name": "exit-code"}]
+
+
+def test_multiple_models():
+    with pytest.raises(
+        benchpark.error.BenchparkError,
+        match="spec cannot specify multiple mutually-exclusive programming models",
+    ):
+        spec = benchpark.spec.ExperimentSpec("saxpy+rocm+openmp").concretize()
+        spec.experiment

@@ -109,6 +109,10 @@ class Caliper(CachedCMakePackage, CudaPackage, ROCmPackage):
     variant("tools", default=True, description="Enable tools")
     variant("python", default=False, when="@v2.12:", description="Build Python bindings")
 
+    depends_on("c", type="build")
+    depends_on("cxx", type="build")
+    depends_on("fortran", type="build")
+
     depends_on("adiak@0.1:0", when="@2.2:2.10 +adiak")
     depends_on("adiak@0.4:0", when="@2.11: +adiak")
 

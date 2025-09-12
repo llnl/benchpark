@@ -39,6 +39,7 @@ def test_system_compute_variables_section(monkeypatch):
                 88,
             ],
             "sys_gpus_per_node": 4,
+            "sys_mem_per_node_GB": 512,
             "rocm_arch": "gfx942",
             "rocm_version": "6.4.0",
             "gtl_flag": True,
