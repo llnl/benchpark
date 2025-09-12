@@ -39,6 +39,7 @@ class LlnlCluster(System):
         },
         "dane": {
             "sys_cores_per_node": 112,
+            "sys_sockets_per_node": 2,
             "sys_cores_os_reserved_per_node": 0,  # No explicit core reservation, first thread on each core reserved (2 threads per core)
             "sys_cores_os_reserved_per_node_list": None,
             "sys_mem_per_node_GB": 256,
@@ -54,12 +55,18 @@ class LlnlCluster(System):
         "rzgenie": {
             "sys_cores_per_node": 36,
             "system_site": "llnl",
+            "sys_sockets_per_node": 2,
+            "sys_cpu_L2_KB": 256,
+            "sys_cpu_L3_MB": 45,
             "hardware_key": str(hardware_descriptions)
             + "/Penguin-haswell-OmniPath/hardware_description.yaml",
             "queues": [JobQueue("pdebug", 720, 43)],
         },
         "poodle": {
             "sys_cores_per_node": 112,
+            "sys_sockets_per_node": 2,
+            "sys_cpu_L2_KB": 2048,
+            "sys_cpu_L3_MB": 112.5, # Depends on partition (could be 105)
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/DELL-sapphirerapids-OmniPath/hardware_description.yaml",

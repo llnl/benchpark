@@ -3,6 +3,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import math
+
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.mpi import MpiOnlyExperiment
@@ -35,16 +37,37 @@ class RajaPerf(
         description="app version",
     )
 
+    variant(
+        "exec_mode",
+        default="test",
+        values=("test", "perf", "cache_study"),
+        description="Execution mode",
+    )
+
     maintainers("michaelmckinsey1")
 
     def compute_applications_section(self):
         if self.spec.satisfies("exec_mode=test"):
-            # Per-process size
+            self.add_experiment_variable("process_problem_size", 1048576, True)
+            self.add_experiment_variable("n_resources", 1, False)
+        elif self.spec.satisfies("exec_mode=cache_study"):
+            sys = self.system_spec.system
+            sockets = sys.sys_sockets_per_node
+            L3size_bytes = sys.sys_cpu_L3_MB * 10**6
+            L2size_bytes = sys.sys_cpu_L2_KB * 10**3
+            num_cores = sys.sys_cores_per_node / sockets
+            div_constant = 16 # 2 doubles per problem size
+            cache_constant = 4 # Make sure data stays in cache
+            if hasattr(sys, "sys_ccd_per_node"):
+                L3size_bytes *= sys.sys_ccd_per_node / sockets
+            problem_size = (sockets * (L3size_bytes + L2size_bytes * num_cores)) * cache_constant / div_constant
+            nearest_power_of_two = 2 ** round(math.log2(problem_size))
+            self.add_experiment_variable("process_problem_size", nearest_power_of_two, True)
             #self.add_experiment_variable("process_problem_size", 134217728, True) #dane
             #self.add_experiment_variable("process_problem_size", 67108864, True) #lassen
             #self.add_experiment_variable("process_problem_size", 268435456, True) # tuo
             #self.add_experiment_variable("process_problem_size", 32*1024*1024, True) # rzgenie
-            self.add_experiment_variable("process_problem_size", 128*1024*1024, True) # poodle
+            #self.add_experiment_variable("process_problem_size", 128*1024*1024, True) # poodle
             # Number of processes
             self.add_experiment_variable("n_resources", 1, False)
 
