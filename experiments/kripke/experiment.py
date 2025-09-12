@@ -182,5 +182,5 @@ class Kripke(
             else "~single_memory"
         )
         self.add_package_spec(
-            self.name, [f"kripke{self.determine_version()} {single_memory} "]
+            self.name, [f"kripke{self.determine_version()} {single_memory} +mpi"]
         )

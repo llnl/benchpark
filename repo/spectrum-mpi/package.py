@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from spack.package import *
-from spack.pkg.builtin.spectrum_mpi import SpectrumMpi as BuiltinSM
+from spack_repo.builtin.packages.spectrum_mpi.package import SpectrumMpi as BuiltinSM
 
 
 class SpectrumMpi(BuiltinSM):
