@@ -11,6 +11,7 @@ import shlex
 import tarfile
 import shutil
 import warnings
+from tqdm import tqdm
 from glob import glob
 from datetime import datetime
 
@@ -237,7 +238,6 @@ def make_stacked_line_chart(**kwargs):
     ax.set_title(kwargs.get("chart_title", ""))
     ax.set_xlabel(xlabel)
     ax.set_ylabel(y_label)
-    ax.legend(title="System")
     plt.xscale("log", base=2) 
     plt.yscale("log", base=2)
     plt.grid(True)
@@ -262,6 +262,8 @@ def make_stacked_line_chart(**kwargs):
     plt.gca().yaxis.set_major_formatter(ScalarFormatter())
     plt.gca().xaxis.set_major_formatter(ScalarFormatter())
     plt.gca().ticklabel_format(style="plain")
+
+    plt.legend(title="System")
 
     # handles, labels = ax.get_legend_handles_labels()
     # handles = list(reversed(handles))
@@ -311,7 +313,11 @@ def prepare_data(**kwargs):
     tk = th.Thicket.from_caliperreader(
         files, intersection=intersection, disable_tqdm=True
     )
-    tk.update_inclusive_columns()
+    if kwargs["yaxis_metric"] in tk.inc_metrics and not kwargs["no_update_inc_cols"]:
+        pbar = tqdm(total=1, desc="Updating inclusive columns")
+        tk.update_inclusive_columns()
+        pbar.update(1)
+        pbar.close()
 
     cluster_to_ps = dict(zip(tk.metadata["cluster"], tk.metadata["total_problem_size"]))
 
@@ -640,6 +646,11 @@ def setup_parser(root_parser):
         default="area",
         choices=["area", "line", "bar", "scatter"],
         help="Type of chart to generate",
+    )
+    root_parser.add_argument(
+        "--no-update-inc-cols",
+        action="store_true",
+        help="Don't call Thicket.update_inclusive_columns() which can take a while."
     )
 
 
