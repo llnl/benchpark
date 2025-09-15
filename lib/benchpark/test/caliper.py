@@ -106,6 +106,7 @@ def test_caliper_modifier(monkeypatch):
             88,
         ],
         "sys_gpus_per_node": 4,
+        "sys_mem_per_node_GB": 512,
         "application_name": "{application_name}",
         "experiment_name": "{experiment_name}",
         "n_nodes": "{n_nodes}",

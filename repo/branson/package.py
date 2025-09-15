@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from spack.package import *
-from spack.pkg.builtin.boost import Boost
+from spack_repo.builtin.packages.boost.package import Boost
 
 import os
 
@@ -38,6 +38,9 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
     variant("metis", default=False, description="Enable METIS")
     variant("viz", default=False, description="Enable VIZ")
     variant("n_groups", default=30, values=int, description="Number of groups")
+
+    depends_on("c", type="build")
+    depends_on("cxx", type="build")
 
     #depends_on("mpi")
     depends_on("mpi@2:")

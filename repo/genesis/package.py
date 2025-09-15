@@ -39,6 +39,11 @@ class Genesis(AutotoolsPackage):
     variant("simd", description="Build with SIMD width.", default="auto", values=("auto", "MIC-AVX512", "CORE-AVX512", "CORE-AVX2"), multi=False)
     variant("debug", description="Set Debug level", default="0", values=("0", "1", "2", "3", "4"), multi=False)
 
+    # Has Fortran but I didn't see c/c++ code
+    depends_on("c", type="build")
+    depends_on("cxx", type="build")
+    depends_on("fortran", type="build")
+
     depends_on("mpi", when="+mpi")
     depends_on("lapack", when="+lapack")
     depends_on("cuda", when="+gpu")
