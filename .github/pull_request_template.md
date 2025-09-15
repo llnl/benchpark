@@ -17,8 +17,7 @@
 - [ ] If package.py upstreamed to Spack is insufficient, add/modify `repo/benchmark_name/package.py` plus: create, self-assign, and link here a follow up issue with a link to the PR in the Spack repo.
 - [ ] If application.py upstreamed to Ramble is insufficient, add/modify `repo/benchmark_name/application.py` plus: create, self-assign, and link here a follow up issue with a link to the PR in the Ramble repo.
 - [ ] Tags in Ramble's `application.py` or in `repo/benchmark_name/application.py` will appear in the [docs catalogue](https://software.llnl.gov/benchpark/benchmark-list.html)
-- [ ] Add/modify an `experiments/benchmark_name/experiment.py` to define a single node and multi-node experiments
-- [ ] Add/modify a dry run unit test in `.github/workflows/run.yml`
+- [ ] Add/modify an `experiments/benchmark_name/experiment.py` to define an experiment
 
 ## Adding/modifying core functionality, CI, or documentation:
 

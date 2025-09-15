@@ -5,7 +5,7 @@
 
 
 from benchpark.directives import variant, maintainers
-from benchpark.system import System
+from benchpark.system import System, compiler_def, compiler_section_for
 from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.paths import hardware_descriptions
 
@@ -17,7 +17,7 @@ class RikenFugaku(System):
     id_to_resources = {
         "fugaku": {
             "sys_cores_per_node": 48,
-            "sys_mem_per_node": 32,
+            "sys_mem_per_node_GB": 32,
             "system_site": "riken",
             "hardware_key": str(hardware_descriptions)
             + "/Fujitsu-A64FX-TofuD/hardware_description.yaml",
@@ -552,54 +552,40 @@ class RikenFugaku(System):
         return selections
 
     def compute_compilers_section(self):
-
         compiler = self.spec.variants["compiler"][0]
 
-        selections = {"compilers": []}
-
         if compiler == "clang":
-            selections["compilers"] += [
-                {
-                    "compiler": {
-                        "spec": "clang@17.0.2",
-                        "paths": {
-                            "cc": "/vol0004/apps/oss/llvm-v17.0.2/compute_node/bin/clang",
-                            "cxx": "/vol0004/apps/oss/llvm-v17.0.2/compute_node/bin/clang++",
-                            "f77": "/vol0004/apps/oss/llvm-v17.0.2/compute_node/bin/flang",
-                            "fc": "/vol0004/apps/oss/llvm-v17.0.2/compute_node/bin/flang",
-                        },
-                        # Uncomment and populate these if needed
-                        # "flags": {
-                        #     "cflags": {"-msve-vector-bits=scalable"},
-                        #     "cxxflags": {"-msve-vector-bits=scalable"},
-                        #     "fflags": {"-msve-vector-bits=scalable"},
-                        #     "ldflags": {"-fuse-ld=lld"},
-                        # },
-                        "environment": {
+            # maybe_flags = {
+            #    "cflags": {"-msve-vector-bits=scalable"},
+            #    "cxxflags": {"-msve-vector-bits=scalable"},
+            #    "fflags": {"-msve-vector-bits=scalable"},
+            #    "ldflags": {"-fuse-ld=lld"},
+            # }
+            cfg = compiler_section_for(
+                "llvm",
+                [
+                    compiler_def(
+                        "llvm@17.0.2",
+                        "/vol0004/apps/oss/llvm-v17.0.2/compute_node/",
+                        {"c": "clang", "cxx": "clang++", "fortran": "flang"},
+                        env={
                             "append_path": {
                                 "LD_LIBRARY_PATH": "/opt/FJSVxtclanga/tcsds-1.2.38/lib64"
                             }
                         },
-                        "operating_system": "rhel8",
-                        "target": "aarch64",
-                        "modules": [],
-                        "extra_rpaths": [],
-                    }
-                }
-            ]
+                        # flags = maybe_flags
+                    )
+                ],
+            )
         elif compiler == "gcc":
-            selections["compilers"] += [
-                {
-                    "compiler": {
-                        "spec": "gcc@13.2.0",
-                        "paths": {
-                            "cc": "/vol0004/apps/oss/spack-v0.21/opt/spack/linux-rhel8-a64fx/gcc-8.5.0/gcc-13.2.0-abihbe7ykvpedq54j6blfvfppy7ojbmd/bin/gcc",
-                            "cxx": "/vol0004/apps/oss/spack-v0.21/opt/spack/linux-rhel8-a64fx/gcc-8.5.0/gcc-13.2.0-abihbe7ykvpedq54j6blfvfppy7ojbmd/bin/g++",
-                            "f77": "/vol0004/apps/oss/spack-v0.21/opt/spack/linux-rhel8-a64fx/gcc-8.5.0/gcc-13.2.0-abihbe7ykvpedq54j6blfvfppy7ojbmd/bin/gfortran",
-                            "fc": "/vol0004/apps/oss/spack-v0.21/opt/spack/linux-rhel8-a64fx/gcc-8.5.0/gcc-13.2.0-abihbe7ykvpedq54j6blfvfppy7ojbmd/bin/gfortran",
-                        },
-                        "flags": {"ldflags": {"-lelf -ldl"}},
-                        "environment": {
+            cfg = compiler_section_for(
+                "gcc",
+                [
+                    compiler_def(
+                        "gcc@13.2.0 languages:=c,c++,fortran",
+                        "/vol0004/apps/oss/spack-v0.21/opt/spack/linux-rhel8-a64fx/gcc-8.5.0/gcc-13.2.0-abihbe7ykvpedq54j6blfvfppy7ojbmd/",
+                        {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                        env={
                             "set": {
                                 "OPAL_PREFIX": "/vol0004/apps/oss/mpigcc/fjmpi-gcc12"
                             },
@@ -607,29 +593,19 @@ class RikenFugaku(System):
                                 "LD_LIBRARY_PATH": "/opt/FJSVxtclanga/tcsds-1.2.38/lib64"
                             },
                         },
-                        "operating_system": "rhel8",
-                        "target": "aarch64",
-                        "modules": [],
-                        "extra_rpaths": [],
-                    }
-                }
-            ]
+                        flags={"ldflags": {"-lelf -ldl"}},
+                    )
+                ],
+            )
         elif compiler == "fj":
-            selections["compilers"] += [
-                {
-                    "compiler": {
-                        "spec": "fj@4.10.0",
-                        "modules": [],
-                        "paths": {
-                            "cc": "/opt/FJSVxtclanga/tcsds-1.2.38/bin/fcc",
-                            "cxx": "/opt/FJSVxtclanga/tcsds-1.2.38/bin/FCC",
-                            "f77": "/opt/FJSVxtclanga/tcsds-1.2.38/bin/frt",
-                            "fc": "/opt/FJSVxtclanga/tcsds-1.2.38/bin/frt",
-                        },
-                        "flags": {},
-                        "operating_system": "rhel8",
-                        "target": "aarch64",
-                        "environment": {
+            cfg = compiler_section_for(
+                "fj",
+                [
+                    compiler_def(
+                        "fj@4.10.0",
+                        "/opt/FJSVxtclanga/tcsds-1.2.38/",
+                        {"c": "fcc", "cxx": "FCC", "fortran": "frt"},
+                        env={
                             "set": {
                                 "fcc_ENV": "-Nclang",
                                 "FCC_ENV": "-Nclang",
@@ -639,12 +615,11 @@ class RikenFugaku(System):
                                 "LD_LIBRARY_PATH": "/opt/FJSVxtclanga/tcsds-1.2.38/lib64",
                             },
                         },
-                        "extra_rpaths": [],
-                    }
-                }
-            ]
+                    )
+                ],
+            )
 
-        return selections
+        return cfg
 
     def system_specific_variables(self):
         return {
