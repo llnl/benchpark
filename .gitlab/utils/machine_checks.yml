@@ -28,8 +28,3 @@ dane-up-check:
   variables:
     CI_MACHINE: dane
   extends: [.machine-check]
-lassen-up-check:
-  stage: machine-checks
-  variables:
-    CI_MACHINE: lassen
-  extends: [.machine-check]
