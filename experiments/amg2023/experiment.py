@@ -118,3 +118,4 @@ class Amg2023(
             self.add_package_spec(self.name, [f"amg2023{self.determine_version()} +umpire"])
         else:
             self.add_package_spec(self.name, [f"amg2023{self.determine_version()}"])
+        self.add_package_spec("hypre", ["hypre+lapack"])
