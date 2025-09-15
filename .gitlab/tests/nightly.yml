@@ -77,7 +77,6 @@ include:
         SCHEDULER_PARAMETERS: $DANE_PARAMS
         BENCHMARK:
           - amg2023
-          - babelstream
           - kripke
           - lammps
           - raja-perf
