@@ -25,6 +25,7 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     variant("mpi", default=True, description="Enable MPI support")
     variant("openmp", default=False, description="Enable OpenMP support")
     variant("caliper", default=False, description="Enable Caliper monitoring")
+    variant("umpire", default=False, description="Enable Umpire support")
 
     depends_on("c", type="build")
     depends_on("cxx", type="build")
@@ -35,9 +36,11 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
     depends_on("hypre+caliper", when="+caliper")
-    depends_on("hypre@2.31.0:")
+    depends_on("hypre@2.33.0:")
     depends_on("hypre+mixedint~fortran")
 
+    depends_on("hypre+umpire", when="+umpire")
+    depends_on("hypre~umpire", when="~umpire")
     depends_on("hypre+cuda", when="+cuda")
     depends_on("hypre+openmp", when="+openmp")
     requires("+cuda", when="^hypre+cuda")
@@ -59,6 +62,7 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
         cmake_options = []
         cmake_options.append(self.define_from_variant("AMG_WITH_CALIPER", "caliper"))
         cmake_options.append(self.define_from_variant("AMG_WITH_OMP", "openmp"))
+        cmake_options.append(self.define_from_variant("AMG_WITH_UMPIRE", "umpire"))
         cmake_options.append(self.define("HYPRE_PREFIX", self.spec["hypre"].prefix))
         if self.spec["hypre"].satisfies("+cuda"):
             cmake_options.append("-DAMG_WITH_CUDA=ON")
