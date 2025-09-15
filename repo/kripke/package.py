@@ -21,6 +21,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     license("BSD-3-Clause")
 
     version("develop", branch="develop", submodules=False)
+    version("2025-07", submodules=False, commit="8cf38433a6a11e0dcd17864e649b2d045159ee9c")
     version(
         "1.2.7.0", submodules=False, commit="db920c1f5e1dcbb9e949d120e7d86efcdb777635"
     )
@@ -57,7 +58,11 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     conflicts("+single_memory", when="~rocm")
     depends_on("chai+single_memory", when="+single_memory")
 
-    depends_on("chai@2024.07.0+raja", when="@develop")
+    depends_on("c", type="build")
+    depends_on("cxx", type="build")
+    depends_on("fortran", type="build")
+
+    depends_on("chai@2024.07.0+raja", when="@1.2.7.0:")
     depends_on("fmt@9.1", when=f"^chai@2024.07.0")
 
     depends_on("mpi", when="+mpi")
@@ -65,6 +70,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("caliper", when="+caliper")
     depends_on("adiak@0.4:", when="+caliper")
     conflicts("^blt@:0.3.6", when="+rocm")
+    conflicts("^blt@0.7.0")
 
     depends_on("blt@0.6.2:", type="build", when=f"@1.2.7:")
 
@@ -126,8 +132,9 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
             args.append("-DHIP_ROOT_DIR={0}".format(spec["hip"].prefix))
             rocm_archs = spec.variants["amdgpu_target"].value
             if "none" not in rocm_archs:
-                args.append("-DHIP_HIPCC_FLAGS=--amdgpu-target={0}".format(",".join(rocm_archs)))
-                args.append("-DCMAKE_HIP_ARCHITECTURES={0}".format(rocm_archs))
+                arch_str = ",".join(rocm_archs)
+                args.append("-DHIP_HIPCC_FLAGS=--amdgpu-target={0}".format(arch_str))
+                args.append("-DCMAKE_HIP_ARCHITECTURES={0}".format(arch_str))
         else:
             # Ensure build with hip is disabled
             args.append("-DENABLE_HIP=OFF")

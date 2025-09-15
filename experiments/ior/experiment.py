@@ -6,16 +6,10 @@
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.mpi import MpiOnlyExperiment
-from benchpark.scaling import StrongScaling
-from benchpark.scaling import WeakScaling
+from benchpark.scaling import ScalingMode, Scaling
 
 
-class Ior(
-    Experiment,
-    MpiOnlyExperiment,
-    StrongScaling,
-    WeakScaling,
-):
+class Ior(Experiment, MpiOnlyExperiment, Scaling(ScalingMode.Strong, ScalingMode.Weak)):
     variant(
         "workload",
         default="ior",
@@ -24,7 +18,8 @@ class Ior(
 
     variant(
         "version",
-        default="3.3.0",
+        default="4.0.0",
+        values=("develop", "latest", "4.0.0"),
         description="app version",
     )
 
@@ -39,31 +34,26 @@ class Ior(
             for pk, pv in num_nodes.items():
                 self.add_experiment_variable(pk, pv, True)
             self.add_experiment_variable("b", "268435456", True)
-        elif self.spec.satisfies("+strong"):
-            scaled_variables = self.generate_strong_scaling_params(
-                {tuple(num_nodes.keys()): list(num_nodes.values())},
-                int(self.spec.variants["scaling-factor"][0]),
-                int(self.spec.variants["scaling-iterations"][0]),
-            )
-            for k, v in scaled_variables.items():
-                self.add_experiment_variable(k, v, True)
-            # 256 mb
-            self.add_experiment_variable("b", "268435456 / {n_nodes}", True)
-        elif self.spec.satisfies("+weak"):
-            scaled_variables = self.generate_weak_scaling_params(
-                {tuple(num_nodes.keys()): list(num_nodes.values())},
-                {tuple(num_nodes.keys()): list(num_nodes.values())},
-                int(self.spec.variants["scaling-factor"][0]),
-                int(self.spec.variants["scaling-iterations"][0]),
-            )
-            for k, v in scaled_variables.items():
-                self.add_experiment_variable(k, v, True)
-
-            self.add_experiment_variable("b", "268435456", True)
 
         self.add_experiment_variable("t", t, True)
         self.add_experiment_variable(
             "n_ranks", "{sys_cores_per_node} * {n_nodes}", True
+        )
+
+        self.register_scaling_config(
+            {
+                ScalingMode.Strong: {
+                    "n_ranks": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "b": lambda var, itr, dim, scaling_factor: var.val(dim),
+                },
+                ScalingMode.Weak: {
+                    "n_ranks": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "b": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                },
+            }
         )
 
         self.set_required_variables(
@@ -73,6 +63,4 @@ class Ior(
         )
 
     def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, [f"ior@{app_version}"])
+        self.add_package_spec(self.name, [f"ior{self.determine_version()}"])

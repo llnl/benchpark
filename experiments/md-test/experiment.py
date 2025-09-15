@@ -6,13 +6,13 @@
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.mpi import MpiOnlyExperiment
-from benchpark.scaling import StrongScaling
+from benchpark.scaling import ScalingMode, Scaling
 
 
 class MdTest(
     Experiment,
     MpiOnlyExperiment,
-    StrongScaling,
+    Scaling(ScalingMode.Strong),
 ):
     variant(
         "workload",
@@ -38,14 +38,16 @@ class MdTest(
         if self.spec.satisfies("exec_mode=test"):
             for pk, pv in num_resources.items():
                 self.add_experiment_variable(pk, pv, True)
-        elif self.spec.satisfies("+strong"):
-            scaled_variables = self.generate_strong_scaling_params(
-                {tuple(num_resources.keys()): list(num_resources.values())},
-                int(self.spec.variants["scaling-factor"][0]),
-                int(self.spec.variants["scaling-iterations"][0]),
-            )
-            for k, v in scaled_variables.items():
-                self.add_experiment_variable(k, v, True)
+
+        self.register_scaling_config(
+            {
+                ScalingMode.Strong: {
+                    "n_ranks": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "num-objects": lambda var, itr, dim, scaling_factor: var.val(dim),
+                },
+            }
+        )
 
         self.set_required_variables(
             n_resources="{n_ranks}",
@@ -54,12 +56,10 @@ class MdTest(
         )
 
     def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
         self.add_package_spec(
             "ior",
             [
                 "ior@3.3.0",
             ],
         )
-        self.add_package_spec(self.name, [f"mdtest@{app_version}"])
+        self.add_package_spec(self.name, [f"mdtest{self.determine_version()}"])

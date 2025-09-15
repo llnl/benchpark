@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.system import System
+from benchpark.system import System, compiler_def, compiler_section_for
 from benchpark.directives import variant, maintainers
 from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.paths import hardware_descriptions
@@ -19,28 +19,28 @@ class AwsPcluster(System):
     id_to_resources = {
         "c4.xlarge": {
             "sys_cores_per_node": 4,
-            "sys_mem_per_node": 7.5,
+            "sys_mem_per_node_GB": 7.5,
             "system_site": "aws",
             "hardware_key": str(hardware_descriptions)
             + "/AWS_PCluster-zen-EFA/hardware_description.yaml",
         },
         "c6g.xlarge": {
             "sys_cores_per_node": 4,
-            "sys_mem_per_node": 8,
+            "sys_mem_per_node_GB": 8,
             "system_site": "aws",
             "hardware_key": str(hardware_descriptions)
             + "/AWS_PCluster-zen-EFA/hardware_description.yaml",
         },
         "hpc7a.48xlarge": {
             "sys_cores_per_node": 96,
-            "sys_mem_per_node": 768,
+            "sys_mem_per_node_GB": 768,
             "system_site": "aws",
             "hardware_key": str(hardware_descriptions)
             + "/AWS_PCluster-zen-EFA/hardware_description.yaml",
         },
         "hpc6a.48xlarge": {
             "sys_cores_per_node": 96,
-            "sys_mem_per_node": 384,
+            "sys_mem_per_node_GB": 384,
             "system_site": "aws",
             "hardware_key": str(hardware_descriptions)
             + "/AWS_PCluster-zen-EFA/hardware_description.yaml",
@@ -101,28 +101,16 @@ class AwsPcluster(System):
         }
 
     def compute_compilers_section(self):
-
-        return {
-            "compilers": [
-                {
-                    "compiler": {
-                        "spec": "gcc@7.3.1",
-                        "paths": {
-                            "cc": "/usr/bin/gcc",
-                            "cxx": "/usr/bin/g++",
-                            "f77": "/usr/bin/gfortran",
-                            "fc": "/usr/bin/gfortran",
-                        },
-                        "flags": {},
-                        "operating_system": "alinux2",
-                        "target": "x86_64",
-                        "modules": [],
-                        "environment": {},
-                        "extra_rpaths": [],
-                    }
-                }
-            ]
-        }
+        return compiler_section_for(
+            "gcc",
+            [
+                compiler_def(
+                    "gcc@7.3.1 languages=c,c++,fortran",
+                    "/usr/",
+                    {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                )
+            ],
+        )
 
     def compute_software_section(self):
         return {
