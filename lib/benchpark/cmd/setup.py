@@ -47,9 +47,6 @@ def setup_parser(root_parser):
         help="The experiment (benchmark/ProgrammingModel) to run",
     )
     root_parser.add_argument(
-        "system", type=str, help="The system on which to run the experiment"
-    )
-    root_parser.add_argument(
         "experiments_root",
         type=str,
         help="Where to install packages and store results for the experiments. Benchpark expects to manage this directory, and it should be empty/nonexistent the first time you run benchpark setup experiments.",
@@ -69,18 +66,45 @@ def command(args):
                         (everything from source/experiments/<experiment>)
     """
 
+    # Parse experiment YAML for package_manager, system_id
+    def _find(d, tag):
+        if tag in d:
+            return d[tag]
+        for k, v in d.items():
+            if isinstance(v, dict):
+                result = _find(v, tag)
+                if result is not None:
+                    return result
+
     experiments_root = pathlib.Path(os.path.abspath(args.experiments_root))
     experiment_id = args.experiment
-    system_id = args.system
     source_dir = benchpark.paths.benchpark_root
+
+    experiment_src_dir = pathlib.Path(os.path.abspath(str(experiment_id)))
+
+    with open(str(experiment_src_dir / "ramble.yaml"), "r") as file:
+        parsed_yaml = yaml.safe_load(file)
+    pkg_manager = _find(parsed_yaml, "package_manager")
+    system_id = _find(parsed_yaml, "destdir")
 
     debug_print(f"source_dir = {source_dir}")
     debug_print(f"specified experiment = {experiment_id}")
     debug_print(f"specified system = {system_id}")
 
-    experiment_src_dir = pathlib.Path(os.path.abspath(str(experiment_id)))
     configs_src_dir = pathlib.Path(os.path.abspath(str(system_id)))
-    workspace_dir = experiments_root / str(experiment_id) / str(system_id)
+
+    experiments_root = pathlib.Path(os.path.abspath(experiments_root))
+    experiment_id = pathlib.Path(os.path.abspath(experiment_id))
+    system_id = pathlib.Path(os.path.abspath(system_id))
+    common_root = pathlib.Path(
+        os.path.commonpath([experiments_root, experiment_id, system_id])
+    )
+    workspace_dir = (
+        common_root
+        / experiments_root.relative_to(common_root)
+        / experiment_id.relative_to(common_root)
+        / system_id.relative_to(common_root)
+    )
 
     if workspace_dir.exists():
         if workspace_dir.is_dir():
@@ -145,25 +169,21 @@ def command(args):
         experiments_root, upstream=RuntimeResources(benchpark.paths.benchpark_home)
     )
 
-    # Parse experiment YAML for package_manager
-    def find(d, tag):
-        if tag in d:
-            return d[tag]
-        for k, v in d.items():
-            if isinstance(v, dict):
-                result = find(v, tag)
-                if result is not None:
-                    return result
-
-    with open(str(experiment_src_dir / "ramble.yaml"), "r") as file:
-        parsed_yaml = yaml.safe_load(file)
-    pkg_manager = find(parsed_yaml, "package_manager")
-
     pkg_str = ""
     if pkg_manager == "spack":
         spack, first_time_spack = per_workspace_setup.spack_first_time_setup()
         if first_time_spack:
-            spack("repo", "add", "--scope=site", f"{source_dir}/repo")
+            site_repos = (
+                per_workspace_setup.spack_location / "etc" / "spack" / "repos.yaml"
+            )
+            with open(site_repos, "w") as f:
+                f.write(
+                    f"""\
+repos::
+  benchpark: {source_dir}/repo
+  builtin: {per_workspace_setup.pkgs_location}/repos/spack_repo/builtin/
+"""
+                )
 
         pkg_str = f"""\
 . {per_workspace_setup.spack_location}/share/spack/setup-env.sh

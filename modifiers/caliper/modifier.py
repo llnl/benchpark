@@ -80,14 +80,14 @@ class Caliper(BasicModifier):
 
     add_mode(
         mode_name="cuda",
-        mode_option="profile.cuda",
-        description="Profile CUDA API functions",
+        mode_option="profile.cuda,cuda.gputime",
+        description="Profile CUDA API functions, time spent on GPU",
     )
 
     add_mode(
         mode_name="rocm",
-        mode_option="profile.hip",
-        description="Profile HIP API functions",
+        mode_option="profile.hip,rocm.gputime",
+        description="Profile HIP API functions, time spent on GPU",
     )
 
     add_mode(
@@ -131,7 +131,7 @@ class Caliper(BasicModifier):
             "sys_cores_os_reserved_per_node",
             "sys_cores_os_reserved_per_node_list",
             "sys_gpus_per_node",
-            "sys_mem_per_node",
+            "sys_mem_per_node_GB",
             "system_site",
         ]
         for key in system_metadata:

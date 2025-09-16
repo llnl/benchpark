@@ -22,6 +22,7 @@ class Babelstream(CMakePackage, CudaPackage, ROCmPackage):
     homepage = "https://github.com/UoB-HPC/BabelStream"
     url = "https://github.com/UoB-HPC/BabelStream/archive/refs/tags/v4.0.tar.gz"
     git = "https://github.com/august-knox/BabelStream.git"
+    version("5.0", tag="v5.0")
     version("4.0", sha256="a9cd39277fb15d977d468435eb9b894f79f468233f0131509aa540ffda4f5953")
     version("main", branch="main")
     version("develop", branch="develop")
@@ -85,6 +86,11 @@ class Babelstream(CMakePackage, CudaPackage, ROCmPackage):
         when="+raja",
         msg="RAJA implementation requires architecture to be specified by dir=",
     )
+
+    # Confirmed c++ and Fortran
+    depends_on("c", type="build")
+    depends_on("cxx", type="build")
+    depends_on("fortran", type="build")
 
     # Thrust Conflict
     # conflicts("~cuda", when="+thrust", msg="Thrust requires +cuda variant")

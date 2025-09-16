@@ -4,12 +4,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from spack.package import *
-from spack.pkg.builtin.cray_mpich import CrayMpich as BuiltinCM
+from spack_repo.builtin.packages.cray_mpich.package import CrayMpich as BuiltinCM
 
 
 class CrayMpich(BuiltinCM):
 
-    variant("gtl", default=False, description="enable GPU-aware mode")
+    variant("gtl", default=True, description="enable GPU-aware mode")
 
     @property
     def libs(self):
@@ -36,3 +36,12 @@ class CrayMpich(BuiltinCM):
             gtl_path = self.spec.extra_attributes.get("gtl_lib_path", "")
             if gtl_path:
                 env.prepend_path("LD_LIBRARY_PATH", gtl_path)
+
+    def cmake_args(self):
+        args = super().cmake_args(self)
+
+        if self.spec.satisfies("+gtl"):
+            # Link GTL for MPICH GPU-aware
+            args.append(self.define("CMAKE_EXE_LINKER_FLAGS", self.spec['mpi'].libs.ld_flags))
+
+        return args

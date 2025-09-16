@@ -17,9 +17,12 @@ class Gpcnet(MakefilePackage):
     maintainers("knox10")
 
     version("master", branch="master")
+    version("1.2", tag="1.2")
 
     variant("mpi", default=False, description="Build with MPI support")
-    
+
+    depends_on("c", type="build")
+
     depends_on("mpi", when="+mpi")
 
     @property

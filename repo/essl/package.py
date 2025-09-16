@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from spack.package import *
-from spack.pkg.builtin.essl import Essl as BuiltinEssl
+from spack_repo.builtin.packages.essl.package import Essl as BuiltinEssl
 
 
 class Essl(BuiltinEssl):

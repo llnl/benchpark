@@ -60,19 +60,6 @@ include:
           - raja-perf
           - salmon-tddft
         VARIANT: [+openmp]
-      - HOST: lassen
-        ARCHCONFIG: llnl-sierra
-        SCHEDULER_PARAMETERS: -nnodes 1 -W 60 -q pci
-        BENCHMARK:
-          - amg2023
-          - babelstream
-          - kripke
-          - laghos
-          - lammps
-          - osu-micro-benchmarks
-          - raja-perf
-          - remhos
-        VARIANT: [+cuda]
       #############
       # Other tests
       #############
@@ -84,6 +71,19 @@ include:
         VARIANT: [+rocm]
         GPUMODE: [TPX, CPX]
         SYSTEM_ARGS: [gpumode=$GPUMODE]
+      # Test benchmark@develop
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: $DANE_PARAMS
+        BENCHMARK:
+          - amg2023
+          - babelstream
+          - kripke
+          - lammps
+          - raja-perf
+          - remhos
+          - stream
+        BENCHMARK_VERSION: develop
 nightly_test_run:
   extends: .nightly_rules
   resource_group: $HOST

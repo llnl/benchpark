@@ -23,6 +23,7 @@ import llnl.util.tty.color as color
 
 def system_init(args):
     system_spec = benchpark.spec.SystemSpec(" ".join(args.spec)).concretize()
+    system_spec.destdir = args.dest
     system = system_spec.system
 
     if args.basedir:
