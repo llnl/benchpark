@@ -1,7 +1,7 @@
-# Copyright 2023 Lawrence Livermore National Security, LLC and other
-# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+Copyright 2023 Lawrence Livermore National Security, LLC and other
+Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 #
-# SPDX-License-Identifier: Apache-2.0
+SPDX-License-Identifier: Apache-2.0
 
 from benchpark.directives import maintainers, variant
 from benchpark.openmpsystem import OpenMPCPUOnlySystem
@@ -10,8 +10,8 @@ from benchpark.system import System, compiler_def, compiler_section_for
 
 
 class AwsTutorial(System):
-    # Taken from https://aws.amazon.com/ec2/instance-types/
-    # With boto3, we could determine this dynamically vs. storing a static table
+    Taken from https://aws.amazon.com/ec2/instance-types/
+    With boto3, we could determine this dynamically vs. storing a static table
 
     maintainers("stephanielam3211")
 
@@ -155,19 +155,19 @@ class AwsTutorial(System):
                     ],
                     "buildable": False,
                 },
-                # "caliper": {
-                #     "externals": [
-                #         {
-                #             "spec": "caliper@master+adiak+mpi%gcc@11.4.0",
-                #             "prefix": "/usr",
-                #         }
-                #     ],
-                #     "buildable": False,
-                # },
-                # "adiak": {
-                #     "externals": [{"spec": "adiak@0.4.1", "prefix": "/usr"}],
-                #     "buildable": False,
-                # },
+                "caliper": {
+                    "externals": [
+                        {
+                            "spec": "caliper@master+adiak+mpi%gcc@11.4.0",
+                            "prefix": "/usr",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "adiak": {
+                    "externals": [{"spec": "adiak@0.4.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
                 "groff": {
                     "externals": [{"spec": "groff@1.22.4", "prefix": "/usr"}],
                     "buildable": False,
