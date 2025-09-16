@@ -21,35 +21,35 @@ class AwsTutorial(System):
             "sys_cores_per_node": 192,
             "sys_mem_per_node_GB": 384,
             "hardware_key": str(hardware_descriptions)
-            + "/AWS_Tutorial-c7i-EFA/hardware_description.yaml",
+            + "/AWS_Tutorial-sapphirerapids-EFA/hardware_description.yaml",
         },
         "c7i.metal-48xl": {
             "system_site": "aws",
             "sys_cores_per_node": 192,
             "sys_mem_per_node_GB": 384,
             "hardware_key": str(hardware_descriptions)
-            + "/AWS_Tutorial-c7i-EFA/hardware_description.yaml",
+            + "/AWS_Tutorial-sapphirerapids-EFA/hardware_description.yaml",
         },
         "c7i.24xlarge": {
             "system_site": "aws",
             "sys_cores_per_node": 96,
             "sys_mem_per_node_GB": 192,
             "hardware_key": str(hardware_descriptions)
-            + "/AWS_Tutorial-c7i-EFA/hardware_description.yaml",
+            + "/AWS_Tutorial-sapphirerapids-EFA/hardware_description.yaml",
         },
         "c7i.metal-24xl": {
             "system_site": "aws",
             "sys_cores_per_node": 96,
             "sys_mem_per_node_GB": 192,
             "hardware_key": str(hardware_descriptions)
-            + "/AWS_Tutorial-c7i-EFA/hardware_description.yaml",
+            + "/AWS_Tutorial-sapphirerapids-EFA/hardware_description.yaml",
         },
         "c7i.12xlarge": {
             "system_site": "aws",
             "sys_cores_per_node": 48,
             "sys_mem_per_node_GB": 96,
             "hardware_key": str(hardware_descriptions)
-            + "/AWS_Tutorial-c7i-EFA/hardware_description.yaml",
+            + "/AWS_Tutorial-sapphirerapids-EFA/hardware_description.yaml",
         },
     }
 
