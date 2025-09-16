@@ -29,8 +29,8 @@ class Lammps(
 
     variant(
         "version",
-        default="20250204",
-        values=("develop", "latest", "20250204", "stable_29Aug2024_update3"),
+        default="20250722",
+        values=("develop", "latest", "20250722", "stable_29Aug2024_update3"),
         description="app version",
     )
 
