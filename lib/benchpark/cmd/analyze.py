@@ -427,10 +427,14 @@ def prepare_data(**kwargs):
         temp_df = ctk.dataframe[ctk.dataframe.index.isin(temp_df_idx)]
         temp_df.loc["Sum(removed_regions)"] = 0
         for p in ctk.profile:
-            temp_df.loc["Sum(removed_regions)", (p[1], metric)] = (
+            diff = (
                 ctk.dataframe.loc[:, (p[1], metric)].sum()
                 - temp_df.loc[:, (p[1], metric)].sum()
-            ).iloc[0]
+            )
+            if isinstance(diff, pd.Series):
+                assert len(diff) == 1
+                diff = diff.iloc[0]
+            temp_df.loc["Sum(removed_regions)", (p[1], metric)] = diff
         ctk.dataframe = temp_df
         logger.info(
             f"Filtered top {top_n} regions for chart display. Added the sum of the regions that were removed as single region."
