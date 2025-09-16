@@ -67,3 +67,10 @@ def test_tags():
         [benchpark.paths.benchpark_root / "bin/benchpark", "tags", "-a", "ad"],
         check=True,
     )
+
+
+def test_info():
+    subprocess.run(
+        [benchpark.paths.benchpark_root / "bin/benchpark", "info", "system", "llnl-cluster"],
+        check=True,
+    )
