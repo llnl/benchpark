@@ -143,8 +143,9 @@ the ``Allocation Modifier`` generates the appropriate scheduler request for thes
 resources (how many nodes are required to run a given experiment, etc.).
 
 .. list-table:: Hardware resources as specified by the system, and requested for the experiment
-    :widths: 20 40 40
-    :header-rows: 1
+
+        :widths: 20 40 40
+        :header-rows: 1
 
     - - Resource
       - Available on the System
@@ -162,7 +163,7 @@ resources (how many nodes are required to run a given experiment, etc.).
       - sys_gpus_per_node
       - (opt) n_gpus_per_node
     - - Memory per node
-      - sys_mem_per_node
+      - sys_mem_per_node_GB
       - (opt) n_mem_per_node
 
 The experiment is required to specify:
@@ -178,7 +179,7 @@ The system is required to specify:
 
     - sys_cores_per_node
     - sys_gpus_per_node (if it has GPUs)
-    - sys_mem_per_node
+    - sys_mem_per_node_GB
 
 The modifier checks the resources requested by the experiment, computes the values for
 the unspecified variables, and checks that the request does not exceed the resources

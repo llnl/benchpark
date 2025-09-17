@@ -5,7 +5,7 @@
 
 import os
 from spack.package import *
-from spack.pkg.builtin.cray_mpich import CrayMpich as BuiltinCM
+from spack_repo.builtin.packages.cray_mpich.package import CrayMpich as BuiltinCM
 
 class CrayMpich(BuiltinCM):
     """Cray MPICH with optional GPU-aware GTL support."""

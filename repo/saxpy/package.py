@@ -28,6 +28,8 @@ class Saxpy(CMakePackage, CudaPackage, ROCmPackage):
     conflicts("+rocm", when="+cuda+openmp")
     conflicts("+openmp", when="+rocm+cuda")
 
+    depends_on("c", type="build")
+
     depends_on("cmake")
     depends_on("mpi")
     depends_on("caliper", when="+caliper")

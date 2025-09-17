@@ -68,29 +68,43 @@ class RuntimeResources:
         self.dest = pathlib.Path(dest)
         self.upstream = upstream
 
-        self.ramble_location, self.spack_location = (
+        self.ramble_location, self.spack_location, self.pkgs_location = (
             self.dest / "ramble",
             self.dest / "spack",
+            self.dest / "spack-packages",
         )
 
         # Read pinned versions of ramble and spack
         with open(benchpark.paths.checkout_versions, "r") as yaml_file:
             data = yaml.safe_load(yaml_file)["versions"]
-            self.ramble_commit, self.spack_commit = data["ramble"], data["spack"]
+            self.ramble_commit, self.spack_commit, self.pkgs_commit = (
+                data["ramble"],
+                data["spack"],
+                data["spack-packages"],
+            )
 
         # Read remote urls for ramble and spack
         with open(benchpark.paths.remote_urls, "r") as yaml_file:
             data = yaml.safe_load(yaml_file)["urls"]
-            remote_ramble_url, remote_spack_url = data["ramble"], data["spack"]
+            remote_ramble_url, remote_spack_url, remote_pkgs_url = (
+                data["ramble"],
+                data["spack"],
+                data["spack-packages"],
+            )
 
         # If this does not have an upstream, then we will be cloning from the URLs indicated in remote-urls.yaml
         if self.upstream is None:
-            self.ramble_url, self.spack_url = remote_ramble_url, remote_spack_url
+            self.ramble_url, self.spack_url, self.pkgs_url = (
+                remote_ramble_url,
+                remote_spack_url,
+                remote_pkgs_url,
+            )
         else:
             # Clone from local "upstream" repository
-            self.ramble_url, self.spack_url = (
+            self.ramble_url, self.spack_url, self.pkgs_url = (
                 self.upstream.ramble_location,
                 self.upstream.spack_location,
+                self.upstream.pkgs_location,
             )
 
     def _check_and_update_bootstrap(self, desired_commit, location):
@@ -116,6 +130,11 @@ class RuntimeResources:
         internals = str(ramble_lib_path)
         if internals not in sys.path:
             sys.path.insert(1, internals)
+
+        if not self.pkgs_location.exists():
+            self._install_packages()
+        else:
+            self._check_and_update_bootstrap(self.pkgs_commit, self.pkgs_location)
 
         # Spack does not go in sys.path, but we will manually access modules from it
         # The reason for this oddity is that spack modules will compete with the internal
@@ -143,6 +162,15 @@ class RuntimeResources:
         )
         debug_print(f"Done cloning Spack ({self.spack_location})")
 
+    def _install_packages(self):
+        print(f"Cloning packages to {self.pkgs_location}")
+        git_clone_commit(
+            self.pkgs_url,
+            self.pkgs_commit,
+            self.pkgs_location,
+        )
+        debug_print(f"Done cloning spack-packages ({self.pkgs_location})")
+
     def _ramble(self):
         first_time = False
         if not self.ramble_location.exists():
@@ -151,10 +179,13 @@ class RuntimeResources:
         return Command(self.ramble_location / "bin" / "ramble", env={}), first_time
 
     def _spack(self):
+        if not self.pkgs_location.exists():
+            self._install_packages()
+
         env = {"SPACK_DISABLE_LOCAL_CONFIG": "1"}
         spack = Command(self.spack_location / "bin" / "spack", env)
         spack_cache_location = self.spack_location / "misc-cache"
-        bootstrap_cache_location = self.spack_location / "b-c"
+        bootstrap_cache_location = self.dest / "sbc"
         first_time = False
         if not self.spack_location.exists():
             first_time = True

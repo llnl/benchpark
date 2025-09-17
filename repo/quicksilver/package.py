@@ -29,6 +29,8 @@ class Quicksilver(MakefilePackage):
     variant("cuda", default=False, description="Build with CUDA support")
     variant("caliper", default=False, description="Build with Caliper support")
 
+    depends_on("c", type="build")
+
     depends_on("mpi", when="+mpi")
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
