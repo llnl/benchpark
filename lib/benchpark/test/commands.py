@@ -71,7 +71,12 @@ def test_tags():
 
 def test_info():
     text = subprocess.run(
-        ["benchpark", "list", "systems", "--no-title"],
+        [
+            benchpark.paths.benchpark_root / "bin/benchpark",
+            "list",
+            "systems",
+            "--no-title",
+        ],
         capture_output=True,
         text=True,
         check=True,
