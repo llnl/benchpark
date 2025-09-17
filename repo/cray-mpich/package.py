@@ -3,45 +3,62 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import os
 from spack.package import *
 from spack.pkg.builtin.cray_mpich import CrayMpich as BuiltinCM
 
-
 class CrayMpich(BuiltinCM):
-
+    """Cray MPICH with optional GPU-aware GTL support."""
     variant("gtl", default=True, description="enable GPU-aware mode")
 
     @property
     def libs(self):
-        libs = super().libs
+        # if +gtl is off just return the base libs
+        if "+gtl" not in self.spec:
+            return super().libs
 
-        if self.spec.satisfies("+gtl"):
-            gtl_lib_prefix = self.spec.extra_attributes["gtl_path"] + "/lib"
-            # gtl_libs, if set, must be a single string. You can pass multiple
-            # libs by adding a space between each
-            gtl_libs = self.spec.extra_attributes["gtl_libs"].split()
-            libs += find_libraries(gtl_libs, root=gtl_lib_prefix, recursive=True)
+        # support both old ("gtl_lib_path") and new ("gtl_path") semantics
+        gtl_prefix = (
+            self.spec.extra_attributes.get("gtl_lib_path")
+            or self.spec.extra_attributes.get("gtl_path")
+        )
+        if not gtl_prefix:
+            raise InstallError(
+                "variant +gtl requires extra_attributes['gtl_lib_path'] or ['gtl_path']"
+            )
 
-        return libs
+        # if the user pointed at the top-level install, append /lib
+        if os.path.basename(gtl_prefix) != "lib":
+            gtl_prefix = os.path.join(gtl_prefix, "lib")
+
+        base_libs = super().libs
+        gtl_libs = self.spec.extra_attributes["gtl_libs"].split()
+        base_libs += find_libraries(gtl_libs, root=gtl_prefix, recursive=True)
+        return base_libs
 
     def setup_run_environment(self, env):
-
         super().setup_run_environment(env)
 
-        if self.spec.satisfies("+gtl"):
-            env.set("MPICH_GPU_SUPPORT_ENABLED", "1")
-            # env.prepend_path("LD_LIBRARY_PATH", self.spec.extra_attributes["gtl_lib_path"])
-        else:
-            env.set("MPICH_GPU_SUPPORT_ENABLED", "0")
-            gtl_path = self.spec.extra_attributes.get("gtl_lib_path", "")
-            if gtl_path:
-                env.prepend_path("LD_LIBRARY_PATH", gtl_path)
+        # turn GPU support on/off
+        enabled = "1" if "+gtl" in self.spec else "0"
+        env.set("MPICH_GPU_SUPPORT_ENABLED", enabled)
+
+        if "+gtl" in self.spec:
+            # if the old key is set, use it
+            if "gtl_lib_path" in self.spec.extra_attributes:
+                env.prepend_path("LD_LIBRARY_PATH",
+                                 self.spec.extra_attributes["gtl_lib_path"])
+            else:
+                # otherwise assume gtl_path points at the install root, add /lib
+                gtl_top = self.spec.extra_attributes.get("gtl_path", "")
+                if gtl_top:
+                    env.prepend_path("LD_LIBRARY_PATH", os.path.join(gtl_top, "lib"))
 
     def cmake_args(self):
-        args = super().cmake_args(self)
-
-        if self.spec.satisfies("+gtl"):
-            # Link GTL for MPICH GPU-aware
-            args.append(self.define("CMAKE_EXE_LINKER_FLAGS", self.spec['mpi'].libs.ld_flags))
-
+        args = super().cmake_args()
+        if "+gtl" in self.spec:
+            args.append(
+                self.define("CMAKE_EXE_LINKER_FLAGS",
+                            self.spec["mpi"].libs.ld_flags)
+            )
         return args
