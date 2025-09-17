@@ -83,10 +83,6 @@ class AwsTutorial(System):
                     "buildable": False,
                 },
                 "gmake": {"externals": [{"spec": "gmake@4.3", "prefix": "/usr"}]},
-                "blas": {
-                    "externals": [{"spec": "blas@0.29.2", "prefix": "/usr"}],
-                    "buildable": False,
-                },
                 "lapack": {
                     "externals": [{"spec": "lapack@0.29.2", "prefix": "/usr"}],
                     "buildable": False,
