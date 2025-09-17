@@ -229,15 +229,3 @@ class AwsTutorial(System):
                 }
             }
         }
-
-    def compute_spack_config_section(self):
-        return {
-            "config": {},
-            "concretizer": {},
-            "modules": {},
-            "packages": {},
-            "repos": [],
-            "compilers": [],
-            "mirrors": {},
-            "providers": {"mpi": ["openmpi"]},
-        }
