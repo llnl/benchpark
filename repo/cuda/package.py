@@ -7,11 +7,11 @@ import pathlib
 
 import llnl.util.tty as tty
 from spack.package import *
-import spack.pkg.builtin.cuda
+import spack_repo.builtin.packages.cuda.package
 from llnl.util.filesystem import find_headers
 
 
-class Cuda(spack.pkg.builtin.cuda.Cuda):
+class Cuda(spack_repo.builtin.packages.cuda.package.Cuda):
     # Layout of hpc-sdk puts some headers in sibling directories:
     # cuda compiler in /opt/nvidia/hpc_sdk/Linux_aarch64/24.7/cuda/12.5
     # cufft in         /opt/nvidia/hpc_sdk/Linux_aarch64/24.7/math_libs/12.5

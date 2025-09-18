@@ -31,6 +31,10 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
     variant("metis", default=True, description="Enable/disable METIS support")
     variant("caliper", default=False, description="Enable/disable Caliper support")
 
+    depends_on("c", type="build")
+    depends_on("cxx", type="build")
+    depends_on("fortran", type="build")
+
     depends_on("mfem+mpi+metis", when="+metis")
     depends_on("mfem+mpi~metis", when="~metis")
     depends_on("caliper", when="+caliper")
@@ -48,7 +52,7 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
 
     depends_on("mpi")
     depends_on("hypre+mpi")
-    depends_on("hypre+cuda+cublas+mpi", when="+cuda")
+    depends_on("hypre+cuda+mpi", when="+cuda")
     depends_on("hypre+mixedint~fortran")
     depends_on("hypre+caliper", when="+caliper")
 
@@ -59,7 +63,7 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
     depends_on("mfem +cuda+mpi", when="+cuda")
     depends_on("mfem +rocm+mpi", when="+rocm")
 
-    depends_on("hypre +rocm+rocblas +mpi", when="+rocm")
+    depends_on("hypre +rocm +mpi", when="+rocm")
     requires("+rocm", when="^hypre+rocm")
     for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
         depends_on(f"hypre amdgpu_target={target}", when=f"amdgpu_target={target}")

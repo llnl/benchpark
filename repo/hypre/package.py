@@ -6,7 +6,7 @@
 import os
 
 from spack.package import *
-from spack.pkg.builtin.hypre import Hypre as BuiltinHypre
+from spack_repo.builtin.packages.hypre.package import Hypre as BuiltinHypre
 
 
 class Hypre(BuiltinHypre):
@@ -17,17 +17,6 @@ class Hypre(BuiltinHypre):
         "cce": "cray",
         "gcc": "gnu",
     }
-
-    def configure_args(self):
-        configure_args = super().configure_args()
-
-        if (self.compiler.fc and 'xlf' in self.compiler.fc) or (self.compiler.f77 and 'xlf' in self.compiler.f77):
-          if not "+fortran" in self.spec:        
-            configure_args.append("--with-fmangle=no-underscores")
-            configure_args.append("--with-fmangle-blas=no-underscores") 
-            configure_args.append("--with-fmangle-lapack=no-underscores")
-
-        return configure_args
 
     def setup_build_environment(self, env):
         if self.spec.satisfies('%oneapi'):
