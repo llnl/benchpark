@@ -421,6 +421,9 @@ def prepare_data(**kwargs):
 
     top_n = kwargs.get("top_n_regions", -1)
     if top_n != -1:
+        num_nodes = len(ctk.graph)
+        if num_nodes < kwargs.get("top_n_regions", -1):
+            raise ValueError(f"Value for '--top-n-regions' must be less than number of regions ({num_nodes})")
         temp_df_idx = ctk.dataframe.nlargest(
             top_n, [(list(grouped.keys())[0], metric)]
         ).index
