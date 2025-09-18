@@ -75,13 +75,7 @@ include:
       - HOST: dane
         ARCHCONFIG: llnl-cluster
         SCHEDULER_PARAMETERS: $DANE_PARAMS
-        BENCHMARK:
-          - amg2023
-          - kripke
-          - lammps
-          - raja-perf
-          - remhos
-          - stream
+        BENCHMARK: [amg2023, kripke, lammps, raja-perf, remhos, stream]
         BENCHMARK_VERSION: develop
 nightly_test_run:
   extends: .nightly_rules
