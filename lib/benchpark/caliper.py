@@ -15,7 +15,6 @@ class Caliper:
         values=(
             "none",
             "time",
-            "variance",
             "mpi",
             "cuda",
             "rocm",

@@ -38,7 +38,7 @@ class Caliper(BasicModifier):
 
     add_mode(
         mode_name=_default_mode,
-        mode_option="time.exclusive",
+        mode_option="time.exclusive,time.variance",
         description="Platform-independent collection of time (default mode)",
     )
 
@@ -112,12 +112,6 @@ class Caliper(BasicModifier):
         mode_name="topdown-toplevel",
         mode_option="topdown.toplevel",
         description="Top-down analysis for Intel CPUs (top level)",
-    )
-
-    add_mode(
-        mode_name="variance",
-        mode_option="time.variance",
-        description="Variance of time across ranks",
     )
 
     # Write out the metadata file once all variables are resolved
