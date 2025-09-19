@@ -67,3 +67,29 @@ def test_tags():
         [benchpark.paths.benchpark_root / "bin/benchpark", "tags", "-a", "ad"],
         check=True,
     )
+
+
+def test_info():
+    text = subprocess.run(
+        [
+            benchpark.paths.benchpark_root / "bin/benchpark",
+            "list",
+            "systems",
+            "--no-title",
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    result = [
+        line.lstrip().split(" ")[0]
+        for line in text.stdout.splitlines()
+        if line.strip() and not line.lstrip().startswith("generic-x86")
+    ]
+
+    for r in result:
+        subprocess.run(
+            [benchpark.paths.benchpark_root / "bin/benchpark", "info", "system", r],
+            check=True,
+            capture_output=True,
+        )
