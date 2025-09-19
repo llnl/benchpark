@@ -171,6 +171,7 @@ def command(args):
 
     pkg_str = ""
     if pkg_manager == "spack":
+        spack_build_stage = experiments_root / "builds"
         spack, first_time_spack = per_workspace_setup.spack_first_time_setup()
         if first_time_spack:
             site_repos = (
@@ -184,6 +185,7 @@ repos::
   builtin: {per_workspace_setup.pkgs_location}/repos/spack_repo/builtin/
 """
                 )
+            spack(f'config --scope=site add "config:build_stage:[\'{spack_build_stage}\']"')
 
         pkg_str = f"""\
 . {per_workspace_setup.spack_location}/share/spack/setup-env.sh
