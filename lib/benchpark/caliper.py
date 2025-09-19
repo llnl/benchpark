@@ -60,7 +60,6 @@ class Caliper:
             if not self.spec.satisfies("caliper=none"):
                 package_specs["caliper"] = {
                     "pkg_spec": f"caliper@{caliper_version}+adiak+mpi~libunwind~libdw",
-                    "compiler": system_specs["compiler"],
                 }
                 if any("topdown" in var for var in self.spec.variants["caliper"]):
                     papi_support = True  # check if target system supports papi

@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 system_definition:
-  name: AWS_Tutorial-c7i-EFA
+  name: AWS_Tutorial-sapphirerapids-EFA
   integrator:
     vendor: AWS
     name: EKS
