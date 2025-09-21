@@ -186,7 +186,9 @@ repos::
   builtin: {per_workspace_setup.pkgs_location}/repos/spack_repo/builtin/
 """
                 )
-            spack(f'config --scope=site add "config:build_stage:[\'{spack_build_stage}\']"')
+            spack(
+                f"config --scope=site add \"config:build_stage:['{spack_build_stage}']\""
+            )
 
         pkg_str = f"""\
 export SPACK_USER_CACHE_PATH={spack_user_cache_path}
