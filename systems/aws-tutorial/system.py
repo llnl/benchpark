@@ -218,10 +218,6 @@ class AwsTutorial(System):
             "software": {
                 "packages": {
                     "default-compiler": {"pkg_spec": "gcc@11.4.0"},
-                    "default-mpi": {"pkg_spec": "openmpi@4.0%gcc@11.4.0"},
-                    "compiler-gcc": {"pkg_spec": "gcc@11.4.0"},
-                    "lapack": {"pkg_spec": "lapack@0.29.2"},
-                    "mpi-gcc": {"pkg_spec": "openmpi@4.0%gcc@11.4.0"},
                 }
             }
         }
