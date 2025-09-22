@@ -10,6 +10,8 @@ Tutorial: Benchpark 101
 This tutorial will guide you through using Benchpark to run a strong scaling experiment
 with the `Kripke benchmark <https://github.com/LLNL/Kripke>`_ on an AWS instance.
 
+Video recording of `Benchpark tutorial as part of the HPCIC tutorial series <https://www.youtube.com/watch?v=AeaUfpybJfg>`_ held on September 3, 2025.
+
 It was last presented at the `International Conference on eScience (eScience)
 <https://www.escience-conference.org/2025/>`_ on September 16, 2025. The event was a
 half-day tutorial along with Ramble.
