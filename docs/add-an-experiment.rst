@@ -17,7 +17,6 @@ Video recording of
 `Benchpark tutorial as part of the HPCIC tutorial series <https://www.youtube.com/watch?v=AeaUfpybJfg>`_
 held on September 3, 2025.
 
-
 - If you are adding experiments to an existing benchmark, you should extend the current
   ``experiment.py`` for that benchmark in the experiments directory.
 - If you are adding experiments to a new benchmark, create a directory for your
