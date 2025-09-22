@@ -44,23 +44,23 @@ in :doc:`system-list`.
 If you are running on a system with an accelerator, find an existing system with the
 same accelerator vendor, and then secondarily, if you can, match the actual accelerator.
 
-1. ``accelerator.vendor`` - TODO
-2. ``accelerator.name`` -
-3. ``accelerator.ISA`` -
-4. ``accelerator.uArch`` -
+1. ``accelerator.vendor`` - Company name
+2. ``accelerator.name`` - Product name
+3. ``accelerator.ISA`` - Instruction set architecture
+4. ``accelerator.uArch`` - Microarchitecture
 
 Once you have found an existing system with a similar accelerator or if you do not have
 an accelerator, match the following processor specs as closely as you can.
 
-1. ``processor.name`` -
-2. ``processor.ISA`` -
-3. ``processor.uArch`` -
-4. ``processor.vendor`` -
+1. ``processor.vendor`` - Company name
+2. ``processor.name`` - Product name
+3. ``processor.ISA`` - Instruction set architecture
+4. ``processor.uArch`` - Microarchitecture
 
 And add the interconnect vendor and product name.
 
-1. ``interconnect.vendor`` -
-2. ``interconnect.name`` -
+1. ``interconnect.vendor`` - Company name
+2. ``interconnect.name`` - Product name
 
 For example, if your system has an NVIDIA A100 GPU and an Intel x86 Icelake CPUs, a
 similar config would share the A100 GPU, and CPU architecture may or may not match. Or,
