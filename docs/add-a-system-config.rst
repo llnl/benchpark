@@ -102,7 +102,7 @@ the ``system.py``, which involves defining the software on your system. This inc
 defining compilers and pre-installed packages, which your package manager can use
 instead of attempting to build the package from scratch. If using Spack, defining as
 many external packages as possible here will ensure a much faster build process, and
-using system-installed packages will likely always be more performant than building them
+using system-installed packages may be significantly more performant than building them
 from scratch.
 
 1. Creating the System class
@@ -130,12 +130,12 @@ systems), to differentiate a cloud ``instance`` from an HPC ``cluster``.
 
         variant(
             "instance_type",
-            values=("c7i.12xlarge", c7i.24xlarge),
+            values=("c7i.12xlarge", "c7i.24xlarge"),
             default="c7i.12xlarge",
             description="AWS instance type",
         )
 
-1. Specify the class initializer and resources
+2. Specify the class initializer and resources
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When defining ``__init__()`` for our system, we invoke the parent
@@ -148,16 +148,16 @@ When defining ``__init__()`` for our system, we invoke the parent
    located.
 2. ``programming_models`` - List of applicable programming models. ``MPI`` is assumed
    for every system in benchpark, so you do not need to add it here. For this system, we
-   add ``OpenMPCPUOnlySystem`` (different from GPU openmp). If we had Nvidia
+   add ``OpenMPCPUOnlySystem`` (different from GPU openmp). If we had NVIDIA
    accelerators, we would add ``CudaSystem`` to this list, and ``ROCmSystem`` for AMD.
 3. ``scheduler`` - The job scheduler.
-4. ``hardware_key``, which defines a path to the yaml description you just created in
+4. ``hardware_key`` - which defines a path to the yaml description you just created in
    the previous step.
 5. ``sys_cores_per_node`` - The amount of hardware cores per node.
-6. ``sys_mem_per_node_GB`` - The amount of node memory, in gigabytes.
+6. ``sys_mem_per_node_GB`` - The amount of node memory (in gigabytes).
 
 This information is used to determine the necessary resource allocation request for any
-experiment initialized with your chosen.
+experiment initialized with your chosen instance.
 
 ::
 
@@ -209,7 +209,7 @@ experiment initialized with your chosen.
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here, we define the ``compute_packages_section()`` function, where you can include any
-package that you would like a package manager, such as spack, to find as an "external",
+package that you would like the package manager, such as spack, to find on the system,
 meaning it will not build that package from source and use your system package instead.
 For each package that you include, you need to define its spec ``name@version`` and the
 system path ``prefix`` to the package. Additionally for spack, you need to set
@@ -370,7 +370,7 @@ installed on your system.
 4. Add a compilers section
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In the ``compute_compilers_section``, we define the compilers available on the system.
+In the ``compute_compilers_section()``, we define the compilers available on the system.
 For our AWS system, this is ``gcc@11.4.0``. We return a dictionary, with the helper
 ``compiler_section_for()`` function, that formulates the compiler ``name`` and
 ``entries`` for Spack, where the ``entries`` are a list of ``compiler_def()``. For the
@@ -380,7 +380,7 @@ For our AWS system, this is ``gcc@11.4.0``. We return a dictionary, with the hel
    the ``languages=c,c++,fortran`` variant.
 2. ``prefix`` - Prefix to the compiler binary directory, e.g. ``/usr/`` for
    ``/usr/bin/gcc``
-3. ``exes`` - Dictionary to map ``c``, ``cxx``, ``fortran`` to the appropriate file
+3. ``exes`` - Dictionary to map ``c``, ``cxx``, and ``fortran`` to the appropriate file
    found in the prefix.
 
 ::
@@ -412,7 +412,7 @@ For our AWS system, this is ``gcc@11.4.0``. We return a dictionary, with the hel
 
 Finally, we define the ``compute_software_section()``, where at minimum we must define
 the ``default-compiler`` for Ramble. This is trivial for the single compiler that we
-have ``gcc@11.4.0``.
+have, ``gcc@11.4.0``.
 
 ::
 
@@ -531,7 +531,8 @@ ruby for llnl-cluster. Use this output to update your package definitions in you
 ``system.py``'s ``compute_package_section()``.
 
 For packages that are not found by ``benchpark system external``, you can manually find
-them using a command like the ``module`` command:
+them using a command like the ``module`` command, if your system has environment
+modules:
 
 ::
 
