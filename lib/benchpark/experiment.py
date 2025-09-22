@@ -218,6 +218,12 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
         description="Prepend to environment PATH during experiment execution",
     )
 
+    variant(
+        "n_repeats",
+        default="0",
+        description="Number of experiment repetitions",
+    )
+
     def __init__(self, spec):
         self.spec: "benchpark.spec.ConcreteExperimentSpec" = spec
         # Device type must be set before super with absence of mpionly experiment type
@@ -275,6 +281,18 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
         ):
             raise NotImplementedError(
                 f'"{self.name}" cannot run with MPI only without inheriting from MpiOnlyExperiment. Choose from {self.programming_models}'
+            )
+
+        if (
+            sum([self.spec.satisfies(s) for s in ["+strong", "+weak", "+throughput"]])
+            > 1
+        ):
+            raise BenchparkError(
+                f"spec cannot specify multiple scaling options. {self.spec}"
+            )
+        if sum([self.spec.satisfies(s) for s in ["+cuda", "+rocm", "+openmp"]]) > 1:
+            raise BenchparkError(
+                f"spec cannot specify multiple mutually-exclusive programming models. {self.spec}"
             )
 
     @property
@@ -337,6 +355,7 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
             }
         # default configs for all experiments
         default_config = {
+            "n_repeats": self.spec.variants["n_repeats"][0],
             "deprecated": True,
             "benchpark_experiment_command": "benchpark " + " ".join(sys.argv[1:]),
             "system": system_dict,

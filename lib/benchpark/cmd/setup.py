@@ -92,7 +92,19 @@ def command(args):
     debug_print(f"specified system = {system_id}")
 
     configs_src_dir = pathlib.Path(os.path.abspath(str(system_id)))
-    workspace_dir = experiments_root / str(experiment_id) / str(system_id)
+
+    experiments_root = pathlib.Path(os.path.abspath(experiments_root))
+    experiment_id = pathlib.Path(os.path.abspath(experiment_id))
+    system_id = pathlib.Path(os.path.abspath(system_id))
+    common_root = pathlib.Path(
+        os.path.commonpath([experiments_root, experiment_id, system_id])
+    )
+    workspace_dir = (
+        common_root
+        / experiments_root.relative_to(common_root)
+        / experiment_id.relative_to(common_root)
+        / system_id.relative_to(common_root)
+    )
 
     if workspace_dir.exists():
         if workspace_dir.is_dir():
@@ -161,7 +173,17 @@ def command(args):
     if pkg_manager == "spack":
         spack, first_time_spack = per_workspace_setup.spack_first_time_setup()
         if first_time_spack:
-            spack("repo", "add", "--scope=site", f"{source_dir}/repo")
+            site_repos = (
+                per_workspace_setup.spack_location / "etc" / "spack" / "repos.yaml"
+            )
+            with open(site_repos, "w") as f:
+                f.write(
+                    f"""\
+repos::
+  benchpark: {source_dir}/repo
+  builtin: {per_workspace_setup.pkgs_location}/repos/spack_repo/builtin/
+"""
+                )
 
         pkg_str = f"""\
 . {per_workspace_setup.spack_location}/share/spack/setup-env.sh
