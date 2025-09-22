@@ -31,7 +31,8 @@ To determine if you need to create a new system:
    specify your systems specific resource configuration under the ``id_to_resources``
    dictionary.
 4. If the same software stack description does not exist, determine if there is one that
-   can be parameterized to match yours, otherwise proceed with adding a new system.
+   can be parameterized to match yours, otherwise proceed with adding a new system in
+   :ref:`system-specification`.
 
 .. _adding-system-hardware-specs:
 
@@ -68,12 +69,12 @@ if I do not have GPUs and instead have SapphireRapids CPUs, the closest match wo
 another system with x86_64, Xeon Platinum, SapphireRapids.
 
 If there is not an exact match, you may add a new directory in the
-`systems/all_hardware_descriptions/system_name` where `system_name` follows the naming
-convention:
+``systems/all_hardware_descriptions/system_name`` where ``system_name`` follows the
+naming convention:
 
 ::
 
-    [INTEGRATOR]-MICROARCHITECTURE[-GPU][-NETWORK]
+    [INTEGRATOR]-MICROARCHITECTURE[-ACCELERATOR][-NETWORK]
 
 where:
 
@@ -83,13 +84,15 @@ where:
 
     MICROARCHITECTURE = CPU Microarchitecture
 
-    GPU = GPU Product Name
+    ACCELERATOR = ACCELERATOR Product Name
 
     NETWORK = Network Product Name
 
-In the `systems/all_hardware_descriptions/system_name` directory, add a
-`hardware_description.yaml` which follows the yaml format of existing
-`hardware_description.yaml` files.
+In the ``systems/all_hardware_descriptions/system_name`` directory, add a
+``hardware_description.yaml`` which follows the yaml format of existing
+``hardware_description.yaml`` files.
+
+.. _system-specification:
 
 B. Creating the System Definition (``system.py``)
 -------------------------------------------------
@@ -105,8 +108,8 @@ from scratch.
 1. Creating the System class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In this example, we will recreate a fully-functional simplified example of the AWS
-``system.py`` that we use for benchpark tutorials (see `aws-tutorial/system.py
+In this example, we will recreate a fully-functional example of the AWS ``system.py``
+that we use for benchpark tutorials (see `aws-tutorial/system.py
 <https://github.com/LLNL/benchpark/blob/develop/systems/aws-tutorial/system.py>`_). To
 start, we import the base benchpark ``System`` class, which our ``AwsTutorial`` system
 will inherit from. We also import the maintainer and variant directives, which provide
@@ -114,7 +117,7 @@ the utilities to track a maintainer by their GitHub username and variants to spe
 configurable properties of our system. We can specify the different AWS instances that
 share this same hardware and software specificaiton using the ``instance_type`` variant.
 We use ``instance_type`` here instead of ``cluster`` (you will see ``cluster`` in other
-systems), because ``instance_type`` is more fitting in this context.
+systems), to differentiate a cloud ``instance`` from an HPC ``cluster``.
 
 ::
 
@@ -132,7 +135,7 @@ systems), because ``instance_type`` is more fitting in this context.
             description="AWS instance type",
         )
 
-2. Specify the class initializer and resources
+1. Specify the class initializer and resources
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When defining ``__init__()`` for our system, we invoke the parent
