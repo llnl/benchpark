@@ -71,7 +71,7 @@ def system_external(args):
         )
 
         with open(
-            benchpark.paths.benchpark_home / "../.spack/packages.yaml", "r"
+            benchpark.paths.benchpark_home / "spack/etc/spack/packages.yaml", "r"
         ) as file:
             new_packages = yaml.safe_load(file)["packages"]
 
@@ -94,7 +94,7 @@ def system_external(args):
         + [pkg for pkg in pkg_list]
     )
 
-    with open(benchpark.paths.benchpark_home / "../.spack/packages.yaml", "r") as file:
+    with open(benchpark.paths.benchpark_home / "spack/etc/spack/packages.yaml", "r") as file:
         new_packages = yaml.safe_load(file)["packages"]
 
     # Use DeepDiff to find differences
