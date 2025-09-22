@@ -6,7 +6,7 @@
 from benchpark.directives import maintainers, variant
 from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.paths import hardware_descriptions
-from benchpark.system import System
+from benchpark.system import System, compiler_def, compiler_section_for
 
 
 class AwsTutorial(System):
@@ -21,35 +21,35 @@ class AwsTutorial(System):
             "sys_cores_per_node": 192,
             "sys_mem_per_node_GB": 384,
             "hardware_key": str(hardware_descriptions)
-            + "/AWS_Tutorial-zen-EFA/hardware_description.yaml",
+            + "/AWS_Tutorial-sapphirerapids-EFA/hardware_description.yaml",
         },
         "c7i.metal-48xl": {
             "system_site": "aws",
             "sys_cores_per_node": 192,
             "sys_mem_per_node_GB": 384,
             "hardware_key": str(hardware_descriptions)
-            + "/AWS_Tutorial-zen-EFA/hardware_description.yaml",
+            + "/AWS_Tutorial-sapphirerapids-EFA/hardware_description.yaml",
         },
         "c7i.24xlarge": {
             "system_site": "aws",
             "sys_cores_per_node": 96,
             "sys_mem_per_node_GB": 192,
             "hardware_key": str(hardware_descriptions)
-            + "/AWS_Tutorial-zen-EFA/hardware_description.yaml",
+            + "/AWS_Tutorial-sapphirerapids-EFA/hardware_description.yaml",
         },
         "c7i.metal-24xl": {
             "system_site": "aws",
             "sys_cores_per_node": 96,
             "sys_mem_per_node_GB": 192,
             "hardware_key": str(hardware_descriptions)
-            + "/AWS_Tutorial-zen-EFA/hardware_description.yaml",
+            + "/AWS_Tutorial-sapphirerapids-EFA/hardware_description.yaml",
         },
         "c7i.12xlarge": {
             "system_site": "aws",
             "sys_cores_per_node": 48,
             "sys_mem_per_node_GB": 96,
             "hardware_key": str(hardware_descriptions)
-            + "/AWS_Tutorial-zen-EFA/hardware_description.yaml",
+            + "/AWS_Tutorial-sapphirerapids-EFA/hardware_description.yaml",
         },
     }
 
@@ -83,10 +83,6 @@ class AwsTutorial(System):
                     "buildable": False,
                 },
                 "gmake": {"externals": [{"spec": "gmake@4.3", "prefix": "/usr"}]},
-                "blas": {
-                    "externals": [{"spec": "blas@0.29.2", "prefix": "/usr"}],
-                    "buildable": False,
-                },
                 "lapack": {
                     "externals": [{"spec": "lapack@0.29.2", "prefix": "/usr"}],
                     "buildable": False,
@@ -162,7 +158,7 @@ class AwsTutorial(System):
                 "caliper": {
                     "externals": [
                         {
-                            "spec": "caliper@master%gcc@11.4.0+adiak+mpi",
+                            "spec": "caliper@master+adiak+mpi%gcc@11.4.0",
                             "prefix": "/usr",
                         }
                     ],
@@ -210,27 +206,16 @@ class AwsTutorial(System):
         }
 
     def compute_compilers_section(self):
-        return {
-            "compilers": [
-                {
-                    "compiler": {
-                        "spec": "gcc@11.4.0",
-                        "paths": {
-                            "cc": "/usr/bin/gcc",
-                            "cxx": "/usr/bin/g++",
-                            "f77": "/usr/bin/gfortran-11",
-                            "fc": "/usr/bin/gfortran-11",
-                        },
-                        "flags": {},
-                        "operating_system": "ubuntu22.04",
-                        "target": "x86_64",
-                        "modules": [],
-                        "environment": {},
-                        "extra_rpaths": [],
-                    }
-                }
-            ]
-        }
+        return compiler_section_for(
+            "gcc",
+            [
+                compiler_def(
+                    "gcc@11.4.0 languages=c,c++,fortran",
+                    "/usr/",
+                    {"c": "gcc", "cxx": "g++", "fortran": "gfortran-11"},
+                )
+            ],
+        )
 
     def compute_software_section(self):
         return {
@@ -243,16 +228,4 @@ class AwsTutorial(System):
                     "mpi-gcc": {"pkg_spec": "openmpi@4.0%gcc@11.4.0"},
                 }
             }
-        }
-
-    def compute_spack_config_section(self):
-        return {
-            "config": {},
-            "concretizer": {},
-            "modules": {},
-            "packages": {},
-            "repos": [],
-            "compilers": [],
-            "mirrors": {},
-            "providers": {"mpi": ["openmpi"]},
         }
