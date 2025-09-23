@@ -15,36 +15,24 @@ class AwsTutorial(System):
 
     maintainers("stephanielam3211")
 
-    common = {
-        "system_site": "aws",
-        "scheduler": "flux",
-        "hardware_key": str(hardware_descriptions)
-        + "/AWS_Tutorial-sapphirerapids-EFA/hardware_description.yaml",
-    }
-
     id_to_resources = {
         "c7i.48xlarge": {
-            **common,
             "sys_cores_per_node": 192,
             "sys_mem_per_node_GB": 384,
         },
         "c7i.metal-48xl": {
-            **common,
             "sys_cores_per_node": 192,
             "sys_mem_per_node_GB": 384,
         },
         "c7i.24xlarge": {
-            **common,
             "sys_cores_per_node": 96,
             "sys_mem_per_node_GB": 192,
         },
         "c7i.metal-24xl": {
-            **common,
             "sys_cores_per_node": 96,
             "sys_mem_per_node_GB": 192,
         },
         "c7i.12xlarge": {
-            **common,
             "sys_cores_per_node": 48,
             "sys_mem_per_node_GB": 96,
         },
@@ -65,7 +53,15 @@ class AwsTutorial(System):
 
     def __init__(self, spec):
         super().__init__(spec)
+
+        # Common attributes across instances
         self.programming_models = [OpenMPCPUOnlySystem()]
+        self.system_site = "aws"
+        self.scheduler = "flux"
+        self.hardware_key = (
+            str(hardware_descriptions)
+            + "/AWS_Tutorial-sapphirerapids-EFA/hardware_description.yaml"
+        )
 
         attrs = self.id_to_resources.get(self.spec.variants["instance_type"][0])
         for k, v in attrs.items():

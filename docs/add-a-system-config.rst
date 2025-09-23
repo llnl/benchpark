@@ -150,8 +150,8 @@ instances that share this same hardware and software specification using the
 When defining ``__init__()`` for our system, we invoke the parent
 ``System::__init__()``, and set important system attributes using the
 ``id_to_resources`` dictionary, which contains information for each ``cluster`` or
-``instance_type``. We can optionally refactor common attributes for all
-``instance_type``'s into a separate dictionary, for readability:
+``instance_type``. We define common attributes for all ``instance_type``'s in the
+``__init__()`` function:
 
 1. ``system_site`` - The name of the site where the ``cluster``/``instance_type`` is
    located.
@@ -179,21 +179,12 @@ experiment initialized with your chosen instance.
     class AwsTutorial(System):
         maintainers("michaelmckinsey1")
 
-        common = {
-            "system_site": "aws",
-            "scheduler": "flux",
-            "hardware_key": str(hardware_descriptions)
-            + "/AWS_Tutorial-sapphirerapids-EFA/hardware_description.yaml",
-        }
-
         id_to_resources = {
             "c7i.24xlarge": {
-                **common,
                 "sys_cores_per_node": 96,
                 "sys_mem_per_node_GB": 192,
             },
             "c7i.12xlarge": {
-                **common,
                 "sys_cores_per_node": 48,
                 "sys_mem_per_node_GB": 96,
             },
@@ -208,13 +199,100 @@ experiment initialized with your chosen instance.
 
         def __init__(self, spec):
             super().__init__(spec)
+
+            # Common attributes across instances
             self.programming_models = [OpenMPCPUOnlySystem()]
+            self.system_site = "aws"
+            self.scheduler = "flux"
+            self.hardware_key = (
+                str(hardware_descriptions)
+                + "/AWS_Tutorial-sapphirerapids-EFA/hardware_description.yaml"
+            )
 
             attrs = self.id_to_resources.get(self.spec.variants["instance_type"][0])
             for k, v in attrs.items():
                 setattr(self, k, v)
 
-3. Add Software Definitions
+3. Add Compiler Definitions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We define compilers that are available on our system by implementing
+``compute_compilers_section()``:
+
+1. For each compiler, create the necessary config with ``compiler_def()``.
+2. For each type of compiler (gcc, intel, etc.), combine them with
+   ``compiler_section_for()``.
+3. Merge the compiler definitions with merge_dicts (this part is unnecessary if you have
+   only one type of compiler).
+4. Generally you will want to compose a minimal list of compilers: e.g. if you want to
+   compile your benchmark with the oneAPI compiler, and have multiple versions to choose
+   from, you would add a variant to the system, and the config would expose only one of
+   them.
+
+For our AWS system, the compiler we define is ``gcc@11.4.0``. For the
+``compiler_def()``, we must at minimum specify the ``spec``, ``prefix``, and ``exes``:
+
+1. ``spec`` - Similar to package specs, ``name@version``. GCC in particular also needs
+   the ``languages`` variant, where the list of languages depends on the available
+   ``exes`` (e.g. do not include "fortran" if ``gfortran`` is not available).
+2. ``prefix`` - Prefix to the compiler binary directory, e.g. ``/usr/`` for
+   ``/usr/bin/gcc``
+3. ``exes`` - Dictionary to map ``c``, ``cxx``, and ``fortran`` to the appropriate file
+   found in the prefix.
+
+::
+
+    from benchpark.directives import maintainers, variant
+    from benchpark.openmpsystem import OpenMPCPUOnlySystem
+    from benchpark.paths import hardware_descriptions
+    from benchpark.system import System, compiler_def, compiler_section_for
+
+
+    class AwsTutorial(System):
+
+    ...
+
+        def compute_compilers_section(self):
+            return compiler_section_for(
+                "gcc",
+                [
+                    compiler_def(
+                        "gcc@11.4.0 languages=c,c++,fortran",
+                        "/usr/",
+                        {"c": "gcc", "cxx": "g++", "fortran": "gfortran-11"},
+                    )
+                ],
+            )
+
+4. Add a Software Section
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Finally, we define the ``compute_software_section()``, where at minimum we must define
+the ``default-compiler`` for Ramble. This is trivial for the single compiler that we
+have, ``gcc@11.4.0``.
+
+::
+
+    from benchpark.directives import maintainers, variant
+    from benchpark.openmpsystem import OpenMPCPUOnlySystem
+    from benchpark.paths import hardware_descriptions
+    from benchpark.system import System, compiler_def, compiler_section_for
+
+
+    class AwsTutorial(System):
+
+    ...
+
+        def compute_software_section(self):
+            return {
+                "software": {
+                    "packages": {
+                        "default-compiler": {"pkg_spec": "gcc@11.4.0"},
+                    }
+                }
+            }
+
+5. Add Software Definitions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here, we define the ``compute_packages_section()`` function, where you can include any
@@ -269,85 +347,6 @@ available on your system.
                         "buildable": False,
                     },
                     ...
-                }
-            }
-
-4. Add Compiler Definitions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-We define compilers that are available on our system by implementing
-``compute_compilers_section()``:
-
-1. For each compiler, create the necessary config with ``compiler_def()``.
-2. For each type of compiler (gcc, intel, etc.), combine them with
-   ``compiler_section_for()``.
-3. Merge the compiler definitions with merge_dicts (this part is unnecessary if you have
-   only one type of compiler).
-4. Generally you will want to compose a minimal list of compilers: e.g. if you want to
-   compile your benchmark with the oneAPI compiler, and have multiple versions to choose
-   from, you would add a variant to the system, and the config would expose only one of
-   them.
-
-For our AWS system, the compiler we define is ``gcc@11.4.0``. For the
-``compiler_def()``, we must at minimum specify the ``spec``, ``prefix``, and ``exes``:
-
-1. ``spec`` - Similar to package specs, ``name@version``. GCC in particular also needs
-   the ``languages`` variant, where the list of languages depends on the available
-   ``exes`` (e.g. do not include "fortran" if ``gfortran`` is not available).
-2. ``prefix`` - Prefix to the compiler binary directory, e.g. ``/usr/`` for
-   ``/usr/bin/gcc``
-3. ``exes`` - Dictionary to map ``c``, ``cxx``, and ``fortran`` to the appropriate file
-   found in the prefix.
-
-::
-
-    from benchpark.directives import maintainers, variant
-    from benchpark.openmpsystem import OpenMPCPUOnlySystem
-    from benchpark.paths import hardware_descriptions
-    from benchpark.system import System, compiler_def, compiler_section_for
-
-
-    class AwsTutorial(System):
-
-    ...
-
-        def compute_compilers_section(self):
-            return compiler_section_for(
-                "gcc",
-                [
-                    compiler_def(
-                        "gcc@11.4.0 languages=c,c++,fortran",
-                        "/usr/",
-                        {"c": "gcc", "cxx": "g++", "fortran": "gfortran-11"},
-                    )
-                ],
-            )
-
-5. Add a Software Section
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Finally, we define the ``compute_software_section()``, where at minimum we must define
-the ``default-compiler`` for Ramble. This is trivial for the single compiler that we
-have, ``gcc@11.4.0``.
-
-::
-
-    from benchpark.directives import maintainers, variant
-    from benchpark.openmpsystem import OpenMPCPUOnlySystem
-    from benchpark.paths import hardware_descriptions
-    from benchpark.system import System, compiler_def, compiler_section_for
-
-
-    class AwsTutorial(System):
-
-    ...
-
-        def compute_software_section(self):
-            return {
-                "software": {
-                    "packages": {
-                        "default-compiler": {"pkg_spec": "gcc@11.4.0"},
-                    }
                 }
             }
 
