@@ -86,8 +86,14 @@ run_tests_flux_tuolumne:
     matrix:
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [amg2023, kripke, laghos, raja-perf, sparta-snl]
+        BENCHMARK: [amg2023, kripke, laghos, raja-perf]
         VARIANT: [+rocm]
+        GPUMODE: SPX
+      # sparta needs specific variant
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [sparta-snl]
+        VARIANT: ["+rocm fft_kokkos=hipfft"]
         GPUMODE: SPX
       # Test TPX, CPX
       - HOST: tuolumne
