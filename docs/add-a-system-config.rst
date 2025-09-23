@@ -224,9 +224,10 @@ For each package that you include, you need to define its spec ``name@version`` 
 system path ``prefix`` to the package. Additionally for spack, you need to set
 ``buildable: False`` to use the package as an external.
 
-At minimum, we recommend you define externals for ``cmake``, ``mpi``, ``blas``, and
-``lapack``. Additionally, for systems with accelerators, define externals for CUDA and
-ROCm runtime libraries (see an example for a `CUDA system
+At minimum, we recommend you define externals for ``cmake`` and ``mpi`` (users also
+typically define externals for math libraries like ``blas`` and ``lapack``).
+Additionally, for systems with accelerators, define externals for CUDA and ROCm runtime
+libraries (see an example for a `CUDA system
 <https://github.com/LLNL/benchpark/blob/e82e3a26aef54855cf281c088b8f149ab7d87d9d/systems/llnl-matrix/system.py#L274>`_,
 and a `ROCm system
 <https://github.com/LLNL/benchpark/blob/e82e3a26aef54855cf281c088b8f149ab7d87d9d/systems/llnl-elcapitan/system.py#L483>`_).
