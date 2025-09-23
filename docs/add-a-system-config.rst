@@ -181,7 +181,6 @@ experiment initialized with your chosen instance.
 
         common = {
             "system_site": "aws",
-            "programming_models": [OpenMPCPUOnlySystem()],
             "scheduler": "flux",
             "hardware_key": str(hardware_descriptions)
             + "/AWS_Tutorial-sapphirerapids-EFA/hardware_description.yaml",
@@ -209,6 +208,7 @@ experiment initialized with your chosen instance.
 
         def __init__(self, spec):
             super().__init__(spec)
+            self.programming_models = [OpenMPCPUOnlySystem()]
 
             attrs = self.id_to_resources.get(self.spec.variants["instance_type"][0])
             for k, v in attrs.items():
