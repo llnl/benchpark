@@ -215,7 +215,7 @@ experiment initialized with your chosen instance.
                 setattr(self, k, v)
 
 3. Add Software Definitions
-~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here, we define the ``compute_packages_section()`` function, where you can include any
 package that you would like the package manager, such as spack, to find on the system,
@@ -382,7 +382,7 @@ available on your system.
             }
 
 4. Add Compiler Definitions
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We define compilers that are available on our system by implementing
 ``compute_compilers_section()``:
