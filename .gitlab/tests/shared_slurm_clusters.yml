@@ -42,7 +42,7 @@ release_resources_dane:
     matrix:
       - HOST: dane
         ARCHCONFIG: llnl-cluster
-        BENCHMARK: [hpl, hpcg, amg2023, kripke]
+        BENCHMARK: [hpl, hpcg, amg2023, kripke, sparta-snl]
         VARIANT: [+openmp, '']
       - HOST: dane
         ARCHCONFIG: llnl-cluster
