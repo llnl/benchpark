@@ -44,6 +44,9 @@ class SpartaSnl(CMakePackage, CudaPackage, ROCmPackage):
         multi=False,
     )
 
+    depends_on("c", type="build")
+    depends_on("cxx", type="build")
+
     depends_on("mpi", when="+mpi")
 
     depends_on("kokkos", when="+kokkos")
@@ -74,13 +77,14 @@ class SpartaSnl(CMakePackage, CudaPackage, ROCmPackage):
     conflicts("+cuda", when="+rocm")
 
     def setup_run_environment(self, env):
-        if self.compiler.extra_rpaths:
-            for rpath in self.compiler.extra_rpaths:
-                env.prepend_path("LD_LIBRARY_PATH", rpath)
+        if self.spec.satisfies("+kokkos+rocm fft_kokkos=hipfft"):
+            env.prepend_path("LD_LIBRARY_PATH", self.spec["hipfft"].prefix.lib)
 
     def setup_build_environment(self, env):
         if "+cuda" in self.spec:
             env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
+        if self.spec.satisfies("+kokkos+rocm fft_kokkos=hipfft"):
+            env.prepend_path("LD_LIBRARY_PATH", self.spec["hipfft"].prefix.lib)
 
     root_cmakelists_dir = "cmake"
 
