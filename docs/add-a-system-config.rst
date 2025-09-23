@@ -114,10 +114,19 @@ that we use for benchpark tutorials (see `aws-tutorial/system.py
 start, we import the base benchpark ``System`` class, which our ``AwsTutorial`` system
 will inherit from. We also import the maintainer and variant directives, which provide
 the utilities to track a maintainer by their GitHub username and variants to specify
-configurable properties of our system. We can specify the different AWS instances that
-share this same hardware and software specification using the ``instance_type`` variant.
-We use ``instance_type`` here instead of ``cluster`` (you will see ``cluster`` in other
-systems), to differentiate a cloud ``instance`` from an HPC ``cluster``.
+configurable properties of our system. There are many similar types of AWS nodes that
+differ only in terms of the number of processors and/or memory (but otherwise have the
+same system packages available). This can be encoded with a variant in a benchpark
+system - the user can indicate what type of instance they are creating, and the system
+description will reflect the instance type chosen. We can specify the different AWS
+instances that share this same hardware and software specification using the
+``instance_type`` variant.
+
+.. note::
+
+    Most system classes in Benchpark have a similar concept, but often they refer to
+    physical (named) clusters with very-similar configs, and so they typically use the
+    term "cluster" rather than "instance_type".
 
 ::
 
