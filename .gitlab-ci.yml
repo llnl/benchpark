@@ -6,18 +6,23 @@ workflow:
 
     # Run pipelines only when these files/dirs change
     - changes:
-        - .gitlab/**
-        - .gitlab-ci.yml
+        - '.gitlab/**'
         - 'bin/**'
         - 'configs/**'
-        - 'checkout-versions.yaml'
         - 'experiments/**'
         - 'lib/**'
+        - 'modifiers/**'
         - 'repo/**'
-        - 'requirements.txt'
         - 'var/**'
         - 'systems/llnl-elcapitan/system.py'
         - 'systems/llnl-cluster/system.py'
+        - '.gitlab-ci.yml'
+        - 'checkout-versions.yaml'
+        - 'CTestConfig.cmake'
+        - 'CTestGitlab.cmake'
+        - 'pyproject.toml'
+        - 'remote-urls.yaml'
+        - 'requirements.txt'
 
     # Otherwise, don't create a pipeline
     - when: never
