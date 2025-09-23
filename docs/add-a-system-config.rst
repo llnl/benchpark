@@ -384,14 +384,25 @@ available on your system.
 4. Add a compilers section
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In the ``compute_compilers_section()``, we define the compilers available on the system.
-For our AWS system, this is ``gcc@11.4.0``. We return a dictionary, with the helper
-``compiler_section_for()`` function, that formulates the compiler ``name`` and
-``entries`` for Spack, where the ``entries`` are a list of ``compiler_def()``. For the
+We define compilers that are available on our system by implementing
+``compute_compilers_section()``:
+
+1. For each compiler, create the necessary config with ``compiler_def()``.
+2. For each type of compiler (gcc, intel, etc.), combine them with
+   ``compiler_section_for()``.
+3. Merge the compiler definitions with merge_dicts (this part is unnecessary if you have
+   only one type of compiler).
+4. Generally you will want to compose a minimal list of compilers: e.g. if you want to
+   compile your benchmark with the oneAPI compiler, and have multiple versions to choose
+   from, you would add a variant to the system, and the config would expose only one of
+   them.
+
+For our AWS system, the compiler we define is ``gcc@11.4.0``. For the
 ``compiler_def()``, we must at minimum specify the ``spec``, ``prefix``, and ``exes``:
 
 1. ``spec`` - Similar to package specs, ``name@version``. GCC in particular also needs
-   the ``languages=c,c++,fortran`` variant.
+   the ``languages`` variant, where the list of languages depends on the available
+   ``exes`` (e.g. do not include "fortran" if ``gfortran`` is not available).
 2. ``prefix`` - Prefix to the compiler binary directory, e.g. ``/usr/`` for
    ``/usr/bin/gcc``
 3. ``exes`` - Dictionary to map ``c``, ``cxx``, and ``fortran`` to the appropriate file
