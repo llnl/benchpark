@@ -115,7 +115,7 @@ start, we import the base benchpark ``System`` class, which our ``AwsTutorial`` 
 will inherit from. We also import the maintainer and variant directives, which provide
 the utilities to track a maintainer by their GitHub username and variants to specify
 configurable properties of our system. We can specify the different AWS instances that
-share this same hardware and software specificaiton using the ``instance_type`` variant.
+share this same hardware and software specification using the ``instance_type`` variant.
 We use ``instance_type`` here instead of ``cluster`` (you will see ``cluster`` in other
 systems), to differentiate a cloud ``instance`` from an HPC ``cluster``.
 
