@@ -225,8 +225,13 @@ system path ``prefix`` to the package. Additionally for spack, you need to set
 ``buildable: False`` to use the package as an external.
 
 At minimum, we recommend you define externals for ``cmake``, ``mpi``, ``blas``, and
-``lapack``. See :ref:`adding-sys-packages`, for help on how to search for the packages
-installed on your system.
+``lapack``. Additionally, for systems with accelerators, define externals for CUDA and
+ROCm runtime libraries (see an example for a `CUDA system
+<https://github.com/LLNL/benchpark/blob/e82e3a26aef54855cf281c088b8f149ab7d87d9d/systems/llnl-matrix/system.py#L274>`_,
+and a `ROCm system
+<https://github.com/LLNL/benchpark/blob/e82e3a26aef54855cf281c088b8f149ab7d87d9d/systems/llnl-elcapitan/system.py#L483>`_).
+Also, see :ref:`adding-sys-packages`, for help on how to search for the packages
+available on your system.
 
 .. note::
 
