@@ -144,7 +144,7 @@ instances that share this same hardware and software specification using the
             description="AWS instance type",
         )
 
-2. Specify the class initializer and resources
+2. Specify the Class Initializer and Resources
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When defining ``__init__()`` for our system, we invoke the parent
@@ -214,7 +214,7 @@ experiment initialized with your chosen instance.
             for k, v in attrs.items():
                 setattr(self, k, v)
 
-3. Add a packages section
+3. Add Software Definitions
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here, we define the ``compute_packages_section()`` function, where you can include any
@@ -381,7 +381,7 @@ available on your system.
                 }
             }
 
-4. Add a compilers section
+4. Add Compiler Definitions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We define compilers that are available on our system by implementing
@@ -432,7 +432,7 @@ For our AWS system, the compiler we define is ``gcc@11.4.0``. For the
                 ],
             )
 
-5. Add a software section
+5. Add a Software Section
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Finally, we define the ``compute_software_section()``, where at minimum we must define
