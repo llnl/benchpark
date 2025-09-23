@@ -20,12 +20,13 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     license("Apache-2.0")
 
     version("develop", branch="main")
-    version("20240511", commit="19bc10c925c4434da72a9cbb4fa1a009dbc52f33")
+    version("20240511", branch="20240511")
 
     variant("mpi", default=True, description="Enable MPI support")
     variant("openmp", default=False, description="Enable OpenMP support")
     variant("caliper", default=False, description="Enable Caliper monitoring")
     variant("umpire", default=False, description="Enable Umpire support")
+    variant("mixedint", default=False, description="Use 64bit integers while reducing memory use")
 
     depends_on("c", type="build")
     depends_on("cxx", type="build")
@@ -36,8 +37,12 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
     depends_on("hypre+caliper", when="+caliper")
-    depends_on("hypre@2.33.0:")
-    depends_on("hypre+mixedint~fortran")
+    depends_on("hypre@:2.29.0", when="@20240511")
+    depends_on("hypre@2.30.0:", when="@develop")
+    depends_on("hypre~fortran")
+    depends_on("hypre+mixedint", when="+mixedint")
+    depends_on("blas")
+    depends_on("lapack")
 
     depends_on("hypre+umpire", when="+umpire")
     depends_on("hypre~umpire", when="~umpire")
@@ -56,6 +61,8 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
 
     def setup_build_environment(self, env):
         if "+cuda" in self.spec:
+            #env.append_flags('LDFLAGS', '-lessl')
+            #env.append_flags('LDFLAGS', '-lmkl_intel_lp64 -lmkl_sequential -lmkl_core')
             env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
 
     def cmake_args(self):
