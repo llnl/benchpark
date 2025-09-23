@@ -1,3 +1,26 @@
+workflow:
+  rules:
+    # Always allow scheduled pipelines
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: always
+
+    # Run pipelines only when these files/dirs change
+    - changes:
+        - .gitlab/**
+        - .gitlab-ci.yml
+        - 'bin/**'
+        - 'configs/**'
+        - 'checkout-versions.yaml'
+        - 'experiments/**'
+        - 'lib/**'
+        - 'repo/**'
+        - 'requirements.txt'
+        - 'var/**'
+        - 'systems/llnl-elcapitan/system.py'
+        - 'systems/llnl-cluster/system.py'
+
+    # Otherwise, don't create a pipeline
+    - when: never
 variables:
   LLNL_SERVICE_USER: benchpark
   # Required information about GitHub repository
