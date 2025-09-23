@@ -100,12 +100,16 @@ B. Creating the System Definition (``system.py``)
 Now that you have defined the hardware description for your system, you can now create
 the ``system.py``, which involves defining the software on your system. This includes
 defining compilers and pre-installed packages, which your package manager can use
-instead of attempting to build the package from scratch. If using Spack, defining as
-many external packages as possible here will ensure a much faster build process, and
-using system-installed packages may be significantly more performant than building them
-from scratch.
+instead of attempting to build the package from scratch. The mandatory steps are:
 
-1. Creating the System class
+- :ref:`creating-sys-class`
+- :ref:`class-init-and-resources` - At least one cluster must be defined.
+- :ref:`compiler-def` - At least one compiler must be defined.
+- :ref:`software-section`
+
+.. _creating-sys-class:
+
+1. Creating the System Class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In this example, we will recreate a fully-functional example of the AWS ``system.py``
@@ -143,6 +147,8 @@ instances that share this same hardware and software specification using the
             default="c7i.12xlarge",
             description="AWS instance type",
         )
+
+.. _class-init-and-resources:
 
 2. Specify the Class Initializer and Resources
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -213,6 +219,8 @@ experiment initialized with your chosen instance.
             for k, v in attrs.items():
                 setattr(self, k, v)
 
+.. _compiler-def:
+
 3. Add Compiler Definitions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -264,6 +272,8 @@ For our AWS system, the compiler we define is ``gcc@11.4.0``. For the
                 ],
             )
 
+.. _software-section:
+
 4. Add a Software Section
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -292,6 +302,8 @@ have, ``gcc@11.4.0``.
                 }
             }
 
+.. _software-definitions:
+
 5. Add Software Definitions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -303,9 +315,11 @@ system path ``prefix`` to the package. Additionally for spack, you need to set
 ``buildable: False`` to use the package as an external.
 
 At minimum, we recommend you define externals for ``cmake`` and ``mpi`` (users also
-typically define externals for math libraries like ``blas`` and ``lapack``).
-Additionally, for systems with accelerators, define externals for CUDA and ROCm runtime
-libraries (see an example for a `CUDA system
+typically define externals for math libraries like ``blas`` and ``lapack``). This is
+because certain packages (e.g. ``cmake``) can take a long time to build, and packages
+such as ``mpi``, ``blas``, and ``lapack`` can influence runtime performance
+significantly. Additionally, for systems with accelerators, define externals for CUDA
+and ROCm runtime libraries (see an example for a `CUDA system
 <https://github.com/LLNL/benchpark/blob/e82e3a26aef54855cf281c088b8f149ab7d87d9d/systems/llnl-matrix/system.py#L274>`_,
 and a `ROCm system
 <https://github.com/LLNL/benchpark/blob/e82e3a26aef54855cf281c088b8f149ab7d87d9d/systems/llnl-elcapitan/system.py#L483>`_).
@@ -322,7 +336,7 @@ available on your system.
     from benchpark.directives import maintainers, variant
     from benchpark.openmpsystem import OpenMPCPUOnlySystem
     from benchpark.paths import hardware_descriptions
-    from benchpark.system import System
+    from benchpark.system import System, compiler_def, compiler_section_for
 
 
     class AwsTutorial(System):
