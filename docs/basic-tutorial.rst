@@ -39,6 +39,11 @@ By the end of this tutorial, you will be able to use Benchpark to:
   <https://github.com/llnl/benchpark-tutorial>`_)
 - Basic familiarity with command-line interfaces
 
+.. rubric:: Video
+
+For the last recorded video of this tutorial, see the `Benchpark HPCIC Tutorial
+2025 <https://www.youtube.com/watch?v=AeaUfpybJfg>`_ held on September 3, 2025.
+
 Step 1: Verify Benchpark Installation
 -------------------------------------
 

@@ -41,6 +41,11 @@ the HPL application in Ramble also inherits from a `base HPL application
 which is relevant because it contains the workload variables that we will need to define
 in our Benchpark experiment.
 
+.. rubric:: Video
+
+For the last recorded video of this tutorial, see the `Benchpark HPCIC Tutorial
+2025 <https://www.youtube.com/watch?v=AeaUfpybJfg>`_ held on September 3, 2025.
+
 Step 1: Create the Experiment class
 -----------------------------------
 
