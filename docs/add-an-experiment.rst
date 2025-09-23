@@ -12,13 +12,13 @@ benchmark.
 
 .. rubric:: Video
 
-For the last recorded video of this tutorial, see the
-`Benchpark Tutorial starting at 1:47:00 <https://www.youtube.com/watch?v=AeaUfpybJfg>`_.
+For the last recorded video of this tutorial, see the `Benchpark Tutorial starting at
+1:47:00 <https://www.youtube.com/watch?v=AeaUfpybJfg>`_.
 
-Similar to the systems API, Benchpark provides an API for representing
-experiments as objects and customizing their options with command line arguments.
-Experiment specifications are defined in ``experiment.py`` files located in the
-experiment directory for each benchmark: ``benchpark/experiments/<benchmark>``.
+Similar to the systems API, Benchpark provides an API for representing experiments as
+objects and customizing their options with command line arguments. Experiment
+specifications are defined in ``experiment.py`` files located in the experiment
+directory for each benchmark: ``benchpark/experiments/<benchmark>``.
 
 - If you are adding experiments to an existing benchmark, you should extend the current
   ``experiment.py`` for that benchmark in the experiments directory.
@@ -47,7 +47,6 @@ the HPL application in Ramble also inherits from a `base HPL application
 <https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/base_applications/hpl/base_application.py>`__,
 which is relevant because it contains the workload variables that we will need to define
 in our Benchpark experiment.
-
 
 Step 1: Create the Experiment class
 -----------------------------------

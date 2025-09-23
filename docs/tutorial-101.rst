@@ -8,19 +8,24 @@ Tutorial: Benchpark 101
 =======================
 
 This tutorial will guide you through using Benchpark to run a strong scaling experiment
-with the `Kripke benchmark <https://github.com/LLNL/Kripke>`_ on an AWS instance.
-Recent presentations of this tutorial: 
+with the `Kripke benchmark <https://github.com/LLNL/Kripke>`_ on an AWS instance. Recent
+presentations of this tutorial:
 
-- September 3, 2025.  Half-day tutorial at `Livermore's HPC Tutorials <https://hpcic.llnl.gov/tutorials/2025-hpc-tutorials>`_.
-- September 16, 2025.  Half-day tutorial at `International Conference on eScience (eScience) <https://www.escience-conference.org/2025/>`_.
+- August 20, 2025. Half-day tutorial at `International Symposium on High-Performance
+  Parallel and Distributed Computing (HPDC) <https://hpdc.sci.utah.edu/2025/>`_ on
+  Caliper, Thicket, and Benchpark.
+- September 3, 2025. Half-day tutorial at `Livermore's HPC Tutorials
+  <https://hpcic.llnl.gov/tutorials/2025-hpc-tutorials>`_ on Benchpark and Ramble.
+- September 16, 2025. Half-day tutorial at `International Conference on eScience
+  (eScience) <https://www.escience-conference.org/2025/>`_ on Benchpark and Ramble.
 
-.. image:: tutorial/eScience25-Tutorial-Slide-Preview.jpg
-    :target: _static/slides/eScience25-Tutorial-Slides.pdf
+.. image:: tutorial/HPCIC25-Tutorial-Slide-Preview.jpg
+    :target: _static/slides/HPCIC25-Tutorial-Slides.pdf
     :height: 72px
     :align: left
     :alt: Slide Preview
 
-:download:`Download Slides <_static/slides/eScience25-Tutorial-Slides.pdf>`.
+:download:`Download Slides <_static/slides/HPCIC25-Tutorial-Slides.pdf>`.
 
 `Watch Video <https://www.youtube.com/watch?v=AeaUfpybJfg>`_.
 
@@ -36,7 +41,6 @@ By the end of this tutorial, you will be able to use Benchpark to:
   infrastructure in our `Benchpark Tutorial repository
   <https://github.com/llnl/benchpark-tutorial>`_)
 - Basic familiarity with command-line interfaces
-
 
 Step 1: Verify Benchpark Installation
 -------------------------------------
@@ -346,7 +350,8 @@ Now that you know how to initialize, run, and analyze the performance of an expe
 check out our :doc:`Benchpark Workflow <./benchpark-workflow>` page for more information
 on how to interact with Benchpark, and further guides.
 
-The second portion of this tutorial demonstrates how to add a new experiment to Benchpark.
-Follow the guide on :doc:`Adding an Experiment <./add-an-experiment>` page as you 
+The second portion of this tutorial demonstrates how to add a new experiment to
+Benchpark. Follow the guide on :doc:`Adding an Experiment <./add-an-experiment>` page as
+you
 
 `Watch Video Starting at 1:47:00 <https://www.youtube.com/watch?v=AeaUfpybJfg>`_.
