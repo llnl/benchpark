@@ -27,9 +27,9 @@ To determine if you need to create a new system:
    already used by Benchpark, the same software stack may already be specified if the
    same vendor software stack is used on this hardware - or, if a software stack of your
    datacenter is already specified. If a system exists with the same software stack, add
-   your system to that ``system.py`` as a value under the ``cluster`` variant, and
-   specify your systems specific resource configuration under the ``id_to_resources``
-   dictionary.
+   your system to that ``system.py`` as a value under the ``cluster`` variant (may be
+   under ``instance_type``), and specify your systems specific resource configuration
+   under the ``id_to_resources`` dictionary.
 4. If the same software stack description does not exist, determine if there is one that
    can be parameterized to match yours, otherwise proceed with adding a new system in
    :ref:`system-specification`.
@@ -40,10 +40,9 @@ A. Adding System Hardware Specs
 -------------------------------
 
 We list hardware descriptions of Systems specified in Benchpark in the System Catalogue
-in :doc:`system-list`.
-
-If you are running on a system with an accelerator, find an existing system with the
-same accelerator vendor, and then secondarily, if you can, match the actual accelerator.
+in :doc:`system-list`. If you are running on a system with an accelerator, find an
+existing system with the same accelerator vendor, and then secondarily, if you can,
+match the actual accelerator.
 
 1. ``accelerator.vendor`` - Company name
 2. ``accelerator.name`` - Product name
@@ -63,6 +62,11 @@ And add the interconnect vendor and product name.
 1. ``interconnect.vendor`` - Company name
 2. ``interconnect.name`` - Product name
 
+Finally, match the integrator vendor and name.
+
+1. ``integrator.vendor`` - Company name
+2. ``integrator.name`` - Product name
+
 For example, if your system has an NVIDIA A100 GPU and an Intel x86 Icelake CPUs, a
 similar config would share the A100 GPU, and CPU architecture may or may not match. Or,
 if I do not have GPUs and instead have SapphireRapids CPUs, the closest match would be
@@ -74,17 +78,17 @@ naming convention:
 
 ::
 
-    [INTEGRATOR]-MICROARCHITECTURE[-ACCELERATOR][-NETWORK]
+    [INTEGRATOR][-MICROARCHITECTURE][-ACCELERATOR][-NETWORK]
 
 where:
 
 ::
 
-    INTEGRATOR = COMPANY[_PRODUCTNAME][...]
+    INTEGRATOR = Integrator Company name
 
     MICROARCHITECTURE = CPU Microarchitecture
 
-    ACCELERATOR = ACCELERATOR Product Name
+    ACCELERATOR = Accelerator Product Name
 
     NETWORK = Network Product Name
 
@@ -99,8 +103,8 @@ B. Creating the System Definition (``system.py``)
 
 Now that you have defined the hardware description for your system, you can now create
 the ``system.py``, which involves defining the software on your system. This includes
-defining compilers and pre-installed packages, which your package manager can use
-instead of attempting to build the package from scratch. The mandatory steps are:
+defining system resources, compilers, and pre-installed packages. The mandatory steps to
+create a ``system.py`` are:
 
 - :ref:`creating-sys-class`
 - :ref:`class-init-and-resources` - At least one cluster must be defined.
@@ -153,11 +157,11 @@ instances that share this same hardware and software specification using the
 2. Specify the Class Initializer and Resources
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When defining ``__init__()`` for our system, we invoke the parent
+When defining ``__init__()`` for our system, we invoke the parent class
 ``System::__init__()``, and set important system attributes using the
 ``id_to_resources`` dictionary, which contains information for each ``cluster`` or
-``instance_type``. We define common attributes for all ``instance_type``'s in the
-``__init__()`` function:
+``instance_type``. We define common attributes a single time for all ``instance_type``'s
+inside the ``__init__()`` function:
 
 1. ``system_site`` - The name of the site where the ``cluster``/``instance_type`` is
    located.
@@ -167,7 +171,7 @@ When defining ``__init__()`` for our system, we invoke the parent
    accelerators, we would add ``CudaSystem`` to this list, and ``ROCmSystem`` for AMD.
 3. ``scheduler`` - The job scheduler.
 4. ``hardware_key`` - which defines a path to the yaml description you just created in
-   the previous step.
+   the previous step :ref:`adding-system-hardware-specs`.
 5. ``sys_cores_per_node`` - The amount of hardware cores per node.
 6. ``sys_mem_per_node_GB`` - The amount of node memory (in gigabytes).
 
@@ -225,14 +229,15 @@ experiment initialized with your chosen instance.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We define compilers that are available on our system by implementing
-``compute_compilers_section()``:
+``compute_compilers_section()`` function. Here are the general steps for how to write
+this function, followed by our AWS example:
 
 1. For each compiler, create the necessary config with ``compiler_def()``.
 2. For each type of compiler (gcc, intel, etc.), combine them with
    ``compiler_section_for()``.
 3. Merge the compiler definitions with merge_dicts (this part is unnecessary if you have
    only one type of compiler).
-4. Generally you will want to compose a minimal list of compilers: e.g. if you want to
+4. Generally, you will want to compose a minimal list of compilers: e.g. if you want to
    compile your benchmark with the oneAPI compiler, and have multiple versions to choose
    from, you would add a variant to the system, and the config would expose only one of
    them.
@@ -242,7 +247,8 @@ For our AWS system, the compiler we define is ``gcc@11.4.0``. For the
 
 1. ``spec`` - Similar to package specs, ``name@version``. GCC in particular also needs
    the ``languages`` variant, where the list of languages depends on the available
-   ``exes`` (e.g. do not include "fortran" if ``gfortran`` is not available).
+   ``exes`` (e.g. do not include "fortran" if ``gfortran`` is not available). If you are
+   **not** using GCC or Spack as your package manager, ``languages`` is unecessary.
 2. ``prefix`` - Prefix to the compiler binary directory, e.g. ``/usr/`` for
    ``/usr/bin/gcc``
 3. ``exes`` - Dictionary to map ``c``, ``cxx``, and ``fortran`` to the appropriate file
@@ -277,9 +283,9 @@ For our AWS system, the compiler we define is ``gcc@11.4.0``. For the
 4. Add a Software Section
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Finally, we define the ``compute_software_section()``, where at minimum we must define
-the ``default-compiler`` for Ramble. This is trivial for the single compiler that we
-have, ``gcc@11.4.0``.
+Here we define the ``compute_software_section()``, where at minimum we must define the
+``default-compiler`` for Ramble. This is trivial for the single compiler that we have,
+``gcc@11.4.0``.
 
 ::
 
@@ -307,21 +313,21 @@ have, ``gcc@11.4.0``.
 5. Add Software Definitions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here, we define the ``compute_packages_section()`` function, where you can include any
-package that you would like the package manager, such as spack, to find on the system,
-meaning it will not build that package from source and use your system package instead.
-For each package that you include, you need to define its spec ``name@version`` and the
-system path ``prefix`` to the package. Additionally for spack, you need to set
-``buildable: False`` to use the package as an external.
+Finally, we define the ``compute_packages_section()`` function, where you can include
+any package that you would like the package manager, such as Spack, to find on the
+system, meaning it will not build that package from source and use your system package
+instead. For each package that you include, you need to define its spec ``name@version``
+and the system path ``prefix`` to the package. Additionally for Spack, you need to set
+``buildable: False`` to tell Spack not to build that package.
 
 At minimum, we recommend you define externals for ``cmake`` and ``mpi`` (users also
-typically define externals for math libraries like ``blas`` and ``lapack``). This is
-because certain packages (e.g. ``cmake``) can take a long time to build, and packages
-such as ``mpi``, ``blas``, and ``lapack`` can influence runtime performance
-significantly. Additionally, for systems with accelerators, define externals for CUDA
-and ROCm runtime libraries (see an example for a `CUDA system
+typically define externals for other libraries, e.g. math libraries like ``blas`` and
+``lapack``). This is because certain packages (e.g. ``cmake``) can take a long time to
+build, and packages such as ``mpi``, ``blas``, and ``lapack`` can influence runtime
+performance significantly. Additionally, for systems with accelerators, define externals
+for CUDA and ROCm runtime libraries (see externals examples for a `CUDA system
 <https://github.com/LLNL/benchpark/blob/e82e3a26aef54855cf281c088b8f149ab7d87d9d/systems/llnl-matrix/system.py#L274>`_,
-and a `ROCm system
+or a `ROCm system
 <https://github.com/LLNL/benchpark/blob/e82e3a26aef54855cf281c088b8f149ab7d87d9d/systems/llnl-elcapitan/system.py#L483>`_).
 Also, see :ref:`adding-sys-packages`, for help on how to search for the packages
 available on your system.
@@ -329,7 +335,8 @@ available on your system.
 .. note::
 
     For ``mpi``, you need to define ``"mpi": {"buildable": False},`` as a virtual
-    package, and then define your MPI package as we have for ``openmpi``.
+    package, and then define your MPI package as we have for the ``openmpi`` package.
+    This is to ensure Spack uses our MPI, and does not try to build another MPI package.
 
 ::
 
@@ -469,5 +476,5 @@ modules:
     ...
     prepend_path("PATH","/usr/tce/packages/gcc/gcc-12.1.1/bin")
 
-Therefore, I can add my ``prefix`` as ``/usr/tce/packages/gcc/gcc-12.1.1/`` and my spec
-as ``gcc@12.1.1``.
+Therefore, the ``prefix`` is ``/usr/tce/packages/gcc/gcc-12.1.1/`` and the spec is
+``gcc@12.1.1``.
