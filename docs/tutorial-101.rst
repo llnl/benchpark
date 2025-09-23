@@ -9,10 +9,10 @@ Tutorial: Benchpark 101
 
 This tutorial will guide you through using Benchpark to run a strong scaling experiment
 with the `Kripke benchmark <https://github.com/LLNL/Kripke>`_ on an AWS instance.
+Recent presentations of this tutorial: 
 
-It was last presented at the `International Conference on eScience (eScience)
-<https://www.escience-conference.org/2025/>`_ on September 16, 2025. The event was a
-half-day tutorial along with Ramble.
+- September 3, 2025.  Half-day tutorial at `Livermore's HPC Tutorials <https://hpcic.llnl.gov/tutorials/2025-hpc-tutorials>`_.
+- September 16, 2025.  Half-day tutorial at `International Conference on eScience (eScience) <https://www.escience-conference.org/2025/>`_.
 
 .. image:: tutorial/eScience25-Tutorial-Slide-Preview.jpg
     :target: _static/slides/eScience25-Tutorial-Slides.pdf
@@ -22,9 +22,7 @@ half-day tutorial along with Ramble.
 
 :download:`Download Slides <_static/slides/eScience25-Tutorial-Slides.pdf>`.
 
-**Full citation:** Pearce, O., Scott, A., Becker, G., Haque, R., Hanford, N., Brink, S.,
-Jacobsen, D., Poxon, H., Domke, J., & Gamblin, T. (2023, November 12–17). Towards
-Collaborative Continuous Benchmarking for HPC.
+`Watch Video <https://www.youtube.com/watch?v=AeaUfpybJfg>`_.
 
 By the end of this tutorial, you will be able to use Benchpark to:
 
@@ -39,10 +37,6 @@ By the end of this tutorial, you will be able to use Benchpark to:
   <https://github.com/llnl/benchpark-tutorial>`_)
 - Basic familiarity with command-line interfaces
 
-.. rubric:: Video
-
-For the last recorded video of this tutorial, see the `Benchpark HPCIC Tutorial
-2025 <https://www.youtube.com/watch?v=AeaUfpybJfg>`_ held on September 3, 2025.
 
 Step 1: Verify Benchpark Installation
 -------------------------------------
@@ -350,5 +344,9 @@ Next Steps
 
 Now that you know how to initialize, run, and analyze the performance of an experiment,
 check out our :doc:`Benchpark Workflow <./benchpark-workflow>` page for more information
-on how to interact with Benchpark. We have guides for users wanting to add or modify a
-system, add a new benchmark, or define a new experiment parameters for a benchmark.
+on how to interact with Benchpark, and further guides.
+
+The second portion of this tutorial demonstrates how to add a new experiment to Benchpark.
+Follow the guide on :doc:`Adding an Experiment <./add-an-experiment>` page as you 
+
+`Watch Video Starting at 1:47:00 <https://www.youtube.com/watch?v=AeaUfpybJfg>`_.
