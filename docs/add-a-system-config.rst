@@ -255,15 +255,6 @@ available on your system.
         def compute_packages_section(self):
             return {
                 "packages": {
-                    "tar": {
-                        "externals": [{"spec": "tar@1.34", "prefix": "/usr"}],
-                        "buildable": False,
-                    },
-                    "gmake": {"externals": [{"spec": "gmake@4.3", "prefix": "/usr"}]},
-                    "lapack": {
-                        "externals": [{"spec": "lapack@0.29.2", "prefix": "/usr"}],
-                        "buildable": False,
-                    },
                     "mpi": {"buildable": False},
                     "openmpi": {
                         "externals": [
@@ -277,108 +268,7 @@ available on your system.
                         "externals": [{"spec": "cmake@4.0.2", "prefix": "/usr"}],
                         "buildable": False,
                     },
-                    "git": {
-                        "externals": [{"spec": "git@2.34.1~tcltk", "prefix": "/usr"}],
-                        "buildable": False,
-                    },
-                    "openssl": {
-                        "externals": [{"spec": "openssl@3.0.2", "prefix": "/usr"}],
-                        "buildable": False,
-                    },
-                    "automake": {
-                        "externals": [{"spec": "automake@1.16.5", "prefix": "/usr"}],
-                        "buildable": False,
-                    },
-                    "openssh": {
-                        "externals": [{"spec": "openssh@8.9p1", "prefix": "/usr"}],
-                        "buildable": False,
-                    },
-                    "m4": {
-                        "externals": [{"spec": "m4@1.4.18", "prefix": "/usr"}],
-                        "buildable": False,
-                    },
-                    "sed": {
-                        "externals": [{"spec": "sed@4.8", "prefix": "/usr"}],
-                        "buildable": False,
-                    },
-                    "autoconf": {
-                        "externals": [{"spec": "autoconf@2.71", "prefix": "/usr"}],
-                        "buildable": False,
-                    },
-                    "diffutils": {
-                        "externals": [{"spec": "diffutils@3.8", "prefix": "/usr"}],
-                        "buildable": False,
-                    },
-                    "coreutils": {
-                        "externals": [{"spec": "coreutils@8.32", "prefix": "/usr"}],
-                        "buildable": False,
-                    },
-                    "findutils": {
-                        "externals": [{"spec": "findutils@4.8.0", "prefix": "/usr"}],
-                        "buildable": False,
-                    },
-                    "binutils": {
-                        "externals": [
-                            {"spec": "binutils@2.38+gold~headers", "prefix": "/usr"}
-                        ],
-                        "buildable": False,
-                    },
-                    "perl": {
-                        "externals": [
-                            {
-                                "spec": "perl@5.34.0~cpanm+opcode+open+shared+threads",
-                                "prefix": "/usr",
-                            }
-                        ],
-                        "buildable": False,
-                    },
-                    "caliper": {
-                        "externals": [
-                            {
-                                "spec": "caliper@master+adiak+mpi%gcc@11.4.0",
-                                "prefix": "/usr",
-                            }
-                        ],
-                        "buildable": False,
-                    },
-                    "adiak": {
-                        "externals": [{"spec": "adiak@0.4.1", "prefix": "/usr"}],
-                        "buildable": False,
-                    },
-                    "groff": {
-                        "externals": [{"spec": "groff@1.22.4", "prefix": "/usr"}],
-                        "buildable": False,
-                    },
-                    "curl": {
-                        "externals": [
-                            {"spec": "curl@7.81.0+gssapi+ldap+nghttp2", "prefix": "/usr"}
-                        ],
-                        "buildable": False,
-                    },
-                    "ccache": {
-                        "externals": [{"spec": "ccache@4.5.1", "prefix": "/usr"}],
-                        "buildable": False,
-                    },
-                    "flex": {
-                        "externals": [{"spec": "flex@2.6.4+lex", "prefix": "/usr"}],
-                        "buildable": False,
-                    },
-                    "pkg-config": {
-                        "externals": [{"spec": "pkg-config@0.29.2", "prefix": "/usr"}],
-                        "buildable": False,
-                    },
-                    "zlib": {
-                        "externals": [{"spec": "zlib@1.2.11", "prefix": "/usr"}],
-                        "buildable": False,
-                    },
-                    "ninja": {
-                        "externals": [{"spec": "ninja@1.10.1", "prefix": "/usr"}],
-                        "buildable": False,
-                    },
-                    "libtool": {
-                        "externals": [{"spec": "libtool@2.4.6", "prefix": "/usr"}],
-                        "buildable": False,
-                    },
+                    ...
                 }
             }
 
