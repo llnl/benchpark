@@ -7,7 +7,6 @@ workflow:
     # Run pipelines only when these files/dirs change
     - changes:
         - .gitlab/**
-        - .gitlab-ci.yml
         - 'bin/**'
         - 'configs/**'
         - 'checkout-versions.yaml'
