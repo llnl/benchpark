@@ -81,13 +81,24 @@ def main():
 
     if args.benchmarks == []:
         experiments_out = subprocess.run(
-            ["benchpark", "list", "experiments", "-e", args.programming_model, "--no-title"],
+            [
+                "benchpark",
+                "list",
+                "experiments",
+                "-e",
+                args.programming_model,
+                "--no-title",
+            ],
             text=True,
             capture_output=True,
         )
         experiments = experiments_out.stdout.replace(" ", "")
         lines = experiments.split("\n")
-        experiments = [line.split("+")[0] + "+" + args.programming_model for line in lines if args.programming_model in line]
+        experiments = [
+            line.split("+")[0] + "+" + args.programming_model
+            for line in lines
+            if args.programming_model in line
+        ]
     else:
         experiments = []
         for e in args.benchmarks:
@@ -99,9 +110,9 @@ def main():
     cluster = args.cluster
     if not cluster:
         cluster = system
-        no_cluster=True
+        no_cluster = True
     else:
-        no_cluster=False
+        no_cluster = False
 
     if (
         old_name in os.listdir(os.getcwd())
