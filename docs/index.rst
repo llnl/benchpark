@@ -27,8 +27,8 @@
     :maxdepth: 1
     :caption: Tutorials
 
-    basic-tutorial
-    llnl-tutorial
+    tutorial-101
+    tutorial-llnl
     comparing-experiment-builds
 
 .. toctree::
