@@ -17,39 +17,24 @@ class AwsTutorial(System):
 
     id_to_resources = {
         "c7i.48xlarge": {
-            "system_site": "aws",
             "sys_cores_per_node": 192,
             "sys_mem_per_node_GB": 384,
-            "hardware_key": str(hardware_descriptions)
-            + "/AWS_Tutorial-sapphirerapids-EFA/hardware_description.yaml",
         },
         "c7i.metal-48xl": {
-            "system_site": "aws",
             "sys_cores_per_node": 192,
             "sys_mem_per_node_GB": 384,
-            "hardware_key": str(hardware_descriptions)
-            + "/AWS_Tutorial-sapphirerapids-EFA/hardware_description.yaml",
         },
         "c7i.24xlarge": {
-            "system_site": "aws",
             "sys_cores_per_node": 96,
             "sys_mem_per_node_GB": 192,
-            "hardware_key": str(hardware_descriptions)
-            + "/AWS_Tutorial-sapphirerapids-EFA/hardware_description.yaml",
         },
         "c7i.metal-24xl": {
-            "system_site": "aws",
             "sys_cores_per_node": 96,
             "sys_mem_per_node_GB": 192,
-            "hardware_key": str(hardware_descriptions)
-            + "/AWS_Tutorial-sapphirerapids-EFA/hardware_description.yaml",
         },
         "c7i.12xlarge": {
-            "system_site": "aws",
             "sys_cores_per_node": 48,
             "sys_mem_per_node_GB": 96,
-            "hardware_key": str(hardware_descriptions)
-            + "/AWS_Tutorial-sapphirerapids-EFA/hardware_description.yaml",
         },
     }
 
@@ -68,9 +53,16 @@ class AwsTutorial(System):
 
     def __init__(self, spec):
         super().__init__(spec)
-        self.programming_models = [OpenMPCPUOnlySystem()]
 
+        # Common attributes across instances
+        self.programming_models = [OpenMPCPUOnlySystem()]
+        self.system_site = "aws"
         self.scheduler = "flux"
+        self.hardware_key = (
+            str(hardware_descriptions)
+            + "/AWS_Tutorial-sapphirerapids-EFA/hardware_description.yaml"
+        )
+
         attrs = self.id_to_resources.get(self.spec.variants["instance_type"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
@@ -222,10 +214,6 @@ class AwsTutorial(System):
             "software": {
                 "packages": {
                     "default-compiler": {"pkg_spec": "gcc@11.4.0"},
-                    "default-mpi": {"pkg_spec": "openmpi@4.0%gcc@11.4.0"},
-                    "compiler-gcc": {"pkg_spec": "gcc@11.4.0"},
-                    "lapack": {"pkg_spec": "lapack@0.29.2"},
-                    "mpi-gcc": {"pkg_spec": "openmpi@4.0%gcc@11.4.0"},
                 }
             }
         }
