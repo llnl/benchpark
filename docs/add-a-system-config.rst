@@ -248,7 +248,7 @@ For our AWS system, the compiler we define is ``gcc@11.4.0``. For the
 1. ``spec`` - Similar to package specs, ``name@version``. GCC in particular also needs
    the ``languages`` variant, where the list of languages depends on the available
    ``exes`` (e.g. do not include "fortran" if ``gfortran`` is not available). If you are
-   **not** using GCC or Spack as your package manager, ``languages`` is unecessary.
+   **not** using GCC or Spack as your package manager, ``languages`` is unnecessary.
 2. ``prefix`` - Prefix to the compiler binary directory, e.g. ``/usr/`` for
    ``/usr/bin/gcc``
 3. ``exes`` - Dictionary to map ``c``, ``cxx``, and ``fortran`` to the appropriate file
