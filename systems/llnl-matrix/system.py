@@ -163,6 +163,7 @@ class LlnlMatrix(System):
                     "externals": [{"spec": "curl@7.61.1", "prefix": "/usr"}],
                     "buildable": False,
                 },
+                "mpi": {"buildable": False},
             }
         }
 
@@ -170,8 +171,7 @@ class LlnlMatrix(System):
             selections |= {
                 "packages": selections["packages"]
                 | {
-                    "mpi": {
-                        "buildable": False,
+                    "mvapich2": {
                         "externals": [
                             {
                                 "spec": "mvapich2@2.3.7-gcc1211",
@@ -188,8 +188,7 @@ class LlnlMatrix(System):
             selections |= {
                 "packages": selections["packages"]
                 | {
-                    "mpi": {
-                        "buildable": False,
+                    "mvapich2": {
                         "externals": [
                             {
                                 "spec": "mvapich2@2.3.7-intel202160classic",
@@ -206,8 +205,7 @@ class LlnlMatrix(System):
             selections |= {
                 "packages": selections["packages"]
                 | {
-                    "mpi": {
-                        "buildable": False,
+                    "mvapich2": {
                         "externals": [
                             {
                                 "spec": "mvapich2@2.3.7-intel202321",
