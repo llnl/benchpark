@@ -81,13 +81,13 @@ def main():
 
     if args.benchmarks == []:
         experiments_out = subprocess.run(
-            ["benchpark", "list", "experiments", "--no-title"],
+            ["benchpark", "list", "experiments", "-e", args.programming_model, "--no-title"],
             text=True,
             capture_output=True,
         )
         experiments = experiments_out.stdout.replace(" ", "")
         lines = experiments.split("\n")
-        experiments = [line for line in lines if args.programming_model in line]
+        experiments = [line.split("+")[0] + "+" + args.programming_model for line in lines if args.programming_model in line]
     else:
         experiments = []
         for e in args.benchmarks:
@@ -97,6 +97,11 @@ def main():
 
     system = args.system
     cluster = args.cluster
+    if not cluster:
+        cluster = system
+        no_cluster=True
+    else:
+        no_cluster=False
 
     if (
         old_name in os.listdir(os.getcwd())
@@ -131,7 +136,7 @@ def main():
                     f"--dest={name}/{cluster}",
                     system,
                 ]
-                if cluster:
+                if not no_cluster:
                     sys_list.append(f"{var}={cluster}")
                 subprocess.run(sys_list)
                 if os.path.isdir(f"{name}/{exper}"):
@@ -143,6 +148,7 @@ def main():
                         "experiment",
                         "init",
                         f"--dest={name}/{exper}",
+                        f"--system={name}/{cluster}",
                         f"{exper}{spec}" + args.extra_spec,
                     ]
                 )
@@ -152,18 +158,17 @@ def main():
                         f"{name}/lib/main.py",
                         "setup",
                         f"{name}/{exper}",
-                        f"{name}/{cluster}",
                         f"{name}/wkp",
                     ]
                 )
                 # Path to the Spack setup script
                 spack_setup_script = f"{name}/wkp/setup.sh"
                 # Define the ramble command
-                ramble_command = f"{name}/wkp/ramble/bin/ramble --workspace-dir {name}/wkp/{name}/{exper}/{name}/{cluster}/workspace workspace setup"
+                ramble_command = f"{name}/wkp/ramble/bin/ramble --workspace-dir {name}/wkp/{exper}/{cluster}/workspace workspace setup"
                 # Combine sourcing the script and running the command
                 run_str = f"bash -c 'source {spack_setup_script} && {ramble_command}"
                 if args.run_experiment:
-                    run_str += f" && {name}/wkp/ramble/bin/ramble --workspace-dir {name}/wkp/{name}/{exper}/{name}/{cluster}/workspace on"
+                    run_str += f" && {name}/wkp/ramble/bin/ramble --workspace-dir {name}/wkp/{exper}/{cluster}/workspace on"
                 run_str += "'"
                 subprocess.run(
                     run_str,
