@@ -101,11 +101,10 @@ class Caliper:
                 ):
                     package_specs["caliper"]["pkg_spec"] += "~papi"
 
-            return {}
-            # return {
-            #     "packages": {k: v for k, v in package_specs.items() if v},
-            #     "environments": {"caliper": {"packages": list(package_specs.keys())}},
-            # }
+            return {
+                "packages": {k: v for k, v in package_specs.items() if v},
+                "environments": {"caliper": {"packages": list(package_specs.keys())}},
+            }
 
         def get_helper_name_prefix(self):
             if not self.spec.satisfies("caliper=none"):
