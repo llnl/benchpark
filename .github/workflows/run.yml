@@ -184,3 +184,21 @@ jobs:
       - name: Run
         run: |-
           ./bin/benchpark unit-test
+  validate_docs:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Setup Python
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: .github/workflows/requirements/docs.txt
+      - name: Install deps
+        run: |
+          pip install -r .github/workflows/requirements/docs.txt
+      - name: Test Docs Scripts
+        run: |-
+          python docs/generate-sys-defs-list.py
+          python docs/generate-benchmark-list.py
