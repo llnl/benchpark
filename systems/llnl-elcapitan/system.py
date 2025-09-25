@@ -261,8 +261,18 @@ class LlnlElcapitan(System):
                 "python": {
                     "externals": [
                         {
+                            "spec": "python@3.9.12",
+                            "prefix": "/usr/tce/packages/python/python-3.9.12",
+                            "buildable": False,
+                        },
+                        {
                             "spec": "python@3.11.5",
                             "prefix": "/usr/tce/packages/python/python-3.11.5",
+                            "buildable": False,
+                        },
+                        {
+                            "spec": "python@3.12.2",
+                            "prefix": "/usr/tce/packages/python/python-3.12.2",
                             "buildable": False,
                         }
                     ]
@@ -313,6 +323,36 @@ class LlnlElcapitan(System):
                 "opengl": {
                     "externals": [
                         {"spec": "opengl@4.5", "prefix": "/usr"}
+                    ],
+                    "buildable": False,
+                },
+                "py-numpy": {
+                    "externals": [
+                        {"spec": "py-numpy@1.24.3", "prefix": "/usr/tce/packages/python/python-3.11.5/lib/python3.11/site-packages"}
+                    ],
+                    "buildable": False,
+                },
+                "py-numba": {
+                    "externals": [
+                        {"spec": "py-numba@0.57.1", "prefix": "/usr/tce/packages/python/python-3.11.5/lib/python3.11/site-packages"}
+                    ],
+                    "buildable": False,
+                },
+                "py-matplotlib": {
+                    "externals": [
+                        {"spec": "py-matplotlib@3.7.2", "prefix": "/usr/tce/packages/python/python-3.11.5/lib/python3.11/site-packages"}
+                    ],
+                    "buildable": False,
+                },
+                "py-mpi4py": {
+                    "externals": [
+                        {"spec": "py-mpi4py@3.1.4", "prefix": "/usr/tce/packages/python/python-3.11.5/lib/python3.11/site-packages"}
+                    ],
+                    "buildable": False,
+                },
+                "py-pybind11": {
+                    "externals": [
+                        {"spec": "py-pybind11@2.11.1", "prefix": "/usr/tce/packages/python/python-3.11.5/lib/python3.11/site-packages"}
                     ],
                     "buildable": False,
                 },
@@ -643,7 +683,11 @@ class LlnlElcapitan(System):
                         {
                             "spec": f"llvm@{self.llvm_version}",
                             "prefix": f"/opt/rocm-{self.rocm_version}/llvm",
-                        }
+                        },
+                        # {
+                        #     "spec": f"llvm@14.0.6",
+                        #     "prefix": f"/opt/rocm-5.2.3/llvm",
+                        # }
                     ],
                     "buildable": True,
                 },

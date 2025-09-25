@@ -28,6 +28,7 @@ class Caliper(CachedCMakePackage, CudaPackage, ROCmPackage):
     license("BSD-3-Clause")
 
     version("master", branch="master")
+    version("2.13.1", tag="v2.13.1")
     version("2.12.1", sha256="2b5a8f98382c94dc75cc3f4517c758eaf9a3f9cea0a8dbdc7b38506060d6955c")
     version("2.11.0", sha256="b86b733cbb73495d5f3fe06e6a9885ec77365c8aa9195e7654581180adc2217c")
     version("2.10.0", sha256="14c4fb5edd5e67808d581523b4f8f05ace8549698c0e90d84b53171a77f58565")
@@ -109,8 +110,8 @@ class Caliper(CachedCMakePackage, CudaPackage, ROCmPackage):
     variant("tools", default=True, description="Enable tools")
     variant("python", default=False, when="@v2.12:", description="Build Python bindings")
 
-    depends_on("adiak@0.1:0", when="@2.2:2.10 +adiak")
-    depends_on("adiak@0.4:0", when="@2.11: +adiak")
+    depends_on("adiak@0.1:0", when="@2.2:2.10 +adiak~python")
+    depends_on("adiak@0.4:0", when="@2.11: +adiak~python")
 
     depends_on("papi@5.3:5", when="@:2.2 +papi")
     depends_on("papi@5.3:", when="@2.3: +papi")
@@ -130,6 +131,7 @@ class Caliper(CachedCMakePackage, CudaPackage, ROCmPackage):
 
     depends_on("python@3", when="+python", type=("build", "link", "run"))
     depends_on("py-pybind11", when="+python", type=("build", "link", "run"))
+    depends_on("adiak@0.4.1p+python", when="+python", type=("build", "link", "run"))
 
     # sosflow support not yet in 2.0
     conflicts("+sosflow", "@2:")
@@ -248,7 +250,12 @@ class Caliper(CachedCMakePackage, CudaPackage, ROCmPackage):
         return entries
 
     def cmake_args(self):
-        return []
+        args = []
+
+        args.append(self.define("CMAKE_EXE_LINKER_FLAGS", self.spec['mpi'].libs.ld_flags))
+        args.append(self.define("MPI_CXX_LINK_FLAGS", self.spec['mpi'].libs.ld_flags))
+
+        return args
 
     def setup_run_environment(self, env):
         if self.spec.satisfies("+python"):

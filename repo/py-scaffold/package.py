@@ -7,29 +7,47 @@ class PyScaffold(PythonPackage, CudaPackage, ROCmPackage):
 
     git = "file:///usr/workspace/mckinsey/ScaFFold-spack"
 
-    version("main", branch="main")
+    version("main", branch="spack-install")
 
-    homepage = "https://<project-homepage-or-readme>"
     maintainers("michaelmckinsey")
-    license("BSD-3-Clause")
+    license("Apache-2.0")
 
     variant("caliper", default=False, description="Build with Caliper support enabled.")
 
-    depends_on("python@3.11:", type=("build", "run"))
+    depends_on("python@3.11", type=("build", "run"))
     depends_on("py-setuptools", type="build")
     depends_on("py-wheel", type="build")
+    depends_on("py-pip", type=("build", "run"))
 
-    depends_on("py-matplotlib", type=("build", "run"))
-    depends_on("py-numpy", type=("build", "run"))
-    depends_on("py-numba@0.60.0", type=("build", "run"))
-    depends_on("py-tqdm", type=("build", "run"))
-    depends_on("py-wandb", type=("build", "run"))
-    depends_on("py-pyyaml", type=("build", "run"))
-    depends_on("py-mpi4py", type=("build", "run"))
+    # depends_on("py-matplotlib", type=("build", "run"))
+    # depends_on("py-numpy@1.24.3", type=("build", "run"))
+    # depends_on("py-numba", type=("build", "run"))
+    # depends_on("py-tqdm", type=("build", "run"))
+    #depends_on("py-wandb", type=("build", "run"))
+    # depends_on("py-pyyaml", type=("build", "run"))
+    # depends_on("py-mpi4py", type=("build", "run"))
 
-    #depends_on("open3d+python", type="build")
+    depends_on("mpi")
 
-    depends_on("caliper+python", when="+caliper")
+    # depends_on("open3d+python", type=("build", "run"))
+
+    # TODO glew wont build (dependency of open3d)
+    # depends_on("glew@2.1.0", type="build")
+
+    depends_on("caliper+python", when="+caliper", type=("build", "run"))
 
     # These dont exist
     #depends_on("py-pyntcloud", type=("build","run"))
+
+    def cmake_args(self):
+        args = super().cmake_args(self)
+
+        args.append(self.define("CMAKE_EXE_LINKER_FLAGS", self.spec['mpi'].libs.ld_flags))
+        args.append(self.define("MPI_CXX_LINK_FLAGS", self.spec['mpi'].libs.ld_flags))
+
+        return args
+
+    def setup_run_environment(self, env):
+        super().setup_run_environment(env)
+
+        env.prepend_path("LD_LIBRARY_PATH", self.spec['mpi'].libs.gtl_lib_path)

@@ -35,8 +35,21 @@ class PyScaffold(ExecutableApplication):
         "export LD_LIBRARY_PATH={ld_paths}:$LD_LIBRARY_PATH",
     )
     executable(
+        "pip",
+        "pip install -r {package_path}requirements.txt\npip install torch==2.8.0+rocm6.4 --extra-index-url https://download.pytorch.org/whl/rocm6.4",
+        use_mpi=False,
+    )
+    executable(
+        "generate",
+        "scaffold generate_fractals -c {package_path}ScaFFold/configs/benchmark_default.yml --problem-scale {problem_scale}",
+        use_mpi=True,
+    )
+    executable(
         "run",
         "scaffold benchmark -c {package_path}ScaFFold/configs/benchmark_default.yml --problem-scale {problem_scale}",
+        use_mpi=True,
     )
 
-    workload("sweep", executables=["modules", "run"])
+    workload("sweep", executables=["modules", "pip",
+                                    "generate",
+                                    "run"])
