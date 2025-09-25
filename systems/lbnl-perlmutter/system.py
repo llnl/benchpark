@@ -60,7 +60,7 @@ class LbnlPerlmutter(System):
                 "m4": {"externals": [{"spec": "m4@1.4.18", "prefix": "/usr"}]},
                 "groff": {"externals": [{"spec": "groff@1.22.4", "prefix": "/usr"}]},
                 "cmake": {
-                    "externals": [{"spec": "cmake@3.20.4", "prefix": "/usr"}],
+                    "externals": [{"spec": "cmake@3.30.2", "prefix": "/global/common/software/nersc9/cmake/3.30.2"}],
                     "buildable": False,
                 },
                 "curl": {
