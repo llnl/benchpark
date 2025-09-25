@@ -36,7 +36,7 @@ class LbnlPerlmutter(System):
         super().__init__(spec)
 
         if self.spec.satisfies("compiler=gcc"):
-            self.gcc_version = Version("13.2.1")
+            self.gcc_version = Version("12.3.0")
             self.mpi_version = Version("8.1.30")
 
         self.scheduler = "slurm"
@@ -171,17 +171,17 @@ class LbnlPerlmutter(System):
 
         #selections["packages"] |= self.mpi_config()
 
-#        if self.spec.satisfies("compiler=gcc"):
-#            selections["packages"] |= {
-#                "cray-libsci": {
-#                    "externals": [
-#                        {
-#                            "spec": "cray-libsci@23.05.1.4%gcc",
-#                            "prefix": "/opt/cray/pe/libsci/23.05.1.4/gnu/10.3/x86_64/",
-#                        }
-#                    ]
-#                }
-#            }
+        if self.spec.satisfies("compiler=gcc"):
+            selections["packages"] |= {
+                "cray-libsci": {
+                    "externals": [
+                        {
+                            "spec": "cray-libsci@23.05.1.4%gcc",
+                            "prefix": "/opt/cray/pe/libsci/23.05.1.4/gnu/10.3/x86_64/",
+                        }
+                    ]
+                }
+            }
 
         return selections
 
@@ -190,12 +190,12 @@ class LbnlPerlmutter(System):
             "compilers": [
                 {
                     "compiler": {
-                        "spec": "gcc@12.2.0",
+                        "spec": "gcc@12.3.0",
                         "paths": {
-                            "cc": "/opt/cray/pe/gcc/12.2.0/bin/gcc",
-                            "cxx": "/opt/cray/pe/gcc/12.2.0/bin/g++",
-                            "f77": "/opt/cray/pe/gcc/12.2.0/bin/gfortran",
-                            "fc": "/opt/cray/pe/gcc/12.2.0/bin/gfortran",
+                            "cc": "/opt/cray/pe/gcc-native/12/bin/gcc",
+                            "cxx": "/opt/cray/pe/gcc-native/12/bin/g++",
+                            "f77": "/opt/cray/pe/gcc-native/12/bin/gfortran",
+                            "fc": "/opt/cray/pe/gcc-native/12/bin/gfortran",
                         },
                         "flags": {},
                         "operating_system": "rhel8",
