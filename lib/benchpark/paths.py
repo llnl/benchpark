@@ -25,8 +25,8 @@ if benchpark_config.exists():
         config = yaml.safe_load(f)
         benchpark_home = config["bootstrap"]["location"]
 else:
-    benchpark_home = "~"
-benchpark_home = pathlib.Path(os.path.expanduser(benchpark_home + "/.benchpark"))
+    benchpark_home = "~/.benchpark"
+benchpark_home = pathlib.Path(os.path.expanduser(benchpark_home))
 
 
 global_ramble_path = benchpark_home / "ramble"

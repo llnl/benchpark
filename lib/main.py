@@ -44,17 +44,20 @@ if len(sys.argv) == 1 or "-h" == sys.argv[1] or "--help" == sys.argv[1]:
     print(helpstr)
     exit()
 
-# Check for alternate bootstrap location
-pre_parser = argparse.ArgumentParser(add_help=False)
-pre_parser.add_argument("-l", "--location")
-known, _ = pre_parser.parse_known_args(sys.argv[1:])
-benchpark_home = (
-    Path(known.location).expanduser().resolve() / ".benchpark"
-    or benchpark.paths.benchpark_home
-)
-
 import benchpark.paths  # noqa: E402
 from benchpark.runtime import RuntimeResources  # noqa: E402
+
+# Check for alternate bootstrap location
+pre_parser = argparse.ArgumentParser(add_help=False)
+if "bootstrap" in sys.argv:
+    pre_parser.add_argument("-l", "--location")
+known, _ = pre_parser.parse_known_args(sys.argv[1:])
+loc = getattr(known, "location", None)
+benchpark_home = (
+    (Path(known.location).expanduser().resolve() / ".benchpark")
+    if loc
+    else benchpark.paths.benchpark_home
+)
 
 bootstrapper = RuntimeResources(benchpark_home)  # noqa
 bootstrapper.bootstrap()  # noqa
