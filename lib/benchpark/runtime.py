@@ -118,9 +118,21 @@ class RuntimeResources:
                     f"Updating '{location}' from {current_commit} to {desired_commit}"
                 )
 
+    def _write_benchpark_config(self):
+        data = {
+            "bootstrap": {
+                "location": str(self.dest),
+            },
+        }
+        print(f"Writing to {benchpark.paths.benchpark_config}")
+        with open(benchpark.paths.benchpark_config, "w") as yaml_file:
+            yaml.safe_dump(data, yaml_file)
+
     def bootstrap(self):
         if not self.ramble_location.exists():
             self._install_ramble()
+            # Check here since Ramble must exist, spack may not depending on package manager
+            self._write_benchpark_config()
         else:
             self._check_and_update_bootstrap(self.ramble_commit, self.ramble_location)
         ramble_lib_path = self.ramble_location / "lib" / "ramble"

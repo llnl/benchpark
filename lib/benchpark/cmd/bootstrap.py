@@ -3,14 +3,22 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+from pathlib import Path
+
 import benchpark.paths
 from benchpark.runtime import RuntimeResources
 
 
-def setup_parser(subparser):
-    pass
+def setup_parser(root_parser):
+    root_parser.add_argument(
+        "-l",
+        "--location",
+        default=benchpark.paths.benchpark_home,
+        help="Path to the bootstrap location",
+    )
 
 
 def command(args):
-    bootstrapper = RuntimeResources(benchpark.paths.benchpark_home)
+    path = Path(args.location).expanduser().resolve() / ".benchpark"
+    bootstrapper = RuntimeResources(path)
     bootstrapper.bootstrap()

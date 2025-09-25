@@ -12,6 +12,8 @@ import subprocess
 import sys
 import yaml
 
+from pathlib import Path
+
 __version__ = "0.1.0"
 if "-V" in sys.argv or "--version" in sys.argv:
     print(__version__)
@@ -42,10 +44,19 @@ if len(sys.argv) == 1 or "-h" == sys.argv[1] or "--help" == sys.argv[1]:
     print(helpstr)
     exit()
 
+# Check for alternate bootstrap location
+pre_parser = argparse.ArgumentParser(add_help=False)
+pre_parser.add_argument("-l", "--location")
+known, _ = pre_parser.parse_known_args(sys.argv[1:])
+benchpark_home = (
+    Path(known.location).expanduser().resolve() / ".benchpark"
+    or benchpark.paths.benchpark_home
+)
+
 import benchpark.paths  # noqa: E402
 from benchpark.runtime import RuntimeResources  # noqa: E402
 
-bootstrapper = RuntimeResources(benchpark.paths.benchpark_home)  # noqa
+bootstrapper = RuntimeResources(benchpark_home)  # noqa
 bootstrapper.bootstrap()  # noqa
 
 import benchpark.cmd.audit  # noqa: E402
