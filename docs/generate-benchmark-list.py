@@ -9,6 +9,7 @@ sys.path.append("../lib/")
 import benchpark.accounting  # noqa: E402
 import benchpark.paths  # noqa: E402
 
+raise ValueError("test")
 
 def construct_tag_groups(tag_groups, tag_dicts, dictionary):
     # everything is a dict
