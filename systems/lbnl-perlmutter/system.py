@@ -166,6 +166,9 @@ class LbnlPerlmutter(System):
                     "externals": [{"spec": "zlib@1.2.13", "prefix": "/usr"}],
                     "buildable": False,
                 },
+                "mpi": {
+                    "buildable": False,
+                },
             }
         }
 
@@ -176,8 +179,8 @@ class LbnlPerlmutter(System):
                 "cray-libsci": {
                     "externals": [
                         {
-                            "spec": "cray-libsci@23.05.1.4%gcc",
-                            "prefix": "/opt/cray/pe/libsci/23.05.1.4/gnu/10.3/x86_64/",
+                            "spec": "cray-libsci@24.07.0%gcc",
+                            "prefix": "/opt/cray/pe/libsci/24.07.0/gnu/12.3/x86_64/",
                         }
                     ]
                 }
