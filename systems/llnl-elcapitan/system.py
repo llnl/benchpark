@@ -326,33 +326,33 @@ class LlnlElcapitan(System):
                     ],
                     "buildable": False,
                 },
-                "py-numpy": {
-                    "externals": [
-                        {"spec": "py-numpy@1.24.3", "prefix": "/usr/tce/packages/python/python-3.11.5/lib/python3.11/site-packages"}
-                    ],
-                    "buildable": False,
-                },
-                "py-numba": {
-                    "externals": [
-                        {"spec": "py-numba@0.57.1", "prefix": "/usr/tce/packages/python/python-3.11.5/lib/python3.11/site-packages"}
-                    ],
-                    "buildable": False,
-                },
-                "py-matplotlib": {
-                    "externals": [
-                        {"spec": "py-matplotlib@3.7.2", "prefix": "/usr/tce/packages/python/python-3.11.5/lib/python3.11/site-packages"}
-                    ],
-                    "buildable": False,
-                },
-                "py-mpi4py": {
-                    "externals": [
-                        {"spec": "py-mpi4py@3.1.4", "prefix": "/usr/tce/packages/python/python-3.11.5/lib/python3.11/site-packages"}
-                    ],
-                    "buildable": False,
-                },
+                # "py-numpy": {
+                #     "externals": [
+                #         {"spec": "py-numpy@1.24.3", "prefix": "/usr/tce/packages/python/python-3.11.5/lib/python3.11/site-packages"}
+                #     ],
+                #     "buildable": False,
+                # },
+                # "py-numba": {
+                #     "externals": [
+                #         {"spec": "py-numba@0.57.1", "prefix": "/usr/tce/packages/python/python-3.11.5/lib/python3.11/site-packages"}
+                #     ],
+                #     "buildable": False,
+                # },
+                # "py-matplotlib": {
+                #     "externals": [
+                #         {"spec": "py-matplotlib@3.7.2", "prefix": "/usr/tce/packages/python/python-3.11.5/lib/python3.11/site-packages"}
+                #     ],
+                #     "buildable": False,
+                # },
+                # "py-mpi4py": {
+                #     "externals": [
+                #         {"spec": "py-mpi4py@3.1.4", "prefix": "/usr/tce/packages/python/python-3.11.5/lib/python3.11/site-packages"}
+                #     ],
+                #     "buildable": False,
+                # },
                 "py-pybind11": {
                     "externals": [
-                        {"spec": "py-pybind11@2.11.1", "prefix": "/usr/tce/packages/python/python-3.11.5/lib/python3.11/site-packages"}
+                        {"spec": "py-pybind11@3.0.0", "prefix": "/usr/workspace/mckinsey/bp_scaffold_spack/venv/bp-x86-3.11.5/lib/python3.11/site-packages"}
                     ],
                     "buildable": False,
                 },

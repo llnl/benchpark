@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
+import os
 from spack.package import *
 
 
@@ -43,8 +44,7 @@ class Adiak(CMakePackage):
     depends_on("mpi", when="+mpi")
 
     depends_on("python@3", when="+python", type=("build", "link", "run"))
-    depends_on("py-pybind11", when="+python", type=("build", "link", "run"))
-    
+    depends_on("py-pybind11@3.0.0:", when="+python", type=("build", "link", "run"))
 
     def cmake_args(self):
         args = []
@@ -61,7 +61,12 @@ class Adiak(CMakePackage):
             args.append("-DBUILD_SHARED_LIBS=OFF")
         
         if self.spec.satisfies("+python"):
-            args.append("-DWITH_PYTHON_BINDINGS=ON")
+            args.append("-DENABLE_PYTHON_BINDINGS=ON")
+            cmakedir = os.path.join(self.spec.prefix.join(python_platlib), "pybind11", "share", "cmake", "pybind11")
+            args.append(f"-Dpybind11_DIR={cmakedir}")
+
+        args.append(self.define("CMAKE_EXE_LINKER_FLAGS", self.spec['mpi'].libs.ld_flags))
+        args.append(self.define("MPI_CXX_LINK_FLAGS", self.spec['mpi'].libs.ld_flags))
 
         args.append("-DENABLE_TESTS=OFF")
         return args

@@ -27,6 +27,16 @@ class Caliper:
         description="caliper mode",
     )
 
+    variant(
+        "cali_version",
+        default="master",
+        values=(
+            "master",
+            "2.13.1",
+        ),
+        description="version",
+    )
+
     class Helper(ExperimentHelper):
         def compute_modifiers_section(self):
             modifier_list = []
@@ -43,7 +53,7 @@ class Caliper:
 
         def compute_package_section(self):
             # set package versions
-            caliper_version = "master"
+            caliper_version = self.spec.variants["cali_version"][0]
 
             # get system config options
             # TODO: Get compiler/mpi/package handles directly from system.py

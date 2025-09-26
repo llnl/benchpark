@@ -1,3 +1,5 @@
+import os
+
 from spack.package import *
 from spack.build_systems.python import PythonPackage
 
@@ -51,3 +53,6 @@ class PyScaffold(PythonPackage, CudaPackage, ROCmPackage):
         super().setup_run_environment(env)
 
         env.prepend_path("LD_LIBRARY_PATH", self.spec['mpi'].libs.gtl_lib_path)
+
+        if self.spec.satisfies("+caliper") and self.spec.satisfies("+python"):
+            env.prepend_path("LD_LIBRARY_PATH", os.path.join(self.spec.prefix.join(python_platlib), "torch", "lib"))
