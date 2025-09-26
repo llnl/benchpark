@@ -64,9 +64,19 @@ class CrayLibsci(Package):
     def blas_libs(self):
         shared = True if "+shared" in self.spec else False
 
-        candidates = [name for name in self.canonical_names.values() if name.lower() in self.prefix.lower()]
-        candidates = [candidates[0]]
-        if len(candidates) != 1:
+        candidates = []
+        for entry in os.listdir(spack_prefix):
+            if entry.endswith(".so"):
+                candidates.append(entry)
+
+        lib_targets = []
+        for name in canonical_names.values():
+            if any(name.lower() in c for c in candidates):
+                lib_targets.append(name)
+            else:
+                pass
+
+        if len(lib_targets) != 1:
             raise RuntimeError("cannot determine libsci libraries")
 
         lib = []
@@ -81,7 +91,7 @@ class CrayLibsci(Package):
 
         libname = []
         for lib_fmt in lib:
-            libname.append(lib_fmt.format(candidates[0].lower()))
+            libname.append(lib_fmt.format(lib_targets[0].lower()))
 
         return find_libraries(libname, root=self.prefix.lib, shared=shared, recursive=False)
 
