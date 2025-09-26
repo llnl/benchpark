@@ -141,18 +141,21 @@ class LlnlElcapitan(System):
                 self.short_cce_version = (
                     f"{self.cce_version.major}.{self.cce_version.minor}"
                 )
+                self.rccl_version = Version("6.4.1")
             elif self.rocm_version >= Version("6.0.0"):
                 self.cce_version = Version("18.0.1")
                 self.mpi_version = Version("8.1.31")
                 self.short_cce_version = (
                     f"{self.cce_version.major}.{self.cce_version.minor}"
                 )
+                self.rccl_version = Version("6.3.1")
             else:
                 self.cce_version = Version("16.0.0")
                 self.mpi_version = Version("8.1.26")
                 self.short_cce_version = (
                     f"{self.cce_version.major}.{self.cce_version.minor}"
                 )
+                self.rccl_version = Version("5.4.3")
         if self.rocm_version >= Version("6.4.0"):
             self.pmi_version = Version("6.1.15.6")
             self.pals_version = Version("1.2.12")
@@ -726,6 +729,7 @@ class LlnlElcapitan(System):
             f"/opt/rocm-{self.rocm_version}/lib",
             "/opt/cray/pe/gcc-libs",
             f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib",
+            f"/collab/usr/global/tools/rccl/toss_4_x86_64_ib_cray/rocm-{self.rccl_version}/install/lib",
         ]
         # Avoid libunwind.so.1 error on tioga
         if self.spec.variants["cluster"][0] == "tioga":

@@ -86,7 +86,7 @@ class Caliper(BasicModifier):
 
     add_mode(
         mode_name="rocm",
-        mode_option="profile.hip,rocm.gputime",
+        mode_option="rocm.gputime",
         description="Profile HIP API functions, time spent on GPU",
     )
 

@@ -49,10 +49,21 @@ class PyScaffold(PythonPackage, CudaPackage, ROCmPackage):
 
         return args
 
+    def setup_build_environment(self, env):
+        super().setup_build_environment(env)
+
+        if self.compiler.extra_rpaths:
+            for rpath in self.compiler.extra_rpaths:
+                env.prepend_path("LD_LIBRARY_PATH", rpath)
+
     def setup_run_environment(self, env):
         super().setup_run_environment(env)
 
         env.prepend_path("LD_LIBRARY_PATH", self.spec['mpi'].libs.gtl_lib_path)
 
-        if self.spec.satisfies("+caliper") and self.spec.satisfies("+python"):
+        if self.spec.satisfies("+caliper"):
             env.prepend_path("LD_LIBRARY_PATH", os.path.join(self.spec.prefix.join(python_platlib), "torch", "lib"))
+
+        if self.compiler.extra_rpaths:
+            for rpath in self.compiler.extra_rpaths:
+                env.prepend_path("LD_LIBRARY_PATH", rpath)
