@@ -334,9 +334,11 @@ available on your system.
 
 .. note::
 
-    For ``mpi``, you need to define ``"mpi": {"buildable": False},`` as a virtual
-    package, and then define your MPI package as we have for the ``openmpi`` package.
-    This is to ensure Spack uses our MPI, and does not try to build another MPI package.
+    For packages that declare virtual dependencies, e.g. ``depends_on("mpi")``, you need
+    to define ``"mpi": {"buildable": False},`` as a virtual package, and then define
+    your MPI package as we have for the ``openmpi`` package. This is to ensure Spack
+    uses our MPI, and does not try to build another MPI package. See a similar example
+    for ``blas``, ``lapack``, and their provider ``atlas``.
 
 ::
 
@@ -354,6 +356,11 @@ available on your system.
         def compute_packages_section(self):
             return {
                 "packages": {
+                    "blas": {"buildable": False},
+                    "lapack": {"buildable": False},
+                    "atlas": {
+                        "externals": [{"spec": "atlas@3.10.3", "prefix": "/usr"}],
+                    },
                     "mpi": {"buildable": False},
                     "openmpi": {
                         "externals": [
@@ -364,7 +371,7 @@ available on your system.
                         ]
                     },
                     "cmake": {
-                        "externals": [{"spec": "cmake@4.0.2", "prefix": "/usr"}],
+                        "externals": [{"spec": "cmake@4.1.1", "prefix": "/usr"}],
                         "buildable": False,
                     },
                     ...
