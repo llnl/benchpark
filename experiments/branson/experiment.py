@@ -29,7 +29,7 @@ class Branson(
     variant(
         "version",
         default="develop",
-        values=("develop","fix_cmake_scripts"),
+        values=("develop",),
         description="app version",
     )
 
