@@ -3,14 +3,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.error import BenchparkError
 from benchpark.directives import variant
 from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
 from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
-from benchpark.scaling import StrongScaling
-from benchpark.scaling import WeakScaling
+from benchpark.scaling import ScalingMode, Scaling
 from benchpark.caliper import Caliper
 
 
@@ -19,8 +17,7 @@ class Branson(
     OpenMPExperiment,
     CudaExperiment,
     ROCmExperiment,
-    StrongScaling,
-    WeakScaling,
+    Scaling(ScalingMode.Strong, ScalingMode.Weak),
     Caliper,
 ):
     variant(
@@ -32,6 +29,7 @@ class Branson(
     variant(
         "version",
         default="develop",
+        values=("develop","fix_cmake_scripts"),
         description="app version",
     )
 
@@ -43,69 +41,42 @@ class Branson(
     )
 
     def compute_applications_section(self):
-        # TODO: Replace with conflicts clause
-        scaling_modes = {
-            "strong": self.spec.satisfies("+strong"),
-            "weak": self.spec.satisfies("+weak"),
-            "single_node": self.spec.satisfies("+single_node"),
-        }
+        if self.spec.satisfies("exec_mode=test"):
+            self.add_experiment_variable("num_particles", 1000000, True)
+        else:
+            self.add_experiment_variable("num_particles", 850000000, True)
+        self.add_experiment_variable("resource_count", 1, False)
 
-        scaling_mode_enabled = [key for key, value in scaling_modes.items() if value]
-        if len(scaling_mode_enabled) != 1:
-            raise BenchparkError(
-                f"Only one type of scaling per experiment is allowed for application package {self.name}"
-            )
-
-        # Number of processes in each dimension
-        num_nodes = {"n_nodes": 1}
-
-        # Per-process size (in zones) in each dimension
-        num_particles = {"num_particles": 850000000}
-
-        if self.spec.satisfies("+single_node"):
-            for pk, pv in num_nodes.items():
-                self.add_experiment_variable(pk, pv, True)
-            for nk, nv in num_particles.items():
-                self.add_experiment_variable(nk, nv, True)
-        elif self.spec.satisfies("+strong"):
-            scaled_variables = self.generate_strong_scaling_params(
-                {tuple(num_nodes.keys()): list(num_nodes.values())},
-                int(self.spec.variants["scaling-factor"][0]),
-                int(self.spec.variants["scaling-iterations"][0]),
-            )
-            for pk, pv in scaled_variables.items():
-                self.add_experiment_variable(pk, pv, True)
-            for nk, nv in num_particles.items():
-                self.add_experiment_variable(nk, nv, True)
-        elif self.spec.satisfies("+weak"):
-            scaled_variables = self.generate_weak_scaling_params(
-                {tuple(num_nodes.keys()): list(num_nodes.values())},
-                {tuple(num_particles.keys()): list(num_particles.values())},
-                int(self.spec.variants["scaling-factor"][0]),
-                int(self.spec.variants["scaling-iterations"][0]),
-            )
-            for k, v in scaled_variables.items():
-                self.add_experiment_variable(k, v, True)
-
-        self.add_experiment_variable(
-            "use_gpu",
-            (
-                "TRUE"
-                if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm")
-                else "FALSE"
-            ),
+        self.register_scaling_config(
+            {
+                ScalingMode.Strong: {
+                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                },
+                ScalingMode.Weak: {
+                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "num_particles": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                },
+            }
         )
 
+        # Set the variables required by the experiment
+        self.set_required_variables(
+            n_resources="{resource_count}",
+            process_problem_size="{num_particles}",
+            total_problem_size="{num_particles} * {resource_count}",
+        )
+
+        if self.spec.satisfies("+openmp"):
+            self.add_experiment_variable("n_threads_per_proc", 1, True)
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
-            self.add_experiment_variable(
-                "n_ranks", "{n_nodes}*{sys_gpus_per_node}", True
-            )
+            self.add_experiment_variable("use_gpu", "TRUE")
+            self.add_experiment_variable("n_gpus", "{n_resources}", True)
         else:
-            if self.spec.satisfies("+openmp"):
-                self.add_experiment_variable("n_threads_per_proc", 1, True)
-            self.add_experiment_variable(
-                "n_ranks", "{n_nodes}*{sys_cores_per_node}", True
-            )
+            self.add_experiment_variable("use_gpu", "FALSE")
+            self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
     def compute_package_section(self):
         # get package version

@@ -3,10 +3,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from spack.package import *
+from spack_repo.builtin.build_systems.cmake import CMakePackage
+from spack_repo.builtin.build_systems.cuda import CudaPackage
+from spack_repo.builtin.build_systems.rocm import ROCmPackage
 from spack_repo.builtin.packages.boost.package import Boost
 
-import os
+from spack.package import *
 
 
 class Branson(CMakePackage, CudaPackage, ROCmPackage):
@@ -16,7 +18,7 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
 
     homepage = "https://github.com/lanl/branson"
     url = "https://github.com/lanl/branson/archive/0.82.tar.gz"
-    git = "https://github.com/lanl/branson.git"
+    git = "https://github.com/rfhaque/branson.git"
 
     tags = ["proxy-app"]
 
@@ -33,16 +35,15 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
     version("0.81", sha256="493f720904791f06b49ff48c17a681532c6a4d9fa59636522cf3f9700e77efe4")
     version("0.8", sha256="85ffee110f89be00c37798700508b66b0d15de1d98c54328b6d02a9eb2cf1cb8")
 
+    depends_on("c", type="build")
+    depends_on("cxx", type="build")
+
     variant("openmp", default=False, description="Enable OpenMP support")
     variant("caliper", default=False, description="Enable Caliper monitoring")
     variant("metis", default=False, description="Enable METIS")
     variant("viz", default=False, description="Enable VIZ")
     variant("n_groups", default=30, values=int, description="Number of groups")
 
-    depends_on("c", type="build")
-    depends_on("cxx", type="build")
-
-    #depends_on("mpi")
     depends_on("mpi@2:")
 
     # TODO: replace this with an explicit list of components of Boost,
@@ -58,25 +59,18 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
 
     flag_handler = build_system_flags
 
-    patch("branson_cmake.patch")
-    patch("branson_power9.patch")
-
     def setup_build_environment(self, env):
         if "+cuda" in self.spec:
             env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
-
-    def patch(self):
-        ppu_intrinsics_file = os.path.join(self.stage.source_path, "src", "random123", "features", "ppu_intrinsics.h")
-        with open(ppu_intrinsics_file , "w") as f:
-            pass
 
     def cmake_args(self):
         spec = self.spec
         args = []
 
-        args.append(f"-DMPI_C_COMPILER={spec['mpi'].mpicc}")
-        args.append(f"-DMPI_CXX_COMPILER={spec['mpi'].mpicxx}")
+        args.append(f"-DCMAKE_C_COMPILER={spec['mpi'].mpicc}")
+        args.append(f"-DCMAKE_CXX_COMPILER={spec['mpi'].mpicxx}")
         args.append(f"-DCMAKE_Fortran_COMPILER={spec['mpi'].mpifc}")
+        args.append(f"-DCMAKE_CXX_STANDARD=17")
 
         args.append(self.define_from_variant("ENABLE_METIS", "metis"))
         args.append(f"-DMETIS_ROOT_DIR={spec['metis'].prefix}")
