@@ -38,7 +38,7 @@ class Caliper(BasicModifier):
 
     add_mode(
         mode_name=_default_mode,
-        mode_option="time.exclusive",
+        mode_option="time.exclusive,time.variance",
         description="Platform-independent collection of time (default mode)",
     )
 
