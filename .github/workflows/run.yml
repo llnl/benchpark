@@ -200,5 +200,6 @@ jobs:
           pip install -r .github/workflows/requirements/docs.txt
       - name: Test Docs Scripts
         run: |-
-          python docs/generate-sys-defs-list.py
-          python docs/generate-benchmark-list.py
+          cd docs/
+          python generate-sys-defs-list.py
+          python generate-benchmark-list.py
