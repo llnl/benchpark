@@ -194,4 +194,15 @@ jobs:
           pip install -r ./requirements.txt
       - name: Run
         run: |-
-          ./bin/benchpark bootstrap -l .
+          output=$(./bin/benchpark bootstrap -l . 2>&1)
+
+          # 1. Check the path is present
+          echo "$output" | grep -q "/home/runner/work/benchpark/benchpark/.benchpark/ramble" \
+            || { echo "Expected path not found"; exit 1; }
+
+          # 2. Check "Cloning Ramble" appears exactly once
+          count=$(echo "$output" | grep -c "Cloning Ramble")
+          if [[ "$count" -ne 1 ]]; then
+            echo "'Cloning Ramble' appeared $count times (expected 1)"
+            exit 1
+          fi
