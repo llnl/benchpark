@@ -19,6 +19,6 @@ def setup_parser(root_parser):
 
 
 def command(args):
-    path = Path(args.location).expanduser().resolve().removesuffix(".benchpark") / ".benchpark"
+    path = str(Path(args.location).expanduser().resolve()).removesuffix(".benchpark") + "/.benchpark"
     bootstrapper = RuntimeResources(path)
     bootstrapper.bootstrap()
