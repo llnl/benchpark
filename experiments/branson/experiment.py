@@ -14,6 +14,7 @@ from benchpark.caliper import Caliper
 
 class Branson(
     Experiment,
+    MpiOnlyExperiment,
     OpenMPExperiment,
     CudaExperiment,
     ROCmExperiment,
