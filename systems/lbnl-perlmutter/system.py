@@ -6,7 +6,7 @@
 from packaging.version import Version
 
 from benchpark.directives import variant, maintainers
-from benchpark.system import System
+from benchpark.system import System, compiler_section_for, compiler_def
 from benchpark.paths import hardware_descriptions
 
 
@@ -121,19 +121,19 @@ class LbnlPerlmutter(System):
                     "externals": [{"spec": "bison@3.0.4", "prefix": "/usr"}],
                     "buildable": False,
                 },
-                "python": {
-                    "externals": [
-                        {
-                            "prefix": "/usr",
-                            "spec": "python@2.7.18+bz2+crypt+ctypes~dbm~lzma+nis~pyexpat+pythoncmd~readline~sqlite3~ssl~tkinter+uuid+zlib",
-                        },
-                        {
-                            "prefix": "/usr",
-                            "spec": "python@3.6.15+bz2+crypt+ctypes~dbm+lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl~tkinter+uuid+zlib",
-                        },
-                    ],
-                    "buildable": False,
-                },
+                # "python": {
+                #     "externals": [
+                #         {
+                #             "prefix": "/usr",
+                #             "spec": "python@2.7.18+bz2+crypt+ctypes~dbm~lzma+nis~pyexpat+pythoncmd~readline~sqlite3~ssl~tkinter+uuid+zlib",
+                #         },
+                #         {
+                #             "prefix": "/usr",
+                #             "spec": "python@3.6.15+bz2+crypt+ctypes~dbm+lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl~tkinter+uuid+zlib",
+                #         },
+                #     ],
+                #     "buildable": False,
+                # },
                 "doxygen": {
                     "externals": [{"spec": "doxygen@1.8.14~graphviz~mscgen", "prefix": "/usr"}],
                     "buildable": False,
@@ -166,7 +166,22 @@ class LbnlPerlmutter(System):
                     "externals": [{"spec": "zlib@1.2.13", "prefix": "/usr"}],
                     "buildable": False,
                 },
-                "mpi": {
+                "cray-mpich": {
+                    "externals": [
+                                    {
+                                        "spec": "cray-mpich@8.1.30+wrappers", 
+                                        "prefix": "/opt/cray/pe/mpich/8.1.30/ofi/gnu/12.3",
+                                    }
+                                ],
+                    "buildable": False,
+                },
+                "cray-libsci": {
+                    "externals": [
+                                    {
+                                        "spec": "cray-libsci@23.02.1.1", 
+                                        "prefix": "/opt/cray/pe/libsci/23.02.1.1/cray/9.0/x86_64",
+                                    }
+                                ],
                     "buildable": False,
                 },
             }
@@ -189,29 +204,41 @@ class LbnlPerlmutter(System):
         return selections
 
     def compute_compilers_section(self):
-        selections = {
-            "compilers": [
-                {
-                    "compiler": {
-                        "spec": "gcc@12.3.0",
-                        "paths": {
-                            "cc": "/opt/cray/pe/gcc-native/12/bin/gcc",
-                            "cxx": "/opt/cray/pe/gcc-native/12/bin/g++",
-                            "f77": "/opt/cray/pe/gcc-native/12/bin/gfortran",
-                            "fc": "/opt/cray/pe/gcc-native/12/bin/gfortran",
-                        },
-                        "flags": {},
-                        "operating_system": "rhel8",
-                        "target": "x86_64",
-                        "modules": [],
-                        "environment": {},
-                        "extra_rpaths": [],
-                    }
-                }
-            ]
-        }
+        # selections = {
+        #     "compilers": [
+        #         {
+        #             "compiler": {
+        #                 "spec": "gcc@12.3.0",
+        #                 "paths": {
+        #                     "cc": "/opt/cray/pe/gcc-native/12/bin/gcc",
+        #                     "cxx": "/opt/cray/pe/gcc-native/12/bin/g++",
+        #                     "f77": "/opt/cray/pe/gcc-native/12/bin/gfortran",
+        #                     "fc": "/opt/cray/pe/gcc-native/12/bin/gfortran",
+        #                 },
+        #                 "flags": {},
+        #                 "operating_system": "rhel8",
+        #                 "target": "x86_64",
+        #                 "modules": [],
+        #                 "environment": {},
+        #                 "extra_rpaths": [],
+        #             }
+        #         }
+        #     ]
+        # }
 
-        return selections
+        # return selections
+        if self.spec.satisfies("compiler=gcc"):
+            cfg = compiler_section_for(
+                "gcc",
+                [
+                    compiler_def(
+                        "gcc@12.3.0 languages:=c,c++,fortran",
+                        "/opt/cray/pe/gcc-native/12/bin/gcc",
+                        {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                    )
+                ],
+            )
+        return cfg
 
     def mpi_config(self):
         if self.spec.satisfies("compiler=gcc"):
@@ -239,16 +266,27 @@ class LbnlPerlmutter(System):
         will fail if these variables are not defined though, so for now
         they are still generated (but with more-generic values).
         """
+        # return {
+        #     "software": {
+        #         "packages": {
+        #             "default-compiler": {
+        #                 "pkg_spec": f"{self.spec.variants['compiler'][0]}"
+        #             },
+        #             "default-mpi": {"pkg_spec": "cray-mpich"},
+        #             "compiler-amdclang": {"pkg_spec": "clang"},
+        #             "compiler-gcc": {"pkg_spec": "gcc"},
+        #             "mpi-gcc": {"pkg_spec": "cray-mpich~gtl"},
+        #             "lapack-oneapi": {"pkg_spec": "intel-oneapi-mkl"},
+        #         }
+        #     }
+        # }
         return {
             "software": {
                 "packages": {
-                    "default-compiler": {
-                        "pkg_spec": f"{self.spec.variants['compiler'][0]}"
-                    },
+                    #"default-compiler": {"pkg_spec": default_compiler},
                     "default-mpi": {"pkg_spec": "cray-mpich"},
-                    "compiler-amdclang": {"pkg_spec": "clang"},
-                    "compiler-gcc": {"pkg_spec": "gcc"},
-                    "mpi-gcc": {"pkg_spec": "cray-mpich~gtl"},
+                    #"compiler-gcc": {"pkg_spec": "gcc"},
+                    "mpi-gcc": {"pkg_spec": "cray-mpich"},
                     "lapack-oneapi": {"pkg_spec": "intel-oneapi-mkl"},
                 }
             }
