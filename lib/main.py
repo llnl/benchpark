@@ -54,7 +54,10 @@ if "bootstrap" in sys.argv:
 known, _ = pre_parser.parse_known_args(sys.argv[1:])
 loc = getattr(known, "location", None)
 benchpark_home = (
-    (str(Path(known.location).expanduser().resolve()).removesuffix(".benchpark") + "/.benchpark")
+    (
+        str(Path(known.location).expanduser().resolve()).removesuffix(".benchpark")
+        + "/.benchpark"
+    )
     if loc
     else benchpark.paths.benchpark_home
 )
