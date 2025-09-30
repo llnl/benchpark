@@ -36,10 +36,10 @@ class PyScaffold(PythonPackage, CudaPackage, ROCmPackage):
     # TODO glew wont build (dependency of open3d)
     # depends_on("glew@2.1.0", type="build")
 
-    depends_on("caliper+python", when="+caliper", type=("build", "run"))
-
     # These dont exist
     #depends_on("py-pyntcloud", type=("build","run"))
+
+    depends_on("caliper+python", when="+caliper", type=("build", "run"))
 
     def cmake_args(self):
         args = super().cmake_args(self)

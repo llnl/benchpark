@@ -170,7 +170,7 @@ def command(args):
     )
 
     pkg_str = ""
-    if pkg_manager == "spack":
+    if "spack" in pkg_manager:
         spack, first_time_spack = per_workspace_setup.spack_first_time_setup()
         if first_time_spack:
             spack("repo", "add", "--scope=site", f"{source_dir}/repo")

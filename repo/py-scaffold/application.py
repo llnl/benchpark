@@ -15,6 +15,9 @@ class PyScaffold(ExecutableApplication):
 
     tags = ["python"]
 
+    # Add system logic to determine spec whether rocm or cuda system here in app.py
+    pip_spec = "{package_path}[rocmwci]"
+
     # register_phase("prepend_library_path", pipeline="setup", run_before=["make_experiments"])
 
     # def _prepend_library_path(self, workspace, app_inst=None):
@@ -28,17 +31,27 @@ class PyScaffold(ExecutableApplication):
     #             paths.append(env["prepend_path"]["LD_LIBRARY_PATH"])
     #     app_inst.variables["ld_paths"] = ":".join(paths)
 
+    # register_phase("install_python_packages", pipeline="setup", run_before=["make_experiments"])
+
+    # def _install_python_packages(self, workspace, app_inst=None):
+    #     # activate ramble env python
+
+    #     # model = self.system["provides"] # "cuda" or "rocm", depends on package defining these in pyproject.toml
+
+    #     #             vvvvvvvvvvvvvv depends on local install
+    #     # pip install {package_path}[model]
+
     software_spec("scaffold", None)
 
     # executable(
     #     "modules",
     #     "export LD_LIBRARY_PATH={ld_paths}:$LD_LIBRARY_PATH",
     # )
-    executable(
-        "pip",
-        "pip install -r {package_path}requirements.txt\npip install torch==2.8.0+rocm6.4 --extra-index-url https://download.pytorch.org/whl/rocm6.4",
-        use_mpi=False,
-    )
+    # executable(
+    #     "pip",
+    #     "pip install -r {package_path}requirements.txt\npip install torch==2.8.0+rocm642",
+    #     use_mpi=False,
+    # )
     executable(
         "generate",
         "scaffold generate_fractals -c {package_path}ScaFFold/configs/benchmark_default.yml --problem-scale {problem_scale}",
@@ -51,6 +64,6 @@ class PyScaffold(ExecutableApplication):
     )
 
     workload("sweep", executables=[#"modules", 
-                                   "pip",
+                                   # "pip",
                                     "generate",
                                     "run"])

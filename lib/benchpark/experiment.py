@@ -202,7 +202,7 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
     variant(
         "package_manager",
         default="spack",
-        values=("spack", "environment-modules", "user-managed", "pip"),
+        values=("spack", "environment-modules", "user-managed", "pip", "spack-pip"),
         description="package manager to use",
     )
 
@@ -341,7 +341,7 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
             "benchpark_experiment_command": "benchpark " + " ".join(sys.argv[1:]),
             "system": system_dict,
         }
-        if self.spec.variants["package_manager"][0] == "spack":
+        if "spack" in self.spec.variants["package_manager"][0]:
             default_config["spack_flags"] = {
                 "install": "--add --keep-stage",
                 "concretize": "-U -f",
@@ -498,7 +498,7 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
                 f"Package section must be defined for application package {self.name}"
             )
 
-        if pkg_manager == "spack":
+        if "spack" in pkg_manager:
             spack_variants = list(
                 filter(
                     lambda v: v is not None,
