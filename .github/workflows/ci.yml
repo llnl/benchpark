@@ -69,6 +69,7 @@ jobs:
               - '.gitlab-ci.yml'
               - 'docs/**'
             run:
+              - '.github/**'
               - 'bin/**'
               - 'configs/**'
               - 'checkout-versions.yaml'
