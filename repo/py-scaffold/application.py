@@ -53,6 +53,10 @@ class PyScaffold(ExecutableApplication):
     #     use_mpi=False,
     # )
     executable(
+        "modules",
+        "export LD_LIBRARY_PATH=/usr/WS1/mckinsey/bp_scaffold_spack/wkp2/py-scaffold-sp/tuolumne/workspace/software/spack-pip/py-scaffold/ramble/lib/python3.11/site-packages/torch/lib:$LD_LIBRARY_PATH  # libcaffe2_nvrtc.so\nexport SPINDLE_FLUXOPT=off  # specific issue with WCI wheel\nexport LD_LIBRARY_PATH=/opt/cray/pe/cce/20.0.0/cce-clang/x86_64/lib/:$LD_LIBRARY_PATH  # torch libmagma error\nexport LD_LIBRARY_PATH=/opt/cray/pe/cce/20.0.0/cce/x86_64/lib/:$LD_LIBRARY_PATH  # libmodules.so.1",
+    )
+    executable(
         "generate",
         "scaffold generate_fractals -c {package_path}ScaFFold/configs/benchmark_default.yml --problem-scale {problem_scale}",
         use_mpi=True,
@@ -63,7 +67,7 @@ class PyScaffold(ExecutableApplication):
         use_mpi=True,
     )
 
-    workload("sweep", executables=[#"modules", 
+    workload("sweep", executables=["modules",
                                    # "pip",
                                     "generate",
                                     "run"])
