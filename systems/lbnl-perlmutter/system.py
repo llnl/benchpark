@@ -166,6 +166,9 @@ class LbnlPerlmutter(System):
                     "externals": [{"spec": "zlib@1.2.13", "prefix": "/usr"}],
                     "buildable": False,
                 },
+                "mpi": {
+                    "buildable": False,
+                },
                 "cray-mpich": {
                     "externals": [
                                     {
@@ -173,7 +176,6 @@ class LbnlPerlmutter(System):
                                         "prefix": "/opt/cray/pe/mpich/8.1.30/ofi/gnu/12.3",
                                     }
                                 ],
-                    "buildable": False,
                 },
                 "cray-libsci": {
                     "externals": [
@@ -187,7 +189,7 @@ class LbnlPerlmutter(System):
             }
         }
 
-        #selections["packages"] |= self.mpi_config()
+        selections["packages"] |= self.mpi_config()["packages"]
 
         if self.spec.satisfies("compiler=gcc"):
             selections["packages"] |= {
@@ -233,27 +235,30 @@ class LbnlPerlmutter(System):
                 [
                     compiler_def(
                         "gcc@12.3.0 languages:=c,c++,fortran",
-                        "/opt/cray/pe/gcc-native/12/bin/gcc",
+                        "/opt/cray/pe/gcc-native/12",
                         {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
                     )
                 ],
             )
+
         return cfg
 
     def mpi_config(self):
         if self.spec.satisfies("compiler=gcc"):
             return {
-                "cray-mpich": {
-                    "externals": [
-                        {
-                            "spec": f"cray-mpich@{self.mpi_version}%gcc@{self.gcc_version} ~gtl +wrappers",
-                            "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/10.3",
-                            "extra_attributes": {
-                                "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
-                                "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/10.3/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
-                            },
-                        }
-                    ]
+                "packages": {
+                    "cray-mpich": {
+                        "externals": [
+                            {
+                                "spec": f"cray-mpich@{self.mpi_version}%gcc@{self.gcc_version} ~gtl +wrappers",
+                                "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/10.3",
+                                "extra_attributes": {
+                                    "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
+                                    "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/10.3/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
+                                },
+                            }
+                        ]
+                    }
                 }
             }
 
