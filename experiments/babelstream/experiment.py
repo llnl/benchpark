@@ -6,17 +6,13 @@
 from benchpark.directives import variant, maintainers
 from benchpark.experiment import Experiment
 from benchpark.caliper import Caliper
-from benchpark.cuda import CudaExperiment
-from benchpark.rocm import ROCmExperiment
-from benchpark.openmp import OpenMPExperiment
+from benchpark.models import ModelsType, Models
 
 
 class Babelstream(
     Experiment,
     Caliper,
-    CudaExperiment,
-    ROCmExperiment,
-    OpenMPExperiment,
+    Models(ModelsType.Openmp, ModelsType.Cuda, ModelsType.Rocm),
 ):
     variant(
         "workload",
