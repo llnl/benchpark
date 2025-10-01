@@ -14,7 +14,8 @@ class MpiOnlyExperiment:
 
     def __init__(self):
         super().__init__()
-        if self.spec.variants["mpi"][0]:
+        #if self.spec.variants["mpi"][0]:
+        if self.spec.satisfies("+mpi"):
             self.device_type = "cpu"
         self.programming_models.append("mpi")
 

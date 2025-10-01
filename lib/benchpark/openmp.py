@@ -14,7 +14,8 @@ class OpenMPExperiment:
 
     def __init__(self):
         super().__init__()
-        if self.spec.variants["openmp"][0]:
+        #if self.spec.variants["openmp"][0]:
+        if self.spec.satisfies("+openmp"):
             self.device_type = "cpu"
         self.programming_models.append("openmp")
 

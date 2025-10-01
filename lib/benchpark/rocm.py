@@ -14,7 +14,8 @@ class ROCmExperiment:
 
     def __init__(self):
         super().__init__()
-        if self.spec.variants["rocm"][0]:
+        #if self.spec.variants["rocm"][0]:
+        if self.spec.satisfies("+rocm"):
             self.device_type = "gpu"
         self.programming_models.append("rocm")
 

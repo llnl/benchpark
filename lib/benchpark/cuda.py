@@ -14,7 +14,8 @@ class CudaExperiment:
 
     def __init__(self):
         super().__init__()
-        if self.spec.variants["cuda"][0]:
+        #if self.spec.variants["cuda"][0]:
+        if self.spec.satisfies("+cuda"):
             self.device_type = "gpu"
         self.programming_models.append("cuda")
 
