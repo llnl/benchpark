@@ -463,12 +463,17 @@ class LlnlElcapitan(System):
             }
 
         elif self.spec.satisfies("compiler=gcc"):
+            if gtl:
+                gtl_spec = "+gtl"
+            else:
+                gtl_spec = "~gtl"
+    
             return {
                 "packages": {
                     "cray-mpich": {
                         "externals": [
                             {
-                                "spec": f"cray-mpich@{self.mpi_version}+gtl+wrappers %gcc@{self.gcc_version}",
+                                "spec": f"cray-mpich@{self.mpi_version}{gtl_spec}+wrappers %gcc@{self.gcc_version}",
                                 "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/10.3",
                                 "extra_attributes": {
                                     "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
