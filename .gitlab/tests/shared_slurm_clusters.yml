@@ -20,8 +20,8 @@ workflow:
     - echo "Slurm job = ${JOBID}"
     # wait until Flux is actually reachable (not just the Slurm job RUNNING)
     # 1..1080 is up to 3 hours
-    - for i in {1..1080}; do flux proxy slurm:${JOBID} flux ping -c1 >/dev/null 2>&1
-      && break; sleep 10; done
+    - for i in {1..1080}; do state=$(sacct -j ${JOBID} -n -o State 2>/dev/null | head -1 | awk '{print $1}'); [[ "$state" == "RUNNING" ]] && break; echo "waiting..." && sleep 10; done
+    #- for i in {1..1080}; do flux proxy slurm:${JOBID} flux ping -c1 >/dev/null 2>&1 && break; echo "waiting..." sleep 10; done
     - flux proxy slurm:${JOBID} flux ping -c1  # final check (fails the job if still not ready)
   after_script:
     - |
