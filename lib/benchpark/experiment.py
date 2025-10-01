@@ -264,14 +264,17 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
 
         # Explicitly ordered list. "mpi" first
         models = ["mpi"] + ["openmp", "cuda", "rocm"]
+        valid_models = []
         invalid_models = []
         for model in models:
-            # Experiment specifying model in add_package_spec that it doesn't implement
-            if (
-                self.spec.satisfies("+" + model)
-                and model not in self.programming_models
-            ):
-                invalid_models.append(model)
+            if self.spec.satisfies("+" + model):
+                valid_models.append(model)
+                # Experiment specifying model in add_package_spec that it doesn't implement
+                if model not in self.programming_models:
+                    invalid_models.append(model)
+        # MPI is always valid if with another programming model, even if no mpionly
+        if "mpi" in invalid_models and len(valid_models) > 1:
+            invalid_models.remove("mpi")
         # Case where there are no experiments specified in experiment.py
         if len(self.programming_models) == 0:
             raise BenchparkError(
@@ -462,7 +465,10 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
         for cls in self.helpers:
             helper_prefix = cls.get_helper_name_prefix()
             if helper_prefix:
-                expr_helper_list.append(helper_prefix)
+                if isinstance(helper_prefix, list):
+                    expr_helper_list.extend(helper_prefix)
+                else:
+                    expr_helper_list.append(helper_prefix)
         expr_name_suffix = "_".join(expr_helper_list + self.expr_var_names)
 
         self.check_required_variables()
