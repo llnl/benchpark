@@ -44,6 +44,7 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("blas")
     depends_on("lapack")
 
+    depends_on("umpire", when="+umpire")
     depends_on("hypre+umpire", when="+umpire")
     depends_on("hypre~umpire", when="~umpire")
     depends_on("hypre+cuda", when="+cuda")
@@ -60,9 +61,7 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("hypre+gpu-aware-mpi", when="^cray-mpich+gtl")
 
     def setup_build_environment(self, env):
-        if "+cuda" in self.spec:
-            #env.append_flags('LDFLAGS', '-lessl')
-            #env.append_flags('LDFLAGS', '-lmkl_intel_lp64 -lmkl_sequential -lmkl_core')
+        if self.spec.satisfies("+cuda"):
             env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
 
     def cmake_args(self):
@@ -77,5 +76,7 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
             cmake_options.append("-DAMG_WITH_HIP=ON")
         if self.spec["hypre"].satisfies("+mpi"):
             cmake_options.append("-DAMG_WITH_MPI=ON")
+        if self.spec.satisfies("+cuda"):
+            cmake_options.append(f'-DCMAKE_EXE_LINKER_FLAGS={self.spec["lapack"].libs.ld_flags} {self.spec["blas"].libs.ld_flags}')
 
         return cmake_options
