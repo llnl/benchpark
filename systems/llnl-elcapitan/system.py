@@ -468,7 +468,7 @@ class LlnlElcapitan(System):
                     "cray-mpich": {
                         "externals": [
                             {
-                                "spec": f"cray-mpich@{self.mpi_version}~gtl+wrappers %gcc@{self.gcc_version}",
+                                "spec": f"cray-mpich@{self.mpi_version}+gtl+wrappers %gcc@{self.gcc_version}",
                                 "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/10.3",
                                 "extra_attributes": {
                                     "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
@@ -755,7 +755,7 @@ class LlnlElcapitan(System):
                     "compiler-gcc": {"pkg_spec": "gcc"},
                     "mpi-rocm-gtl": {"pkg_spec": "cray-mpich+gtl"},
                     "mpi-rocm-no-gtl": {"pkg_spec": "cray-mpich~gtl"},
-                    "mpi-gcc": {"pkg_spec": "cray-mpich~gtl"},
+                    "mpi-gcc": {"pkg_spec": "cray-mpich+gtl"},
                     "blas": {"pkg_spec": f"{self.spec.variants['blas'][0]}"},
                     "blas-rocm": {"pkg_spec": "rocblas"},
                     "lapack": {"pkg_spec": f"{self.spec.variants['lapack'][0]}"},
