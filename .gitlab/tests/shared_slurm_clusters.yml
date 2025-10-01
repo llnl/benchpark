@@ -14,9 +14,8 @@ workflow:
   stage: allocate-resources
   script:
     - set -x
-    # Allow optional GPUMODE suffix (defaults to empty so existing names still work)
-    - sbatch ${SHARED_ALLOC} --wait-all-nodes=1 --job-name=${ALLOC_NAME}${GPUMODE:-}
-      \ --wrap="srun -N 1 -n 1 flux start sleep inf"
+    - sbatch ${SHARED_ALLOC} --wait-all-nodes=1 --job-name=${ALLOC_NAME} --wrap="srun
+      -N 1 -n 1 flux start sleep inf"
   after_script:
     - |
       if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
