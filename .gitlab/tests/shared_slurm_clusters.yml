@@ -13,9 +13,16 @@ workflow:
   extends: .on_host_template
   stage: allocate-resources
   script:
-    - set -x
-    - sbatch ${SHARED_ALLOC} --wait-all-nodes=1 --job-name=${ALLOC_NAME} --wrap="srun
-      -N 1 -n 1 flux start sleep inf"
+    - set -e
+    # submit and grab JobID
+    - JOBID=$(sbatch --parsable ${SHARED_ALLOC} --wait-all-nodes=1 --job-name="${ALLOC_NAME}"
+      --wrap='srun -N 1 -n 1 flux start sleep inf')
+    - echo "Slurm job = ${JOBID}"
+    # wait until Flux is actually reachable (not just the Slurm job RUNNING)
+    # 1..1080 is up to 3 hours
+    - for i in {1..1080}; do flux proxy slurm:${JOBID} flux ping -c1 >/dev/null 2>&1
+      && break; sleep 10; done
+    - flux proxy slurm:${JOBID} flux ping -c1  # final check (fails the job if still not ready)
   after_script:
     - |
       if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
