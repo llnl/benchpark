@@ -33,6 +33,13 @@ class Laghos(
         description="app version",
     )
 
+    variant(
+        "gpu-aware-mpi",
+        default=False,
+        values=(True, False),
+        description="Use GPU-aware MPI",
+    )
+
     maintainers("wdhawkins")
 
     def compute_applications_section(self):
@@ -70,6 +77,10 @@ class Laghos(
 
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_experiment_variable("n_gpus", "{n_resources}", True)
+            if self.spec.satisfies("+gpu-aware-mpi"):
+                self.add_experiment_variable("gam", "--gpu-aware-mpi")
+            else:
+                self.add_experiment_variable("gam", "--no-gpu-aware-mpi")
         else:
             self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
