@@ -20,7 +20,9 @@ workflow:
     - echo "Slurm job = ${JOBID}"
     # wait until SLURM job running
     # 1..2160 is up to 6 hours
-    - for i in {1..2160}; do state=$(sacct -j ${JOBID} -n -o State 2>/dev/null | head -1 | awk '{print $1}'); [[ "$state" == "RUNNING" ]] && break; echo "waiting... total duration has been $(( (i-1)*10 ))s" && sleep 10; done
+    - for i in {1..2160}; do state=$(sacct -j ${JOBID} -n -o State 2>/dev/null | head
+      -1 | awk '{print $1}'); [[ "$state" == "RUNNING" ]] && break; echo "waiting...
+      total duration has been $(( (i-1)*10 ))s" && sleep 10; done
     #- for i in {1..1080}; do flux proxy slurm:${JOBID} flux ping -c1 >/dev/null 2>&1 && break; echo "waiting..." sleep 10; done
     #- flux proxy slurm:${JOBID} flux ping -c1  # final check (fails the job if still not ready)
   after_script:
