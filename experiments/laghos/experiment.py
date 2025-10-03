@@ -44,6 +44,9 @@ class Laghos(
 
     def compute_applications_section(self):
         # "zones" defined from mesh file, we are hardcoding it here
+        self.add_experiment_variable("nx", 2, True)
+        self.add_experiment_variable("ny", 2, True)
+        self.add_experiment_variable("nz", 2, True)
         self.add_experiment_variable("zones", 1024, True)
 
         # resource_count is the number of resources used for this experiment:
