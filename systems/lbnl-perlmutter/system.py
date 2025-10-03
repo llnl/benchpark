@@ -32,6 +32,13 @@ class LbnlPerlmutter(System):
         description="Which compiler to use",
     )
 
+    variant(
+        "constraint",
+        default="cpu",
+        values=("cpu", "gpu", "gpu&hbmg40", "gpu&hbmg80"),
+        description="Which constraint to use"
+    )
+
     def __init__(self, spec):
         super().__init__(spec)
 
@@ -262,6 +269,37 @@ class LbnlPerlmutter(System):
                     }
                 }
             }
+
+    def system_specific_variables(self):
+        opts = super().system_specific_variables()
+        if self.spec.satisfies("constraint=cpu"):
+            opts.update(
+                {
+                    "extra_batch_opts":f"--constraint={self.spec.variants['constraint'][0]}",
+                }
+            )
+        elif self.spec.satisfies("constraint=gpu"):
+            opts.update(
+                {
+                    "extra_batch_opts":f"--constraint={self.spec.variants['constraint'][0]}",
+                }
+            )
+        elif self.spec.satisfies("constraint=gpu&hbmg40"):
+            opts.update(
+                {
+                    "extra_batch_opts":f"--constraint={self.spec.variants['constraint'][0]}",
+                }
+            )
+        elif self.spec.satisfies("constraint=gpu&hbmg80"):
+            opts.update(
+                {
+                    "extra_batch_opts":f"--constraint={self.spec.variants['constraint'][0]}",
+                }
+            )
+        
+        return opts
+
+
 
     def compute_software_section(self):
         """This is somewhat vestigial: for the Tioga config that is committed
