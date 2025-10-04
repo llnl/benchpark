@@ -27,6 +27,7 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     variant("caliper", default=False, description="Enable Caliper monitoring")
     variant("umpire", default=False, description="Enable Umpire support")
     variant("mixedint", default=False, description="Use 64bit integers while reducing memory use")
+    variant("gpu-aware-mpi", default=False, description="Enable GPU aware MPI")
 
     depends_on("c", type="build")
     depends_on("cxx", type="build")
@@ -58,7 +59,7 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
         depends_on(f"hypre amdgpu_target={target}", when=f"amdgpu_target={target}")
 
-    depends_on("hypre+gpu-aware-mpi", when="^cray-mpich+gtl")
+    depends_on("hypre+gpu-aware-mpi", when="+mpi+gpu-aware-mpi")
 
     def setup_build_environment(self, env):
         if self.spec.satisfies("+cuda"):

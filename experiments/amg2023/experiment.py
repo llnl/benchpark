@@ -44,6 +44,13 @@ class Amg2023(
     )
 
     variant(
+        "gpu-aware-mpi",
+        default=False,
+        values=(True, False),
+        description="Use GPU-aware MPI",
+    )
+
+    variant(
         "config",
         default="tuolumne",
         values=("lassen", "matrix", "tioga", "tuolumne", "dane"),
@@ -155,9 +162,13 @@ class Amg2023(
 
     def compute_package_section(self):
         mixedint = "+mixedint" if self.spec.satisfies("+mixedint") else "~mixedint"
+        gam = "~gpu-aware-mpi"
+        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+            if self.spec.satisfies("+gpu-aware-mpi"):
+                gam = "+gpu-aware-mpi"
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_package_spec(
-                self.name, [f"amg2023{self.determine_version()} +umpire {mixedint}"]
+                self.name, [f"amg2023{self.determine_version()} +umpire {mixedint} {gam}"]
             )
         else:
             self.add_package_spec(
