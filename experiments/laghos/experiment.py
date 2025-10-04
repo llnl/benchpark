@@ -89,6 +89,9 @@ class Laghos(
             self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
     def compute_package_section(self):
-        gam = "+gpu-aware-mpi" if self.spec.satisfies("+gpu-aware-mpi") else "~gpu-aware-mpi"
+        gam = "~gpu-aware-mpi"
+        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+            if self.spec.satisfies("+gpu-aware-mpi"):
+                gam = "+gpu-aware-mpi"
         self.add_package_spec(self.name, [f"laghos{self.determine_version()} +metis {gam}"])
         self.add_package_spec("hypre", ["hypre@2.32.0: +lapack"])
