@@ -1,3 +1,31 @@
+workflow:
+  rules:
+    # Always allow scheduled pipelines
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: always
+
+    # Run pipelines only when these files/dirs change
+    - changes:
+        - .gitlab/**
+        - bin/**
+        - configs/**
+        - experiments/**
+        - lib/**
+        - modifiers/**
+        - repo/**
+        - var/**
+        - systems/llnl-elcapitan/system.py
+        - systems/llnl-cluster/system.py
+        - .gitlab-ci.yml
+        - checkout-versions.yaml
+        - CTestConfig.cmake
+        - CTestGitlab.cmake
+        - pyproject.toml
+        - remote-urls.yaml
+        - requirements.txt
+
+    # Otherwise, don't create a pipeline
+    - when: never
 variables:
   LLNL_SERVICE_USER: benchpark
   # Required information about GitHub repository
@@ -19,6 +47,8 @@ variables:
   FLUX_ARGS: -N 1 --exclusive
   # Dane
   DANE_SHARED_ALLOC: -N 1 -t 04:00:00 --exclusive --reservation=ci
+  # Matrix (NODES ARE SHARED WITHOUT --exclusive)
+  MATRIX_SHARED_ALLOC: -N 1 -t 04:00:00 --exclusive
   # Tuolumne (max 4hr policy)
   TUOLUMNE_SHARED_ALLOC: -N 1 -t 2h --queue=pbatch --exclusive --setattr=gpumode=${GPUMODE}
     --conf=resource.rediscover=true
