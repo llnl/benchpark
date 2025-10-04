@@ -31,15 +31,22 @@ class Amg2023(
 
     variant(
         "version",
-        default="20240511",
+        default="develop",
         values=("develop", "latest", "20240511"),
         description="app version",
     )
 
     variant(
+        "mixedint",
+        default=False,
+        values=(True, False),
+        description="Use 64bit integers while reducing memory use",
+    )
+
+    variant(
         "config",
         default="tuolumne",
-        values=("lassen", "matrix", "tioga", "tuolumne"),
+        values=("lassen", "matrix", "tioga", "tuolumne", "dane"),
         description="Target system config",
     )
 
@@ -50,15 +57,32 @@ class Amg2023(
             process_problem_size_dict = {"nx": 80, "ny": 80, "nz": 80}
             n_resources_dict = {"px": 2, "py": 2, "pz": 2}
         else:
-            if self.spec.satisfies("config=tuolumne"):
-                #process_problem_size_dict = {"nx": [277], "ny": [277], "nz": [277]}
-                process_problem_size_dict = {"nx": [215], "ny": [215], "nz": [215]}
+            if self.spec.satisfies("config=dane"):
+                process_problem_size_dict = {"nx": [120], "ny": [120], "nz": [120]}
+            elif self.spec.satisfies("config=tuolumne"):
+                if self.spec.satisfies("workload=problem1"):
+                    process_problem_size_dict = {"nx": [50], "ny": [50], "nz": [50]}
+                    thru = [100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000, 1050]
+                else:
+                    process_problem_size_dict = {"nx": [80], "ny": [80], "nz": [80]}
+                    thru = [90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260 ,270, 280, 290, 300, 310, 320]
             elif self.spec.satisfies("config=tioga"):
-                process_problem_size_dict = {"nx": [277], "ny": [277], "nz": [277]}
+                process_problem_size_dict = {"nx": [276], "ny": [276], "nz": [276]}
             elif self.spec.satisfies("config=matrix"):
-                process_problem_size_dict = {"nx": [215], "ny": [215], "nz": [215]}
+                if self.spec.satisfies("workload=problem1"):
+                    process_problem_size_dict = {"nx": [50], "ny": [50], "nz": [50]}
+                    thru = [100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800]
+                else:
+                    process_problem_size_dict = {"nx": [80], "ny": [80], "nz": [80]}
+                    thru = [90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260 ,270, 280, 290, 300, 310, 320]
             elif self.spec.satisfies("config=lassen"):
-                process_problem_size_dict = {"nx": [215], "ny": [215], "nz": [215]}
+                if self.spec.satisfies("workload=problem1"):
+                    process_problem_size_dict = {"nx": [50], "ny": [50], "nz": [50]}
+                    thru = [60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200]
+                    #thru = [100, 150, 200]
+                else:
+                    process_problem_size_dict = {"nx": [80], "ny": [80], "nz": [80]}
+                    thru = [90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260 ,270, 280, 290, 300, 310, 320]
             n_resources_dict = {"px": 1, "py": 1, "pz": 1}
 
         # Per-process size (in zones) in each dimension
@@ -86,6 +110,12 @@ class Amg2023(
         # For weak scaling, only the n_resources_dict have to be scaled up,
         # process_problem_size_dict remain the same
 
+        def compute_lassen_throughput(var, itr, dim, scaling_factor):
+            var._var["nx"].append(thru[itr])
+            var._var["ny"].append(thru[itr])
+            var._var["nz"].append(thru[itr])
+            return var.val(dim)
+
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
@@ -111,10 +141,7 @@ class Amg2023(
                     "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
                         dim
                     ),
-                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    )
-                    * scaling_factor,
+                    "process_problem_size_dict": compute_lassen_throughput,
                 },
             }
         )
@@ -127,10 +154,13 @@ class Amg2023(
             self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
     def compute_package_section(self):
+        mixedint = "+mixedint" if self.spec.satisfies("+mixedint") else "~mixedint"
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_package_spec(
-                self.name, [f"amg2023{self.determine_version()} +umpire"]
+                self.name, [f"amg2023{self.determine_version()} +umpire {mixedint}"]
             )
         else:
-            self.add_package_spec(self.name, [f"amg2023{self.determine_version()}"])
+            self.add_package_spec(
+                self.name, [f"amg2023{self.determine_version()} {mixedint}"]
+            )
         self.add_package_spec("hypre", ["hypre+lapack"])
