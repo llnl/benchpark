@@ -4,7 +4,7 @@ set -e
 # Activate Virtual Environment
 . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
 
-echo "./bin/benchpark system init --dest=${HOST} ${ARCHCONFIG} cluster=$HOST $SYSTEM_ARGS"
+echo "./bin/benchpark system init --dest=${HOST} ${ARCHCONFIG} $([ "$HOST" != "matrix" ] && echo "cluster=$HOST") $SYSTEM_ARGS"
 echo "./bin/benchpark experiment init --dest=${BENCHMARK} --system=${HOST} ${BENCHMARK} ${VARIANT}"
 echo "./bin/benchpark setup ${BENCHMARK} wkp/"
 echo ". wkp/setup.sh"
@@ -14,7 +14,7 @@ echo "ramble --disable-logger --workspace-dir . on --executor '{execute_experime
 echo "ramble --disable-logger --workspace-dir . workspace analyze --format json yaml text"
 
 # Initialize System
-./bin/benchpark system init --dest=${HOST} ${ARCHCONFIG} cluster=$HOST $SYSTEM_ARGS
+./bin/benchpark system init --dest=${HOST} ${ARCHCONFIG} $([ "$HOST" != "matrix" ] && echo "cluster=$HOST") $SYSTEM_ARGS
 
 # Initialize Experiment
 BV=""
