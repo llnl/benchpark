@@ -43,6 +43,13 @@ class Amg2023(
         description="Use 64bit integers while reducing memory use",
     )
 
+    variant(
+        "gpu-aware-mpi",
+        default=False,
+        values=(True, False),
+        description="Use GPU-aware MPI",
+    )
+
     maintainers("pearce8")
 
     def compute_applications_section(self):
@@ -122,9 +129,13 @@ class Amg2023(
 
     def compute_package_section(self):
         mixedint = "+mixedint" if self.spec.satisfies("+mixedint") else "~mixedint"
+        gam = "~gpu-aware-mpi"
+        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+            if self.spec.satisfies("+gpu-aware-mpi"):
+                gam = "+gpu-aware-mpi"
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_package_spec(
-                self.name, [f"amg2023{self.determine_version()} +umpire {mixedint}"]
+                self.name, [f"amg2023{self.determine_version()} +umpire {mixedint} {gam}"]
             )
         else:
             self.add_package_spec(
