@@ -47,6 +47,7 @@ class Laghos(
         self.add_experiment_variable("nx", 2, True)
         self.add_experiment_variable("ny", 2, True)
         self.add_experiment_variable("nz", 2, True)
+        self.add_experiment_variable("tf", 0.0033, True)
         self.add_experiment_variable("zones", 1024, True)
 
         # resource_count is the number of resources used for this experiment:
