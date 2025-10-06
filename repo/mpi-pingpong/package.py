@@ -10,7 +10,7 @@ class MpiPingpong(CMakePackage, ROCmPackage, CudaPackage):
 
     git = "https://github.com/LLNL/microbenchmarks.git"
 
-    version("develop", branch="add-cuda")
+    version("develop", branch="develop")
 
     variant("caliper", default=False, description="Enable Caliper/Adiak support")
     variant("rocm", default=False, description="Enable Rocm support")
@@ -39,7 +39,7 @@ class MpiPingpong(CMakePackage, ROCmPackage, CudaPackage):
 
         if self.spec.satisfies("+rocm"):
             args.append(self.define("CMAKE_EXE_LINKER_FLAGS", self.spec['mpi'].libs.ld_flags))
-            args.append('-DUSE_ROCM=ON')
+            args.append('-DUSE_HIP=ON')
             args.append(self.define("ROCM_PATH", self.spec["hip"].prefix))
             hip_vars = self.spec["hip"].variants
             if "amdgpu_targets" in hip_vars:
@@ -48,7 +48,7 @@ class MpiPingpong(CMakePackage, ROCmPackage, CudaPackage):
                     archs = ",".join(vals)
                     args.append(self.define("CMAKE_HIP_ARCHITECTURES", archs))
         else:
-            args.append('-DUSE_ROCM=OFF')
+            args.append('-DUSE_HIP=OFF')
 
         if self.spec.satisfies("+cuda"):
             args.append(self.define("USE_CUDA", "ON"))
