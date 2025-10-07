@@ -9,15 +9,12 @@ from spack_repo.builtin.packages.lammps.package import Lammps as BuiltinLammps
 
 class Lammps(BuiltinLammps):
 
-  version("stable_29Aug2024_update3", tag="stable_29Aug2024_update3")
+  variant("pace", default=False, description="Enable the ML PACE module")
+  depends_on("pace", when="+pace")
 
   depends_on("kokkos+openmp cxxstd=17", when="+openmp")
-  depends_on("kokkos+rocm", when="+rocm")
-  depends_on("kokkos+cuda cxxstd=17", when="+cuda")
+  depends_on("kokkos+wrapper", when="+cuda")
   
-  conflicts("+rocm", when="+cuda")
-  conflicts("+cuda", when="+rocm")
-
   flag_handler = build_system_flags
 
   def setup_run_environment(self, env):
@@ -38,6 +35,8 @@ class Lammps(BuiltinLammps):
     args.append(f"-DMPI_CXX_LINK_FLAGS='{self.spec['mpi'].libs.ld_flags}'")
     args.append(f"-DMPI_C_COMPILER='{self.spec['mpi'].mpicc}'")
     args.append(f"-DMPI_CXX_COMPILER={self.spec['mpi'].mpicxx}")
+    if "+pace" in self.spec:
+        args.append(f"-DPKG_ML-PACE=ON")
 
     return args
  

@@ -23,14 +23,14 @@ class Lammps(
     variant(
         "workload",
         default="hns-reaxff",
-        values=("hns-reaxff", "lj", "eam", "chain", "chute", "rhodo"),
+        values=("hns-reaxff", "lj", "eam", "chain", "chute", "rhodo", "pace"),
         description="workloads",
     )
 
     variant(
         "version",
         default="20250722",
-        values=("develop", "latest", "20250722", "stable_29Aug2024_update3"),
+        values=("develop", "latest", "20250722"),
         description="app version",
     )
 
@@ -45,10 +45,20 @@ class Lammps(
     maintainers("simongdg", "rfhaque")
 
     def compute_applications_section(self):
+        if self.spec.satisfies("workload=pace"):
+            self.add_experiment_variable("lc", 3.597, True)
+            self.add_experiment_variable("lattice", "fcc", True)
+
         if self.spec.satisfies("exec_mode=test"):
-            total_problem_sizes = {"x": 8, "y": 8, "z": 8}
+            if self.spec.satisfies("workload=hns-reaxff"):
+                total_problem_sizes = {"x": 8, "y": 8, "z": 8}
+            if self.spec.satisfies("workload=pace"):
+                total_problem_sizes = {"x": 8, "y": 8, "z": 8}
         else:
-            total_problem_sizes = {"x": 20, "y": 40, "z": 32}
+            if self.spec.satisfies("workload=hns-reaxff"):
+                total_problem_sizes = {"x": 20, "y": 40, "z": 32}
+            if self.spec.satisfies("workload=pace"):
+                total_problem_sizes = {"x": 8, "y": 8, "z": 8}
 
         self.add_experiment_variable(
             "total_problem_size_dict", total_problem_sizes, True
@@ -93,12 +103,20 @@ class Lammps(
             self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
         self.add_experiment_variable("timesteps", 100, False)
-        self.add_experiment_variable("input_file", "{input_path}/in.reaxff.hns", False)
+        if self.spec.satisfies("workload=pace"):
+            self.add_experiment_variable("input_file", "{input_path}/in.pace.product", False)
 
-        self.set_required_variables(
-            process_problem_size="{x}*{y}*{z}/{n_resources}",
-            total_problem_size="{x}*{y}*{z}",
-        )
+            self.set_required_variables(
+                process_problem_size="{x}*{y}*{z}*4/{n_resources}", # placeholder value using fcc lattice with 4 atoms per unit cell
+                total_problem_size="{x}*{y}*{z}*4", # placeholder value using fcc lattice with 4 atoms per unit cell
+            )
+        if self.spec.satisfies("workload=hns-reaxff"):
+            self.add_experiment_variable("input_file", "{input_path}/in.reaxff.hns", False)
+
+            self.set_required_variables(
+                process_problem_size="{x}*{y}*{z}/{n_resources}",
+                total_problem_size="{x}*{y}*{z}",
+            )
 
     def compute_package_section(self):
         fft_kokkos = (
@@ -106,9 +124,12 @@ class Lammps(
             if self.spec.satisfies("+cuda")
             else "fft_kokkos=hipfft" if self.spec.satisfies("+rocm") else ""
         )
+
+        pace = "+pace" if self.spec.satisfies("workload=pace") else "~pace"
+
         self.add_package_spec(
             self.name,
             [
-                f"lammps{self.determine_version()} +opt+manybody+molecule+kspace+rigid+kokkos+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth+reaxff lammps_sizes=bigbig {fft_kokkos} "
+                f"lammps{self.determine_version()} +opt+manybody+molecule+kspace+rigid+kokkos+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth+reaxff lammps_sizes=bigbig {pace} {fft_kokkos} "
             ],
         )
