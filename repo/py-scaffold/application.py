@@ -16,7 +16,7 @@ class PyScaffold(ExecutableApplication):
     tags = ["python"]
 
     # Add system logic to determine spec whether rocm or cuda system here in app.py
-    pip_spec = "{package_path}[rocmwci]"
+    #pip_spec = "{package_path}[rocmwci]"
 
     # register_phase("prepend_library_path", pipeline="setup", run_before=["make_experiments"])
 
@@ -52,10 +52,17 @@ class PyScaffold(ExecutableApplication):
     #     "pip install -r {package_path}requirements.txt\npip install torch==2.8.0+rocm642",
     #     use_mpi=False,
     # )
+
+    # matrix
     executable(
         "modules",
-        "export LD_LIBRARY_PATH=/usr/WS1/mckinsey/bp_scaffold_spack/wkp2/py-scaffold-sp/tuolumne/workspace/software/spack-pip/py-scaffold/ramble/lib/python3.11/site-packages/torch/lib:$LD_LIBRARY_PATH  # libcaffe2_nvrtc.so\nexport SPINDLE_FLUXOPT=off  # specific issue with WCI wheel\nexport LD_LIBRARY_PATH=/opt/cray/pe/cce/20.0.0/cce-clang/x86_64/lib/:$LD_LIBRARY_PATH  # torch libmagma error\nexport LD_LIBRARY_PATH=/opt/cray/pe/cce/20.0.0/cce/x86_64/lib/:$LD_LIBRARY_PATH  # libmodules.so.1",
+        "export LD_LIBRARY_PATH=/usr/WS1/mckinsey/bp_scaffold_spack/wkp3/py-scaffold-sp-mat/matrix/workspace/software/spack-pip/py-scaffold/.venv/lib/python3.11/site-packages/nvidia/cudnn/lib/:$LD_LIBRARY_PATH # libcudnn_graph.so\nexport LD_LIBRARY_PATH=/usr/WS1/mckinsey/bp_scaffold_spack/wkp3/py-scaffold-sp-mat/matrix/workspace/software/spack-pip/py-scaffold/.venv/lib/python3.11/site-packages/torch/lib:LD_LIBRARY_PATH",
     )
+    # # tuo
+    # executable(
+    #     "modules",
+    #     "export LD_LIBRARY_PATH=/usr/WS1/mckinsey/bp_scaffold_spack/wkp2/py-scaffold-sp/tuolumne/workspace/software/spack-pip/py-scaffold/ramble/lib/python3.11/site-packages/torch/lib:$LD_LIBRARY_PATH  # libcaffe2_nvrtc.so\nexport SPINDLE_FLUXOPT=off  # specific issue with WCI wheel\nexport LD_LIBRARY_PATH=/opt/cray/pe/cce/20.0.0/cce-clang/x86_64/lib/:$LD_LIBRARY_PATH  # torch libmagma error\nexport LD_LIBRARY_PATH=/opt/cray/pe/cce/20.0.0/cce/x86_64/lib/:$LD_LIBRARY_PATH  # libmodules.so.1",
+    # )
     executable(
         "generate",
         "scaffold generate_fractals -c {package_path}ScaFFold/configs/benchmark_default.yml --problem-scale {problem_scale}",

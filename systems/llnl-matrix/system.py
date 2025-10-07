@@ -138,12 +138,23 @@ class LlnlMatrix(System):
                 },
                 "python": {
                     "externals": [
+                        # Only define 1 python so pybind path works
+                        # {
+                        #     "spec": "python@3.9.12",
+                        #     "prefix": "/usr/tce/packages/python/python-3.9.12",
+                        #     "buildable": False,
+                        # },
                         {
-                            "spec": "python@3.9.12+bz2+crypt+ctypes+dbm+lzma+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
-                            "prefix": "/usr/tce",
+                            "spec": "python@3.11.9",
+                            "prefix": "/usr/tce/packages/python/python-3.11.9",
+                            "buildable": False,
                         },
-                    ],
-                    "buildable": False,
+                        # {
+                        #     "spec": "python@3.12.4",
+                        #     "prefix": "/usr/tce/packages/python/python-3.12.4",
+                        #     "buildable": False,
+                        # }
+                    ]
                 },
                 "hwloc": {
                     "externals": [{"spec": "hwloc@2.11.2", "prefix": "/usr"}],
@@ -155,6 +166,12 @@ class LlnlMatrix(System):
                 },
                 "curl": {
                     "externals": [{"spec": "curl@7.61.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "py-pybind11": {
+                    "externals": [
+                        {"spec": "py-pybind11@3.0.0", "prefix": "/usr/workspace/mckinsey/bp_scaffold_spack/venv/bp-x86-3.11.5/lib/python3.11/site-packages"}
+                    ],
                     "buildable": False,
                 },
             }
