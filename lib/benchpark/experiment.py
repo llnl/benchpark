@@ -130,14 +130,14 @@ class Affinity:
 
             if not self.spec.satisfies("affinity=none"):
                 package_specs["affinity"] = {
-                    "pkg_spec": f"affinity@{affinity_version}+mpi",
+                    "spack_pkg_spec": f"affinity@{affinity_version}+mpi",
                     "compiler": system_specs["compiler"],
                 }
                 if self.spec.satisfies("+cuda"):
-                    package_specs["affinity"]["pkg_spec"] += "+cuda"
+                    package_specs["affinity"]["spack_pkg_spec"] += "+cuda"
                 elif self.spec.satisfies("+rocm"):
                     package_specs["affinity"][
-                        "pkg_spec"
+                        "spack_pkg_spec"
                     ] += "+rocm amdgpu_target={rocm_arch}"
 
             return {
@@ -466,11 +466,14 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
             }
         }
 
-    def add_package_spec(self, package_name, spec=None):
+    def add_package_spec(self, package_name, spec=None, package_manager="spack"):
         if spec:
-            self.package_specs[package_name] = {
-                "pkg_spec": spec[0],
-            }
+            if package_name not in self.package_specs:
+                self.package_specs[package_name] = {
+                    f"{package_manager}_pkg_spec": spec[0],
+                }
+            else:
+                self.package_specs[package_name][f"{package_manager}_pkg_spec"] = spec[0]
         else:
             self.package_specs[package_name] = {}
 
@@ -505,7 +508,7 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
                     (cls.get_spack_variants() for cls in self.helpers),
                 )
             )
-            self.package_specs[self.name]["pkg_spec"] += " ".join(
+            self.package_specs[self.name]["spack_pkg_spec"] += " ".join(
                 spack_variants
             ).strip()
 

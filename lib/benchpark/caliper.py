@@ -69,13 +69,13 @@ class Caliper:
 
             if not self.spec.satisfies("caliper=none"):
                 package_specs["caliper"] = {
-                    "pkg_spec": f"caliper@{caliper_version}+adiak+mpi~libunwind~libdw",
+                    "spack_pkg_spec": f"caliper@{caliper_version}+adiak+mpi~libunwind~libdw",
                     "compiler": system_specs["compiler"],
                 }
                 if any("topdown" in var for var in self.spec.variants["caliper"]):
                     papi_support = True  # check if target system supports papi
                     if papi_support:
-                        package_specs["caliper"]["pkg_spec"] += "+papi"
+                        package_specs["caliper"]["spack_pkg_spec"] += "+papi"
                     else:
                         raise NotImplementedError(
                             "Target system does not support the papi interface"
@@ -86,7 +86,7 @@ class Caliper:
                     )  # check if target system supports cuda
                     if cuda_support:
                         package_specs["caliper"][
-                            "pkg_spec"
+                            "spack_pkg_spec"
                         ] += "~papi+cuda cuda_arch={}".format(system_specs["cuda_arch"])
                     else:
                         raise NotImplementedError(
@@ -98,7 +98,7 @@ class Caliper:
                     )  # check if target system supports rocm
                     if rocm_support:
                         package_specs["caliper"][
-                            "pkg_spec"
+                            "spack_pkg_spec"
                         ] += "~papi+rocm amdgpu_target={}".format(
                             system_specs["rocm_arch"]
                         )
@@ -109,7 +109,7 @@ class Caliper:
                 elif self.spec.satisfies("caliper=time") or self.spec.satisfies(
                     "caliper=mpi"
                 ):
-                    package_specs["caliper"]["pkg_spec"] += "~papi"
+                    package_specs["caliper"]["spack_pkg_spec"] += "~papi"
 
             return {
                 "packages": {k: v for k, v in package_specs.items() if v},

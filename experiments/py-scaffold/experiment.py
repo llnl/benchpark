@@ -68,9 +68,21 @@ class PyScaffold(
 
     def compute_package_section(self):
         # Spec written into requirements.txt for pip install
+        if self.spec.satisfies("+rocm"):
+            model = "rocmwci"
+        elif self.spec.satisfies("+cuda"):
+            model = "cuda"
         self.add_package_spec(
             self.name,
             [
                 "py-scaffold@main"
             ],
+            package_manager="spack",
+        )
+        self.add_package_spec(
+            self.name,
+            [
+                f"{self.spec.variants['scaffold_path'][0]}[{model}]",
+            ],
+            package_manager="pip",
         )

@@ -153,6 +153,6 @@ class Caliper(BasicModifier):
         with open(cali_metadata_file, "w") as f:
             f.write(json.dumps(cali_metadata))
 
-    software_spec("caliper", pkg_spec="caliper")
-
-    required_package("caliper")
+        with when("package_manager_family=spack"):
+            software_spec("caliper", pkg_spec="caliper", package_manager="spack")
+            required_package("caliper")
