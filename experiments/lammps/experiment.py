@@ -38,7 +38,6 @@ class Lammps(
         "gpu-aware-mpi",
         default=True,
         values=(True, False),
-        when=("+cuda" or "+rocm"),
         description="Enable GPU-aware MPI",
     )
 
@@ -67,7 +66,7 @@ class Lammps(
 
         if self.spec.satisfies("+rocm") or self.spec.satisfies("+cuda"):
             kokkos_mode = "g 1"
-            kokkos_gpu_aware = "on" if self.spec.satisfies("+rocm") else "off"
+            kokkos_gpu_aware = "on" if self.spec.satisfies("+gpu-aware-mpi") else "off"
             kokkos_comm = "device"
         else:
             kokkos_mode = "t {n_threads_per_proc}"
@@ -80,7 +79,7 @@ class Lammps(
             False,
         )
 
-        self.add_experiment_variable("n_resources", 1, False)
+        self.add_experiment_variable("n_resources", 4, False)
 
         self.register_scaling_config(
             {

@@ -30,6 +30,10 @@ class Lammps(BuiltinLammps):
     if "+cuda" in self.spec:
       env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
 
+      if "+mpi" in spec:
+          if spec["mpi"].extra_attributes and "ldflags" in spec["mpi"].extra_attributes:
+              env.append_flags("LDFLAGS", spec["mpi"].extra_attributes["ldflags"])
+
   def cmake_args(self):
     args = super().cmake_args()
     args.append(f"-DMPI_CXX_LINK_FLAGS='{self.spec['mpi'].libs.ld_flags}'")
