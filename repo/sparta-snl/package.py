@@ -85,6 +85,9 @@ class SpartaSnl(CMakePackage, CudaPackage, ROCmPackage):
             env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
         if self.spec.satisfies("+kokkos+rocm fft_kokkos=hipfft"):
             env.prepend_path("LD_LIBRARY_PATH", self.spec["hipfft"].prefix.lib)
+        if "+mpi" in self.spec:
+            if self.spec["mpi"].extra_attributes and "ldflags" in self.spec["mpi"].extra_attributes:
+                env.append_flags("LDFLAGS", self.spec["mpi"].extra_attributes["ldflags"])
 
     root_cmakelists_dir = "cmake"
 

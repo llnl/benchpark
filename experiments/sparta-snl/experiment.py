@@ -48,13 +48,12 @@ class SpartaSnl(
         multi=False,
     )
 
-    # variant(
-    #     "gpu-aware-mpi",
-    #     default=True,
-    #     values=(True, False),
-    #     when=("+cuda" or "+rocm"),
-    #     description="Enable GPU-aware MPI",
-    # )
+    variant(
+        "gpu-aware-mpi",
+        default=True,
+        values=(True, False),
+        description="Enable GPU-aware MPI",
+    )
 
     maintainers("rfhaque")
 
@@ -75,19 +74,20 @@ class SpartaSnl(
         self.add_experiment_variable("stats", stats, True)
         self.add_experiment_variable("run", run, True)
 
-        kokkos_mode = ""
-        if self.spec.satisfies("+openmp"):
-            kokkos_mode += "t {n_threads_per_proc}"
         if self.spec.satisfies("+rocm") or self.spec.satisfies("+cuda"):
-            kokkos_mode += " g {n_gpus}"
+            kokkos_mode = "g 1"
+            kokkos_gpu_aware = "yes" if self.spec.satisfies("+gpu-aware-mpi") else "no"
+        else:
+            kokkos_mode = "t {n_threads_per_proc}"
+            kokkos_gpu_aware = "no"
 
         self.add_experiment_variable(
             "sparta_flags",
-            f"-k on {kokkos_mode} -sf kk",
+            f"-k on {kokkos_mode} -sf kk -pk kokkos gpu/aware {kokkos_gpu_aware}",
             False,
         )
 
-        self.add_experiment_variable("n_resources", 1, False)
+        self.add_experiment_variable("n_resources", 4, False)
 
         if self.spec.satisfies("+openmp"):
             self.add_experiment_variable("n_threads_per_proc", 16, True)
