@@ -26,6 +26,10 @@ class SpartaSnl(ExecutableApplication):
     executable(
         "set-size",
         template=[
+            "sed -i -e 's/xmin equal .*/xmin equal {xmin}*$L/g' -i {in}",
+            "sed -i -e 's/xmax equal .*/xmax equal {xmax}*$L/g' -i {in}",
+            "sed -i -e 's/ymin equal .*/ymin equal {ymin}*$L/g' -i {in}",
+            "sed -i -e 's/ymax equal .*/ymax equal {ymax}*$L/g' -i {in}",
             "sed -i -e 's/ppc equal .*/ppc equal {ppc}/g' -i {in}",
             "sed -i -e 's/L equal .*/L equal {L}./g' -i {in}",
             "sed -i -e 's/collide_modify .*/collide_modify      {collide_modify}/g' -i {in}",
@@ -55,8 +59,24 @@ class SpartaSnl(ExecutableApplication):
             description='length scale factor',
             workloads=['cylinder'])
 
-    workload_variable('ppc', default='32',
+    workload_variable('ppc', default='47',
             description='particles per cell',
+            workloads=['cylinder'])
+    
+    workload_variable('xmin', default='-1.0',
+            description='xmin',
+            workloads=['cylinder'])
+    
+    workload_variable('xmax', default='1.1',
+            description='xmax',
+            workloads=['cylinder'])
+    
+    workload_variable('ymin', default='-1.1',
+            description='ymin',
+            workloads=['cylinder'])
+    
+    workload_variable('ymax', default='1.1',
+            description='ymax',
             workloads=['cylinder'])
     
     workload_variable('collide_modify', default='vremax 100 yes vibrate no rotate smooth nearcp yes 10',

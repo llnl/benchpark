@@ -60,17 +60,31 @@ class SpartaSnl(
     def compute_applications_section(self):
         if self.spec.satisfies("exec_mode=test"):
             L = 1
-            ppc = 32
+            ppc = 47
             stats = 10
             run = 100
+            xmin = -1.0
+            xmax = 1.1
+            ymin = -1.1
+            ymax = 1.1
         else:
             L = 2  # will increase problem size by 4X
             ppc = 64
             stats = 10
             run = 100
+            xmin = -1.0
+            xmax = 1.1
+            ymin = -1.1
+            ymax = 1.1
 
-        self.add_experiment_variable("L", L, True)
-        self.add_experiment_variable("ppc", ppc, True)
+        if self.spec.satisfies("workload=cylinder"):
+            self.add_experiment_variable("L", L, True)
+            self.add_experiment_variable("ppc", ppc, True)
+            self.add_experiment_variable("xmin", xmin, True)
+            self.add_experiment_variable("xmax", xmax, True)
+            self.add_experiment_variable("ymin", ymin, True)
+            self.add_experiment_variable("ymax", ymax, True)
+
         self.add_experiment_variable("stats", stats, True)
         self.add_experiment_variable("run", run, True)
 
@@ -100,10 +114,10 @@ class SpartaSnl(
         if self.spec.satisfies("workload=cylinder"):
             self.add_experiment_variable("in", "in.cylinder", False)
 
-        self.set_required_variables(
-            process_problem_size="{L}*{ppc}*1000",  # 1000 is a placeholder multiplier
-            total_problem_size="{process_problem_size}*{n_resources}",
-        )
+            self.set_required_variables(
+                process_problem_size="{L}*{ppc}*1000",  # 1000 is a placeholder multiplier
+                total_problem_size="{process_problem_size}*{n_resources}",
+            )
 
     def compute_package_section(self):
         fft = self.spec.variants["fft"][0]
