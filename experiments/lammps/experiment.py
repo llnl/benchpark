@@ -103,14 +103,17 @@ class Lammps(
 
         self.add_experiment_variable("timesteps", 100, False)
         if self.spec.satisfies("workload=pace"):
-            self.add_experiment_variable("input_file", "{input_path}/in.pace.product", False)
-
+            self.add_experiment_variable(
+                "input_file", "{input_path}/in.pace.product", False
+            )
             self.set_required_variables(
-                process_problem_size="{x}*{y}*{z}*4/{n_resources}", # placeholder value using fcc lattice with 4 atoms per unit cell
-                total_problem_size="{x}*{y}*{z}*4", # placeholder value using fcc lattice with 4 atoms per unit cell
+                process_problem_size="{x}*{y}*{z}*4/{n_resources}",  # placeholder value using fcc lattice with 4 atoms per unit cell
+                total_problem_size="{x}*{y}*{z}*4",  # placeholder value using fcc lattice with 4 atoms per unit cell
             )
         if self.spec.satisfies("workload=hns-reaxff"):
-            self.add_experiment_variable("input_file", "{input_path}/in.reaxff.hns", False)
+            self.add_experiment_variable(
+                "input_file", "{input_path}/in.reaxff.hns", False
+            )
 
             self.set_required_variables(
                 process_problem_size="{x}*{y}*{z}/{n_resources}",
