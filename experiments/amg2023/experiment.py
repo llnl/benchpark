@@ -135,7 +135,8 @@ class Amg2023(
                 gam = "+gpu-aware-mpi"
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_package_spec(
-                self.name, [f"amg2023{self.determine_version()} +umpire {mixedint} {gam}"]
+                self.name,
+                [f"amg2023{self.determine_version()} +umpire {mixedint} {gam}"],
             )
         else:
             self.add_package_spec(
