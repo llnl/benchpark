@@ -59,6 +59,11 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
 
     flag_handler = build_system_flags
 
+    def setup_run_environment(self, env):
+      if self.compiler.extra_rpaths:
+        for rpath in self.compiler.extra_rpaths:
+          env.prepend_path("LD_LIBRARY_PATH", rpath)
+
     def setup_build_environment(self, env):
         if "+cuda" in self.spec:
             env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
@@ -92,7 +97,6 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
             args.append("-DENABLE_HIP=ON")
             rocm_arch_vals = spec.variants["amdgpu_target"].value
             args.append(f"-DROCM_PATH={spec['hip'].prefix}")
-            args.append(f"-DHIP_PATH={spec['hip'].prefix}/hip")
             if rocm_arch_vals:
               rocm_arch_sorted = list(sorted(rocm_arch_vals, reverse=True))
               rocm_arch = rocm_arch_sorted[0]
