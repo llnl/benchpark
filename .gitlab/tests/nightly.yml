@@ -31,12 +31,6 @@ include:
           - salmon-tddft
           - smb
           - stream
-      # LAMMPS ACE test
-      - HOST: dane
-        ARCHCONFIG: llnl-cluster
-        SCHEDULER_PARAMETERS: $DANE_PARAMS
-        BENCHMARK: [lammps]
-        VARIANT: [workload=pace]
       # +rocm tests
       - HOST: [tuolumne]
         ARCHCONFIG: llnl-elcapitan
@@ -100,11 +94,6 @@ include:
         SCHEDULER_PARAMETERS: $DANE_PARAMS
         BENCHMARK: [amg2023, kripke, lammps, raja-perf, remhos, stream]
         BENCHMARK_VERSION: develop
-      - HOST: dane
-        ARCHCONFIG: llnl-cluster
-        SCHEDULER_PARAMETERS: $DANE_PARAMS
-        BENCHMARK: [lammps]
-        VARIANT: [+rocm]
 nightly_test_run:
   extends: .nightly_rules
   resource_group: $HOST
