@@ -6,7 +6,12 @@
 from packaging.version import Version
 
 from benchpark.directives import variant, maintainers
-from benchpark.system import System, compiler_section_for, compiler_def
+from benchpark.system import (
+    System,
+    compiler_section_for,
+    compiler_def,
+    JobQueue,
+)
 from benchpark.paths import hardware_descriptions
 
 
@@ -22,6 +27,7 @@ class LbnlPerlmutter(System):
             "system_site": "lbnl",
             "hardware_key": str(hardware_descriptions)
             + "/HPECray-zen3-A100-Slingshot/hardware_description.yaml",
+            "queues": [JobQueue("regular", 2880, 3072), JobQueue("debug", 30, 8)],
         },
     }
 
@@ -37,6 +43,14 @@ class LbnlPerlmutter(System):
         default="cpu",
         values=("cpu", "gpu", "gpu&hbmg40", "gpu&hbmg80"),
         description="Which constraint to use"
+    )
+
+    variant(
+        "queue",
+        default="regular",
+        values=("none", "regular", "debug"),
+        multi=False,
+        description="Submit to queue",
     )
 
     def __init__(self, spec):
