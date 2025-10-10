@@ -190,6 +190,12 @@ class LbnlPerlmutter(System):
                 "mpi": {
                     "buildable": False,
                 },
+                "lapac": {
+                    "buildable": False,
+                },
+                "blas": {
+                    "buildable": False,
+                },
                 "cray-libsci": {
                     "externals": [
                         {
