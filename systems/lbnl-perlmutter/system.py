@@ -190,21 +190,13 @@ class LbnlPerlmutter(System):
                 "mpi": {
                     "buildable": False,
                 },
-                "cray-mpich": {
-                    "externals": [
-                                    {
-                                        "spec": "cray-mpich@8.1.30+wrappers", 
-                                        "prefix": "/opt/cray/pe/mpich/8.1.30/ofi/gnu/12.3",
-                                    }
-                                ],
-                },
                 "cray-libsci": {
                     "externals": [
-                                    {
-                                        "spec": "cray-libsci@23.02.1.1", 
-                                        "prefix": "/opt/cray/pe/libsci/23.02.1.1/cray/9.0/x86_64",
-                                    }
-                                ],
+                        {
+                            "spec": "cray-libsci@23.02.1.1", 
+                            "prefix": "/opt/cray/pe/libsci/23.02.1.1/cray/9.0/x86_64",
+                        }
+                    ],
                     "buildable": False,
                 },
             }
@@ -217,7 +209,7 @@ class LbnlPerlmutter(System):
                 "cray-libsci": {
                     "externals": [
                         {
-                            "spec": "cray-libsci@24.07.0%gcc",
+                            "spec": "cray-libsci@24.07.0%gcc+mpi",
                             "prefix": "/opt/cray/pe/libsci/24.07.0/gnu/12.3/x86_64/",
                         }
                     ]
@@ -334,7 +326,6 @@ class LbnlPerlmutter(System):
         #             "compiler-amdclang": {"pkg_spec": "clang"},
         #             "compiler-gcc": {"pkg_spec": "gcc"},
         #             "mpi-gcc": {"pkg_spec": "cray-mpich~gtl"},
-        #             "lapack-oneapi": {"pkg_spec": "intel-oneapi-mkl"},
         #         }
         #     }
         # }
@@ -345,7 +336,6 @@ class LbnlPerlmutter(System):
                     "default-mpi": {"pkg_spec": "cray-mpich"},
                     #"compiler-gcc": {"pkg_spec": "gcc"},
                     "mpi-gcc": {"pkg_spec": "cray-mpich"},
-                    "lapack-oneapi": {"pkg_spec": "intel-oneapi-mkl"},
                 }
             }
         }
