@@ -215,7 +215,7 @@ class LbnlPerlmutter(System):
                 "cray-libsci": {
                     "externals": [
                         {
-                            "spec": "cray-libsci@24.07.0%gcc+mpi",
+                            "spec": "cray-libsci@24.07.0 +mpi %gcc",
                             "prefix": "/opt/cray/pe/libsci/24.07.0/gnu/12.3/x86_64/",
                         }
                     ]
@@ -344,4 +344,4 @@ class LbnlPerlmutter(System):
                     "mpi-gcc": {"pkg_spec": "cray-mpich"},
                 }
             }
-        }
+       }
