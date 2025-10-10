@@ -37,11 +37,11 @@ class PyScaffold(ExecutableApplication):
         # if cuda
         if "cuda_arch" in app_inst.variables.keys():
             # Avoid libcudnn_graph.so error (unecessary if cuX_full, necessary if cuX wheel)
-            paths.append("{env_path}/ramble/lib64/python3.11/site-packages/nvidia/cudnn/lib")
+            paths.append("{env_path}/.venv/lib64/python3.11/site-packages/nvidia/cudnn/lib")
 
         # if caliper
         # Avoid libcaffe2_nvrtc.so
-        paths.append("{env_path}/ramble/lib64/python3.11/site-packages/torch/lib")
+        paths.append("{env_path}/.venv/lib64/python3.11/site-packages/torch/lib")
 
         app_inst.variables["ld_paths"] = ":".join(paths)
 
