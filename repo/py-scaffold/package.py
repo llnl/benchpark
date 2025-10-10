@@ -14,6 +14,7 @@ class PyScaffold(PythonPackage, CudaPackage, ROCmPackage):
     maintainers("michaelmckinsey")
     license("Apache-2.0")
 
+    variant("mpi", default=True, description="MPI support")
     variant("caliper", default=False, description="Build with Caliper support enabled.")
 
     depends_on("python@3.11:", type=("build", "run"))
@@ -59,10 +60,14 @@ class PyScaffold(PythonPackage, CudaPackage, ROCmPackage):
     def setup_run_environment(self, env):
         super().setup_run_environment(env)
 
-        env.prepend_path("LD_LIBRARY_PATH", self.spec['mpi'].libs.gtl_lib_path)
+        #env.prepend_path("LD_LIBRARY_PATH", self.spec['mpi'].extra_attributes["gtl_lib_path"])
 
-        if self.spec.satisfies("+caliper"):
-            env.prepend_path("LD_LIBRARY_PATH", os.path.join(self.spec.prefix.join(python_platlib), "torch", "lib"))
+        # if self.spec.satisfies("+caliper"):
+        #     # Avoid libcaffe2_nvrtc.so
+        #     env.prepend_path("LD_LIBRARY_PATH", os.path.join(str(self.spec.prefix.join(python_platlib)), "torch", "lib"))
+        #     if self.spec.satisfies("+cuda"):
+        #         # Avoid libcudnn_graph.so error (unecessary if cuX_full, necessary if cuX wheel)
+        #         env.prepend_path("LD_LIBRARY_PATH", os.path.join(self.spec.prefix.join(python_platlib), "nvidia", "cudnn", "lib"))
 
         if self.compiler.extra_rpaths:
             for rpath in self.compiler.extra_rpaths:

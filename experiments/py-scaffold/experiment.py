@@ -82,7 +82,8 @@ class PyScaffold(
         self.add_package_spec(
             self.name,
             [
-                f"{self.spec.variants['scaffold_path'][0]}[{model}]",
+                # extra index for torch wheel
+                f"--extra-index-url https://download.pytorch.org/whl/\n{self.spec.variants['scaffold_path'][0]}[{model}]",
             ],
             package_manager="pip",
         )
