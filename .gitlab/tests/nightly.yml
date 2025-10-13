@@ -5,6 +5,7 @@ include:
   variables:
     DASHBOARD_NAME: Nightly [benchpark-develop]
     DANE_PARAMS: -N 1 -t 01:00:00 --exclusive --reservation=ci
+    MATRIX_PARAMS: -N 1 -t 01:00:00 --exclusive
     ELCAP_PARAMS: -N 1 -t 60m --queue=pci --exclusive
   parallel:
     matrix:
@@ -60,6 +61,22 @@ include:
           - raja-perf
           - salmon-tddft
         VARIANT: [+openmp]
+      # +cuda tests
+      - HOST: matrix
+        ARCHCONFIG: llnl-matrix
+        SCHEDULER_PARAMETERS: $MATRIX_PARAMS
+        BENCHMARK:
+          - amg2023
+          - babelstream
+          - gromacs
+          - kripke
+          - laghos
+          - lammps
+          - osu-micro-benchmarks
+          - raja-perf
+          - remhos
+          - saxpy
+        VARIANT: [+cuda]
       #############
       # Other tests
       #############
@@ -75,14 +92,7 @@ include:
       - HOST: dane
         ARCHCONFIG: llnl-cluster
         SCHEDULER_PARAMETERS: $DANE_PARAMS
-        BENCHMARK:
-          - amg2023
-          - babelstream
-          - kripke
-          - lammps
-          - raja-perf
-          - remhos
-          - stream
+        BENCHMARK: [amg2023, kripke, lammps, raja-perf, remhos, stream]
         BENCHMARK_VERSION: develop
 nightly_test_run:
   extends: .nightly_rules

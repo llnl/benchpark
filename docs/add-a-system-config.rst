@@ -7,51 +7,65 @@
 Adding a System
 ===============
 
-This guide is intended for those wanting to run a benchmark on a new system, such as
-vendors, system administrators, or application developers. It assumes a system
-specification does not already exist.
-
-System specifications include two types of information:
-
-1. Hardware specs in `hardware_description.yaml` (e.g., how many CPU cores the node has)
-2. Software stack specs in `system.py` (e.g., installed compilers and libraries, along
-   with their locations and versions)
+This guide is intended for those who would like to add a new system to benchpark, such
+as vendors, system administrators, or application developers. Benchpark provides an API
+for representing system specifications as objects and options to customize the
+specification on the command line. System specifications are defined in ``system.py``
+files located in the systems directory: ``benchpark/systems/<system>/``.
 
 ..
     note:
     Please replace the steps below with a flow diagram.
 
-To specify a new system:
+To determine if you need to create a new system:
 
-1. Identify a system in Benchpark with the same hardware.
+1. Identify a system in Benchpark with the same hardware. See :doc:`system-list` to see
+   hardware descriptions for all available benchpark systems.
 2. If a system with the same hardware does not exist, add a new hardware description, as
-   described in Adding System Hardware Specs section.
+   described in :ref:`adding-system-hardware-specs`.
 3. Identify the same software stack description. Typically if the same hardware is
    already used by Benchpark, the same software stack may already be specified if the
    same vendor software stack is used on this hardware - or, if a software stack of your
-   datacenter is already specified.
+   datacenter is already specified. If a system exists with the same software stack, add
+   your system to that ``system.py`` as a value under the ``cluster`` variant (may be
+   under ``instance_type``), and specify your systems specific resource configuration
+   under the ``id_to_resources`` dictionary.
 4. If the same software stack description does not exist, determine if there is one that
-   can be parameterized to match yours.
-5. If can't parameterize existing software description, add a new one.
+   can be parameterized to match yours, otherwise proceed with adding a new system in
+   :ref:`system-specification`.
 
-1. Adding System Hardware Specs
+.. _adding-system-hardware-specs:
+
+A. Adding System Hardware Specs
 -------------------------------
 
 We list hardware descriptions of Systems specified in Benchpark in the System Catalogue
-in :doc:`system-list`.
+in :doc:`system-list`. If you are running on a system with an accelerator, find an
+existing system with the same accelerator vendor, and then secondarily, if you can,
+match the actual accelerator.
 
-If you are running on a system with an accelerator, find an existing system with the
-same accelerator vendor, and then secondarily, if you can, match the actual accelerator.
-
-1. accelerator.vendor
-2. accelerator.name
+1. ``accelerator.vendor`` - Company name
+2. ``accelerator.name`` - Product name
+3. ``accelerator.ISA`` - Instruction set architecture
+4. ``accelerator.uArch`` - Microarchitecture
 
 Once you have found an existing system with a similar accelerator or if you do not have
 an accelerator, match the following processor specs as closely as you can.
 
-1. processor.name
-2. processor.ISA
-3. processor.uArch
+1. ``processor.vendor`` - Company name
+2. ``processor.name`` - Product name
+3. ``processor.ISA`` - Instruction set architecture
+4. ``processor.uArch`` - Microarchitecture
+
+And add the interconnect vendor and product name.
+
+1. ``interconnect.vendor`` - Company name
+2. ``interconnect.name`` - Product name
+
+Finally, match the integrator vendor and name.
+
+1. ``integrator.vendor`` - Company name
+2. ``integrator.name`` - Product name
 
 For example, if your system has an NVIDIA A100 GPU and an Intel x86 Icelake CPUs, a
 similar config would share the A100 GPU, and CPU architecture may or may not match. Or,
@@ -59,388 +73,417 @@ if I do not have GPUs and instead have SapphireRapids CPUs, the closest match wo
 another system with x86_64, Xeon Platinum, SapphireRapids.
 
 If there is not an exact match, you may add a new directory in the
-`systems/all_hardware_descriptions/system_name` where `system_name` follows the naming
-convention:
+``systems/all_hardware_descriptions/system_name`` where ``system_name`` follows the
+naming convention:
 
 ::
 
-    [INTEGRATOR]-MICROARCHITECTURE[-GPU][-NETWORK]
+    [INTEGRATOR][-MICROARCHITECTURE][-ACCELERATOR][-NETWORK]
 
 where:
 
 ::
 
-    INTEGRATOR = COMPANY[_PRODUCTNAME][...]
+    INTEGRATOR = Integrator Company name
 
     MICROARCHITECTURE = CPU Microarchitecture
 
-    GPU = GPU Product Name
+    ACCELERATOR = Accelerator Product Name
 
     NETWORK = Network Product Name
 
-In the `systems/all_hardware_descriptions/system_name` directory, add a
-`hardware_description.yaml` which follows the yaml format of existing
-`hardware_description.yaml` files.
+In the ``systems/all_hardware_descriptions/system_name`` directory, add a
+``hardware_description.yaml`` which follows the yaml format of existing
+``hardware_description.yaml`` files.
 
-2. Adding or Parameterizing System Software Stack
+.. _system-specification:
+
+B. Creating the System Definition (``system.py``)
 -------------------------------------------------
 
-``system.py`` in Benchpark provides an API to represent a system software stack as a
-command line parameterizable object. If none of the available software stack
-specifications match your system, you may add a `new-system` directory in the `systems`
-directory where the `new-system` directory name follows the naming convention:
+Now that you have defined the hardware description for your system, you can now create
+the ``system.py``, which involves defining the software on your system. This includes
+defining system resources, compilers, and pre-installed packages. The mandatory steps to
+create a ``system.py`` are:
+
+- :ref:`creating-sys-class`
+- :ref:`class-init-and-resources` - At least one cluster must be defined.
+- :ref:`compiler-def` - At least one compiler must be defined.
+- :ref:`software-section`
+
+.. _creating-sys-class:
+
+1. Creating the System Class
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In this example, we will recreate a fully-functional example of the AWS ``system.py``
+that we use for benchpark tutorials (see `aws-tutorial/system.py
+<https://github.com/LLNL/benchpark/blob/develop/systems/aws-tutorial/system.py>`_). To
+start, we import the base benchpark ``System`` class, which our ``AwsTutorial`` system
+will inherit from. We also import the maintainer and variant directives, which provide
+the utilities to track a maintainer by their GitHub username and variants to specify
+configurable properties of our system. There are many similar types of AWS nodes that
+differ only in terms of the number of processors and/or memory (but otherwise have the
+same system packages available). This can be encoded with a variant in a benchpark
+system - the user can indicate what type of instance they are creating, and the system
+description will reflect the instance type chosen. We can specify the different AWS
+instances that share this same hardware and software specification using the
+``instance_type`` variant.
+
+.. note::
+
+    Most system classes in Benchpark have a similar concept, but often they refer to
+    physical (named) clusters with very-similar configs, and so they typically use the
+    term "cluster" rather than "instance_type".
 
 ::
 
-    SITE-SYSTEMNAME
-
-where:
-
-::
-
-    SITE = nosite | abbreviated datacenter name
-
-    SYSTEMNAME = the name of the specific system
-
-..
-    note:
-    make all these x86 example. Automate the directory structure?
-
-Next, copy the system.py from the system with the most similar software stack into
-`new-system` directory, and update it to match your system. For example, the generic-x86
-system software stack is defined in:
-
-::
-
-    $benchpark
-    ├── systems
-       ├── generic-x86
-          ├── system.py
-
-The System base class is defined in ``/lib/benchpark/system.py``, some or all of the
-functions can be overridden to define custom system behavior. Your
-``systems/{SYSTEM}/system.py`` should inherit from the System base class.
-
-The generic-x86 system subclass should run on most x86_64 systems, but we mostly provide
-it as a starting point for modifying or testing. Potential common changes might be to
-edit the scheduler or number of cores per node, adding a GPU configuration, or adding
-other external compilers or packages.
-
-To make these changes, we provided an example below, where we start with the generic-x86
-system.py, and make a system called Modifiedx86.
-
-1. First, make a copy of the system.py file in generic_x86 folder and move it into a new
-   folder, e.g., ``systems/modified_x86/system.py``. Then, update the class name to
-   ``Modifiedx86``.:
-
-   ::
-
-       class Modifiedx86(System):
-
-2. Next, to match our new system, we change the scheduler to slurm and the number of
-   cores per node to 48, and number of GPUs per node to 2.:
-
-   ::
-
-       # this sets basic attributes of our system
-       def __init__(self, spec):
-           super().__init__(spec)
-           self.scheduler = "slurm"
-           self.sys_cores_per_node = "48"
-           self.sys_gpus_per_node = "2"
-
-3. Let's say the new system's GPUs are NVIDIA, we can add a variant that allows us to
-   specify the version of CUDA we want to use, and the location of those CUDA
-   installations on our system. We then add the spack package configuration for our CUDA
-   installations into the `compute_packages_section`.:
-
-   ::
-
-       # import the variant feature at the top of your system.py
-       from benchpark.directives import variant
-
-       # this allows us to specify which cuda version we want as a command line parameter
-       variant(
-           "cuda",
-           default="11-8-0",
-           values=("11-8-0", "10-1-243"),
-           description="CUDA version",
-       )
-
-       # set this to pass to spack
-       def system_specific_variables(self):
-           return {"cuda_arch": "70"}
-
-       # define the external package locations
-       def compute_packages_section(self):
-           selections = {
-               "packages": {
-                   "elfutils": {
-                       "externals": [{"spec": "elfutils@0.176", "prefix": "/usr"}],
-                       "buildable": False,
-                   },
-                   "papi": {
-                       "buildable": False,
-                       "externals": [{"spec": "papi@5.2.0.0", "prefix": "/usr"}],
-                   },
-               }
-           }
-           if self.spec.satisfies("cuda=10-1-243"):
-               selections["packages"] |= {
-                   "cusparse": {
-                       "externals": [
-                           {
-                               "spec": "cusparse@10.1.243",
-                               "prefix": "/usr/tce/packages/cuda/cuda-10.1.243",
-                           }
-                       ],
-                       "buildable": False,
-                   },
-                   "cuda": {
-                       "externals": [
-                           {
-                               "spec": "cuda@10.1.243+allow-unsupported-compilers",
-                               "prefix": "/usr/tce/packages/cuda/cuda-10.1.243",
-                           }
-                       ],
-                       "buildable": False,
-                   },
-               }
-           elif self.spec.satisfies("cuda=11-8-0"):
-               selections["packages"] |= {
-                   "cusparse": {
-                       "externals": [
-                           {
-                               "spec": "cusparse@11.8.0",
-                               "prefix": "/usr/tce/packages/cuda/cuda-11.8.0",
-                           }
-                       ],
-                       "buildable": False,
-                   },
-                   "cuda": {
-                       "externals": [
-                           {
-                               "spec": "cuda@11.8.0+allow-unsupported-compilers",
-                               "prefix": "/usr/tce/packages/cuda/cuda-11.8.0",
-                           }
-                       ],
-                       "buildable": False,
-                   },
-               }
-
-           return selections
-
-External packages can be found via `benchpark system external ---new-system
-{mysite}-{mysystem}`. Note, if your externals are *not* installed via Spack, read `Spack
-documentation on modules
-<https://spack.readthedocs.io/en/latest/packages_yaml.html#external-packages>`_.
-
-4. Next, add any of the packages that can be managed by spack, such as blas/cublas
-pointing to the correct version, this will generate the software configurations for
-spack (``software.yaml``). The actual version will be rendered by Ramble when it is
-built.
-
-::
-
-    def compute_software_section(self):
-      return {
-          "software": {
-              "packages": {
-                  "default-compiler": {"pkg_spec": "gcc"},
-                  "compiler-gcc": {"pkg_spec": "gcc"},
-                  "default-mpi": {"pkg_spec": "openmpi"},
-                  "blas": {"pkg_spec": "openblas"},
-                  "lapack": {"pkg_spec": "openblas"},
-              }
-          }
-      }
-
-5. The full system.py class for the modified_x86 system should now look like:
-
-::
-
-    import pathlib
-
-    from benchpark.directives import variant
+    from benchpark.directives import maintainers, variant
     from benchpark.system import System
 
-    class Modifiedx86(System):
+
+    class AwsTutorial(System):
+        maintainers("michaelmckinsey1")
 
         variant(
-            "cuda",
-            default="11-8-0",
-            values=("11-8-0", "10-1-243"),
-            description="CUDA version",
+            "instance_type",
+            values=("c7i.12xlarge", "c7i.24xlarge"),
+            default="c7i.12xlarge",
+            description="AWS instance type",
         )
 
-        def __init__(self):
-            super().__init__()
+.. _class-init-and-resources:
 
-            self.scheduler = "slurm"
-            setattr(self, "sys_cores_per_node", 48)
-            self.sys_gpus_per_node = "2"
+2. Specify the Class Initializer and Resources
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        def system_specific_variables(self):
-            return {"cuda_arch": "70"}
+When defining ``__init__()`` for our system, we invoke the parent class
+``System::__init__()``, and set important system attributes using the
+``id_to_resources`` dictionary, which contains information for each ``cluster`` or
+``instance_type``. We define common attributes a single time for all ``instance_type``'s
+inside the ``__init__()`` function:
 
-        def compute_packages_section(self):
-          selections = {
-              "packages": {
-                  "elfutils": {
-                      "externals": [{"spec": "elfutils@0.176", "prefix": "/usr"}],
-                      "buildable": False,
-                  },
-                  "papi": {
-                      "buildable": False,
-                      "externals": [{"spec": "papi@5.2.0.0", "prefix": "/usr"}],
-                  },
-              }
-          }
-          if self.spec.satisfies("cuda=10-1-243"):
-              selections["packages"] |= {
-                  "cusparse": {
-                      "externals": [
-                          {
-                              "spec": "cusparse@10.1.243",
-                              "prefix": "/usr/tce/packages/cuda/cuda-10.1.243",
-                          }
-                      ],
-                      "buildable": False,
-                  },
-                  "cuda": {
-                      "externals": [
-                          {
-                              "spec": "cuda@10.1.243+allow-unsupported-compilers",
-                              "prefix": "/usr/tce/packages/cuda/cuda-10.1.243",
-                          }
-                      ],
-                      "buildable": False,
-                  },
-              }
-          elif self.spec.satisfies("cuda=11-8-0"):
-              selections["packages"] |= {
-                  "cusparse": {
-                      "externals": [
-                          {
-                              "spec": "cusparse@11.8.0",
-                              "prefix": "/usr/tce/packages/cuda/cuda-11.8.0",
-                          }
-                      ],
-                      "buildable": False,
-                  },
-                  "cuda": {
-                      "externals": [
-                          {
-                              "spec": "cuda@11.8.0+allow-unsupported-compilers",
-                              "prefix": "/usr/tce/packages/cuda/cuda-11.8.0",
-                          }
-                      ],
-                      "buildable": False,
-                  },
-              }
+1. ``system_site`` - The name of the site where the ``cluster``/``instance_type`` is
+   located.
+2. ``programming_models`` - List of applicable programming models. ``MPI`` is assumed
+   for every system in benchpark, so you do not need to add it here. For this system, we
+   add ``OpenMPCPUOnlySystem`` (different from GPU openmp). If we had NVIDIA
+   accelerators, we would add ``CudaSystem`` to this list, and ``ROCmSystem`` for AMD.
+3. ``scheduler`` - The job scheduler.
+4. ``hardware_key`` - which defines a path to the yaml description you just created in
+   the previous step :ref:`adding-system-hardware-specs`.
+5. ``sys_cores_per_node`` - The amount of hardware cores per node.
+6. ``sys_mem_per_node_GB`` - The amount of node memory (in gigabytes).
 
-          return selections
-
-        def compute_software_section(self):
-          return {
-              "software": {
-                  "packages": {
-                      "default-compiler": {"pkg_spec": "gcc"},
-                      "compiler-gcc": {"pkg_spec": "gcc"},
-                      "default-mpi": {"pkg_spec": "openmpi"},
-                      "blas": {"pkg_spec": "openblas"},
-                      "lapack": {"pkg_spec": "openblas"},
-                  }
-              }
-          }
-    """
-
-Once the modified system subclass is written, run: ``benchpark system init
---dest=modifiedx86-system modifiedx86``
-
-This will generate the required yaml configurations for your system and you can validate
-it works with a static experiment test.
-
-.. note::
-
-    Use the ``benchpark info system {system_name}`` to find additional variants that are
-    available to all systems. This includes settings such as: the job timeout,
-    submitting to a different partition/queue, and setting the account/bank.
-
-3. Validating the System
-------------------------
-
-To manually validate your new system, you should initialize it and run an existing
-experiment such as saxpy. For example:
+This information is used to determine the necessary resource allocation request for any
+experiment initialized with your chosen instance.
 
 ::
 
-    benchpark system init --dest=modifiedx86-system modifiedx86
-    benchpark experiment init --dest=saxpy --system=modifiedx86-system saxpy +openmp
-    benchpark setup ./saxpy workspace/
+    from benchpark.directives import maintainers, variant
+    from benchpark.openmpsystem import OpenMPCPUOnlySystem
+    from benchpark.paths import hardware_descriptions
+    from benchpark.system import System
 
-Then you can run the commands provided by the output, the experiments should be built
-and run successfully without any errors.
 
-The following yaml files are examples of what is generated for the modified_x86 system
-from the example after it is initialized:
+    class AwsTutorial(System):
+        maintainers("michaelmckinsey1")
+
+        id_to_resources = {
+            "c7i.24xlarge": {
+                "sys_cores_per_node": 96,
+                "sys_mem_per_node_GB": 192,
+            },
+            "c7i.12xlarge": {
+                "sys_cores_per_node": 48,
+                "sys_mem_per_node_GB": 96,
+            },
+        }
+
+        variant(
+            "instance_type",
+            values=("c7i.12xlarge", "c7i.24xlarge"),
+            default="c7i.12xlarge",
+            description="AWS instance type",
+        )
+
+        def __init__(self, spec):
+            super().__init__(spec)
+
+            # Common attributes across instances
+            self.programming_models = [OpenMPCPUOnlySystem()]
+            self.system_site = "aws"
+            self.scheduler = "flux"
+            self.hardware_key = (
+                str(hardware_descriptions)
+                + "/AWS_Tutorial-sapphirerapids-EFA/hardware_description.yaml"
+            )
+
+            attrs = self.id_to_resources.get(self.spec.variants["instance_type"][0])
+            for k, v in attrs.items():
+                setattr(self, k, v)
+
+.. _compiler-def:
+
+3. Add Compiler Definitions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We define compilers that are available on our system by implementing
+``compute_compilers_section()`` function. Here are the general steps for how to write
+this function, followed by our AWS example:
+
+1. For each compiler, create the necessary config with ``compiler_def()``.
+2. For each type of compiler (gcc, intel, etc.), combine them with
+   ``compiler_section_for()``.
+3. Merge the compiler definitions with merge_dicts (this part is unnecessary if you have
+   only one type of compiler).
+4. Generally, you will want to compose a minimal list of compilers: e.g., if you want to
+   compile your benchmark with the oneAPI compiler, and have multiple versions to choose
+   from, you would add a variant to the system, and the config would expose only one of
+   them.
+
+For our AWS system, the compiler we define is ``gcc@11.4.0``. For the
+``compiler_def()``, we must at minimum specify the ``spec``, ``prefix``, and ``exes``:
+
+1. ``spec`` - Similar to package specs, ``name@version``. GCC in particular also needs
+   the ``languages`` variant, where the list of languages depends on the available
+   ``exes`` (e.g., do not include "fortran" if ``gfortran`` is not available). If you
+   are **not** using GCC or Spack as your package manager, ``languages`` is unnecessary.
+2. ``prefix`` - Prefix to the compiler binary directory, e.g., ``/usr/`` for
+   ``/usr/bin/gcc``
+3. ``exes`` - Dictionary to map ``c``, ``cxx``, and ``fortran`` to the appropriate file
+   found in the prefix.
+
+::
+
+    from benchpark.directives import maintainers, variant
+    from benchpark.openmpsystem import OpenMPCPUOnlySystem
+    from benchpark.paths import hardware_descriptions
+    from benchpark.system import System, compiler_def, compiler_section_for
+
+
+    class AwsTutorial(System):
+
+    ...
+
+        def compute_compilers_section(self):
+            return compiler_section_for(
+                "gcc",
+                [
+                    compiler_def(
+                        "gcc@11.4.0 languages=c,c++,fortran",
+                        "/usr/",
+                        {"c": "gcc", "cxx": "g++", "fortran": "gfortran-11"},
+                    )
+                ],
+            )
+
+.. _software-section:
+
+4. Add a Software Section
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Here we define the ``compute_software_section()``, where at minimum we must define the
+``default-compiler`` for Ramble. This is trivial for the single compiler that we have,
+``gcc@11.4.0``.
+
+::
+
+    from benchpark.directives import maintainers, variant
+    from benchpark.openmpsystem import OpenMPCPUOnlySystem
+    from benchpark.paths import hardware_descriptions
+    from benchpark.system import System, compiler_def, compiler_section_for
+
+
+    class AwsTutorial(System):
+
+    ...
+
+        def compute_software_section(self):
+            return {
+                "software": {
+                    "packages": {
+                        "default-compiler": {"pkg_spec": "gcc@11.4.0"},
+                    }
+                }
+            }
+
+.. _software-definitions:
+
+5. Add Software Definitions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Finally, we define the ``compute_packages_section()`` function, where you can include
+any package that you would like the package manager, such as Spack, to find on the
+system, meaning it will not build that package from source and use your system package
+instead. For each package that you include, you need to define its spec ``name@version``
+and the system path ``prefix`` to the package. Additionally for Spack, you need to set
+``buildable: False`` to tell Spack not to build that package.
+
+At minimum, we recommend to define externals for ``cmake`` and ``mpi`` (users also
+typically define externals for other libraries, e.g., math libraries like ``blas`` and
+``lapack``). This is because certain packages (e.g., ``cmake``) can take a long time to
+build, and packages such as ``mpi``, ``blas``, and ``lapack`` can influence runtime
+performance significantly so it is prudent to use the versions optimized for our system.
+Additionally, for systems with accelerators, define externals for CUDA and ROCm runtime
+libraries (see externals examples for a `CUDA system
+<https://github.com/LLNL/benchpark/blob/e82e3a26aef54855cf281c088b8f149ab7d87d9d/systems/llnl-matrix/system.py#L274>`_,
+or a `ROCm system
+<https://github.com/LLNL/benchpark/blob/e82e3a26aef54855cf281c088b8f149ab7d87d9d/systems/llnl-elcapitan/system.py#L483>`_).
+See :ref:`adding-sys-packages`, for help on how to search for the packages available on
+your system.
 
 .. note::
 
-    The following files are generated by benchpark (in the system destination folder)
-    and do not have to be manually created.
+    For packages that declare virtual dependencies, e.g., ``depends_on("mpi")``, you
+    need to define a virtual package ``"mpi": {"buildable": False},``, followed by a
+    definition of at least one provider of this package (see the provider definition for
+    ``openmpi`` in our example). This is to ensure Spack uses the provider we specified,
+    and does not try to build another MPI package. See a similar example for ``blas``,
+    ``lapack``, and their provider ``atlas``.
 
-1. ``system_id.yaml`` describes the system hardware, including the integrator (and the
-   name of the product node or cluster type), the processor, (optionally) the
-   accelerator, and the network; the information included here is what you will
-   typically see recorded about the system on Top500.org. We intend to make the system
-   definitions in Benchpark searchable, and will add a schema to enforce consistency;
-   until then, please copy the file and fill out all of the fields without changing the
-   keys. Also listed is the specific system the config was developed and tested on, as
-   well as the known systems with the same hardware so that the users of those systems
-   can find this system specification.
+::
 
-.. code-block:: yaml
+    from benchpark.directives import maintainers, variant
+    from benchpark.openmpsystem import OpenMPCPUOnlySystem
+    from benchpark.paths import hardware_descriptions
+    from benchpark.system import System, compiler_def, compiler_section_for
 
-    system:
-      name: Modifiedx86
-      spec: sysbuiltin.modifiedx86 cuda=11-8-0
-      config-hash: 5310ebe8b2c841108e5da854c75dab931f5397a7fb41726902bb8a51ffb84a36
 
-2. ``software.yaml`` defines default compiler and package names your package manager
-(Spack) should use to build the benchmarks on this system. ``software.yaml`` becomes the
-spack section in the `Ramble configuration file
-<https://ramble.readthedocs.io/en/latest/configuration_files.html#external-spack-environment-support>`_.
+    class AwsTutorial(System):
 
-.. code-block:: yaml
+    ...
 
-    software:
-      packages:
-        default-compiler:
-          pkg_spec: 'gcc'
-        compiler-gcc:
-          pkg_spec: 'gcc'
-        default-mpi:
-          pkg_spec: 'openmpi'
-        blas:
-          pkg_spec: cublas@{default_cuda_version}
-        cublas-cuda:
-          pkg_spec: cublas@{default_cuda_version}
 
-3. ``variables.yaml`` defines system-specific launcher and job scheduler.
+        def compute_packages_section(self):
+            return {
+                "packages": {
+                    "blas": {"buildable": False},
+                    "lapack": {"buildable": False},
+                    "atlas": {
+                        "externals": [{"spec": "atlas@3.10.3", "prefix": "/usr"}],
+                    },
+                    "mpi": {"buildable": False},
+                    "openmpi": {
+                        "externals": [
+                            {
+                                "spec": "openmpi@4.0%gcc@11.4.0",
+                                "prefix": "/usr",
+                            }
+                        ]
+                    },
+                    "cmake": {
+                        "externals": [{"spec": "cmake@4.1.1", "prefix": "/usr"}],
+                        "buildable": False,
+                    },
+                    ...
+                }
+            }
 
-.. code-block:: yaml
+6. Validating the System
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-    variables:
-      timeout: "120"
-      scheduler: "slurm"
-      sys_cores_per_node: "48"
-      sys_gpus_per_node: 2
-      cuda_arch: 70
-      n_ranks: 18446744073709551615  # placeholder value
-      n_nodes: 18446744073709551615  # placeholder value
-      batch_submit: "placeholder"
-      mpi_command: "placeholder"
+To manually validate that your new system works, you should start by initializing your
+system:
 
-Once you can run an experiment successfully, and the yaml looks correct, the new system
-has been validated and you can continue your :doc:`benchpark-workflow`.
+::
+
+    benchpark system init --dest=aws-tutorial aws-tutorial
+
+If this completes without errors, you can continue by creating a benchmark
+:doc:`add-a-benchmark`.
+
+System Appendix
+---------------
+
+.. _adding-sys-packages:
+
+1. Adding/Updating System Packages
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+External package definitions can be added/updated from the output of ``benchpark system
+external``. If you don't have any packages yet, define ``compute_packages_section`` as
+an empty dictionary:
+
+::
+
+    def compute_packages_section(self):
+        return {
+            "packages": {}
+        }
+
+And then whether or not you have packages, run ``benchpark system external <system>
+cluster=<cluster>``:
+
+::
+
+    [ruby]$ benchpark system external llnl-cluster cluster=ruby
+
+    $ benchpark system external llnl-cluster
+    ==> The following specs have been detected on this system and added to /g/g20/mckinsey/.benchmark/spack/etc/spack/packages.yaml
+    cmake@3.23.1  cmake@3.26.5  gmake@4.2.1  hwloc@2.11.2  python@2.7.18  python@2.7.18  python@3.6.8  python@3.9.12  python@3.10.8  python@3.12.8  tar@1.30
+                    The Packages are different. Here are the differences:
+    {'dictionary_item_added': ["root['gmake']['buildable']"],
+    'dictionary_item_removed': ["root['elfutils']", "root['papi']", "root['unwind']", "root['blas']", "root['lapack']", "root['fftw']", "root['mpi']"],
+    'iterable_item_added': {"root['cmake']['externals'][1]": {'prefix': '/usr/tce',
+                                                              'spec': 'cmake@3.23.1'},
+                            "root['python']['externals'][1]": {'prefix': '/usr',
+                                                                'spec': 'python@2.7.18+bz2+crypt+ctypes+dbm~lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl~tkinter+uuid+zlib'},
+                            "root['python']['externals'][2]": {'prefix': '/usr',
+                                                                'spec': 'python@3.6.8+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib'},
+                            "root['python']['externals'][3]": {'prefix': '/usr/tce',
+                                                                'spec': 'python@2.7.18+bz2+crypt+ctypes+dbm~lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib'},
+                            "root['python']['externals'][4]": {'prefix': '/usr/tce',
+                                                                'spec': 'python@3.9.12+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib'},
+                            "root['python']['externals'][5]": {'prefix': '/usr/workspace/wsa/mckinsey/venv/benchpark-3.12.8',
+                                                                'spec': 'python@3.12.8+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat+pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib'}},
+    'values_changed': {"root['cmake']['externals'][0]['prefix']": {'new_value': '/usr',
+                                                                    'old_value': '/usr/tce/packages/cmake/cmake-3.26.3'},
+                        "root['cmake']['externals'][0]['spec']": {'new_value': 'cmake@3.26.5',
+                                                                  'old_value': 'cmake@3.26.3'},
+                        "root['hwloc']['externals'][0]['spec']": {'new_value': 'hwloc@2.11.2',
+                                                                  'old_value': 'hwloc@2.9.1'},
+                        "root['python']['externals'][0]['prefix']": {'new_value': '/usr/WS1/mckinsey/venv/python-3.10.8',
+                                                                    'old_value': '/usr/tce/packages/python/python-3.9.12/'},
+                        "root['python']['externals'][0]['spec']": {'new_value': 'python@3.10.8+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat+pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib',
+                                                                  'old_value': 'python@3.9.12'}}}
+                    Here are all of the new packages:
+    {'cmake': {'buildable': False,
+              'externals': [{'prefix': '/usr', 'spec': 'cmake@3.26.5'},
+                            {'prefix': '/usr/tce', 'spec': 'cmake@3.23.1'}]},
+    'gmake': {'buildable': False,
+              'externals': [{'prefix': '/usr', 'spec': 'gmake@4.2.1'}]},
+    'hwloc': {'buildable': False,
+              'externals': [{'prefix': '/usr', 'spec': 'hwloc@2.11.2'}]},
+    'python': {'buildable': False,
+                'externals': [{'prefix': '/usr/WS1/mckinsey/venv/python-3.10.8',
+                              'spec': 'python@3.10.8+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat+pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib'},
+                              {'prefix': '/usr',
+                              'spec': 'python@2.7.18+bz2+crypt+ctypes+dbm~lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl~tkinter+uuid+zlib'},
+                              {'prefix': '/usr',
+                              'spec': 'python@3.6.8+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib'},
+                              {'prefix': '/usr/tce',
+                              'spec': 'python@2.7.18+bz2+crypt+ctypes+dbm~lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib'},
+                              {'prefix': '/usr/tce',
+                              'spec': 'python@3.9.12+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib'},
+                              {'prefix': '/usr/workspace/wsa/mckinsey/venv/benchpark-3.12.8',
+                              'spec': 'python@3.12.8+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat+pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib'}]},
+    'tar': {'buildable': False,
+            'externals': [{'prefix': '/usr', 'spec': 'tar@1.30'}]}}
+
+where the command should be ran on a cluster that is defined for the given system, e.g.,
+ruby for llnl-cluster. Use this output to update your package definitions in your
+``system.py``'s ``compute_package_section()``.
+
+For packages that are not found by ``benchpark system external``, you can manually find
+them using a command like the ``module`` command, if your system has environment
+modules:
+
+::
+
+    [dane6:~]$ module display gcc/12.1.1
+    ...
+    prepend_path("PATH","/usr/tce/packages/gcc/gcc-12.1.1/bin")
+
+Therefore, the ``prefix`` is ``/usr/tce/packages/gcc/gcc-12.1.1/`` and the spec is
+``gcc@12.1.1``.
