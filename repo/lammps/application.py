@@ -284,6 +284,95 @@ class Lammps(ExecutableApplication):
         workloads=["hns-reaxff"],
     )
 
+    pace_input_test_path = os.path.join(
+        "{lammps}/src", "examples", "PACKAGES", "pace"
+    )
+
+    executable(
+        "set-lattice",
+        template=[
+            "sed -i -e 's/a equal .*/a equal {lc}/g' -i input.txt",
+            "sed -i -e 's/lattice .*/lattice {lattice} $a/g' -i input.txt",
+        ],
+        use_mpi=False,
+    )
+
+    executable(
+        "set-size",
+        template=[
+            "sed -i -e 's/box block .*/box block 0 {x} 0 {y} 0 {z}/g' -i input.txt",
+        ],
+        use_mpi=False,
+    )
+
+    workload(
+        "pace",
+        executables=["copy-contents", "set-lattice", "set-size", "set-timesteps", "execute"],
+    )
+
+    workload_variable(
+        "lc",
+        default="3.597",
+        description="Lattice constant",
+        workloads=["pace"],
+    )
+
+    workload_variable(
+        "lattice",
+        default="fcc",
+        description="Lattice type",
+        workloads=["pace"],
+    )
+
+    workload_variable(
+        "x",
+        default="4",
+        description="Unit cells in the x direction",
+        workloads=["pace"],
+    )
+
+    workload_variable(
+        "y",
+        default="4",
+        description="Unit cells in the y direction",
+        workloads=["pace"],
+    )
+
+    workload_variable(
+        "z",
+        default="4",
+        description="Unit cells in the z direction",
+        workloads=["pace"],
+    )
+
+    workload_variable(
+        "input_file",
+        default="in.pace.product",
+        description="PACE input file name",
+        workloads=["pace"],
+    )
+
+    workload_variable(
+        "input_path",
+        default=os.path.join(f"{pace_input_test_path}"),
+        description="Path to input directory for pace workload",
+        workloads=["pace"],
+    )
+
+    workload_variable(
+        "timesteps",
+        default="100",
+        description="Number of timesteps",
+        workloads=["pace"],
+    )
+
+    workload_variable(
+        "lammps_flags",
+        default="",
+        description="Additional execution flags for lammps",
+        workloads=["pace"],
+    )
+
     success_criteria(
         "walltime",
         mode="string",

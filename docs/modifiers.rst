@@ -104,11 +104,11 @@ running, a ``.cali`` file is created which contains the collected performance me
     - - cuda
       - NVIDIA GPUs
       - |   - CUDA API functions
-      - |   - GPU time
+        |   - GPU time
     - - rocm
       - AMD GPUs
       - |   - HIP API functions
-      - |   - GPU time
+        |   - GPU time
     - - topdown-counters-all
       - x86 Intel CPUs
       - |   - Raw counter values for Intel top-down analysis (all levels)
@@ -143,9 +143,8 @@ the ``Allocation Modifier`` generates the appropriate scheduler request for thes
 resources (how many nodes are required to run a given experiment, etc.).
 
 .. list-table:: Hardware resources as specified by the system, and requested for the experiment
-
-        :widths: 20 40 40
-        :header-rows: 1
+    :widths: 20 40 40
+    :header-rows: 1
 
     - - Resource
       - Available on the System

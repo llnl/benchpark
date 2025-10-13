@@ -247,8 +247,8 @@ For our AWS system, the compiler we define is ``gcc@11.4.0``. For the
 
 1. ``spec`` - Similar to package specs, ``name@version``. GCC in particular also needs
    the ``languages`` variant, where the list of languages depends on the available
-   ``exes`` (e.g., do not include "fortran" if ``gfortran`` is not available). If you are
-   **not** using GCC or Spack as your package manager, ``languages`` is unnecessary.
+   ``exes`` (e.g., do not include "fortran" if ``gfortran`` is not available). If you
+   are **not** using GCC or Spack as your package manager, ``languages`` is unnecessary.
 2. ``prefix`` - Prefix to the compiler binary directory, e.g., ``/usr/`` for
    ``/usr/bin/gcc``
 3. ``exes`` - Dictionary to map ``c``, ``cxx``, and ``fortran`` to the appropriate file
@@ -325,22 +325,22 @@ typically define externals for other libraries, e.g., math libraries like ``blas
 ``lapack``). This is because certain packages (e.g., ``cmake``) can take a long time to
 build, and packages such as ``mpi``, ``blas``, and ``lapack`` can influence runtime
 performance significantly so it is prudent to use the versions optimized for our system.
-Additionally, for systems with accelerators, define externals
-for CUDA and ROCm runtime libraries (see externals examples for a `CUDA system
+Additionally, for systems with accelerators, define externals for CUDA and ROCm runtime
+libraries (see externals examples for a `CUDA system
 <https://github.com/LLNL/benchpark/blob/e82e3a26aef54855cf281c088b8f149ab7d87d9d/systems/llnl-matrix/system.py#L274>`_,
 or a `ROCm system
 <https://github.com/LLNL/benchpark/blob/e82e3a26aef54855cf281c088b8f149ab7d87d9d/systems/llnl-elcapitan/system.py#L483>`_).
-See :ref:`adding-sys-packages`, for help on how to search for the packages
-available on your system.
+See :ref:`adding-sys-packages`, for help on how to search for the packages available on
+your system.
 
 .. note::
 
-    For packages that declare virtual dependencies, e.g., ``depends_on("mpi")``, you need
-    to define a virtual package ``"mpi": {"buildable": False},``, followed by a definition
-    of at least one provider of this package (see the provider definition for ``openmpi``
-    in our example). This is to ensure Spack uses the provider we specified,
-    and does not try to build another MPI package. See a similar example
-    for ``blas``, ``lapack``, and their provider ``atlas``.
+    For packages that declare virtual dependencies, e.g., ``depends_on("mpi")``, you
+    need to define a virtual package ``"mpi": {"buildable": False},``, followed by a
+    definition of at least one provider of this package (see the provider definition for
+    ``openmpi`` in our example). This is to ensure Spack uses the provider we specified,
+    and does not try to build another MPI package. See a similar example for ``blas``,
+    ``lapack``, and their provider ``atlas``.
 
 ::
 
