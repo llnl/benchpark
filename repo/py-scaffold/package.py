@@ -33,6 +33,9 @@ class PyScaffold(PythonPackage, CudaPackage, ROCmPackage):
 
     depends_on("mpi")
 
+    depends_on("c", type="build")
+    depends_on("cxx", type="build")
+
     # depends_on("open3d+python", type=("build", "run"))
 
     # TODO glew wont build (dependency of open3d)
