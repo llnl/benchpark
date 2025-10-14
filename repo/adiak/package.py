@@ -62,14 +62,20 @@ class Adiak(CMakePackage):
         
         if self.spec.satisfies("+python"):
             args.append("-DENABLE_PYTHON_BINDINGS=ON")
-            cmakedir = os.path.join(self.spec.prefix.join(python_platlib), "pybind11", "share", "cmake", "pybind11")
-            args.append(f"-Dpybind11_DIR={cmakedir}")
+            args.append(f"-Dpybind11_DIR={os.path.join(self.spec['py-pybind11'].prefix, 'pybind11', 'share', 'cmake', 'pybind11')}")
 
         args.append(self.define("CMAKE_EXE_LINKER_FLAGS", self.spec['mpi'].libs.ld_flags))
         args.append(self.define("MPI_CXX_LINK_FLAGS", self.spec['mpi'].libs.ld_flags))
 
         args.append("-DENABLE_TESTS=OFF")
         return args
+
+    def setup_build_environment(self, env):
+        super().setup_build_environment(env)
+
+        if "+mpi" in self.spec:
+            if self.spec["mpi"].extra_attributes and "ldflags" in self.spec["mpi"].extra_attributes:
+                env.append_flags("LDFLAGS", self.spec["mpi"].extra_attributes["ldflags"])
 
     def setup_run_environment(self, env):
         if self.spec.satisfies("+python"):

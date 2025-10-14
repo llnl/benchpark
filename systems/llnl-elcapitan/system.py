@@ -355,7 +355,7 @@ class LlnlElcapitan(System):
                 # },
                 "py-pybind11": {
                     "externals": [
-                        {"spec": "py-pybind11@3.0.0", "prefix": "/usr/workspace/mckinsey/bp_scaffold_spack/venv/bp-x86-3.11.5/lib/python3.11/site-packages"}
+                        {"spec": "py-pybind11@3.0.0", "prefix": "/usr/workspace/mckinsey/venv/bp-x86-3.11.5/lib/python3.11/site-packages/"}
                     ],
                     "buildable": False,
                 },

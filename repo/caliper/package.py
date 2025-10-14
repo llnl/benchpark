@@ -130,8 +130,8 @@ class Caliper(CachedCMakePackage, CudaPackage, ROCmPackage):
     depends_on("python", type="build")
 
     depends_on("python@3", when="+python", type=("build", "link", "run"))
-    depends_on("py-pybind11@3.0.0:", when="+python", type=("build", "link", "run"))
     depends_on("adiak@0.4.1p+python", when="+python", type=("build", "link", "run"))
+    depends_on("py-pybind11@3.0.0:", when="+python", type=("build", "link", "run"))
 
     # sosflow support not yet in 2.0
     conflicts("+sosflow", "@2:")
@@ -252,6 +252,9 @@ class Caliper(CachedCMakePackage, CudaPackage, ROCmPackage):
 
         args.append(self.define("CMAKE_EXE_LINKER_FLAGS", self.spec['mpi'].libs.ld_flags))
         args.append(self.define("MPI_CXX_LINK_FLAGS", self.spec['mpi'].libs.ld_flags))
+
+        if self.spec.satisfies("+python"):
+            args.append(f"-Dpybind11_DIR={os.path.join(self.spec['py-pybind11'].prefix, 'pybind11', 'share', 'cmake', 'pybind11')}")
 
         return args
 
