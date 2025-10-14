@@ -13,18 +13,34 @@ jobs:
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
-      - name: Non-MPIOnlyExperiment Test
+      - name: Run negative tests via helper
+        shell: bash
         run: |
+          fail() { echo "TEST FAILED: $*" >&2; exit 1; }
+
+          # one-time setup
           ./bin/benchpark system init --dest dane llnl-cluster
+
+          # 1) Non-MPIOnlyExperiment Test
           set +e
           # babelstream is not an MPIOnlyExperiment
-          stderr_output="$({ BENCHPARK_RUN_COVERAGE=errors ./bin/benchpark experiment init --dest babelstream --system dane babelstream 1>/dev/null; } 2>&1)"
+          stderr_output="$({ ./bin/benchpark experiment init --dest babelstream --system dane babelstream; } 2>&1)"
           status=$?
           set -e
-          fail() { echo "TEST FAILED: $*" >&2; exit 1; }
           [[ $status -ne 0 ]] || fail "Expected non-zero exit status, got $status"
           # Check for the specific BenchparkError message
           expected="cannot run with MPI only"
+          grep -Fq "$expected" <<< "$stderr_output" && echo "failed as expected: $expected" || fail "Expected error message not found in stderr. Got: $stderr_output"
+
+          # 2) Multiple scaling options
+          set +e
+          # Cannot use both +strong and +weak
+          stderr_output="$({ ./bin/benchpark experiment init --dest kripke --system dane kripke+strong+weak; } 2>&1)"
+          status=$?
+          set -e
+          [[ $status -ne 0 ]] || fail "Expected non-zero exit status, got $status"
+          # Check for the specific BenchparkError message
+          expected="spec cannot specify multiple scaling options"
           grep -Fq "$expected" <<<"$stderr_output" && echo "failed as expected: $expected" || fail "Expected error message not found in stderr. Got: $stderr_output"
   saxpy:
     runs-on: ubuntu-24.04
@@ -168,3 +184,22 @@ jobs:
       - name: Run
         run: |-
           ./bin/benchpark unit-test
+  validate_docs:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Setup Python
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: .github/workflows/requirements/docs.txt
+      - name: Install deps
+        run: |
+          pip install -r .github/workflows/requirements/docs.txt
+      - name: Test Docs Scripts
+        run: |-
+          cd docs/
+          python generate-sys-defs-list.py
+          python generate-benchmark-list.py

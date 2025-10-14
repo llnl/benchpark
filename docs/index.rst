@@ -1,79 +1,80 @@
-.. Copyright 2023 Lawrence Livermore National Security, LLC and other
-   Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+..
+    Copyright 2023 Lawrence Livermore National Security, LLC and other
+    Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 
-   SPDX-License-Identifier: Apache-2.0
+    SPDX-License-Identifier: Apache-2.0
 
 .. include:: ../README.rst
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Basics
+    :maxdepth: 1
+    :caption: Basics
 
-   for-the-impatient
-   getting-started
-   benchpark-commands
-   benchpark-workflow
-   FAQ
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Catalogue
-
-   system-list
-   benchmark-list
+    for-the-impatient
+    getting-started
+    benchpark-commands
+    benchpark-workflow
+    FAQ
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Tutorials
+    :maxdepth: 1
+    :caption: Catalogue
 
-   basic-tutorial
-   llnl-tutorial
-   comparing-experiment-builds
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Using Benchpark
-
-   benchpark-setup
-   build-experiment
-   run-experiment
-   analyze-experiment
-   benchpark-analyze
-   modifiers
-   set-of-experiments
-   run-binary
-   create-mirror
+    system-list
+    benchmark-list
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Contributing
+    :maxdepth: 1
+    :caption: Tutorials
 
-   add-a-system-config
-   add-a-benchmark
-   add-an-experiment
-   testing-your-contribution
-   update-a-system-config
+    tutorial-101
+    tutorial-llnl
+    comparing-experiment-builds
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Developer Docs
+    :maxdepth: 1
+    :caption: Using Benchpark
 
-   developer-guide
-   ci-developer-guide
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Benchpark Utils
-
-   diffBuildSpecs
-   diffExperimentBuilds
-   diffExperimentSpecs
-   diffPackageCommits
-   diffSystemSpecs
-   showBuild
+    benchpark-setup
+    build-experiment
+    run-experiment
+    analyze-experiment
+    benchpark-analyze
+    modifiers
+    set-of-experiments
+    run-binary
+    create-mirror
 
 .. toctree::
-   :maxdepth: 2
-   :caption: API Docs
+    :maxdepth: 1
+    :caption: Contributing
 
-   Benchpark API Docs <source/benchpark>
+    add-a-system-config
+    add-a-benchmark
+    add-an-experiment
+    testing-your-contribution
+    update-a-system-config
+
+.. toctree::
+    :maxdepth: 1
+    :caption: Developer Docs
+
+    developer-guide
+    ci-developer-guide
+
+.. toctree::
+    :maxdepth: 1
+    :caption: Benchpark Utils
+
+    diffBuildSpecs
+    diffExperimentBuilds
+    diffExperimentSpecs
+    diffPackageCommits
+    diffSystemSpecs
+    showBuild
+
+.. toctree::
+    :maxdepth: 2
+    :caption: API Docs
+
+    Benchpark API Docs <source/benchpark>

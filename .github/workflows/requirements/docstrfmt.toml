@@ -1,0 +1,2 @@
+[tool.docstrfmt]
+line-length = 88
