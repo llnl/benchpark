@@ -164,6 +164,22 @@ class LlnlCluster(System):
                     "externals": [{"spec": "autoconf@2.69", "prefix": "/usr"}],
                     "buildable": False,
                 },
+                "automake": {
+                    "externals": [{"spec": "automake@1.16.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "libtool": {
+                    "externals": [{"spec": "libtool@2.4.6", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "ncurses": {
+                    "externals": [{"spec": "ncurses@6.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "m4": {
+                    "externals": [{"spec": "m4@1.4.18", "prefix": "/usr"}],
+                    "buildable": False,
+                },
                 "python": {
                     "externals": [
                         {
