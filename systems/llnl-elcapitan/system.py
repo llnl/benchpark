@@ -379,10 +379,14 @@ class LlnlElcapitan(System):
                 #     ],
                 #     "buildable": False,
                 # },
-                "py-pybind11": {
-                    "externals": [
-                        {"spec": "py-pybind11@3.0.0", "prefix": "/usr/workspace/mckinsey/venv/bp-x86-3.11.5/lib/python3.11/site-packages/"}
-                    ],
+                # "py-pybind11": {
+                #     "externals": [
+                #         {"spec": "py-pybind11@3.0.0", "prefix": "/usr/workspace/mckinsey/venv/bp-x86-3.11.5/lib/python3.11/site-packages/"}
+                #     ],
+                #     "buildable": False,
+                # },
+                "git": {
+                    "externals": [{"spec": "git@2.43.7", "prefix": "/usr"}],
                     "buildable": False,
                 },
             }
