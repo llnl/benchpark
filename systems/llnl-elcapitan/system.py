@@ -349,36 +349,6 @@ class LlnlElcapitan(System):
                     "externals": [{"spec": "opengl@4.5", "prefix": "/usr"}],
                     "buildable": False,
                 },
-                # "py-numpy": {
-                #     "externals": [
-                #         {"spec": "py-numpy@1.24.3", "prefix": "/usr/tce/packages/python/python-3.11.5/lib/python3.11/site-packages"}
-                #     ],
-                #     "buildable": False,
-                # },
-                # "py-numba": {
-                #     "externals": [
-                #         {"spec": "py-numba@0.57.1", "prefix": "/usr/tce/packages/python/python-3.11.5/lib/python3.11/site-packages"}
-                #     ],
-                #     "buildable": False,
-                # },
-                # "py-matplotlib": {
-                #     "externals": [
-                #         {"spec": "py-matplotlib@3.7.2", "prefix": "/usr/tce/packages/python/python-3.11.5/lib/python3.11/site-packages"}
-                #     ],
-                #     "buildable": False,
-                # },
-                # "py-mpi4py": {
-                #     "externals": [
-                #         {"spec": "py-mpi4py@3.1.4", "prefix": "/usr/tce/packages/python/python-3.11.5/lib/python3.11/site-packages"}
-                #     ],
-                #     "buildable": False,
-                # },
-                # "py-pybind11": {
-                #     "externals": [
-                #         {"spec": "py-pybind11@3.0.0", "prefix": "/usr/workspace/mckinsey/venv/bp-x86-3.11.5/lib/python3.11/site-packages/"}
-                #     ],
-                #     "buildable": False,
-                # },
                 "git": {
                     "externals": [{"spec": "git@2.43.7", "prefix": "/usr"}],
                     "buildable": False,
@@ -698,12 +668,8 @@ class LlnlElcapitan(System):
                             "spec": f"llvm@{self.llvm_version}",
                             "prefix": f"/opt/rocm-{self.rocm_version}/llvm",
                         },
-                        # {
-                        #     "spec": f"llvm@14.0.6",
-                        #     "prefix": f"/opt/rocm-5.2.3/llvm",
-                        # }
                     ],
-                    "buildable": True,
+                    "buildable": False,
                 },
                 "rocblas": {
                     "externals": [

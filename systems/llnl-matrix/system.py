@@ -144,22 +144,21 @@ class LlnlMatrix(System):
                 },
                 "python": {
                     "externals": [
-                        # Only define 1 python so pybind path works
-                        # {
-                        #     "spec": "python@3.9.12",
-                        #     "prefix": "/usr/tce/packages/python/python-3.9.12",
-                        #     "buildable": False,
-                        # },
+                        {
+                            "spec": "python@3.9.12",
+                            "prefix": "/usr/tce/packages/python/python-3.9.12",
+                            "buildable": False,
+                        },
                         {
                             "spec": "python@3.11.9",
                             "prefix": "/usr/tce/packages/python/python-3.11.9",
                             "buildable": False,
                         },
-                        # {
-                        #     "spec": "python@3.12.4",
-                        #     "prefix": "/usr/tce/packages/python/python-3.12.4",
-                        #     "buildable": False,
-                        # }
+                        {
+                            "spec": "python@3.12.4",
+                            "prefix": "/usr/tce/packages/python/python-3.12.4",
+                            "buildable": False,
+                        },
                     ]
                 },
                 "hwloc": {
@@ -174,12 +173,6 @@ class LlnlMatrix(System):
                     "externals": [{"spec": "curl@7.61.1", "prefix": "/usr"}],
                     "buildable": False,
                 },
-                # "py-pybind11": {
-                #     "externals": [
-                #         {"spec": "py-pybind11@3.0.0", "prefix": "/usr/workspace/mckinsey/venv/bp-x86-3.11.5/lib/python3.11/site-packages/"}
-                #     ],
-                #     "buildable": False,
-                # },
                 "git": {
                     "externals": [{"spec": "git@2.43.7", "prefix": "/usr"}],
                     "buildable": False,
