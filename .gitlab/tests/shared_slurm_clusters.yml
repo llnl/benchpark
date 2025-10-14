@@ -106,11 +106,6 @@ run_tests_slurm_dane:
         ARCHCONFIG: llnl-cluster
         BENCHMARK: [kripke]
         VARIANT: ['caliper=mpi,time hwloc=on affinity=on']
-      # lammps workload=pace
-      - HOST: dane
-        ARCHCONFIG: llnl-cluster
-        BENCHMARK: [lammps]
-        VARIANT: [workload=pace]
 run_tests_slurm_matrix:
   extends: .run_tests_slurm
   tags: [shell, matrix]
@@ -128,7 +123,3 @@ run_tests_slurm_matrix:
           - raja-perf
           - saxpy
         VARIANT: [+cuda]
-      - HOST: matrix
-        ARCHCONFIG: llnl-matrix
-        BENCHMARK: [lammps]
-        VARIANT: [+cuda workload=pace]

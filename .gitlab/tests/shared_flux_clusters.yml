@@ -120,12 +120,6 @@ run_tests_flux_tuolumne:
         BENCHMARK: [kripke]
         VARIANT: ['+rocm caliper=mpi,time,rocm']
         GPUMODE: SPX
-      # lammps workload=pace
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [lammps]
-        VARIANT: [+rocm workload=pace]
-        GPUMODE: SPX
 run_tests_flux_tioga:
   extends: .run_tests_flux
   tags: [shell, tioga]
