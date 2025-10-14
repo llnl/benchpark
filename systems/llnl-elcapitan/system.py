@@ -303,7 +303,7 @@ class LlnlElcapitan(System):
                             "spec": "python@3.12.2",
                             "prefix": "/usr/tce/packages/python/python-3.12.2",
                             "buildable": False,
-                        }
+                        },
                     ]
                 },
                 "unzip": {
@@ -338,21 +338,15 @@ class LlnlElcapitan(System):
                     "buildable": False,
                 },
                 "ncurses": {
-                    "externals": [
-                        {"spec": "ncurses@6.1.20180224", "prefix": "/usr"}
-                    ],
+                    "externals": [{"spec": "ncurses@6.1.20180224", "prefix": "/usr"}],
                     "buildable": False,
                 },
                 "libxcrypt": {
-                    "externals": [
-                        {"spec": "libxcrypt@4.1.1", "prefix": "/usr"}
-                    ],
+                    "externals": [{"spec": "libxcrypt@4.1.1", "prefix": "/usr"}],
                     "buildable": False,
                 },
                 "opengl": {
-                    "externals": [
-                        {"spec": "opengl@4.5", "prefix": "/usr"}
-                    ],
+                    "externals": [{"spec": "opengl@4.5", "prefix": "/usr"}],
                     "buildable": False,
                 },
                 # "py-numpy": {

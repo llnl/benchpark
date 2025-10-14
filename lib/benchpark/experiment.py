@@ -492,7 +492,9 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
                     f"{package_manager}_pkg_spec": spec[0],
                 }
             else:
-                self.package_specs[package_name][f"{package_manager}_pkg_spec"] = spec[0]
+                self.package_specs[package_name][f"{package_manager}_pkg_spec"] = spec[
+                    0
+                ]
         else:
             self.package_specs[package_name] = {}
 

@@ -49,13 +49,9 @@ class PyScaffold(
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "n_gpus": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    )
+                    "n_gpus": lambda var, itr, dim, scaling_factor: var.val(dim)
                     * scaling_factor,
-                    "problem_scale": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    ),
+                    "problem_scale": lambda var, itr, dim, scaling_factor: var.val(dim),
                 },
             }
         )
@@ -74,9 +70,7 @@ class PyScaffold(
             model = "cuda"
         self.add_package_spec(
             self.name,
-            [
-                "py-scaffold@main"
-            ],
+            ["py-scaffold@main"],
             package_manager="spack",
         )
         self.add_package_spec(
