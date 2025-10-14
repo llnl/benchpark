@@ -17,7 +17,8 @@ class PyScaffold(PythonPackage, CudaPackage, ROCmPackage):
     variant("mpi", default=True, description="MPI support")
     variant("caliper", default=False, description="Build with Caliper support enabled.")
 
-    depends_on("python@3.11:", type=("build", "run"))
+    # TODO: Required because of how we set paths in application.py hardcoded to python3.11
+    depends_on("python@3.11", type=("build", "run"))
     depends_on("py-setuptools", type="build")
     depends_on("py-wheel", type="build")
     depends_on("py-pip", type=("build", "run"))
@@ -57,17 +58,35 @@ class PyScaffold(PythonPackage, CudaPackage, ROCmPackage):
             for rpath in self.compiler.extra_rpaths:
                 env.prepend_path("LD_LIBRARY_PATH", rpath)
 
+        if "+mpi" in self.spec:
+            if self.spec["mpi"].extra_attributes:
+                if "ldflags" in self.spec["mpi"].extra_attributes:
+                    env.append_flags("LDFLAGS", self.spec["mpi"].extra_attributes["ldflags"])
+                if "gtl_lib_path" in self.spec["mpi"].extra_attributes:
+                    env.prepend_path("LD_LIBRARY_PATH", self.spec['mpi'].extra_attributes["gtl_lib_path"])
+
     def setup_run_environment(self, env):
         super().setup_run_environment(env)
 
-        #env.prepend_path("LD_LIBRARY_PATH", self.spec['mpi'].extra_attributes["gtl_lib_path"])
+
+        if "+mpi" in self.spec:
+            if self.spec["mpi"].extra_attributes:
+                if "gtl_lib_path" in self.spec["mpi"].extra_attributes:
+                    env.prepend_path("LD_LIBRARY_PATH", self.spec['mpi'].extra_attributes["gtl_lib_path"])
 
         # if self.spec.satisfies("+caliper"):
         #     # Avoid libcaffe2_nvrtc.so
-        #     env.prepend_path("LD_LIBRARY_PATH", os.path.join(str(self.spec.prefix.join(python_platlib)), "torch", "lib"))
+        #     env.prepend_path("LD_LIBRARY_PATH", os.path.join(self.spec.prefix.join(python_platlib), "torch", "lib"))
         #     if self.spec.satisfies("+cuda"):
         #         # Avoid libcudnn_graph.so error (unecessary if cuX_full, necessary if cuX wheel)
         #         env.prepend_path("LD_LIBRARY_PATH", os.path.join(self.spec.prefix.join(python_platlib), "nvidia", "cudnn", "lib"))
+
+        # print(prefix)
+        # print(python_platlib)
+        # print(self.spec["caliper"].prefix)
+        if self.spec.satisfies("+caliper"):
+            if self.spec.satisfies("+rocm"):
+                env.set("ROCP_TOOL_LIBRARIES", os.path.join(self.spec["caliper"].prefix, "lib64", "libcaliper.so"))
 
         if self.compiler.extra_rpaths:
             for rpath in self.compiler.extra_rpaths:

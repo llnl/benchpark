@@ -67,9 +67,9 @@ class PyScaffold(
         )
 
     def compute_package_section(self):
-        # Spec written into requirements.txt for pip install
+        # Spec that will be written into requirements.txt for pip install
         if self.spec.satisfies("+rocm"):
-            model = "rocmwci"
+            model = "rocm"
         elif self.spec.satisfies("+cuda"):
             model = "cuda"
         self.add_package_spec(
@@ -82,8 +82,8 @@ class PyScaffold(
         self.add_package_spec(
             self.name,
             [
-                # extra index for torch wheel
-                f"--extra-index-url https://download.pytorch.org/whl/\n{self.spec.variants['scaffold_path'][0]}[{model}]",
+                # extra index for torch wheel and pypi index for packages that won't be found on WCI
+                f"--extra-index-url https://download.pytorch.org/whl/\n--extra-index-url https://pypi.org/simple\n{self.spec.variants['scaffold_path'][0]}[{model}]",
             ],
             package_manager="pip",
         )

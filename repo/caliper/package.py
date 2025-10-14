@@ -255,6 +255,13 @@ class Caliper(CachedCMakePackage, CudaPackage, ROCmPackage):
 
         return args
 
+    def setup_build_environment(self, env):
+        super().setup_build_environment(env)
+
+        if "+mpi" in self.spec:
+            if self.spec["mpi"].extra_attributes and "ldflags" in self.spec["mpi"].extra_attributes:
+                env.append_flags("LDFLAGS", self.spec["mpi"].extra_attributes["ldflags"])
+
     def setup_run_environment(self, env):
         if self.spec.satisfies("+python"):
             env.prepend_path("PYTHONPATH", self.spec.prefix.join(python_platlib))

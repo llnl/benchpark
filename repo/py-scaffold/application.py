@@ -57,9 +57,10 @@ class PyScaffold(ExecutableApplication):
 
     software_spec("scaffold", None)
 
+    # TODO: Figure out MPICH_GPU_SUPPORT_ENABLED=0, disabling GTL otherwise linker error.
     executable(
         "modules",
-        "export LD_LIBRARY_PATH={ld_paths}:$LD_LIBRARY_PATH",
+        "export MPICH_GPU_SUPPORT_ENABLED=0\nexport LD_LIBRARY_PATH={ld_paths}:$LD_LIBRARY_PATH",
     )
     # executable(
     #     "pip",
