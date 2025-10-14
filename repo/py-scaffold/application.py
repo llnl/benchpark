@@ -39,6 +39,9 @@ class PyScaffold(ExecutableApplication):
             # Avoid libcudnn_graph.so error (unecessary if cuX_full, necessary if cuX wheel)
             paths.append("{env_path}/.venv/lib64/python3.11/site-packages/nvidia/cudnn/lib")
 
+        if "rocm_arch" in app_inst.variables.keys():
+            app_inst.variables["rocm_mods"] = "module load rccl/fast-env-slows-mpi\nexport MPICH_GPU_SUPPORT_ENABLED=0\n"
+
         # if caliper
         # Avoid libcaffe2_nvrtc.so
         paths.append("{env_path}/.venv/lib64/python3.11/site-packages/torch/lib")
@@ -60,7 +63,7 @@ class PyScaffold(ExecutableApplication):
     # TODO: Figure out MPICH_GPU_SUPPORT_ENABLED=0, disabling GTL otherwise linker error.
     executable(
         "modules",
-        "export MPICH_GPU_SUPPORT_ENABLED=0\nexport LD_LIBRARY_PATH={ld_paths}:$LD_LIBRARY_PATH",
+        "{rocm_mods}export LD_LIBRARY_PATH={ld_paths}:$LD_LIBRARY_PATH",
     )
     # executable(
     #     "pip",
