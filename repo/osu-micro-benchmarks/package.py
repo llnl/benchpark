@@ -16,7 +16,13 @@ class OsuMicroBenchmarks(BuiltinOsu, ROCmPackage):
         if self.spec.satisfies("+rocm"):
             args.extend([f"LDFLAGS={self.spec['mpi'].libs.ld_flags}"]) 
             print(self.spec['mpi'])
-        return args
+        new_args = list()
+        for x in args:
+            if "NVCCFLAGS" in x:
+                new_args.append(x + " -allow-unsupported-compiler")
+            else:
+                new_args.append(x)
+        return new_args
 
     def setup_run_environment(self, env):
         mpidir = join_path(self.prefix.libexec, "osu-micro-benchmarks", "mpi")
