@@ -22,11 +22,10 @@ class PyScaffold(PythonPackage, CudaPackage, ROCmPackage):
     variant("mpi", default=True, description="MPI support")
     variant("caliper", default=False, description="Build with Caliper support enabled.")
 
-    # TODO: Required because of how we set paths in application.py hardcoded to python3.11
-    # depends_on("python@3.11", type=("build", "run"))
-    # depends_on("py-setuptools", type="build")
-    # depends_on("py-wheel", type="build")
-    # depends_on("py-pip", type=("build", "run"))
+    # TODO: Should only be required because of how we set paths in application.py hardcoded to python3.11
+    depends_on("python@3.11", type=("build", "run"))
+    # TODO: Get pip._vendor.pyproject_hooks._impl.BackendUnavailable: Cannot import 'setuptools.build_meta' from pip otherwise
+    depends_on("py-setuptools", type="build")
 
     depends_on("mpi")
 
