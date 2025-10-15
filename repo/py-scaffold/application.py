@@ -22,7 +22,7 @@ class PyScaffold(ExecutableApplication):
         paths = []
         # if cuda
         if "cuda_arch" in app_inst.variables.keys():
-            # Avoid libcudnn_graph.so error (unecessary if cuX_full, necessary if cuX wheel)
+            # Avoid libcudnn_graph.so error (unnecessary if cuX_full, necessary if cuX wheel)
             paths.append("{pip_site_packages_path}/nvidia/cudnn/lib")
 
         app_inst.variables["rocm_mods"] = ""
