@@ -23,14 +23,14 @@ class PyScaffold(ExecutableApplication):
         # if cuda
         if "cuda_arch" in app_inst.variables.keys():
             # Avoid libcudnn_graph.so error (unecessary if cuX_full, necessary if cuX wheel)
-            paths.append("{env_path}/.venv/lib64/python3.11/site-packages/nvidia/cudnn/lib")
+            paths.append("{pip_site_packages_path}/nvidia/cudnn/lib")
 
         app_inst.variables["rocm_mods"] = ""
         if "rocm_arch" in app_inst.variables.keys():
             app_inst.variables["rocm_mods"] = "module load rccl/fast-env-slows-mpi\nexport MPICH_GPU_SUPPORT_ENABLED=0\n"
 
         # if caliper - Avoid libcaffe2_nvrtc.so
-        paths.append("{env_path}/.venv/lib64/python3.11/site-packages/torch/lib")
+        paths.append("{pip_site_packages_path}/torch/lib")
 
         app_inst.variables["ld_paths"] = ":".join(paths)
 
