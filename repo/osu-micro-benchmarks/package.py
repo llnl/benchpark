@@ -18,7 +18,7 @@ class OsuMicroBenchmarks(BuiltinOsu, ROCmPackage):
             print(self.spec['mpi'])
         new_args = list()
         for x in args:
-            if "NVCCFLAGS" in x:
+            if "NVCCFLAGS" in x and self.spec.satisfies("%intel-oneapi-compilers"):
                 new_args.append(x + " -allow-unsupported-compiler")
             else:
                 new_args.append(x)
