@@ -37,7 +37,7 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     requires("+mpi", when="^hypre+mpi")
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
-    depends_on("hypre+caliper", when="+caliper")
+    depends_on("hypre~caliper")
     depends_on("hypre@:2.29.0", when="@20240511")
     depends_on("hypre@2.30.0:", when="@develop")
     depends_on("hypre~fortran")
