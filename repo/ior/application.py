@@ -17,7 +17,8 @@ class Ior(ExecutableApplication):
     executable('p', 'ior -Cge -vv -F -i5'+
             ' -b {b}' +
             ' -t {t}' + 
-            ' -a {a}'
+            ' -a {a}' +
+            ' -o {o}'
             , use_mpi=True)
 
     workload('ior', executables=['p'])

@@ -89,6 +89,14 @@ class LlnlCluster(System):
         description="Submit to queue other than the default queue (e.g. pdebug)",
     )
 
+    variant(
+        "mount_point",
+        default="none",
+        values=("none", "~", "/usr/workspace", "/p/lustre1", "/p/lustre2", "/p/lustre3"),
+        multi=False,
+        description="Which mount point to use for IO benchmarks"
+    )
+
     def __init__(self, spec):
         super().__init__(spec)
         self.programming_models = [OpenMPCPUOnlySystem()]
