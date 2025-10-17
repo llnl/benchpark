@@ -27,6 +27,9 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     variant("caliper", default=False, description="Enable Caliper monitoring")
     variant("umpire", default=False, description="Enable Umpire support")
 
+    depends_on("c", type="build")
+    depends_on("cxx", type="build")
+
     depends_on("mpi", when="+mpi")
     depends_on("hypre+mpi", when="+mpi")
     requires("+mpi", when="^hypre+mpi")
@@ -39,14 +42,12 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("hypre+umpire", when="+umpire")
     depends_on("hypre~umpire", when="~umpire")
     depends_on("hypre+cuda", when="+cuda")
-    depends_on("hypre+cublas", when="+cuda")
     depends_on("hypre+openmp", when="+openmp")
     requires("+cuda", when="^hypre+cuda")
     for arch in ("none", "50", "60", "70", "80", "90"):
         depends_on(f"hypre cuda_arch={arch}", when=f"cuda_arch={arch}")
 
     depends_on("hypre+rocm", when="+rocm")
-    depends_on("hypre+rocblas", when="+rocm")
     requires("+rocm", when="^hypre+rocm")
     for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
         depends_on(f"hypre amdgpu_target={target}", when=f"amdgpu_target={target}")

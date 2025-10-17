@@ -7,7 +7,8 @@ import os
 import re
 
 from spack.package import *
-from spack.pkg.builtin.blt import Blt as BuiltinBlt
+from spack_repo.builtin.packages.blt.package import Blt as BuiltinBlt
+
 
 class Blt(BuiltinBlt):
 

@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.system import System
+from benchpark.system import System, compiler_def, compiler_section_for
 from benchpark.directives import variant, maintainers
 from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.paths import hardware_descriptions
@@ -101,28 +101,16 @@ class AwsPcluster(System):
         }
 
     def compute_compilers_section(self):
-
-        return {
-            "compilers": [
-                {
-                    "compiler": {
-                        "spec": "gcc@7.3.1",
-                        "paths": {
-                            "cc": "/usr/bin/gcc",
-                            "cxx": "/usr/bin/g++",
-                            "f77": "/usr/bin/gfortran",
-                            "fc": "/usr/bin/gfortran",
-                        },
-                        "flags": {},
-                        "operating_system": "alinux2",
-                        "target": "x86_64",
-                        "modules": [],
-                        "environment": {},
-                        "extra_rpaths": [],
-                    }
-                }
-            ]
-        }
+        return compiler_section_for(
+            "gcc",
+            [
+                compiler_def(
+                    "gcc@7.3.1 languages=c,c++,fortran",
+                    "/usr/",
+                    {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                )
+            ],
+        )
 
     def compute_software_section(self):
         return {
