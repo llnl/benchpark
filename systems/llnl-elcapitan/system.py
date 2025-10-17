@@ -777,12 +777,16 @@ class LlnlElcapitan(System):
         will fail if these variables are not defined though, so for now
         they are still generated (but with more-generic values).
         """
+        default_compiler = "gcc"
+        if self.spec.satisfies("compiler=cce"):
+            default_compiler = "cce"
+        elif self.spec.satisfies("compiler=rocmcc"):
+            default_compiler = "llvm-amdgpu"
+
         return {
             "software": {
                 "packages": {
-                    "default-compiler": {
-                        "pkg_spec": f"{self.spec.variants['compiler'][0]}"
-                    },
+                    "default-compiler": {"pkg_spec": default_compiler},
                     "default-mpi": {"pkg_spec": "cray-mpich"},
                     "compiler-rocm": {"pkg_spec": "cce"},
                     "compiler-amdclang": {"pkg_spec": "clang"},
