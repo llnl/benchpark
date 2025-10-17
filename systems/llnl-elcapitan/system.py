@@ -749,7 +749,7 @@ class LlnlElcapitan(System):
         return {
             "software": {
                 "packages": {
-                    "default-compiler": {"pkg_spec": "gcc"},
+                    "default-compiler": {"pkg_spec": default_compiler},
                     "default-mpi": {"pkg_spec": "cray-mpich"},
                     "compiler-rocm": {"pkg_spec": "cce"},
                     "compiler-amdclang": {"pkg_spec": "clang"},
