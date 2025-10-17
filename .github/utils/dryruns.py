@@ -21,9 +21,6 @@ SKIP_EXPR = [
     "stream aws-pcluster instance_type=c4.xlarge",
     "stream cscs-daint",
     "stream generic-x86",
-    "sparta-snl+openmp aws-pcluster instance_type=c6g.xlarge",
-    "sparta-snl+openmp aws-pcluster instance_type=c4.xlarge",
-    "sparta-snl+openmp generic-x86",
     # Broken URL's in application.py going to cause dryrun failure
     "genesis",
 ]

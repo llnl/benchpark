@@ -104,7 +104,7 @@ class SpartaSnl(
         self.add_experiment_variable("n_resources", 4, False)
 
         if self.spec.satisfies("+openmp"):
-            self.add_experiment_variable("n_threads_per_proc", 16, True)
+            self.add_experiment_variable("n_threads_per_proc", 1, True)
 
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_experiment_variable("n_gpus", "{n_resources}", True)
