@@ -94,7 +94,7 @@ run_tests_slurm_dane:
         VARIANT: [+openmp, '']
       - HOST: dane
         ARCHCONFIG: llnl-cluster
-        BENCHMARK: [laghos, raja-perf, phloem]
+        BENCHMARK: [laghos, lammps, raja-perf, phloem]
       # Strong scaling runs for "benchpark analyze" test
       - HOST: dane
         ARCHCONFIG: llnl-cluster
@@ -119,6 +119,7 @@ run_tests_slurm_matrix:
           - babelstream
           - kripke
           - laghos
+          - lammps
           - raja-perf
           - saxpy
         VARIANT: [+cuda]
