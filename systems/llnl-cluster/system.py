@@ -94,7 +94,7 @@ class LlnlCluster(System):
         default="none",
         values=("none", "/p/lustre1", "/p/lustre2", "/p/lustre3"),
         multi=False,
-        description="Which mount point to use for IO benchmarks"
+        description="Which mount point to use for IO benchmarks",
     )
 
     def __init__(self, spec):

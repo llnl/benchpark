@@ -155,7 +155,7 @@ class LlnlElcapitan(System):
         default="none",
         values=("none", "/p/lustre5"),
         multi=False,
-        description="Which mount point to use for IO benchmarks"
+        description="Which mount point to use for IO benchmarks",
     )
 
     def __init__(self, spec):
