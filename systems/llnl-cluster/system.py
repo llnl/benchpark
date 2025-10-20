@@ -92,7 +92,7 @@ class LlnlCluster(System):
     variant(
         "mount_point",
         default="none",
-        values=("none", "~", "/usr/workspace", "/p/lustre1", "/p/lustre2", "/p/lustre3"),
+        values=("none", "/p/lustre1", "/p/lustre2", "/p/lustre3"),
         multi=False,
         description="Which mount point to use for IO benchmarks"
     )

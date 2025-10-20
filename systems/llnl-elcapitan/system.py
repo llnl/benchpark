@@ -153,7 +153,7 @@ class LlnlElcapitan(System):
     variant(
         "mount_point",
         default="none",
-        values=("none", "~", "/usr/workspace", "/p/lustre5"),
+        values=("none", "/p/lustre5"),
         multi=False,
         description="Which mount point to use for IO benchmarks"
     )

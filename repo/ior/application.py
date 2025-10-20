@@ -49,20 +49,23 @@ class Ior(ExecutableApplication):
     
     figure_of_merit('Mean write OPs',
                     log_file='{experiment_run_dir}/{experiment_name}.out',
+                    # Skip the first 6 numbers in row starting with "write"
                     fom_regex=r'write\s+[0-9]+\.[0-9]*[0-9]*\s+[0-9]+\.[0-9]*[0-9]*\s+[0-9]+\.[0-9]*[0-9]*\s+[0-9]+\.[0-9]*[0-9]*\s+[0-9]+\.[0-9]*[0-9]*\s+[0-9]+\.[0-9]*[0-9]*\s+(?P<fom>[0-9]+\.[0-9]*([0-9]*)?)',
                     group_name='fom', units='OPs')
-
     figure_of_merit('Mean read OPs',
                     log_file='{experiment_run_dir}/{experiment_name}.out',
+                    # Skip the first 6 numbers in row starting with "read"
                     fom_regex=r'read\s+[0-9]+\.[0-9]*[0-9]*\s+[0-9]+\.[0-9]*[0-9]*\s+[0-9]+\.[0-9]*[0-9]*\s+[0-9]+\.[0-9]*[0-9]*\s+[0-9]+\.[0-9]*[0-9]*\s+[0-9]+\.[0-9]*[0-9]*\s+(?P<fom>[0-9]+\.[0-9]*([0-9]*)?)',
                     group_name='fom', units='OPs')
     figure_of_merit('Mean write',
                     log_file='{experiment_run_dir}/{experiment_name}.out',
+                    # Skip the first 2 numbers in row starting with "write"
                     fom_regex=r'write\s+[0-9]+\.[0-9]*[0-9]*\s+[0-9]+\.[0-9]*[0-9]*\s+(?P<fom>[0-9]+\.[0-9]*([0-9]*)?)',
                     group_name='fom', units='MiB/sec')
-
     figure_of_merit('Mean read',
                     log_file='{experiment_run_dir}/{experiment_name}.out',
+                    # Skip the first 2 numbers in row starting with "read"
                     fom_regex=r'read\s+[0-9]+\.[0-9]*[0-9]*\s+[0-9]+\.[0-9]*[0-9]*\s+(?P<fom>[0-9]+\.[0-9]*([0-9]*)?)',
                     group_name='fom', units='MiB/sec')
+    # Pass if output in file
     success_criteria('pass', mode='string', match=r'.*', file='{experiment_run_dir}/{experiment_name}.out')

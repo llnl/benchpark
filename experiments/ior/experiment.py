@@ -49,10 +49,7 @@ class Ior(Experiment, MpiOnlyExperiment, Scaling(ScalingMode.Strong, ScalingMode
             sys_name = self.system_spec._name
             raise ValueError(f'Must set "mount_point" variant (e.g. "benchpark system init {sys_name} mount_point=...") on the system used in this experiment. Run "benchpark info system {sys_name}" for valid values.')
         else:
-            full_path = mount_point + "/$USER/test.bat"
-            if mount_point == "~":
-                full_path = mount_point + "/test.bat"
-            self.add_experiment_variable("o", full_path)
+            self.add_experiment_variable("o", mount_point + "/$USER/test.bat")
 
         self.register_scaling_config(
             {
