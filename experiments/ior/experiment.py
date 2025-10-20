@@ -44,12 +44,16 @@ class Ior(Experiment, MpiOnlyExperiment, Scaling(ScalingMode.Strong, ScalingMode
         self.add_experiment_variable("b", t*bt_factor, True)
 
         mount_point = self.system_spec.system.spec.variants["mount_point"][0]
+        rabbit_config = self.system_spec.system.spec.variants["rabbit_config"][0]
+        sys_name = self.system_spec._name
         # Check mount point provided
         if mount_point == "none":
-            sys_name = self.system_spec._name
             raise ValueError(f'Must set "mount_point" variant (e.g. "benchpark system init {sys_name} mount_point=...") on the system used in this experiment. Run "benchpark info system {sys_name}" for valid values.')
+        elif rabbit_config != "none":
+            full_path = f"$DW_JOB_{''.join(rabbit_config.split('_'))}" + "/test.bat"
         else:
-            self.add_experiment_variable("o", mount_point + "/$USER/test.bat")
+            full_path = mount_point + "/$USER/test.bat"
+        self.add_experiment_variable("o", full_path)
 
         self.register_scaling_config(
             {

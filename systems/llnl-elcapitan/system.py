@@ -153,9 +153,17 @@ class LlnlElcapitan(System):
     variant(
         "mount_point",
         default="none",
-        values=("none", "/p/lustre5"),
+        values=("none", "/p/lustre5", "rabbits"),
         multi=False,
         description="Which mount point to use for IO benchmarks"
+    )
+
+    variant(
+        "rabbit_config",
+        default="none",
+        values=("none", "xfs_small", "xfs_large", "lustre_small", "lustre_large", "gfs2_small", "gfs2_large"),
+        multi=False,
+        description="Rabbit configurations",
     )
 
     def __init__(self, spec):
@@ -721,19 +729,27 @@ class LlnlElcapitan(System):
 
     def system_specific_variables(self):
         opts = super().system_specific_variables()
-        # MI300A modes
+
+        extra_batch_opts = ""
         if self.rocm_arch == "gfx942":
+            # MI300A modes
             if self.spec.satisfies("gpumode=SPX"):
                 gpu_factor = 1
             elif self.spec.satisfies("gpumode=TPX"):
                 gpu_factor = 3
             elif self.spec.satisfies("gpumode=CPX"):
                 gpu_factor = 6
+            extra_batch_opts += f"--setattr=gpumode={self.spec.variants['gpumode'][0]}\n--conf=resource.rediscover=true"
+
+            # Rabbits
+            rb_config = self.spec.variants['rabbit_config'][0]
+            if rb_config != "none":
+                extra_batch_opts += f"\n-S dw={rb_config}"
 
             opts.update(
                 {
                     "gpu_factor": gpu_factor,
-                    "extra_batch_opts": f"--setattr=gpumode={self.spec.variants['gpumode'][0]}\n--conf=resource.rediscover=true",
+                    "extra_batch_opts": extra_batch_opts,
                 }
             )
         return opts
