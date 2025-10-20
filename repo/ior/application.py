@@ -14,14 +14,17 @@ class Ior(ExecutableApplication):
 
     tags = ['synthetic','i-o','large-scale','mpi','c']
 
-    executable('p', 'ior -Cge -vv -F -i5'+
+    executable('p', 'ior -Cge -vv -F -c -w -m'+
             ' -b {b}' +
             ' -t {t}' + 
             ' -a {a}' +
+            ' -i {i}' +
             ' -o {o}'
             , use_mpi=True)
 
-    workload('ior', executables=['p'])
+    executable('disable_gtl', 'export MPICH_GPU_SUPPORT_ENABLED=0', use_mpi=False)
+
+    workload('ior', executables=['disable_gtl', 'p'])
 
     workload_variable('a', default='MPIIO',
         description='api',
@@ -29,6 +32,10 @@ class Ior(ExecutableApplication):
 
     workload_variable('b', default='16m',
         description='blockSize -- contiguous bytes to write per task  (e.g.: 8, 4k, 2m, 1g)',
+        workloads=['ior'])
+
+    workload_variable('i', default=10,
+        description='repetitions -- number of repetitions of test',
         workloads=['ior'])
 
     workload_variable('t', default='1m',
