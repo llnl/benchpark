@@ -33,8 +33,8 @@ class Ior(Experiment, MpiOnlyExperiment, Scaling(ScalingMode.Strong, ScalingMode
             t = 524288
         elif self.spec.satisfies("exec_mode=perf"):
             nodes = 32
-            bt_factor = 256  # blocksize = transfersize * bt_factor
-            t = 268435456
+            bt_factor = 128  # blocksize = transfersize * bt_factor
+            t = 67108864
 
         self.add_experiment_variable("n_nodes", nodes, True)
         self.add_experiment_variable(
@@ -57,12 +57,12 @@ class Ior(Experiment, MpiOnlyExperiment, Scaling(ScalingMode.Strong, ScalingMode
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "n_ranks": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    "n_nodes": lambda var, itr, dim, scaling_factor: var.val(dim)
                     * scaling_factor,
                     "b": lambda var, itr, dim, scaling_factor: var.val(dim),
                 },
                 ScalingMode.Weak: {
-                    "n_ranks": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    "n_nodes": lambda var, itr, dim, scaling_factor: var.val(dim)
                     * scaling_factor,
                     "b": lambda var, itr, dim, scaling_factor: var.val(dim)
                     * scaling_factor,
