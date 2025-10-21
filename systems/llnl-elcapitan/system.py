@@ -166,7 +166,7 @@ class LlnlElcapitan(System):
 
         # TODO: Replace this with lookups into the working set
         if self.spec.satisfies("compiler=gcc"):
-            self.gcc_version = Version("11.2.0")
+            self.gcc_version = Version("12.2.0")
             self.mpi_version = Version("9.0.1")
             self.short_gcc_version = f"{self.gcc_version.major}.{self.gcc_version.minor}"
         if self.rocm_version >= Version("6.4.0"):
