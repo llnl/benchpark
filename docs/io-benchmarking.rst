@@ -65,7 +65,7 @@ such as:
     )
 
 If it does, check to see if the ``mount_point`` variant is referenced in the
-``experiment`` that you wish to run. Because experiments are intialized with a specific
+``experiment`` that you wish to run. Because experiments are initialized with a specific
 system, we can reference the ``mount_point`` system variant in our experiment. Here, we
 see an example in the ``ior`` experiment, which uses the ``mount_point`` to determine
 where test files should be created (the ``-o`` command line argument):
