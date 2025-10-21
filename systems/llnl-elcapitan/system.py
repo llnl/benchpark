@@ -169,32 +169,33 @@ class LlnlElcapitan(System):
             self.gcc_version = Version("12.2.0")
             self.mpi_version = Version("9.0.1")
             self.short_gcc_version = f"{self.gcc_version.major}.{self.gcc_version.minor}"
-        if self.rocm_version >= Version("6.4.0"):
-            self.cce_version = Version("20.0.0")
-            self.mpi_version = Version("9.0.1")
-            self.short_cce_version = (
-                f"{self.cce_version.major}.{self.cce_version.minor}"
-            )
-        elif self.rocm_version >= Version("6.0.0"):
-            self.cce_version = Version("18.0.1")
-            self.mpi_version = Version("8.1.31")
-            self.short_cce_version = (
-                f"{self.cce_version.major}.{self.cce_version.minor}"
-            )
         else:
-            self.cce_version = Version("16.0.0")
-            self.mpi_version = Version("8.1.26")
-            self.short_cce_version = (
-                f"{self.cce_version.major}.{self.cce_version.minor}"
-            )
-        if self.rocm_version >= Version("6.0.0"):
-            self.pmi_version = Version("6.1.15.6")
-            self.pals_version = Version("1.2.12")
-            self.llvm_version = Version("18.0.1")
-        else:
-            self.pmi_version = Version("6.1.12")
-            self.pals_version = Version("1.2.9")
-            self.llvm_version = Version("16.0.0")
+            if self.rocm_version >= Version("6.4.0"):
+                self.cce_version = Version("20.0.0")
+                self.mpi_version = Version("9.0.1")
+                self.short_cce_version = (
+                    f"{self.cce_version.major}.{self.cce_version.minor}"
+                )
+            elif self.rocm_version >= Version("6.0.0"):
+                self.cce_version = Version("18.0.1")
+                self.mpi_version = Version("8.1.31")
+                self.short_cce_version = (
+                    f"{self.cce_version.major}.{self.cce_version.minor}"
+                )
+            else:
+                self.cce_version = Version("16.0.0")
+                self.mpi_version = Version("8.1.26")
+                self.short_cce_version = (
+                    f"{self.cce_version.major}.{self.cce_version.minor}"
+                )
+            if self.rocm_version >= Version("6.0.0"):
+                self.pmi_version = Version("6.1.15.6")
+                self.pals_version = Version("1.2.12")
+                self.llvm_version = Version("18.0.1")
+            else:
+                self.pmi_version = Version("6.1.12")
+                self.pals_version = Version("1.2.9")
+                self.llvm_version = Version("16.0.0")
         # TODO: Replace this with lookups into the working set
 
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
