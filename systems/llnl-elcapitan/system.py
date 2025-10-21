@@ -166,8 +166,9 @@ class LlnlElcapitan(System):
 
         # TODO: Replace this with lookups into the working set
         if self.spec.satisfies("compiler=gcc"):
-            self.gcc_version = Version("12.2.0")
-            self.mpi_version = Version("8.1.26")
+            self.gcc_version = Version("11.2.0")
+            self.mpi_version = Version("9.0.1")
+            self.short_gcc_version = f"{self.gcc_version.major}.{self.gcc_version.minor}"
         if self.rocm_version >= Version("6.4.0"):
             self.cce_version = Version("20.0.0")
             self.mpi_version = Version("9.0.1")
@@ -339,8 +340,8 @@ class LlnlElcapitan(System):
                 "cray-libsci": {
                     "externals": [
                         {
-                            "spec": "cray-libsci@23.05.1.4%cce",
-                            "prefix": "/opt/cray/pe/libsci/23.05.1.4/cray/12.0/x86_64/",
+                            "spec": "cray-libsci@25.09.0%cce",
+                            "prefix": f"/opt/cray/pe/libsci/25.09.0/cray/{self.short_cce_version}/x86_64/",
                         }
                     ]
                 }
@@ -350,8 +351,8 @@ class LlnlElcapitan(System):
                 "cray-libsci": {
                     "externals": [
                         {
-                            "spec": "cray-libsci@23.05.1.4%gcc",
-                            "prefix": "/opt/cray/pe/libsci/23.05.1.4/gnu/10.3/x86_64/",
+                            "spec": "cray-libsci@25.09.0%gcc",
+                            "prefix": f"/opt/cray/pe/libsci/25.09.0/gnu/{self.short_gcc_version}/x86_64/",
                         }
                     ]
                 }
@@ -379,8 +380,8 @@ class LlnlElcapitan(System):
             "gcc",
             [
                 compiler_def(
-                    "gcc@12.2.0 languages=c,c++,fortran",
-                    "/opt/cray/pe/gcc/12.2.0/",
+                    f"gcc@{self.gcc_version} languages=c,c++,fortran",
+                    f"/opt/cray/pe/gcc/{self.gcc_version}/",
                     {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
                 )
             ],
@@ -485,10 +486,11 @@ class LlnlElcapitan(System):
                         "externals": [
                             {
                                 "spec": f"cray-mpich@{self.mpi_version}{gtl_spec}+wrappers %gcc@{self.gcc_version}",
-                                "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/10.3",
+                                "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/{self.short_gcc_version}",
                                 "extra_attributes": {
                                     "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
-                                    "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/10.3/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
+                                    "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/{self.short_gcc_version}/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
+                                    "gtl_libs": "libmpi_gtl_hsa",
                                 },
                             }
                         ]
