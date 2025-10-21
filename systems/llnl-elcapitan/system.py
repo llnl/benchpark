@@ -153,15 +153,23 @@ class LlnlElcapitan(System):
     variant(
         "mount_point",
         default="none",
-        values=("none", "/p/lustre5", "rabbits"),
+        values=("none", "/l/ssd", "/p/lustre5", "rabbits"),
         multi=False,
-        description="Which mount point to use for IO benchmarks"
+        description="Which mount point to use for IO benchmarks",
     )
 
     variant(
         "rabbit_config",
         default="none",
-        values=("none", "xfs_small", "xfs_large", "lustre_small", "lustre_large", "gfs2_small", "gfs2_large"),
+        values=(
+            "none",
+            "xfs_small",
+            "xfs_large",
+            "lustre_small",
+            "lustre_large",
+            "gfs2_small",
+            "gfs2_large",
+        ),
         multi=False,
         description="Rabbit configurations",
     )
@@ -742,7 +750,7 @@ class LlnlElcapitan(System):
             extra_batch_opts += f"--setattr=gpumode={self.spec.variants['gpumode'][0]}\n--conf=resource.rediscover=true"
 
             # Rabbits
-            rb_config = self.spec.variants['rabbit_config'][0]
+            rb_config = self.spec.variants["rabbit_config"][0]
             if rb_config != "none":
                 extra_batch_opts += f"\n-S dw={rb_config}"
 
