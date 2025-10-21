@@ -188,14 +188,14 @@ class LlnlElcapitan(System):
                 self.short_cce_version = (
                     f"{self.cce_version.major}.{self.cce_version.minor}"
                 )
-            if self.rocm_version >= Version("6.0.0"):
-                self.pmi_version = Version("6.1.15.6")
-                self.pals_version = Version("1.2.12")
-                self.llvm_version = Version("18.0.1")
-            else:
-                self.pmi_version = Version("6.1.12")
-                self.pals_version = Version("1.2.9")
-                self.llvm_version = Version("16.0.0")
+        if self.rocm_version >= Version("6.0.0"):
+            self.pmi_version = Version("6.1.15.6")
+            self.pals_version = Version("1.2.12")
+            self.llvm_version = Version("18.0.1")
+        else:
+            self.pmi_version = Version("6.1.12")
+            self.pals_version = Version("1.2.9")
+            self.llvm_version = Version("16.0.0")
         # TODO: Replace this with lookups into the working set
 
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
