@@ -16,25 +16,27 @@ class Ior(ExecutableApplication):
     tags = ["synthetic", "i-o", "large-scale", "mpi", "c"]
 
     params = " -b {b}" + " -t {t}" + " -i {i}" + " -o {o}"
-    common_args = ' -Cge -vv '
+    common_args = ' -Cge -vv {test_file_mode}'
 
     # MPIIO
-    common_mpiio = "ior -a MPIIO" + common_args
-    executable("mpiio-write", common_mpiio + " -F -c -w -m" + params, use_mpi=True)
-    executable("mpiio-read", common_mpiio + " -F -c -m -E -r" + params, use_mpi=True)
+    common_mpiio = "ior -a MPIIO -m -c" + common_args + params
+    executable("mpiio-write", common_mpiio + " -w", use_mpi=True)
+    executable("mpiio-read", common_mpiio + " -E -r", use_mpi=True)
 
     # POSIX
-    common_posix = "ior -a POSIX" + common_args
+    common_posix = "ior -a POSIX" + common_args + params
     executable(
-        "posix-write", common_posix + " -w --posix.odirect -k" + params, use_mpi=True
+        "posix-write", common_posix + " -w --posix.odirect -k", use_mpi=True
     )
-    executable("posix-read", common_posix + " -E -r" + params, use_mpi=True)
+    executable("posix-read", common_posix + " -E -r", use_mpi=True)
 
     # No GTL
     executable("disable_gtl", "export MPICH_GPU_SUPPORT_ENABLED=0", use_mpi=False)
 
-    workload("MPIIO", executables=["disable_gtl", "mpiio-write", "mpiio-read"])
-    workload("POSIX", executables=["disable_gtl", "posix-write", "posix-read"])
+    workload("mpiio-write", executables=["disable_gtl", "mpiio-write"])
+    workload("mpiio-read", executables=["disable_gtl", "mpiio-read"])
+    workload("posix-write", executables=["disable_gtl", "posix-write"])
+    workload("posix-read", executables=["disable_gtl", "posix-read"])
 
     workload_variable(
         "b",

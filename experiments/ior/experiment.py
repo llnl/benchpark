@@ -12,8 +12,8 @@ from benchpark.scaling import ScalingMode, Scaling
 class Ior(Experiment, MpiOnlyExperiment, Scaling(ScalingMode.Strong, ScalingMode.Weak)):
     variant(
         "workload",
-        default="MPIIO",
-        values=("MPIIO", "POSIX"),
+        default="mpiio-write",
+        values=("mpiio-write", "mpiio-read", "posix-write", "posix-read"),
         description="base IOR  or other problem",
     )
 
@@ -24,9 +24,21 @@ class Ior(Experiment, MpiOnlyExperiment, Scaling(ScalingMode.Strong, ScalingMode
         description="app version",
     )
 
+    variant(
+        "test_file_mode",
+        default="fpp",
+        values=("fpp", "ssf"),
+        description="File per-process (fpp) or single shared file (ssf)",
+    )
+
     maintainers("hariharan-devarajan")
 
     def compute_applications_section(self):
+
+        test_file_mode = ""
+        if self.spec.variants["test_file_mode"][0] == "fpp":
+            test_file_mode = "-F"
+        self.add_experiment_variable("test_file_mode", test_file_mode, False)
 
         if self.spec.satisfies("exec_mode=test"):
             nodes = 1
