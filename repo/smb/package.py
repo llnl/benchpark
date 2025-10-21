@@ -2,9 +2,11 @@
 # Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: Apache-2.0
-from spack.package import *
-import llnl.util.filesystem as fs
 import inspect
+
+import llnl.util.filesystem as fs
+from spack.package import *
+
 
 class Smb(MakefilePackage):
     tags = []

@@ -3,12 +3,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import subprocess
-import time
-import sys
 import argparse
 import os
 import re
+import subprocess
+import sys
+import time
 
 DEFAULT_SYSTEM = "llnl-cluster cluster=dane"
 # Skip experiments
