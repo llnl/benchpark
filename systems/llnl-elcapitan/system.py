@@ -383,8 +383,8 @@ class LlnlElcapitan(System):
             "gcc",
             [
                 compiler_def(
-                    f"gcc@12.2.0 languages=c,c++,fortran",
-                    f"/opt/cray/pe/gcc/12.2.0/",
+                    "gcc@12.2.0 languages=c,c++,fortran",
+                    "/opt/cray/pe/gcc/12.2.0/",
                     {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
                 )
             ],
