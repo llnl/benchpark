@@ -147,7 +147,9 @@ The linter step checks:
 - Check spelling using ``codespell``
    - Fix the spelling errors manually.
 - Sort imports using ``isort``
+   - Fix isort linter errors using ``isort .``
 - ``flake8`` for checking Python style enforcement
+   - Fix flake linter errors manually
 - ``yamlfix`` for formatting ``.yaml``/``.yml`` files
    - Fix yaml linter errors using ``yamlfix dir.filename.yaml``
 - ``docstrfmt`` for formatting ``.rst`` files
