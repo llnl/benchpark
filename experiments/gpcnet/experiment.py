@@ -18,8 +18,8 @@ class Gpcnet(Experiment, MpiOnlyExperiment):
 
     variant(
         "version",
-        default="1.2",
-        values=("master", "latest", "1.2"),
+        default="master",
+        values=("master", "latest"),
         description="app version",
     )
 
