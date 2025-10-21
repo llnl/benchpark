@@ -75,3 +75,8 @@ documentation, render the pages with the following:
     make html
 
 Then, open ``_build/html/index.html`` in a browser to view the rendered documentation.
+
+Code Formatting
+---------------
+
+If lint check fails on your PR, please run `python -m black dir/filename.py` or `python -m black .` (in source code dir)
