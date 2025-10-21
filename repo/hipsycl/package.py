@@ -7,7 +7,6 @@ import json
 from os import path
 
 from llnl.util import filesystem
-
 from spack.package import *
 
 

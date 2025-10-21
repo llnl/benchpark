@@ -2,8 +2,8 @@ import os
 import subprocess
 import textwrap
 
-import yaml
 import llnl.util.tty.color as color
+import yaml
 
 import benchpark.paths
 

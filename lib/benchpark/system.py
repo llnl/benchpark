@@ -5,14 +5,15 @@
 
 import hashlib
 import os
-import packaging.version
-import yaml
 import sys
 from typing import Dict, Tuple
 
-from benchpark.directives import ExperimentSystemBase, provides, variant
+import packaging.version
+import yaml
+
 import benchpark.spec
 import benchpark.variant
+from benchpark.directives import ExperimentSystemBase, provides, variant
 
 
 def _hash_id(content_list):

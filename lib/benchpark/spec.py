@@ -12,10 +12,10 @@ import pathlib
 import re
 from typing import Iterable, Iterator, List, Match, Optional, Union
 
-from benchpark.error import BenchparkError
-import benchpark.repo
-
 import llnl.util.lang  # noqa
+
+import benchpark.repo
+from benchpark.error import BenchparkError
 
 repo_path = benchpark.repo.paths[benchpark.repo.ObjectTypes.experiments]
 sys_repo = benchpark.repo.paths[benchpark.repo.ObjectTypes.systems]
