@@ -42,21 +42,21 @@ class Ior(ExecutableApplication):
         "b",
         default="16m",
         description="blockSize -- contiguous bytes to write per task  (e.g.: 8, 4k, 2m, 1g)",
-        workloads=["MPIIO", "POSIX"],
+        workloads=["mpiio-write", "mpiio-read", "posix-write", "posix-read"],
     )
 
     workload_variable(
         "i",
         default=10,
         description="repetitions -- number of repetitions of test",
-        workloads=["MPIIO", "POSIX"],
+        workloads=["mpiio-write", "mpiio-read", "posix-write", "posix-read"],
     )
 
     workload_variable(
         "t",
         default="1m",
         description="transferSize -- size of transfer in bytes (e.g.: 8, 4k, 2m, 1g)",
-        workloads=["MPIIO", "POSIX"],
+        workloads=["mpiio-write", "mpiio-read", "posix-write", "posix-read"],
     )
 
     # TODO: Simplify FOMs
