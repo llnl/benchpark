@@ -143,10 +143,15 @@ style.yml - Lint
 The linter step checks:
 
 - Check Python code formatting using ``black``
+   - Fix black linter errors using ``python -m black dir/filename.py`` or ``python -m black .`` (in source code dir).
 - Check spelling using ``codespell``
+   - Fix the spelling errors manually.
 - Sort imports using ``isort``
 - ``flake8`` for checking Python style enforcement
 - ``yamlfix`` for formatting ``.yaml``/``.yml`` files
+   - Fix yaml linter errors using ``yamlfix dir.filename.yaml``
+- ``docstrfmt`` for formatting ``.rst`` files
+   - Fix docs linter errors using ``docstrfmt -p .github/workflows/requirements/docstrfmt.toml docs/``
 
 Code Coverage
 ~~~~~~~~~~~~~
