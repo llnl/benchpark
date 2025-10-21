@@ -168,7 +168,9 @@ class LlnlElcapitan(System):
         if self.spec.satisfies("compiler=gcc"):
             self.gcc_version = Version("12.2.0")
             self.mpi_version = Version("9.0.1")
-            self.short_gcc_version = f"{self.gcc_version.major}.{self.gcc_version.minor}"
+            self.short_gcc_version = (
+                f"{self.gcc_version.major}.{self.gcc_version.minor}"
+            )
         else:
             if self.rocm_version >= Version("6.4.0"):
                 self.cce_version = Version("20.0.0")
@@ -342,7 +344,7 @@ class LlnlElcapitan(System):
                     "externals": [
                         {
                             "spec": "cray-libsci@25.09.0%cce",
-                            "prefix": f"/opt/cray/pe/libsci/25.09.0/cray/{self.short_cce_version}/x86_64/",
+                            "prefix": "/opt/cray/pe/libsci/25.09.0/cray/20.0/x86_64/",
                         }
                     ]
                 }
@@ -353,7 +355,7 @@ class LlnlElcapitan(System):
                     "externals": [
                         {
                             "spec": "cray-libsci@25.09.0%gcc",
-                            "prefix": f"/opt/cray/pe/libsci/25.09.0/gnu/{self.short_gcc_version}/x86_64/",
+                            "prefix": "/opt/cray/pe/libsci/25.09.0/gnu/12.2/x86_64/",
                         }
                     ]
                 }
@@ -381,8 +383,8 @@ class LlnlElcapitan(System):
             "gcc",
             [
                 compiler_def(
-                    f"gcc@{self.gcc_version} languages=c,c++,fortran",
-                    f"/opt/cray/pe/gcc/{self.gcc_version}/",
+                    f"gcc@12.2.0 languages=c,c++,fortran",
+                    f"/opt/cray/pe/gcc/12.2.0/",
                     {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
                 )
             ],
