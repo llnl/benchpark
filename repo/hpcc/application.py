@@ -5,8 +5,8 @@
 
 import sys
 
-from ramble.appkit import *
 from ramble.app.builtin.hpcc import Hpcc as HpccBase
+from ramble.appkit import *
 
 
 class Hpcc(HpccBase):

@@ -5,14 +5,14 @@
 import argparse
 import collections
 import io
-import pytest
 import os
 import re
 import sys
 
 import llnl.util.filesystem
-import llnl.util.tty.color as color
 import llnl.util.tty.colify as colify
+import llnl.util.tty.color as color
+import pytest
 
 import benchpark.paths
 

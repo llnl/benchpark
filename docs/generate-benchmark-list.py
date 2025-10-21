@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
+import subprocess
+import sys
+
 import pandas as pd
 import yaml
-import sys
-import subprocess
 
 sys.path.append("../lib/")
 import benchpark.accounting  # noqa: E402

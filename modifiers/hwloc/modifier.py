@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from pathlib import Path
+
 from ramble.modkit import *
 
 
@@ -46,6 +47,7 @@ class Hwloc(BasicModifier):
 
     def hwloc(self, executable_name, executable, app_inst=None):
         import os
+
         from ramble.util.executable import CommandExecutable
 
         hwloc_parser_dir = os.path.dirname(f"{self._file_path}")
