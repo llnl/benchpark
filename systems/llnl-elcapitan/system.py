@@ -160,25 +160,24 @@ class LlnlElcapitan(System):
         if self.spec.satisfies("compiler=gcc"):
             self.gcc_version = Version("12.2.0")
             self.mpi_version = Version("8.1.26")
+        if self.rocm_version >= Version("6.4.0"):
+            self.cce_version = Version("20.0.0")
+            self.mpi_version = Version("9.0.1")
+            self.short_cce_version = (
+                f"{self.cce_version.major}.{self.cce_version.minor}"
+            )
+        elif self.rocm_version >= Version("6.0.0"):
+            self.cce_version = Version("18.0.1")
+            self.mpi_version = Version("8.1.31")
+            self.short_cce_version = (
+                f"{self.cce_version.major}.{self.cce_version.minor}"
+            )
         else:
-            if self.rocm_version >= Version("6.4.0"):
-                self.cce_version = Version("20.0.0")
-                self.mpi_version = Version("9.0.1")
-                self.short_cce_version = (
-                    f"{self.cce_version.major}.{self.cce_version.minor}"
-                )
-            elif self.rocm_version >= Version("6.0.0"):
-                self.cce_version = Version("18.0.1")
-                self.mpi_version = Version("8.1.31")
-                self.short_cce_version = (
-                    f"{self.cce_version.major}.{self.cce_version.minor}"
-                )
-            else:
-                self.cce_version = Version("16.0.0")
-                self.mpi_version = Version("8.1.26")
-                self.short_cce_version = (
-                    f"{self.cce_version.major}.{self.cce_version.minor}"
-                )
+            self.cce_version = Version("16.0.0")
+            self.mpi_version = Version("8.1.26")
+            self.short_cce_version = (
+                f"{self.cce_version.major}.{self.cce_version.minor}"
+            )
         if self.rocm_version >= Version("6.0.0"):
             self.pmi_version = Version("6.1.15.6")
             self.pals_version = Version("1.2.12")
@@ -359,7 +358,8 @@ class LlnlElcapitan(System):
             prefs = {"one_of": ["%cce", "%gcc"], "when": "%c"}
             return {"packages": {"all": {"require": [prefs]}}}
         elif compiler == "gcc":
-            return {"packages": {}}
+            prefs = {"one_of": ["%gcc"], "when": "%c"}
+            return {"packages": {"all": {"require": [prefs]}}}
         elif compiler == "rocmcc":
             prefs = {"one_of": ["%rocmcc", "%gcc"], "when": "%c"}
             return {"packages": {"all": {"require": [prefs]}}}
@@ -378,8 +378,11 @@ class LlnlElcapitan(System):
             ],
         )
 
-        if self.spec.satisfies("compiler=cce") or self.spec.satisfies(
-            "compiler=rocmcc"
+        # gcc because we want llvm-amdgpu for hip, even if using gcc for c
+        if (
+            self.spec.satisfies("compiler=gcc")
+            or self.spec.satisfies("compiler=cce")
+            or self.spec.satisfies("compiler=rocmcc")
         ):
             cfg = merge_dicts(cfg, self.rocm_cce_compiler_cfg())
 
