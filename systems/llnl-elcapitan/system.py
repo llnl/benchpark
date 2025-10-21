@@ -467,7 +467,7 @@ class LlnlElcapitan(System):
                 gtl_spec = "+gtl"
             else:
                 gtl_spec = "~gtl"
-    
+
             return {
                 "packages": {
                     "cray-mpich": {
