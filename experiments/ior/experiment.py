@@ -26,29 +26,40 @@ class Ior(Experiment, MpiOnlyExperiment, Scaling(ScalingMode.Strong, ScalingMode
     maintainers("hariharan-devarajan")
 
     def compute_applications_section(self):
-        num_nodes = {"n_nodes": 1}
-        t = "{b}/256"
-        self.add_experiment_variable("t", t, True)
 
         if self.spec.satisfies("exec_mode=test"):
-            for pk, pv in num_nodes.items():
-                self.add_experiment_variable(pk, pv, True)
-            self.add_experiment_variable("b", "268435456", True)
+            nodes = 1
+            bt_factor = 8  # blocksize = transfersize * bt_factor
+            t = 524288
+        elif self.spec.satisfies("exec_mode=perf"):
+            nodes = 32
+            bt_factor = 128  # blocksize = transfersize * bt_factor
+            t = 67108864
 
+        self.add_experiment_variable("n_nodes", nodes, True)
+        self.add_experiment_variable("n_ranks", "4 * {n_nodes}", True)
         self.add_experiment_variable("t", t, True)
-        self.add_experiment_variable(
-            "n_ranks", "{sys_cores_per_node} * {n_nodes}", True
-        )
+        self.add_experiment_variable("b", t * bt_factor, True)
+
+        mount_point = self.system_spec.system.spec.variants["mount_point"][0]
+        # Check mount point provided
+        if mount_point == "none":
+            sys_name = self.system_spec._name
+            raise ValueError(
+                f'Must set "mount_point" variant (e.g. "benchpark system init {sys_name} mount_point=...") on the system used in this experiment. Run "benchpark info system {sys_name}" for valid values.'
+            )
+        else:
+            self.add_experiment_variable("o", mount_point + "/$USER/test.bat")
 
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "n_ranks": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    "n_nodes": lambda var, itr, dim, scaling_factor: var.val(dim)
                     * scaling_factor,
                     "b": lambda var, itr, dim, scaling_factor: var.val(dim),
                 },
                 ScalingMode.Weak: {
-                    "n_ranks": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    "n_nodes": lambda var, itr, dim, scaling_factor: var.val(dim)
                     * scaling_factor,
                     "b": lambda var, itr, dim, scaling_factor: var.val(dim)
                     * scaling_factor,
