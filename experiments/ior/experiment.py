@@ -55,7 +55,9 @@ class Ior(Experiment, MpiOnlyExperiment, Scaling(ScalingMode.Strong, ScalingMode
         self.add_experiment_variable("b", t * bt_factor, True)
 
         mount_point = self.system_spec.system.spec.variants["mount_point"][0]
-        rabbit_config = self.system_spec.system.spec.variants["rabbit_config"][0]
+        rabbit_config = self.system_spec.system.spec.variants.get(
+            "rabbit_config", ["none"]
+        )[0]
         sys_name = self.system_spec._name
         # Check mount point provided
         if mount_point == "none":
