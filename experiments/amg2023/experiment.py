@@ -31,9 +31,23 @@ class Amg2023(
 
     variant(
         "version",
-        default="20240511",
+        default="develop",
         values=("develop", "latest", "20240511"),
         description="app version",
+    )
+
+    variant(
+        "mixedint",
+        default=False,
+        values=(True, False),
+        description="Use 64bit integers while reducing memory use",
+    )
+
+    variant(
+        "gpu-aware-mpi",
+        default=False,
+        values=(True, False),
+        description="Use GPU-aware MPI",
     )
 
     maintainers("pearce8")
@@ -114,10 +128,18 @@ class Amg2023(
             self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
     def compute_package_section(self):
+        mixedint = "+mixedint" if self.spec.satisfies("+mixedint") else "~mixedint"
+        gam = "~gpu-aware-mpi"
+        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+            if self.spec.satisfies("+gpu-aware-mpi"):
+                gam = "+gpu-aware-mpi"
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_package_spec(
-                self.name, [f"amg2023{self.determine_version()} +umpire"]
+                self.name,
+                [f"amg2023{self.determine_version()} +umpire {mixedint} {gam}"],
             )
         else:
-            self.add_package_spec(self.name, [f"amg2023{self.determine_version()}"])
+            self.add_package_spec(
+                self.name, [f"amg2023{self.determine_version()} {mixedint}"]
+            )
         self.add_package_spec("hypre", ["hypre+lapack"])
