@@ -3,19 +3,18 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Dict
-import yaml  # TODO: some way to ensure yaml available
 import sys
-
-from benchpark.error import BenchparkError
-from benchpark.directives import ExperimentSystemBase
-from benchpark.directives import variant
-from benchpark.variables import VariableDict
-import benchpark.spec
-import benchpark.variant
+from typing import Dict
 
 import ramble.language.language_base  # noqa
 import ramble.language.language_helpers  # noqa
+import yaml  # TODO: some way to ensure yaml available
+
+import benchpark.spec
+import benchpark.variant
+from benchpark.directives import ExperimentSystemBase, variant
+from benchpark.error import BenchparkError
+from benchpark.variables import VariableDict
 
 
 class ExperimentHelper:

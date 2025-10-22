@@ -6,11 +6,10 @@
 import os
 
 import llnl.util.filesystem as fs
-
-from spack_repo.builtin.build_systems.cmake import CMakePackage, CMakeBuilder
+from spack.package import *
+from spack_repo.builtin.build_systems.cmake import CMakeBuilder, CMakePackage
 from spack_repo.builtin.build_systems.cuda import CudaPackage
 from spack_repo.builtin.build_systems.rocm import ROCmPackage
-from spack.package import *
 
 
 class Gromacs(CMakePackage, CudaPackage, ROCmPackage):

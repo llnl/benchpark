@@ -23,11 +23,13 @@ class Amg2023(ExecutableApplication):
                      ' -P {px} {py} {pz}' +
                      ' -n {nx} {ny} {nz}' +
                      ' -problem 1'        +
+                     ' -dev_pool_size {pool}' +
                      ' -keepT', use_mpi=True)
 
     executable('p2', 'amg' +
                      ' -P {px} {py} {pz}' +
                      ' -n {nx} {ny} {nz}' +
+                     ' -dev_pool_size {pool}' +
                      ' -problem 2'        +
                      ' -keepT', use_mpi=True)
 
@@ -51,6 +53,9 @@ class Amg2023(ExecutableApplication):
                       workloads=['problem1', 'problem2'])
     workload_variable('nz', default='220',
                       description='nz',
+                      workloads=['problem1', 'problem2'])
+    workload_variable('pool', default='4',
+                      description='Device pool size in GB',
                       workloads=['problem1', 'problem2'])
 
     figure_of_merit('Figure of Merit (FOM)', log_file='{experiment_run_dir}/{experiment_name}.out', fom_regex=r'Figure of Merit \(FOM\):\s+(?P<fom>[0-9]+\.[0-9]*(e^[0-9]*)?)', group_name='fom', units='')

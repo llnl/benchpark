@@ -3,11 +3,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import sys
 import os
+import sys
 
 from ramble.appkit import *
 from ramble.expander import Expander
+
 
 class Babelstream(ExecutableApplication):
     """Babelstream benchmark"""

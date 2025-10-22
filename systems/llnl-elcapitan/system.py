@@ -4,18 +4,19 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.directives import variant, maintainers
+from packaging.version import Version
+
+from benchpark.directives import maintainers, variant
+from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.paths import hardware_descriptions
 from benchpark.rocmsystem import ROCmSystem
 from benchpark.system import (
-    System,
     JobQueue,
+    System,
     compiler_def,
     compiler_section_for,
     merge_dicts,
 )
-from benchpark.openmpsystem import OpenMPCPUOnlySystem
-from packaging.version import Version
 
 
 class LlnlElcapitan(System):
@@ -150,6 +151,14 @@ class LlnlElcapitan(System):
         description="Submit to queue other than the default queue (e.g. pdebug)",
     )
 
+    variant(
+        "mount_point",
+        default="none",
+        values=("none", "/p/lustre5"),
+        multi=False,
+        description="Which mount point to use for IO benchmarks",
+    )
+
     def __init__(self, spec):
         super().__init__(spec)
         self.programming_models = [ROCmSystem(), OpenMPCPUOnlySystem()]
@@ -159,7 +168,10 @@ class LlnlElcapitan(System):
         # TODO: Replace this with lookups into the working set
         if self.spec.satisfies("compiler=gcc"):
             self.gcc_version = Version("12.2.0")
-            self.mpi_version = Version("8.1.26")
+            self.mpi_version = Version("9.0.1")
+            self.short_gcc_version = (
+                f"{self.gcc_version.major}.{self.gcc_version.minor}"
+            )
         else:
             if self.rocm_version >= Version("6.4.0"):
                 self.cce_version = Version("20.0.0")
@@ -332,8 +344,8 @@ class LlnlElcapitan(System):
                 "cray-libsci": {
                     "externals": [
                         {
-                            "spec": "cray-libsci@23.05.1.4%cce",
-                            "prefix": "/opt/cray/pe/libsci/23.05.1.4/cray/12.0/x86_64/",
+                            "spec": "cray-libsci@25.09.0%cce",
+                            "prefix": "/opt/cray/pe/libsci/25.09.0/cray/20.0/x86_64/",
                         }
                     ]
                 }
@@ -343,8 +355,8 @@ class LlnlElcapitan(System):
                 "cray-libsci": {
                     "externals": [
                         {
-                            "spec": "cray-libsci@23.05.1.4%gcc",
-                            "prefix": "/opt/cray/pe/libsci/23.05.1.4/gnu/10.3/x86_64/",
+                            "spec": "cray-libsci@25.09.0%gcc",
+                            "prefix": "/opt/cray/pe/libsci/25.09.0/gnu/12.2/x86_64/",
                         }
                     ]
                 }
@@ -359,7 +371,8 @@ class LlnlElcapitan(System):
             prefs = {"one_of": ["%cce", "%gcc"], "when": "%c"}
             return {"packages": {"all": {"require": [prefs]}}}
         elif compiler == "gcc":
-            return {"packages": {}}
+            prefs = {"one_of": ["%gcc"], "when": "%c"}
+            return {"packages": {"all": {"require": [prefs]}}}
         elif compiler == "rocmcc":
             prefs = {"one_of": ["%rocmcc", "%gcc"], "when": "%c"}
             return {"packages": {"all": {"require": [prefs]}}}
@@ -378,8 +391,11 @@ class LlnlElcapitan(System):
             ],
         )
 
-        if self.spec.satisfies("compiler=cce") or self.spec.satisfies(
-            "compiler=rocmcc"
+        # gcc because we want llvm-amdgpu for hip, even if using gcc for c
+        if (
+            self.spec.satisfies("compiler=gcc")
+            or self.spec.satisfies("compiler=cce")
+            or self.spec.satisfies("compiler=rocmcc")
         ):
             cfg = merge_dicts(cfg, self.rocm_cce_compiler_cfg())
 
@@ -463,16 +479,22 @@ class LlnlElcapitan(System):
             }
 
         elif self.spec.satisfies("compiler=gcc"):
+            if gtl:
+                gtl_spec = "+gtl"
+            else:
+                gtl_spec = "~gtl"
+
             return {
                 "packages": {
                     "cray-mpich": {
                         "externals": [
                             {
-                                "spec": f"cray-mpich@{self.mpi_version}~gtl+wrappers %gcc@{self.gcc_version}",
-                                "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/10.3",
+                                "spec": f"cray-mpich@{self.mpi_version}{gtl_spec}+wrappers %gcc@{self.gcc_version}",
+                                "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/{self.short_gcc_version}",
                                 "extra_attributes": {
                                     "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
-                                    "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/10.3/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
+                                    "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/{self.short_gcc_version}/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
+                                    "gtl_libs": "libmpi_gtl_hsa",
                                 },
                             }
                         ]
@@ -755,7 +777,7 @@ class LlnlElcapitan(System):
                     "compiler-gcc": {"pkg_spec": "gcc"},
                     "mpi-rocm-gtl": {"pkg_spec": "cray-mpich+gtl"},
                     "mpi-rocm-no-gtl": {"pkg_spec": "cray-mpich~gtl"},
-                    "mpi-gcc": {"pkg_spec": "cray-mpich~gtl"},
+                    "mpi-gcc": {"pkg_spec": "cray-mpich+gtl"},
                     "blas": {"pkg_spec": f"{self.spec.variants['blas'][0]}"},
                     "blas-rocm": {"pkg_spec": "rocblas"},
                     "lapack": {"pkg_spec": f"{self.spec.variants['lapack'][0]}"},

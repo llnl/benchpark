@@ -3,12 +3,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import subprocess
-import time
-import sys
 import argparse
 import os
 import re
+import subprocess
+import sys
+import time
 
 DEFAULT_SYSTEM = "llnl-cluster cluster=dane"
 # Skip experiments
@@ -171,8 +171,13 @@ def main():
     for _, expr_spec_list, sys_spec_list in exprs_to_sys:
         for espec in expr_spec_list:
             for sspec in sys_spec_list:
+                if "ior" in espec and "llnl-cluster" in sspec:
+                    sspec += " mount_point=/p/lustre1"
+                elif "ior" in espec:
+                    SKIP_EXPR.append(f"{espec} {sspec}")
                 expr = f"{espec} {sspec}"
-                if expr in SKIP_EXPR:
+                # If (1) entire spec in SKIP_EXPR or (2) just the experiment name is specified, e.g. skip all systems
+                if expr in SKIP_EXPR or any([expr.split(" ")[0] == se for se in SKIP_EXPR]):
                     skip_tests += 1
                     print(f'Skipping "{expr}"')
                     continue

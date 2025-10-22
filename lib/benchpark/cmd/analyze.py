@@ -3,19 +3,19 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import logging
 import os
 import re
-import logging
-import sys
 import shlex
-import tarfile
 import shutil
+import sys
+import tarfile
 import warnings
-from glob import glob
 from datetime import datetime
+from glob import glob
 
-import matplotlib.pyplot as plt
 import matplotlib as mpl
+import matplotlib.pyplot as plt
 import pandas as pd
 import thicket as th
 
