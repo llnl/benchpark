@@ -120,11 +120,6 @@ run_tests_flux_tuolumne:
         BENCHMARK: [kripke]
         VARIANT: ['+rocm caliper=mpi,time,rocm']
         GPUMODE: SPX
-      # IOR using rabbits
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [ior]
-        SYSTEM_ARGS: [mount_point=rabbits rabbit_config=lustre_small]
 run_tests_flux_tioga:
   extends: .run_tests_flux
   tags: [shell, tioga]
