@@ -10,46 +10,8 @@ Using File Systems
 For benchmarks that need to run on a different file system, benchpark defines per-system
 variants, which experiments can use to leverage specific file systems.
 
-2. How to add filesystem details to scheduler request `extra_batch_opts`
-----------------------------------------------------
-
-Check if the ``system`` you are attempting to initialize has a variant supporting your
-desired file system. If it does not, first add a variant that describes the different
-options. For example, the ``llnl-elcapitan`` system has ``rabbit`` storage available via
-a flux scheduler request. We specify the options with a ``rabbit_config`` variant:
-
-::
-
-    variant(
-        "rabbit_config",
-        default="none",
-        values=("none", "xfs_small", "xfs_large", "lustre_small", "lustre_large", "gfs2_small", "gfs2_large"),
-        multi=False,
-        description="Rabbit configurations",
-    )
-
-These are the different options that we can specify to the ``flux`` scheduler, for
-different configurations of rabbit storage. Then, in the ``system_specific_variables()``
-function, we can add the selected variant to all batch jobs generated using this system
-definition, using the ``extra_batch_opts`` keyword.
-
-::
-
-    def system_specific_variables(self):
-        opts = super().system_specific_variables()
-        extra_batch_opts = ""
-
-        rb_config = self.spec.variants['rabbit_config'][0]
-        if rb_config != "none":
-            extra_batch_opts += f"\n-S dw={rb_config}"
-        opts.update(
-            {
-                "extra_batch_opts": extra_batch_opts,
-            }
-        )
-
-1. How to enable writing to a file system from a benchmark or application
---------------------------------------------------
+1. How to enable writing to a file system on a specific system
+--------------------------------------------------------------
 
 Check if the ``system`` you are attempting to initialize has a ``mount_point`` variant,
 such as:
@@ -74,3 +36,43 @@ where test files should be created (the ``-o`` command line argument):
 
     mount_point = self.system_spec.system.spec.variants["mount_point"][0]
     self.add_experiment_variable("o", mount_point + "/$USER/test.bat")
+
+
+2. How to add filesystem details to scheduler request `extra_batch_opts`
+------------------------------------------------------------------------
+
+If the ``system`` you are attempting to initialize has a variant supporting your
+desired file system, you may also need to specify additional configuration details
+to the scheduler. For example, the ``llnl-elcapitan`` system has ``rabbits`` storage
+available via a flux scheduler request; we use the ``io_config`` variant to add 
+these options to the ``extra_batch_opts`` in the flux request:
+
+::
+
+    variant(
+        "io_config",
+        default="none",
+        values=("none", "xfs_small", "xfs_large", "lustre_small", "lustre_large", "gfs2_small", "gfs2_large"),
+        multi=False,
+        description="Rabbit configurations",
+    )
+
+These are the different options that we can specify to the ``flux`` scheduler, for
+different configurations of rabbits storage. Then, in the ``system_specific_variables()``
+function, we can add the selected variant to all batch jobs generated using this system
+definition, using the ``extra_batch_opts`` keyword.
+
+::
+
+    def system_specific_variables(self):
+        opts = super().system_specific_variables()
+        extra_batch_opts = ""
+
+        rb_config = self.spec.variants['io_config'][0]
+        if rb_config != "none":
+            extra_batch_opts += f"\n-S dw={rb_config}"
+        opts.update(
+            {
+                "extra_batch_opts": extra_batch_opts,
+            }
+        )
