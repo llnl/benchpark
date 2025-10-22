@@ -72,7 +72,7 @@ class LbnlPerlmutter(System):
                 compiler_def(
                     "gcc@12.3.0 languages:=c,c++,fortran",
                     f"/opt/cray/pe/gcc-native/12/",
-                    {"c": "cc", "cxx": "CC", "fortran": "ftn"},
+                    {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
                     modules=["PrgEnv-gnu", "gcc/12.3.0"],
                     compilers_use_relative_paths=True,
                         env={
@@ -92,13 +92,21 @@ class LbnlPerlmutter(System):
                 "cray-mpich": {
                     "externals": [
                         {
-                            "spec": "cray-mpich@8.1.28",
+                            "spec": "cray-mpich@8.1.30",
                             "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/12.3",
                         }
                     ]
                 },
                 "zlib": {
                     "externals": [{"spec": "zlib@1.2.13", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "gmake": {
+                    "externals": [{"spec": "gmake@4.2.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "cmake": {
+                    "externals": [{"spec": "cmake@3.30.2", "prefix": "/global/common/software/nersc9/cmake/3.30.2"}],
                     "buildable": False,
                 },
             }
