@@ -5,11 +5,11 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import os
 import pathlib
 import subprocess
 import sys
 import uuid
-import os
 
 
 def main():

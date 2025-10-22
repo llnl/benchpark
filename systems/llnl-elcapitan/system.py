@@ -4,18 +4,19 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.directives import variant, maintainers
+from packaging.version import Version
+
+from benchpark.directives import maintainers, variant
+from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.paths import hardware_descriptions
 from benchpark.rocmsystem import ROCmSystem
 from benchpark.system import (
-    System,
     JobQueue,
+    System,
     compiler_def,
     compiler_section_for,
     merge_dicts,
 )
-from benchpark.openmpsystem import OpenMPCPUOnlySystem
-from packaging.version import Version
 
 
 class LlnlElcapitan(System):
@@ -148,6 +149,14 @@ class LlnlElcapitan(System):
         values=("none", "pbatch", "pdebug"),
         multi=False,
         description="Submit to queue other than the default queue (e.g. pdebug)",
+    )
+
+    variant(
+        "mount_point",
+        default="none",
+        values=("none", "/p/lustre5"),
+        multi=False,
+        description="Which mount point to use for IO benchmarks",
     )
 
     def __init__(self, spec):

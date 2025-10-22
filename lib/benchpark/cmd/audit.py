@@ -8,10 +8,9 @@ import pathlib
 import re
 import sys
 
-import benchpark.repo
-
 import ramble.config as cfg  # noqa
 
+import benchpark.repo
 
 sys_repo = benchpark.repo.paths[benchpark.repo.ObjectTypes.systems]
 exp_repo = benchpark.repo.paths[benchpark.repo.ObjectTypes.experiments]

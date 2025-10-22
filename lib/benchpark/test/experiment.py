@@ -3,10 +3,10 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import yaml
 import sys
 
 import pytest
+import yaml
 
 import benchpark.spec
 
