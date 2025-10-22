@@ -138,7 +138,7 @@ include:
         ARCHCONFIG: llnl-elcapitan
         SCHEDULER_PARAMETERS: $ELCAP_PARAMS -S dw=lustre_small
         BENCHMARK: [ior]
-        SYSTEM_ARGS: [mount_point=rabbits rabbit_config=lustre_small]
+        SYSTEM_ARGS: [mount_point=rabbits io_config=lustre_small]
 nightly_test_run:
   extends: .nightly_rules
   resource_group: $HOST

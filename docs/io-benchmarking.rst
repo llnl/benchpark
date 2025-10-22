@@ -10,7 +10,7 @@ Using File Systems
 For benchmarks that need to run on a different file system, benchpark defines per-system
 variants, which experiments can use to leverage specific file systems.
 
-1. For file systems that require a scheduler request
+2. How to add filesystem details to scheduler request `extra_batch_opts`
 ----------------------------------------------------
 
 Check if the ``system`` you are attempting to initialize has a variant supporting your
@@ -48,7 +48,7 @@ definition, using the ``extra_batch_opts`` keyword.
             }
         )
 
-2. How to use a different path in your application
+1. How to enable writing to a file system from a benchmark or application
 --------------------------------------------------
 
 Check if the ``system`` you are attempting to initialize has a ``mount_point`` variant,

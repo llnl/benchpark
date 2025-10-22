@@ -160,7 +160,7 @@ class LlnlElcapitan(System):
     )
 
     variant(
-        "rabbit_config",
+        "io_config",
         default="none",
         values=(
             "none",
@@ -764,8 +764,9 @@ class LlnlElcapitan(System):
             extra_batch_opts += f"--setattr=gpumode={self.spec.variants['gpumode'][0]}\n--conf=resource.rediscover=true"
 
             # Rabbits
-            rb_config = self.spec.variants["rabbit_config"][0]
-            if rb_config != "none":
+            mt_point = self.spec.variants["mount_point"][0]
+            rb_config = self.spec.variants["io_config"][0]
+            if mt_point == rabbits && rb_config != "none":
                 extra_batch_opts += f"\n-S dw={rb_config}"
 
             opts.update(
