@@ -3,11 +3,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainers
-from benchpark.system import System, compiler_def, compiler_section_for
-from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from packaging.version import Version
+
+from benchpark.directives import maintainers, variant
+from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.paths import hardware_descriptions
+from benchpark.system import System, compiler_def, compiler_section_for
 
 
 class CscsEiger(System):

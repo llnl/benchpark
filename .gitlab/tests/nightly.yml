@@ -19,7 +19,6 @@ include:
           - gpcnet
           - hpcg
           - hpl
-          - ior
           - kripke
           - laghos
           - lammps
@@ -31,6 +30,12 @@ include:
           - salmon-tddft
           - smb
           - stream
+      # IOR needs a mount_point
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: $DANE_PARAMS
+        SYSTEM_ARGS: [mount_point="/p/lustre1"]
+        BENCHMARK: ior
       # +rocm tests
       - HOST: [tuolumne]
         ARCHCONFIG: llnl-elcapitan

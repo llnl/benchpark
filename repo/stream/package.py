@@ -5,6 +5,7 @@
 
 from spack.package import *
 
+
 class Stream(CMakePackage):
     """The STREAM benchmark is a simple synthetic benchmark program that
     measures sustainable memory bandwidth (in MB/s) and the corresponding

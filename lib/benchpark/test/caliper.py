@@ -3,15 +3,15 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import sys
 import json
+import sys
 import tempfile
 
 from ramble.expander import Expander
 
 import benchpark.caliper
-import benchpark.spec
 import benchpark.paths
+import benchpark.spec
 
 
 def get_caliper_vars_section(expr_spec):
