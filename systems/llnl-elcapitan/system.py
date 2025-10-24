@@ -154,25 +154,19 @@ class LlnlElcapitan(System):
     variant(
         "mount_point",
         default="none",
-        values=("none", "/l/ssd", "/p/lustre5", "rabbits"),
-        multi=False,
-        description="Which mount point to use for IO benchmarks",
-    )
-
-    variant(
-        "io_config",
-        default="none",
         values=(
             "none",
-            "xfs_small",
-            "xfs_large",
-            "lustre_small",
-            "lustre_large",
-            "gfs2_small",
-            "gfs2_large",
+            "/l/ssd",
+            "/p/lustre5",
+            "rabbits_xfs_small",
+            "rabbits_xfs_large",
+            "rabbits_lustre_small",
+            "rabbits_lustre_large",
+            "rabbits_gfs2_small",
+            "rabbits_gfs2_large",
         ),
         multi=False,
-        description="Rabbit configurations",
+        description="Which mount point to use for IO benchmarks",
     )
 
     def __init__(self, spec):
@@ -231,6 +225,18 @@ class LlnlElcapitan(System):
                 self.sys_gpus_per_node = 24
             else:
                 raise ValueError(f"Invalid gpumode in spec: {self.spec}")
+
+        mount_point = self.spec.variants["mount_point"][0]
+        if mount_point == "none":
+            full_path = "none"
+        elif "rabbits" in mount_point:
+            full_path = (
+                f"$DW_JOB_{''.join(mount_point.lstrip('rabbits_').split('_'))}"
+                + "/test.bat"
+            )
+        else:
+            full_path = mount_point + "/$USER/test.bat"
+        self.spec.variants["full_path"] = full_path
 
     def compute_packages_section(self):
         selections = {
@@ -765,9 +771,8 @@ class LlnlElcapitan(System):
 
             # Rabbits
             mt_point = self.spec.variants["mount_point"][0]
-            rb_config = self.spec.variants["io_config"][0]
-            if mt_point == rabbits && rb_config != "none":
-                extra_batch_opts += f"\n-S dw={rb_config}"
+            if mt_point != "none" and "rabbits" in mt_point:
+                extra_batch_opts += f"\n-S dw={mt_point.lstrip('rabbits_')}"
 
             opts.update(
                 {
