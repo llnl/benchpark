@@ -50,7 +50,7 @@ include:
           - osu-micro-benchmarks
           - raja-perf
           - remhos
-          - sparta
+          - sparta-snl
         VARIANT: [+rocm]
       # +openmp tests
       - HOST: dane
@@ -83,7 +83,7 @@ include:
           - raja-perf
           - remhos
           - saxpy
-          - sparta
+          - sparta-snl
         VARIANT: [+cuda]
       #############
       # Other tests
