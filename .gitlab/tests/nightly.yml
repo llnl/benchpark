@@ -19,7 +19,6 @@ include:
           - gpcnet
           - hpcg
           - hpl
-          - ior
           - kripke
           - laghos
           - lammps
@@ -31,6 +30,12 @@ include:
           - salmon-tddft
           - smb
           - stream
+      # IOR needs a mount_point
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: $DANE_PARAMS
+        SYSTEM_ARGS: [mount_point="/p/lustre1"]
+        BENCHMARK: ior
       # +rocm tests
       - HOST: [tuolumne]
         ARCHCONFIG: llnl-elcapitan
@@ -94,6 +99,34 @@ include:
         SCHEDULER_PARAMETERS: $DANE_PARAMS
         BENCHMARK: [amg2023, kripke, lammps, raja-perf, remhos, stream]
         BENCHMARK_VERSION: develop
+      # Lammps workload=pace
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        BENCHMARK: [lammps]
+        VARIANT: [workload=pace]
+      - HOST: matrix
+        ARCHCONFIG: llnl-matrix
+        BENCHMARK: [lammps]
+        VARIANT: [+cuda workload=pace]
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [lammps]
+        VARIANT: [+rocm workload=pace]
+        GPUMODE: SPX
+      # AMG2023 workload=problem2
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        BENCHMARK: [amg2023]
+        VARIANT: [workload=problem2]
+      - HOST: matrix
+        ARCHCONFIG: llnl-matrix
+        BENCHMARK: [amg2023]
+        VARIANT: [+cuda workload=problem2]
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [amg2023]
+        VARIANT: [+rocm workload=problem2]
+        GPUMODE: SPX
 nightly_test_run:
   extends: .nightly_rules
   resource_group: $HOST

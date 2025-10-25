@@ -19,7 +19,7 @@ jobs:
         run: |-
           black --diff --check .
           codespell --ignore-words=.codespellignore
-          isort
-          flake8
+          isort --check-only .
+          flake8 .
           yamlfix --check --verbose .
           docstrfmt -p .github/workflows/requirements/docstrfmt.toml --check --verbose docs/

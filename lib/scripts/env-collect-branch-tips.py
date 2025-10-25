@@ -1,8 +1,9 @@
-import spack.environment as ev
-from spack.fetch_strategy import GitFetchStrategy
-import sys
 import os
 import shutil
+import sys
+
+import spack.environment as ev
+from spack.fetch_strategy import GitFetchStrategy
 
 
 def main():
