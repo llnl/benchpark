@@ -1,9 +1,9 @@
+import argparse
+
 import spack.cmd
 import spack.environment as ev
 import spack.traverse as traverse
 from llnl.util.tty.color import cwrite
-
-import argparse
 
 
 def diff_specs(spec_a, spec_b, truncate=False):

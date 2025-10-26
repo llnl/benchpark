@@ -1,10 +1,10 @@
 import argparse
 import os
 import subprocess
-import yaml
 import sys
 from pprint import pprint
 
+import yaml
 from deepdiff import DeepDiff
 
 import benchpark.paths

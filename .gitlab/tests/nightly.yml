@@ -19,7 +19,6 @@ include:
           - gpcnet
           - hpcg
           - hpl
-          - ior
           - kripke
           - laghos
           - lammps
@@ -30,7 +29,14 @@ include:
           - remhos
           - salmon-tddft
           - smb
+          - sparta-snl
           - stream
+      # IOR needs a mount_point
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: $DANE_PARAMS
+        SYSTEM_ARGS: [mount_point="/p/lustre1"]
+        BENCHMARK: ior
       # +rocm tests
       - HOST: [tuolumne]
         ARCHCONFIG: llnl-elcapitan
@@ -44,6 +50,7 @@ include:
           - osu-micro-benchmarks
           - raja-perf
           - remhos
+          - sparta-snl
         VARIANT: [+rocm]
       # +openmp tests
       - HOST: dane
@@ -76,6 +83,7 @@ include:
           - raja-perf
           - remhos
           - saxpy
+          - sparta-snl
         VARIANT: [+cuda]
       #############
       # Other tests
