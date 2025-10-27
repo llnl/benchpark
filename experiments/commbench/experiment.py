@@ -38,7 +38,7 @@ class Commbench(
         self.set_required_variables(
             n_resources="{n_ranks}",
             process_problem_size="{size}",
-            total_problem_size="{size}*{n_ranks}"
+            total_problem_size="{size}*{n_ranks}",
         )
 
     def compute_package_section(self):
