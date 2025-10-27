@@ -127,4 +127,5 @@ run_tests_slurm_matrix:
           - lammps
           - raja-perf
           - saxpy
+          - sparta-snl
         VARIANT: [+cuda]
