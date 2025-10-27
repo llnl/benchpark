@@ -1,0 +1,26 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+system_definition:
+  name: Penguin-haswell-OmniPath
+  integrator:
+    vendor: Penguin
+    name:
+  processor:
+    vendor: Intel
+    name: Xeon-E5-2695v4
+    ISA: x86_64
+    uArch: haswell
+  interconnect:
+    vendor: CornelisNetworks
+    name: OmniPath
+  systems-tested:
+    llnl-rzgenie:
+      os: TOSS
+      scheduler: slurm
+      compiler: gcc
+      runtime:
+      mpi: mvapich
+      installation-year: 2017
+  top500-system-instances:
