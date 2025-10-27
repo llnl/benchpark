@@ -27,6 +27,7 @@ class LlnlSierra(System):
         "lassen": {
             "cuda_arch": 70,
             "sys_cores_per_node": 40,
+            "sys_sockets_per_node": 2,
             "sys_cores_os_reserved_per_node": 4,
             "sys_cores_os_reserved_per_node_list": [
                 0,
