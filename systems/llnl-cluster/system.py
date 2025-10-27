@@ -57,7 +57,7 @@ class LlnlCluster(System):
             + "/DELL-sapphirerapids-OmniPath/hardware_description.yaml",
             "queues": [JobQueue("pdebug", 60, 20), JobQueue("pbatch", 1440, 520)],
         },
-       "rzgenie": {
+        "rzgenie": {
             "sys_cores_per_node": 36,
             "system_site": "llnl",
             "sys_sockets_per_node": 2,
@@ -71,11 +71,15 @@ class LlnlCluster(System):
             "sys_cores_per_node": 112,
             "sys_sockets_per_node": 2,
             "sys_cpu_L2_KB": 2048,
-            "sys_cpu_L3_MB": 112.5, # Depends on partition (could be 105)
+            "sys_cpu_L3_MB": 112.5,  # Depends on partition (could be 105)
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/DELL-sapphirerapids-OmniPath/hardware_description.yaml",
-            "queues": [JobQueue("pdebug", 30, 3), JobQueue("pbatch", 12000, 29), JobQueue("phighmem", 12000, 4)],
+            "queues": [
+                JobQueue("pdebug", 30, 3),
+                JobQueue("pbatch", 12000, 29),
+                JobQueue("phighmem", 12000, 4),
+            ],
         },
     }
 
