@@ -24,7 +24,7 @@ class SnlEldorado(System):
 
     attrs = {
         "rocm_arch": "gfx942",
-         "sys_cores_per_node": 84,
+        "sys_cores_per_node": 84,
         "sys_cores_os_reserved_per_node": 12,
         "sys_cores_os_reserved_per_node_list": [
             0,
@@ -39,7 +39,7 @@ class SnlEldorado(System):
             72,
             80,
             88,
-            ],  # 3 cores reserved per socket
+        ],  # 3 cores reserved per socket
         "sys_gpus_per_node": None,  # Determined by "gpumode" variant
         "sys_sockets_per_node": 4,
         "sys_mem_per_node_GB": 512,
@@ -133,7 +133,7 @@ class SnlEldorado(System):
             self.llvm_version = Version("16.0.0")
         # TODO: Replace this with lookups into the working set
 
-        #attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
+        # attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
         attrs = self.attrs
         for k, v in attrs.items():
             setattr(self, k, v)
@@ -295,7 +295,7 @@ class SnlEldorado(System):
                 }
             }
 
-            #Missing a line here if things fail
+            # Missing a line here if things fail
 
         return selections
 
