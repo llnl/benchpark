@@ -23,40 +23,42 @@ class SnlEldorado(System):
 
     maintainers("simongdg", "pearce8", "nhanford", "rfhaque")
 
-    attrs = {
-        "rocm_arch": "gfx942",
-        "sys_cores_per_node": 84,
-        "sys_cores_os_reserved_per_node": 12,
-        "sys_cores_os_reserved_per_node_list": [
-            0,
-            8,
-            16,
-            24,
-            32,
-            40,
-            48,
-            56,
-            64,
-            72,
-            80,
-            88,
-        ],  # 3 cores reserved per socket
-        "sys_gpus_per_node": None,  # Determined by "gpumode" variant
-        "sys_sockets_per_node": 4,
-        "sys_mem_per_node_GB": 512,
-        "sys_cpu_mem_per_node_MB": 3072,
-        "sys_gpu_mem_per_node_GB": 512,
-        "sys_gpu_num_L1": 228,
-        "sys_gpu_L1_KB": 32,
-        "sys_gpu_L2_KB": 4096,
-        "sys_gpu_L3_MB": 256,
-        "sys_cpu_L1_KB": 32,  # 32KB for L1d and 32KB for L1i
-        "sys_cpu_L2_KB": 1024,  # 512 KB
-        "sys_cpu_L3_MB": 32,  # 32MB
-        "system_site": "snl",
-        "scheduler": "flux",
-        "hardware_key": str(hardware_descriptions)
-        + "/HPECray-zen4-MI300A-Slingshot/hardware_description.yaml",
+    id_to_resources = {
+        "eldorado": {
+            "rocm_arch": "gfx942",
+            "sys_cores_per_node": 84,
+            "sys_cores_os_reserved_per_node": 12,
+            "sys_cores_os_reserved_per_node_list": [
+                0,
+                8,
+                16,
+                24,
+                32,
+                40,
+                48,
+                56,
+                64,
+                72,
+                80,
+                88,
+            ],  # 3 cores reserved per socket
+            "sys_gpus_per_node": None,  # Determined by "gpumode" variant
+            "sys_sockets_per_node": 4,
+            "sys_mem_per_node_GB": 512,
+            "sys_cpu_mem_per_node_MB": 3072,
+            "sys_gpu_mem_per_node_GB": 512,
+            "sys_gpu_num_L1": 228,
+            "sys_gpu_L1_KB": 32,
+            "sys_gpu_L2_KB": 4096,
+            "sys_gpu_L3_MB": 256,
+            "sys_cpu_L1_KB": 32,  # 32KB for L1d and 32KB for L1i
+            "sys_cpu_L2_KB": 1024,  # 512 KB
+            "sys_cpu_L3_MB": 32,  # 32MB
+            "system_site": "snl",
+            "scheduler": "flux",
+            "hardware_key": str(hardware_descriptions)
+            + "/HPECray-zen4-MI300A-Slingshot/hardware_description.yaml",
+        }
     }
     variant(
         "gpumode",
@@ -134,9 +136,7 @@ class SnlEldorado(System):
             self.llvm_version = Version("16.0.0")
         # TODO: Replace this with lookups into the working set
 
-        # attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
-        attrs = self.attrs
-        for k, v in attrs.items():
+        for k, v in self.id_to_resources["eldorado"].items():
             setattr(self, k, v)
 
         # MI300A modes
