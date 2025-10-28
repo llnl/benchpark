@@ -7,11 +7,9 @@
 from packaging.version import Version
 
 from benchpark.directives import maintainers, variant
-from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.paths import hardware_descriptions
 from benchpark.rocmsystem import ROCmSystem
 from benchpark.system import (
-    JobQueue,
     System,
     compiler_def,
     compiler_section_for,
