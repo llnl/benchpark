@@ -5,7 +5,6 @@
 
 from spack.package import *
 
-
 class Commbench(CMakePackage, CudaPackage, ROCmPackage):
     """FIXME: Put a proper description of your package here."""
 
