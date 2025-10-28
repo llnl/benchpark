@@ -3,9 +3,10 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import sys
+
 from ramble.appkit import *
 from ramble.expander import Expander
-import os
 
 class Commbench(ExecutableApplication):
     name = "commbench"
