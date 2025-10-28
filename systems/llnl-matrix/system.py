@@ -31,7 +31,7 @@ class LlnlMatrix(System):
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
             + "/DELL-sapphirerapids-H100-Infiniband/hardware_description.yaml",
-            "queues": [JobQueue("pdebug", 60, 1), JobQueue("pbatch", 1440, 28)],
+            "queues": [JobQueue("pdebug", 60, 1), JobQueue("pbatch", 1440, 28), JobQueue("erl", 99999, 6)],
         },
     }
 
@@ -55,6 +55,14 @@ class LlnlMatrix(System):
         values=("none", "guests", "asccasc", "lc", "fractale"),
         multi=False,
         description="Submit a job to a specific named bank",
+    )
+
+    variant(
+        "queue",
+        default="none",
+        values=("none", "pbatch", "pdebug", "erl"),
+        multi=False,
+        description="Submit to queue other than the default queue (e.g. pdebug)",
     )
 
     def __init__(self, spec):
