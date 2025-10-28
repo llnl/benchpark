@@ -42,7 +42,7 @@ class RikenFugaku(System):
 
     def compute_packages_section(self):
         # Doesn't look like we need to switch MPI based on compiler from old definition, verify this
-        # SBA: It is actually needed for fujitsu-mpi and fujitsu-ssl2. Edited to load the required version only. 
+        # SBA: It is actually needed for fujitsu-mpi and fujitsu-ssl2. Edited to load the required version only.
         default_comp = self.spec.variants["compiler"][0]
         if default_comp == "clang":
             comp_version = "clang@17.0.2"
@@ -83,7 +83,8 @@ class RikenFugaku(System):
                     "buildable": False,
                     "externals": [
                         {
-                            "spec": "fujitsu-mpi@4.10.0 arch=linux-rhel8-a64fx %"f"{comp_version}",
+                            "spec": "fujitsu-mpi@4.10.0 arch=linux-rhel8-a64fx %"
+                            f"{comp_version}",
                             "prefix": f"{mpi_prefix}",
                         },
                     ],
@@ -92,7 +93,8 @@ class RikenFugaku(System):
                     "buildable": False,
                     "externals": [
                         {
-                            "spec": "fujitsu-ssl2@4.10.0 arch=linux-rhel8-a64fx %"f"{comp_version}",
+                            "spec": "fujitsu-ssl2@4.10.0 arch=linux-rhel8-a64fx %"
+                            f"{comp_version}",
                             "prefix": f"{ssl2_prefix}",
                         },
                     ],
@@ -628,14 +630,12 @@ class RikenFugaku(System):
 
     def compute_software_section(self):
         default_comp = self.spec.variants["compiler"][0]
-        if default_comp == "clang": 
+        if default_comp == "clang":
             default_comp = "llvm"
         return {
             "software": {
                 "packages": {
-                    "default-compiler": {
-                        "pkg_spec": f"{default_comp}"
-                    },
+                    "default-compiler": {"pkg_spec": f"{default_comp}"},
                     "default-mpi": {"pkg_spec": "fujitsu-mpi"},
                     "compiler-clang": {"pkg_spec": "llvm"},
                     "compiler-fj": {"pkg_spec": "fj"},
