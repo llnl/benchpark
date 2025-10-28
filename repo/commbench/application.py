@@ -8,6 +8,7 @@ import sys
 from ramble.appkit import *
 from ramble.expander import Expander
 
+
 class Commbench(ExecutableApplication):
     name = "commbench"
 

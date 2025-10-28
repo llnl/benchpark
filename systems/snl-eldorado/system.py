@@ -4,18 +4,19 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
+from packaging.version import Version
+
 from benchpark.directives import maintainers, variant
 from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.paths import hardware_descriptions
 from benchpark.rocmsystem import ROCmSystem
 from benchpark.system import (
-    System,
     JobQueue,
+    System,
     compiler_def,
     compiler_section_for,
     merge_dicts,
 )
-from packaging.version import Version
 
 
 class SnlEldorado(System):
