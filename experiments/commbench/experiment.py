@@ -3,10 +3,10 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainers
+from benchpark.cuda import CudaExperiment
+from benchpark.directives import maintainers, variant 
 from benchpark.experiment import Experiment
 from benchpark.openmp import OpenMPExperiment
-from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
 
 
