@@ -93,5 +93,7 @@ class Laghos(
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             if self.spec.satisfies("+gpu-aware-mpi"):
                 gam = "+gpu-aware-mpi"
-        self.add_package_spec(self.name, [f"laghos{self.determine_version()} +metis {gam}"])
+        self.add_package_spec(
+            self.name, [f"laghos{self.determine_version()} +metis {gam}"]
+        )        
         self.add_package_spec("hypre", ["hypre@2.32.0: +lapack"])
