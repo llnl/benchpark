@@ -95,5 +95,5 @@ class Laghos(
                 gam = "+gpu-aware-mpi"
         self.add_package_spec(
             self.name, [f"laghos{self.determine_version()} +metis {gam}"]
-        )        
+        )
         self.add_package_spec("hypre", ["hypre@2.32.0: +lapack"])
