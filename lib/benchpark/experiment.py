@@ -518,7 +518,7 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
 
         if hasattr(self, "system_spec"):
             sys_name = str(self.system_spec.system.__class__.__name__)
-            if sys_name == "RikenFugaku" :
+            if sys_name == "RikenFugaku":
                 if self.spec.satisfies("+mpi"):
                     self.add_package_spec("default-mpi")
                 if not self.system_spec.system.spec.variants["compiler"][0] == "gcc":
