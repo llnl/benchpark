@@ -34,7 +34,7 @@ include:
       - HOST: dane
         ARCHCONFIG: llnl-cluster
         SCHEDULER_PARAMETERS: $DANE_PARAMS
-        SYSTEM_ARGS: ["compiler=gcc"]
+        SYSTEM_ARGS: [compiler=gcc]
         BENCHMARK: salmon-tddft
       # IOR needs a mount_point
       - HOST: dane
@@ -75,8 +75,8 @@ include:
       - HOST: dane
         ARCHCONFIG: llnl-cluster
         SCHEDULER_PARAMETERS: $DANE_PARAMS
-        SYSTEM_ARGS: ["compiler=gcc"]
-        BENCHMARK: ["qws", "salmon-tddft"]
+        SYSTEM_ARGS: [compiler=gcc]
+        BENCHMARK: [qws, salmon-tddft]
       # +cuda tests
       - HOST: matrix
         ARCHCONFIG: llnl-matrix
