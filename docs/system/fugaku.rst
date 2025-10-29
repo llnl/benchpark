@@ -51,7 +51,7 @@ Patch some files in various repos:
     #sed -i -e "s@256000000@134217728@g" experiments/stream/openmp/ramble.yaml
     #wget https://raw.githubusercontent.com/jdomke/spack/RIKEN_CCS_fugaku5/lib/spack/spack/util/libc.py -O ${WSDIR}/spack/lib/spack/spack/util/libc.py
     wget https://raw.githubusercontent.com/jdomke/spack/RIKEN_CCS_fugaku10/var/spack/repos/builtin/packages/hpl/package.py -O ${WSDIR}/spack-packages/repos/spack_repo/builtin/packages/hpl/package.py
-    wget https://https://raw.githubusercontent.com/SBA0486/spack-packages/refs/heads/develop/repos/spack_repo/builtin/packages/fujitsu_ssl2/package.py -O ${WSDIR}/spack-packages/repos/spack_repo/builtin/packages/fujitsu_ssl2/package.py
+    wget https://raw.githubusercontent.com/SBA0486/spack-packages/refs/heads/develop/repos/spack_repo/builtin/packages/fujitsu_ssl2/package.py -O ${WSDIR}/spack-packages/repos/spack_repo/builtin/packages/fujitsu_ssl2/package.py
     sed -i -e 's@SYSTEM_PATHS = \[\(.*\)\]@SYSTEM_PATHS = [\1, "/opt/FJSVxtclanga/tcsds-mpi-1.2.38", "/opt/FJSVxtclanga/tcsds-ssl2-1.2.38"]@g'  ${WSDIR}/spack/lib/spack/spack/util/environment.py
     sed -i -e 's@%fj"):@%fj") or (spec.target == "a64fx" and spec.satisfies("%clang\@11:")):@g'  ${WSDIR}/spack-packages/repos/spack_repo/builtin/packages/cmake/package.py
 
