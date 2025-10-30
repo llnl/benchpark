@@ -22,7 +22,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
 
     license("BSD-2-Clause")
 
-    version("develop", branch="caliper")
+    version("develop", branch="master")
 
     variant("metis", default=True, description="Enable/disable METIS support")
     variant("caliper", default=False, description="Enable/disable Caliper support")
