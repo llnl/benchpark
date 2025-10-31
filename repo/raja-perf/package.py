@@ -94,9 +94,12 @@ def cuda_for_radiuss_projects(options, spec):
 
 def blt_link_helpers(options, spec, spec_compiler):
 
+    spec_cxx = getattr(spec_compiler, "cxx", None) or ""
+    spec_fc  = getattr(spec_compiler, "fc",  None) or ""
+
     ### From local package:
     fortran_compilers = ["gfortran", "xlf"]
-    if any(compiler in spec_compiler.fc for compiler in fortran_compilers) and ("clang" in spec_compiler.cxx):
+    if any(compiler in spec_fc for compiler in fortran_compilers) and ("clang" in spec_cxx):
         # Pass fortran compiler lib as rpath to find missing libstdc++
         libdir = os.path.join(os.path.dirname(
                        os.path.dirname(spec_compiler.fc)), "lib")
@@ -113,7 +116,7 @@ def blt_link_helpers(options, spec, spec_compiler):
         "/usr/tce/packages/gcc/gcc-4.9.3/lib64;/usr/tce/packages/gcc/gcc-4.9.3/gnu/lib64/gcc/powerpc64le-unknown-linux-gnu/4.9.3;/usr/tce/packages/gcc/gcc-4.9.3/gnu/lib64;/usr/tce/packages/gcc/gcc-4.9.3/lib64/gcc/x86_64-unknown-linux-gnu/4.9.3"))
 
     compilers_using_toolchain = ["pgi", "xl", "icpc"]
-    if any(compiler in spec_compiler.cxx for compiler in compilers_using_toolchain):
+    if any(compiler in spec_cxx for compiler in compilers_using_toolchain):
         if spec_uses_toolchain(spec) or spec_uses_gccname(spec):
 
             # Ignore conflicting default gcc toolchain
@@ -250,7 +253,8 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
         # adrienbernede-23-01
         # Maybe we want to share this in the above blt_link_helpers function.
         compilers_using_cxx14 = ["intel-17", "intel-18", "xl"]
-        if any(compiler in self.compiler.cxx for compiler in compilers_using_cxx14):
+        cxx_name = getattr(self.compiler, "cxx", None) or ""
+        if any(compiler in cxx_name for compiler in compilers_using_cxx14):
             entries.append(cmake_cache_string("BLT_CXX_STD", "c++14"))
 
         return entries
