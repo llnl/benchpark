@@ -67,57 +67,57 @@ class LbnlPerlmutter(System):
             setattr(self, k, v)
 
     def compute_compilers_section(self):
-        nvhpc_cfg = compiler_section_for(
-            "nvhpc",
-            [
-                compiler_def(
-                    "nvhpc@25.5",
-                    "/opt/cray/pe/craype/2.7.32/",
-                    {"c": "cc", "cxx": "CC", "fortran": "ftn"},
-                    modules=["PrgEnv-nvhpc/8.5.0", "nvhpc/25.5"],
-                )
-            ],
-        )
-        if self.spec.satisfies("compiler=gcc"):
-            gcc_cfg = compiler_section_for(
-                "gcc",
-                [
-                    compiler_def(
-                        "gcc@12.3.0 languages:=c,c++,fortran",
-                        f"/opt/cray/pe/gcc-native/12/",
-                        {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
-                        modules=["PrgEnv-gnu", "gcc/12.3.0"],
-                        compilers_use_relative_paths=True,
-                            env={
-                                "append_path": {
-                                    "LD_LIBRARY_PATH": "/opt/cray/libfabric/1.22.0/lib64/:/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/cuda/12.4/lib64"
-                                }
-                            },
-                    )
-                ],
-            )
-            cfg = merge_dicts(nvhpc_cfg, gcc_cfg)
-        else:
-            cfg = nvhpc_cfg
-
-        return cfg
-#        return compiler_section_for(
-#            "gcc",
+#        nvhpc_cfg = compiler_section_for(
+#            "nvhpc",
 #            [
 #                compiler_def(
-#                    "gcc@12.3.0 languages:=c,c++,fortran",
-#                    f"/opt/cray/pe/gcc-native/12/",
-#                    {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
-#                    modules=["PrgEnv-gnu", "gcc/12.3.0"],
-#                    compilers_use_relative_paths=True,
-#                        env={
-#                            "append_path": {
-#                                "LD_LIBRARY_PATH": "/opt/cray/libfabric/1.22.0/lib64/:/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/cuda/12.4/lib64"
-#                            }
-#                        },
+#                    "cray-mpich@8.1.30",
+#                    "/opt/cray/pe/craype/2.7.32/",
+#                    {"c": "cc", "cxx": "CC", "fortran": "ftn"},
+#                    modules=["PrgEnv-cray/8.5.0", "craype/2.7.32"],
 #                )
 #            ],
 #        )
+#        if self.spec.satisfies("compiler=gcc"):
+#            gcc_cfg = compiler_section_for(
+#                "gcc",
+#                [
+#                    compiler_def(
+#                        "gcc@12.3.0 languages:=c,c++,fortran",
+#                        f"/opt/cray/pe/gcc-native/12/",
+#                        {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+#                        modules=["PrgEnv-gnu", "gcc/12.3.0"],
+#                        compilers_use_relative_paths=True,
+#                            env={
+#                                "append_path": {
+#                                    "LD_LIBRARY_PATH": "/opt/cray/libfabric/1.22.0/lib64/:/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/cuda/12.4/lib64"
+#                                }
+#                            },
+#                    )
+#                ],
+#            )
+#            cfg = merge_dicts(nvhpc_cfg, gcc_cfg)
+#        else:
+#            cfg = nvhpc_cfg
+#
+#        return cfg
+        return compiler_section_for(
+            "gcc",
+            [
+                compiler_def(
+                    "gcc@12.3.0 languages:=c,c++,fortran",
+                    f"/opt/cray/pe/gcc-native/12/",
+                    {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                    modules=["PrgEnv-gnu", "gcc/12.3.0"],
+                    compilers_use_relative_paths=True,
+                        env={
+                            "append_path": {
+                                "LD_LIBRARY_PATH": "/opt/cray/libfabric/1.22.0/lib64/:/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/cuda/12.4/lib64"
+                            }
+                        },
+                )
+            ],
+        )
 
     def compute_packages_section(self):
 
@@ -128,7 +128,7 @@ class LbnlPerlmutter(System):
                     "externals": [
                         {
                             "spec": "cray-mpich@8.1.30",
-                            "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/12.3",
+                            "prefix": f"/opt/cray/pe/craype/2.7.32/",
                         }
                     ],
                     "buildable": False,
@@ -143,6 +143,15 @@ class LbnlPerlmutter(System):
                 },
                 "cmake": {
                     "externals": [{"spec": "cmake@3.30.2", "prefix": "/global/common/software/nersc9/cmake/3.30.2"}],
+                    "buildable": False,
+                },
+                "cray-libsci": {
+                    "externals": [
+                        {
+                            "spec": "cray-libsci@24.07.0", 
+                            "prefix": "/opt/cray/pe/libsci/24.07.0/CRAYCLANG/17.0/x86_64/",
+                        }
+                    ],
                     "buildable": False,
                 },
             }
