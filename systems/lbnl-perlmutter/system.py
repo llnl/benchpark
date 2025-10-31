@@ -145,6 +145,12 @@ class LbnlPerlmutter(System):
                     "externals": [{"spec": "cmake@3.30.2", "prefix": "/global/common/software/nersc9/cmake/3.30.2"}],
                     "buildable": False,
                 },
+                "mpi": {"buildable": False},
+            }
+        }
+
+        if self.spec.satisfies("compiler=gcc"):
+            selections["packages"] |= {
                 "cray-libsci": {
                     "externals": [
                         {
@@ -153,10 +159,20 @@ class LbnlPerlmutter(System):
                         }
                     ],
                     "buildable": False,
-                },
-                "mpi": {"buildable": False},
+                }
             }
-        }
+        else:
+            selections["packages"] |= {
+                "cray-libsci": {
+                    "externals": [
+                        {
+                            "spec": "cray-libsci@24.07.0",
+                            "prefix": "/opt/cray/pe/libsci/24.07.0/CRAY/17.0/x86_64/",
+                        }
+                    ],
+                    "buildable": False,
+                }
+            }
 
         return selections
 
