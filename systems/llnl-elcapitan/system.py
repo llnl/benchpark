@@ -65,6 +65,8 @@ class LlnlElcapitan(System):
             ],  # 3 cores reserved per socket
             "sys_gpus_per_node": None,  # Determined by "gpumode" variant
             "sys_sockets_per_node": 4,
+            "sys_ccd_per_node": 12,
+            "sys_xcd_per_node": 24,
             "sys_mem_per_node_GB": 512,
             "sys_cpu_mem_per_node_MB": 3072,
             "sys_gpu_mem_per_node_GB": 512,
