@@ -128,7 +128,7 @@ class LbnlPerlmutter(System):
                     "externals": [
                         {
                             "spec": "cray-mpich@8.1.30",
-                            "prefix": f"/opt/cray/pe/craype/2.7.32/",
+                            "prefix": f"/opt/cray/pe/mpich/8.1.30/ofi/gnu/12.3/",
                         }
                     ],
                     "buildable": False,
@@ -149,11 +149,12 @@ class LbnlPerlmutter(System):
                     "externals": [
                         {
                             "spec": "cray-libsci@24.07.0", 
-                            "prefix": "/opt/cray/pe/libsci/24.07.0/CRAYCLANG/17.0/x86_64/",
+                            "prefix": "/opt/cray/pe/libsci/24.07.0/GNU/12.3/x86_64/",
                         }
                     ],
                     "buildable": False,
                 },
+                "mpi": {"buildable": False},
             }
         }
 
