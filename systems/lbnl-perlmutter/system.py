@@ -176,6 +176,35 @@ class LbnlPerlmutter(System):
 
         return selections
 
+    def system_specific_variables(self):
+        opts = super().system_specific_variables()
+        if self.spec.satisfies("constraint=cpu"):
+            opts.update(
+                {
+                    "extra_batch_opts":f"--constraint={self.spec.variants['constraint'][0]}",
+                }
+            )
+        elif self.spec.satisfies("constraint=gpu"):
+            opts.update(
+                {
+                    "extra_batch_opts":f"--constraint={self.spec.variants['constraint'][0]}",
+                }
+            )
+        elif self.spec.satisfies("constraint=gpu&hbmg40"):
+            opts.update(
+                {
+                    "extra_batch_opts":f"--constraint={self.spec.variants['constraint'][0]}",
+                }
+            )
+        elif self.spec.satisfies("constraint=gpu&hbmg80"):
+            opts.update(
+                {
+                    "extra_batch_opts":f"--constraint={self.spec.variants['constraint'][0]}",
+                }
+            )
+        
+        return opts
+
     def compute_software_section(self):
         """This is somewhat vestigial: for the Tioga config that is committed
         to the repo, multiple instances of mpi/compilers are stored and
