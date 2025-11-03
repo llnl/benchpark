@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from benchpark.directives import variant, maintainers
+from benchpark.cudasystem import CudaSystem
 from benchpark.system import (
     System,
     compiler_section_for,
@@ -46,6 +47,13 @@ class LbnlPerlmutter(System):
     )
 
     variant(
+        "gtl",
+        default=False,
+        values=(True, False),
+        description="Use GTL-enabled MPI",
+    )
+
+    variant(
         "queue",
         default="regular",
         values=("none", "regular", "debug"),
@@ -53,13 +61,22 @@ class LbnlPerlmutter(System):
         description="Submit to queue",
     )
 
+    variant(
+        "cuda",
+        default="12.4",
+        values=("12.2", "12.4"),
+        description="CUDA version",
+    )
+
     def __init__(self, spec):
         super().__init__(spec)
-        self.programming_models = [OpenMPCPUOnlySystem()]
+        self.programming_models = [CudaSystem(), OpenMPCPUOnlySystem()]
 
         self.gcc_version = Version("12.3.0")
         self.mpi_version = Version("8.1.30")
         self.cce_version = Version("16.0.0")
+        self.cuda_version = Version(self.spec.variants["cuda"][0])
+        self.gtl_flag = self.spec.variants["gtl"][0]
 
         self.scheduler = "slurm"
         attrs = self.id_to_resources.get("perlmutter")
@@ -174,6 +191,10 @@ class LbnlPerlmutter(System):
                 }
             }
 
+        selections["packages"] |= self.cuda_config(self.spec.variants["cuda"][0])[
+            "packages"
+        ]
+
         return selections
 
     def system_specific_variables(self):
@@ -204,6 +225,77 @@ class LbnlPerlmutter(System):
             )
         
         return opts
+
+    def cuda_config(self, cuda_version):
+        return {
+            "packages": {
+                "blas": {"require": "intel-oneapi-mkl"},
+                "lapack": {"require": "intel-oneapi-mkl"},
+                "curand": {
+                    "externals": [
+                        {
+                            "spec": f"curand@{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/math_libs/12.4/lib64",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cuda": {
+                    "externals": [
+                        {
+                            "spec": f"cuda@{cuda_version}+allow-unsupported-compilers",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/cuda/{cuda_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cub": {
+                    "externals": [
+                        {
+                            "spec": f"cub@{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/cuda/{cuda_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+#                "cusparse": {
+#                    "externals": [
+#                        {
+#                            "spec": f"cusparse@{cuda_version}",
+#                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/cuda/{cuda_version}",
+#                        }
+#                    ],
+#                    "buildable": False,
+#                },
+                "cublas": {
+                    "externals": [
+                        {
+                            "spec": f"cublas@{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/math_libs/12.4/lib64",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cusolver": {
+                    "externals": [
+                        {
+                            "spec": f"cusolver@{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/math_libs/12.4/lib64",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "cufft": {
+                    "externals": [
+                        {
+                            "spec": f"cufft@{cuda_version}",
+                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/math_libs/12.4/lib64",
+                        }
+                    ],
+                    "buildable": False,
+                },
+            }
+        }
 
     def compute_software_section(self):
         """This is somewhat vestigial: for the Tioga config that is committed
