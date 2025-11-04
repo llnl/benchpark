@@ -83,7 +83,8 @@ class RikenFugaku(System):
                     "buildable": False,
                     "externals": [
                         {
-                            "spec": "fujitsu-mpi@4.10.0 arch=linux-rhel8-a64fx %"f"{comp_version}",
+                            "spec": "fujitsu-mpi@4.10.0 arch=linux-rhel8-a64fx %"
+                            f"{comp_version}",
                             "prefix": f"{mpi_prefix}",
                         },
                     ],
@@ -92,7 +93,8 @@ class RikenFugaku(System):
                     "buildable": False,
                     "externals": [
                         {
-                            "spec": "fujitsu-ssl2@4.10.0 arch=linux-rhel8-a64fx %"f"{comp_version}",
+                            "spec": "fujitsu-ssl2@4.10.0 arch=linux-rhel8-a64fx %"
+                            f"{comp_version}",
                             "prefix": f"{ssl2_prefix}",
                         },
                     ],
@@ -639,9 +641,7 @@ class RikenFugaku(System):
         return {
             "software": {
                 "packages": {
-                    "default-compiler": {
-                        "pkg_spec": f"{default_comp}"
-                    },
+                    "default-compiler": {"pkg_spec": f"{default_comp}"},
                     "default-mpi": {"pkg_spec": "fujitsu-mpi"},
                     "compiler-clang": {"pkg_spec": "llvm"},
                     "compiler-fj": {"pkg_spec": "fj"},
