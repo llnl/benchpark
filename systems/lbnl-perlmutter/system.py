@@ -43,7 +43,7 @@ class LbnlPerlmutter(System):
         "constraint",
         default="cpu",
         values=("cpu", "gpu", "gpu&hbmg40", "gpu&hbmg80"),
-        description="Which constraint to use"
+        description="Which constraint to use",
     )
 
     variant(
@@ -73,11 +73,8 @@ class LbnlPerlmutter(System):
         self.programming_models = [CudaSystem(), OpenMPCPUOnlySystem()]
 
         self.gcc_version = Version("12.3.0")
-        self.short_gcc_version = (
-            f"{self.gcc_version.major}.{self.gcc_version.minor}"
-        )
+        self.short_gcc_version = (f"{self.gcc_version.major}.{self.gcc_version.minor}")
         self.mpi_version = Version("8.1.30")
-        #self.cce_version = Version("16.0.0")
         self.cuda_version = Version(self.spec.variants["cuda"][0])
         self.gtl_flag = self.spec.variants["gtl"][0]
 
@@ -114,40 +111,6 @@ class LbnlPerlmutter(System):
             }
 
     def compute_compilers_section(self):
-#        nvhpc_cfg = compiler_section_for(
-#            "nvhpc",
-#            [
-#                compiler_def(
-#                    "cray-mpich@8.1.30",
-#                    "/opt/cray/pe/craype/2.7.32/",
-#                    {"c": "cc", "cxx": "CC", "fortran": "ftn"},
-#                    modules=["PrgEnv-cray/8.5.0", "craype/2.7.32"],
-#                )
-#            ],
-#        )
-#        if self.spec.satisfies("compiler=gcc"):
-#            gcc_cfg = compiler_section_for(
-#                "gcc",
-#                [
-#                    compiler_def(
-#                        "gcc@12.3.0 languages:=c,c++,fortran",
-#                        f"/opt/cray/pe/gcc-native/12/",
-#                        {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
-#                        modules=["PrgEnv-gnu", "gcc/12.3.0"],
-#                        compilers_use_relative_paths=True,
-#                            env={
-#                                "append_path": {
-#                                    "LD_LIBRARY_PATH": "/opt/cray/libfabric/1.22.0/lib64/:/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/cuda/12.4/lib64"
-#                                }
-#                            },
-#                    )
-#                ],
-#            )
-#            cfg = merge_dicts(nvhpc_cfg, gcc_cfg)
-#        else:
-#            cfg = nvhpc_cfg
-#
-#        return cfg
         return compiler_section_for(
             "gcc",
             [
@@ -157,11 +120,11 @@ class LbnlPerlmutter(System):
                     {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
                     modules=["PrgEnv-gnu", "gcc/12.3.0"],
                     compilers_use_relative_paths=True,
-                        env={
-                            "append_path": {
-                                "LD_LIBRARY_PATH": "/opt/cray/libfabric/1.22.0/lib64/:/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/cuda/12.4/lib64"
-                            }
-                        },
+                    env={
+                        "append_path": {
+                            "LD_LIBRARY_PATH": "/opt/cray/libfabric/1.22.0/lib64/:/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/cuda/12.4/lib64"
+                        }
+                    },
                 )
             ],
         )
@@ -189,7 +152,12 @@ class LbnlPerlmutter(System):
                     "buildable": False,
                 },
                 "cmake": {
-                    "externals": [{"spec": "cmake@3.30.2", "prefix": "/global/common/software/nersc9/cmake/3.30.2"}],
+                    "externals": [
+                        {
+                            "spec": "cmake@3.30.2",
+                            "prefix": "/global/common/software/nersc9/cmake/3.30.2",
+                        }
+                    ],
                     "buildable": False,
                 },
                 "mpi": {"buildable": False},
@@ -203,7 +171,7 @@ class LbnlPerlmutter(System):
                 "cray-libsci": {
                     "externals": [
                         {
-                            "spec": "cray-libsci@24.07.0", 
+                            "spec": "cray-libsci@24.07.0",
                             "prefix": "/opt/cray/pe/libsci/24.07.0/GNU/12.3/x86_64/",
                         }
                     ],
@@ -234,25 +202,25 @@ class LbnlPerlmutter(System):
         if self.spec.satisfies("constraint=cpu"):
             opts.update(
                 {
-                    "extra_batch_opts":f"--constraint={self.spec.variants['constraint'][0]}",
+                    "extra_batch_opts": f"--constraint={self.spec.variants['constraint'][0]}",
                 }
             )
         elif self.spec.satisfies("constraint=gpu"):
             opts.update(
                 {
-                    "extra_batch_opts":f"--constraint={self.spec.variants['constraint'][0]}",
+                    "extra_batch_opts": f"--constraint={self.spec.variants['constraint'][0]}",
                 }
             )
         elif self.spec.satisfies("constraint=gpu&hbmg40"):
             opts.update(
                 {
-                    "extra_batch_opts":f"--constraint={self.spec.variants['constraint'][0]}",
+                    "extra_batch_opts": f"--constraint={self.spec.variants['constraint'][0]}",
                 }
             )
         elif self.spec.satisfies("constraint=gpu&hbmg80"):
             opts.update(
                 {
-                    "extra_batch_opts":f"--constraint={self.spec.variants['constraint'][0]}",
+                    "extra_batch_opts": f"--constraint={self.spec.variants['constraint'][0]}",
                 }
             )
         
@@ -290,15 +258,6 @@ class LbnlPerlmutter(System):
                     ],
                     "buildable": False,
                 },
-#                "cusparse": {
-#                    "externals": [
-#                        {
-#                            "spec": f"cusparse@{cuda_version}",
-#                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/cuda/{cuda_version}",
-#                        }
-#                    ],
-#                    "buildable": False,
-#                },
                 "cublas": {
                     "externals": [
                         {
