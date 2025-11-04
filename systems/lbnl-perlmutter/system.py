@@ -73,7 +73,7 @@ class LbnlPerlmutter(System):
         self.programming_models = [CudaSystem(), OpenMPCPUOnlySystem()]
 
         self.gcc_version = Version("12.3.0")
-        self.short_gcc_version = (f"{self.gcc_version.major}.{self.gcc_version.minor}")
+        self.short_gcc_version = f"{self.gcc_version.major}.{self.gcc_version.minor}"
         self.mpi_version = Version("8.1.30")
         self.cuda_version = Version(self.spec.variants["cuda"][0])
         self.gtl_flag = self.spec.variants["gtl"][0]
@@ -223,7 +223,7 @@ class LbnlPerlmutter(System):
                     "extra_batch_opts": f"--constraint={self.spec.variants['constraint'][0]}",
                 }
             )
-        
+
         return opts
 
     def cuda_config(self, cuda_version):
