@@ -48,7 +48,7 @@ class LbnlPerlmutter(System):
 
     variant(
         "gtl",
-        default=False,
+        default=True,
         values=(True, False),
         description="Use GTL-enabled MPI",
     )
@@ -73,8 +73,11 @@ class LbnlPerlmutter(System):
         self.programming_models = [CudaSystem(), OpenMPCPUOnlySystem()]
 
         self.gcc_version = Version("12.3.0")
+        self.short_gcc_version = (
+            f"{self.gcc_version.major}.{self.gcc_version.minor}"
+        )
         self.mpi_version = Version("8.1.30")
-        self.cce_version = Version("16.0.0")
+        #self.cce_version = Version("16.0.0")
         self.cuda_version = Version(self.spec.variants["cuda"][0])
         self.gtl_flag = self.spec.variants["gtl"][0]
 
@@ -82,6 +85,33 @@ class LbnlPerlmutter(System):
         attrs = self.id_to_resources.get("perlmutter")
         for k, v in attrs.items():
             setattr(self, k, v)
+
+    def mpi_config(self):
+        gtl = self.spec.variants["gtl"][0]
+
+        if self.spec.satisfies("compiler=gcc"):
+            if gtl:
+                gtl_spec = "+gtl"
+            else:
+                gtl_spec = "~gtl"
+
+            return {
+                "packages": {
+                    "cray-mpich": {
+                        "externals": [
+                            {
+                                "spec": f"cray-mpich@{self.mpi_version}{gtl_spec}+wrappers %gcc@{self.gcc_version}",
+                                "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/{self.short_gcc_version}",
+                                "extra_attributes": {
+                                    "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
+                                    "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/{self.short_gcc_version}/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
+                                    "gtl_libs": "libmpi_gtl_hsa",
+                                },
+                            }
+                        ]
+                    }
+                }
+            }
 
     def compute_compilers_section(self):
 #        nvhpc_cfg = compiler_section_for(
@@ -166,6 +196,8 @@ class LbnlPerlmutter(System):
             }
         }
 
+        selections["packages"] |= self.mpi_config()["packages"]
+
         if self.spec.satisfies("compiler=gcc"):
             selections["packages"] |= {
                 "cray-libsci": {
@@ -229,8 +261,8 @@ class LbnlPerlmutter(System):
     def cuda_config(self, cuda_version):
         return {
             "packages": {
-                "blas": {"require": "intel-oneapi-mkl"},
-                "lapack": {"require": "intel-oneapi-mkl"},
+                "blas": {"require": "cray-libsci"},
+                "lapack": {"require": "cray-libsci"},
                 "curand": {
                     "externals": [
                         {
@@ -310,8 +342,9 @@ class LbnlPerlmutter(System):
             "software": {
                 "packages": {
                     "default-compiler": {"pkg_spec": "gcc@12.3.0"},
-                    "default-mpi": {"pkg_spec": "cray-mpich@8.1.28"},
+                    "default-mpi": {"pkg_spec": "cray-mpich@8.1.30"},
                     "compiler-gcc": {"pkg_spec": "gcc@12.3.0"},
+                    "mpi-gcc": {"pkg_spec": "cray-mpich+gtl"},
                 }
             }
         }
