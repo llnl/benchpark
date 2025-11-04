@@ -15,7 +15,6 @@ from benchpark.system import (
     System,
     compiler_def,
     compiler_section_for,
-    merge_dicts,
 )
 
 
@@ -118,7 +117,7 @@ class LbnlPerlmutter(System):
             [
                 compiler_def(
                     "gcc@12.3.0 languages:=c,c++,fortran",
-                    f"/opt/cray/pe/gcc-native/12/",
+                    "/opt/cray/pe/gcc-native/12/",
                     {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
                     modules=["PrgEnv-gnu", "gcc/12.3.0"],
                     compilers_use_relative_paths=True,
@@ -140,7 +139,7 @@ class LbnlPerlmutter(System):
                     "externals": [
                         {
                             "spec": "cray-mpich@8.1.30",
-                            "prefix": f"/opt/cray/pe/mpich/8.1.30/ofi/gnu/12.3/",
+                            "prefix": "/opt/cray/pe/mpich/8.1.30/ofi/gnu/12.3/",
                         }
                     ],
                     "buildable": False,
@@ -237,7 +236,7 @@ class LbnlPerlmutter(System):
                     "externals": [
                         {
                             "spec": f"curand@{cuda_version}",
-                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/math_libs/12.4/lib64",
+                            "prefix": "/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/math_libs/12.4/lib64",
                         }
                     ],
                     "buildable": False,
@@ -264,7 +263,7 @@ class LbnlPerlmutter(System):
                     "externals": [
                         {
                             "spec": f"cublas@{cuda_version}",
-                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/math_libs/12.4/lib64",
+                            "prefix": "/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/math_libs/12.4/lib64",
                         }
                     ],
                     "buildable": False,
@@ -273,7 +272,7 @@ class LbnlPerlmutter(System):
                     "externals": [
                         {
                             "spec": f"cusolver@{cuda_version}",
-                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/math_libs/12.4/lib64",
+                            "prefix": "/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/math_libs/12.4/lib64",
                         }
                     ],
                     "buildable": False,
@@ -282,7 +281,7 @@ class LbnlPerlmutter(System):
                     "externals": [
                         {
                             "spec": f"cufft@{cuda_version}",
-                            "prefix": f"/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/math_libs/12.4/lib64",
+                            "prefix": "/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/math_libs/12.4/lib64",
                         }
                     ],
                     "buildable": False,
