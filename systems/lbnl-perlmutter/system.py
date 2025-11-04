@@ -100,7 +100,7 @@ class LbnlPerlmutter(System):
                     "cray-mpich": {
                         "externals": [
                             {
-                                "spec": f"cray-mpich@{self.mpi_version}{gtl_spec}+wrappers %gcc@{self.gcc_version}",
+                                "spec": f"cray-mpich@{self.mpi_version}{gtl_spec}+wrappers +cuda cuda_arch=80 %gcc@{self.gcc_version}",
                                 "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/{self.short_gcc_version}",
                                 "extra_attributes": {
                                     "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
