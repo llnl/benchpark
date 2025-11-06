@@ -58,12 +58,13 @@ def command(args):
     experiments_root/
         spack/
         ramble/
-        <experiment>/
+        <experiment root>
             <system>/
-                workspace/
-                    configs/
-                        (everything from source/configs/<system>)
-                        (everything from source/experiments/<experiment>)
+                <experiment>/
+                    workspace/
+                        configs/
+                            (everything from source/configs/<system>)
+                            (everything from source/experiments/<experiment>)
     """
 
     # Parse experiment YAML for package_manager, system_id
