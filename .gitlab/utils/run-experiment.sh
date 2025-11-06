@@ -8,7 +8,7 @@ echo "./bin/benchpark system init --dest=${HOST} ${ARCHCONFIG} $([ "$HOST" != "m
 echo "./bin/benchpark experiment init --dest=${BENCHMARK} ${HOST} ${BENCHMARK} ${VARIANT}"
 echo "./bin/benchpark setup ${HOST}/${BENCHMARK} wkp/"
 echo ". wkp/setup.sh"
-echo "cd ./wkp/${BENCHMARK}/${HOST}/workspace/"
+echo "cd ./wkp/${HOST}/${BENCHMARK}/workspace/"
 echo "ramble --disable-logger --workspace-dir . workspace setup"
 echo "ramble --disable-logger --workspace-dir . on --executor '{execute_experiment}' --where '{n_nodes} == 1'"
 echo "ramble --disable-logger --workspace-dir . workspace analyze --format json yaml text"
@@ -30,7 +30,7 @@ fi
 . wkp/setup.sh
 
 # Setup Workspace
-cd ./wkp/${BENCHMARK}/${HOST}/workspace/
+cd ./wkp/${HOST}/${BENCHMARK}/workspace/
 
 ramble --disable-logger --workspace-dir . workspace setup
 
