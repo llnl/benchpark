@@ -5,8 +5,8 @@ set -e
 . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
 
 echo "./bin/benchpark system init --dest=${HOST} ${ARCHCONFIG} $([ "$HOST" != "matrix" ] && echo "cluster=$HOST") $SYSTEM_ARGS"
-echo "./bin/benchpark experiment init --dest=${BENCHMARK} --system=${HOST} ${BENCHMARK} ${VARIANT}"
-echo "./bin/benchpark setup ${BENCHMARK} wkp/"
+echo "./bin/benchpark experiment init --dest=${BENCHMARK} ${HOST} ${BENCHMARK} ${VARIANT}"
+echo "./bin/benchpark setup ${HOST}/${BENCHMARK} wkp/"
 echo ". wkp/setup.sh"
 echo "cd ./wkp/${BENCHMARK}/${HOST}/workspace/"
 echo "ramble --disable-logger --workspace-dir . workspace setup"
@@ -21,10 +21,10 @@ BV=""
 if [[ -n "$BENCHMARK_VERSION" ]]; then
     BV="version=$BENCHMARK_VERSION"
 fi
-./bin/benchpark experiment init --dest=${BENCHMARK} --system=${HOST} ${BENCHMARK} ${VARIANT} ${BV}
+./bin/benchpark experiment init --dest=${BENCHMARK} ${HOST} ${BENCHMARK} ${VARIANT} ${BV}
 
 # Build Workspace
-./bin/benchpark setup ${BENCHMARK} wkp/
+./bin/benchpark setup ${HOST}/${BENCHMARK} wkp/
 
 # Setup Ramble & Spack
 . wkp/setup.sh
