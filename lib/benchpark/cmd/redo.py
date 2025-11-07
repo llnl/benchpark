@@ -79,10 +79,10 @@ def command(args):
         experiments.append((experiment_id, experiment_spec))
         setups.append(f"benchpark setup {experiment_src_dir} {experiments_root}")
 
-    reinit_system = f"benchpark system init {system_spec}"
+    reinit_system = f"benchpark system init --dest={system_id} {system_spec}"
 
     per_experiment = list(
-        f"benchpark experiment init --dest={experiment_id} {system_id} {experiment_spec}"
+        f'benchpark experiment init --dest={experiment_id} {system_id} "{experiment_spec}"'
         for (experiment_id, experiment_spec) in experiments
     )
     reinit_experiments = "\n".join(per_experiment)
