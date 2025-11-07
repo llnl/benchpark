@@ -42,7 +42,7 @@ def collect_experiments_for_system(system_dir):
         system = pathlib.Path(system_dir)
         for i, part in enumerate(system.parts):
             assert full.parts[i] == part
-        return str(pathlib.Path(*full.parts[len(system.parts):]))
+        return str(pathlib.Path(*full.parts[len(system.parts) :]))
 
     experiments = list(strip_system_dir(x) for x in experiments)
     return experiments
@@ -71,7 +71,9 @@ def command(args):
     experiments = list()
     setups = list()
     for experiment_id in experiment_dirs:
-        experiment_src_dir = pathlib.Path(os.path.abspath(system_id)) / pathlib.Path(str(experiment_id))
+        experiment_src_dir = pathlib.Path(os.path.abspath(system_id)) / pathlib.Path(
+            str(experiment_id)
+        )
         with open(str(experiment_src_dir / "ramble.yaml"), "r") as file:
             parsed_yaml = yaml.safe_load(file)
 
