@@ -135,3 +135,5 @@ class Lammps(
                 f"lammps{self.determine_version()} +opt+manybody+molecule+kspace+rigid+kokkos+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth+reaxff lammps_sizes=bigbig {pace} {fft_kokkos} "
             ],
         )
+        self.spec.satisfies("+rocm"):
+            self.add_package_spec("kokkos", ["kokkos+apu"])
