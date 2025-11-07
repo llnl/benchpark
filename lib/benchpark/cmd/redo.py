@@ -36,6 +36,15 @@ def collect_experiments_for_system(system_dir):
     for root, _, files in os.walk(system_dir):
         if "ramble.yaml" in files:
             experiments.append(root)
+
+    def strip_system_dir(full_dir):
+        full = pathlib.Path(full_dir)
+        system = pathlib.Path(system_dir)
+        for i, part in enumerate(system.parts):
+            assert full.parts[i] == part
+        return str(pathlib.Path(*full.parts[len(system.parts):]))
+
+    experiments = list(strip_system_dir(x) for x in experiments)
     return experiments
 
 
@@ -59,35 +68,34 @@ def command(args):
         system_spec = pickle.load(f)
 
     experiment_dirs = collect_experiments_for_system(system_id)
-
+    experiments = list()
+    setups = list()
     for experiment_id in experiment_dirs:
-        experiment_src_dir = pathlib.Path(os.path.abspath(str(experiment_id)))
-
+        experiment_src_dir = pathlib.Path(os.path.abspath(system_id)) / pathlib.Path(str(experiment_id))
         with open(str(experiment_src_dir / "ramble.yaml"), "r") as file:
             parsed_yaml = yaml.safe_load(file)
-        pkg_manager = _find(parsed_yaml, "package_manager")
-        system_id = _find(parsed_yaml, "destdir")
-
-        debug_print(f"source_dir = {source_dir}")
-        debug_print(f"specified system/experiment = {experiment_id}")
-
-        configs_src_dir = pathlib.Path(os.path.abspath(str(system_id)))
-
-        experiments_root = pathlib.Path(os.path.abspath(experiments_root))
-        experiment_id = pathlib.Path(os.path.abspath(experiment_id))
-        system_id = pathlib.Path(os.path.abspath(system_id))
-        common_root = pathlib.Path(
-            os.path.commonpath([experiments_root, experiment_id, system_id])
-        )
-        workspace_dir = (
-            common_root
-            / experiments_root.relative_to(common_root)
-            / experiment_id.relative_to(common_root)
-        )
 
         experiment_spec = parsed_yaml["ramble"]["config"]["spec"]
+        experiments.append((experiment_id, experiment_spec))
+        setups.append(f"benchpark setup {experiment_src_dir} {experiments_root}")
 
-    # TODO: at this point you can delete the whole system dir
-    # and you can delete each corresponding dir in the experiments_root
-    # and then you can rerun system/experiment init; setup
-    # To fully clean, you have to remove installs from the spack instance
+    reinit_system = f"benchpark system init {system_spec}"
+
+    per_experiment = list(
+        f"benchpark experiment init --dest={experiment_id} {system_id} {experiment_spec}"
+        for (experiment_id, experiment_spec) in experiments
+    )
+    reinit_experiments = "\n".join(per_experiment)
+
+    setups = "\n".join(setups)
+
+    redo_instructions = rf"""\
+. {experiments_root}/setup.sh
+spack uninstall -afy
+rm -rf {experiments_root}/{system_id}
+rm -rf {system_id}
+{reinit_system}
+{reinit_experiments}
+{setups}
+"""
+    print(redo_instructions)
