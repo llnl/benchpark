@@ -102,8 +102,8 @@ class LbnlPerlmutter(System):
                                 "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/{self.short_gcc_version}",
                                 "extra_attributes": {
                                     "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
-                                    "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/{self.short_gcc_version}/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
-                                    "gtl_libs": "libmpi_gtl_hsa",
+                                    "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/{self.short_gcc_version}/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -lmpi_gtl_cuda",
+                                    "gtl_libs": "libmpi_gtl_cuda",
                                 },
                             }
                         ]
