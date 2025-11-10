@@ -3,6 +3,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+from pathlib import Path
+
 import yaml
 
 import benchpark.paths
@@ -21,8 +23,9 @@ def command(args):
     data = {}
 
     if args.bootstrap_location:
+        bl = str(Path(args.bootstrap_location).expanduser().resolve()).rstrip("/") + "/.benchpark/"
         data["bootstrap"] = {
-            "location": str(args.bootstrap_location).rstrip("/") + "/.benchpark/",
+            "location": bl,
         }
 
     print(f"Writing configuration to {benchpark.paths.benchpark_config}")
