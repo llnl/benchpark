@@ -1,14 +1,15 @@
-# Copyright 2023 Lawrence Livermore National Security, LLC and other
-# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+
+# Copyright Spack Project Developers. See COPYRIGHT file for details.
 #
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
 import os
 
-from spack.package import *
 from spack_repo.builtin.build_systems.cuda import CudaPackage
 from spack_repo.builtin.build_systems.rocm import ROCmPackage
 from spack_repo.builtin.packages.mpich.package import MpichEnvironmentModifications
+
+from spack.package import *
 
 
 class CrayMpich(MpichEnvironmentModifications, Package, CudaPackage, ROCmPackage):
@@ -238,3 +239,4 @@ class CrayMpich(MpichEnvironmentModifications, Package, CudaPackage, ROCmPackage
                     "ldlibs": [f"-l{gtl_library_name}"],
                 }
         return {}
+
