@@ -194,7 +194,7 @@ jobs:
           pip install -r ./requirements.txt
       - name: Run
         run: |-
-          output=$(./bin/benchpark bootstrap -l . 2>&1)
+          output=$(./bin/benchpark configure --bootstrap-location . && ./bin/benchpark bootstrap 2>&1)
 
           # 1. Check the path is present
           echo "$output" | grep -q "/home/runner/work/benchpark/benchpark/.benchpark/ramble" \

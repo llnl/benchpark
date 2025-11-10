@@ -10,18 +10,8 @@ from benchpark.runtime import RuntimeResources
 
 
 def setup_parser(root_parser):
-    root_parser.add_argument(
-        "-l",
-        "--location",
-        default=benchpark.paths.benchpark_home,
-        help="Path to the bootstrap location",
-    )
+    pass
 
 
 def command(args):
-    path = (
-        str(Path(args.location).expanduser().resolve()).removesuffix(".benchpark")
-        + "/.benchpark"
-    )
-    bootstrapper = RuntimeResources(path)
-    bootstrapper.bootstrap()
+    pass
