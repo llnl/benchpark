@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+
 def setup_parser(root_parser):
     pass
 
