@@ -1,242 +1,48 @@
-
-# Copyright Spack Project Developers. See COPYRIGHT file for details.
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 #
-# SPDX-License-Identifier: (Apache-2.0 OR MIT)
-
-import os
-
-from spack_repo.builtin.build_systems.cuda import CudaPackage
-from spack_repo.builtin.build_systems.rocm import ROCmPackage
-from spack_repo.builtin.packages.mpich.package import MpichEnvironmentModifications
+# SPDX-License-Identifier: Apache-2.0
 
 from spack.package import *
+from spack_repo.builtin.packages.cray_mpich.package import CrayMpich as BuiltinCM
 
 
-class CrayMpich(MpichEnvironmentModifications, Package, CudaPackage, ROCmPackage):
-    """Cray's MPICH is a high performance and widely portable implementation of
-    the Message Passing Interface (MPI) standard."""
+class CrayMpich(BuiltinCM):
 
-    homepage = "https://docs.nersc.gov/development/compilers/wrappers/"
-
-    maintainers("etiennemlb", "haampie")
-
-    version("9.0.1")
-    version("8.1.33")
-    version("8.1.32")
-    version("8.1.31")
-    version("8.1.30")
-    version("8.1.28")
-    version("8.1.25")
-    version("8.1.24")
-    version("8.1.21")
-    version("8.1.14")
-    version("8.1.7")
-    version("8.1.0")
-    version("8.0.16")
-    version("8.0.14")
-    version("8.0.11")
-    version("8.0.9")
-    version("7.7.16")
-    version("7.7.15")
-    version("7.7.14")
-    version("7.7.13")
-
-    depends_on("cray-pmi")
-    depends_on("libfabric")
-
-    # cray-mpich 8.1.7: features MPI compiler wrappers
-    variant("wrappers", default=True, when="@8.1.7:", description="enable MPI wrappers")
-    variant("gtl", default=True, when="+rocm", description="Enable GPU Accelerated Transports")
-    variant("gtl", default=True, when="+cuda", description="Enable GPU Accelerated Transports")
-
-    provides("mpi@3")
-
-    canonical_names = {
-        "gcc": "GNU",
-        "cce": "CRAY",
-        "intel": "INTEL",
-        "clang": "ALLINEA",
-        "aocc": "AOCC",
-    }
-
-    has_code = False  # Skip attempts to fetch a source that is not available
-
-    # Allows attaching compilers to externals in packages.yaml
-    depends_on("c", type="build")
-
-    requires("platform=linux", msg="Cray software is only available on linux")
-
-    def install(self, spec, prefix):
-        raise InstallError(
-            self.spec.format(
-                "{name} is not installable, you need to specify "
-                "it as an external package in packages.yaml"
-            )
-        )
-
-    @property
-    def modname(self):
-        return f"cray-mpich/{self.version}"
-
-    @property
-    def external_prefix(self):
-        mpich_module = module_command("show", self.modname).splitlines()
-
-        for line in mpich_module:
-            if "CRAY_MPICH_DIR" in line:
-                return get_path_args_from_module_line(line)[0]
-
-        # Fixes an issue on Archer2 cray-mpich/8.0.16 where there is
-        # no CRAY_MPICH_DIR variable in the module file.
-        for line in mpich_module:
-            if "CRAY_LD_LIBRARY_PATH" in line:
-                libdir = get_path_args_from_module_line(line)[0]
-                return os.path.dirname(os.path.normpath(libdir))
-
-    def setup_run_environment(self, env: EnvironmentModifications) -> None:
-        if self.spec.satisfies("+wrappers"):
-            self.setup_mpi_wrapper_variables(env)
-            return
-
-        if self.spec.has_virtual_dependency("c"):
-            env.set("MPICC", self["c"].cc)
-
-        if self.spec.has_virtual_dependency("cxx"):
-            env.set("MPICXX", self["cxx"].cxx)
-
-        if self.spec.has_virtual_dependency("fortran"):
-            env.set("MPIFC", self["fortran"].fortran)
-            env.set("MPIF77", self["fortran"].fortran)
-
-    def setup_dependent_package(self, module, dependent_spec):
-        spec = self.spec
-        if spec.satisfies("+wrappers"):
-            MpichEnvironmentModifications.setup_dependent_package(self, module, dependent_spec)
-        else:
-            if "c" in dependent_spec:
-                spec.mpicc = dependent_spec["c"].package.cc
-            if "cxx" in dependent_spec:
-                spec.mpicxx = dependent_spec["cxx"].package.cxx
-            if "fortran" in dependent_spec:
-                spec.mpifc = dependent_spec["fortran"].package.fortran
-                spec.mpif77 = dependent_spec["fortran"].package.fortran
-
-    def setup_dependent_build_environment(self, env, dependent_spec):
-        if self.spec.satisfies("+gtl"):
-            for flag in self.gtl_lib["ldflags"]:
-                env.prepend_path("LDFLAGS", flag)
-            env.prepend_path("LIBS", self.gtl_lib["ldlibs"][0])
-
-    def setup_dependent_run_environment(self, env, dependent_spec):
-        if self.spec.satisfies("+gtl"):
-            env.set("MPICH_GPU_SUPPORT_ENABLED", "1")
-
-    @property
-    def headers(self):
-        hdrs = find_headers("mpi", self.prefix.include, recursive=True)
-        hdrs.directories = os.path.dirname(hdrs[0])
-        return hdrs
+    variant("gtl", default=True, description="enable GPU-aware mode")
 
     @property
     def libs(self):
-        query_parameters = self.spec.last_query.extra_parameters
+        libs = super().libs
 
-        libraries = ["libmpich"]
-
-        if "cxx" in query_parameters:
-            libraries.extend(["libmpicxx", "libmpichcxx"])
-
-        if "f77" in query_parameters:
-            libraries.extend(["libmpifort", "libmpichfort", "libfmpi", "libfmpich"])
-
-        if "f90" in query_parameters:
-            libraries.extend(["libmpif90", "libmpichf90"])
-
-        libs = find_libraries(libraries, root=self.prefix.lib, recursive=True)
-        libs += find_libraries(libraries, root=self.prefix.lib64, recursive=True)
+        if self.spec.satisfies("+gtl"):
+            ld_flags = self.spec.extra_attributes["ldflags"]
+            gtl_lib_prefix = self.spec.extra_attributes["gtl_lib_path"]
+            # gtl_libs, if set, must be a single string. You can pass multiple
+            # libs by adding a space between each
+            gtl_libs = self.spec.extra_attributes["gtl_libs"].split()
+            libs += find_libraries(gtl_libs, root=gtl_lib_prefix, recursive=True)
 
         return libs
 
-    @property
-    def gtl_lib(self):
-        # GPU transport Layer (GTL) handling background:
-        # - The cray-mpich module defines an environment variable per supported
-        # GPU (say, PE_MPICH_GTL_LIBS_amd_gfx942). So we should read the
-        # appropriate variable.
-        # In practice loading a module and checking its content is a PITA. We
-        # simplify by assuming that the GTL for a given vendor (say, AMD), is
-        # one and the same for all the targets of this vendor (one GTL for all
-        # Nvidia or one GTL for all AMD devices).
-        # - Second, except if you have a very weird mpich layout, the GTL are
-        # located in /opt/cray/pe/mpich/<cray_mpich_version>/gtl/lib when the
-        # MPI libraries are in
-        # /opt/cray/pe/mpich/<cray_mpich_version>/ofi/<vendor>/<vendor_version>.
-        # Example:
-        #   /opt/cray/pe/mpich/8.1.28/gtl/lib
-        #   /opt/cray/pe/mpich/8.1.28/ofi/<vendor>/<vendor_version>
-        #   /opt/cray/pe/mpich/8.1.28/ofi/<vendor>/<vendor_version>/../../../gtl/lib
+    def setup_run_environment(self, env):
 
-        gtl_kinds = {
-            "cuda": {
-                "lib": "libmpi_gtl_cuda",
-                "variant": "cuda_arch",
-                "values": {"70", "80", "90"},
-            },
-            "rocm": {
-                "lib": "libmpi_gtl_hsa",
-                "variant": "amdgpu_target",
-                "values": {"gfx906", "gfx908", "gfx90a", "gfx940", "gfx942"},
-            },
-        }
+        super().setup_run_environment(env)
 
-        for variant, gtl_kind in gtl_kinds.items():
-            arch_variant = gtl_kind["variant"]
-            arch_values = gtl_kind["values"]
-            gtl_lib = gtl_kind["lib"]
+        if self.spec.satisfies("+gtl"):
+            env.set("MPICH_GPU_SUPPORT_ENABLED", "1")
+            env.prepend_path("LD_LIBRARY_PATH", self.spec.extra_attributes["gtl_lib_path"])
+        else:
+            env.set("MPICH_GPU_SUPPORT_ENABLED", "0")
+            gtl_path = self.spec.extra_attributes.get("gtl_lib_path", "")
+            if gtl_path:
+                env.prepend_path("LD_LIBRARY_PATH", gtl_path)
 
-            if self.spec.satisfies(f"+{variant} {arch_variant}=*"):
-                accelerator_architecture_set = set(self.spec.variants[arch_variant].value)
+    def cmake_args(self):
+        args = super().cmake_args(self)
 
-                if len(
-                    accelerator_architecture_set
-                ) >= 1 and not accelerator_architecture_set.issubset(arch_values):
-                    raise InstallError(
-                        f"cray-mpich variant '+{variant} {arch_variant}'"
-                        " was specified but no GTL support could be found for it."
-                    )
+        if self.spec.satisfies("+gtl"):
+            # Link GTL for MPICH GPU-aware
+            args.append(self.define("CMAKE_EXE_LINKER_FLAGS", self.spec['mpi'].libs.ld_flags))
 
-                mpi_root = os.path.abspath(
-                    os.path.join(self.prefix, os.pardir, os.pardir, os.pardir)
-                )
-
-                gtl_root = os.path.join(mpi_root, "gtl", "lib")
-
-                gtl_shared_libraries = find_libraries(
-                    [gtl_lib], root=gtl_root, shared=True, recursive=False
-                )
-
-                if len(gtl_shared_libraries) != 1:
-                    raise InstallError(
-                        f"cray-mpich variant '+{variant} {arch_variant}'"
-                        " was specified and GTL support was found for it but"
-                        f" the '{gtl_lib}' could not be correctly found on disk."
-                    )
-
-                gtl_library_fullpath = list(gtl_shared_libraries)[0]
-                tty.debug(f"Selected GTL: {gtl_library_fullpath}")
-
-                gtl_library_directory = os.path.dirname(gtl_library_fullpath)
-                gtl_library_name = os.path.splitext(
-                    os.path.basename(gtl_library_fullpath).split("lib")[1]
-                )[0]
-
-                # Early break. Only one GTL can be active at a given time.
-                return {
-                    "ldflags": [
-                        f"-L{gtl_library_directory}",
-                        f"-Wl,-rpath,{gtl_library_directory}",
-                    ],
-                    "ldlibs": [f"-l{gtl_library_name}"],
-                }
-        return {}
-
+        return args
