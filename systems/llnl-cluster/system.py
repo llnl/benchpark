@@ -137,7 +137,9 @@ class LlnlCluster(System):
 
         mount_point = self.spec.variants["mount_point"][0]
         if mount_point not in self.mount_points + ["none"]:
-            raise KeyError(f'"{mount_point}" is not a valid mount point for the cluster "{self.spec.variants["cluster"][0]}"')
+            raise KeyError(
+                f'"{mount_point}" is not a valid mount point for the cluster "{self.spec.variants["cluster"][0]}"'
+            )
         if mount_point == "none":
             self.full_io_path = None
         else:

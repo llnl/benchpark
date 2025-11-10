@@ -105,15 +105,15 @@ class LlnlElcapitan(System):
         JobQueue("pbatch", 1440, 256),
     ]
     id_to_resources["tuolumne"]["mount_points"] = [
-                "/l/ssd",
-                "/p/lustre5",
-                "rabbits_xfs_small",
-                "rabbits_xfs_large",
-                "rabbits_lustre_small",
-                "rabbits_lustre_large",
-                "rabbits_gfs2_small",
-                "rabbits_gfs2_large",
-            ]
+        "/l/ssd",
+        "/p/lustre5",
+        "rabbits_xfs_small",
+        "rabbits_xfs_large",
+        "rabbits_lustre_small",
+        "rabbits_lustre_large",
+        "rabbits_gfs2_small",
+        "rabbits_gfs2_large",
+    ]
 
     variant(
         "cluster",
@@ -249,7 +249,9 @@ class LlnlElcapitan(System):
 
         mount_point = self.spec.variants["mount_point"][0]
         if mount_point not in self.mount_points + ["none"]:
-            raise KeyError(f'"{mount_point}" is not a valid mount point for the cluster "{self.spec.variants["cluster"][0]}"')
+            raise KeyError(
+                f'"{mount_point}" is not a valid mount point for the cluster "{self.spec.variants["cluster"][0]}"'
+            )
         if mount_point == "none":
             self.full_io_path = None
         elif "rabbits" in mount_point:
