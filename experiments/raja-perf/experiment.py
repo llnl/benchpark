@@ -58,13 +58,19 @@ class RajaPerf(
             L3size_bytes = sys.sys_cpu_L3_MB * 10**6
             L2size_bytes = sys.sys_cpu_L2_KB * 10**3
             num_cores = sys.sys_cores_per_node / sockets
-            div_constant = 16 # 2 doubles per problem size
-            cache_constant = 4 # Make sure data stays in cache
+            div_constant = 16  # 2 doubles per problem size
+            cache_constant = 4  # Make sure data stays in cache
             if hasattr(sys, "sys_ccd_per_node"):
                 L3size_bytes *= sys.sys_ccd_per_node / sockets
-            problem_size = (sockets * (L3size_bytes + L2size_bytes * num_cores)) * cache_constant / div_constant
+            problem_size = (
+                (sockets * (L3size_bytes + L2size_bytes * num_cores))
+                * cache_constant
+                / div_constant
+            )
             nearest_power_of_two = 2 ** round(math.log2(problem_size))
-            self.add_experiment_variable("process_problem_size", nearest_power_of_two, True)
+            self.add_experiment_variable(
+                "process_problem_size", nearest_power_of_two, True
+            )
             # Number of processes
             self.add_experiment_variable("n_resources", 1, False)
 
