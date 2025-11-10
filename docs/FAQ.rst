@@ -84,7 +84,8 @@ What to rerun after edits
 How to move the Benchpark bootstrap location from the home directory
 --------------------------------------------------------------------
 
-Remove your current bootstrap in home (``~``) and then use: ``benchpark configure`` to set your preferred location.
+Remove your current bootstrap in home (``~``) and then use: ``benchpark configure`` to
+set your preferred location.
 
 ::
 
