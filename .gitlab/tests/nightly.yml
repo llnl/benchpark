@@ -27,10 +27,15 @@ include:
           - phloem
           - raja-perf
           - remhos
-          - salmon-tddft
           - smb
           - sparta-snl
           - stream
+      # salmon-tddft doesn't build with oneAPI, use gcc
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: $DANE_PARAMS
+        SYSTEM_ARGS: [compiler=gcc]
+        BENCHMARK: salmon-tddft
       # IOR needs a mount_point
       - HOST: dane
         ARCHCONFIG: llnl-cluster
@@ -64,10 +69,14 @@ include:
           - hpl
           - kripke
           - lammps
-          - qws
           - raja-perf
-          - salmon-tddft
         VARIANT: [+openmp]
+      # qws/salmon-tddft don't build with oneAPI, use gcc
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: $DANE_PARAMS
+        SYSTEM_ARGS: [compiler=gcc]
+        BENCHMARK: [qws, salmon-tddft]
       # +cuda tests
       - HOST: matrix
         ARCHCONFIG: llnl-matrix

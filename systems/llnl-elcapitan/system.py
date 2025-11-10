@@ -65,6 +65,8 @@ class LlnlElcapitan(System):
             ],  # 3 cores reserved per socket
             "sys_gpus_per_node": None,  # Determined by "gpumode" variant
             "sys_sockets_per_node": 4,
+            "sys_ccd_per_node": 12,
+            "sys_xcd_per_node": 24,
             "sys_mem_per_node_GB": 512,
             "sys_cpu_mem_per_node_MB": 3072,
             "sys_gpu_mem_per_node_GB": 512,
@@ -186,29 +188,23 @@ class LlnlElcapitan(System):
             if self.rocm_version >= Version("6.4.0"):
                 self.cce_version = Version("20.0.0")
                 self.mpi_version = Version("9.0.1")
-                self.short_cce_version = (
-                    f"{self.cce_version.major}.{self.cce_version.minor}"
-                )
             elif self.rocm_version >= Version("6.0.0"):
                 self.cce_version = Version("18.0.1")
                 self.mpi_version = Version("8.1.31")
-                self.short_cce_version = (
-                    f"{self.cce_version.major}.{self.cce_version.minor}"
-                )
             else:
                 self.cce_version = Version("16.0.0")
                 self.mpi_version = Version("8.1.26")
-                self.short_cce_version = (
-                    f"{self.cce_version.major}.{self.cce_version.minor}"
-                )
         if self.rocm_version >= Version("6.0.0"):
             self.pmi_version = Version("6.1.15.6")
             self.pals_version = Version("1.2.12")
             self.llvm_version = Version("18.0.1")
+
         else:
             self.pmi_version = Version("6.1.12")
             self.pals_version = Version("1.2.9")
             self.llvm_version = Version("16.0.0")
+        self.short_cce_version = f"{self.cce_version.major}.{self.cce_version.minor}"
+        self.short_rocm_version = f"{self.rocm_version.major}.0"
         # TODO: Replace this with lookups into the working set
 
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
@@ -464,7 +460,7 @@ class LlnlElcapitan(System):
         elif self.spec.satisfies("compiler=rocmcc"):
             dont_use_gtl = {
                 "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
-                "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}/lib -lmpi "
+                "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/amd/{self.short_rocm_version}/lib -lmpi "
                 f"-L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib "
                 f"-Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
             }
@@ -474,7 +470,7 @@ class LlnlElcapitan(System):
                 "fi_cxi_ats": "0",
                 "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
                 "gtl_libs": "libmpi_gtl_hsa",
-                "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}/lib -lmpi "
+                "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/amd/{self.short_rocm_version}/lib -lmpi "
                 f"-L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib "
                 f"-Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -lmpi_gtl_hsa",
             }
@@ -491,8 +487,8 @@ class LlnlElcapitan(System):
                     "cray-mpich": {
                         "externals": [
                             {
-                                "spec": f"cray-mpich@{self.mpi_version}{gtl_spec}+wrappers %cce@{self.cce_version}",
-                                "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}",
+                                "spec": f"cray-mpich@{self.mpi_version}{gtl_spec}+wrappers %rocmcc@{self.rocm_version}",
+                                "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/amd/{self.short_rocm_version}",
                                 "extra_attributes": gtl_cfg,
                             }
                         ]
@@ -720,7 +716,7 @@ class LlnlElcapitan(System):
             f"llvm-amdgpu@{self.rocm_version}",
             f"/opt/rocm-{self.rocm_version}/",
             {"c": "amdclang", "cxx": "amdclang++", "fortran": "amdflang"},
-            modules=[f"cce/{self.cce_version}"],
+            modules=[f"rocm/{self.rocm_version}"],
             flags={"cflags": "-g -O2", "cxxflags": "-g -O2"},
             extra_rpaths=list(rpaths),
             env={

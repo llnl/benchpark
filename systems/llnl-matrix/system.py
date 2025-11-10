@@ -44,7 +44,7 @@ class LlnlMatrix(System):
 
     variant(
         "compiler",
-        default="oneapi",
+        default="gcc",
         values=("oneapi", "gcc", "intel"),
         description="Which compiler to use",
     )
