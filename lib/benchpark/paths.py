@@ -18,7 +18,7 @@ benchpark_root = _source_location()
 lib_path = benchpark_root / "lib" / "benchpark"
 test_path = lib_path / "test"
 
-benchpark_config = benchpark_root / "benchpark.yaml"
+benchpark_config = benchpark_root / "configure.yaml"
 
 if benchpark_config.exists():
     with benchpark_config.open("r") as f:

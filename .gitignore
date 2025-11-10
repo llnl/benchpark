@@ -4,7 +4,7 @@
 __pycache__
 _build
 spack.lock
-benchpark.yaml
+configure.yaml
 .spack-env
 .env
 .DS_Store
