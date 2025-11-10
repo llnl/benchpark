@@ -23,7 +23,10 @@ def command(args):
     data = {}
 
     if args.bootstrap_location:
-        bl = str(Path(args.bootstrap_location).expanduser().resolve()).rstrip("/") + "/.benchpark/"
+        bl = (
+            str(Path(args.bootstrap_location).expanduser().resolve()).rstrip("/")
+            + "/.benchpark/"
+        )
         data["bootstrap"] = {
             "location": bl,
         }
