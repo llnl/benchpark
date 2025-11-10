@@ -51,7 +51,7 @@ class RajaPerf(
             self.add_experiment_variable("process_problem_size", 1048576, True)
             self.add_experiment_variable("n_resources", 1, False)
         elif self.spec.satisfies("exec_mode=singlenode_cpu_bandwidth"):
-            # Need large enough problem size to stress cache, so sytem dependent.
+            # Need large enough problem size to stress cache, so system dependent.
             # Examples dane: 128*1024**2, lassen: 64*1024**2, tuolumne: 256*1024**2, rzgenie: 32*1024*1024, poodle: 128*1024*1024
             sys = self.system_spec.system
             sockets = sys.sys_sockets_per_node
