@@ -224,15 +224,14 @@ class LlnlElcapitan(System):
 
         mount_point = self.spec.variants["mount_point"][0]
         if mount_point == "none":
-            full_path = "none"
+            self.full_io_path = None
         elif "rabbits" in mount_point:
-            full_path = (
+            self.full_io_path = (
                 f"$DW_JOB_{''.join(mount_point.lstrip('rabbits_').split('_'))}"
                 + "/test.bat"
             )
         else:
-            full_path = mount_point + "/$USER/test.bat"
-        self.spec.variants["full_path"] = full_path
+            self.full_io_path = mount_point + "/$USER/test.bat"
 
     def compute_packages_section(self):
         selections = {

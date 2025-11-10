@@ -54,10 +54,10 @@ class Ior(Experiment, MpiOnlyExperiment, Scaling(ScalingMode.Strong, ScalingMode
         self.add_experiment_variable("t", t, True)
         self.add_experiment_variable("b", t * bt_factor, True)
 
-        full_path = self.system_spec.system.spec.variants.get("full_path", ["none"])[0]
+        full_path = self.system_spec.system.full_io_path
         sys_name = self.system_spec._name
         # Check mount point provided
-        if full_path == "none":
+        if not full_path:
             raise ValueError(
                 f'Must set "mount_point" variant (e.g. "benchpark system init {sys_name} mount_point=...") on the system used in this experiment. Run "benchpark info system {sys_name}" for valid values.'
             )
