@@ -44,6 +44,7 @@ class LlnlElcapitan(System):
             "hardware_key": str(hardware_descriptions)
             + "/HPECray-zen3-MI250X-Slingshot/hardware_description.yaml",
             "queues": [JobQueue("pdebug", 720, 24)],
+            "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
         },
         "elcapitan": {
             "rocm_arch": "gfx942",
@@ -86,6 +87,16 @@ class LlnlElcapitan(System):
                 JobQueue("pbatch", 1440, 4150),
                 JobQueue("plarge", 1440, 11040),
             ],
+            "mount_points": [
+                "/l/ssd",
+                "/p/lustre4",
+                "rabbits_xfs_small",
+                "rabbits_xfs_large",
+                "rabbits_lustre_small",
+                "rabbits_lustre_large",
+                "rabbits_gfs2_small",
+                "rabbits_gfs2_large",
+            ],
         },
     }
     id_to_resources["tuolumne"] = id_to_resources["elcapitan"]
@@ -93,6 +104,16 @@ class LlnlElcapitan(System):
         JobQueue("pdebug", 60, 16),
         JobQueue("pbatch", 1440, 256),
     ]
+    id_to_resources["tuolumne"]["mount_points"] = [
+                "/l/ssd",
+                "/p/lustre5",
+                "rabbits_xfs_small",
+                "rabbits_xfs_large",
+                "rabbits_lustre_small",
+                "rabbits_lustre_large",
+                "rabbits_gfs2_small",
+                "rabbits_gfs2_large",
+            ]
 
     variant(
         "cluster",
@@ -159,6 +180,10 @@ class LlnlElcapitan(System):
         values=(
             "none",
             "/l/ssd",
+            "/p/lustre1",
+            "/p/lustre2",
+            "/p/lustre3",
+            "/p/lustre4",
             "/p/lustre5",
             "rabbits_xfs_small",
             "rabbits_xfs_large",
@@ -223,6 +248,8 @@ class LlnlElcapitan(System):
                 raise ValueError(f"Invalid gpumode in spec: {self.spec}")
 
         mount_point = self.spec.variants["mount_point"][0]
+        if mount_point not in self.mount_points + ["none"]:
+            raise KeyError(f'"{mount_point}" is not a valid mount point for the cluster "{self.spec.variants["cluster"][0]}"')
         if mount_point == "none":
             self.full_io_path = None
         elif "rabbits" in mount_point:

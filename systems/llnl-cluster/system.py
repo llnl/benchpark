@@ -35,6 +35,7 @@ class LlnlCluster(System):
             "hardware_key": str(hardware_descriptions)
             + "/Supermicro-icelake-OmniPath/hardware_description.yaml",
             "queues": [JobQueue("pdebug", 60, 12), JobQueue("pbatch", 1440, 520)],
+            "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
         },
         "magma": {
             "sys_cores_per_node": 96,
@@ -42,6 +43,7 @@ class LlnlCluster(System):
             "hardware_key": str(hardware_descriptions)
             + "/Penguin-icelake-OmniPath/hardware_description.yaml",
             "queues": [JobQueue("pdebug", 60, 4), JobQueue("pbatch", 2160, 64)],
+            "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
         },
         "dane": {
             "sys_cores_per_node": 112,
@@ -56,6 +58,7 @@ class LlnlCluster(System):
             "hardware_key": str(hardware_descriptions)
             + "/DELL-sapphirerapids-OmniPath/hardware_description.yaml",
             "queues": [JobQueue("pdebug", 60, 20), JobQueue("pbatch", 1440, 520)],
+            "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
         },
         "rzgenie": {
             "sys_cores_per_node": 36,
@@ -66,6 +69,7 @@ class LlnlCluster(System):
             "hardware_key": str(hardware_descriptions)
             + "/Penguin-haswell-OmniPath/hardware_description.yaml",
             "queues": [JobQueue("pdebug", 720, 43)],
+            "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
         },
         "poodle": {
             "sys_cores_per_node": 112,
@@ -80,6 +84,7 @@ class LlnlCluster(System):
                 JobQueue("pbatch", 12000, 29),
                 JobQueue("phighmem", 12000, 4),
             ],
+            "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
         },
     }
 
@@ -116,7 +121,7 @@ class LlnlCluster(System):
     variant(
         "mount_point",
         default="none",
-        values=("none", "/p/lustre1", "/p/lustre2", "/p/lustre3"),
+        values=("none", "l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"),
         multi=False,
         description="Which mount point to use for IO benchmarks",
     )
@@ -129,6 +134,14 @@ class LlnlCluster(System):
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
+
+        mount_point = self.spec.variants["mount_point"][0]
+        if mount_point not in self.mount_points + ["none"]:
+            raise KeyError(f'"{mount_point}" is not a valid mount point for the cluster "{self.spec.variants["cluster"][0]}"')
+        if mount_point == "none":
+            self.full_io_path = None
+        else:
+            self.full_io_path = mount_point + "/$USER/test.bat"
 
     def compute_packages_section(self):
         selections = {
