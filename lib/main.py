@@ -10,6 +10,7 @@ import inspect
 import shlex
 import subprocess
 import sys
+
 import yaml
 
 from pathlib import Path
@@ -66,15 +67,15 @@ bootstrapper = RuntimeResources(benchpark_home)  # noqa
 bootstrapper.bootstrap()  # noqa
 
 import benchpark.cmd.audit  # noqa: E402
-import benchpark.cmd.system  # noqa: E402
+import benchpark.cmd.bootstrap  # noqa: E402
 import benchpark.cmd.experiment  # noqa: E402
-import benchpark.cmd.setup  # noqa: E402
-import benchpark.cmd.show_build  # noqa: E402
-import benchpark.cmd.unit_test  # noqa: E402
-import benchpark.cmd.mirror  # noqa: E402
 import benchpark.cmd.info  # noqa: E402
 import benchpark.cmd.list  # noqa: E402
-import benchpark.cmd.bootstrap  # noqa: E402
+import benchpark.cmd.mirror  # noqa: E402
+import benchpark.cmd.setup  # noqa: E402
+import benchpark.cmd.show_build  # noqa: E402
+import benchpark.cmd.system  # noqa: E402
+import benchpark.cmd.unit_test  # noqa: E402
 from benchpark.accounting import benchpark_benchmarks  # noqa: E402
 
 try:

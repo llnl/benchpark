@@ -4,16 +4,16 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.directives import variant, maintainers
+from benchpark.directives import maintainers, variant
+from benchpark.openmpsystem import OpenMPCPUOnlySystem
+from benchpark.paths import hardware_descriptions
 from benchpark.system import (
-    System,
     JobQueue,
+    System,
     compiler_def,
     compiler_section_for,
     merge_dicts,
 )
-from benchpark.openmpsystem import OpenMPCPUOnlySystem
-from benchpark.paths import hardware_descriptions
 
 
 class LlnlCluster(System):
@@ -57,12 +57,36 @@ class LlnlCluster(System):
             + "/DELL-sapphirerapids-OmniPath/hardware_description.yaml",
             "queues": [JobQueue("pdebug", 60, 20), JobQueue("pbatch", 1440, 520)],
         },
+        "rzgenie": {
+            "sys_cores_per_node": 36,
+            "system_site": "llnl",
+            "sys_sockets_per_node": 2,
+            "sys_cpu_L2_KB": 256,
+            "sys_cpu_L3_MB": 45,
+            "hardware_key": str(hardware_descriptions)
+            + "/Penguin-haswell-OmniPath/hardware_description.yaml",
+            "queues": [JobQueue("pdebug", 720, 43)],
+        },
+        "poodle": {
+            "sys_cores_per_node": 112,
+            "sys_sockets_per_node": 2,
+            "sys_cpu_L2_KB": 2048,
+            "sys_cpu_L3_MB": 112.5,  # Depends on partition (could be 105)
+            "system_site": "llnl",
+            "hardware_key": str(hardware_descriptions)
+            + "/DELL-sapphirerapids-OmniPath/hardware_description.yaml",
+            "queues": [
+                JobQueue("pdebug", 30, 3),
+                JobQueue("pbatch", 12000, 29),
+                JobQueue("phighmem", 12000, 4),
+            ],
+        },
     }
 
     variant(
         "cluster",
         default="dane",
-        values=("ruby", "magma", "dane"),
+        values=("ruby", "magma", "dane", "rzgenie", "poodle"),
         description="Which cluster to run on",
     )
 
@@ -84,9 +108,17 @@ class LlnlCluster(System):
     variant(
         "queue",
         default="none",
-        values=("none", "pbatch", "pdebug"),
+        values=("none", "pbatch", "pdebug", "phighmem"),
         multi=False,
         description="Submit to queue other than the default queue (e.g. pdebug)",
+    )
+
+    variant(
+        "mount_point",
+        default="none",
+        values=("none", "/p/lustre1", "/p/lustre2", "/p/lustre3"),
+        multi=False,
+        description="Which mount point to use for IO benchmarks",
     )
 
     def __init__(self, spec):
@@ -162,6 +194,22 @@ class LlnlCluster(System):
                 },
                 "autoconf": {
                     "externals": [{"spec": "autoconf@2.69", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "automake": {
+                    "externals": [{"spec": "automake@1.16.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "libtool": {
+                    "externals": [{"spec": "libtool@2.4.6", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "ncurses": {
+                    "externals": [{"spec": "ncurses@6.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "m4": {
+                    "externals": [{"spec": "m4@1.4.18", "prefix": "/usr"}],
                     "buildable": False,
                 },
                 "python": {

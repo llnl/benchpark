@@ -4,18 +4,19 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.directives import variant, maintainers
+from packaging.version import Version
+
 from benchpark.cudasystem import CudaSystem
+from benchpark.directives import maintainers, variant
+from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.paths import hardware_descriptions
 from benchpark.system import (
-    System,
     JobQueue,
+    System,
     compiler_def,
     compiler_section_for,
     merge_dicts,
 )
-from benchpark.openmpsystem import OpenMPCPUOnlySystem
-from packaging.version import Version
 
 
 class LlnlMatrix(System):
@@ -43,7 +44,7 @@ class LlnlMatrix(System):
 
     variant(
         "compiler",
-        default="oneapi",
+        default="gcc",
         values=("oneapi", "gcc", "intel"),
         description="Which compiler to use",
     )

@@ -16,17 +16,18 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     tags = ["proxy-app", "ecp-proxy-app"]
 
     homepage = "https://github.com/CEED/Laghos"
-    git = "https://github.com/wdhawkins/Laghos.git"
+    git = "https://github.com/CEED/Laghos.git"
 
     maintainers("wdhawkins")
 
     license("BSD-2-Clause")
 
-    version("develop", branch="caliper")
+    version("develop", branch="master")
 
     variant("metis", default=True, description="Enable/disable METIS support")
     variant("caliper", default=False, description="Enable/disable Caliper support")
     variant("ofast", default=False, description="Enable gcc optimization flags")
+    variant("gpu-aware-mpi", default=False, description="Enable GPU aware MPI")
 
     depends_on("c", type="build")
     depends_on("cxx", type="build")
@@ -69,7 +70,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         depends_on(f"hypre amdgpu_target={target}", when=f"amdgpu_target={target}")
         depends_on(f"mfem amdgpu_target={target}", when=f"amdgpu_target={target}")
 
-    depends_on("hypre+gpu-aware-mpi", when="^cray-mpich+gtl")
+    depends_on("hypre+gpu-aware-mpi", when="+gpu-aware-mpi")
 
     # Replace MPI_Session
     patch(

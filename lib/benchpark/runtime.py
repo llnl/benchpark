@@ -3,12 +3,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from contextlib import contextmanager
 import os
 import pathlib
 import shlex
 import subprocess
 import sys
+from contextlib import contextmanager
 
 import yaml
 

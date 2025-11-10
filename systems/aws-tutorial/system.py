@@ -75,9 +75,10 @@ class AwsTutorial(System):
                     "buildable": False,
                 },
                 "gmake": {"externals": [{"spec": "gmake@4.3", "prefix": "/usr"}]},
-                "lapack": {
-                    "externals": [{"spec": "lapack@0.29.2", "prefix": "/usr"}],
-                    "buildable": False,
+                "blas": {"buildable": False},
+                "lapack": {"buildable": False},
+                "atlas": {
+                    "externals": [{"spec": "atlas@3.10.3", "prefix": "/usr"}],
                 },
                 "mpi": {"buildable": False},
                 "openmpi": {
@@ -89,7 +90,7 @@ class AwsTutorial(System):
                     ]
                 },
                 "cmake": {
-                    "externals": [{"spec": "cmake@4.0.2", "prefix": "/usr"}],
+                    "externals": [{"spec": "cmake@4.1.1", "prefix": "/usr"}],
                     "buildable": False,
                 },
                 "git": {

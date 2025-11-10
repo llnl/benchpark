@@ -97,7 +97,7 @@ jobs:
             workspace archive
       - name: Upload Workspace Archive as CI Artifact
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
         with:
           name: workspace-archive
           path: ./workspace/saxpy/openmp/generic-x86/workspace/archive/**
@@ -206,3 +206,22 @@ jobs:
             echo "'Cloning Ramble' appeared $count times (expected 1)"
             exit 1
           fi
+  validate_docs:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Setup Python
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: .github/workflows/requirements/docs.txt
+      - name: Install deps
+        run: |
+          pip install -r .github/workflows/requirements/docs.txt
+      - name: Test Docs Scripts
+        run: |-
+          cd docs/
+          python generate-sys-defs-list.py
+          python generate-benchmark-list.py
