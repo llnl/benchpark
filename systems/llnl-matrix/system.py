@@ -283,69 +283,69 @@ class LlnlMatrix(System):
             "packages": {
                 "blas": {"require": "intel-oneapi-mkl"},
                 "lapack": {"require": "intel-oneapi-mkl"},
-                "curand": {
-                    "externals": [
-                        {
-                            "spec": f"curand@{cuda_version}",
-                            "prefix": f"/usr/tce/packages/cuda/cuda-{cuda_version}",
-                        }
-                    ],
-                    "buildable": False,
-                },
+                # "curand": {
+                #     "externals": [
+                #         {
+                #             "spec": f"curand@{cuda_version}",
+                #             "prefix": f"/usr/tce/packages/cuda/cuda-{cuda_version}",
+                #         }
+                #     ],
+                #     "buildable": False,
+                # },
                 "cuda": {
                     "externals": [
                         {
                             "spec": f"cuda@{cuda_version}+allow-unsupported-compilers",
-                            "prefix": f"/usr/tce/packages/cuda/cuda-{cuda_version}",
+                            "prefix": f"/collab/usr/global/tools/nvidia/nvhpc/toss_4_x86_64_ib/nvhpc-25.1/Linux_x86_64/25.1/compilers/",
                         }
                     ],
                     "buildable": False,
                 },
-                "cub": {
-                    "externals": [
-                        {
-                            "spec": f"cub@{cuda_version}",
-                            "prefix": f"/usr/tce/packages/cuda/cuda-{cuda_version}",
-                        }
-                    ],
-                    "buildable": False,
-                },
-                "cusparse": {
-                    "externals": [
-                        {
-                            "spec": f"cusparse@{cuda_version}",
-                            "prefix": f"/usr/tce/packages/cuda/cuda-{cuda_version}",
-                        }
-                    ],
-                    "buildable": False,
-                },
-                "cublas": {
-                    "externals": [
-                        {
-                            "spec": f"cublas@{cuda_version}",
-                            "prefix": f"/usr/tce/packages/cuda/cuda-{cuda_version}",
-                        }
-                    ],
-                    "buildable": False,
-                },
-                "cusolver": {
-                    "externals": [
-                        {
-                            "spec": f"cusolver@{cuda_version}",
-                            "prefix": f"/usr/tce/packages/cuda/cuda-{cuda_version}",
-                        }
-                    ],
-                    "buildable": False,
-                },
-                "cufft": {
-                    "externals": [
-                        {
-                            "spec": f"cufft@{cuda_version}",
-                            "prefix": f"/usr/tce/packages/cuda/cuda-{cuda_version}",
-                        }
-                    ],
-                    "buildable": False,
-                },
+                # "cub": {
+                #     "externals": [
+                #         {
+                #             "spec": f"cub@{cuda_version}",
+                #             "prefix": f"/usr/tce/packages/cuda/cuda-{cuda_version}",
+                #         }
+                #     ],
+                #     "buildable": False,
+                # },
+                # "cusparse": {
+                #     "externals": [
+                #         {
+                #             "spec": f"cusparse@{cuda_version}",
+                #             "prefix": f"/usr/tce/packages/cuda/cuda-{cuda_version}",
+                #         }
+                #     ],
+                #     "buildable": False,
+                # },
+                # "cublas": {
+                #     "externals": [
+                #         {
+                #             "spec": f"cublas@{cuda_version}",
+                #             "prefix": f"/usr/tce/packages/cuda/cuda-{cuda_version}",
+                #         }
+                #     ],
+                #     "buildable": False,
+                # },
+                # "cusolver": {
+                #     "externals": [
+                #         {
+                #             "spec": f"cusolver@{cuda_version}",
+                #             "prefix": f"/usr/tce/packages/cuda/cuda-{cuda_version}",
+                #         }
+                #     ],
+                #     "buildable": False,
+                # },
+                # "cufft": {
+                #     "externals": [
+                #         {
+                #             "spec": f"cufft@{cuda_version}",
+                #             "prefix": f"/usr/tce/packages/cuda/cuda-{cuda_version}",
+                #         }
+                #     ],
+                #     "buildable": False,
+                # },
             }
         }
 
