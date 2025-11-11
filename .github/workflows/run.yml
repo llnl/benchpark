@@ -137,13 +137,21 @@ jobs:
           ./bin/benchpark system init --dest=dane llnl-cluster cluster=dane
           ./bin/benchpark experiment init --dest=saxpy-agg --system=dane saxpy n_repeats=5
           ./bin/benchpark setup saxpy-agg workspace2/
-          ./bin/benchpark aggregate --dest agg workspace2  # Aggregate multi-trial workspace
-      - name: Upload coverage to Codecov
+          BENCHPARK_RUN_COVERAGE=aggregate ./bin/benchpark aggregate --dest agg workspace2  # Aggregate multi-trial workspace
+      - name: Upload binary coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
           directory: ./coverage-data-binary
           flags: dryrunexperiments-binary
+          verbose: true
+          fail_ci_if_error: true
+      - name: Upload aggregate coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
+          directory: ./coverage-data-aggregate
+          flags: dryrunexperiments-aggregate
           verbose: true
           fail_ci_if_error: true
   dryrunexperiments:
