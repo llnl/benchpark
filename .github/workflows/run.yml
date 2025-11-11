@@ -134,9 +134,10 @@ jobs:
             --where '{n_nodes} == 1'
       - name: Test aggregate Command
         run: |
-          ./bin/benchpark experiment init --dest=saxpy-agg --system=generic-x86 saxpy n_repeats=5
+          ./bin/benchpark system init --dest=dane llnl-cluster cluster=dane
+          ./bin/benchpark experiment init --dest=saxpy-agg --system=dane saxpy n_repeats=5
           ./bin/benchpark setup saxpy-agg workspace2/
-          ./bin/benchpark aggregate --dest agg workspace2 workspace  # Aggregate multi-trial and single-trial workspace
+          ./bin/benchpark aggregate --dest agg workspace2  # Aggregate multi-trial workspace
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
