@@ -17,7 +17,7 @@ __version__ = "0.1.0"
 if "-V" in sys.argv or "--version" in sys.argv:
     print(__version__)
     exit()
-helpstr = """usage: main.py [-h] [-V] {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze} ...
+helpstr = """usage: main.py [-h] [-V] {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze,aggregate} ...
 
 Benchpark
 
@@ -26,7 +26,7 @@ options:
   -V, --version         show version number and exit
 
 Subcommands:
-  {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze}
+  {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze,aggregate}
     tags                Tags in Benchpark experiments
     system              Initialize a system config
     experiment          Interact with experiments
@@ -38,7 +38,9 @@ Subcommands:
     show-build          Show how spack built a benchmark
     list                List experiments, systems, benchmarks, and modifiers
     bootstrap           Bootstrap benchpark or update an existing bootstrap
-    analyze             Perform pre-defined analysis on the performance data (caliper files) after 'ramble on'"""
+    analyze             Perform pre-defined analysis on the performance data (caliper files) after 'ramble on'
+    aggregate           Aggregate multiple experiments (even across workspaces) into the same submission script
+    """
 if len(sys.argv) == 1 or "-h" == sys.argv[1] or "--help" == sys.argv[1]:
     print(helpstr)
     exit()
@@ -59,6 +61,7 @@ import benchpark.cmd.setup  # noqa: E402
 import benchpark.cmd.show_build  # noqa: E402
 import benchpark.cmd.system  # noqa: E402
 import benchpark.cmd.unit_test  # noqa: E402
+import benchpark.cmd.aggregate # noqa: E402
 from benchpark.accounting import benchpark_benchmarks  # noqa: E402
 
 try:
@@ -225,6 +228,12 @@ def init_commands(subparsers, actions_dict):
         help="Perform pre-defined analysis on the performance data (caliper files) after 'ramble on'",
     )
 
+    aggregate_parser = subparsers.add_parser(
+        "aggregate",
+        help="Aggregate multiple experiments (even across workspaces) into the same submission script",
+    )
+    benchpark.cmd.aggregate.setup_parser(aggregate_parser)
+
     actions_dict["system"] = benchpark.cmd.system.command
     actions_dict["experiment"] = benchpark.cmd.experiment.command
     actions_dict["setup"] = benchpark.cmd.setup.command
@@ -235,6 +244,7 @@ def init_commands(subparsers, actions_dict):
     actions_dict["show-build"] = benchpark.cmd.show_build.command
     actions_dict["list"] = benchpark.cmd.list.command
     actions_dict["bootstrap"] = benchpark.cmd.bootstrap.command
+    actions_dict["aggregate"] = benchpark.cmd.aggregate.command
     if analyze_installed:
         benchpark.cmd.analyze.setup_parser(analyze_parser)
         actions_dict["analyze"] = benchpark.cmd.analyze.command
