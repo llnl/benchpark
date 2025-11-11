@@ -6,9 +6,10 @@
 import os
 
 import llnl.util.filesystem as fs
-
-import spack.build_systems.cmake
 from spack.package import *
+from spack_repo.builtin.build_systems.cmake import CMakeBuilder, CMakePackage
+from spack_repo.builtin.build_systems.cuda import CudaPackage
+from spack_repo.builtin.build_systems.rocm import ROCmPackage
 
 
 class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
@@ -202,6 +203,8 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
         when="@2023:",
         msg="GROMACS requires oneMKL 2021.3 or later since version 2023",
     )
+
+    depends_on("c", type="build")
 
     depends_on("mpi", when="+mpi")
 
@@ -426,7 +429,7 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
             for rpath in self.compiler.extra_rpaths:
                 env.prepend_path("LD_LIBRARY_PATH", rpath)
 
-class CMakeBuilder(spack.build_systems.cmake.CMakeBuilder):
+class CMakeBuilder(CMakeBuilder):
     @run_after("build")
     def build_test_binaries(self):
         """Build the test binaries.

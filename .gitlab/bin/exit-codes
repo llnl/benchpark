@@ -3,6 +3,7 @@
 import json
 import sys
 
+
 def main(results_file):
     with open(results_file, "r") as f:
         data = json.load(f)

@@ -7,7 +7,6 @@ import json
 from os import path
 
 from llnl.util import filesystem
-
 from spack.package import *
 
 
@@ -39,6 +38,9 @@ class Hipsycl(CMakePackage, CudaPackage, ROCmPackage):
     variant("opencl", default=False, description="Enable OpenCL backend for SYCL kernels")
     variant("sscp", default=False, description="Enable SSCP compiler")
     variant("intel", default=False, description="Enable Intel Level Zero backend for SYCL kernels")
+
+    depends_on("c", type="build")
+    depends_on("cxx", type="build")
 
     depends_on("cmake@3.5:", type="build")
     depends_on("boost +filesystem", when="@:0.8")

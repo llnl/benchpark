@@ -3,8 +3,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from ramble.modkit import *
 import json
+
+from ramble.modkit import *
 
 
 def add_mode(mode_name, mode_option, description):
@@ -38,7 +39,7 @@ class Caliper(BasicModifier):
 
     add_mode(
         mode_name=_default_mode,
-        mode_option="time.exclusive",
+        mode_option="time.exclusive,time.variance",
         description="Platform-independent collection of time (default mode)",
     )
 
@@ -131,7 +132,7 @@ class Caliper(BasicModifier):
             "sys_cores_os_reserved_per_node",
             "sys_cores_os_reserved_per_node_list",
             "sys_gpus_per_node",
-            "sys_mem_per_node",
+            "sys_mem_per_node_GB",
             "system_site",
         ]
         for key in system_metadata:

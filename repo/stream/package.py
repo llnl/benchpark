@@ -5,6 +5,7 @@
 
 from spack.package import *
 
+
 class Stream(CMakePackage):
     """The STREAM benchmark is a simple synthetic benchmark program that
     measures sustainable memory bandwidth (in MB/s) and the corresponding
@@ -23,6 +24,9 @@ class Stream(CMakePackage):
     variant("caliper", default=False, description="Enable Caliper/Adiak support")
 
     requires("@5.10-caliper", when="+caliper")
+
+    depends_on("c", type="build")
+    depends_on("fortran", type="build")
 
     depends_on("caliper", when="+caliper")
     depends_on("adiak@0.4:", when="+caliper")

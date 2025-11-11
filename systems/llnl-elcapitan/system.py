@@ -4,12 +4,19 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.directives import variant, maintainers
+from packaging.version import Version
+
+from benchpark.directives import maintainers, variant
+from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.paths import hardware_descriptions
 from benchpark.rocmsystem import ROCmSystem
-from benchpark.system import System, JobQueue
-from benchpark.openmpsystem import OpenMPCPUOnlySystem
-from packaging.version import Version
+from benchpark.system import (
+    JobQueue,
+    System,
+    compiler_def,
+    compiler_section_for,
+    merge_dicts,
+)
 
 
 class LlnlElcapitan(System):
@@ -23,6 +30,15 @@ class LlnlElcapitan(System):
             "sys_cores_os_reserved_per_node": 8,
             "sys_cores_os_reserved_per_node_list": [0, 8, 16, 24, 32, 40, 48, 56],
             "sys_gpus_per_node": 8,
+            "sys_mem_per_node_GB": 512,
+            "sys_cpu_mem_per_node_MB": 2048,
+            "sys_gpu_mem_per_node_GB": 512,
+            "sys_gpu_num_L1": 110,
+            "sys_gpu_L1_KB": 16,
+            "sys_gpu_L2_KB": 8192,
+            "sys_cpu_L1_KB": 32,
+            "sys_cpu_L2_KB": 512,  # 512 KB
+            "sys_cpu_L3_MB": 32,  # 32MB
             "system_site": "llnl",
             "scheduler": "flux",
             "hardware_key": str(hardware_descriptions)
@@ -48,6 +64,19 @@ class LlnlElcapitan(System):
                 88,
             ],  # 3 cores reserved per socket
             "sys_gpus_per_node": None,  # Determined by "gpumode" variant
+            "sys_sockets_per_node": 4,
+            "sys_ccd_per_node": 12,
+            "sys_xcd_per_node": 24,
+            "sys_mem_per_node_GB": 512,
+            "sys_cpu_mem_per_node_MB": 3072,
+            "sys_gpu_mem_per_node_GB": 512,
+            "sys_gpu_num_L1": 228,
+            "sys_gpu_L1_KB": 32,
+            "sys_gpu_L2_KB": 4096,
+            "sys_gpu_L3_MB": 256,
+            "sys_cpu_L1_KB": 32,  # 32KB for L1d and 32KB for L1i
+            "sys_cpu_L2_KB": 1024,  # 512 KB
+            "sys_cpu_L3_MB": 32,  # 32MB
             "system_site": "llnl",
             "scheduler": "flux",
             "hardware_key": str(hardware_descriptions)
@@ -124,6 +153,14 @@ class LlnlElcapitan(System):
         description="Submit to queue other than the default queue (e.g. pdebug)",
     )
 
+    variant(
+        "mount_point",
+        default="none",
+        values=("none", "/p/lustre5"),
+        multi=False,
+        description="Which mount point to use for IO benchmarks",
+    )
+
     def __init__(self, spec):
         super().__init__(spec)
         self.programming_models = [ROCmSystem(), OpenMPCPUOnlySystem()]
@@ -133,34 +170,31 @@ class LlnlElcapitan(System):
         # TODO: Replace this with lookups into the working set
         if self.spec.satisfies("compiler=gcc"):
             self.gcc_version = Version("12.2.0")
-            self.mpi_version = Version("8.1.26")
+            self.mpi_version = Version("9.0.1")
+            self.short_gcc_version = (
+                f"{self.gcc_version.major}.{self.gcc_version.minor}"
+            )
         else:
             if self.rocm_version >= Version("6.4.0"):
                 self.cce_version = Version("20.0.0")
                 self.mpi_version = Version("9.0.1")
-                self.short_cce_version = (
-                    f"{self.cce_version.major}.{self.cce_version.minor}"
-                )
             elif self.rocm_version >= Version("6.0.0"):
                 self.cce_version = Version("18.0.1")
                 self.mpi_version = Version("8.1.31")
-                self.short_cce_version = (
-                    f"{self.cce_version.major}.{self.cce_version.minor}"
-                )
             else:
                 self.cce_version = Version("16.0.0")
                 self.mpi_version = Version("8.1.26")
-                self.short_cce_version = (
-                    f"{self.cce_version.major}.{self.cce_version.minor}"
-                )
         if self.rocm_version >= Version("6.0.0"):
             self.pmi_version = Version("6.1.15.6")
             self.pals_version = Version("1.2.12")
             self.llvm_version = Version("18.0.1")
+
         else:
             self.pmi_version = Version("6.1.12")
             self.pals_version = Version("1.2.9")
             self.llvm_version = Version("16.0.0")
+        self.short_cce_version = f"{self.cce_version.major}.{self.cce_version.minor}"
+        self.short_rocm_version = f"{self.rocm_version.major}.0"
         # TODO: Replace this with lookups into the working set
 
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
@@ -181,7 +215,7 @@ class LlnlElcapitan(System):
     def compute_packages_section(self):
         selections = {
             "packages": {
-                "all": {"require": "target=x86_64:"},
+                "all": {"require": [{"spec": "target=x86_64:"}]},
                 "tar": {"externals": [{"spec": "tar@1.30", "prefix": "/usr"}]},
                 "coreutils": {
                     "externals": [{"spec": "coreutils@8.30", "prefix": "/usr"}]
@@ -306,8 +340,8 @@ class LlnlElcapitan(System):
                 "cray-libsci": {
                     "externals": [
                         {
-                            "spec": "cray-libsci@23.05.1.4%cce",
-                            "prefix": "/opt/cray/pe/libsci/23.05.1.4/cray/12.0/x86_64/",
+                            "spec": "cray-libsci@25.09.0%cce",
+                            "prefix": "/opt/cray/pe/libsci/25.09.0/cray/20.0/x86_64/",
                         }
                     ]
                 }
@@ -317,14 +351,12 @@ class LlnlElcapitan(System):
                 "cray-libsci": {
                     "externals": [
                         {
-                            "spec": "cray-libsci@23.05.1.4%gcc",
-                            "prefix": "/opt/cray/pe/libsci/23.05.1.4/gnu/10.3/x86_64/",
+                            "spec": "cray-libsci@25.09.0%gcc",
+                            "prefix": "/opt/cray/pe/libsci/25.09.0/gnu/12.2/x86_64/",
                         }
                     ]
                 }
             }
-
-        selections["packages"] |= self.compiler_weighting_cfg()["packages"]
 
         return selections
 
@@ -332,45 +364,38 @@ class LlnlElcapitan(System):
         compiler = self.spec.variants["compiler"][0]
 
         if compiler == "cce":
-            return {"packages": {"all": {"require": [{"one_of": ["%cce", "%gcc"]}]}}}
+            prefs = {"one_of": ["%cce", "%gcc"], "when": "%c"}
+            return {"packages": {"all": {"require": [prefs]}}}
         elif compiler == "gcc":
-            return {"packages": {}}
+            prefs = {"one_of": ["%gcc"], "when": "%c"}
+            return {"packages": {"all": {"require": [prefs]}}}
         elif compiler == "rocmcc":
-            return {"packages": {"all": {"require": [{"one_of": ["%rocmcc", "%gcc"]}]}}}
+            prefs = {"one_of": ["%rocmcc", "%gcc"], "when": "%c"}
+            return {"packages": {"all": {"require": [prefs]}}}
         else:
             raise ValueError(f"Unexpected value for compiler: {compiler}")
 
     def compute_compilers_section(self):
-        selections = {
-            "compilers": [
-                {
-                    "compiler": {
-                        "spec": "gcc@12.2.0",
-                        "paths": {
-                            "cc": "/opt/cray/pe/gcc/12.2.0/bin/gcc",
-                            "cxx": "/opt/cray/pe/gcc/12.2.0/bin/g++",
-                            "f77": "/opt/cray/pe/gcc/12.2.0/bin/gfortran",
-                            "fc": "/opt/cray/pe/gcc/12.2.0/bin/gfortran",
-                        },
-                        "flags": {},
-                        "operating_system": "rhel8",
-                        "target": "x86_64",
-                        "modules": [],
-                        "environment": {},
-                        "extra_rpaths": [],
-                    }
-                }
-            ]
-        }
-        if self.spec.satisfies("compiler=cce") or self.spec.satisfies(
-            "compiler=rocmcc"
+        cfg = compiler_section_for(
+            "gcc",
+            [
+                compiler_def(
+                    "gcc@12.2.0 languages=c,c++,fortran",
+                    "/opt/cray/pe/gcc/12.2.0/",
+                    {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                )
+            ],
+        )
+
+        # gcc because we want llvm-amdgpu for hip, even if using gcc for c
+        if (
+            self.spec.satisfies("compiler=gcc")
+            or self.spec.satisfies("compiler=cce")
+            or self.spec.satisfies("compiler=rocmcc")
         ):
-            selections["compilers"] += self.rocm_cce_compiler_cfg()["compilers"]
+            cfg = merge_dicts(cfg, self.rocm_cce_compiler_cfg())
 
-        # Note: this is always included for some low-level dependencies
-        # that shouldn't build with %cce
-
-        return selections
+        return merge_dicts(cfg, self.compiler_weighting_cfg())
 
     def mpi_config(self):
         gtl = self.spec.variants["gtl"][0]
@@ -413,7 +438,7 @@ class LlnlElcapitan(System):
         elif self.spec.satisfies("compiler=rocmcc"):
             dont_use_gtl = {
                 "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
-                "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}/lib -lmpi "
+                "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/amd/{self.short_rocm_version}/lib -lmpi "
                 f"-L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib "
                 f"-Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
             }
@@ -423,7 +448,7 @@ class LlnlElcapitan(System):
                 "fi_cxi_ats": "0",
                 "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
                 "gtl_libs": "libmpi_gtl_hsa",
-                "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}/lib -lmpi "
+                "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/amd/{self.short_rocm_version}/lib -lmpi "
                 f"-L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib "
                 f"-Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -lmpi_gtl_hsa",
             }
@@ -440,8 +465,8 @@ class LlnlElcapitan(System):
                     "cray-mpich": {
                         "externals": [
                             {
-                                "spec": f"cray-mpich@{self.mpi_version}{gtl_spec}+wrappers %cce@{self.cce_version}",
-                                "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}",
+                                "spec": f"cray-mpich@{self.mpi_version}{gtl_spec}+wrappers %rocmcc@{self.rocm_version}",
+                                "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/amd/{self.short_rocm_version}",
                                 "extra_attributes": gtl_cfg,
                             }
                         ]
@@ -450,16 +475,22 @@ class LlnlElcapitan(System):
             }
 
         elif self.spec.satisfies("compiler=gcc"):
+            if gtl:
+                gtl_spec = "+gtl"
+            else:
+                gtl_spec = "~gtl"
+
             return {
                 "packages": {
                     "cray-mpich": {
                         "externals": [
                             {
-                                "spec": f"cray-mpich@{self.mpi_version}~gtl+wrappers %gcc@{self.gcc_version}",
-                                "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/10.3",
+                                "spec": f"cray-mpich@{self.mpi_version}{gtl_spec}+wrappers %gcc@{self.gcc_version}",
+                                "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/{self.short_gcc_version}",
                                 "extra_attributes": {
                                     "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
-                                    "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/10.3/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
+                                    "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/{self.short_gcc_version}/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
+                                    "gtl_libs": "libmpi_gtl_hsa",
                                 },
                             }
                         ]
@@ -625,15 +656,6 @@ class LlnlElcapitan(System):
                     ],
                     "buildable": False,
                 },
-                "llvm-amdgpu": {
-                    "externals": [
-                        {
-                            "spec": f"llvm-amdgpu@{self.rocm_version}",
-                            "prefix": f"/opt/rocm-{self.rocm_version}/llvm",
-                        }
-                    ],
-                    "buildable": False,
-                },
                 "rocblas": {
                     "externals": [
                         {
@@ -662,71 +684,50 @@ class LlnlElcapitan(System):
             f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib",
         ]
         # Avoid libunwind.so.1 error on tioga
-        if self.spec.variants["cluster"][0] == "tioga":
+        if self.spec.variants["cluster"][0] in ["tioga", "tuolumne"]:
             rpaths.append(f"/opt/cray/pe/cce/{self.cce_version}/cce-clang/x86_64/lib/")
 
-        if self.spec.satisfies("compiler=rocmcc"):
-            return {
-                "compilers": [
-                    {
-                        "compiler": {
-                            "spec": f"rocmcc@{self.rocm_version}",
-                            "paths": {
-                                "cc": f"/opt/rocm-{self.rocm_version}/bin/amdclang",
-                                "cxx": f"/opt/rocm-{self.rocm_version}/bin/amdclang++",
-                                "f77": f"/opt/rocm-{self.rocm_version}/bin/amdflang",
-                                "fc": f"/opt/rocm-{self.rocm_version}/bin/amdflang",
-                            },
-                            "flags": {"cflags": "-g -O2", "cxxflags": "-g -O2"},
-                            "operating_system": "rhel8",
-                            "target": "x86_64",
-                            "modules": [f"cce/{self.cce_version}"],
-                            "environment": {
-                                "set": {"RFE_811452_DISABLE": "1"},
-                                "append_path": {
-                                    "LD_LIBRARY_PATH": "/opt/cray/pe/gcc-libs"
-                                },
-                                "prepend_path": {
-                                    "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib",
-                                    "LIBRARY_PATH": f"/opt/rocm-{self.rocm_version}/lib",
-                                },
-                            },
-                            "extra_rpaths": rpaths,
-                        }
+        cfgs = []
+        # Always need an instance of llvm-gpu as an external. Sometimes as a compiler
+        # and sometimes just for ROCm support
+        rocmcc_entry = compiler_def(
+            f"llvm-amdgpu@{self.rocm_version}",
+            f"/opt/rocm-{self.rocm_version}/",
+            {"c": "amdclang", "cxx": "amdclang++", "fortran": "amdflang"},
+            modules=[f"rocm/{self.rocm_version}"],
+            flags={"cflags": "-g -O2", "cxxflags": "-g -O2"},
+            extra_rpaths=list(rpaths),
+            env={
+                "set": {"RFE_811452_DISABLE": "1"},
+                "append_path": {"LD_LIBRARY_PATH": "/opt/cray/pe/gcc-libs"},
+                "prepend_path": {
+                    "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib",
+                    "LIBRARY_PATH": f"/opt/rocm-{self.rocm_version}/lib",
+                },
+            },
+        )
+        cfgs.append(compiler_section_for("llvm-amdgpu", [rocmcc_entry]))
+        if self.spec.satisfies("compiler=cce"):
+            cce_entry = compiler_def(
+                f"cce@{self.cce_version}-rocm{self.rocm_version}",
+                f"/opt/cray/pe/cce/{self.cce_version}/",
+                {"c": "craycc", "cxx": "crayCC", "fortran": "crayftn"},
+                modules=[f"cce/{self.cce_version}"],
+                extra_rpaths=list(rpaths),
+                env={
+                    "prepend_path": {
+                        "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/rocm-{self.rocm_version}/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib"
                     }
-                ]
-            }
-        else:
-            return {
-                "compilers": [
-                    {
-                        "compiler": {
-                            "spec": f"cce@{self.cce_version}-rocm{self.rocm_version}",
-                            "paths": {
-                                "cc": f"/opt/cray/pe/cce/{self.cce_version}/bin/craycc",
-                                "cxx": f"/opt/cray/pe/cce/{self.cce_version}/bin/crayCC",
-                                "f77": f"/opt/cray/pe/cce/{self.cce_version}/bin/crayftn",
-                                "fc": f"/opt/cray/pe/cce/{self.cce_version}/bin/crayftn",
-                            },
-                            "flags": {
-                                "cflags": "-g -O2",
-                                "cxxflags": "-g -O2 -std=c++14",
-                                "fflags": "-g -O2 -hnopattern",
-                                "ldflags": "-ldl",
-                            },
-                            "operating_system": "rhel8",
-                            "target": "x86_64",
-                            "modules": [f"cce/{self.cce_version}"],
-                            "environment": {
-                                "prepend_path": {
-                                    "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/rocm-{self.rocm_version}/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib"
-                                }
-                            },
-                            "extra_rpaths": rpaths,
-                        }
-                    }
-                ]
-            }
+                },
+                flags={
+                    "cflags": "-g -O2",
+                    "cxxflags": "-g -O2 -std=c++14",
+                    "fflags": "-g -O2 -hnopattern",
+                    "ldflags": "-ldl",
+                },
+            )
+            cfgs.append(compiler_section_for("cce", [cce_entry]))
+        return merge_dicts(*cfgs)
 
     def system_specific_variables(self):
         opts = super().system_specific_variables()
@@ -756,19 +757,23 @@ class LlnlElcapitan(System):
         will fail if these variables are not defined though, so for now
         they are still generated (but with more-generic values).
         """
+        default_compiler = "gcc"
+        if self.spec.satisfies("compiler=cce"):
+            default_compiler = "cce"
+        elif self.spec.satisfies("compiler=rocmcc"):
+            default_compiler = "llvm-amdgpu"
+
         return {
             "software": {
                 "packages": {
-                    "default-compiler": {
-                        "pkg_spec": f"{self.spec.variants['compiler'][0]}"
-                    },
+                    "default-compiler": {"pkg_spec": default_compiler},
                     "default-mpi": {"pkg_spec": "cray-mpich"},
                     "compiler-rocm": {"pkg_spec": "cce"},
                     "compiler-amdclang": {"pkg_spec": "clang"},
                     "compiler-gcc": {"pkg_spec": "gcc"},
                     "mpi-rocm-gtl": {"pkg_spec": "cray-mpich+gtl"},
                     "mpi-rocm-no-gtl": {"pkg_spec": "cray-mpich~gtl"},
-                    "mpi-gcc": {"pkg_spec": "cray-mpich~gtl"},
+                    "mpi-gcc": {"pkg_spec": "cray-mpich+gtl"},
                     "blas": {"pkg_spec": f"{self.spec.variants['blas'][0]}"},
                     "blas-rocm": {"pkg_spec": "rocblas"},
                     "lapack": {"pkg_spec": f"{self.spec.variants['lapack'][0]}"},

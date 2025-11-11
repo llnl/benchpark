@@ -3,19 +3,19 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import logging
 import os
 import re
-import logging
-import sys
 import shlex
-import tarfile
 import shutil
+import sys
+import tarfile
 import warnings
-from glob import glob
 from datetime import datetime
+from glob import glob
 
-import matplotlib.pyplot as plt
 import matplotlib as mpl
+import matplotlib.pyplot as plt
 import pandas as pd
 import thicket as th
 
@@ -421,16 +421,25 @@ def prepare_data(**kwargs):
 
     top_n = kwargs.get("top_n_regions", -1)
     if top_n != -1:
+        num_nodes = len(ctk.graph)
+        if num_nodes < kwargs.get("top_n_regions", -1):
+            raise ValueError(
+                f"Value for '--top-n-regions' must be less than number of regions ({num_nodes})"
+            )
         temp_df_idx = ctk.dataframe.nlargest(
             top_n, [(list(grouped.keys())[0], metric)]
         ).index
         temp_df = ctk.dataframe[ctk.dataframe.index.isin(temp_df_idx)]
         temp_df.loc["Sum(removed_regions)"] = 0
         for p in ctk.profile:
-            temp_df.loc["Sum(removed_regions)", (p[1], metric)] = (
+            diff = (
                 ctk.dataframe.loc[:, (p[1], metric)].sum()
                 - temp_df.loc[:, (p[1], metric)].sum()
-            ).iloc[0]
+            )
+            if isinstance(diff, pd.Series):
+                assert len(diff) == 1
+                diff = diff.iloc[0]
+            temp_df.loc["Sum(removed_regions)", (p[1], metric)] = diff
         ctk.dataframe = temp_df
         logger.info(
             f"Filtered top {top_n} regions for chart display. Added the sum of the regions that were removed as single region."

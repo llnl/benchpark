@@ -3,11 +3,11 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainers
-from benchpark.experiment import Experiment
-from benchpark.mpi import MpiOnlyExperiment
 from benchpark.caliper import Caliper
 from benchpark.cuda import CudaExperiment
+from benchpark.directives import maintainers, variant
+from benchpark.experiment import Experiment
+from benchpark.mpi import MpiOnlyExperiment
 from benchpark.rocm import ROCmExperiment
 from benchpark.scaling import Scaling, ScalingMode
 
@@ -33,10 +33,21 @@ class Laghos(
         description="app version",
     )
 
+    variant(
+        "gpu-aware-mpi",
+        default=False,
+        values=(True, False),
+        description="Use GPU-aware MPI",
+    )
+
     maintainers("wdhawkins")
 
     def compute_applications_section(self):
         # "zones" defined from mesh file, we are hardcoding it here
+        self.add_experiment_variable("nx", 2, True)
+        self.add_experiment_variable("ny", 2, True)
+        self.add_experiment_variable("nz", 2, True)
+        self.add_experiment_variable("tf", 0.0033, True)
         self.add_experiment_variable("zones", 1024, True)
 
         # resource_count is the number of resources used for this experiment:
@@ -70,8 +81,19 @@ class Laghos(
 
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_experiment_variable("n_gpus", "{n_resources}", True)
+            if self.spec.satisfies("+gpu-aware-mpi"):
+                self.add_experiment_variable("gam", "--gpu-aware-mpi")
+            else:
+                self.add_experiment_variable("gam", "--no-gpu-aware-mpi")
         else:
             self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
     def compute_package_section(self):
-        self.add_package_spec(self.name, [f"laghos{self.determine_version()} +metis"])
+        gam = "~gpu-aware-mpi"
+        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+            if self.spec.satisfies("+gpu-aware-mpi"):
+                gam = "+gpu-aware-mpi"
+        self.add_package_spec(
+            self.name, [f"laghos{self.determine_version()} +metis {gam}"]
+        )
+        self.add_package_spec("hypre", ["hypre@2.32.0: +lapack"])

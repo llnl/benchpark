@@ -3,15 +3,15 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import sys
 import json
+import sys
 import tempfile
 
 from ramble.expander import Expander
 
 import benchpark.caliper
-import benchpark.spec
 import benchpark.paths
+import benchpark.spec
 
 
 def get_caliper_vars_section(expr_spec):
@@ -35,6 +35,7 @@ def test_experiment_compute_variables_section_caliper(monkeypatch):
             "experiment_name": "{experiment_name}",
             "n_nodes": "{n_nodes}",
             "n_ranks": "{n_ranks}",
+            "n_repeats": "0",
             "n_threads_per_proc": "{n_threads_per_proc}",
             "benchpark_spec": ["~cuda+mpi~openmp~rocm"],
             "append_path": "'",
@@ -105,10 +106,12 @@ def test_caliper_modifier(monkeypatch):
             88,
         ],
         "sys_gpus_per_node": 4,
+        "sys_mem_per_node_GB": 512,
         "application_name": "{application_name}",
         "experiment_name": "{experiment_name}",
         "n_nodes": "{n_nodes}",
         "n_ranks": "{n_ranks}",
+        "n_repeats": "0",
         "n_threads_per_proc": "{n_threads_per_proc}",
         "n_resources": "{n_resources}",
         "process_problem_size": "{process_problem_size}",

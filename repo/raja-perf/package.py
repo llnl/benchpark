@@ -35,7 +35,7 @@ def hip_repair_cache(options, spec):
     options.append(
         cmake_cache_path(
             "HIP_CLANG_INCLUDE_PATH",
-            glob.glob("{}/lib/clang/*/include".format(spec["llvm-amdgpu"].prefix))[0],
+            glob.glob("{}/llvm/lib/clang/*/include".format(spec["llvm-amdgpu"].prefix))[0],
         )
     )
 
@@ -94,9 +94,12 @@ def cuda_for_radiuss_projects(options, spec):
 
 def blt_link_helpers(options, spec, spec_compiler):
 
+    spec_cxx = getattr(spec_compiler, "cxx", None) or ""
+    spec_fc  = getattr(spec_compiler, "fc",  None) or ""
+
     ### From local package:
     fortran_compilers = ["gfortran", "xlf"]
-    if any(compiler in spec_compiler.fc for compiler in fortran_compilers) and ("clang" in spec_compiler.cxx):
+    if any(compiler in spec_fc for compiler in fortran_compilers) and ("clang" in spec_cxx):
         # Pass fortran compiler lib as rpath to find missing libstdc++
         libdir = os.path.join(os.path.dirname(
                        os.path.dirname(spec_compiler.fc)), "lib")
@@ -113,7 +116,7 @@ def blt_link_helpers(options, spec, spec_compiler):
         "/usr/tce/packages/gcc/gcc-4.9.3/lib64;/usr/tce/packages/gcc/gcc-4.9.3/gnu/lib64/gcc/powerpc64le-unknown-linux-gnu/4.9.3;/usr/tce/packages/gcc/gcc-4.9.3/gnu/lib64;/usr/tce/packages/gcc/gcc-4.9.3/lib64/gcc/x86_64-unknown-linux-gnu/4.9.3"))
 
     compilers_using_toolchain = ["pgi", "xl", "icpc"]
-    if any(compiler in spec_compiler.cxx for compiler in compilers_using_toolchain):
+    if any(compiler in spec_cxx for compiler in compilers_using_toolchain):
         if spec_uses_toolchain(spec) or spec_uses_gccname(spec):
 
             # Ignore conflicting default gcc toolchain
@@ -151,8 +154,14 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
     variant("tests", default="basic", values=("none", "basic", "benchmarks"),
             multi=False, description="Tests to run")
     variant("caliper",default=False, description="Build with support for Caliper based profiling")
+    variant("kokkos", default=False, description="Include Kokkos implementations of the kernels in RAJAPerf")
+
+    depends_on("c", type="build")
+    depends_on("cxx", type="build")
+    depends_on("fortran", type="build")
 
     depends_on("blt")
+    depends_on("blt@0.7.0:", type="build", when="@2025.03.0:")
     depends_on("blt@0.5.2:", type="build", when="@2022.10.0:")
     depends_on("blt@0.5.0:", type="build", when="@0.12.0:")
     depends_on("blt@0.4.1:", type="build", when="@0.11.0:")
@@ -167,8 +176,6 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
     depends_on("llvm-openmp", when="+openmp %apple-clang")
 
     depends_on("rocprim", when="+rocm")
-
-
 
     conflicts("~openmp", when="+openmp_target", msg="OpenMP target requires OpenMP")
     conflicts("+cuda", when="+openmp_target", msg="Cuda may not be activated when openmp_target is ON")
@@ -246,7 +253,8 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
         # adrienbernede-23-01
         # Maybe we want to share this in the above blt_link_helpers function.
         compilers_using_cxx14 = ["intel-17", "intel-18", "xl"]
-        if any(compiler in self.compiler.cxx for compiler in compilers_using_cxx14):
+        cxx_name = getattr(self.compiler, "cxx", None) or ""
+        if any(compiler in cxx_name for compiler in compilers_using_cxx14):
             entries.append(cmake_cache_string("BLT_CXX_STD", "c++14"))
 
         return entries
@@ -309,7 +317,7 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
             entries.append(cmake_cache_option("ENABLE_HIP", False))
 
         if "+cuda" in spec or "+rocm" in spec:
-            entries.append(cmake_cache_string("RAJA_PERFSUITE_GPU_BLOCKSIZES", "25,64,128,256,512,1024"))
+            entries.append(cmake_cache_string("RAJA_PERFSUITE_GPU_BLOCKSIZES", "64,128,256,512,1024"))
 
         entries.append(cmake_cache_option("ENABLE_OPENMP_TARGET", "+openmp_target" in spec))
         if "+openmp_target" in spec:
@@ -360,11 +368,18 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
             entries.append(cmake_cache_path("caliper_DIR", spec["caliper"].prefix+"/share/cmake/caliper/"))
             entries.append(cmake_cache_path("adiak_DIR", spec["adiak"].prefix+"/lib/cmake/adiak/"))
 
+        entries.append(cmake_cache_option("ENABLE_KOKKOS", "+kokkos" in spec))
+
         return entries
 
     def cmake_args(self):
         options = [f"-DMPI_CXX_LINK_FLAGS='{self.spec['mpi'].libs.ld_flags}'"]
         return options
+
+    def setup_build_environment(self, env):
+        super().setup_build_environment(env)
+        if "+cuda" in self.spec:
+            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
 
     def setup_run_environment(self, env):
         super().setup_run_environment(env)

@@ -5,6 +5,7 @@
 
 import math
 from enum import Enum
+
 from ramble.modkit import *
 
 
@@ -22,7 +23,7 @@ class AllocOpt(Enum):
     # Descriptions of resources available on systems
     SYS_GPUS_PER_NODE = 100
     SYS_CORES_PER_NODE = 101
-    SYS_MEM_PER_NODE = 102
+    SYS_MEM_PER_NODE_GB = 102
 
     # Scheduler identification and other high-level instructions
     SCHEDULER = 200

@@ -3,14 +3,14 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainers
+from benchpark.caliper import Caliper
+from benchpark.cuda import CudaExperiment
+from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
 from benchpark.mpi import MpiOnlyExperiment
 from benchpark.openmp import OpenMPExperiment
-from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
-from benchpark.scaling import ScalingMode, Scaling
-from benchpark.caliper import Caliper
+from benchpark.scaling import Scaling, ScalingMode
 
 
 class Kripke(
@@ -156,5 +156,5 @@ class Kripke(
             else "~single_memory"
         )
         self.add_package_spec(
-            self.name, [f"kripke{self.determine_version()} {single_memory} "]
+            self.name, [f"kripke{self.determine_version()} {single_memory} +mpi"]
         )

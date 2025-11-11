@@ -3,19 +3,18 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Dict
-import yaml  # TODO: some way to ensure yaml available
 import sys
-
-from benchpark.error import BenchparkError
-from benchpark.directives import ExperimentSystemBase
-from benchpark.directives import variant
-from benchpark.variables import VariableDict
-import benchpark.spec
-import benchpark.variant
+from typing import Dict
 
 import ramble.language.language_base  # noqa
 import ramble.language.language_helpers  # noqa
+import yaml  # TODO: some way to ensure yaml available
+
+import benchpark.spec
+import benchpark.variant
+from benchpark.directives import ExperimentSystemBase, variant
+from benchpark.error import BenchparkError
+from benchpark.variables import VariableDict
 
 
 class ExperimentHelper:
@@ -218,6 +217,12 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
         description="Prepend to environment PATH during experiment execution",
     )
 
+    variant(
+        "n_repeats",
+        default="0",
+        description="Number of experiment repetitions",
+    )
+
     def __init__(self, spec):
         self.spec: "benchpark.spec.ConcreteExperimentSpec" = spec
         # Device type must be set before super with absence of mpionly experiment type
@@ -349,6 +354,7 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
             }
         # default configs for all experiments
         default_config = {
+            "n_repeats": self.spec.variants["n_repeats"][0],
             "deprecated": True,
             "benchpark_experiment_command": "benchpark " + " ".join(sys.argv[1:]),
             "system": system_dict,

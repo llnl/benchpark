@@ -4,12 +4,19 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.directives import variant, maintainers
-from benchpark.cudasystem import CudaSystem
-from benchpark.paths import hardware_descriptions
-from benchpark.system import System, JobQueue
-from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from packaging.version import Version
+
+from benchpark.cudasystem import CudaSystem
+from benchpark.directives import maintainers, variant
+from benchpark.openmpsystem import OpenMPCPUOnlySystem
+from benchpark.paths import hardware_descriptions
+from benchpark.system import (
+    JobQueue,
+    System,
+    compiler_def,
+    compiler_section_for,
+    merge_dicts,
+)
 
 
 class LlnlMatrix(System):
@@ -37,7 +44,7 @@ class LlnlMatrix(System):
 
     variant(
         "compiler",
-        default="oneapi",
+        default="gcc",
         values=("oneapi", "gcc", "intel"),
         description="Which compiler to use",
     )
@@ -157,6 +164,7 @@ class LlnlMatrix(System):
                     "externals": [{"spec": "curl@7.61.1", "prefix": "/usr"}],
                     "buildable": False,
                 },
+                "mpi": {"buildable": False},
             }
         }
 
@@ -164,8 +172,7 @@ class LlnlMatrix(System):
             selections |= {
                 "packages": selections["packages"]
                 | {
-                    "mpi": {
-                        "buildable": False,
+                    "mvapich2": {
                         "externals": [
                             {
                                 "spec": "mvapich2@2.3.7-gcc1211",
@@ -182,8 +189,7 @@ class LlnlMatrix(System):
             selections |= {
                 "packages": selections["packages"]
                 | {
-                    "mpi": {
-                        "buildable": False,
+                    "mvapich2": {
                         "externals": [
                             {
                                 "spec": "mvapich2@2.3.7-intel202160classic",
@@ -200,8 +206,7 @@ class LlnlMatrix(System):
             selections |= {
                 "packages": selections["packages"]
                 | {
-                    "mpi": {
-                        "buildable": False,
+                    "mvapich2": {
                         "externals": [
                             {
                                 "spec": "mvapich2@2.3.7-intel202321",
@@ -215,111 +220,55 @@ class LlnlMatrix(System):
                 }
             }
 
-        selections["packages"] |= self.compiler_weighting_cfg()["packages"]
-
         selections["packages"] |= self.cuda_config(self.spec.variants["cuda"][0])[
             "packages"
         ]
 
         return selections
 
-    def compiler_weighting_cfg(self):
-        compiler = self.spec.variants["compiler"][0]
-
-        if compiler == "oneapi":
-            return {"packages": {"all": {"require": [{"one_of": ["%oneapi", "%gcc"]}]}}}
-        else:
-            return {"packages": {}}
-
     def compute_compilers_section(self):
-        selections = {}
+        gcc_cfg = compiler_section_for(
+            "gcc",
+            [
+                compiler_def(
+                    "gcc@12.1.1 languages:=c,c++,fortran",
+                    "/usr/tce/packages/gcc/gcc-12.1.1/",
+                    {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                )
+            ],
+        )
         if self.spec.satisfies("compiler=gcc"):
-            selections = {
-                "compilers": [
-                    {
-                        "compiler": {
-                            "spec": "gcc@12.1.1",
-                            "paths": {
-                                "cc": "/usr/tce/packages/gcc/gcc-12.1.1/bin/gcc",
-                                "cxx": "/usr/tce/packages/gcc/gcc-12.1.1/bin/g++",
-                                "f77": "/usr/tce/packages/gcc/gcc-12.1.1/bin/gfortran",
-                                "fc": "/usr/tce/packages/gcc/gcc-12.1.1/bin/gfortran",
-                            },
-                            "flags": {},
-                            "operating_system": "rhel8",
-                            "target": "x86_64",
-                            "modules": [],
-                            "environment": {},
-                            "extra_rpaths": [],
-                        }
-                    }
-                ]
-            }
+            cfg = gcc_cfg
         elif self.spec.satisfies("compiler=intel"):
-            selections = {
-                "compilers": [
-                    {
-                        "compiler": {
-                            "spec": "intel@2021.6.0-classic",
-                            "paths": {
-                                "cc": "/usr/tce/packages/intel-classic/intel-classic-2021.6.0/bin/icc",
-                                "cxx": "/usr/tce/packages/intel-classic/intel-classic-2021.6.0/bin/icpc",
-                                "f77": "/usr/tce/packages/intel-classic/intel-classic-2021.6.0/bin/ifort",
-                                "fc": "/usr/tce/packages/intel-classic/intel-classic-2021.6.0/bin/ifort",
-                            },
-                            "flags": {},
-                            "operating_system": "rhel8",
-                            "target": "x86_64",
-                            "modules": [],
-                            "environment": {},
-                            "extra_rpaths": [],
-                        }
-                    }
-                ]
-            }
+            cfg = compiler_section_for(
+                "intel-oneapi-compilers-classic",
+                [
+                    compiler_def(
+                        "intel-oneapi-compilers-classic@2021.6.0 ~envmods",
+                        "/usr/tce/packages/intel-classic/intel-classic-2021.6.0/",
+                        {"c": "icc", "cxx": "icpc", "fortran": "ifort"},
+                    )
+                ],
+            )
         elif self.spec.satisfies("compiler=oneapi"):
-            selections = {
-                "compilers": [
-                    {
-                        "compiler": {
-                            "spec": "gcc@12.1.1",
-                            "paths": {
-                                "cc": "/usr/tce/packages/gcc/gcc-12.1.1/bin/gcc",
-                                "cxx": "/usr/tce/packages/gcc/gcc-12.1.1/bin/g++",
-                                "f77": "/usr/tce/packages/gcc/gcc-12.1.1/bin/gfortran",
-                                "fc": "/usr/tce/packages/gcc/gcc-12.1.1/bin/gfortran",
-                            },
-                            "flags": {},
-                            "operating_system": "rhel8",
-                            "target": "x86_64",
-                            "modules": [],
-                            "environment": {},
-                            "extra_rpaths": [],
-                        }
-                    },
-                    {
-                        "compiler": {
-                            "spec": "oneapi@2023.2.1",
-                            "paths": {
-                                "cc": "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/bin/icx",
-                                "cxx": "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/bin/icpx",
-                                "f77": "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/bin/ifx",
-                                "fc": "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/bin/ifx",
-                            },
-                            "flags": {},
-                            "operating_system": "rhel8",
-                            "target": "x86_64",
-                            "modules": [
-                                f"cuda/{self.cuda_version}",
-                            ],
-                            "environment": {},
-                            "extra_rpaths": [],
-                        }
-                    },
-                ]
-            }
+            oneapi_cfg = compiler_section_for(
+                "intel-oneapi-compilers",
+                [
+                    compiler_def(
+                        "intel-oneapi-compilers@2023.2.1 ~envmods",
+                        "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/",
+                        {"c": "icx", "cxx": "icpx", "fortran": "ifx"},
+                        modules=[
+                            f"cuda/{self.cuda_version}",
+                        ],
+                    )
+                ],
+            )
+            prefs = {"one_of": ["%oneapi", "%gcc"], "when": "%c"}
+            weighting_cfg = {"packages": {"all": {"require": [prefs]}}}
+            cfg = merge_dicts(gcc_cfg, oneapi_cfg, weighting_cfg)
 
-        return selections
+        return cfg
 
     def cuda_config(self, cuda_version):
         return {
@@ -393,10 +342,16 @@ class LlnlMatrix(System):
         }
 
     def compute_software_section(self):
+        default_compiler = "gcc"
+        if self.spec.satisfies("compiler=intel"):
+            default_compiler = "intel-oneapi-compilers-classic"
+        elif self.spec.satisfies("compiler=oneapi"):
+            default_compiler = "intel-oneapi-compilers"
+
         return {
             "software": {
                 "packages": {
-                    "default-compiler": {"pkg_spec": self.spec.variants["compiler"][0]},
+                    "default-compiler": {"pkg_spec": default_compiler},
                     "default-mpi": {"pkg_spec": "mvapich2"},
                     "compiler-gcc": {"pkg_spec": "gcc"},
                     "compiler-intel": {"pkg_spec": "intel"},

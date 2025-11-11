@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from pathlib import Path
+
 from ramble.modkit import *
 
 
@@ -32,7 +33,7 @@ class Hwloc(BasicModifier):
             "sys_cores_os_reserved_per_node",
             "sys_cores_os_reserved_per_node_list",
             "sys_gpus_per_node",
-            "sys_mem_per_node",
+            "sys_mem_per_node_GB",
             "system_site",
         ]
         os_reserved_metadata = {}
@@ -46,6 +47,7 @@ class Hwloc(BasicModifier):
 
     def hwloc(self, executable_name, executable, app_inst=None):
         import os
+
         from ramble.util.executable import CommandExecutable
 
         hwloc_parser_dir = os.path.dirname(f"{self._file_path}")

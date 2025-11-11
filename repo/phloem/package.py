@@ -5,6 +5,7 @@
 
 from spack.package import *
 
+
 class Phloem(MakefilePackage):
     tags = []
 
@@ -17,7 +18,11 @@ class Phloem(MakefilePackage):
     version("1.4.5", tag="v1.4.5")
 
     variant("mpi", default=False, description="Build with MPI support")
-    
+
+    depends_on("c", type="build")
+    depends_on("cxx", type="build")
+    depends_on("fortran", type="build")
+
     depends_on("mpi", when="+mpi")
 
     def install(self, spec, prefix):
