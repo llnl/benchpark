@@ -65,7 +65,7 @@ class Caliper:
                 if any("topdown" in var for var in self.spec.variants["caliper"]):
                     papi_support = True  # check if target system supports papi
                     if papi_support:
-                        package_specs["caliper"]["pkg_spec"] += "+papi"
+                        package_specs["caliper"]["pkg_spec"] += "+papi target=sapphirerapids"
                     else:
                         raise NotImplementedError(
                             "Target system does not support the papi interface"

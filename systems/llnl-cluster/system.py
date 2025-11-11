@@ -137,15 +137,15 @@ class LlnlCluster(System):
                     "externals": [{"spec": "elfutils@0.190", "prefix": "/usr"}],
                     "buildable": False,
                 },
-                "papi": {
-                    "buildable": False,
-                    "externals": [
-                        {
-                            "spec": "papi@6.0.0.1",
-                            "prefix": "/usr/tce/packages/papi/papi-6.0.0.1",
-                        }
-                    ],
-                },
+                # "papi": {
+                #     "buildable": False,
+                #     "externals": [
+                #         {
+                #             "spec": "papi@6.0.0.1",
+                #             "prefix": "/usr/tce/packages/papi/papi-6.0.0.1",
+                #         }
+                #     ],
+                # },
                 "unwind": {
                     "externals": [{"spec": "unwind@8.0.1", "prefix": "/usr"}],
                     "buildable": False,
