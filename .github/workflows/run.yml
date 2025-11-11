@@ -136,7 +136,7 @@ jobs:
         run: |
           ./bin/benchpark experiment init --dest=saxpy-agg --system=generic-x86 saxpy n_repeats=5
           ./bin/benchpark setup saxpy-agg workspace2/
-          ./bin/benchpark aggregate agg workspace2 workspace  # Aggregate multi-trial and single-trial workspace
+          ./bin/benchpark aggregate --dest agg workspace2 workspace  # Aggregate multi-trial and single-trial workspace
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
