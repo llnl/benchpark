@@ -265,7 +265,20 @@ class Caliper(CachedCMakePackage, CudaPackage, ROCmPackage):
         return entries
 
     def cmake_args(self):
-        return []
+        options = []
+
+        # Create a post-project include that runs after languages are enabled
+        after = join_path(self.stage.source_path, "force_cupti_after.cmake")
+        with open(after, "w") as f:
+            f.write(
+                "cmake_policy(SET CMP0074 NEW)\n"
+                "find_package(CUDAToolkit REQUIRED COMPONENTS cupti)\n"
+            )
+
+        # Use CMAKE_PROJECT_INCLUDE (not TOP_LEVEL) so it runs after project()
+        options.append(f"-DCMAKE_PROJECT_INCLUDE={after}")
+
+        return options
 
     def setup_run_environment(self, env):
         if self.spec.satisfies("+python"):
