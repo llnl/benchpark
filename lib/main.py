@@ -61,7 +61,7 @@ import benchpark.cmd.setup  # noqa: E402
 import benchpark.cmd.show_build  # noqa: E402
 import benchpark.cmd.system  # noqa: E402
 import benchpark.cmd.unit_test  # noqa: E402
-import benchpark.cmd.aggregate # noqa: E402
+import benchpark.cmd.aggregate  # noqa: E402
 from benchpark.accounting import benchpark_benchmarks  # noqa: E402
 
 try:

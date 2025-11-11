@@ -20,7 +20,7 @@ def _make_aggregate_script(script_path, batch_lines, to_aggregate):
 
 def _collect_scheduler_options(experiment_script):
     batch_patterns = [
-        r"\s*#\s*(flux:.*$)",   # flux-style header (kept verbatim)
+        r"\s*#\s*(flux:.*$)",  # flux-style header (kept verbatim)
         r"\s*#SBATCH\s+(.*)$",  # SLURM
     ]
 
@@ -97,6 +97,7 @@ def _aggregate(args):
         script_path = os.path.join(output_dir, f"{script_id}.sh")
         _make_aggregate_script(script_path, opts_to_request[opts_group], scripts)
         script_id += 1
+
 
 def setup_parser(root_parser):
     """
