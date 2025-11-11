@@ -45,7 +45,7 @@ def _collect_experiments(workspace_dir):
         )
 
     experiments = []
-    skip_roots = {"spack", "ramble"}
+    skip_roots = {"spack", "ramble", "spack-packages"}
 
     for entry in os.listdir(workspace_dir):
         entry_path = os.path.join(workspace_dir, entry)
