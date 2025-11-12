@@ -137,6 +137,7 @@ jobs:
           ./bin/benchpark system init --dest=dane llnl-cluster cluster=dane
           ./bin/benchpark experiment init --dest=saxpy-agg --system=dane saxpy n_repeats=5
           ./bin/benchpark setup saxpy-agg workspace2/
+          ./workspace2/ramble/bin/ramble --workspace-dir /home/runner/work/benchpark/benchpark/workspace2/saxpy-agg/dane/workspace workspace setup --dry-run
           BENCHPARK_RUN_COVERAGE=aggregate ./bin/benchpark aggregate --dest agg workspace2  # Aggregate multi-trial workspace
       - name: Upload binary coverage to Codecov
         uses: codecov/codecov-action@v4
