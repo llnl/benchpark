@@ -5,27 +5,43 @@
 
 from spack.package import *
 import os.path
+import os
+import stat
+from spack_repo.builtin.packages.mpich.package import MpichEnvironmentModifications
 
-class CrayMpichWrappers(BundlePackage):
+class CrayMpichWrappers(MpichEnvironmentModifications, BundlePackage):
 
     version("1.0.0")
 
+    depends_on("cray-mpich")
+    provides("mpi")
+
+    @property
+    def libs(self):
+        return self.spec["cray-mpich"].libs
+
+    def setup_run_environment(self, env: EnvironmentModifications) -> None:
+        self.setup_mpi_wrapper_variables(env)
+
+    def setup_dependent_package(self, module, dependent_spec):
+        MpichEnvironmentModifications.setup_dependent_package(self, module, dependent_spec)
+
     def install(self, spec, prefix):
-        with open(os.path.join(prefix, "FindMPI.cmake"), "w") as f:
-            f.write("""\
-include_guard(GLOBAL)
+        dep = spec["cray-mpich"]
+        for subdir in os.listdir(dep.prefix):
+            if subdir == "bin":
+                continue
+            os.symlink(os.path.join(dep.prefix, subdir), os.path.join(self.prefix, subdir))
 
-include("${CMAKE_ROOT}/Modules/FindMPI.cmake")
+        mkdir(self.prefix.bin)
+        for target in os.listdir(dep.prefix.bin):
+            if target in ["mpicc", "mpicxx", "mpif90", "mpif77"]:
+                fpath = os.path.join(self.prefix.bin, target)
+                with open(fpath, "w") as f:
+                    f.write(f"""\
+#!/bin/bash
 
-message("cray-mpich-wrappers test231 module")
-
-if(TARGET MPI::MPI_C)
-  if(NOT DEFINED MPI_C_EXTRA_FLAGS)
-    set(MPI_C_EXTRA_FLAGS "-ltest231")
-  endif()
-  if(MPI_C_EXTRA_FLAGS)
-    separate_arguments(MPI_C_EXTRA_FLAGS NATIVE_COMMAND)
-    target_compile_options(MPI::MPI_C INTERFACE ${MPI_C_EXTRA_FLAGS})
-  endif()
-endif()
+{dep.prefix.bin}/{target} -lmpi_gtl_hsa "$@"
 """)
+                st = os.stat(fpath)
+                os.chmod(fpath, st.st_mode | stat.S_IEXEC)
