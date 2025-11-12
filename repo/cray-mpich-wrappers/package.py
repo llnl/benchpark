@@ -8,17 +8,23 @@ import os.path
 import os
 import stat
 from spack_repo.builtin.packages.mpich.package import MpichEnvironmentModifications
+from spack.package import LinkTree
 
 class CrayMpichWrappers(MpichEnvironmentModifications, BundlePackage):
 
     version("1.0.0")
 
-    depends_on("cray-mpich")
+    depends_on("cray-mpich", type="build")
     provides("mpi")
 
     @property
     def libs(self):
         return self.spec["cray-mpich"].libs
+
+    #def add_files_to_view(self, view, merge_map, skip_if_exists=True):
+    #    for src, dst in merge_map.items():
+    #        if "/bin/" in src:
+    #            os.copy(src, dst)
 
     def setup_run_environment(self, env: EnvironmentModifications) -> None:
         self.setup_mpi_wrapper_variables(env)
@@ -31,7 +37,9 @@ class CrayMpichWrappers(MpichEnvironmentModifications, BundlePackage):
         for subdir in os.listdir(dep.prefix):
             if subdir == "bin":
                 continue
-            os.symlink(os.path.join(dep.prefix, subdir), os.path.join(self.prefix, subdir))
+            #os.symlink(os.path.join(dep.prefix, subdir), os.path.join(self.prefix, subdir))
+            link_tree = LinkTree(os.path.join(dep.prefix, subdir))
+            link_tree.merge(os.path.join(self.prefix, subdir))
 
         mkdir(self.prefix.bin)
         for target in os.listdir(dep.prefix.bin):
