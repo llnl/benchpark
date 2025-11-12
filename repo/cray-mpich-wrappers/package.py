@@ -21,11 +21,6 @@ class CrayMpichWrappers(MpichEnvironmentModifications, BundlePackage):
     def libs(self):
         return self.spec["cray-mpich"].libs
 
-    #def add_files_to_view(self, view, merge_map, skip_if_exists=True):
-    #    for src, dst in merge_map.items():
-    #        if "/bin/" in src:
-    #            os.copy(src, dst)
-
     def setup_run_environment(self, env: EnvironmentModifications) -> None:
         self.setup_mpi_wrapper_variables(env)
 
@@ -37,7 +32,6 @@ class CrayMpichWrappers(MpichEnvironmentModifications, BundlePackage):
         for subdir in os.listdir(dep.prefix):
             if subdir == "bin":
                 continue
-            #os.symlink(os.path.join(dep.prefix, subdir), os.path.join(self.prefix, subdir))
             link_tree = LinkTree(os.path.join(dep.prefix, subdir))
             link_tree.merge(os.path.join(self.prefix, subdir))
 
