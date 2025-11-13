@@ -44,6 +44,7 @@
     set-of-experiments
     run-binary
     create-mirror
+    io-benchmarking
 
 .. toctree::
     :maxdepth: 1

@@ -17,7 +17,7 @@ __version__ = "0.1.0"
 if "-V" in sys.argv or "--version" in sys.argv:
     print(__version__)
     exit()
-helpstr = """usage: main.py [-h] [-V] {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze,aggregate} ...
+helpstr = """usage: main.py [-h] [-V] {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze,aggregate,configure} ...
 
 Benchpark
 
@@ -26,7 +26,7 @@ options:
   -V, --version         show version number and exit
 
 Subcommands:
-  {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze,aggregate}
+  {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze,aggregate,configure}
     tags                Tags in Benchpark experiments
     system              Initialize a system config
     experiment          Interact with experiments
@@ -40,6 +40,7 @@ Subcommands:
     bootstrap           Bootstrap benchpark or update an existing bootstrap
     analyze             Perform pre-defined analysis on the performance data (caliper files) after 'ramble on'
     aggregate           Aggregate multiple experiments (even across workspaces) into the same submission script
+    configure           Configure options relating to the Benchpark environment
     """
 if len(sys.argv) == 1 or "-h" == sys.argv[1] or "--help" == sys.argv[1]:
     print(helpstr)
@@ -47,6 +48,19 @@ if len(sys.argv) == 1 or "-h" == sys.argv[1] or "--help" == sys.argv[1]:
 
 import benchpark.paths  # noqa: E402
 from benchpark.runtime import RuntimeResources  # noqa: E402
+
+if sys.argv[1] == "configure":
+    import benchpark.cmd.configure  # noqa: E402
+
+    parser = argparse.ArgumentParser(description="Benchpark")
+    subparsers = parser.add_subparsers(title="Subcommands", dest="subcommand")
+    configure_parser = subparsers.add_parser(
+        "configure", help="Configure options relating to the Benchpark environment"
+    )
+    benchpark.cmd.configure.setup_parser(configure_parser)
+    args = parser.parse_args()
+    benchpark.cmd.configure.command(args)
+    sys.exit(0)
 
 bootstrapper = RuntimeResources(benchpark.paths.benchpark_home)  # noqa
 bootstrapper.bootstrap()  # noqa
