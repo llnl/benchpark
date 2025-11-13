@@ -110,12 +110,16 @@ def test_default_include_section():
 
     assert include_section == ["./configs"]
 
-
 def test_default_config_section():
     spec = benchpark.spec.ExperimentSpec("saxpy").concretize()
     experiment = spec.experiment
 
     config_section = experiment.compute_config_section()
+
+    the_spec = config_section["spec"]
+    del config_section["spec"]
+
+    assert benchpark.spec.ExperimentSpec(the_spec) == spec
 
     assert config_section == {
         "benchpark_experiment_command": "benchpark "
