@@ -16,6 +16,6 @@ system="s-$timestamp"
 ./bin/benchpark setup ./$system/$benchmark workspace/
 . workspace/setup.sh
 ramble \
-    --workspace-dir "workspace/$benchmark/$system/workspace" \
+    --workspace-dir "workspace/$system/$benchmark/workspace" \
     --disable-logger \
     workspace setup --dry-run
