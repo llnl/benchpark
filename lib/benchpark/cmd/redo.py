@@ -8,14 +8,8 @@
 import os
 import pathlib
 import pickle
-import shutil
-import sys
 
 import ruamel.yaml as yaml
-
-import benchpark.paths
-from benchpark.debug import debug_print
-from benchpark.runtime import RuntimeResources
 
 
 def setup_parser(root_parser):
@@ -60,7 +54,6 @@ def command(args):
                     return result
 
     experiments_root = pathlib.Path(os.path.abspath(args.experiments_root))
-    source_dir = benchpark.paths.benchpark_root
 
     system_id = args.system
     system_file = os.path.join(system_id, "system.pkl")
