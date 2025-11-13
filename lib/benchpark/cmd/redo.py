@@ -86,7 +86,6 @@ def command(args):
 
     redo_instructions = rf"""
 . {experiments_root}/setup.sh
-spack uninstall -afy
 rm -rf {experiments_root}/{system_id}
 rm -rf {system_id}
 {reinit_system}
