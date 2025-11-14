@@ -22,7 +22,7 @@ jobs:
           # create a dummy workspace to get a working ramble
           bin/benchpark system init --dest=generic-x86 generic-x86
           bin/benchpark experiment init --dest=saxpy generic-x86 saxpy
-          bin/benchpark setup saxpy /tmp/workspace
+          bin/benchpark setup generic-x86/saxpy /tmp/workspace
           # this is gross and we should better setup ramble for people or make it a Spack package
           pip install -r /tmp/workspace/ramble/requirements.txt
       - name: Build with sphinx
