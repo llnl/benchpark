@@ -52,8 +52,8 @@ cd -
 
 # Test 'benchpark analyze' 
 if [[ "$TEST_ANALYZE" == "true" ]]; then
-    ./bin/benchpark analyze --workspace-dir ./wkp/${BENCHMARK}/${HOST}/workspace/
+    ./bin/benchpark analyze --workspace-dir ./wkp/${HOST}/${BENCHMARK}/workspace/
 fi
 
 # Check Experiment Exit Codes
-python ./.gitlab/bin/exit-codes ./wkp/${BENCHMARK}/${HOST}/workspace/results.latest.json
+python ./.gitlab/bin/exit-codes ./wkp/${HOST}/${BENCHMARK}/workspace/results.latest.json
