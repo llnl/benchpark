@@ -19,7 +19,17 @@ class Laghos(ExecutableApplication):
             'lagrangian','spatial-discretization','unstructured-grid',
             'network-latency-bound','network-collectives','unstructured-grid']
 
-    executable('prob', 'laghos -p {problem} -m {mesh} -nx {nx} -ny {ny} -nz {nz} -rs {rs} -rp {rp} -ms {ms} --fom {gam} -d {device} {assembly} -tf {tf}', use_mpi=True)
+    executable('prob', 'laghos' +
+                       ' -p {problem}' +
+                       ' -m {mesh}' +
+                       ' -nx {nx} -ny {ny} -nz {nz}' +
+                       ' -rs {rs} -rp {rp}' +
+                       ' -ms {ms}' +
+                       ' -ok {ok} -ot {ot} -oq {oq}' +
+                       ' --fom {gam}' +
+                       ' -d {device}' +
+                       ' {assembly}' +
+                       ' -tf {tf}', use_mpi=True)
 
     workload('triplept', executables=['prob'])
 
@@ -53,6 +63,18 @@ class Laghos(ExecutableApplication):
     
     workload_variable('ms', default='250',
             description='max number of steps',
+            workloads=['triplept'])
+
+    workload_variable('ok', default='1',
+            description='Order (degree) of the kinematic finite element space',
+            workloads=['triplept'])
+
+    workload_variable('ot', default='0',
+            description='Order (degree) of the thermodynamic finite element space',
+            workloads=['triplept'])
+
+    workload_variable('oq', default='2',
+            description='Order  of the integration rule',
             workloads=['triplept'])
 
     workload_variable('device', default='cpu',

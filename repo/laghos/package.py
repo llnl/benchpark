@@ -63,6 +63,8 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         depends_on(f"mfem cuda_arch={arch}", when=f"cuda_arch={arch}")
     depends_on("mfem +cuda+mpi", when="+cuda")
     depends_on("mfem +rocm+mpi", when="+rocm")
+    depends_on("mfem +umpire", when="+cuda")
+    depends_on("mfem +umpire", when="+rocm")
 
     depends_on("hypre +rocm+mpi", when="+rocm")
     requires("+rocm", when="^hypre+rocm")
@@ -70,6 +72,8 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         depends_on(f"hypre amdgpu_target={target}", when=f"amdgpu_target={target}")
         depends_on(f"mfem amdgpu_target={target}", when=f"amdgpu_target={target}")
 
+    depends_on("hypre+umpire", when="+cuda")
+    depends_on("hypre+umpire", when="+rocm")
     depends_on("hypre+gpu-aware-mpi", when="+gpu-aware-mpi")
 
     # Replace MPI_Session
@@ -78,6 +82,10 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         sha256="e783a71c3cb36886eb539c0f7ac622883ed5caf7ccae597d545d48eaf051d15d",
         when="@3.1 ^mfem@4.4:",
     )
+
+    def setup_run_environment(self, env):
+        if "+gpu-aware-mpi" in self.spec:
+            env.set("MFEM_GPU_AWARE_MPI", "1")
 
     def setup_build_environment(self, env):
         if "+cuda" in self.spec:
