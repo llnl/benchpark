@@ -17,7 +17,7 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
 
     homepage = "https://github.com/CEED/Remhos"
     url = "https://github.com/CEED/Remhos/archive/v1.0.tar.gz"
-    git = "https://github.com/rfhaque/Remhos.git"
+    git = "https://github.com/CEED/Remhos.git"
 
     maintainers("v-dobrev", "tzanio", "vladotomov")
 
