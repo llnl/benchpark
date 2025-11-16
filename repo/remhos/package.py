@@ -17,7 +17,7 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
 
     homepage = "https://github.com/CEED/Remhos"
     url = "https://github.com/CEED/Remhos/archive/v1.0.tar.gz"
-    git = "https://github.com/CEED/Remhos.git"
+    git = "https://github.com/rfhaque/Remhos.git"
 
     maintainers("v-dobrev", "tzanio", "vladotomov")
 
@@ -30,6 +30,7 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
 
     variant("metis", default=True, description="Enable/disable METIS support")
     variant("caliper", default=False, description="Enable/disable Caliper support")
+    variant("gpu-aware-mpi", default=False, description="Enable GPU aware MPI")
 
     depends_on("c", type="build")
     depends_on("cxx", type="build")
@@ -62,14 +63,22 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
         depends_on(f"mfem cuda_arch={arch}", when=f"cuda_arch={arch}")
     depends_on("mfem +cuda+mpi", when="+cuda")
     depends_on("mfem +rocm+mpi", when="+rocm")
+    depends_on("mfem +umpire", when="+cuda")
+    depends_on("mfem +umpire", when="+rocm")
 
-    depends_on("hypre +rocm +mpi", when="+rocm")
+    depends_on("hypre +rocm+mpi", when="+rocm")
     requires("+rocm", when="^hypre+rocm")
     for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
         depends_on(f"hypre amdgpu_target={target}", when=f"amdgpu_target={target}")
         depends_on(f"mfem amdgpu_target={target}", when=f"amdgpu_target={target}")
 
-    depends_on("hypre+gpu-aware-mpi", when="^cray-mpich+gtl")
+    depends_on("hypre+umpire", when="+cuda")
+    depends_on("hypre+umpire", when="+rocm")
+    depends_on("hypre+gpu-aware-mpi", when="+gpu-aware-mpi")
+
+    def setup_run_environment(self, env):
+        if "+gpu-aware-mpi" in self.spec:
+            env.set("MFEM_GPU_AWARE_MPI", "1")
 
     def setup_build_environment(self, env):
         if "+cuda" in self.spec:

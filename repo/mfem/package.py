@@ -38,7 +38,19 @@ class Mfem(BuiltinMfem):
         def yes_no(varstr):
             return "YES" if varstr in self.spec else "NO"
 
-        options = super().get_make_config_options(spec, prefix)
+        options = [x for x in super().get_make_config_options(spec, prefix) if not x.startswith("UMPIRE_LIB=")]
+
+        if "+umpire" in spec:
+            umpire = spec["umpire"]
+            umpire_libs = umpire.libs
+            if "^camp" in umpire:
+                umpire_libs += umpire["camp"].libs
+            if "^fmt" in umpire:
+                umpire_libs += umpire["fmt"].libs
+            options += [
+                "UMPIRE_LIB=%s" % self.ld_flags_from_library_list(umpire_libs),
+            ]
+
         options.append("MFEM_USE_CALIPER=%s" % yes_no("+caliper"))
         if "+caliper" in self.spec: 
             options.append("CALIPER_DIR=%s" % self.spec["caliper"].prefix)

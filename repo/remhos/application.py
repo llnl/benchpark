@@ -20,8 +20,30 @@ class Remhos(ExecutableApplication):
             'network-latency-bound','network-collectives','unstructured-grid']
 
     #TODO: add -ms flag once it's implemented
-    executable('2d', 'remhos'+' -dim 2 -epm {epm}'+' -p 14'+' -rs {rs2d}'+' -o 3 -dt {dt}'+' -tf {tf}'+' -ho {ho}' ' -lo {lo}'+' -fct {fct}'+' -vs {vs}'+' -ms {ms}'+' -d {device}'+' -pa -no-vis', use_mpi=True)
-    executable('3d', 'remhos'+' -dim 3 -epm {epm}'+' -p 10'+' -rs {rs3d}'+' -o 2'+' -dt {dt}'+' -tf {tf}'+' -ho {ho}' ' -lo {lo}'+' -fct {fct}'+' -vs {vs}'+' -ms {ms}'+' -d {device}'+' -pa -no-vis', use_mpi=True)
+    executable('2d', 'remhos' +
+                     ' -dim 2 -epm {epm}' +
+                     ' -p 14' +
+                     ' -rs {rs2d}' +
+                     ' -o 3 -dt {dt} -tf {tf}' +
+                     ' -ho {ho} -lo {lo}' +
+                     ' -fct {fct}' +
+                     ' -vs {vs}' +
+                     ' -ms {ms}' +
+                     ' {gam}' +
+                     ' -d {device}' +
+                     ' -pa -no-vis', use_mpi=True)
+    executable('3d', 'remhos' +
+                     ' -dim 3 -epm {epm}' +
+                     ' -p 10' +
+                     ' -rs {rs3d}' +
+                     ' -o 2 -dt {dt} -tf {tf}' +
+                     ' -ho {ho} -lo {lo}' +
+                     ' -fct {fct}' +
+                     ' -vs {vs}' +
+                     ' -ms {ms}' +
+                     ' {gam}' +
+                     ' -d {device}' +
+                     ' -pa -no-vis', use_mpi=True)
     workload('2d', executables=['2d'])
     workload('3d', executables=['3d'])
     
@@ -76,8 +98,13 @@ class Remhos(ExecutableApplication):
     workload_variable('ms', default='5',
         description='ms',
         workloads=['2d','3d'])
+
     workload_variable('device', default='cpu',
-        description='cpu or cuda',
+        description='cpu, cuda or hip',
+        workloads=['2d','3d'])
+
+    workload_variable('gam', default='--no-gpu-aware-mpi',
+        description='--gpu-aware-mpi or --no-gpu-aware-mpi',
         workloads=['2d','3d'])
 
     figure_of_merit("FOM", log_file='{experiment_run_dir}/{experiment_name}.out', fom_regex=r'FOM:\s+(?P<fom>[0-9]*\.[0-9]*)', group_name='fom', units='megadofs x time steps / second')

@@ -35,6 +35,13 @@ class Remhos(
         description="app version",
     )
 
+    variant(
+        "gpu-aware-mpi",
+        default=False,
+        values=(True, False),
+        description="Use GPU-aware MPI",
+    )
+
     maintainers("rfhaque")
 
     def compute_applications_section(self):
@@ -77,8 +84,18 @@ class Remhos(
 
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_experiment_variable("n_gpus", "{n_resources}", True)
+            if self.spec.satisfies("+gpu-aware-mpi"):
+                self.add_experiment_variable("gam", "--gpu-aware-mpi")
+            else:
+                self.add_experiment_variable("gam", "--no-gpu-aware-mpi")
         else:
             self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
     def compute_package_section(self):
-        self.add_package_spec(self.name, [f"remhos{self.determine_version()} +metis"])
+        gam = "~gpu-aware-mpi"
+        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+            if self.spec.satisfies("+gpu-aware-mpi"):
+                gam = "+gpu-aware-mpi"
+        self.add_package_spec(
+            self.name, [f"remhos{self.determine_version()} +metis {gam}"]
+        )
