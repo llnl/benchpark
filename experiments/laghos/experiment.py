@@ -29,8 +29,8 @@ class Laghos(
 
     variant(
         "order",
-        default="linear",
-        values=("linear", "quadratic", "cubic"),
+        default="default",
+        values=("default", "linear", "quadratic", "cubic"),
         description="solution order",
     )
 
@@ -57,7 +57,7 @@ class Laghos(
         self.add_experiment_variable("tf", 0.0033, True)
         self.add_experiment_variable("zones", 1024, True)
 
-        self.add_experiment_variable("pool", 4, False)
+        self.add_experiment_variable("pool", 16, False)
 
         if self.spec.satisfies("order=linear"):
             self.add_experiment_variable("order", "linear", True)
@@ -74,6 +74,11 @@ class Laghos(
             self.add_experiment_variable("ok", 3, False)
             self.add_experiment_variable("ot", 2, False)
             self.add_experiment_variable("oq", 4, False)
+        else:
+            self.add_experiment_variable("order", "default", True)
+            self.add_experiment_variable("ok", 2, False)
+            self.add_experiment_variable("ot", 1, False)
+            self.add_experiment_variable("oq", -1, False)
 
         # resource_count is the number of resources used for this experiment:
         self.add_experiment_variable("resource_count", 1, False)

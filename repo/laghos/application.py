@@ -27,6 +27,7 @@ class Laghos(ExecutableApplication):
                        ' -ms {ms}' +
                        ' -ok {ok} -ot {ot} -oq {oq}' +
                        ' --fom {gam}' +
+                       ' --dev-pool-size {pool}' +
                        ' -d {device}' +
                        ' {assembly}' +
                        ' -tf {tf}', use_mpi=True)
@@ -76,6 +77,10 @@ class Laghos(ExecutableApplication):
     workload_variable('oq', default='2',
             description='Order  of the integration rule',
             workloads=['triplept'])
+
+    workload_variable('pool', default='4',
+        description='Device pool size',
+        workloads=['triplept'])
 
     workload_variable('device', default='cpu',
         description='cpu, cuda or hip',
