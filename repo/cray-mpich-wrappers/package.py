@@ -10,6 +10,7 @@ import stat
 from spack_repo.builtin.packages.mpich.package import MpichEnvironmentModifications
 from spack.package import LinkTree
 
+
 class CrayMpichWrappers(MpichEnvironmentModifications, BundlePackage):
 
     version("1.0.0")
@@ -28,7 +29,9 @@ class CrayMpichWrappers(MpichEnvironmentModifications, BundlePackage):
         self.setup_mpi_wrapper_variables(env)
 
     def setup_dependent_package(self, module, dependent_spec):
-        MpichEnvironmentModifications.setup_dependent_package(self, module, dependent_spec)
+        MpichEnvironmentModifications.setup_dependent_package(
+            self, module, dependent_spec
+        )
 
     def install(self, spec, prefix):
         dep = spec["cray-mpich"]
@@ -43,10 +46,12 @@ class CrayMpichWrappers(MpichEnvironmentModifications, BundlePackage):
             if target in ["mpicc", "mpicxx", "mpif90", "mpif77"]:
                 fpath = os.path.join(self.prefix.bin, target)
                 with open(fpath, "w") as f:
-                    f.write(f"""\
+                    f.write(
+                        f"""\
 #!/bin/bash
 
 {dep.prefix.bin}/{target} -lmpi_gtl_hsa "$@"
-""")
+"""
+                    )
                 st = os.stat(fpath)
                 os.chmod(fpath, st.st_mode | stat.S_IEXEC)
