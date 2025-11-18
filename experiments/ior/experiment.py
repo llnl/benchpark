@@ -12,7 +12,8 @@ from benchpark.scaling import Scaling, ScalingMode
 class Ior(Experiment, MpiOnlyExperiment, Scaling(ScalingMode.Strong, ScalingMode.Weak)):
     variant(
         "workload",
-        default="ior",
+        default="mpiio-write",
+        values=("mpiio-write", "mpiio-read", "posix-write", "posix-read"),
         description="base IOR  or other problem",
     )
 
@@ -23,9 +24,21 @@ class Ior(Experiment, MpiOnlyExperiment, Scaling(ScalingMode.Strong, ScalingMode
         description="app version",
     )
 
+    variant(
+        "test_file_mode",
+        default="fpp",
+        values=("fpp", "ssf"),
+        description="File per-process (fpp) or single shared file (ssf)",
+    )
+
     maintainers("hariharan-devarajan")
 
     def compute_applications_section(self):
+
+        test_file_mode = ""
+        if self.spec.variants["test_file_mode"][0] == "fpp":
+            test_file_mode = "-F"
+        self.add_experiment_variable("test_file_mode", test_file_mode, False)
 
         if self.spec.satisfies("exec_mode=test"):
             nodes = 1
@@ -41,15 +54,14 @@ class Ior(Experiment, MpiOnlyExperiment, Scaling(ScalingMode.Strong, ScalingMode
         self.add_experiment_variable("t", t, True)
         self.add_experiment_variable("b", t * bt_factor, True)
 
-        mount_point = self.system_spec.system.spec.variants["mount_point"][0]
+        full_path = self.system_spec.system.full_io_path
+        sys_name = self.system_spec._name
         # Check mount point provided
-        if mount_point == "none":
-            sys_name = self.system_spec._name
+        if not full_path:
             raise ValueError(
                 f'Must set "mount_point" variant (e.g. "benchpark system init {sys_name} mount_point=...") on the system used in this experiment. Run "benchpark info system {sys_name}" for valid values.'
             )
-        else:
-            self.add_experiment_variable("o", mount_point + "/$USER/test.bat")
+        self.add_experiment_variable("o", full_path)
 
         self.register_scaling_config(
             {
