@@ -21,6 +21,9 @@ class CrayMpichWrappers(MpichEnvironmentModifications, BundlePackage):
     def libs(self):
         return self.spec["cray-mpich"].libs
 
+    def setup_dependent_run_environment(self, env, dependent_spec):
+        env.set("MPICH_GPU_SUPPORT_ENABLED", "1")
+
     def setup_run_environment(self, env: EnvironmentModifications) -> None:
         self.setup_mpi_wrapper_variables(env)
 
