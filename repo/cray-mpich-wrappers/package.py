@@ -3,12 +3,13 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from spack.package import *
-import os.path
 import os
+import os.path
 import stat
-from spack_repo.builtin.packages.mpich.package import MpichEnvironmentModifications
+
+from spack.package import *
 from spack.package import LinkTree
+from spack_repo.builtin.packages.mpich.package import MpichEnvironmentModifications
 
 
 class CrayMpichWrappers(MpichEnvironmentModifications, BundlePackage):
