@@ -23,8 +23,14 @@ class CrayMpichGtl(MpichEnvironmentModifications, BundlePackage):
     def libs(self):
         return self.spec["cray-mpich"].libs
 
-    def setup_dependent_run_environment(self, env, dependent_spec):
-        env.set("MPICH_GPU_SUPPORT_ENABLED", "1")
+    def setup_dependent_build_environment(self, env, dependent_spec):
+        if dependent_spec.satisfies("+rocm"):
+            env.set("SPACK_GTL", "hip")
+        elif dependent_spec.satisfies("+cuda"):
+            env.set("SPACK_GTL", "cuda")
+
+    # def setup_dependent_run_environment(self, env, dependent_spec):
+    #    env.set("MPICH_GPU_SUPPORT_ENABLED", "1")
 
     def setup_run_environment(self, env: EnvironmentModifications) -> None:
         self.setup_mpi_wrapper_variables(env)
@@ -51,7 +57,15 @@ class CrayMpichGtl(MpichEnvironmentModifications, BundlePackage):
                         f"""\
 #!/bin/bash
 
-{dep.prefix.bin}/{target} -lmpi_gtl_hsa "$@"
+if [[ "$SPACK_GTL" == "hip" ]]; then
+    addlibs="-lmpi_gtl_hsa"
+elif [[ "$SPACK_GTL" == "cuda" ]]; then
+    addlibs="-lmpi_gtl_cuda"
+else
+    addlibs=""
+fi
+
+{dep.prefix.bin}/{target} "$addlibs" "$@"
 """
                     )
                 st = os.stat(fpath)
