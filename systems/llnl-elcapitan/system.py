@@ -321,7 +321,7 @@ class LlnlElcapitan(System):
                     "buildable": False,
                     "require": "intel-oneapi-mkl",
                 },
-                "mpi": {"require": "cray-mpich-wrappers"},
+                "mpi": {"require": "cray-mpich-gtl"},
                 "libfabric": {
                     "externals": [
                         {"spec": "libfabric@2.1", "prefix": "/opt/cray/libfabric/2.1"}

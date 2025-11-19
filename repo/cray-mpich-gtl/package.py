@@ -12,7 +12,7 @@ from spack.package import LinkTree
 from spack_repo.builtin.packages.mpich.package import MpichEnvironmentModifications
 
 
-class CrayMpichWrappers(MpichEnvironmentModifications, BundlePackage):
+class CrayMpichGtl(MpichEnvironmentModifications, BundlePackage):
 
     version("1.0.0")
 
