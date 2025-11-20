@@ -13,14 +13,14 @@ programming model. Finally, set up the workspace in a directory for your experim
 
 ::
 
-    benchpark system init --dest=</output/path/to/system_def_dir> <SystemName> compiler=<Compiler>
-    benchpark experiment init --dest=</output/path/to/experiment_def_dir> <Benchmark> +/~<Boolean Variant> <String Variant>=<value> --system=</output/path/to/system_def_dir>
-    benchpark setup </output/path/to/experiment_def> </output/path/to/workspace>
+    benchpark system init --dest=</output/path/to/system_def_dir/mySystemName> <SystemName> compiler=<Compiler>
+    benchpark experiment init <mySystemName> <Benchmark> +/~<Boolean Variant> <String Variant>=<value> 
+    benchpark setup <Benchmark> </output/path/to/workspace>
 
 where:
 
 - ``<Benchmark>``: amg2023 | saxpy | etc. (specified choices in :doc:`benchmark-list`)
-- ``<System>``: Cts | Tioga | etc. (specified systems in :doc:`system-list`)
+- ``<SystemName>``: Cts | Tioga | etc. (specified systems in :doc:`system-list`)
 
 This command will assemble a Ramble workspace per experiment with a configuration for
 the specified benchmark and system with the following directory structure:
@@ -30,8 +30,8 @@ the specified benchmark and system with the following directory structure:
     experiments_root/
         ramble/
         spack/
-        <Benchmark/ProgrammingModel>/
-            <System>/
+        <System>/
+            <Benchmark/ProgrammingModel>/
                 workspace/
                     configs/
                         (everything from system_def_dir)
