@@ -16,6 +16,7 @@ class CrayMpich(BuiltinCM):
         libs = super().libs
 
         if self.spec.satisfies("+gtl"):
+            ld_flags = self.spec.extra_attributes["ldflags"]
             gtl_lib_prefix = self.spec.extra_attributes["gtl_lib_path"]
             # gtl_libs, if set, must be a single string. You can pass multiple
             # libs by adding a space between each

@@ -80,3 +80,18 @@ What to rerun after edits
       - delete ``workspace/experiments``
     - - wish to rerun experiments
       - delete ``workspace/experiments``
+
+How to move the Benchpark bootstrap location from the home directory
+--------------------------------------------------------------------
+
+Remove your current bootstrap in home (``~``) and then use: ``benchpark configure`` to
+set your preferred location.
+
+::
+
+    rm -rf ~/.benchpark
+    benchpark configure --bootstrap-location /my/path
+    benchpark bootstrap
+
+benchpark will save this location, and you can optionally set a new bootstrap location
+for each clone of benchpark, or reuse the same location.
