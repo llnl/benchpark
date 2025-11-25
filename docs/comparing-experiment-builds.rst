@@ -32,9 +32,9 @@ will be the same, we only need to generate a single experiment description. This
 initializes a quicksilver experiment configuration in the ``quicksilver`` directory. We
 are doing weak scaling with openMP, and measuring MPI metrics with Caliper.
 
-``benchpark experiment init --dest=quicksilver-gcc ruby-gcc quicksilver
-caliper=mpi +weak +openmp`` ``benchpark experiment init --dest=quicksilver-intel
-ruby-intel quicksilver caliper=mpi +weak +openmp``
+``benchpark experiment init --dest=quicksilver-gcc ruby-gcc quicksilver caliper=mpi
++weak +openmp`` ``benchpark experiment init --dest=quicksilver-intel ruby-intel
+quicksilver caliper=mpi +weak +openmp``
 
 .. note::
 

@@ -30,8 +30,8 @@ To use the Affinity modifier:
 - When you initialize your experiment, add ``affinity=on`` to ``experiment init``.
 - A small, separate run will execute in your allocation to record the information.
 - The Affinity modifier will output a text file in the experiment directory which will
-  look like this for ``benchpark experiment init --dest=saxpy system-name
-  saxpy+openmp affinity=on`` on 8 ranks, 2 threads/proc, 1 node:
+  look like this for ``benchpark experiment init --dest=saxpy system-name saxpy+openmp
+  affinity=on`` on 8 ranks, 2 threads/proc, 1 node:
 
 .. code-block:: console
 
