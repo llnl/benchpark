@@ -14,7 +14,7 @@ programming model. Finally, set up the workspace in a directory for your experim
 ::
 
     benchpark system init --dest=</output/path/to/system_def_dir/mySystemName> <SystemName> compiler=<Compiler>
-    benchpark experiment init <mySystemName> <Benchmark> +/~<Boolean Variant> <String Variant>=<value> 
+    benchpark experiment init <mySystemName> <Benchmark> +/~<Boolean Variant> <String Variant>=<value>
     benchpark setup <Benchmark> </output/path/to/workspace>
 
 where:

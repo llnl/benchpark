@@ -27,7 +27,7 @@ Set up a Workspace
 ::
 
     benchpark system init --dest=</output/path/to/system_def_dir/mySystemName> <SystemName> compiler=<Compiler>
-    benchpark experiment init <mySystemName> <Benchmark> +/~<Boolean Variant> <String Variant>=<value> 
+    benchpark experiment init <mySystemName> <Benchmark> +/~<Boolean Variant> <String Variant>=<value>
     benchpark setup <mySystemName>/<Benchmark> </output/path/to/workspace>
 
 where:
