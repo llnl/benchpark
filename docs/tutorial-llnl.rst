@@ -56,13 +56,13 @@ for experiments:
 
 ::
 
-    benchpark experiment init --dest=amg2023-benchmark --system=ruby-system amg2023 +openmp
+    benchpark experiment init --dest=amg2023-benchmark ruby-system amg2023 +openmp
 
 Then setup the workspace directory for the system and experiment together:
 
 ::
 
-    benchpark setup ./amg2023-benchmark workspace/
+    benchpark setup ./ruby-system/amg2023-benchmark workspace/
 
 Benchpark will provide next steps to the console but they are also provided here. Run
 the setup script for dependency software, Ramble and Spack:
@@ -97,8 +97,8 @@ different due to the different variants defined for the system. For example, the
 ::
 
     benchpark system init --dest=tioga-system llnl-elcapitan cluster=tioga ~gtl
-    benchpark experiment init --dest=saxpy-benchmark --system=tioga-system saxpy +rocm
-    benchpark setup ./saxpy-benchmark workspace/
+    benchpark experiment init --dest=saxpy-benchmark tioga-system saxpy +rocm
+    benchpark setup ./tioga-system/saxpy-benchmark workspace/
     . workspace/setup.sh
     cd ./workspace/saxpy-benchmark/Tioga-975af3c/workspace/
     ramble --workspace-dir . workspace setup

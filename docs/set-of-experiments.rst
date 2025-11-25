@@ -21,9 +21,9 @@ benchpark to set them up in the same experiments_root:
 
 ::
 
-    benchpark setup ${Benchmark1}/${ProgrammingModel1} /output/path/to/experiments_root
-    benchpark setup ${Benchmark1}/${ProgrammingModel2} /output/path/to/experiments_root
-    benchpark setup ${Benchmark2}/${ProgrammingModel2} /output/path/to/experiments_root
+    benchpark setup ${System1}/${Benchmark1}/${ProgrammingModel1} /output/path/to/experiments_root
+    benchpark setup ${System1}/${Benchmark1}/${ProgrammingModel2} /output/path/to/experiments_root
+    benchpark setup ${System1}/${Benchmark2}/${ProgrammingModel2} /output/path/to/experiments_root
 
 This will result in the following directory structure:
 

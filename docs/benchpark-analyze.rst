@@ -81,8 +81,8 @@ study of Kripke:
 .. code-block:: console
 
     $ benchpark system init --dest=lassen llnl-sierra
-    $ benchpark experiment init --dest=kripke/cuda/strong --system=lassen kripke+cuda+strong caliper=time,mpi
-    $ benchpark setup kripke/cuda/strong wkp
+    $ benchpark experiment init --dest=kripke/cuda/strong lassen kripke+cuda+strong caliper=time,mpi
+    $ benchpark setup lassen/kripke/cuda/strong wkp
     // Follow instructions for running Ramble ...
 
 Run ``benchpark analyze``:
@@ -113,8 +113,8 @@ To generate the weak scaling dataset:
 
 .. code-block:: console
 
-    $ benchpark experiment init --dest=kripke/cuda/weak --system=lassen kripke+cuda+weak caliper=time,mpi
-    $ benchpark setup kripke/cuda/weak wkp
+    $ benchpark experiment init --dest=kripke/cuda/weak lassen kripke+cuda+weak caliper=time,mpi
+    $ benchpark setup lassen/kripke/cuda/weak wkp
     // Follow instructions for running Ramble ...
 
 Run ``benchpark analyze``:
@@ -134,8 +134,8 @@ To generate the throughput dataset:
 
 .. code-block:: console
 
-    $ benchpark experiment init --dest=kripke/cuda/throughput --system=lassen kripke+cuda+throughput caliper=time,mpi
-    $ benchpark setup kripke/cuda/throughput wkp
+    $ benchpark experiment init --dest=kripke/cuda/throughput lassen kripke+cuda+throughput caliper=time,mpi
+    $ benchpark setup lassen/kripke/cuda/throughput wkp
     // Follow instructions for running Ramble ...
 
 Run ``benchpark analyze``:

@@ -30,7 +30,7 @@ To use the Affinity modifier:
 - When you initialize your experiment, add ``affinity=on`` to ``experiment init``.
 - A small, separate run will execute in your allocation to record the information.
 - The Affinity modifier will output a text file in the experiment directory which will
-  look like this for ``benchpark experiment init --dest=saxpy --system=system-name
+  look like this for ``benchpark experiment init --dest=saxpy system-name
   saxpy+openmp affinity=on`` on 8 ranks, 2 threads/proc, 1 node:
 
 .. code-block:: console
@@ -78,7 +78,7 @@ init setup step:
 
 ::
 
-    benchpark experiment init --dest=</path/to/experiment_root> --system=</path/to/system> <benchmark> caliper=<caliper_variant>
+    benchpark experiment init --dest=</path/to/experiment_root> </path/to/system> <benchmark> caliper=<caliper_variant>
 
 Valid values for ``<caliper_variant>`` are found in the **Caliper Variant** column of
 the table below. Benchpark will link the experiment to Caliper, and inject appropriate
@@ -218,7 +218,7 @@ modifier is disabled by default (``hwloc=none``).:
 
 ::
 
-    benchpark experiment init --dest=</path/to/experiment_root> --system=</path/to/system> <benchmark> caliper=<caliper_variant> hwloc=on
+    benchpark experiment init --dest=</path/to/experiment_root> </path/to/system> <benchmark> caliper=<caliper_variant> hwloc=on
 
 The hwloc modifier will output the hardware information in a flattened JSON file in the
 experiment directory.

@@ -32,9 +32,9 @@ will be the same, we only need to generate a single experiment description. This
 initializes a quicksilver experiment configuration in the ``quicksilver`` directory. We
 are doing weak scaling with openMP, and measuring MPI metrics with Caliper.
 
-``benchpark experiment init --dest=quicksilver-gcc --system=ruby-gcc quicksilver
+``benchpark experiment init --dest=quicksilver-gcc ruby-gcc quicksilver
 caliper=mpi +weak +openmp`` ``benchpark experiment init --dest=quicksilver-intel
---system=ruby-intel quicksilver caliper=mpi +weak +openmp``
+ruby-intel quicksilver caliper=mpi +weak +openmp``
 
 .. note::
 
@@ -51,8 +51,8 @@ execute_experiment shell script
 
 .. code-block:: console
 
-    $ benchpark setup quicksilver-gcc workspace
-    $ benchpark setup quicksilver-intel workspace
+    $ benchpark setup ruby-gcc/quicksilver-gcc workspace
+    $ benchpark setup ruby-intel/quicksilver-intel workspace
 
 Now, we generate an execute_experiment shell script for each run, and install the
 benchmark along with all dependencies

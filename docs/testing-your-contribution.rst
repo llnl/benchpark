@@ -79,7 +79,7 @@ variables you defined in your ``experiment.py`` will be used by Ramble during th
 
 ::
 
-    benchpark experiment init --dest=my-experiment --system=my-system my-experiment
+    benchpark experiment init --dest=my-experiment my-system my-experiment
 
 3. Setup Benchpark Workspace:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -89,7 +89,7 @@ complete as long as you have completed the prior steps.
 
 ::
 
-    benchpark setup ./my-experiment workspace/
+    benchpark setup ./my-system/my-experiment workspace/
 
 4. ``application.py``/ ``package.py`` - Test Application and Package:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
