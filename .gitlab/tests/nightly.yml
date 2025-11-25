@@ -92,8 +92,13 @@ include:
           - raja-perf
           - remhos
           - saxpy
-          - sparta-snl
         VARIANT: [+cuda]
+      - HOST: matrix
+        ARCHCONFIG: llnl-matrix
+        SCHEDULER_PARAMETERS: $MATRIX_PARAMS
+        BENCHMARK:
+          - sparta-snl
+        VARIANT: ['+cuda~gpu-aware-mpi']
       #############
       # Other tests
       #############
