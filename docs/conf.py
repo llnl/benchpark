@@ -57,5 +57,6 @@ html_css_files = [
     ("css/custom.css", {"priority": 999}),
 ]
 html_logo = "_static/images/benchpark-dark.svg"
+html_theme = "furo"
 html_theme_options = {"logo_only": True}
 pygments_style = "sphinx"
