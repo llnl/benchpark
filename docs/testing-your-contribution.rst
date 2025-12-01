@@ -4,11 +4,13 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Testing Your Contribution
-=========================
+###########################
+ Testing Your Contribution
+###########################
 
-Through GitHub CI
------------------
+*******************
+ Through GitHub CI
+*******************
 
 .. figure:: _static/images/dryruns.png
     :alt: Slide Preview
@@ -44,8 +46,9 @@ Dry run tests **do not** build your benchmark or run your experiments, they do:
 If all of the ``dryrunexperiments`` tests pass, your experiment/system has been
 successfully tested.
 
-Manually Testing
-----------------
+******************
+ Manually Testing
+******************
 
 You can manually test a system, experiment, or application using the following steps
 (use an existing system/experiment/application to test against):
@@ -59,7 +62,7 @@ You can manually test a system, experiment, or application using the following s
     <https://ramble.readthedocs.io/en/latest/dev_guides/application_dev_guide.html#usage-while-developing>`_).
 
 1. ``system.py`` - Test System Initialization:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+==============================================
 
 This step will test the ``system.py`` you have created by attempting to create system
 configuration files from your system definition.
@@ -69,7 +72,7 @@ configuration files from your system definition.
     benchpark system init --dest=my-system my-system
 
 2. ``experiment.py`` - Test Experiment Initialization:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+======================================================
 
 This step requires an existing system and will test the ``experiment.py`` you have
 created by attempting to create an experiment configuration file ``ramble.yaml`` from
@@ -82,7 +85,7 @@ variables you defined in your ``experiment.py`` will be used by Ramble during th
     benchpark experiment init --dest=my-experiment --system=my-system my-experiment
 
 3. Setup Benchpark Workspace:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=============================
 
 The benchpark setup step does not directly test any of the components, and should
 complete as long as you have completed the prior steps.
@@ -92,7 +95,7 @@ complete as long as you have completed the prior steps.
     benchpark setup ./my-experiment workspace/
 
 4. ``application.py``/ ``package.py`` - Test Application and Package:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=====================================================================
 
 Setting up a Ramble workspace will test your ``application.py`` and if successful, will
 attempt to build your application using \*Spack. We recommend first testing your
@@ -108,7 +111,7 @@ that you did not define in your experiment.
     ramble --workspace-dir workspace/my-experiment/my-system/workspace workspace setup
 
 5. Test Your Benchmark
-~~~~~~~~~~~~~~~~~~~~~~
+======================
 
 If built successfully, the ``ramble on`` command will submit your experiments (job
 scripts that ramble has generated) to the scheduler. Runtime errors at this point are

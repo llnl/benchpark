@@ -4,8 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Benchpark Modifiers
-===================
+#####################
+ Benchpark Modifiers
+#####################
 
 In Benchpark, a ``modifier`` follows the `Ramble Modifier
 <https://ramble.readthedocs.io/en/latest/tutorials/10_using_modifiers.html>`_ and is an
@@ -14,8 +15,9 @@ Modifiers are intended to encapsulate reusable patterns that perform a specific
 configuration of an experiment. This may include injecting performance analysis or
 setting up system resources.
 
-Affinity: Threads, GPUs
------------------------
+*************************
+ Affinity: Threads, GPUs
+*************************
 
 We are using (with permission) the following implementation of `Linux thread and GPU
 affinity checks <https://github.com/bcumming/affinity>`_. The following checks are
@@ -66,8 +68,9 @@ To use the Affinity modifier:
 If also running with the ``caliper`` modifier, ``affinity`` information will be included
 in the Caliper metadata.
 
-Caliper: Profiling
-------------------
+********************
+ Caliper: Profiling
+********************
 
 `Caliper <https://github.com/LLNL/Caliper/>`_ is an instrumentation and performance
 profiling library. We have implemented a Caliper modifier to enable profiling of
@@ -130,8 +133,9 @@ experiment, it is as simple as adding it to the class definition signature. For 
 
     class Amg2023(Experiment, Caliper):
 
-Allocation: Resources
----------------------
+***********************
+ Allocation: Resources
+***********************
 
 Given:
 
@@ -205,8 +209,9 @@ If you do not specify values, it will assign the default values as listed below.
     - - n_threads_per_proc
       - 1
 
-Hwloc: Hardware Map
--------------------
+*********************
+ Hwloc: Hardware Map
+*********************
 
 The hwloc modifier enables using `hwloc <https://github.com/open-mpi/hwloc>`_ in
 Benchpark to record the hierarchical map of key computing elements on the given system,
