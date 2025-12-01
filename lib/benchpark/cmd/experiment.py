@@ -38,7 +38,7 @@ def experiment_init(args):
     try:
         os.makedirs(destdir)
         experiment.write_ramble_dict(f"{destdir}/ramble.yaml")
-        print(f"Run `benchpark setup {destdir} ...` to generate Ramble workspace")
+        print(f"Run `benchpark setup {destdir} <experiments_root>` to generate Ramble workspace")
     except FileExistsError:
         print(f"Abort: experiment description dir already exists ({destdir})")
         sys.exit(1)
