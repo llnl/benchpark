@@ -130,6 +130,5 @@ run_tests_slurm_matrix:
         VARIANT: [+cuda]
       - HOST: matrix
         ARCHCONFIG: llnl-matrix
-        BENCHMARK:
-          - sparta-snl
-        VARIANT: ['+cuda~gpu-aware-mpi']
+        BENCHMARK: [sparta-snl]
+        VARIANT: [+cuda~gpu-aware-mpi]
