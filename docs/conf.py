@@ -32,7 +32,6 @@ author = "Olga Pearce, Alec Scott, Peter Scheibel, Greg Becker, Riyaz Haque, and
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    "sphinx_rtd_theme",
     "sphinxcontrib.programoutput",
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
@@ -58,6 +57,5 @@ html_css_files = [
     ("css/custom.css", {"priority": 999}),
 ]
 html_logo = "_static/images/benchpark-dark.svg"
-html_theme = "sphinx_rtd_theme"
 html_theme_options = {"logo_only": True}
 pygments_style = "sphinx"
