@@ -5,4 +5,4 @@
 versions:
   ramble: 6b4ecac  # develop on 5/06/2025 (newer than 0.6.0 release)
   spack: 0c2be44  # Nov. 14 2025 v1.1.0
-  spack-packages: 559789f # Last commit Nov. 14 2025
+  spack-packages: 559789f  # Last commit Nov. 14 2025
