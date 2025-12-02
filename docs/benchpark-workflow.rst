@@ -4,16 +4,18 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Benchpark Workflow
-==================
+####################
+ Benchpark Workflow
+####################
 
 Follow the workflow diagram to determine if you can run existing configurations or if
 you will need to add or edit any Benchpark files.
 
 .. image:: /_static/images/workflow_fig.png
 
-A. Run Existing Systems, Benchmarks and Experiments
----------------------------------------------------
+*****************************************************
+ A. Run Existing Systems, Benchmarks and Experiments
+*****************************************************
 
 If you are running on an existing ``system``, and the ``benchmark`` and ``experiment``
 are already configured, you can proceed directly to the Running Benchpark Steps,
@@ -21,8 +23,9 @@ starting with :doc:`benchpark-setup` for:
 
 - Setup / Run / Analyze
 
-B. System Specification
------------------------
+*************************
+ B. System Specification
+*************************
 
 A system specification defines the hardware, scheduling system, compilers, and any
 external libraries that might exist on a system.
@@ -33,8 +36,9 @@ to :doc:`add-a-system-config` for the following:
 - Find a similar ``system``
 - Add or edit a ``system``
 
-C. Benchmark Specification
---------------------------
+****************************
+ C. Benchmark Specification
+****************************
 
 A benchmark specification defines the application build and run behavior, utilizing
 spack for build and dependency management.
@@ -44,8 +48,9 @@ to :doc:`add-a-benchmark` for the following:
 
 - Add a ``benchmark``
 
-D. Experiment Specification
----------------------------
+*****************************
+ D. Experiment Specification
+*****************************
 
 An experiment specification defines application parameters for experiments that require
 one or more application runs, such as single-node, scaling, or throughput runs.

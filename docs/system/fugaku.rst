@@ -4,8 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Running benchpark on Fugaku
-===========================
+#############################
+ Running benchpark on Fugaku
+#############################
 
 Git is needed to clone Benchpark, and Python 3.8+ is needed to run Benchpark:
 

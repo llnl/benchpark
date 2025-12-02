@@ -4,8 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Benchpark Lists
-===============
+#################
+ Benchpark Lists
+#################
 
 The easiest way to get started with Benchpark is to run already specified experiments on
 already specified systems, or to modify one that is similar. You can search through the
