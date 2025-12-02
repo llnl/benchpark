@@ -60,7 +60,7 @@ class SpartaSnl(
     def compute_applications_section(self):
         if self.spec.satisfies("exec_mode=test"):
             L = 1
-            ppc = 47
+            ppc = 16
             stats = 10
             run = 100
             xmin = -1.0
