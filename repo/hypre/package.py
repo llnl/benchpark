@@ -6,8 +6,8 @@
 import os
 
 from spack.package import *
-from spack_repo.builtin.packages.hypre.package import Hypre as BuiltinHypre
 from spack_repo.builtin.packages.hypre.package import CMakeBuilder as HypreCMakeBuilder
+from spack_repo.builtin.packages.hypre.package import Hypre as BuiltinHypre
 
 
 class Hypre(BuiltinHypre):
