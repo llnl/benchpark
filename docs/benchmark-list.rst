@@ -4,8 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Benchmarks and Experiments
-==========================
+############################
+ Benchmarks and Experiments
+############################
 
 .. csv-table:: Current Benchpark tags by Benchmark and tag groups.
     :file: benchmark-list.csv
