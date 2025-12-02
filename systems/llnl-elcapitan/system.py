@@ -339,11 +339,11 @@ class LlnlElcapitan(System):
                 "texinfo": {"externals": [{"spec": "texinfo@6.5", "prefix": "/usr"}]},
                 "bison": {"externals": [{"spec": "bison@3.0.4", "prefix": "/usr"}]},
                 "python": {
+                    "buildable": False,
                     "externals": [
                         {
                             "spec": "python@3.9.12",
                             "prefix": "/usr/tce/packages/python/python-3.9.12",
-                            "buildable": False,
                         }
                     ]
                 },
@@ -353,8 +353,9 @@ class LlnlElcapitan(System):
                 },
                 "hypre": {"variants": f"amdgpu_target={self.rocm_arch}"},
                 "hwloc": {
+                    "buildable": False,
                     "externals": [
-                        {"spec": "hwloc@2.9.1", "prefix": "/usr", "buildable": False}
+                        {"spec": "hwloc@2.9.1", "prefix": "/usr"}
                     ]
                 },
                 "fftw": {"buildable": False},

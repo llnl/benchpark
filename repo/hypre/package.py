@@ -7,6 +7,7 @@ import os
 
 from spack.package import *
 from spack_repo.builtin.packages.hypre.package import Hypre as BuiltinHypre
+from spack_repo.builtin.packages.hypre.package import CMakeBuilder as HypreCMakeBuilder
 
 
 class Hypre(BuiltinHypre):
@@ -52,3 +53,6 @@ class Hypre(BuiltinHypre):
             env.append_flags("LDFLAGS", f"-L{spec['lapack'].prefix}/lib -l{libsci_name}")
         if "+cuda" in self.spec:
             env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
+
+class CMakeBuilder(HypreCMakeBuilder):
+    pass
