@@ -4,8 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Compare Experiment Builds
-=========================
+###########################
+ Compare Experiment Builds
+###########################
 
 ``lib/scripts/diffExperimentBuilds.py``
 
@@ -25,8 +26,9 @@ Stages that occur during this script:
 
     This script *must* be ran on the target system and cluster to work correctly.
 
-Example: amg2023~mpi
---------------------
+**********************
+ Example: amg2023~mpi
+**********************
 
 For example, we can compare the builds for different benchpark branches of ``amg2023``
 on the ``ruby`` cluster. ``myBranch`` is a branch of benchpark where we have configured
