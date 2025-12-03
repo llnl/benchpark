@@ -134,7 +134,7 @@ class Caliper(CachedCMakePackage, CudaPackage, ROCmPackage):
     depends_on("python", type="build")
 
     depends_on("python@3", when="+python", type=("build", "link", "run"))
-    depends_on("adiak@master+python", when="+python", type=("build", "link", "run"))
+    depends_on("adiak+python", when="+python", type=("build", "link", "run"))
     depends_on("py-pybind11@3.0.0:", when="+python", type=("build", "link", "run"))
 
     # sosflow support not yet in 2.0
