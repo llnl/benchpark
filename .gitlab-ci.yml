@@ -84,6 +84,7 @@ stages:
 bootstrap_benchpark:
   tags: [shell, oslic]
   extends: .on_host_template
+  stage: bootstrap-benchpark
   script:
     - pwd
     - ls

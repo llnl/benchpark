@@ -14,29 +14,21 @@
         exit 1
       fi
 tioga-up-check:
-  needs:
-    - bootstrap_benchpark
   stage: machine-checks
   variables:
     CI_MACHINE: tioga
   extends: [.machine-check]
 tuolumne-up-check:
-  needs:
-    - bootstrap_benchpark
   stage: machine-checks
   variables:
     CI_MACHINE: tuolumne
   extends: [.machine-check]
 dane-up-check:
-  needs:
-    - bootstrap_benchpark
   stage: machine-checks
   variables:
     CI_MACHINE: dane
   extends: [.machine-check]
 matrix-up-check:
-  needs:
-    - bootstrap_benchpark
   stage: machine-checks
   variables:
     CI_MACHINE: matrix
