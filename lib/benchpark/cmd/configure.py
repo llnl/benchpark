@@ -5,6 +5,7 @@
 
 from pathlib import Path
 
+import os
 import yaml
 
 import benchpark.paths
@@ -23,10 +24,8 @@ def command(args):
     data = {}
 
     if args.bootstrap_location:
-        bl = (
-            str(Path(args.bootstrap_location).expanduser().resolve()).rstrip("/")
-            + "/.benchpark/"
-        )
+        loc = os.path.expandvars(os.path.expanduser(args.bootstrap_location))
+        bl = str(Path(loc).resolve()).rstrip("/") + "/.benchpark/"
         data["bootstrap"] = {
             "location": bl,
         }
