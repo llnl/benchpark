@@ -1,6 +1,7 @@
-import spack.environment as ev
 import json
 import sys
+
+import spack.environment as ev
 
 
 def main():

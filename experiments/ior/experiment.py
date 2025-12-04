@@ -3,16 +3,17 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainers
+from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
 from benchpark.mpi import MpiOnlyExperiment
-from benchpark.scaling import ScalingMode, Scaling
+from benchpark.scaling import Scaling, ScalingMode
 
 
 class Ior(Experiment, MpiOnlyExperiment, Scaling(ScalingMode.Strong, ScalingMode.Weak)):
     variant(
         "workload",
-        default="ior",
+        default="mpiio-write",
+        values=("mpiio-write", "mpiio-read", "posix-write", "posix-read"),
         description="base IOR  or other problem",
     )
 
@@ -23,32 +24,54 @@ class Ior(Experiment, MpiOnlyExperiment, Scaling(ScalingMode.Strong, ScalingMode
         description="app version",
     )
 
+    variant(
+        "test_file_mode",
+        default="fpp",
+        values=("fpp", "ssf"),
+        description="File per-process (fpp) or single shared file (ssf)",
+    )
+
     maintainers("hariharan-devarajan")
 
     def compute_applications_section(self):
-        num_nodes = {"n_nodes": 1}
-        t = "{b}/256"
-        self.add_experiment_variable("t", t, True)
+
+        test_file_mode = ""
+        if self.spec.variants["test_file_mode"][0] == "fpp":
+            test_file_mode = "-F"
+        self.add_experiment_variable("test_file_mode", test_file_mode, False)
 
         if self.spec.satisfies("exec_mode=test"):
-            for pk, pv in num_nodes.items():
-                self.add_experiment_variable(pk, pv, True)
-            self.add_experiment_variable("b", "268435456", True)
+            nodes = 1
+            bt_factor = 8  # blocksize = transfersize * bt_factor
+            t = 524288
+        elif self.spec.satisfies("exec_mode=perf"):
+            nodes = 32
+            bt_factor = 128  # blocksize = transfersize * bt_factor
+            t = 67108864
 
+        self.add_experiment_variable("n_nodes", nodes, True)
+        self.add_experiment_variable("n_ranks", "4 * {n_nodes}", True)
         self.add_experiment_variable("t", t, True)
-        self.add_experiment_variable(
-            "n_ranks", "{sys_cores_per_node} * {n_nodes}", True
-        )
+        self.add_experiment_variable("b", t * bt_factor, True)
+
+        full_path = self.system_spec.system.full_io_path
+        sys_name = self.system_spec._name
+        # Check mount point provided
+        if not full_path:
+            raise ValueError(
+                f'Must set "mount_point" variant (e.g. "benchpark system init {sys_name} mount_point=...") on the system used in this experiment. Run "benchpark info system {sys_name}" for valid values.'
+            )
+        self.add_experiment_variable("o", full_path)
 
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "n_ranks": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    "n_nodes": lambda var, itr, dim, scaling_factor: var.val(dim)
                     * scaling_factor,
                     "b": lambda var, itr, dim, scaling_factor: var.val(dim),
                 },
                 ScalingMode.Weak: {
-                    "n_ranks": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    "n_nodes": lambda var, itr, dim, scaling_factor: var.val(dim)
                     * scaling_factor,
                     "b": lambda var, itr, dim, scaling_factor: var.val(dim)
                     * scaling_factor,

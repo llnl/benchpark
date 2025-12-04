@@ -3,19 +3,20 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainers
+from packaging.version import Version
+
 from benchpark.cudasystem import CudaSystem
+from benchpark.directives import maintainers, variant
+from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.paths import hardware_descriptions
 from benchpark.system import (
-    System,
     JobQueue,
+    System,
     compiler_def,
     compiler_section_for,
-    merge_dicts,
     hybrid_compiler_requirements,
+    merge_dicts,
 )
-from benchpark.openmpsystem import OpenMPCPUOnlySystem
-from packaging.version import Version
 
 
 class LlnlSierra(System):
@@ -26,6 +27,7 @@ class LlnlSierra(System):
         "lassen": {
             "cuda_arch": 70,
             "sys_cores_per_node": 40,
+            "sys_sockets_per_node": 2,
             "sys_cores_os_reserved_per_node": 4,
             "sys_cores_os_reserved_per_node_list": [
                 0,

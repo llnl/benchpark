@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from benchpark.directives import maintainers
-from benchpark.system import System
 from benchpark.openmpsystem import OpenMPCPUOnlySystem
+from benchpark.system import System
 
 
 class GenericX86(System):

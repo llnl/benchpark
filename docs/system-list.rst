@@ -4,8 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-System Specifications
-=====================
+#######################
+ System Specifications
+#######################
 
 The table below provides a directory of information for systems that have been specified
 in Benchpark. The column headers in the table below are available for use as the

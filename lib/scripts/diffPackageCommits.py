@@ -1,9 +1,9 @@
 import argparse
 import difflib
+import itertools
 import os
 import subprocess
 import sys
-import itertools
 
 import benchpark.paths
 

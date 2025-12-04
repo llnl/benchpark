@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout Benchpark
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout Benchpark
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
@@ -97,7 +97,7 @@ jobs:
             workspace archive
       - name: Upload Workspace Archive as CI Artifact
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
         with:
           name: workspace-archive
           path: ./workspace/saxpy/openmp/generic-x86/workspace/archive/**
@@ -157,7 +157,7 @@ jobs:
           - modifiers
     steps:
       - name: Checkout Benchpark
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
@@ -177,20 +177,42 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout Benchpark
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
       - name: Run
         run: |-
           ./bin/benchpark unit-test
+  test_bootstrap:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Benchpark
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
+      - name: Add needed Python libs
+        run: |
+          pip install -r ./requirements.txt
+      - name: Run
+        run: |-
+          output=$(./bin/benchpark configure --bootstrap-location . && ./bin/benchpark bootstrap 2>&1)
+
+          # 1. Check the path is present
+          echo "$output" | grep -q "/home/runner/work/benchpark/benchpark/.benchpark/ramble" \
+            || { echo "Expected path not found"; exit 1; }
+
+          # 2. Check "Cloning Ramble" appears exactly once
+          count=$(echo "$output" | grep -c "Cloning Ramble")
+          if [[ "$count" -ne 1 ]]; then
+            echo "'Cloning Ramble' appeared $count times (expected 1)"
+            exit 1
+          fi
   validate_docs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
       - name: Setup Python
-        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c
+        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548
         with:
           python-version: '3.11'
           cache: pip

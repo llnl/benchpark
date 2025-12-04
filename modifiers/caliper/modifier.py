@@ -3,8 +3,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from ramble.modkit import *
 import json
+
+from ramble.modkit import *
 
 
 def add_mode(mode_name, mode_option, description):

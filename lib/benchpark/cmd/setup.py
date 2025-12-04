@@ -171,6 +171,8 @@ def command(args):
 
     pkg_str = ""
     if "spack" in pkg_manager:
+        spack_build_stage = experiments_root / "builds"
+        spack_user_cache_path = experiments_root / "spack-cache"
         spack, first_time_spack = per_workspace_setup.spack_first_time_setup()
         if first_time_spack:
             site_repos = (
@@ -184,11 +186,14 @@ repos::
   builtin: {per_workspace_setup.pkgs_location}/repos/spack_repo/builtin/
 """
                 )
+            spack(
+                f"config --scope=site add \"config:build_stage:['{spack_build_stage}']\""
+            )
 
         pkg_str = f"""\
-. {per_workspace_setup.spack_location}/share/spack/setup-env.sh
-
+export SPACK_USER_CACHE_PATH={spack_user_cache_path}
 export SPACK_DISABLE_LOCAL_CONFIG=1
+. {per_workspace_setup.spack_location}/share/spack/setup-env.sh
 """
 
     ramble, first_time_ramble = per_workspace_setup.ramble_first_time_setup()

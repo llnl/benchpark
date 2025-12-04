@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import warnings
+
 from benchpark.directives import variant
 from benchpark.experiment import ExperimentHelper
 

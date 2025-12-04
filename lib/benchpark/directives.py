@@ -13,16 +13,16 @@ import os
 import re
 from typing import Any, Callable, Optional, Tuple, Union
 
-import benchpark.spec
-import benchpark.paths
-import benchpark.repo
-import benchpark.runtime
-import benchpark.variant
-
 import ramble.language.language_base
 import ramble.language.language_helpers
 import ramble.language.shared_language
 from ramble.language.language_base import DirectiveError
+
+import benchpark.paths
+import benchpark.repo
+import benchpark.runtime
+import benchpark.spec
+import benchpark.variant
 
 
 # TODO remove this when it is added to ramble.lang (when ramble updates from spack)

@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainers
+from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
 from benchpark.mpi import MpiOnlyExperiment
 
@@ -18,8 +18,8 @@ class Gpcnet(Experiment, MpiOnlyExperiment):
 
     variant(
         "version",
-        default="1.2",
-        values=("master", "latest", "1.2"),
+        default="master",
+        values=("master", "latest"),
         description="app version",
     )
 
