@@ -3,9 +3,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import os
 from pathlib import Path
 
-import os
 import yaml
 
 import benchpark.paths
