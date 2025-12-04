@@ -75,15 +75,25 @@ include:
   # Nightly tests
   - local: .gitlab/tests/nightly.yml
 stages:
+  - bootstrap-benchpark
   - machine-checks
   - allocate-resources
   - test
   - release-resources
   - cleanup-dir
+bootstrap_benchpark:
+  tags: [shell, oslic]
+  extends: .on_host_template
+  script:
+    - pwd
+    - ls
+    - benchpark configure --bootstrap-location $CUSTOM_CI_BUILDS_DIR
+    - benchpark bootstrap
 cleanup_pipeline_dir:
   tags: [shell, oslic]
   needs:
     - release_resources_dane
+    - release_resources_matrix
     - release_resources_flux_tioga
     - release_resources_flux_tuolumne
   extends: .on_host_template
