@@ -86,10 +86,8 @@ bootstrap_benchpark:
   extends: .on_host_template
   stage: bootstrap-benchpark
   script:
-    - pwd
-    - ls
-    - benchpark configure --bootstrap-location $CUSTOM_CI_BUILDS_DIR
-    - benchpark bootstrap
+    - ./bin/benchpark configure --bootstrap-location $CUSTOM_CI_BUILDS_DIR
+    - ./bin/benchpark bootstrap
 cleanup_pipeline_dir:
   tags: [shell, oslic]
   needs:
