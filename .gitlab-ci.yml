@@ -86,6 +86,7 @@ bootstrap_benchpark:
   extends: .on_host_template
   stage: bootstrap-benchpark
   script:
+    - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
     - ./bin/benchpark configure --bootstrap-location $CUSTOM_CI_BUILDS_DIR
     - ./bin/benchpark bootstrap
 cleanup_pipeline_dir:
