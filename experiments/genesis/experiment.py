@@ -20,7 +20,8 @@ class Genesis(Experiment, MpiOnlyExperiment, OpenMPExperiment):
 
     variant(
         "version",
-        default="main",
+        default="2.1.6",
+        values=("2.1.6", "main"),
         description="app version",
     )
 
