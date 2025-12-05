@@ -1,9 +1,11 @@
-# Copyright 2023 Lawrence Livermore National Security, LLC and other
-# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+# Copyright Spack Project Developers. See COPYRIGHT file for details.
 #
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
 import os
+
+from spack_repo.builtin.build_systems.cmake import CMakePackage
+
 from spack.package import *
 
 
@@ -13,28 +15,23 @@ class Adiak(CMakePackage):
 
     homepage = "https://github.com/LLNL/Adiak"
     url = "https://github.com/LLNL/Adiak/releases/download/v0.1/adiak-v0.1.1.tar.gz"
-    git = "https://github.com/TauferLab/Adiak"
+    git = "https://github.com/LLNL/Adiak"
 
     maintainers("daboehme", "mplegendre")
 
     variant("mpi", default=True, description="Build with MPI support")
     variant("shared", default=True, description="Build dynamic libraries")
-    variant("python", default=False, when="@0.4.1:", description="Build Python bindings")
+    variant("python", default=False, when="@0.5.0:", description="Build Python bindings")
 
     license("MIT")
 
-    version("0.4.1p", branch="python_bindings", submodules=True)
+    version("master", branch="master")
     version(
-        "0.4.1", commit="7ac997111785bee6d9391664b1d18ebc2b3c557b", submodules=True, preferred=True
+        "0.5.0", commit="f08c8375c613e13e9b9c6a1db271cbf8f0d3f3e3", submodules=True, preferred=True
     )
+    version("0.4.1", commit="7ac997111785bee6d9391664b1d18ebc2b3c557b", submodules=True)
     version("0.4.0", commit="7e8b7233f8a148b402128ed46b2f0c643e3b397e", submodules=True)
     version("0.2.2", commit="3aedd494c81c01df1183af28bc09bade2fabfcd3", submodules=True)
-    version(
-        "0.3.0-alpha",
-        commit="054d2693a977ed0e1f16c665b4966bb90924779e",
-        submodules=True,
-        deprecated=True,
-    )
     version("0.2.1", commit="950e3bfb91519ecb7b7ee7fa3063bfab23c0e2c9", submodules=True)
     version("0.1.1", sha256="438e4652e15e206cd0019423d829fd4f2329323ff0c8861d9586bae051d9624b")
 
@@ -60,23 +57,16 @@ class Adiak(CMakePackage):
             args.append("-DBUILD_SHARED_LIBS=ON")
         else:
             args.append("-DBUILD_SHARED_LIBS=OFF")
-        
+
         if self.spec.satisfies("+python"):
             args.append("-DENABLE_PYTHON_BINDINGS=ON")
-            args.append(f"-Dpybind11_DIR={os.path.join(self.spec['py-pybind11'].prefix, 'pybind11', 'share', 'cmake', 'pybind11')}")
-
-        args.append(self.define("CMAKE_EXE_LINKER_FLAGS", self.spec['mpi'].libs.ld_flags))
-        args.append(self.define("MPI_CXX_LINK_FLAGS", self.spec['mpi'].libs.ld_flags))
+            pybind11_cmake = os.path.join(
+                self.spec["py-pybind11"].prefix, "pybind11", "share", "cmake", "pybind11"
+            )
+            args.append(f"-Dpybind11_DIR={pybind11_cmake}")
 
         args.append("-DENABLE_TESTS=OFF")
         return args
-
-    def setup_build_environment(self, env):
-        super().setup_build_environment(env)
-
-        if "+mpi" in self.spec:
-            if self.spec["mpi"].extra_attributes and "ldflags" in self.spec["mpi"].extra_attributes:
-                env.append_flags("LDFLAGS", self.spec["mpi"].extra_attributes["ldflags"])
 
     def setup_run_environment(self, env):
         if self.spec.satisfies("+python"):

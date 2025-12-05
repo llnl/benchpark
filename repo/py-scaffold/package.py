@@ -12,9 +12,10 @@ from spack_repo.builtin.build_systems.python import PythonPackage
 class PyScaffold(PythonPackage, CudaPackage, ROCmPackage):
     """Scale-Free Fractal benchmark"""
 
-    git = "file:///usr/workspace/mckinsey/ScaFFold-spack"
+    git = "file:///usr/workspace/mckinsey/ScaFFold-sharedmemory"
 
-    version("main", branch="spack-install")
+    version("main", branch="main")
+    version("sharedmem", branch="sharedmem")
 
     maintainers("michaelmckinsey")
     license("Apache-2.0")
@@ -64,10 +65,10 @@ class PyScaffold(PythonPackage, CudaPackage, ROCmPackage):
                     # Avoid gtl error
                     env.prepend_path("LD_LIBRARY_PATH", self.spec['mpi'].extra_attributes["gtl_lib_path"])
 
-        if self.spec.satisfies("+caliper"):
-            if self.spec.satisfies("+rocm"):
-                # Need to set this to libcaliper.so to avoid rocprofiler context error
-                env.set("ROCP_TOOL_LIBRARIES", os.path.join(self.spec["caliper"].prefix, "lib64", "libcaliper.so"))
+        # if self.spec.satisfies("+caliper"):
+        #     if self.spec.satisfies("+rocm"):
+        #         # Need to set this to libcaliper.so to avoid rocprofiler context error
+        #         env.set("ROCP_TOOL_LIBRARIES", os.path.join(self.spec["caliper"].prefix, "lib64", "libcaliper.so"))
 
         if self.compiler.extra_rpaths:
             for rpath in self.compiler.extra_rpaths:

@@ -34,13 +34,12 @@ class PyScaffold(
         description="Path to local repository of ScaFFold (i.e. git clone), since it is private.",
     )
 
-    variant("version", default="develop", description="app version")
+    variant("version", default="main", values=("main", "sharedmem"), description="app version")
 
     def compute_applications_section(self):
         self.add_experiment_variable(
             "package_path", self.spec.variants["scaffold_path"][0], False
         )
-        self.add_experiment_variable("timeout", 720, True)
 
         self.add_experiment_variable("n_gpus", 4, True)
 
@@ -70,7 +69,7 @@ class PyScaffold(
             model = "cuda"
         self.add_package_spec(
             self.name,
-            ["py-scaffold@main"],
+            [f"py-scaffold@{self.spec.variants['version'][0]}"],
             package_manager="spack",
         )
         self.add_package_spec(
