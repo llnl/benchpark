@@ -4,11 +4,13 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Getting Started
-===============
+#################
+ Getting Started
+#################
 
-Installation
-------------
+**************
+ Installation
+**************
 
 Git is needed to clone Benchpark, and Python 3.8+ is needed to run Benchpark:
 
@@ -29,8 +31,9 @@ Now, to check the version you can run:
 
     benchpark --version
 
-System Prerequisites
---------------------
+**********************
+ System Prerequisites
+**********************
 
 Once Benchpark is available on your system, its python dependencies can be installed
 using the ``requirements.txt`` file included in the root directory of Benchpark.

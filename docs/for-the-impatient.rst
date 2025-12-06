@@ -4,8 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-For the Impatient
-=================
+###################
+ For the Impatient
+###################
 
 You need git and Python 3.8+:
 
@@ -21,8 +22,9 @@ You need git and Python 3.8+:
 
     pip install -r requirements.txt
 
-Set up a Workspace
-------------------
+********************
+ Set up a Workspace
+********************
 
 ::
 
@@ -41,16 +43,18 @@ where:
 
     . <experiments_root>/setup.sh
 
-Build an Experiment
--------------------
+*********************
+ Build an Experiment
+*********************
 
 ::
 
     cd <experiments_root>/<Benchmark>/<System>/workspace
     ramble --workspace-dir . workspace setup
 
-Run the Experiment
-------------------
+********************
+ Run the Experiment
+********************
 
 To run all of the experiments in the workspace:
 
@@ -62,8 +66,9 @@ To run a single experiment in the workspace, invoke the ``execute_experiment`` s
 for the specific experiment (e.g.,
 ``$workspace/experiments/amg2023/problem1/amg2023_cuda11.8.0_problem1_1_8_2_2_2_10_10_10/execute_experiment``).
 
-Experiment pass/fail
---------------------
+**********************
+ Experiment pass/fail
+**********************
 
 Once the experiments completed running, the command:
 

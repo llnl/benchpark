@@ -13,6 +13,9 @@ echo "ramble --disable-logger --workspace-dir . workspace setup"
 echo "ramble --disable-logger --workspace-dir . on --executor '{execute_experiment}' --where '{n_nodes} == 1'"
 echo "ramble --disable-logger --workspace-dir . workspace analyze --format json yaml text"
 
+# Ensure proper bootstrap location configured
+./bin/benchpark configure --bootstrap-location $CUSTOM_CI_BUILDS_DIR
+
 # Initialize System
 ./bin/benchpark system init --dest=${HOST} ${ARCHCONFIG} $([ "$HOST" != "matrix" ] && echo "cluster=$HOST") $SYSTEM_ARGS
 
