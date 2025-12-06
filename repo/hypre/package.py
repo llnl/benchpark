@@ -63,6 +63,3 @@ class Hypre(BuiltinHypre):
 
 class CMakeBuilder(HypreCMakeBuilder):
     pass
-
-class AutotoolsBuilder(HypreAutotoolsBuilder):
-    pass

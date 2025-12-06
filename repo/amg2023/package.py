@@ -38,9 +38,9 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
     depends_on("hypre~caliper")
+    depends_on("hypre@:2.29.0", when="@20240511")
+    depends_on("hypre@2.30.0:", when="@develop")
     depends_on("hypre@:2.99")
-    #depends_on("hypre@:2.29.0", when="@20240511")
-    #depends_on("hypre@2.30.0:", when="@develop")
     depends_on("hypre~fortran")
     depends_on("hypre+mixedint", when="+mixedint")
     depends_on("blas")
@@ -57,8 +57,8 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
 
     depends_on("hypre+rocm", when="+rocm")
     requires("+rocm", when="^hypre+rocm")
-    #for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
-    #    depends_on(f"hypre amdgpu_target={target}", when=f"amdgpu_target={target}")
+    for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
+        depends_on(f"hypre amdgpu_target={target}", when=f"amdgpu_target={target}")
 
     depends_on("hypre+gpu-aware-mpi", when="+mpi+gpu-aware-mpi")
 
