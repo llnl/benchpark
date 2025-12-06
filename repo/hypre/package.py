@@ -4,13 +4,15 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
-from itertools import product 
+from itertools import product
 
 from spack.package import *
+from spack_repo.builtin.build_systems.rocm import ROCmPackage
+from spack_repo.builtin.packages.hypre.package import (
+    AutotoolsBuilder as HypreAutotoolsBuilder,
+)
 from spack_repo.builtin.packages.hypre.package import CMakeBuilder as HypreCMakeBuilder
 from spack_repo.builtin.packages.hypre.package import Hypre as BuiltinHypre
-from spack_repo.builtin.packages.hypre.package import AutotoolsBuilder as HypreAutotoolsBuilder
-from spack_repo.builtin.build_systems.rocm import ROCmPackage 
 
 
 class Hypre(BuiltinHypre):
