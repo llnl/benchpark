@@ -189,9 +189,11 @@ def make_chart(**kwargs):
     x_axis = kwargs.get("x_axis")
     yaxis_metric = kwargs.get("yaxis_metric")
 
-    value = "perc" if chart_type == "percentage" else yaxis_metric
     y_label = kwargs.get("chart_ylabel") or (
         f"Percentage of {yaxis_metric}" if chart_type == "percentage" else yaxis_metric
+    )
+    yaxis_metric = (
+        yaxis_metric + "-perc" if chart_type == "percentage" else yaxis_metric
     )
 
     os.makedirs(kwargs["out_dir"], exist_ok=True)
@@ -277,7 +279,9 @@ def make_chart(**kwargs):
     #     if name not in label:
     #         raise ValueError(f"Name '{name}' is not in label '{label}'")
     #     labels[i] = str(name) + " (" + str(calls_list[i][1]) + ")"
-    title = "Region (Calls/rank (max))" if kwargs["cluster"] != "multiple" else "Cluster"
+    title = (
+        "Region (Calls/rank (max))" if kwargs["cluster"] != "multiple" else "Cluster"
+    )
     ax.legend(
         handles,
         labels,
@@ -436,7 +440,9 @@ def prepare_data(**kwargs):
         print("Multiple clusters detected. Using multi-cluster mode.")
         cluster = "multiple"
         if kwargs.get("chart_kind") == "area":
-            raise ValueError("Data from multiple workspaces (clusters) not allowed for 'area' chart type.")
+            raise ValueError(
+                "Data from multiple workspaces (clusters) not allowed for 'area' chart type."
+            )
     version = validate_single_metadata_value("version", tk)
 
     # Find programming model from spec
@@ -482,11 +488,15 @@ def prepare_data(**kwargs):
         f.write(clean_tree)
     logger.info(f"Saving Input Calltree to {tree_file}")
 
-    # for key in grouped.keys():
-    #     tk.dataframe["perc"] = tk.dataframe[tk.dataframe[g] == ]
-    #     ctk.dataframe[(key, "perc")] = (
-    #         ctk.dataframe[(key, metric)] / ctk.dataframe[(key, metric)].sum()
-    #     ) * 100
+    # Compute percentage
+    if kwargs.get("chart_type") == "percentage":
+        tk.dataframe[metric + "-perc"] = 0
+        for profile in tk.profile:
+            tk.dataframe.loc[(slice(None), profile), metric + "-perc"] = (
+                tk.dataframe.loc[(slice(None), profile), metric]
+                * 100
+                / tk.dataframe.loc[(slice(None), profile), metric].sum()
+            )
 
     # top_n = kwargs.get("top_n_regions", -1)
     # if top_n != -1:
@@ -543,10 +553,7 @@ def setup_parser(root_parser):
     root_parser.add_argument(
         "--chart-type",
         default="raw",
-        choices=[
-            "raw",
-            # "percentage"
-        ],
+        choices=["raw", "percentage"],
         type=str,
         help="Specify processing on the metric. 'raw' does nothing, 'percentage' shows the metric values as a percentage relative to the total summation of all regions.",
     )
