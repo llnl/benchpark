@@ -4,8 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-System Mirror
-=============
+###############
+ System Mirror
+###############
 
 If you build a benchmark on a networked system, you can use `benchpark mirror` to create
 a directory that bundles all necessary resources to install and run that benchmark on
@@ -43,8 +44,9 @@ this will install the benchmark on the new system, and also configure Ramble to 
 mirror resources that were bundled in `test-benchmark-mirror/` (so it does not need
 internet access to build the benchmark).
 
-Limitations
------------
+*************
+ Limitations
+*************
 
 For now, benchpark can only create mirrors that are useful for destination systems that
 match the host system in terms of:

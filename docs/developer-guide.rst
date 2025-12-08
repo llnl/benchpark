@@ -4,13 +4,15 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Developer Guide
-===============
+#################
+ Developer Guide
+#################
 
 This guide is intended for people who want to work on Benchpark itself.
 
-Overview
---------
+**********
+ Overview
+**********
 
 Benchpark is designed with several roles in mind:
 
@@ -27,8 +29,9 @@ This gets us to the key concepts in Benchpark's software design:
 - Specs: expressions for describing experiments and compute systems
 - Packages: Python modules that build benchmarks according to a spec.
 
-Directory Structure
--------------------
+*********************
+ Directory Structure
+*********************
 
 So that you can familiarize yourself with the project, we will start with a high-level
 view of Benchpark's directory structure:
@@ -56,8 +59,9 @@ view of Benchpark's directory structure:
 
        systems/                  <- system specs
 
-Updating Documentation
-----------------------
+************************
+ Updating Documentation
+************************
 
 To build the documentation, requirements can be easily installed from
 ``.github/workflows/requirements/docs.txt``, using:

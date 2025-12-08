@@ -4,8 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Set up a Workspace
-==================
+####################
+ Set up a Workspace
+####################
 
 To setup an experiment workspace you must first initialize the system you will be
 running on. Next, initialize the experiment you plan to run with the appropriate
@@ -50,19 +51,22 @@ including ``--dry-run`` and ``--phases make_experiments``.
 
 Now you are ready to compile your experiments as described in :doc:`build-experiment`.
 
-Built-in System/Experiment Variants
------------------------------------
+*************************************
+ Built-in System/Experiment Variants
+*************************************
 
 There are benchpark system and experiment variants that you can change, without needing
 to define them in your ``system.py`` and ``experiment.py``.
 
-For Systems
-===========
+#############
+ For Systems
+#############
 
     - ``timeout`` - Job timeout limit in minutes.
 
-For Experiments
-===============
+#################
+ For Experiments
+#################
 
     - ``package_manager`` - Specify this variant to use a ramble package manager other
       than ``spack``. See :doc:`run-binary` to see an example.

@@ -4,8 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Compare Package Commits
-=======================
+#########################
+ Compare Package Commits
+#########################
 
 ``lib/scripts/diffPackageCommits.py``
 
@@ -16,8 +17,9 @@ the ``package.py`` in ``spack/var/spack/repos/builtin/packages/``, ``package.py`
 this scenario occurs if ``package.py`` has been upstreamed to Spack. This script runs in
 the benchpark CI and will fail if a package should be deleted in benchpark.
 
-Example: amg2023 and raja-perf
-------------------------------
+********************************
+ Example: amg2023 and raja-perf
+********************************
 
 In this example, we made ``benchpark/repo/amg2023/package.py`` the same as the spack
 ``amg2023/package.py`` and equivalently ``benchpark/repo/raja-perf/package.py`` the same
