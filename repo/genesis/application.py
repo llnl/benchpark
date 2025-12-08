@@ -3,8 +3,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from ramble.appkit import *
 import sys
+
+from ramble.appkit import *
 
 
 class Genesis(ExecutableApplication):
