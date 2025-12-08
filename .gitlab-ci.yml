@@ -90,11 +90,6 @@ bootstrap_benchpark:
     - ./bin/benchpark bootstrap
 cleanup_pipeline_dir:
   tags: [shell, oslic]
-  needs:
-    - release_resources_dane
-    - release_resources_matrix
-    - release_resources_flux_tioga
-    - release_resources_flux_tuolumne
   stage: cleanup-dir
   script:
     - echo "Removing $CUSTOM_CI_BUILDS_DIR"
