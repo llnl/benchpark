@@ -4,8 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Run a Binary
-============
+##############
+ Run a Binary
+##############
 
 If you have a pre-built binary of your application, you can use it in your Benchpark
 experiment using the ``user-managed`` Ramble-defined package manager (`see docs

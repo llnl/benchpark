@@ -4,8 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Adding an Experiment
-====================
+######################
+ Adding an Experiment
+######################
 
 This guide is intended for those who would like to add a new experiment for a specific
 benchmark.
@@ -48,8 +49,9 @@ the HPL application in Ramble also inherits from a `base HPL application
 which is relevant because it contains the workload variables that we will need to define
 in our Benchpark experiment.
 
-Step 1: Create the Experiment class
------------------------------------
+*************************************
+ Step 1: Create the Experiment class
+*************************************
 
 We create the ``experiment.py`` file under ``benchpark/experiments/hpl/experiment.py``.
 The naming of this directory will affect how the experiment is initialized, e.g.,
@@ -94,8 +96,9 @@ experiment only requires inheritance from the pre-defined ``OpenMPExperiment`` a
       Caliper,
     ):
 
-Step 2: Add Variants and Maintainers
-------------------------------------
+**************************************
+ Step 2: Add Variants and Maintainers
+**************************************
 
 Next, we add experiment variants and a maintainer:
 
@@ -142,8 +145,9 @@ experiment.
 
       maintainers("daboehme")
 
-Step 3: Add a Ramble Application Section
-----------------------------------------
+******************************************
+ Step 3: Add a Ramble Application Section
+******************************************
 
 The ``experiment.py::compute_applications_section()`` function in Benchpark exists to
 interface with the Ramble application for:
@@ -153,7 +157,7 @@ interface with the Ramble application for:
        scaling.
 
 Step 3a: Define Experiment Variables
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+====================================
 
 We can specify experiment variables in Benchpark using the
 ``Experiment.add_experiment_variable()`` member function. *One* of ``n_ranks``,
@@ -261,7 +265,7 @@ by default.
 For more details on the ``add_experiment_variable`` function, see :ref:`add-expr-var`.
 
 Step 3b: Define Scaling Options
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+===============================
 
 To complete our ``compute_applications_section()`` function, we import the scaling
 module, inherit from the appropriate scaling options, and write the scaling
@@ -337,8 +341,9 @@ runtime parameters during experiment initialization, e.g., ``benchpark experimen
 See :ref:`this section <scaling-configs>` for more information on how to write Benchpark
 scaling configurations.
 
-Step 4: Add a Package Manager Section
--------------------------------------
+***************************************
+ Step 4: Add a Package Manager Section
+***************************************
 
 In ``experiment.py::compute_package_section()``, add the benchmark's package spec. We do
 not list required packages for the benchmark here, since they are already defined in the
@@ -382,8 +387,9 @@ not list required packages for the benchmark here, since they are already define
       def compute_package_section(self):
         self.add_package_spec(self.name, [f"hpl{self.determine_version()}"])
 
-Step 5: Validating the Benchmark/Experiment
--------------------------------------------
+*********************************************
+ Step 5: Validating the Benchmark/Experiment
+*********************************************
 
 To manually validate that your new experiment works, you should start by initializing
 your experiment:
@@ -398,13 +404,14 @@ your experiment:
 If this completes without errors, you can continue testing by setting up a benchpark
 workspace as described in :doc:`testing-your-contribution`.
 
-Experiment Appendix
--------------------
+*********************
+ Experiment Appendix
+*********************
 
 .. _experiment-variants:
 
 More on Inherited Experiment Variants
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=====================================
 
 Variants of the experiment can be added to utilize different programming models used for
 on-node parallelization, e.g., ``benchpark/experiments/amg2023/experiment.py`` can be
@@ -460,7 +467,7 @@ profiling see :doc:`modifiers`.
 .. _add-expr-var:
 
 More on add_experiment_variable
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+===============================
 
 The method ``add_experiment_variable`` is used to add a variable to the experiment's
 ``ramble.yaml``. It has the following signature:
@@ -526,7 +533,7 @@ and matrix.
 .. _scaling-configs:
 
 More on Scaling Configurations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+==============================
 
 For each scaling mode supported by an application, the ``def register_scaling_config()``
 method must define the scaled variables and their corresponding scaling function. The

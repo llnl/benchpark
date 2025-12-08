@@ -4,8 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Show Build
-==========
+############
+ Show Build
+############
 
 If you build an experiment with Benchpark, you can see exactly how the experiment was
 built.

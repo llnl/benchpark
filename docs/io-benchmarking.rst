@@ -4,14 +4,16 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Using File Systems
-==================
+####################
+ Using File Systems
+####################
 
 For benchmarks that need to run on a different file system, benchpark defines per-system
 variants, which experiments can use to leverage specific file systems.
 
-1. How to enable writing to a file system on a specific system
---------------------------------------------------------------
+****************************************************************
+ 1. How to enable writing to a file system on a specific system
+****************************************************************
 
 Check if the ``system`` you are attempting to initialize has a ``mount_point`` variant,
 with ``benchpark info system SYSTEM``:
@@ -48,8 +50,9 @@ argument):
     full_path = self.system_spec.system.full_io_path
     self.add_experiment_variable("o", full_path)
 
-2. How to add filesystem details to scheduler request `extra_batch_opts`
-------------------------------------------------------------------------
+**************************************************************************
+ 2. How to add filesystem details to scheduler request `extra_batch_opts`
+**************************************************************************
 
 If the ``system`` you are attempting to initialize has a variant supporting your desired
 file system, you may also need to specify additional configuration details to the

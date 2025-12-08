@@ -4,8 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Run on LLNL System
-==================
+####################
+ Run on LLNL System
+####################
 
 ..
     note
@@ -37,8 +38,9 @@ Create virtual env. and install dependencies:
     . my-env/bin/activate
     pip install -r requirements.txt
 
-CTS (Ruby, Dane, Magma)
------------------------
+*************************
+ CTS (Ruby, Dane, Magma)
+*************************
 
 This example uses the openmp version of the Saxpy benchmark on one of our CTS systems
 (Ruby, Dane, Magma). The variant ``cluster`` determines which of the three systems to
@@ -86,8 +88,9 @@ the CTS system:
 
     ramble --workspace-dir . on
 
-Tioga
------
+*******
+ Tioga
+*******
 
 This second tutorial will guide you through the process of using the ROCm version of the
 Saxpy benchmark on Tioga. The parameters for initializing the system are slightly
