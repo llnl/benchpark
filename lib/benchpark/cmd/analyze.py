@@ -277,12 +277,13 @@ def make_chart(**kwargs):
     #     if name not in label:
     #         raise ValueError(f"Name '{name}' is not in label '{label}'")
     #     labels[i] = str(name) + " (" + str(calls_list[i][1]) + ")"
+    title = "Region (Calls/rank (max))" if kwargs["cluster"] != "multiple" else "Cluster"
     ax.legend(
         handles,
         labels,
         bbox_to_anchor=(1, 0.5),
         loc="center left",
-        title="Region (Calls/rank (max))",
+        title=title,
     )
     ax.set_xlabel(xlabel)
 
@@ -434,6 +435,8 @@ def prepare_data(**kwargs):
     except ValueError:
         print("Multiple clusters detected. Using multi-cluster mode.")
         cluster = "multiple"
+        if kwargs.get("chart_kind") == "area":
+            raise ValueError("Data from multiple workspaces (clusters) not allowed for 'area' chart type.")
     version = validate_single_metadata_value("version", tk)
 
     # Find programming model from spec
