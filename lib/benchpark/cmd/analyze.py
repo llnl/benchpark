@@ -198,24 +198,14 @@ def make_chart(**kwargs):
 
     os.makedirs(kwargs["out_dir"], exist_ok=True)
 
-    # tdf_calls = df["Calls/rank (max)"].T.reset_index(
-    #     level=1, drop=True
-    # )
-    # calls_list = []
-    # for column in tdf_calls.columns:
-    #     mx = max(tdf_calls[column])
-    #     val = int(mx) if mx > 0 else 0
-    #     calls_list.append((column, val))
+    # Calls/rank in legend
+    calls_list = []
+    for node in set(df.index.get_level_values("node")):
+        calls_list.append(df.loc[node, "Calls/rank (max)"].max())
 
-    # tdf = df[[(i, value) for i in x_axis]].T.reset_index(level=1, drop=True)
     mpl.rcParams["axes.prop_cycle"] = mpl.cycler(color=COLOR_PALETTE)
     if kwargs.get("chart_fontsize"):
         mpl.rcParams.update({"font.size": kwargs.get("chart_fontsize")})
-
-    # tcol = tdf.columns[0]
-    # tdf["cluster"] = tdf.index.map(lambda x: x[-1]).map(mapping)
-    # tdf["profile"] = tdf.index.map(lambda x: ", ".join(str(i) for i in x[:-1]))
-    # tdf = tdf.reset_index(drop=True)
 
     xlabel = kwargs.get("chart_xlabel")
     if isinstance(xlabel, list):
@@ -228,7 +218,6 @@ def make_chart(**kwargs):
     ax.set_title(kwargs.get("chart_title", ""))
     ax.set_xlabel(xlabel)
     ax.set_ylabel(y_label)
-    # plt.yscale("log", base=2)
     plt.grid(True)
     df = df.sort_values(by=x_axis)
     plot_args = dict(
@@ -272,13 +261,10 @@ def make_chart(**kwargs):
     handles, labels = ax.get_legend_handles_labels()
     handles = list(reversed(handles))
     labels = list(reversed(labels))
-    # calls_list = list(reversed(calls_list))
-    # for i, label in enumerate(labels):
-    #     obj = calls_list[i][0]
-    #     name = obj if isinstance(obj, str) else obj[0].frame["name"]
-    #     if name not in label:
-    #         raise ValueError(f"Name '{name}' is not in label '{label}'")
-    #     labels[i] = str(name) + " (" + str(calls_list[i][1]) + ")"
+    if kwargs["cluster"] != "multiple":
+        calls_list = list(reversed(calls_list))
+        for i, label in enumerate(labels):
+            labels[i] = str(label) + " (" + str(int(calls_list[i])) + ")"
     title = (
         "Region (Calls/rank (max))" if kwargs["cluster"] != "multiple" else "Cluster"
     )
@@ -326,8 +312,6 @@ def prepare_data(**kwargs):
         tk.update_inclusive_columns()
         pbar.update(1)
         pbar.close()
-
-    # cluster_to_ps = dict(zip(tk.metadata["cluster"], tk.metadata["total_problem_size"]))
 
     clean_tree = tk.tree(kwargs["tree_metric"], render_header=True)
     clean_tree = re.compile(r"\x1b\[([0-9;]*m)").sub("", clean_tree)
@@ -421,13 +405,6 @@ def prepare_data(**kwargs):
     prefix = kwargs.get("filter_regions_byname", "")
     if prefix:
         tk.dataframe = pd.concat([tk.dataframe.filter(like=p, axis=0) for p in prefix])
-
-    # Group by varied parameters
-    # grouped = tk.groupby(x_axis_metadata)
-    # print(grouped.keys())
-    # ctk = th.Thicket.concat_thickets(
-    #     list(grouped.values()), headers=list(grouped.keys()), axis="index"
-    # )
 
     tk.metadata_columns_to_perfdata(["cluster"] + list(NAME_REMAP.keys()))
 
