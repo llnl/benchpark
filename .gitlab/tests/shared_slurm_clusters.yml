@@ -137,3 +137,9 @@ run_tests_slurm_matrix:
         ARCHCONFIG: llnl-matrix
         BENCHMARK: [sparta-snl]
         VARIANT: [+cuda~gpu-aware-mpi]
+      # Test openmpi
+      - HOST: matrix
+        ARCHCONFIG: llnl-matrix
+        SYSTEM_ARGS: [mpi=openmpi]
+        BENCHMARK: kripke
+        VARIANT: ['', +cuda]
