@@ -413,13 +413,10 @@ class LlnlCluster(System):
             "software": {
                 "packages": {
                     "default-compiler": {"pkg_spec": default_compiler},
-                    "default-mpi": {"pkg_spec": "mvapich2"},
                     "compiler-gcc": {"pkg_spec": "gcc"},
                     "compiler-intel": {"pkg_spec": "intel"},
                     "blas": {"pkg_spec": "intel-oneapi-mkl"},
                     "lapack": {"pkg_spec": "intel-oneapi-mkl"},
-                    # "mpi-gcc": {"pkg_spec": "mvapich2"},
-                    # "mpi-intel": {"pkg_spec": "mvapich2"},
                 }
             }
         }
