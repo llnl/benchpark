@@ -18,6 +18,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn
+import hatchet as ht
 import thicket as th
 from tqdm import tqdm
 
@@ -199,9 +200,11 @@ def make_chart(**kwargs):
     os.makedirs(kwargs["out_dir"], exist_ok=True)
 
     # Calls/rank in legend
-    calls_list = []
+    calls_dict = {}
     for node in set(df.index.get_level_values("node")):
-        calls_list.append(df.loc[node, "Calls/rank (max)"].max())
+        v = df.loc[node, "Calls/rank (max)"].max()
+        name = node.frame["name"] if isinstance(node, ht.node.Node) else node
+        calls_dict[name] = int(v) if pd.notna(v) else v
 
     mpl.rcParams["axes.prop_cycle"] = mpl.cycler(color=COLOR_PALETTE)
     if kwargs.get("chart_fontsize"):
@@ -262,9 +265,8 @@ def make_chart(**kwargs):
     handles = list(reversed(handles))
     labels = list(reversed(labels))
     if kwargs["cluster"] != "multiple":
-        calls_list = list(reversed(calls_list))
         for i, label in enumerate(labels):
-            labels[i] = str(label) + " (" + str(int(calls_list[i])) + ")"
+            labels[i] = str(label) + " (" + str(calls_dict[label]) + ")"
     title = (
         "Region (Calls/rank (max))" if kwargs["cluster"] != "multiple" else "Cluster"
     )
@@ -475,21 +477,35 @@ def prepare_data(**kwargs):
                 / tk.dataframe.loc[(slice(None), profile), metric].sum()
             )
 
-    # top_n = kwargs.get("top_n_regions", -1)
-    # if top_n != -1:
-    #     temp_df_idx = tk.dataframe.nlargest(
-    #         top_n, metric).index
-    #     temp_df = tk.dataframe[tk.dataframe.index.isin(temp_df_idx)]
-    #     temp_df.loc["Sum(removed_regions)"] = 0
-    #     for p in tk.profile:
-    #         temp_df.loc["Sum(removed_regions)", metric] = (
-    #             tk.dataframe.loc[:, metric].sum()
-    #             - temp_df.loc[:, metric].sum()
-    #         )
-    #     tk.dataframe = temp_df
-    #     logger.info(
-    #         f"Filtered top {top_n} regions for chart display. Added the sum of the regions that were removed as single region."
-    #     )
+    top_n = kwargs.get("top_n_regions", -1)
+    if top_n != -1:
+        chosen_profile = tk.profile[0]
+        temp_df_idx = (
+            tk.dataframe.loc[(slice(None), chosen_profile), :]
+            .nlargest(top_n, metric)
+            .index.get_level_values("node")
+        )
+        temp_df = tk.dataframe[
+            tk.dataframe.index.get_level_values("node").isin(temp_df_idx)
+        ]
+        for p in tk.profile:
+            temp_df.loc[("Sum(removed_regions)", p), metric] = (
+                tk.dataframe.loc[(slice(None), p), metric].sum()
+                - temp_df.loc[(slice(None), p), metric].sum()
+            )
+            for xp in kwargs["xaxis_parameter"]:
+                temp_df.loc[("Sum(removed_regions)", p), xp] = tk.dataframe.loc[
+                    (slice(None), p), xp
+                ].iloc[0]
+        temp_df.loc[("Sum(removed_regions)",), "name"] = "Sum(removed_regions)"
+        tk.dataframe = temp_df
+        logger.info(
+            f"Filtered top {top_n} regions for chart display (based on first profile in Thicket.profile). Added the sum of the regions that were removed as single region."
+        )
+
+    # Convert int-like columns to int
+    for col in kwargs["xaxis_parameter"]:
+        tk.dataframe[col] = tk.dataframe[col].astype(int)
 
     if not kwargs.get("chart_xlabel"):
         kwargs["chart_xlabel"] = x_axis_metadata
@@ -502,7 +518,6 @@ def prepare_data(**kwargs):
             raise ValueError(
                 f"Expected one scaling factor, found: {list(scaling_factors)}"
             )
-    # kwargs["cluster_to_ps"] = cluster_to_ps
     kwargs["cluster"] = cluster
 
     make_chart(df=tk.dataframe, x_axis=x_axis_metadata, **kwargs)
@@ -564,13 +579,13 @@ def setup_parser(root_parser):
         help="Query for one or more regions REGION. Includes children of region.",
         metavar="REGION",
     )
-    # root_parser.add_argument(
-    #     "--top-n-regions",
-    #     default=-1,
-    #     type=int,
-    #     help="Filters only top N largest metric entries to be included in chart (based on the first profile).",
-    #     metavar="N",
-    # )
+    root_parser.add_argument(
+        "--top-n-regions",
+        default=-1,
+        type=int,
+        help="Filters only top N largest metric entries to be included in chart (based on the first profile).",
+        metavar="N",
+    )
     root_parser.add_argument(
         "--group-regions-name",
         action="store_true",
