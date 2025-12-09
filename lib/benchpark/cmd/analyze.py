@@ -364,7 +364,7 @@ def prepare_data(**kwargs):
     known_applications = {"raja-perf": RAJAPerf}
     for ta in tk.metadata["application_name"].unique():
         added_mets = known_applications[ta](tk).set_metrics()
-        logger.info(f"Added the following derived metrics for app '{ta}': {added_mets}")
+        logger.info(f"Added the following derived metrics for app '{ta}':\n\t{added_mets}\n\tUse them via the '--yaxis-metric' parameter.")
 
     if metric in tk.inc_metrics and len(tk.graph.roots) == 1:
         root_name = tk.graph.roots[0].frame["name"]
