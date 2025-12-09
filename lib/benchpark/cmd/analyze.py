@@ -61,6 +61,32 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s: %(message)s")
 
 
+class RAJAPerf:
+    def __init__(self, tk):
+        self.tk = tk
+        # Matches application_name column in metadata
+        self.name = "raja-perf"
+
+    def set_metrics(self):
+        self.tk.dataframe["Bandwidth (GB/s)"] = (
+            self.tk.dataframe["Bytes/Rep"]
+            / self.tk.dataframe["Avg time/rank (exc)"]
+            / 10**9
+            * self.tk.dataframe["Reps"]
+            * self.tk.metadata["mpi.world.size"]
+        )
+
+        self.tk.dataframe["FLOP Rate (GFLOPS)"] = (
+            self.tk.dataframe["Flops/Rep"]
+            / self.tk.dataframe["Avg time/rank (exc)"]
+            / 10**9
+            * self.tk.dataframe["Reps"]
+            * self.tk.metadata["mpi.world.size"]
+        )
+
+        return ["Bandwidth (GB/s)", "FLOP Rate (GFLOPS)"]
+
+
 # -----------------------------
 # Helper Functions
 # -----------------------------
@@ -335,13 +361,10 @@ def prepare_data(**kwargs):
     # Remove singular roots if inclusive metric
     metric = kwargs["yaxis_metric"]
 
-    tk.dataframe["Bandwidth (GB/s)"] = (
-        tk.dataframe["Bytes/Rep"]
-        / tk.dataframe["Avg time/rank (exc)"]
-        / 10**9
-        * tk.dataframe["Reps"]
-        * tk.metadata["mpi.world.size"]
-    )
+    known_applications = {"raja-perf": RAJAPerf}
+    for ta in tk.metadata["application_name"].unique():
+        added_mets = known_applications[ta](tk).set_metrics()
+        logger.info(f"Added the following derived metrics for app '{ta}': {added_mets}")
 
     if metric in tk.inc_metrics and len(tk.graph.roots) == 1:
         root_name = tk.graph.roots[0].frame["name"]
