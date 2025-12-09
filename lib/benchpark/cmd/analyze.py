@@ -68,7 +68,7 @@ class RAJAPerf:
         self.name = "raja-perf"
 
     def set_metrics(self):
-        self.tk.dataframe["Bandwidth (GB/s)"] = (
+        self.tk.dataframe["Memory Bandwidth (GB/s)"] = (
             self.tk.dataframe["Bytes/Rep"]
             / self.tk.dataframe["Avg time/rank (exc)"]
             / 10**9
@@ -84,7 +84,7 @@ class RAJAPerf:
             * self.tk.metadata["mpi.world.size"]
         )
 
-        return ["Bandwidth (GB/s)", "FLOP Rate (GFLOPS)"]
+        return ["Memory Bandwidth (GB/s)", "FLOP Rate (GFLOPS)"]
 
 
 # -----------------------------
@@ -247,6 +247,8 @@ def make_chart(**kwargs):
     ax.set_title(kwargs.get("chart_title", ""))
     ax.set_xlabel(xlabel)
     ax.set_ylabel(y_label)
+    if kwargs["yaxis_log"]:
+        ax.set_yscale('log', base=2) 
     plt.grid(True)
     df = df.sort_values(by=x_axis)
     plot_args = dict(
@@ -660,6 +662,23 @@ def setup_parser(root_parser):
         default="Calls/rank (max)",
         help="Metric to show on the tree output",
     )
+    root_parser.add_argument(
+        "--chart-kind",
+        type=str,
+        default="area",
+        choices=["area", "line", "bar", "scatter"],
+        help="Type of chart to generate",
+    )
+    root_parser.add_argument(
+        "--no-update-inc-cols",
+        action="store_true",
+        help="Don't call Thicket.update_inclusive_columns() which can take a while.",
+    )
+    root_parser.add_argument(
+        "--yaxis-log",
+        action="store_true",
+        help="Change yaxis to log base 2."
+    )
 
     # Workspace commands
     root_parser.add_argument(
@@ -682,19 +701,6 @@ def setup_parser(root_parser):
         default=None,
         help="With 'archive', path for the .tar.gz (defaults to CWD/<workspace>-<timestamp>.tar.gz)",
     )
-    root_parser.add_argument(
-        "--chart-kind",
-        type=str,
-        default="area",
-        choices=["area", "line", "bar", "scatter"],
-        help="Type of chart to generate",
-    )
-    root_parser.add_argument(
-        "--no-update-inc-cols",
-        action="store_true",
-        help="Don't call Thicket.update_inclusive_columns() which can take a while.",
-    )
-
 
 def command(args):
     """
