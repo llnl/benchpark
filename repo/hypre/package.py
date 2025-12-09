@@ -19,6 +19,10 @@ class Hypre(BuiltinHypre):
     requires("+rocm", when="^rocblas")
     requires("+rocm", when="^rocsolver")
 
+    with when("+cuda"):
+        for pkg, sm_ in product(["umpire", "magma"], CudaPackage.cuda_arch_values):
+            depends_on(f"{pkg} cuda_arch={sm_}", when=f"+{pkg} cuda_arch={sm_}")
+
     with when("+rocm"):
         for pkg, gfx in product(["umpire", "magma"], ROCmPackage.amdgpu_targets):
             depends_on(f"{pkg} amdgpu_target={gfx}", when=f"+{pkg} amdgpu_target={gfx}")
