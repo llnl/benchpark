@@ -115,7 +115,7 @@ run_tests_slurm_dane:
       - HOST: dane
         ARCHCONFIG: llnl-cluster
         SYSTEM_ARGS: [mpi=openmpi]
-        BENCHMARK: kripke
+        BENCHMARK: osu-micro-benchmarks
 run_tests_slurm_matrix:
   extends: .run_tests_slurm
   tags: [shell, matrix]
@@ -137,9 +137,3 @@ run_tests_slurm_matrix:
         ARCHCONFIG: llnl-matrix
         BENCHMARK: [sparta-snl]
         VARIANT: [+cuda~gpu-aware-mpi]
-      # Test openmpi
-      - HOST: matrix
-        ARCHCONFIG: llnl-matrix
-        SYSTEM_ARGS: [mpi=openmpi]
-        BENCHMARK: kripke
-        VARIANT: ['', +cuda]
