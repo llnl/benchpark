@@ -4,8 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Compare Build Specs
-===================
+#####################
+ Compare Build Specs
+#####################
 
 ``lib/scripts/diffBuildSpecs.py``
 
@@ -20,8 +21,9 @@ different.
     If you are trying to compare benchpark benchmarks, try using
     ``diffExperimentBuilds.py``.
 
-Example: dray with/without MPI
-------------------------------
+********************************
+ Example: dray with/without MPI
+********************************
 
 In this example, we see the difference of ``dray`` built with and without ``mpi``. The
 difference between the specs ``dray+mpi`` and ``dray~mpi`` is indicated in the output by
@@ -44,8 +46,9 @@ difference between the specs ``dray+mpi`` and ``dray~mpi`` is indicated in the o
     It will automatically be added to your ``$PATH`` when you run ``benchpark setup
     ...``.
 
-Example: Installed packages
----------------------------
+*****************************
+ Example: Installed packages
+*****************************
 
 If you want to compare already installed packages, provide the hashes
 

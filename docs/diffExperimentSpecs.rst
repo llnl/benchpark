@@ -4,8 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Compare Experiment Specs
-========================
+##########################
+ Compare Experiment Specs
+##########################
 
 ``lib/scripts/diffExperimentSpecs.py``
 
@@ -18,8 +19,9 @@ the resulting experiment spec.
 Stages that occur during this script:
     - ``benchpark experiment init``
 
-Example: Change n_ranks in Saxpy
---------------------------------
+**********************************
+ Example: Change n_ranks in Saxpy
+**********************************
 
 In this example, we modify the ``saxpy+openmp`` experiment to see how the script
 identifies the differences. On the branch ``myBranch``, we change

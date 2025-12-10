@@ -4,16 +4,18 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Compare two Experiments
-=======================
+#########################
+ Compare two Experiments
+#########################
 
 This tutorial will guide you through the process of building and comparing distinct
 binaries of the same benchmark. As an example, we will be using an experiment comparing
 two builds of the quicksilver benchmark, compiled with the ``gcc`` and ``intel``
 compiler variants on LLNL's Ruby cluster.
 
-Building Multiple Binaries
---------------------------
+****************************
+ Building Multiple Binaries
+****************************
 
 Create separate system instances. Parameters could include: compiler, mpi, etc. In this
 case, we are changing the compiler variant
@@ -22,8 +24,9 @@ case, we are changing the compiler variant
 
 ``benchpark system init --dest=ruby-intel llnl-cluster cluster=ruby compiler=intel``
 
-Creating experiment ramble.yaml
--------------------------------
+*********************************
+ Creating experiment ramble.yaml
+*********************************
 
 Create the experiment description Parameters could include: version, scaling, etc.
 
@@ -32,9 +35,9 @@ will be the same, we only need to generate a single experiment description. This
 initializes a quicksilver experiment configuration in the ``quicksilver`` directory. We
 are doing weak scaling with openMP, and measuring MPI metrics with Caliper.
 
-``benchpark experiment init --dest=quicksilver-gcc --system=ruby-gcc quicksilver
-caliper=mpi +weak +openmp`` ``benchpark experiment init --dest=quicksilver-intel
---system=ruby-intel quicksilver caliper=mpi +weak +openmp``
+``benchpark experiment init --dest=quicksilver-gcc ruby-gcc quicksilver caliper=mpi
++weak +openmp`` ``benchpark experiment init --dest=quicksilver-intel ruby-intel
+quicksilver caliper=mpi +weak +openmp``
 
 .. note::
 
@@ -42,8 +45,9 @@ caliper=mpi +weak +openmp`` ``benchpark experiment init --dest=quicksilver-intel
     this is to create multiple duplicate experiments, changing the experiment name
     (``--dest=quicksilver``, ``--dest=quicksilver2``).
 
-Running multiple experiments
-----------------------------
+******************************
+ Running multiple experiments
+******************************
 
 Now that both the system and experiment parameters have been defined, we can setup each
 experiment directory. This step will install the binary, and create the
@@ -51,8 +55,8 @@ execute_experiment shell script
 
 .. code-block:: console
 
-    $ benchpark setup quicksilver-gcc workspace
-    $ benchpark setup quicksilver-intel workspace
+    $ benchpark setup ruby-gcc/quicksilver-gcc workspace
+    $ benchpark setup ruby-intel/quicksilver-intel workspace
 
 Now, we generate an execute_experiment shell script for each run, and install the
 benchmark along with all dependencies
@@ -82,8 +86,9 @@ Completing these steps will result in the following structure
                      ..../
                      execute_experiment
 
-Verifying build details, differences between builds
----------------------------------------------------
+*****************************************************
+ Verifying build details, differences between builds
+*****************************************************
 
 Benchpark offers two ways to double check that each binary has built according to the
 specifications:
@@ -153,8 +158,9 @@ differences between the specs highlighted in red, e.g. ``glibc``.
 .. image:: /_static/images/quicksilver-diffspecs.png
     :align: center
 
-Running Experiments
--------------------
+*********************
+ Running Experiments
+*********************
 
 To launch the experiments in separate job allocations, run the following commands:
 
@@ -163,8 +169,9 @@ To launch the experiments in separate job allocations, run the following command
     ramble --workspace-dir workspace/quicksilver/ruby-gcc/workspace on
     ramble --workspace-dir workspace/quicksilver/ruby-intel/workspace on
 
-Collecting FOMs
----------------
+*****************
+ Collecting FOMs
+*****************
 
 Most benchmarks within benchpark generate a figure of merit, which is a measure of
 performance. We can analyze the figure of merit by running the following:
@@ -180,8 +187,9 @@ performance. We can analyze the figure of merit by running the following:
     the LLNL ``Dane`` cluster is located at
     ``benchpark/docs/examples/compare_experiment_builds/compareExperimentBuilds.sh``.
 
-Analyzing Caliper Data with Thicket
------------------------------------
+*************************************
+ Analyzing Caliper Data with Thicket
+*************************************
 
 Enabling the Caliper modifier (see :doc:`modifiers`) gives us a much more detailed
 picture about any performance differences, beyond looking at runtimes we can generate a

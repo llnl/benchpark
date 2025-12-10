@@ -4,8 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Run a Binary
-============
+##############
+ Run a Binary
+##############
 
 If you have a pre-built binary of your application, you can use it in your Benchpark
 experiment using the ``user-managed`` Ramble-defined package manager (`see docs
@@ -20,11 +21,11 @@ system:
 ::
 
     benchpark system init --dest=ruby llnl-cluster cluster=ruby
-    benchpark experiment init --dest=osumb --system=ruby osu-micro-benchmarks \
+    benchpark experiment init --dest=osumb ruby osu-micro-benchmarks \
         package_manager="user-managed" \
         workload="osu_latency" \
         prepend_path="/usr/myuser/osu-micro-benchmarks/mpi/pt2pt"
-    benchpark setup ./osumb/ osumb-ruby/
+    benchpark setup ./ruby/osumb/ osumb-ruby/
     # Follow Ramble execution instructions ...
 
 This will execute using the ``osu_latency`` binary located at
@@ -36,10 +37,10 @@ binary (``bin/kripke.exe``):
 ::
 
     benchpark system init --dest=dane llnl-cluster cluster=dane
-    benchpark experiment init --dest=kripke --system=dane kripke \
+    benchpark experiment init --dest=kripke dane kripke \
         package_manager="user-managed" \
         prepend_path="/usr/myuser/benchpark/wkp/spack/opt/spack/linux-rhel8-sapphirerapids/oneapi-2023.2.1/kripke-develop-ehvoc6dzdprgm3lhaghh7uoiqsc5xcf6/bin"
-    benchpark setup ./kripke/ kripke-dane/
+    benchpark setup ./dane/kripke/ kripke-dane/
     # Follow Ramble execution instructions ...
 
 Using the spack built binary.

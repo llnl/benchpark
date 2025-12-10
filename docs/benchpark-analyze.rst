@@ -4,8 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Analyze a Scaling Study
-=======================
+#########################
+ Analyze a Scaling Study
+#########################
 
 The ``benchpark analyze`` command can be used to generate pre-defined charts for
 analysis of scaling studies using Caliper and Thicket. The study must use the Caliper
@@ -32,8 +33,9 @@ To run ``benchpark analyze``:
 
 .. program-output:: ../bin/benchpark analyze -h
 
-Calltree
---------
+**********
+ Calltree
+**********
 
 We will use one of the experiments available in Benchpark, Kripke, to demonstrate the
 output of the ``benchpark analyze`` command.
@@ -72,8 +74,9 @@ The output includes the Calltree of the benchmark:
             ├─  MPI_Waitall
             └─  SweepSubdomain
 
-Strong Scaling
---------------
+****************
+ Strong Scaling
+****************
 
 To generate a strong scaling dataset, you would need to run the strong scaling scaling
 study of Kripke:
@@ -81,8 +84,8 @@ study of Kripke:
 .. code-block:: console
 
     $ benchpark system init --dest=lassen llnl-sierra
-    $ benchpark experiment init --dest=kripke/cuda/strong --system=lassen kripke+cuda+strong caliper=time,mpi
-    $ benchpark setup kripke/cuda/strong wkp
+    $ benchpark experiment init --dest=kripke/cuda/strong lassen kripke+cuda+strong caliper=time,mpi
+    $ benchpark setup lassen/kripke/cuda/strong wkp
     // Follow instructions for running Ramble ...
 
 Run ``benchpark analyze``:
@@ -106,15 +109,16 @@ The default configuration will visualize a stacked area chart of:
 - The legend will contain the regions and maximum calls out of all of the ranks
   (``Calls/rank (max)``).
 
-Weak Scaling
-------------
+**************
+ Weak Scaling
+**************
 
 To generate the weak scaling dataset:
 
 .. code-block:: console
 
-    $ benchpark experiment init --dest=kripke/cuda/weak --system=lassen kripke+cuda+weak caliper=time,mpi
-    $ benchpark setup kripke/cuda/weak wkp
+    $ benchpark experiment init --dest=kripke/cuda/weak lassen kripke+cuda+weak caliper=time,mpi
+    $ benchpark setup lassen/kripke/cuda/weak wkp
     // Follow instructions for running Ramble ...
 
 Run ``benchpark analyze``:
@@ -127,15 +131,16 @@ Run ``benchpark analyze``:
     :width: 800
     :align: center
 
-Throughput
-----------
+************
+ Throughput
+************
 
 To generate the throughput dataset:
 
 .. code-block:: console
 
-    $ benchpark experiment init --dest=kripke/cuda/throughput --system=lassen kripke+cuda+throughput caliper=time,mpi
-    $ benchpark setup kripke/cuda/throughput wkp
+    $ benchpark experiment init --dest=kripke/cuda/throughput lassen kripke+cuda+throughput caliper=time,mpi
+    $ benchpark setup lassen/kripke/cuda/throughput wkp
     // Follow instructions for running Ramble ...
 
 Run ``benchpark analyze``:
@@ -148,8 +153,9 @@ Run ``benchpark analyze``:
     :width: 800
     :align: center
 
-Percentage
-----------
+************
+ Percentage
+************
 
 .. code-block:: console
 
@@ -163,8 +169,9 @@ what percentage of the time each region is taking.
     :width: 800
     :align: center
 
-Inclusive Metrics
------------------
+*******************
+ Inclusive Metrics
+*******************
 
 .. code-block:: console
 
@@ -179,8 +186,9 @@ inclusive metric.
     :width: 800
     :align: center
 
-Region Filtering
-----------------
+******************
+ Region Filtering
+******************
 
 .. code-block:: console
 

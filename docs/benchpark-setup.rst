@@ -4,8 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Set up a Workspace
-==================
+####################
+ Set up a Workspace
+####################
 
 To setup an experiment workspace you must first initialize the system you will be
 running on. Next, initialize the experiment you plan to run with the appropriate
@@ -13,14 +14,14 @@ programming model. Finally, set up the workspace in a directory for your experim
 
 ::
 
-    benchpark system init --dest=</output/path/to/system_def_dir> <SystemName> compiler=<Compiler>
-    benchpark experiment init --dest=</output/path/to/experiment_def_dir> <Benchmark> +/~<Boolean Variant> <String Variant>=<value> --system=</output/path/to/system_def_dir>
-    benchpark setup </output/path/to/experiment_def> </output/path/to/workspace>
+    benchpark system init --dest=</output/path/to/system_def_dir/mySystemName> <SystemName> compiler=<Compiler>
+    benchpark experiment init <mySystemName> <Benchmark> +/~<Boolean Variant> <String Variant>=<value>
+    benchpark setup <mySystemName>/<Benchmark> </output/path/to/workspace>
 
 where:
 
 - ``<Benchmark>``: amg2023 | saxpy | etc. (specified choices in :doc:`benchmark-list`)
-- ``<System>``: Cts | Tioga | etc. (specified systems in :doc:`system-list`)
+- ``<SystemName>``: Cts | Tioga | etc. (specified systems in :doc:`system-list`)
 
 This command will assemble a Ramble workspace per experiment with a configuration for
 the specified benchmark and system with the following directory structure:
@@ -30,8 +31,8 @@ the specified benchmark and system with the following directory structure:
     experiments_root/
         ramble/
         spack/
-        <Benchmark/ProgrammingModel>/
-            <System>/
+        <System>/
+            <Benchmark/ProgrammingModel>/
                 workspace/
                     configs/
                         (everything from system_def_dir)
@@ -50,19 +51,22 @@ including ``--dry-run`` and ``--phases make_experiments``.
 
 Now you are ready to compile your experiments as described in :doc:`build-experiment`.
 
-Built-in System/Experiment Variants
------------------------------------
+*************************************
+ Built-in System/Experiment Variants
+*************************************
 
 There are benchpark system and experiment variants that you can change, without needing
 to define them in your ``system.py`` and ``experiment.py``.
 
-For Systems
-===========
+#############
+ For Systems
+#############
 
     - ``timeout`` - Job timeout limit in minutes.
 
-For Experiments
-===============
+#################
+ For Experiments
+#################
 
     - ``package_manager`` - Specify this variant to use a ramble package manager other
       than ``spack``. See :doc:`run-binary` to see an example.
