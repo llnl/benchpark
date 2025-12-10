@@ -306,13 +306,14 @@ def make_chart(**kwargs):
     title = (
         "Region (Calls/rank (max))" if kwargs["cluster"] != "multiple" else "Cluster"
     )
-    ax.legend(
-        handles,
-        labels,
-        bbox_to_anchor=(1, 0.5),
-        loc="center left",
-        title=title,
-    )
+    if not kwargs["disable_legend"]:
+        ax.legend(
+            handles,
+            labels,
+            bbox_to_anchor=(1, 0.5),
+            loc="center left",
+            title=title,
+        )
     ax.set_xlabel(xlabel)
 
     fig.autofmt_xdate()
@@ -693,6 +694,11 @@ def setup_parser(root_parser):
     )
     root_parser.add_argument(
         "--yaxis-log", action="store_true", help="Change yaxis to log base 2."
+    )
+    root_parser.add_argument(
+        "--disable-legend",
+        action="store_true",
+        help="Turn off the legend on the figure",
     )
 
     # Workspace commands
