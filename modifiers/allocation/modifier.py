@@ -297,6 +297,10 @@ class Allocation(BasicModifier):
         if not v.n_threads_per_proc:
             v.n_threads_per_proc = 1
 
+        # Calculate n_ranks_per_node if not explicitly set
+        if not v.n_ranks_per_node and v.n_ranks and v.n_nodes:
+            v.n_ranks_per_node = math.ceil(v.n_ranks / v.n_nodes)
+
         # Final check, make sure the above arithmetic didn't result in an
         # unreasonable allocation request.
         for var, val in v.defined():
@@ -466,6 +470,59 @@ class Allocation(BasicModifier):
         v.batch_submit = "pjsub {execute_experiment}"
         v.allocation_directives = "\n".join(batch_directives)
 
+    def pbs_instructions(self, v):
+        batch_opts, cmd_opts = Allocation._init_batch_and_cmd_opts(v)
+
+        if v.n_ranks and v.n_nodes and v.n_ranks_per_node:
+            expected_ranks = v.n_nodes * v.n_ranks_per_node
+            if v.n_ranks != expected_ranks:
+                raise ValueError(
+                    f"Inconsistent rank specification: n_ranks ({v.n_ranks}) != "
+                    f"n_nodes ({v.n_nodes}) * n_ranks_per_node ({v.n_ranks_per_node})"
+                )
+
+        if v.n_ranks:
+            cmd_opts.append(f"-np {v.n_ranks}")
+
+        if v.n_nodes:
+            node_spec = f"nodes={v.n_nodes}"
+            if v.n_ranks_per_node:
+                node_spec += f":ppn={v.n_ranks_per_node}"
+
+            if v.n_gpus and v.sys_gpus_per_node:
+                if v.n_gpus > v.n_nodes * v.sys_gpus_per_node:
+                    raise ValueError(
+                        f"Requested GPUs ({v.n_gpus}) exceeds available GPUs "
+                        f"({v.n_nodes * v.sys_gpus_per_node}) on {v.n_nodes} nodes"
+                    )
+                # Distribute GPUs as evenly as possible
+                gpus_per_node = v.n_gpus // v.n_nodes
+                if v.n_gpus % v.n_nodes > 0:
+                    gpus_per_node += 1
+                gpus_per_node = min(gpus_per_node, v.sys_gpus_per_node)
+                node_spec += f":gpus={gpus_per_node}"
+            elif v.n_gpus:
+                raise ValueError(
+                    "GPU allocation requested but sys_gpus_per_node not specified"
+                )
+
+            batch_opts.append(f"-l {node_spec}")
+
+        if v.queue:
+            batch_opts.append(f"-q {v.queue}")
+
+        if v.timeout:
+            batch_opts.append(f"-l walltime={TimeFormat.as_hhmmss(v.timeout)}")
+
+        if v.bank:
+            batch_opts.append(f"-A {v.bank}")
+
+        batch_directives = list(f"#PBS {x}" for x in batch_opts)
+
+        v.mpi_command = f"mpiexec {' '.join(cmd_opts)}"
+        v.batch_submit = "qsub {execute_experiment}"
+        v.allocation_directives = "\n".join(batch_directives)
+
     def determine_scheduler_instructions(self, v):
         handler = {
             "slurm": self.slurm_instructions,
@@ -473,6 +530,7 @@ class Allocation(BasicModifier):
             "mpi": self.mpi_instructions,
             "lsf": self.lsf_instructions,
             "pjm": self.pjm_instructions,
+            "pbs": self.pbs_instructions,
         }
         if v.scheduler not in handler:
             raise ValueError(
