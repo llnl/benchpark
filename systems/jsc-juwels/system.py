@@ -100,12 +100,12 @@ class JscJuwels(System):
                     "buildable": False,
                 },
                 "cmake": {
+                    "buildable": False,
                     "externals": [
                         {
                             "spec": "cmake@3.26.3",
                             "prefix": "/p/software/juwelsbooster/stages/2024/software/CMake/3.26.3-GCCcore-12.3.0",
                             "modules": ["Stages/2024", "CMake"],
-                            "buildable": False,
                         }
                     ],
                 },

@@ -399,7 +399,7 @@ your experiment:
     # first - initialize some system: benchpark system init --dest=my-system ...
 
     # second - initialize the experiment
-    benchpark experiment init --dest=hpl --system=my-system hpl
+    benchpark experiment init --dest=hpl my-system hpl
 
 If this completes without errors, you can continue testing by setting up a benchpark
 workspace as described in :doc:`testing-your-contribution`.
