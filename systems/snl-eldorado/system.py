@@ -229,9 +229,9 @@ class SnlEldorado(System):
                         {
                             "spec": "python@3.9.12",
                             "prefix": "/usr/tce/packages/python/python-3.9.12",
-                            "buildable": False,
                         }
-                    ]
+                    ],
+                    "buildable": False,
                 },
                 "unzip": {
                     "buildable": False,
@@ -239,9 +239,8 @@ class SnlEldorado(System):
                 },
                 "hypre": {"variants": f"amdgpu_target={self.rocm_arch}"},
                 "hwloc": {
-                    "externals": [
-                        {"spec": "hwloc@2.9.1", "prefix": "/usr", "buildable": False}
-                    ]
+                    "externals": [{"spec": "hwloc@2.9.1", "prefix": "/usr"}],
+                    "buildable": False,
                 },
                 "fftw": {"buildable": False},
                 "intel-oneapi-mkl": {
