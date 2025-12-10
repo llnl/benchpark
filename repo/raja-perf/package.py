@@ -127,8 +127,9 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
     """RAJA Performance Suite."""
 
     homepage = "http://software.llnl.gov/RAJAPerf/"
-    git      = "https://github.com/LLNL/RAJAPerf.git"
+    git      = "/usr/workspace/mckinsey/bp_ERkripke-vs-rajaperf/RAJAPerf/"
 
+    version("ltimes-a1c", branch="ltimes-a1c", submodules="True")
     version("develop", branch="develop", submodules="True")
     version("main",  branch="main",  submodules="True")
     version("2025.03.0", tag="v2025.03.0", submodules="True")
@@ -375,16 +376,17 @@ class RajaPerf(CachedCMakePackage, CudaPackage, ROCmPackage):
     def cmake_args(self):
         options = [f"-DMPI_CXX_LINK_FLAGS='{self.spec['mpi'].libs.ld_flags}'"]
 
-        # Create a post-project include that runs after languages are enabled
-        after = join_path(self.stage.source_path, "force_cupti_after.cmake")
-        with open(after, "w") as f:
-            f.write(
-                "cmake_policy(SET CMP0074 NEW)\n"
-                "find_package(CUDAToolkit REQUIRED COMPONENTS cupti)\n"
-            )
+        if "+cuda" in self.spec:
+            # Create a post-project include that runs after languages are enabled
+            after = join_path(self.stage.source_path, "force_cupti_after.cmake")
+            with open(after, "w") as f:
+                f.write(
+                    "cmake_policy(SET CMP0074 NEW)\n"
+                    "find_package(CUDAToolkit REQUIRED COMPONENTS cupti)\n"
+                )
 
-        # Use CMAKE_PROJECT_INCLUDE (not TOP_LEVEL) so it runs after project()
-        options.append(f"-DCMAKE_PROJECT_INCLUDE={after}")
+            # Use CMAKE_PROJECT_INCLUDE (not TOP_LEVEL) so it runs after project()
+            options.append(f"-DCMAKE_PROJECT_INCLUDE={after}")
 
         return options
 

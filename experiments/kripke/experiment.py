@@ -32,7 +32,7 @@ class Kripke(
     variant(
         "version",
         default="2025-07",
-        values=("develop", "latest", "2025-07", "1.2.7.0"),
+        values=("develop", "latest", "2025-07", "1.2.7.0", "fix-policies"),
         description="app version",
     )
 
@@ -82,7 +82,6 @@ class Kripke(
             self.add_experiment_variable("nquad", 36, True)
             self.add_experiment_variable("ds", 36, True)
             self.add_experiment_variable("lorder", 4, True)
-            self.add_experiment_variable("layout", "GDZ", True)
 
         # Set the variables required by the experiment
         self.set_required_variables(
@@ -134,12 +133,16 @@ class Kripke(
 
         if self.spec.satisfies("+openmp"):
             self.add_experiment_variable("arch", "OpenMP")
+            self.add_experiment_variable("layout", "DGZ", True)
         elif self.spec.satisfies("+cuda"):
             self.add_experiment_variable("arch", "CUDA")
+            self.add_experiment_variable("layout", "GDZ", True)
         elif self.spec.satisfies("+rocm"):
             self.add_experiment_variable("arch", "HIP")
+            self.add_experiment_variable("layout", "GDZ", True)
         else:
             self.add_experiment_variable("arch", "Sequential")
+            self.add_experiment_variable("layout", "DGZ", True)
 
         if self.spec.satisfies("+openmp"):
             self.add_experiment_variable("n_threads_per_proc", 1, True)

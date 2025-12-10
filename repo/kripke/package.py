@@ -12,7 +12,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     """
 
     homepage = "https://computing.llnl.gov/projects/co-design/kripke"
-    git = "https://github.com/LLNL/Kripke.git"
+    git = "/usr/workspace/mckinsey/bp_ERkripke-vs-rajaperf/Kripke/"
 
     tags = ["proxy-app"]
 
@@ -20,6 +20,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
 
     license("BSD-3-Clause")
 
+    version("fix-policies", branch="fix-policies", submodules=False)
     version("develop", branch="develop", submodules=False)
     version("2025-07", submodules=False, commit="8cf38433a6a11e0dcd17864e649b2d045159ee9c")
     version(
@@ -62,7 +63,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("cxx", type="build")
     depends_on("fortran", type="build")
 
-    depends_on("chai@2024.07.0+raja", when="@1.2.7.0:")
+    depends_on("chai@2024.07.0+raja")#, when="@1.2.7.0:")
     depends_on("fmt@9.1", when=f"^chai@2024.07.0")
 
     depends_on("mpi", when="+mpi")
@@ -72,7 +73,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     conflicts("^blt@:0.3.6", when="+rocm")
     conflicts("^blt@0.7.0")
 
-    depends_on("blt@0.6.2:", type="build", when=f"@1.2.7:")
+    depends_on("blt@0.6.2:", type="build")#, when=f"@1.2.7:")
 
     depends_on("chai+openmp", when="+openmp")
     depends_on("chai~openmp", when="~openmp")
@@ -99,6 +100,11 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
         if "+cuda" in spec:
             env.set("CUDAHOSTCXX", self.spec["mpi"].mpicxx)
             env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
+    
+    def setup_run_environment(self, env):
+        spec = self.spec
+        if "+rocm" in spec:
+            env.set("HSA_XNACK", "1")
 
     def cmake_args(self):
         spec = self.spec
@@ -152,6 +158,18 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
             )
         else:
             args.append("-DENABLE_CUDA=OFF")
+
+        if "+cuda" in self.spec:
+            # Create a post-project include that runs after languages are enabled
+            after = join_path(self.stage.source_path, "force_cupti_after.cmake")
+            with open(after, "w") as f:
+                f.write(
+                    "cmake_policy(SET CMP0074 NEW)\n"
+                    "find_package(CUDAToolkit REQUIRED COMPONENTS cupti)\n"
+                )
+
+            # Use CMAKE_PROJECT_INCLUDE (not TOP_LEVEL) so it runs after project()
+            args.append(f"-DCMAKE_PROJECT_INCLUDE={after}")
 
         return args
 

@@ -31,7 +31,7 @@ class RajaPerf(
     variant(
         "version",
         default="2025.03.0",
-        values=("develop", "latest", "2025.03.0", "2024.07.0"),
+        values=("develop", "latest", "2025.03.0", "2024.07.0", "ltimes-a1c"),
         description="app version",
     )
 
@@ -42,7 +42,7 @@ class RajaPerf(
             # Per-process size
             self.add_experiment_variable("process_problem_size", 1048576, True)
             # Number of processes
-            self.add_experiment_variable("n_resources", 1, False)
+            self.add_experiment_variable("n_resources", 4, False)
 
         self.set_required_variables(
             total_problem_size="{n_resources}*{process_problem_size}",

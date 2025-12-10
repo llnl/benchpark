@@ -18,24 +18,137 @@ class Kripke(ExecutableApplication):
             'high-memory-bandwidth','large-memory-footprint','regular-memory-access',
             'mpi','network-latency-bound','network-collectives']
 
-    executable('kripke', 'kripke.exe' +
-                     ' --groups {ngroups}' +
-                     ' --legendre {lorder}' +
-                     ' --quad {nquad}' +
-                     ' --zones {nzx},{nzy},{nzz}' +
-                     ' --sigt {sigt0},{sigt1},{sigt2}' +
-                     ' --sigs {sigs0},{sigs1},{sigs2}' +
-                     ' --arch {arch}' +
-                     ' --layout {layout}' +
-#                     ' --pdist {lout}' +
-                     ' --procs {npx},{npy},{npz}' +
-                     ' --dset {ds}' +
-                     ' --gset {gs}' +
-                     ' --zset {nzsetx},{nzsety},{nzsetz}' +
-                     ' --niter {niter}' +
-                     ' --pmethod {method}', use_mpi=True)
+    # executable('kripke', 'kripke.exe' +
+    #                  ' --groups {ngroups}' +
+    #                  ' --legendre {lorder}' +
+    #                  ' --quad {nquad}' +
+    #                  ' --zones {nzx},{nzy},{nzz}' +
+    #                  #' --sigt {sigt0},{sigt1},{sigt2}' +
+    #                  #' --sigs {sigs0},{sigs1},{sigs2}' +
+    #                  ' --arch {arch}' +
+    #                  ' --layout {layout}' +
+    #                  ' --procs {npx},{npy},{npz}' +
+    #                  #' --dset {ds}' +
+    #                  #' --gset {gs}' +
+    #                  #' --zset {nzsetx},{nzsety},{nzsetz}' +
+    #                  ' --niter {niter}', use_mpi=True)
+    #                  #' --pmethod {method}'
 
-    workload('kripke', executables=['kripke'])
+    common = 'kripke.exe --arch {arch} --layout {layout} --procs 1,1,1 --niter 1 --legendre 4 --quad 96 --gset 1 '
+
+    executable('k1',  common + ' --groups 220 --zones 4,4,4',   use_mpi=True)
+    executable('k2',  common + ' --groups 220 --zones 8,8,8', use_mpi=True)
+    executable('k3',  common + ' --groups 220 --zones 12,12,12', use_mpi=True)
+    executable('k4',  common + ' --groups 220 --zones 16,16,16', use_mpi=True)
+    executable('k5',  common + ' --groups 220 --zones 20,20,20', use_mpi=True)
+    executable('k6',  common + ' --groups 220 --zones 24,24,24', use_mpi=True)
+    executable('k7',  common + ' --groups 220 --zones 28,28,28', use_mpi=True)
+    executable('k8',  common + ' --groups 220 --zones 32,32,32', use_mpi=True)
+    executable('k9',  common + ' --groups 220 --zones 36,36,36', use_mpi=True)
+    executable('k10', common + ' --groups 220 --zones 40,40,40', use_mpi=True)
+    executable('k11', common + ' --groups 220 --zones 44,44,44', use_mpi=True)
+
+    executable('k12', common + ' --groups 320 --zones 4,4,4',    use_mpi=True)
+    executable('k13', common + ' --groups 320 --zones 8,8,8',  use_mpi=True)
+    executable('k14', common + ' --groups 320 --zones 12,12,12', use_mpi=True)
+    executable('k15', common + ' --groups 320 --zones 16,16,16', use_mpi=True)
+    executable('k16', common + ' --groups 320 --zones 20,20,20', use_mpi=True)
+    executable('k17', common + ' --groups 320 --zones 24,24,24', use_mpi=True)
+    executable('k18', common + ' --groups 320 --zones 28,28,28', use_mpi=True)
+    executable('k19', common + ' --groups 320 --zones 32,32,32', use_mpi=True)
+    executable('k20', common + ' --groups 320 --zones 36,36,36', use_mpi=True)
+    executable('k21', common + ' --groups 320 --zones 40,40,40', use_mpi=True)
+    executable('k22', common + ' --groups 320 --zones 44,44,44', use_mpi=True)
+
+    executable('k23', common + ' --groups 360 --zones 4,4,4',    use_mpi=True)
+    executable('k24', common + ' --groups 360 --zones 8,8,8',  use_mpi=True)
+    executable('k25', common + ' --groups 360 --zones 12,12,12', use_mpi=True)
+    executable('k26', common + ' --groups 360 --zones 16,16,16', use_mpi=True)
+    executable('k27', common + ' --groups 360 --zones 20,20,20', use_mpi=True)
+    executable('k28', common + ' --groups 360 --zones 24,24,24', use_mpi=True)
+    executable('k29', common + ' --groups 360 --zones 28,28,28', use_mpi=True)
+    executable('k30', common + ' --groups 360 --zones 32,32,32', use_mpi=True)
+    executable('k31', common + ' --groups 360 --zones 36,36,36', use_mpi=True)
+    executable('k32', common + ' --groups 360 --zones 40,40,40', use_mpi=True)
+    executable('k33', common + ' --groups 360 --zones 44,44,44', use_mpi=True)
+
+    # common = 'kripke.exe --arch {arch} --layout {layout} --procs 2,2,1 --niter 1 --legendre 4 --quad 96 --gset 1 '
+
+    # executable('k1',  common + ' --groups 220 --zones 8,8,4',   use_mpi=True)
+    # executable('k2',  common + ' --groups 220 --zones 16,16,8', use_mpi=True)
+    # executable('k3',  common + ' --groups 220 --zones 24,24,12', use_mpi=True)
+    # executable('k4',  common + ' --groups 220 --zones 32,32,16', use_mpi=True)
+    # executable('k5',  common + ' --groups 220 --zones 40,40,20', use_mpi=True)
+    # executable('k6',  common + ' --groups 220 --zones 48,48,24', use_mpi=True)
+    # executable('k7',  common + ' --groups 220 --zones 56,56,28', use_mpi=True)
+    # executable('k8',  common + ' --groups 220 --zones 64,64,32', use_mpi=True)
+    # executable('k9',  common + ' --groups 220 --zones 72,72,36', use_mpi=True)
+    # executable('k10', common + ' --groups 220 --zones 80,80,40', use_mpi=True)
+    # executable('k11', common + ' --groups 220 --zones 88,88,44', use_mpi=True)
+
+    # executable('k12', common + ' --groups 320 --zones 8,8,4',    use_mpi=True)
+    # executable('k13', common + ' --groups 320 --zones 16,16,8',  use_mpi=True)
+    # executable('k14', common + ' --groups 320 --zones 24,24,12', use_mpi=True)
+    # executable('k15', common + ' --groups 320 --zones 32,32,16', use_mpi=True)
+    # executable('k16', common + ' --groups 320 --zones 40,40,20', use_mpi=True)
+    # executable('k17', common + ' --groups 320 --zones 48,48,24', use_mpi=True)
+    # executable('k18', common + ' --groups 320 --zones 56,56,28', use_mpi=True)
+    # executable('k19', common + ' --groups 320 --zones 64,64,32', use_mpi=True)
+    # executable('k20', common + ' --groups 320 --zones 72,72,36', use_mpi=True)
+    # executable('k21', common + ' --groups 320 --zones 80,80,40', use_mpi=True)
+    # executable('k22', common + ' --groups 320 --zones 88,88,44', use_mpi=True)
+
+    # executable('k23', common + ' --groups 360 --zones 8,8,4',    use_mpi=True)
+    # executable('k24', common + ' --groups 360 --zones 16,16,8',  use_mpi=True)
+    # executable('k25', common + ' --groups 360 --zones 24,24,12', use_mpi=True)
+    # executable('k26', common + ' --groups 360 --zones 32,32,16', use_mpi=True)
+    # executable('k27', common + ' --groups 360 --zones 40,40,20', use_mpi=True)
+    # executable('k28', common + ' --groups 360 --zones 48,48,24', use_mpi=True)
+    # executable('k29', common + ' --groups 360 --zones 56,56,28', use_mpi=True)
+    # executable('k30', common + ' --groups 360 --zones 64,64,32', use_mpi=True)
+    # executable('k31', common + ' --groups 360 --zones 72,72,36', use_mpi=True)
+    # executable('k32', common + ' --groups 360 --zones 80,80,40', use_mpi=True)
+    # executable('k33', common + ' --groups 360 --zones 88,88,44', use_mpi=True)
+
+    # common = 'kripke.exe --arch {arch} --layout {layout} --procs 7,4,4 --niter 1 --legendre 4 --quad 96 --gset 1 '
+
+    # executable('k1',  common + ' --groups 220 --zones 7,4,4',   use_mpi=True)
+    # executable('k2',  common + ' --groups 220 --zones 14,8,8', use_mpi=True)
+    # executable('k3',  common + ' --groups 220 --zones 21,12,12', use_mpi=True)
+    # executable('k4',  common + ' --groups 220 --zones 28,16,16', use_mpi=True)
+    # executable('k5',  common + ' --groups 220 --zones 35,20,20', use_mpi=True)
+    # executable('k6',  common + ' --groups 220 --zones 42,24,24', use_mpi=True)
+    # executable('k7',  common + ' --groups 220 --zones 49,28,28', use_mpi=True)
+    # executable('k8',  common + ' --groups 220 --zones 56,32,32', use_mpi=True)
+    # executable('k9',  common + ' --groups 220 --zones 63,36,36', use_mpi=True)
+    # executable('k10', common + ' --groups 220 --zones 70,40,40', use_mpi=True)
+    # executable('k11', common + ' --groups 220 --zones 77,44,44', use_mpi=True)
+
+    # executable('k12', common + ' --groups 320 --zones 7,4,4',    use_mpi=True)
+    # executable('k13', common + ' --groups 320 --zones 14,8,8',  use_mpi=True)
+    # executable('k14', common + ' --groups 320 --zones 21,12,12', use_mpi=True)
+    # executable('k15', common + ' --groups 320 --zones 28,16,16', use_mpi=True)
+    # executable('k16', common + ' --groups 320 --zones 35,20,20', use_mpi=True)
+    # executable('k17', common + ' --groups 320 --zones 42,24,24', use_mpi=True)
+    # executable('k18', common + ' --groups 320 --zones 49,28,28', use_mpi=True)
+    # executable('k19', common + ' --groups 320 --zones 56,32,32', use_mpi=True)
+    # executable('k20', common + ' --groups 320 --zones 63,36,36', use_mpi=True)
+    # executable('k21', common + ' --groups 320 --zones 70,40,40', use_mpi=True)
+    # executable('k22', common + ' --groups 320 --zones 77,44,44', use_mpi=True)
+
+    # executable('k23', common + ' --groups 360 --zones 7,4,4',    use_mpi=True)
+    # executable('k24', common + ' --groups 360 --zones 14,8,8',  use_mpi=True)
+    # executable('k25', common + ' --groups 360 --zones 21,12,12', use_mpi=True)
+    # executable('k26', common + ' --groups 360 --zones 28,16,16', use_mpi=True)
+    # executable('k27', common + ' --groups 360 --zones 35,20,20', use_mpi=True)
+    # executable('k28', common + ' --groups 360 --zones 42,24,24', use_mpi=True)
+    # executable('k29', common + ' --groups 360 --zones 49,28,28', use_mpi=True)
+    # executable('k30', common + ' --groups 360 --zones 56,32,32', use_mpi=True)
+    # executable('k31', common + ' --groups 360 --zones 63,36,36', use_mpi=True)
+    # executable('k32', common + ' --groups 360 --zones 70,40,40', use_mpi=True)
+    # executable('k33', common + ' --groups 360 --zones 77,44,44', use_mpi=True)
+
+    workload('kripke', executables=[f'k{i}' for i in range(1, 34)])
 
     workload_variable('ngroups', default='32',
                       description='Number of energy groups. (Default: --groups 32)',
@@ -76,7 +189,7 @@ class Kripke(ExecutableApplication):
     workload_variable('arch', default='Sequential',
                       description='Architecture selection. Selects the back-end used for computation, available are Sequential, OpenMP, CUDA and HIP. The default depends on capabilities selected by the build system and is selected from list of increasing precedence: Sequential, OpenMP, CUDA and HIP.',
                       workloads=['kripke'])
-    workload_variable('layout', default='DGZ',
+    workload_variable('layout', default='ZGD',
                       description='Data layout selection. This determines the data layout and kernel implementation details (such as loop nesting order). The layouts are determined by the order of unknowns in the angular flux: Direction, Group, and Zone. Available layouts are DGZ, DZG, GDZ, GZD, ZDG, and ZGD. The order is specified left-to-right in longest-to-shortest stride. For example: DGZ means that Directions are the longest stride, and Zones are stride-1. (Default: --nest DGZ)',
                       workloads=['kripke'])
 #    workload_variable('lout', default='0',
