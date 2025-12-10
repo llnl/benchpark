@@ -248,7 +248,7 @@ def make_chart(**kwargs):
     ax.set_xlabel(xlabel)
     ax.set_ylabel(y_label)
     if kwargs["yaxis_log"]:
-        ax.set_yscale('log', base=2) 
+        ax.set_yscale("log", base=2)
     plt.grid(True)
     df = df.sort_values(by=x_axis)
     plot_args = dict(
@@ -264,6 +264,8 @@ def make_chart(**kwargs):
         df["xaxis"] = df.apply(
             lambda row: ", ".join([str(row[col]) for col in x_axis]), axis=1
         )
+    if yaxis_metric not in df.columns:
+        raise KeyError(f"'{yaxis_metric}' not in the data. Choose from: {df.columns}")
     if kwargs["cluster"] == "multiple":
         plot_args["hue"] = "cluster"
     # Add marker only if line plot
@@ -276,7 +278,13 @@ def make_chart(**kwargs):
             .reset_index(drop=True)
             .sort_values("xaxis")
         )
-        tdf = tdf.pivot(index="xaxis", columns="name", values=yaxis_metric)
+        try:
+            tdf = tdf.pivot(index="xaxis", columns="name", values=yaxis_metric)
+        except ValueError:
+            print(
+                "Duplicate data points detected:\n\t(1) Check if you have duplicate caliper files per input configuration '--file-name-match'.\n\t(2) Duplicate regions can be grouped with '--group-regions-name'\n\t(3) MPI regions can be removed with '--no-mpi'\n\t(4) If your calltrees are disjoint, use '--calltree-unification intersection'"
+            )
+            raise
         tdf.plot(**plot_args)
     elif kind == "scatter":
         seaborn.scatterplot(**plot_args)
@@ -360,14 +368,17 @@ def prepare_data(**kwargs):
         )
         tk = tk.query(query)
 
-    # Remove singular roots if inclusive metric
     metric = kwargs["yaxis_metric"]
 
     known_applications = {"raja-perf": RAJAPerf}
     for ta in tk.metadata["application_name"].unique():
-        added_mets = known_applications[ta](tk).set_metrics()
-        logger.info(f"Added the following derived metrics for app '{ta}':\n\t{added_mets}\n\tUse them via the '--yaxis-metric' parameter.")
+        if ta in known_applications.keys():
+            added_mets = known_applications[ta](tk).set_metrics()
+            logger.info(
+                f"Added the following derived metrics for app '{ta}':\n\t{added_mets}\n\tUse them via the '--yaxis-metric' parameter."
+            )
 
+    # Remove singular roots if inclusive metric
     if metric in tk.inc_metrics and len(tk.graph.roots) == 1:
         root_name = tk.graph.roots[0].frame["name"]
         logger.info(
@@ -545,6 +556,12 @@ def prepare_data(**kwargs):
             )
     kwargs["cluster"] = cluster
 
+    if metric in tk.metadata.columns:
+        tk.metadata_columns_to_perfdata(metric)
+        logger.info(
+            f"Adding metadata column '{metric}' to the performance data from the metadata."
+        )
+
     make_chart(df=tk.dataframe, x_axis=x_axis_metadata, **kwargs)
 
 
@@ -675,9 +692,7 @@ def setup_parser(root_parser):
         help="Don't call Thicket.update_inclusive_columns() which can take a while.",
     )
     root_parser.add_argument(
-        "--yaxis-log",
-        action="store_true",
-        help="Change yaxis to log base 2."
+        "--yaxis-log", action="store_true", help="Change yaxis to log base 2."
     )
 
     # Workspace commands
@@ -701,6 +716,7 @@ def setup_parser(root_parser):
         default=None,
         help="With 'archive', path for the .tar.gz (defaults to CWD/<workspace>-<timestamp>.tar.gz)",
     )
+
 
 def command(args):
     """
