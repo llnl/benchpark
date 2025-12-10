@@ -186,7 +186,7 @@ class LlnlMatrix(System):
                 mpi_dict["mvapich2"] = {
                     "externals": [
                         {
-                            "spec": "mvapich2@2.3.7-gcc1211",
+                            "spec": "mvapich2@2.3.7",
                             "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-12.1.1",
                             "extra_attributes": {
                                 "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-12.1.1/lib -lmpi"
@@ -198,7 +198,7 @@ class LlnlMatrix(System):
                 mpi_dict["openmpi"] = {
                     "externals": [
                         {
-                            "spec": "openmpi@4.1.2-gcc1211",
+                            "spec": "openmpi@4.1.2",
                             "prefix": "/usr/tce/packages/openmpi/openmpi-4.1.2-gcc-12.1.1",
                             "extra_attributes": {
                                 "ldflags": "-L/usr/tce/packages/openmpi/openmpi-4.1.2-gcc-12.1.1/lib -lmpi"
@@ -211,7 +211,7 @@ class LlnlMatrix(System):
                 mpi_dict["mvapich2"] = {
                     "externals": [
                         {
-                            "spec": "mvapich2@2.3.7-intel202160classic",
+                            "spec": "mvapich2@2.3.7",
                             "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-classic-2021.6.0",
                             "extra_attributes": {
                                 "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-classic-2021.6.0/lib -lmpi"
@@ -223,7 +223,7 @@ class LlnlMatrix(System):
                 mpi_dict["openmpi"] = {
                     "externals": [
                         {
-                            "spec": "openmpi@4.1.2-intel202160classic",
+                            "spec": "openmpi@4.1.2",
                             "prefix": "/usr/tce/packages/openmpi/openmpi-4.1.2-intel-classic-2021.6.0",
                             "extra_attributes": {
                                 "ldflags": "-L/usr/tce/packages/openmpi/openmpi-4.1.2-intel-classic-2021.6.0/lib -lmpi"
@@ -236,7 +236,7 @@ class LlnlMatrix(System):
                 mpi_dict["mvapich2"] = {
                     "externals": [
                         {
-                            "spec": "mvapich2@2.3.7-intel202321",
+                            "spec": "mvapich2@2.3.7",
                             "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2023.2.1",
                             "extra_attributes": {
                                 "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2023.2.1/lib -lmpi"
@@ -248,7 +248,7 @@ class LlnlMatrix(System):
                 mpi_dict["openmpi"] = {
                     "externals": [
                         {
-                            "spec": "openmpi@4.1.2-intel202321",
+                            "spec": "openmpi@4.1.2",
                             "prefix": "/usr/tce/packages/openmpi/openmpi-4.1.2-intel-2023.2.1",
                             "extra_attributes": {
                                 "ldflags": "-L/usr/tce/packages/openmpi/openmpi-4.1.2-intel-2023.2.1/lib -lmpi"
