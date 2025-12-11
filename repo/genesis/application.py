@@ -20,30 +20,33 @@ class Genesis(ExecutableApplication):
     executable('chdir', 'cd $(dirname {input})', use_mpi=False)
     executable('genesis', 'spdyn {input}', use_mpi=True)
 
-    input_file('benchmark-2020',
-               url='https://www.r-ccs.riken.jp/labs/cbrt/wp-content/uploads/2020/12/benchmark_mkl_ver4_nocrowding.tar.gz',
-               sha256='2ca8b2d4974dc0be0a42064392f1d5c603c64ffa9adc1f3bcf7c146a3bbf5bdb',
+    input_file('benchmark-input',
+               url='https://github.com/genesis-release-r-ccs/genesis_benchmark_input/archive/refs/tags/v1.0.0.tar.gz',
+               sha256='13a04449f4036e38a640fd44adb08c723942515ecf512e7c64161c4ff96c8b5c',
                description='Benchmark set for GENESIS 2.0 beta / 1.6 on FUGAKU')
-    input_file('tests-2.1.1',
-               url='https://www.r-ccs.riken.jp/labs/cbrt/wp-content/uploads/2023/09/tests-2.1.1.tar.bz2',
-               sha256='f24d872beae5e38baa6a591906f78e3438186973c88e4879e4b04a0cca74f83e',
+    input_file('tests-2.1.5',
+               url='https://github.com/genesis-release-r-ccs/genesis/archive/refs/tags/v2.1.5.tar.gz',
+               sha256='622e6dc0bf9db54b2d18165f098044146abbf20837cb6209af2015856469afbf',
                description='Regression tests are prepared for ATDYN, SPDYN, prst_setup (parallel I/O), and analysis tools to check if these programs work correctly.')
 
-    workload('DHFR', executables=['chdir', 'genesis'], input='benchmark-2020')
-    workload('ApoA1', executables=['chdir', 'genesis'], input='benchmark-2020')
-    workload('UUN', executables=['chdir', 'genesis'], input='benchmark-2020')
-    workload('cryoEM', executables=['chdir', 'genesis'], input='tests-2.1.1')
+    workload('DHFR', executables=['chdir', 'genesis'], input='benchmark-input')
+    workload('ApoA1', executables=['chdir', 'genesis'], input='benchmark-input')
+    workload('UUN', executables=['chdir', 'genesis'], input='benchmark-input')
+    workload('cryoEM', executables=['chdir', 'genesis'], input='tests-2.1.5')
 
-    workload_variable('input', default='{benchmark-2020}/npt/genesis2.0beta/jac_amber/p{n_ranks}.inp',
+    workload_variable('input', default='{benchmark-input}',
+                      description='input/ : benchmark-input root directory',
+                      workloads=['DHFR','ApoA1','UUN'])
+    workload_variable('input', default='{benchmark-input}/npt/genesis2.0beta/jac_amber/p{n_ranks}.inp',
                       description='jac_amber/ : DHFR (27,346 atoms), AMBER format, soluble system',
                       workloads=['DHFR'])
-    workload_variable('input', default='{benchmark-2020}/npt/genesis2.0beta/apoa1/p{n_ranks}.inp',
+    workload_variable('input', default='{benchmark-input}/npt/genesis2.0beta/apoa1/p{n_ranks}.inp',
                       description='apoa1/ : apoa1 (92,224 atoms), CHARMM format, soluble system',
                       workloads=['ApoA1'])
-    workload_variable('input', default='{benchmark-2020}/npt/genesis2.0beta/uun/p{n_ranks}.inp',
+    workload_variable('input', default='{benchmark-input}/npt/genesis2.0beta/uun/p{n_ranks}.inp',
                       description='uun/ : uun (216,726 atoms), CHARMM format, membrane+solvent system',
                       workloads=['UUN'])
-    workload_variable('input', default='{tests-2.1.1}/regression_test/test_spdyn/cryoEM/All_atom/inp',
+    workload_variable('input', default='{tests-2.1.5}/tests/regression_test/test_spdyn/cryoEM/All_atom/inp',
                       description='cryoEM/All_atom/ : cryoEM (? atoms), CHARMM format',
                       workloads=['cryoEM'])
 
