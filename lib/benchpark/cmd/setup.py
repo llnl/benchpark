@@ -58,12 +58,13 @@ def command(args):
     experiments_root/
         spack/
         ramble/
-        <experiment>/
+        <experiment root>
             <system>/
-                workspace/
-                    configs/
-                        (everything from source/configs/<system>)
-                        (everything from source/experiments/<experiment>)
+                <experiment>/
+                    workspace/
+                        configs/
+                            (everything from source/configs/<system>)
+                            (everything from source/experiments/<experiment>)
     """
 
     # Parse experiment YAML for package_manager, system_id
@@ -77,9 +78,10 @@ def command(args):
                     return result
 
     experiments_root = pathlib.Path(os.path.abspath(args.experiments_root))
-    experiment_id = args.experiment
     source_dir = benchpark.paths.benchpark_root
 
+    # Experiments live inside systems: the experiment_id will include both
+    experiment_id = args.experiment
     experiment_src_dir = pathlib.Path(os.path.abspath(str(experiment_id)))
 
     with open(str(experiment_src_dir / "ramble.yaml"), "r") as file:
@@ -88,8 +90,7 @@ def command(args):
     system_id = _find(parsed_yaml, "destdir")
 
     debug_print(f"source_dir = {source_dir}")
-    debug_print(f"specified experiment = {experiment_id}")
-    debug_print(f"specified system = {system_id}")
+    debug_print(f"specified system/experiment = {experiment_id}")
 
     configs_src_dir = pathlib.Path(os.path.abspath(str(system_id)))
 
@@ -103,7 +104,6 @@ def command(args):
         common_root
         / experiments_root.relative_to(common_root)
         / experiment_id.relative_to(common_root)
-        / system_id.relative_to(common_root)
     )
 
     if workspace_dir.exists():
