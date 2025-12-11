@@ -16,7 +16,7 @@ class PyScaffold(
     Experiment,
     CudaExperiment,
     ROCmExperiment,
-    Scaling(ScalingMode.Strong),
+    Scaling(ScalingMode.Strong, ScalingMode.Weak),
     Caliper,
 ):
 
@@ -41,9 +41,18 @@ class PyScaffold(
             "package_path", self.spec.variants["scaffold_path"][0], False
         )
 
-        self.add_experiment_variable("n_gpus", 4, True)
+        if self.spec.satisfies("+strong"):
+            n_gpus = 4
+            problem_scale = 7
+        elif self.spec.satisfies("+weak"):
+            n_gpus = 1
+            problem_scale = 5
+        else:
+            n_gpus = 1
+            problem_scale = 7
 
-        self.add_experiment_variable("problem_scale", 6, True)
+        self.add_experiment_variable("n_gpus", n_gpus, True)
+        self.add_experiment_variable("problem_scale", problem_scale, True)
 
         self.register_scaling_config(
             {
@@ -52,6 +61,12 @@ class PyScaffold(
                     * scaling_factor,
                     "problem_scale": lambda var, itr, dim, scaling_factor: var.val(dim),
                 },
+                ScalingMode.Weak: {
+                    "n_gpus": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * 8,
+                    "problem_scale": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    + 1,
+                }
             }
         )
 

@@ -27,7 +27,7 @@ class PyScaffold(ExecutableApplication):
 
         app_inst.variables["rocm_mods"] = ""
         if "rocm_arch" in app_inst.variables.keys():
-            app_inst.variables["rocm_mods"] = "pip install amdsmi==6.4.0\nmodule load rccl/fast-env-slows-mpi\nexport MPICH_GPU_SUPPORT_ENABLED=0\n"
+            app_inst.variables["rocm_mods"] = "pip install amdsmi==6.4.0\nmodule load rocm/6.4.2 rccl/fast-env-slows-mpi\nexport MPICH_GPU_SUPPORT_ENABLED=0\nexport LD_LIBRARY_PATH=/collab/usr/global/tools/rccl/toss_4_x86_64_ib_cray/rocm-6.4.1/install/lib/:$LD_LIBRARY_PATH\export LD_LIBRARY_PATH=/opt/cray/pe/cce/20.0.0/cce/x86_64/lib:$LD_LIBRARY_PATH\n"
 
         # if caliper - Avoid libcaffe2_nvrtc.so
         paths.append("{pip_site_packages_path}/torch/lib")
@@ -44,7 +44,7 @@ class PyScaffold(ExecutableApplication):
     executable(
         "generate",
         "scaffold generate_fractals -c {package_path}ScaFFold/configs/benchmark_default.yml --problem-scale {problem_scale}",
-        use_mpi=False,
+        use_mpi=True,
     )
     executable(
         "run",
