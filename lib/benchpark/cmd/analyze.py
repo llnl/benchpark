@@ -275,16 +275,11 @@ def make_chart(**kwargs):
     elif kind == "area":
         tdf = (
             df[[yaxis_metric, "name", "xaxis"]]
-            .reset_index(drop=True)
+            .reset_index()
             .sort_values("xaxis")
         )
-        try:
-            tdf = tdf.pivot(index="xaxis", columns="name", values=yaxis_metric)
-        except ValueError:
-            print(
-                "Duplicate data points detected:\n\t(1) Check if you have duplicate caliper files per input configuration '--file-name-match'.\n\t(2) Duplicate regions can be grouped with '--group-regions-name'\n\t(3) MPI regions can be removed with '--no-mpi'\n\t(4) If your calltrees are disjoint, use '--calltree-unification intersection'"
-            )
-            raise
+        tdf = tdf.pivot(index="xaxis", columns="node", values=yaxis_metric)
+        tdf = tdf.rename(columns={col: col.frame["name"] for col in tdf.columns})
         tdf.plot(**plot_args)
     elif kind == "scatter":
         seaborn.scatterplot(**plot_args)
