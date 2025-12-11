@@ -445,9 +445,9 @@ def prepare_data(**kwargs):
     if prefix:
         tk.dataframe = pd.concat([tk.dataframe.filter(like=p, axis=0) for p in prefix])
 
-    tk.metadata_columns_to_perfdata(["cluster"] + list(NAME_REMAP.keys()))
-
     cluster_col = "cluster" if "cluster" in tk.metadata.columns else "host.cluster"
+    tk.metadata_columns_to_perfdata([cluster_col] + list(NAME_REMAP.keys()))
+
     # Check these values are constant
     app = validate_single_metadata_value("application_name", tk)
     try:
