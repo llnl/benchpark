@@ -278,6 +278,7 @@ def make_chart(**kwargs):
             .reset_index()
             .sort_values("xaxis")
         )
+        tdf["node"] = tdf["node"].apply(lambda i: ht.node.Node(ht.frame.Frame({"name": i})) if isinstance(i, str) else i)
         tdf = tdf.pivot(index="xaxis", columns="node", values=yaxis_metric)
         tdf = tdf.rename(columns={col: col.frame["name"] for col in tdf.columns})
         tdf.plot(**plot_args)
