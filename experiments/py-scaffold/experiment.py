@@ -63,7 +63,7 @@ class PyScaffold(
                 },
                 ScalingMode.Weak: {
                     "n_gpus": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * 8,
+                    * 2**3,
                     "problem_scale": lambda var, itr, dim, scaling_factor: var.val(dim)
                     + 1,
                 }
@@ -72,7 +72,7 @@ class PyScaffold(
 
         self.set_required_variables(
             n_resources="{n_gpus}",
-            process_problem_size="{problem_scale}/{n_gpus}",
+            process_problem_size="({problem_scale}-4)/({n_gpus}/({problem_scale}-4)**3)",
             total_problem_size="{problem_scale}",
         )
 
