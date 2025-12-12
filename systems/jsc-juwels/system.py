@@ -43,6 +43,7 @@ class JscJuwels(System):
         super().__init__(spec)
         self.programming_models = [CudaSystem()]
         self.cuda_version = Version(self.spec.variants["cuda"][0])
+        self.gtl_flag = None
 
         if self.spec.satisfies("compiler=gcc"):
             self.gcc_version = Version("12.3.0")
