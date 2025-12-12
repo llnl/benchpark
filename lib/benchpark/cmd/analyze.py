@@ -273,12 +273,12 @@ def make_chart(**kwargs):
         plot_args["marker"] = "o"
         seaborn.lineplot(**plot_args)
     elif kind == "area":
-        tdf = (
-            df[[yaxis_metric, "name", "xaxis"]]
-            .reset_index()
-            .sort_values("xaxis")
+        tdf = df[[yaxis_metric, "name", "xaxis"]].reset_index().sort_values("xaxis")
+        tdf["node"] = tdf["node"].apply(
+            lambda i: (
+                ht.node.Node(ht.frame.Frame({"name": i})) if isinstance(i, str) else i
+            )
         )
-        tdf["node"] = tdf["node"].apply(lambda i: ht.node.Node(ht.frame.Frame({"name": i})) if isinstance(i, str) else i)
         tdf = tdf.pivot(index="xaxis", columns="node", values=yaxis_metric)
         tdf = tdf.rename(columns={col: col.frame["name"] for col in tdf.columns})
         tdf.plot(**plot_args)
@@ -351,15 +351,23 @@ def prepare_data(**kwargs):
     clean_tree = tk.tree(kwargs["tree_metric"], render_header=True)
     clean_tree = re.compile(r"\x1b\[([0-9;]*m)").sub("", clean_tree)
 
-    # Remove MPI regions, if necesasry
+    exclude_regions = []
+    # Remove MPI regions, if necessary
     if kwargs.get("no_mpi"):
+        exclude_regions.append("MPI_")
+    if kwargs.get("exclude_regions"):
+        exclude_regions.extend(kwargs.get("exclude_regions"))
+    if len(exclude_regions) > 0:
+        logger.info(
+            f"Removing regions that match the following pattern: {exclude_regions}"
+        )
         query = th.query.Query().match(
             ".",
             lambda row: row["name"]
             .apply(
                 # 'n is None' avoid comparison for MPI in n (will cause error)
                 lambda n: n is None
-                or "MPI_" not in n
+                or all(excl not in n for excl in exclude_regions)
             )
             .all(),
         )
@@ -695,6 +703,12 @@ def setup_parser(root_parser):
         "--disable-legend",
         action="store_true",
         help="Turn off the legend on the figure",
+    )
+    root_parser.add_argument(
+        "--exclude-regions",
+        nargs="+",
+        type=str,
+        help="One or more patterns to exclude based on region name",
     )
 
     # Workspace commands
