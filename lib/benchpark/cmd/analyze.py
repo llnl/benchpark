@@ -14,11 +14,11 @@ import warnings
 from datetime import datetime
 from glob import glob
 
+import hatchet as ht
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn
-import hatchet as ht
 import thicket as th
 from tqdm import tqdm
 
