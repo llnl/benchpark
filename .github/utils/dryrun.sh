@@ -12,10 +12,10 @@ timestamp=$(date +%s)
 benchmark="b-$timestamp"
 system="s-$timestamp"
 ./bin/benchpark system init --dest=$system $system_spec
-./bin/benchpark experiment init --dest=$benchmark --system=$system $benchmark_spec
-./bin/benchpark setup ./$benchmark workspace/
+./bin/benchpark experiment init --dest=$benchmark $system $benchmark_spec
+./bin/benchpark setup ./$system/$benchmark workspace/
 . workspace/setup.sh
 ramble \
-    --workspace-dir "workspace/$benchmark/$system/workspace" \
+    --workspace-dir "workspace/$system/$benchmark/workspace" \
     --disable-logger \
     workspace setup --dry-run
