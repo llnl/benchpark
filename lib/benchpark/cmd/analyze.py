@@ -287,7 +287,7 @@ def make_chart(**kwargs):
     elif kind == "bar":
         seaborn.barplot(**plot_args)
     else:
-        raise NotImplementedError(f"Uknown plot kind {kind}")
+        raise NotImplementedError(f"Unknown plot kind {kind}")
 
     y_axis_limits = kwargs.get("chart_yaxis_limits")
     if y_axis_limits is not None:

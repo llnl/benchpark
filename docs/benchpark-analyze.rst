@@ -209,7 +209,7 @@ profile). We can also add the ``--no-mpi`` argument to filter out all ``MPI_*`` 
  Visualize Data From Multiple Workspaces
 *****************************************
 
-Data from multiple clusters will end up in seperate Ramble workspaces. Simply point at
+Data from multiple clusters will end up in separate Ramble workspaces. Simply point at
 the Benchpark workspace instead of the Ramble workspace to include multiple Ramble
 workspaces in your analysis. This example uses the ``line`` chart functionality to
 visualize a single node memory bandwidth study. Other options are ``bar`` and
