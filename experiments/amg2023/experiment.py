@@ -66,17 +66,26 @@ class Amg2023(
 
     def generate_perf_tuolumne(self):
         if self.spec.satisfies("+throughput"):
-            process_problem_size_dict = {
+            problem_spec = {
                 "nx": [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270],
                 "ny": [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270],
                 "nz": [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270],
+                "pool_sizes": [1, 2, 3, 3, 4, 5, 6, 8, 9, 11, 13, 16, 18, 21, 24, 28, 32, 36, 42, 46, 50, 64, 64],
+                "px": 1,
+                "py": 1,
+                "pz": 1,
             }
-            pool = [1, 2, 3, 3, 4, 5, 6, 8, 9, 11, 13, 16, 18, 21, 24, 28, 32, 36, 42, 46, 50, 64, 64] 
+            process_problem_size_dict = {
+                "nx": problem_spec["nx"],
+                "ny": problem_spec["ny"], 
+                "nz": problem_spec["nz"], 
+            }
+            pool = problem_spec["pool_sizes"]
 
             n_resources_dict = {
-                "px": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                "py": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                "pz": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                "px": [problem_spec["px"]] * len(problem_spec["nx"]),
+                "py": [problem_spec["py"]] * len(problem_spec["ny"]),
+                "pz": [problem_spec["pz"]] * len(problem_spec["nz"]),
             }
         elif self.spec.satisfies("+strong"):
             process_problem_size_dict = {"nx": 270, "ny": 270, "nz": 270}
