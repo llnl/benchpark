@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
       - name: Setup Python
         uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548
         with:
@@ -21,8 +21,8 @@ jobs:
           pip install -r .github/workflows/requirements/docs.txt
           # create a dummy workspace to get a working ramble
           bin/benchpark system init --dest=generic-x86 generic-x86
-          bin/benchpark experiment init --dest=saxpy --system=generic-x86 saxpy
-          bin/benchpark setup saxpy /tmp/workspace
+          bin/benchpark experiment init --dest=saxpy generic-x86 saxpy
+          bin/benchpark setup generic-x86/saxpy /tmp/workspace
           # this is gross and we should better setup ramble for people or make it a Spack package
           pip install -r /tmp/workspace/ramble/requirements.txt
       - name: Build with sphinx
