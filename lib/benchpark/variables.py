@@ -155,7 +155,7 @@ class Variable:
         next_val = scaling_func(self, itr, key, sf)
 
         if not next_val:
-            pass
+            return
         elif isinstance(next_val, list):
             idx = 0
             for k in self._dims:

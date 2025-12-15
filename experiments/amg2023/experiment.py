@@ -50,130 +50,182 @@ class Amg2023(
         description="Use GPU-aware MPI",
     )
 
-    variant(
-        "target",
-        default="generic",
-        values=(
-            "generic",
-            "perf-tuolumne",
-            "perf-matrix",
-            "perf-tioga",
-        ),
-        description="Target system",
-    )
-
     maintainers("pearce8")
 
-    def generate_perf_tuolumne(self):
+    def generate_perf_specs(self):
+        # Add problem specs as needed here
         if self.spec.satisfies("+throughput"):
             problem_spec = {
                 "nx": [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270],
                 "ny": [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270],
                 "nz": [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270],
-                "pool_sizes": [1, 2, 3, 3, 4, 5, 6, 8, 9, 11, 13, 16, 18, 21, 24, 28, 32, 36, 42, 46, 50, 64, 64],
+                "pool_size": [1, 2, 3, 3, 4, 5, 6, 8, 9, 11, 13, 16, 18, 21, 24, 28, 32, 36, 42, 46, 50, 64, 64],
+                "px" : 1,
+                "py" : 1,
+                "pz" : 1,
+                "strong_n": lambda var, itr, dim, scaling_factor: None,
+                "strong_p": lambda var, itr, dim, scaling_factor: None,
+                "weak_n": lambda var, itr, dim, scaling_factor: None,
+                "weak_p": lambda var, itr, dim, scaling_factor: None,
+                "throughput_n": lambda var, itr, dim, scaling_factor: None,
+                "throughput_p": lambda var, itr, dim, scaling_factor: None,
+            }
+            problem_spec["px"] = [problem_spec["px"]] * len(problem_spec["nx"])
+            problem_spec["py"] = [problem_spec["py"]] * len(problem_spec["ny"])
+            problem_spec["pz"] = [problem_spec["pz"]] * len(problem_spec["nz"])
+            #problem_spec = {
+            #    "nx": 50,
+            #    "ny": 50,
+            #    "nz": 50,
+            #    "pool_size": [1, 2, 3, 3, 4, 5, 6, 8, 9, 11, 13, 16, 18, 21, 24, 28, 32, 36, 42, 46, 50, 64, 64],
+            #    "px" : 1,
+            #    "py" : 1,
+            #    "pz" : 1,
+            #    "strong_n": lambda var, itr, dim, scaling_factor: None,
+            #    "strong_p": lambda var, itr, dim, scaling_factor: None,
+            #    "weak_n": lambda var, itr, dim, scaling_factor: None,
+            #    "weak_p": lambda var, itr, dim, scaling_factor: None,
+            #    "throughput_n": lambda var, itr, dim, scaling_factor: [50+(itr+1)*10, 50+(itr+1)*10, 50+(itr+1)*10],
+            #    "throughput_p": lambda var, itr, dim, scaling_factor: var.val(dim),
+            #}
+        elif self.spec.satisfies("+strong"):
+            problem_spec = {
+                "nx": 270,
+                "ny": 270,
+                "nz": 270,
+                "pool_size": 64,
                 "px": 1,
                 "py": 1,
                 "pz": 1,
+                "strong_n": lambda var, itr, dim, scaling_factor: var.val(dim) // scaling_factor,
+                "strong_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+                "weak_n": lambda var, itr, dim, scaling_factor: None,
+                "weak_p": lambda var, itr, dim, scaling_factor: None,
+                "throughput_n": lambda var, itr, dim, scaling_factor: None,
+                "throughput_p": lambda var, itr, dim, scaling_factor: None,
             }
-            process_problem_size_dict = {
-                "nx": problem_spec["nx"],
-                "ny": problem_spec["ny"], 
-                "nz": problem_spec["nz"], 
-            }
-            pool = problem_spec["pool_sizes"]
-
-            n_resources_dict = {
-                "px": [problem_spec["px"]] * len(problem_spec["nx"]),
-                "py": [problem_spec["py"]] * len(problem_spec["ny"]),
-                "pz": [problem_spec["pz"]] * len(problem_spec["nz"]),
-            }
-        elif self.spec.satisfies("+strong"):
-            process_problem_size_dict = {"nx": 270, "ny": 270, "nz": 270}
-
-            n_resources_dict = {"px": 1, "py": 1, "pz": 1}
         elif self.spec.satisfies("+weak"):
             # High - SPX
-            # process_problem_size_dict = {"nx": 171, "ny": 171, "nz": 171}
-            # pool = 16
+            problem_spec = {
+                "nx": 171,
+                "ny": 171,
+                "nz": 171,
+                "pool_size": 16,
+                "px": 1,
+                "py": 1,
+                "pz": 1,
+                "strong_n": lambda var, itr, dim, scaling_factor: None,
+                "strong_p": lambda var, itr, dim, scaling_factor: None,
+                "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+                "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+                "throughput_n": lambda var, itr, dim, scaling_factor: None,
+                "throughput_p": lambda var, itr, dim, scaling_factor: None,
+            }
             # High - CPX
-            # process_problem_size_dict = {"nx": 94, "ny": 94, "nz": 94}
-            # pool = 3
+            #problem_spec = {
+            #    "nx": 94,
+            #    "ny": 94,
+            #    "nz": 94,
+            #    "pool_size": 3,
+            #    "px": 1,
+            #    "py": 1,
+            #    "pz": 1,
+            #    "strong_n": lambda var, itr, dim, scaling_factor: None,
+            #    "strong_p": lambda var, itr, dim, scaling_factor: None,
+            #    "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+            #    "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+            #    "throughput_n": lambda var, itr, dim, scaling_factor: None,
+            #    "throughput_p": lambda var, itr, dim, scaling_factor: None,
+            #}
             # Low - SPX
-            # process_problem_size_dict = {"nx": 86, "ny": 86, "nz": 86}
-            # pool = 2
+            #problem_spec = {
+            #    "nx": 86,
+            #    "ny": 86,
+            #    "nz": 86,
+            #    "pool_size": 2,
+            #    "px": 1,
+            #    "py": 1,
+            #    "pz": 1,
+            #    "strong_n": lambda var, itr, dim, scaling_factor: None,
+            #    "strong_p": lambda var, itr, dim, scaling_factor: None,
+            #    "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+            #    "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+            #    "throughput_n": lambda var, itr, dim, scaling_factor: None,
+            #    "throughput_p": lambda var, itr, dim, scaling_factor: None,
+            #}
             # Low - CPX
-            process_problem_size_dict = {"nx": 48, "ny": 48, "nz": 48}
-            pool = 1
-
-            n_resources_dict = {"px": 1, "py": 1, "pz": 1}
+            #problem_spec = {
+            #    "nx": 48,
+            #    "ny": 48,
+            #    "nz": 48,
+            #    "pool_size": 1,
+            #    "px": 1,
+            #    "py": 1,
+            #    "pz": 1,
+            #    "strong_n": lambda var, itr, dim, scaling_factor: lambda var, itr, dim, scaling_factor: None,
+            #    "strong_p": lambda var, itr, dim, scaling_factor: lambda var, itr, dim, scaling_factor: None,
+            #    "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+            #    "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+            #    "throughput_n": lambda var, itr, dim, scaling_factor: lambda var, itr, dim, scaling_factor: None,
+            #    "throughput_p": lambda var, itr, dim, scaling_factor: lambda var, itr, dim, scaling_factor: None,
+            #}
         else:
-            process_problem_size_dict = {"nx": 80, "ny": 80, "nz": 80}
-            pool = 1
-
-            n_resources_dict = {"px": 2, "py": 2, "pz": 2}
+            problem_spec = {
+                "nx": [128, 256],
+                "ny": [128, 256],
+                "nz": [128, 256],
+                "pool_size": [9, 64],
+                "px": [2, 2],
+                "py": [2, 2],
+                "pz": [2, 2],
+                "strong_n": lambda var, itr, dim, scaling_factor: var.val(dim) // scaling_factor,
+                "strong_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+                "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+                "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+                "throughput_n": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+                "throughput_p": lambda var, itr, dim, scaling_factor: var.val(dim),
+            }
 
         # Per-process size (in zones) in each dimension
-        self.add_experiment_variable(
-            "process_problem_size_dict", process_problem_size_dict, True
-        )
+        self.add_experiment_variable("process_problem_size_dict", {
+            "nx": problem_spec["nx"],
+            "ny": problem_spec["ny"], 
+            "nz": problem_spec["nz"], 
+        }, True)
 
-        self.add_experiment_variable("pool", pool, True)
+        # Umpire device pool size
+        self.add_experiment_variable("pool", problem_spec["pool_size"], True)
 
         # Number of processes in each dimension
-        self.add_experiment_variable("n_resources_dict", n_resources_dict, True)
+        self.add_experiment_variable("n_resources_dict", {
+            "px": problem_spec["px"],
+            "py": problem_spec["py"],
+            "pz": problem_spec["pz"],
+        }, True)
 
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    )
-                    * scaling_factor,
-                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    )
-                    // scaling_factor,
+                    "n_resources_dict": problem_spec["strong_p"],
+                    "process_problem_size_dict": problem_spec["strong_n"],
                 },
                 ScalingMode.Weak: {
-                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    )
-                    * scaling_factor,
-                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    ),
+                    "n_resources_dict": problem_spec["weak_p"],
+                    "process_problem_size_dict": problem_spec["weak_n"],
                 },
                 ScalingMode.Throughput: {
-                    "n_resources_dict": lambda var, itr, dim, scaling_factor: None,
-                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: None,
+                    "n_resources_dict": problem_spec["throughput_p"],
+                    "process_problem_size_dict": problem_spec["throughput_n"],
                 },
             }
         )
 
-    def generate_perf_tioga(self):
-        self.generate_perf_tuolumne()
-
-    def generate_perf_matrix(self):
-        self.generate_perf_tuolumne()
-
     def compute_applications_section(self):
-        if self.spec.satisfies("target=perf-tuolumne"):
-            self.generate_perf_tuolumne()
-        elif self.spec.satisfies("target=perf-matrix"):
-            self.generate_perf_matrix()
-        elif self.spec.satisfies("target=perf-tioga"):
-            self.generate_perf_tioga()
+        if self.spec.satisfies("exec_mode=perf"):
+            self.generate_perf_specs()
         else:
-            if self.spec.satisfies("exec_mode=test"):
-                process_problem_size_dict = {"nx": 80, "ny": 80, "nz": 80}
-                n_resources_dict = {"px": 2, "py": 2, "pz": 2}
-            else:
-                process_problem_size_dict = {
-                    "nx": [128, 256],
-                    "ny": [128, 256],
-                    "nz": [128, 256],
-                }
-                n_resources_dict = {"px": [2, 2], "py": [2, 2], "pz": [2, 2]}
+            process_problem_size_dict = {"nx": 80, "ny": 80, "nz": 80}
+            n_resources_dict = {"px": 2, "py": 2, "pz": 2}
 
             # Per-process size (in zones) in each dimension
             self.add_experiment_variable(
