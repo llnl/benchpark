@@ -50,42 +50,58 @@ class Amg2023(
         description="Use GPU-aware MPI",
     )
 
+    variant(
+        "target",
+        default="generic",
+        values=(
+            "generic",
+            "perf-tuolumne",
+            "perf-matrix",
+            "perf-tioga",
+        ),
+        description="Target system",
+    )
+
     maintainers("pearce8")
 
-    def compute_applications_section(self):
-        if self.spec.satisfies("exec_mode=test"):
+    def generate_perf_tuolumne(self):
+        if self.spec.satisfies("+throughput"):
+            process_problem_size_dict = {
+                "nx": [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270],
+                "ny": [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270],
+                "nz": [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270],
+            }
+            n_resources_dict = {"px": 1, "py": 1, "pz": 1}
+            pool= [1, 2, 3, 3, 4, 5, 6, 8, 9, 11, 13, 16, 18, 21, 24, 28, 32, 36, 42, 46, 50, 64, 64] 
+        elif self.spec.satisfies("+strong"):
+            process_problem_size_dict = {"nx": 270, "ny": 270, "nz": 270}
+        elif self.spec.satisfies("+weak"):
+            n_resources_dict = {"px": 1, "py": 1, "pz": 1}
+            # High - SPX
+            # process_problem_size_dict = {"nx": 171, "ny": 171, "nz": 171}
+            # pool= 16
+            # High - CPX
+            # process_problem_size_dict = {"nx": 94, "ny": 94, "nz": 94}
+            # pool= 3
+            # Low - SPX
+            # process_problem_size_dict = {"nx": 86, "ny": 86, "nz": 86}
+            # pool= 2
+            # Low - CPX
+            process_problem_size_dict = {"nx": 48, "ny": 48, "nz": 48}
+            pool= 1
+        else:
             process_problem_size_dict = {"nx": 80, "ny": 80, "nz": 80}
             n_resources_dict = {"px": 2, "py": 2, "pz": 2}
-        else:
-            process_problem_size_dict = {
-                "nx": [128, 256],
-                "ny": [128, 256],
-                "nz": [128, 256],
-            }
-            n_resources_dict = {"px": [2, 2], "py": [2, 2], "pz": [2, 2]}
+
+        # Number of processes in each dimension
+        self.add_experiment_variable("n_resources_dict", n_resources_dict, True)
 
         # Per-process size (in zones) in each dimension
         self.add_experiment_variable(
             "process_problem_size_dict", process_problem_size_dict, True
         )
 
-        # Number of processes in each dimension
-        self.add_experiment_variable("n_resources_dict", n_resources_dict, True)
-
-        # Set the variables required by the experiment
-        self.set_required_variables(
-            n_resources="{px}*{py}*{pz}",
-            process_problem_size="{nx}*{ny}*{nz}",
-            total_problem_size="{nx}*{ny}*{nz}*{px}*{py}*{pz}",
-        )
-
-        # In this application, since the input problem sizes (process_problem_size_dict)
-        # are per process sizes, strong scaling the problem implies that
-        # as n_resources_dict are scaled up, i.e. (x * scaling_factor),
-        # process_problem_size_dict are commensurately scaled down i.e. (x // scaling_factor)
-
-        # For weak scaling, only the n_resources_dict have to be scaled up,
-        # process_problem_size_dict remain the same
+        self.add_experiment_variable("pool", pool_sizes, True)
 
         self.register_scaling_config(
             {
@@ -109,15 +125,90 @@ class Amg2023(
                     ),
                 },
                 ScalingMode.Throughput: {
-                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    ),
-                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    )
-                    * scaling_factor,
+                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: None,
                 },
             }
+        )
+
+    def generate_perf_tioga(self):
+        self.generate_perf_tuolumne()
+
+    def generate_perf_matrix(self):
+        self.generate_perf_tuolumne()
+
+    def compute_applications_section(self):
+        if self.spec.satisfies("target=perf-tuolumne"):
+            self.generate_perf_tuolumne()
+        elif self.spec.satisfies("target=perf-matrix"):
+            self.generate_perf_matrix()
+        elif self.spec.satisfies("target=perf-tioga"):
+            self.generate_perf_tioga()
+        else:
+            if self.spec.satisfies("exec_mode=test"):
+                process_problem_size_dict = {"nx": 80, "ny": 80, "nz": 80}
+                n_resources_dict = {"px": 2, "py": 2, "pz": 2}
+            else:
+                process_problem_size_dict = {
+                    "nx": [128, 256],
+                    "ny": [128, 256],
+                    "nz": [128, 256],
+                }
+                n_resources_dict = {"px": [2, 2], "py": [2, 2], "pz": [2, 2]}
+
+            # Per-process size (in zones) in each dimension
+            self.add_experiment_variable(
+                "process_problem_size_dict", process_problem_size_dict, True
+            )
+
+            # Number of processes in each dimension
+            self.add_experiment_variable("n_resources_dict", n_resources_dict, True)
+
+            # In this application, since the input problem sizes (process_problem_size_dict)
+            # are per process sizes, strong scaling the problem implies that
+            # as n_resources_dict are scaled up, i.e. (x * scaling_factor),
+            # process_problem_size_dict are commensurately scaled down i.e. (x // scaling_factor)
+
+            # For weak scaling, only the n_resources_dict have to be scaled up,
+            # process_problem_size_dict remain the same
+
+            self.register_scaling_config(
+                {
+                    ScalingMode.Strong: {
+                        "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
+                            dim
+                        )
+                        * scaling_factor,
+                        "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
+                            dim
+                        )
+                        // scaling_factor,
+                    },
+                    ScalingMode.Weak: {
+                        "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
+                            dim
+                        )
+                        * scaling_factor,
+                        "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
+                            dim
+                        ),
+                    },
+                    ScalingMode.Throughput: {
+                        "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
+                            dim
+                        ),
+                        "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
+                            dim
+                        )
+                        * scaling_factor,
+                    },
+                }
+            )
+
+        # Set the variables required by the experiment
+        self.set_required_variables(
+            n_resources="{px}*{py}*{pz}",
+            process_problem_size="{nx}*{ny}*{nz}",
+            total_problem_size="{nx}*{ny}*{nz}*{px}*{py}*{pz}",
         )
 
         if self.spec.satisfies("+openmp"):
