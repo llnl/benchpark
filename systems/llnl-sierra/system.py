@@ -161,13 +161,13 @@ class LlnlSierra(System):
                     "buildable": False,
                 },
                 "python": {
+                    "buildable": False,
                     "externals": [
                         {
                             "spec": "python@3.8.2",
                             "prefix": "/usr/tce/packages/python/python-3.8.2",
-                            "buildable": False,
                         }
-                    ]
+                    ],
                 },
                 "mpi": {"buildable": False},
             }

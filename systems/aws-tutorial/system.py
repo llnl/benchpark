@@ -148,19 +148,6 @@ class AwsTutorial(System):
                     ],
                     "buildable": False,
                 },
-                "caliper": {
-                    "externals": [
-                        {
-                            "spec": "caliper@master+adiak+mpi%gcc@11.4.0",
-                            "prefix": "/usr",
-                        }
-                    ],
-                    "buildable": False,
-                },
-                "adiak": {
-                    "externals": [{"spec": "adiak@0.4.1", "prefix": "/usr"}],
-                    "buildable": False,
-                },
                 "groff": {
                     "externals": [{"spec": "groff@1.22.4", "prefix": "/usr"}],
                     "buildable": False,

@@ -17,6 +17,7 @@ class Mfem(BuiltinMfem):
 
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
+    depends_on("hypre+shared", when="+mpi")
 
     requires("+caliper", when="^hypre+caliper")
 
