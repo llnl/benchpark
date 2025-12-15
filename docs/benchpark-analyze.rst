@@ -204,3 +204,41 @@ profile). We can also add the ``--no-mpi`` argument to filter out all ``MPI_*`` 
 .. figure:: _static/images/kripke_cuda_strong_raw_exc-2.png
     :width: 800
     :align: center
+
+*****************************************
+ Visualize Data From Multiple Workspaces
+*****************************************
+
+Data from multiple clusters will end up in separate Ramble workspaces. Simply point at
+the Benchpark workspace instead of the Ramble workspace to include multiple Ramble
+workspaces in your analysis. This example uses the ``line`` chart functionality to
+visualize a single node memory bandwidth study. Other options are ``bar`` and
+``scatter``.
+
+.. note::
+
+    The ``area`` chart will not work for data from multiple Ramble workspaces.
+
+.. code-block:: console
+
+    $ benchpark analyze --workspace-dir wkp/ --query-regions-byname Stream_TRIAD --chart-kind line --file-name-match Base_Seq-default --yaxis-metric 'Memory Bandwidth (GB/s)' --chart-yaxis-limits 8 2048 --chart-figsize 12 7 --yaxis-log --no-mpi
+
+.. figure:: _static/images/raja-perf_mpi_strong_raw_exc.png
+    :width: 800
+    :align: center
+
+*****************************
+ Visualize a Metadata Column
+*****************************
+
+``benchpark analyze`` is not limited to performance data columns. Provide the name of a
+metadata column to visualize that instead. This is useful for metrics like FOM's, which
+only have one value per profile.
+
+.. code-block:: console
+
+    $ benchpark analyze --workspace-dir problem1/ --yaxis-metric Final-FOM --chart-kind line --disable-legend
+
+.. figure:: _static/images/amg2023_rocm_weak_raw_exc.png
+    :width: 800
+    :align: center
