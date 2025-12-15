@@ -71,37 +71,47 @@ class Amg2023(
                 "ny": [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270],
                 "nz": [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270],
             }
-            n_resources_dict = {"px": 1, "py": 1, "pz": 1}
-            pool= [1, 2, 3, 3, 4, 5, 6, 8, 9, 11, 13, 16, 18, 21, 24, 28, 32, 36, 42, 46, 50, 64, 64] 
+            pool = [1, 2, 3, 3, 4, 5, 6, 8, 9, 11, 13, 16, 18, 21, 24, 28, 32, 36, 42, 46, 50, 64, 64] 
+
+            n_resources_dict = {
+                "px": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                "py": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                "pz": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            }
         elif self.spec.satisfies("+strong"):
             process_problem_size_dict = {"nx": 270, "ny": 270, "nz": 270}
-        elif self.spec.satisfies("+weak"):
+
             n_resources_dict = {"px": 1, "py": 1, "pz": 1}
+        elif self.spec.satisfies("+weak"):
             # High - SPX
             # process_problem_size_dict = {"nx": 171, "ny": 171, "nz": 171}
-            # pool= 16
+            # pool = 16
             # High - CPX
             # process_problem_size_dict = {"nx": 94, "ny": 94, "nz": 94}
-            # pool= 3
+            # pool = 3
             # Low - SPX
             # process_problem_size_dict = {"nx": 86, "ny": 86, "nz": 86}
-            # pool= 2
+            # pool = 2
             # Low - CPX
             process_problem_size_dict = {"nx": 48, "ny": 48, "nz": 48}
-            pool= 1
+            pool = 1
+
+            n_resources_dict = {"px": 1, "py": 1, "pz": 1}
         else:
             process_problem_size_dict = {"nx": 80, "ny": 80, "nz": 80}
-            n_resources_dict = {"px": 2, "py": 2, "pz": 2}
+            pool = 1
 
-        # Number of processes in each dimension
-        self.add_experiment_variable("n_resources_dict", n_resources_dict, True)
+            n_resources_dict = {"px": 2, "py": 2, "pz": 2}
 
         # Per-process size (in zones) in each dimension
         self.add_experiment_variable(
             "process_problem_size_dict", process_problem_size_dict, True
         )
 
-        self.add_experiment_variable("pool", pool_sizes, True)
+        self.add_experiment_variable("pool", pool, True)
+
+        # Number of processes in each dimension
+        self.add_experiment_variable("n_resources_dict", n_resources_dict, True)
 
         self.register_scaling_config(
             {
@@ -125,6 +135,7 @@ class Amg2023(
                     ),
                 },
                 ScalingMode.Throughput: {
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: None,
                     "process_problem_size_dict": lambda var, itr, dim, scaling_factor: None,
                 },
             }
