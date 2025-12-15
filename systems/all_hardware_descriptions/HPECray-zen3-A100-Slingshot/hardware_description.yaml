@@ -1,0 +1,46 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+system_definition:
+  name: HPECray-zen3-A100-Slingshot
+  integrator:
+    vendor: HPECray
+    name: EX235a
+  processor:
+    vendor: AMD
+    name: EPYC-Zen3
+    ISA: x86_64
+    uArch: zen3
+  accelerator:
+    vendor: NVIDIA
+    name: A100
+    ISA: PTX
+    uArch: sm_80
+  interconnect:
+    vendor: HPECray
+    name: Slingshot11
+  systems-tested:
+    csc-lumi:
+      os: HPECrayOS
+      scheduler: slurm
+      compiler: cce
+      runtime: rocm
+      mpi: cray-mpich
+      installation-year: 2023
+    llnl-elcapitan:
+      os: TOSS
+      scheduler: flux
+      compiler: cce
+      runtime: rocm
+      mpi: cray-mpich
+  top500-system-instances:
+    Frontier:
+      benchpark_system:
+      top500: <https://www.top500.org/system/180047>
+    Lumi:
+      benchpark_system: csc-lumi
+      top500: <https://www.top500.org/system/180048>
+    Tioga:
+      benchpark_system: llnl-elcapitan
+      top500: <https://www.top500.org/system/180052>
