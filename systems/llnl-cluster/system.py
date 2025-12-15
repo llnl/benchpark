@@ -103,6 +103,13 @@ class LlnlCluster(System):
     )
 
     variant(
+        "mpi",
+        default="mvapich2",
+        values=("mvapich2", "openmpi"),
+        description="Which MPI implementation to use",
+    )
+
+    variant(
         "bank",
         default="none",
         values=("none", "guests", "asccasc", "lc", "fractale"),
@@ -259,66 +266,89 @@ class LlnlCluster(System):
             }
         }
 
+        mpi_type = self.spec.variants["mpi"][0]
+        mpi_dict = {
+            "mpi": {
+                "buildable": False,
+            },
+        }
         if self.spec.satisfies("compiler=gcc"):
-            selections |= {
-                "packages": selections["packages"]
-                | {
-                    "mpi": {
-                        "buildable": False,
-                    },
-                    "mvapich2": {
-                        "externals": [
-                            {
-                                "spec": "mvapich2@2.3.7-gcc1211",
-                                "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-12.1.1",
-                                "extra_attributes": {
-                                    "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-12.1.1/lib -lmpi"
-                                },
-                            }
-                        ],
-                    },
+            if mpi_type == "mvapich2":
+                mpi_dict["mvapich2"] = {
+                    "externals": [
+                        {
+                            "spec": "mvapich2@2.3.7",
+                            "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-12.1.1",
+                            "extra_attributes": {
+                                "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-12.1.1/lib -lmpi"
+                            },
+                        }
+                    ],
                 }
-            }
+            elif mpi_type == "openmpi":
+                mpi_dict["openmpi"] = {
+                    "externals": [
+                        {
+                            "spec": "openmpi@4.1.2",
+                            "prefix": "/usr/tce/packages/openmpi/openmpi-4.1.2-gcc-12.1.1",
+                            "extra_attributes": {
+                                "ldflags": "-L/usr/tce/packages/openmpi/openmpi-4.1.2-gcc-12.1.1/lib -lmpi"
+                            },
+                        }
+                    ],
+                }
         elif self.spec.satisfies("compiler=intel"):
-            selections |= {
-                "packages": selections["packages"]
-                | {
-                    "mpi": {
-                        "buildable": False,
-                    },
-                    "mvapich2": {
-                        "externals": [
-                            {
-                                "spec": "mvapich2@2.3.7-intel202160classic",
-                                "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-classic-2021.6.0",
-                                "extra_attributes": {
-                                    "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-classic-2021.6.0/lib -lmpi"
-                                },
-                            }
-                        ],
-                    },
+            if mpi_type == "mvapich2":
+                mpi_dict["mvapich2"] = {
+                    "externals": [
+                        {
+                            "spec": "mvapich2@2.3.7",
+                            "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-classic-2021.6.0",
+                            "extra_attributes": {
+                                "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-classic-2021.6.0/lib -lmpi"
+                            },
+                        }
+                    ],
                 }
-            }
+            elif mpi_type == "openmpi":
+                mpi_dict["openmpi"] = {
+                    "externals": [
+                        {
+                            "spec": "openmpi@4.1.2",
+                            "prefix": "/usr/tce/packages/openmpi/openmpi-4.1.2-intel-classic-2021.6.0",
+                            "extra_attributes": {
+                                "ldflags": "-L/usr/tce/packages/openmpi/openmpi-4.1.2-intel-classic-2021.6.0/lib -lmpi"
+                            },
+                        }
+                    ],
+                }
         elif self.spec.satisfies("compiler=oneapi"):
-            selections |= {
-                "packages": selections["packages"]
-                | {
-                    "mpi": {
-                        "buildable": False,
-                    },
-                    "mvapich2": {
-                        "externals": [
-                            {
-                                "spec": "mvapich2@2.3.7-intel202321",
-                                "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2023.2.1",
-                                "extra_attributes": {
-                                    "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2023.2.1/lib -lmpi"
-                                },
-                            }
-                        ],
-                    },
+            if mpi_type == "mvapich2":
+                mpi_dict["mvapich2"] = {
+                    "externals": [
+                        {
+                            "spec": "mvapich2@2.3.7",
+                            "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2023.2.1",
+                            "extra_attributes": {
+                                "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2023.2.1/lib -lmpi"
+                            },
+                        }
+                    ],
                 }
-            }
+            elif mpi_type == "openmpi":
+                mpi_dict["openmpi"] = {
+                    "externals": [
+                        {
+                            "spec": "openmpi@4.1.2",
+                            "prefix": "/usr/tce/packages/openmpi/openmpi-4.1.2-intel-2023.2.1",
+                            "extra_attributes": {
+                                "ldflags": "-L/usr/tce/packages/openmpi/openmpi-4.1.2-intel-2023.2.1/lib -lmpi"
+                            },
+                        }
+                    ],
+                }
+
+        selections |= {"packages": selections["packages"] | mpi_dict}
 
         return selections
 
@@ -383,13 +413,10 @@ class LlnlCluster(System):
             "software": {
                 "packages": {
                     "default-compiler": {"pkg_spec": default_compiler},
-                    "default-mpi": {"pkg_spec": "mvapich2"},
                     "compiler-gcc": {"pkg_spec": "gcc"},
                     "compiler-intel": {"pkg_spec": "intel"},
                     "blas": {"pkg_spec": "intel-oneapi-mkl"},
                     "lapack": {"pkg_spec": "intel-oneapi-mkl"},
-                    "mpi-gcc": {"pkg_spec": "mvapich2"},
-                    "mpi-intel": {"pkg_spec": "mvapich2"},
                 }
             }
         }
