@@ -172,7 +172,7 @@ Next, initialize the Kripke strong scaling experiment used in this tutorial by r
 
 .. code-block:: bash
 
-    benchpark experiment init --dest=kripke-benchmark --system=hpc-tutorial kripke +strong caliper=time,mpi
+    benchpark experiment init hpc-tutorial kripke +strong caliper=time,mpi
 
 Similar to ``benchpark system init``, the ``benchpark experiment init`` command
 generates the Ramble configuration file to describe the experiment to be run. The
@@ -195,7 +195,7 @@ running:
 
 .. code-block:: bash
 
-    benchpark setup kripke-benchmark/ wkp/
+    benchpark setup hpc-tutorial/kripke/ wkp/
 
 This command takes the configuration files stored in the output directories of
 ``benchpark experiment init`` (i.e., ``kripke-benchmark/``) and ``benchpark system
@@ -225,7 +225,7 @@ scaling experiment by running:
 .. code-block:: bash
 
     ramble \
-    --workspace-dir /home/jovyan/benchpark/wkp/kripke-benchmark/hpc-tutorial/workspace \
+    --workspace-dir /home/jovyan/benchpark/wkp/hpc-tutorial/kripke/workspace \
     workspace setup
 
 This command does two things. First, it builds all necessary software using Spack.
@@ -240,28 +240,28 @@ If the command is successful, you should see something like:
 .. code-block:: text
 
     ==> Streaming details to log:
-    ==>   /home/jovyan/benchpark/wkp/kripke-benchmark/hpc-tutorial/workspace/logs/setup.2025-07-09_18.08.23.out
+    ==>   /home/jovyan/benchpark/wkp/hpc-tutorial/kripke/workspace/logs/setup.2025-07-09_18.08.23.out
     ==>   Setting up 4 out of 4 experiments:
     ==> Experiment #1 (1/4):
     ==>     name: kripke.kripke.kripke_kripke_single_node_strong_scaling_caliper_time_mpi_2_2_1_64_64_32_64_1_128_128_4_4
     ==>     root experiment_index: 1
-    ==>     log file: /home/jovyan/benchpark/wkp/kripke-benchmark/hpc-tutorial/workspace/logs/setup.2025-07-09_18.08.23/kripke.kripke.kripke_kripke_single_node_strong_scaling_caliper_time_mpi_2_2_1_64_64_32_64_1_128_128_4_4.out
-    ==>   Returning to log file: /home/jovyan/benchpark/wkp/kripke-benchmark/hpc-tutorial/workspace/logs/setup.2025-07-09_18.08.23.out
+    ==>     log file: /home/jovyan/benchpark/wkp/hpc-tutorial/kripke/workspace/logs/setup.2025-07-09_18.08.23/kripke.kripke.kripke_kripke_single_node_strong_scaling_caliper_time_mpi_2_2_1_64_64_32_64_1_128_128_4_4.out
+    ==>   Returning to log file: /home/jovyan/benchpark/wkp/hpc-tutorial/kripke/workspace/logs/setup.2025-07-09_18.08.23.out
     ==> Experiment #2 (2/4):
     ==>     name: kripke.kripke.kripke_kripke_single_node_strong_scaling_caliper_time_mpi_2_2_2_64_64_32_64_1_128_128_4_8
     ==>     root experiment_index: 2
-    ==>     log file: /home/jovyan/benchpark/wkp/kripke-benchmark/hpc-tutorial/workspace/logs/setup.2025-07-09_18.08.23/kripke.kripke.kripke_kripke_single_node_strong_scaling_caliper_time_mpi_2_2_2_64_64_32_64_1_128_128_4_8.out
-    ==>   Returning to log file: /home/jovyan/benchpark/wkp/kripke-benchmark/hpc-tutorial/workspace/logs/setup.2025-07-09_18.08.23.out
+    ==>     log file: /home/jovyan/benchpark/wkp/hpc-tutorial/kripke/workspace/logs/setup.2025-07-09_18.08.23/kripke.kripke.kripke_kripke_single_node_strong_scaling_caliper_time_mpi_2_2_2_64_64_32_64_1_128_128_4_8.out
+    ==>   Returning to log file: /home/jovyan/benchpark/wkp/hpc-tutorial/kripke/workspace/logs/setup.2025-07-09_18.08.23.out
     ==> Experiment #3 (3/4):
     ==>     name: kripke.kripke.kripke_kripke_single_node_strong_scaling_caliper_time_mpi_4_2_2_64_64_32_64_1_128_128_4_16
     ==>     root experiment_index: 3
-    ==>     log file: /home/jovyan/benchpark/wkp/kripke-benchmark/hpc-tutorial/workspace/logs/setup.2025-07-09_18.08.23/kripke.kripke.kripke_kripke_single_node_strong_scaling_caliper_time_mpi_4_2_2_64_64_32_64_1_128_128_4_16.out
-    ==>   Returning to log file: /home/jovyan/benchpark/wkp/kripke-benchmark/hpc-tutorial/workspace/logs/setup.2025-07-09_18.08.23.out
+    ==>     log file: /home/jovyan/benchpark/wkp/hpc-tutorial/kripke/workspace/logs/setup.2025-07-09_18.08.23/kripke.kripke.kripke_kripke_single_node_strong_scaling_caliper_time_mpi_4_2_2_64_64_32_64_1_128_128_4_16.out
+    ==>   Returning to log file: /home/jovyan/benchpark/wkp/hpc-tutorial/kripke/workspace/logs/setup.2025-07-09_18.08.23.out
     ==> Experiment #4 (4/4):
     ==>     name: kripke.kripke.kripke_kripke_single_node_strong_scaling_caliper_time_mpi_4_4_2_64_64_32_64_1_128_128_4_32
     ==>     root experiment_index: 4
-    ==>     log file: /home/jovyan/benchpark/wkp/kripke-benchmark/hpc-tutorial/workspace/logs/setup.2025-07-09_18.08.23/kripke.kripke.kripke_kripke_single_node_strong_scaling_caliper_time_mpi_4_4_2_64_64_32_64_1_128_128_4_32.out
-    ==>   Returning to log file: /home/jovyan/benchpark/wkp/kripke-benchmark/hpc-tutorial/workspace/logs/setup.2025-07-09_18.08.23.out
+    ==>     log file: /home/jovyan/benchpark/wkp/hpc-tutorial/kripke/workspace/logs/setup.2025-07-09_18.08.23/kripke.kripke.kripke_kripke_single_node_strong_scaling_caliper_time_mpi_4_4_2_64_64_32_64_1_128_128_4_32.out
+    ==>   Returning to log file: /home/jovyan/benchpark/wkp/hpc-tutorial/kripke/workspace/logs/setup.2025-07-09_18.08.23.out
 
 ********************************************
  Step 7: Run Kripke Experiment using Ramble
@@ -272,7 +272,7 @@ Next, run the Kripke strong scaling experiment by running the following command:
 .. code-block:: bash
 
     ramble \
-    --workspace-dir /home/jovyan/benchpark/wkp/kripke-benchmark/hpc-tutorial/workspace \
+    --workspace-dir /home/jovyan/benchpark/wkp/hpc-tutorial/kripke/workspace \
     on
 
 This command submits the batch scripts (e.g., submission scripts) generated in
@@ -286,9 +286,9 @@ If the above command is successful, you should see something like:
 .. code-block:: bash
 
     ==> Streaming details to log:
-    ==>   /home/jovyan/benchpark/wkp/kripke-benchmark/hpc-tutorial/workspace/logs/execute.2025-07-09_18.14.08.out
+    ==>   /home/jovyan/benchpark/wkp/hpc-tutorial/kripke/workspace/logs/execute.2025-07-09_18.14.08.out
     ==>   Executing 4 out of 4 experiments:
-    ==>   Log files for experiments are stored in: /home/jovyan/benchpark/wkp/kripke-benchmark/hpc-tutorial/workspace/logs/execute.2025-07-09_18.14.08
+    ==>   Log files for experiments are stored in: /home/jovyan/benchpark/wkp/hpc-tutorial/kripke/workspace/logs/execute.2025-07-09_18.14.08
     ==> Running executors...
     ƒV54uD5o5
     ƒV57fKkEK
@@ -319,7 +319,7 @@ This command will produce an output like:
     system, expect the jobs to complete faster.
 
 After all the jobs are finished, each job directory (i.e., subdirectories of
-``/home/jovyan/benchpark/wkp/kripke-benchmark/hpc-tutorial/workspace/experiments/kripke/kripke``)
+``/home/jovyan/benchpark/wkp/hpc-tutorial/kripke/workspace/experiments/kripke/kripke``)
 will contain a Caliper output file (i.e., a ``.cali`` file) containing performance data
 for the job.
 
@@ -339,14 +339,15 @@ presentations.
 .. code-block:: bash
 
     benchpark analyze \
-    --workspace-dir /home/jovyan/benchpark/wkp/kripke-benchmark/hpc-tutorial/workspace \
+    --workspace-dir /home/jovyan/benchpark/wkp/hpc-tutorial/kripke/workspace \
     --no-mpi \
-    --chart-fontsize 15
+    --chart-fontsize 15 \
+    --chart-figsize 12 7
 
 The command above reads in the Caliper files generated by the experiment and outputs
 several files, such as the stacked area chart and Caliper calling context tree shown
 below. These files can be found in
-``/home/jovyan/benchpark/wkp/kripke-benchmark/hpc-tutorial/workspace/analyze``.
+``/home/jovyan/benchpark/wkp/hpc-tutorial/kripke/workspace/analyze``.
 
 .. image:: ./graph-and-tree.png
     :width: 900px
