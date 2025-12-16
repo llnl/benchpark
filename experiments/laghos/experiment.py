@@ -49,7 +49,7 @@ class Laghos(
 
     variant(
         "nc",
-        default=False,
+        default=True,
         values=(True, False),
         description="nonconforming or conforming",
     )
