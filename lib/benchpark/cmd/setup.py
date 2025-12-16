@@ -68,6 +68,9 @@ def determine_experiment_id(exp_src_dir):
     )
 
 
+_workspace_indicator_file = ".benchpark-ramble-workspace"
+
+
 def command(args):
     """
     experiments_root/
@@ -111,11 +114,28 @@ def command(args):
     experiments_root = pathlib.Path(os.path.abspath(experiments_root))
     system_id = pathlib.Path(os.path.abspath(system_id))
 
-    workspace_dir = os.path.join(experiments_root, experiment_id)
+    workspace_dir = pathlib.Path(experiments_root) / experiment_id
 
-    import pdb; pdb.set_trace()
     if workspace_dir.exists():
         if workspace_dir.is_dir():
+            if not (workspace_dir / _workspace_indicator_file).exists():
+                msg = (f"Derived workspace {workspace_dir} already exists and does not"
+                       " appear to have been created by `benchpark setup`. Please choose"
+                       " a different directory or clear this dir manually")
+                if workspace_dir == pathlib.Path(experiment_src_dir):
+                    # if you did `benchpark system init --dest=x/y`
+                    # and `benchpark experiment init x/y z`
+                    # then for an experiment_root R, `benchpark setup` wants
+                    # to make R/y/z (and manage it). Therefore you cannot pick
+                    # R=x (note that if you just `benchpark system init --dest=y`
+                    # where y is relative, that x is your CWD)
+                    msg = ("<experiments_root> cannot be the directory containing"
+                           " the `--dest` of `benchpark system init`")
+                msg += ("\n\nIt is recommended to choose a nonexistent directory as the"
+                        " <experiments_root> or a directory that has been used as the"
+                        " <experiments_root> before")
+                print(msg)
+                sys.exit(1)
             print(f"Clearing existing workspace {workspace_dir}")
             shutil.rmtree(workspace_dir)
         else:
@@ -125,6 +145,7 @@ def command(args):
             sys.exit(1)
 
     workspace_dir.mkdir(parents=True)
+    (workspace_dir / _workspace_indicator_file).touch()
 
     ramble_workspace_dir = workspace_dir / "workspace"
     ramble_configs_dir = ramble_workspace_dir / "configs"
