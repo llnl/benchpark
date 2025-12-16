@@ -25,7 +25,6 @@ def symlink_tree(src, dst, include_fn=None):
     dst = os.path.abspath(dst)
     if pathlib.Path(src) in pathlib.Path(dst).parents:
         raise Exception(f"Recursive copy from parent to child:\n\t{src}\n\t{dst}")
-    import pdb; pdb.set_trace()
     # By default, we include all filenames
     include_fn = include_fn or (lambda f: True)
     for x in [src, dst]:
@@ -168,8 +167,6 @@ def command(args):
         if fname.endswith(".yaml"):
             return True
         return False
-
-    #import pdb; pdb.set_trace()
 
     symlink_tree(configs_src_dir, ramble_configs_dir, include_fn)
     symlink_tree(experiment_src_dir, ramble_configs_dir, include_fn)
