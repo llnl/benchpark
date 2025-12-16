@@ -23,6 +23,9 @@ def symlink_tree(src, dst, include_fn=None):
     """Like ``cp -R`` but instead of files, create symlinks"""
     src = os.path.abspath(src)
     dst = os.path.abspath(dst)
+    if pathlib.Path(src) in pathlib.Path(dst).parents:
+        raise Exception(f"Recursive copy from parent to child:\n\t{src}\n\t{dst}")
+    import pdb; pdb.set_trace()
     # By default, we include all filenames
     include_fn = include_fn or (lambda f: True)
     for x in [src, dst]:
@@ -53,6 +56,18 @@ def setup_parser(root_parser):
     )
 
 
+def determine_experiment_id(exp_src_dir):
+    x = pathlib.Path(exp_src_dir)
+    for y in x.parents:
+        if (y / "system_id.yaml").exists():
+            # y is the system dir, we want that and everything after it
+            return str(x.relative_to(y.parent))
+    raise Exception(
+        f"No benchpark system dir detected in {exp_src_dir}"
+        " or any parent (no directories containing system_id.yaml)."
+    )
+
+
 def command(args):
     """
     experiments_root/
@@ -80,14 +95,13 @@ def command(args):
     experiments_root = pathlib.Path(os.path.abspath(args.experiments_root))
     source_dir = benchpark.paths.benchpark_root
 
-    # Experiments live inside systems: the experiment_id will include both
-    experiment_id = args.experiment
-    experiment_src_dir = pathlib.Path(os.path.abspath(str(experiment_id)))
+    experiment_src_dir = pathlib.Path(os.path.abspath(str(args.experiment)))
 
     with open(str(experiment_src_dir / "ramble.yaml"), "r") as file:
         parsed_yaml = yaml.safe_load(file)
     pkg_manager = _find(parsed_yaml, "package_manager")
     system_id = _find(parsed_yaml, "destdir")
+    experiment_id = determine_experiment_id(experiment_src_dir)
 
     debug_print(f"source_dir = {source_dir}")
     debug_print(f"specified system/experiment = {experiment_id}")
@@ -95,17 +109,11 @@ def command(args):
     configs_src_dir = pathlib.Path(os.path.abspath(str(system_id)))
 
     experiments_root = pathlib.Path(os.path.abspath(experiments_root))
-    experiment_id = pathlib.Path(os.path.abspath(experiment_id))
     system_id = pathlib.Path(os.path.abspath(system_id))
-    common_root = pathlib.Path(
-        os.path.commonpath([experiments_root, experiment_id, system_id])
-    )
-    workspace_dir = (
-        common_root
-        / experiments_root.relative_to(common_root)
-        / experiment_id.relative_to(common_root)
-    )
 
+    workspace_dir = os.path.join(experiments_root, experiment_id)
+
+    import pdb; pdb.set_trace()
     if workspace_dir.exists():
         if workspace_dir.is_dir():
             print(f"Clearing existing workspace {workspace_dir}")
@@ -139,6 +147,8 @@ def command(args):
         if fname.endswith(".yaml"):
             return True
         return False
+
+    #import pdb; pdb.set_trace()
 
     symlink_tree(configs_src_dir, ramble_configs_dir, include_fn)
     symlink_tree(experiment_src_dir, ramble_configs_dir, include_fn)
