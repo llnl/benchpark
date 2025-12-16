@@ -17,7 +17,7 @@ class Laghos(
     MpiOnlyExperiment,
     CudaExperiment,
     ROCmExperiment,
-    Scaling(ScalingMode.Strong, ScalingMode.Throughput),
+    Scaling(ScalingMode.Strong, ScalingMode.Weak, ScalingMode.Throughput),
     Caliper,
 ):
 
@@ -62,9 +62,9 @@ class Laghos(
                 "rs": [4, 4, 4, 4, 4],
                 "rp": [0, 1, 2, 3, 4],
                 "resource_count": 4,
-                "strong_p": None,
-                "weak_p": None,
-                "throughput_p": None,
+                "strong": None,
+                "weak": None,
+                "throughput": None,
             }
         elif self.spec.satisfies("+strong"):
             problem_spec = {
@@ -77,24 +77,24 @@ class Laghos(
                 "rs": 4,
                 "rp": 4,
                 "resource_count": 4,
-                "strong_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
-                "weak_p": None,
-                "throughput_p": None,
+                "strong": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+                "weak": None,
+                "throughput": None,
             }
         elif self.spec.satisfies("+weak"):
             problem_spec = {
-                "nx": 1,
-                "ny": 1,
-                "nz": 1,
+                "nx": [1, 2, 3, 4],
+                "ny": [1, 2, 3, 4],
+                "nz": [1, 2, 3, 4],
                 "pool_size": 16,
                 "ms": 250,
                 "tf": 5.0,
                 "rs": 4,
-                "rp": 4,
-                "resource_count": 4,
-                "strong_p": None,
-                "weak_p": None,
-                "throughput_p": None,
+                "rp": 3,
+                "resource_count": [4, 64, 108, 256],
+                "strong": None,
+                "weak": None,
+                "throughput": None,
             }
         else:
             problem_spec = {
@@ -107,9 +107,9 @@ class Laghos(
                 "rs": 4,
                 "rp": 4,
                 "resource_count": 4,
-                "strong_p": None,
-                "weak_p": None,
-                "throughput_p": None,
+                "strong": None,
+                "weak": None,
+                "throughput": None,
             }
 
         self.add_experiment_variable("nx", problem_spec["nx"], True)
@@ -120,7 +120,9 @@ class Laghos(
         self.add_experiment_variable("ms", problem_spec["ms"], True)
         self.add_experiment_variable("tf", problem_spec["tf"], True)
 
-        self.add_experiment_variable("resource_count", problem_spec["resource_count"], True)
+        self.add_experiment_variable(
+            "resource_count", problem_spec["resource_count"], True
+        )
 
         # Per-process size (in zones) in each dimension
         self.add_experiment_variable("zones", "{nx}*{ny}*{nz}*(8**({rs}+{rp}))", False)
@@ -131,10 +133,13 @@ class Laghos(
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "resource_count": problem_spec["strong_p"],
+                    "resource_count": problem_spec["strong"],
+                },
+                ScalingMode.Weak: {
+                    "resource_count": problem_spec["weak"],
                 },
                 ScalingMode.Throughput: {
-                    "resource_count": problem_spec["throughput_p"],
+                    "resource_count": problem_spec["throughput"],
                 },
             }
         )
@@ -164,6 +169,9 @@ class Laghos(
                     ScalingMode.Strong: {
                         "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
                         * scaling_factor,
+                    },
+                    ScalingMode.Weak: {
+                        "resource_count": None,
                     },
                     ScalingMode.Throughput: {
                         "resource_count": None,
