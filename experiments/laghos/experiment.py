@@ -83,15 +83,15 @@ class Laghos(
             }
         elif self.spec.satisfies("+weak"):
             problem_spec = {
-                "nx": [1, 2, 3, 4],
-                "ny": [1, 2, 3, 4],
-                "nz": [1, 2, 3, 4],
+                "nx": [1, 2, 3, 4, 5],
+                "ny": [1, 2, 3, 4, 5],
+                "nz": [1, 2, 3, 4, 5],
                 "pool_size": 16,
                 "ms": 250,
                 "tf": 5.0,
                 "rs": 4,
                 "rp": 3,
-                "resource_count": [4, 64, 108, 256],
+                "resource_count": [4, 32, 108, 256, 500],
                 "strong": None,
                 "weak": None,
                 "throughput": None,
