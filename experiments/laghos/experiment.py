@@ -77,7 +77,8 @@ class Laghos(
                 "rs": 4,
                 "rp": 4,
                 "resource_count": 4,
-                "strong": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+                "strong": lambda var, itr, dim, scaling_factor: var.val(dim)
+                * scaling_factor,
                 "weak": None,
                 "throughput": None,
             }
@@ -156,7 +157,9 @@ class Laghos(
             self.add_experiment_variable("rp", 2, True)
             self.add_experiment_variable("ms", 250, True)
             self.add_experiment_variable("tf", 5.0, True)
-            self.add_experiment_variable("zones", "{nx}*{ny}*{nz}*(8**({rs}+{rp}))", False)
+            self.add_experiment_variable(
+                "zones", "{nx}*{ny}*{nz}*(8**({rs}+{rp}))", False
+            )
             self.add_experiment_variable("pool", 16, True)
             # resource_count is the number of resources used for this experiment:
             self.add_experiment_variable("resource_count", 1, False)
@@ -167,7 +170,9 @@ class Laghos(
             self.register_scaling_config(
                 {
                     ScalingMode.Strong: {
-                        "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
+                        "resource_count": lambda var, itr, dim, scaling_factor: var.val(
+                            dim
+                        )
                         * scaling_factor,
                     },
                     ScalingMode.Weak: {
