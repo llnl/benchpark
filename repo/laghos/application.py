@@ -26,7 +26,7 @@ class Laghos(ExecutableApplication):
                        ' -rs {rs} -rp {rp}' +
                        ' -ms {ms}' +
                        ' -ok {ok} -ot {ot} -oq {oq}' +
-                       ' --mem --fom {gam}' +
+                       ' --{nc} --mem --fom {gam}' +
                        ' --dev-pool-size {pool}' +
                        ' -d {device}' +
                        ' {assembly}',
@@ -88,6 +88,10 @@ class Laghos(ExecutableApplication):
 
     workload_variable('gam', default='--no-gpu-aware-mpi',
         description='--gpu-aware-mpi or --no-gpu-aware-mpi',
+        workloads=['triplept'])
+
+    workload_variable('nc', default='-nc',
+        description='Use non-conforming meshes. Requires a 2D or 3D mesh.',
         workloads=['triplept'])
 
     workload_variable('assembly', default='-pa',

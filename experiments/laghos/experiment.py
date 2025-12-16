@@ -47,6 +47,13 @@ class Laghos(
         description="Use GPU-aware MPI",
     )
 
+    variant(
+        "nc",
+        default=False,
+        values=(True, False),
+        description="nonconforming or conforming",
+    )
+
     maintainers("wdhawkins")
 
     def generate_perf_specs(self):
@@ -200,6 +207,13 @@ class Laghos(
             self.add_experiment_variable("order", "linear", True)
             self.add_experiment_variable("ok", 1, False)
             self.add_experiment_variable("ot", 0, False)
+
+        if self.spec.satisfies("+nc"):
+            self.add_experiment_variable("nc_type", "nonconforming", True)
+            self.add_experiment_variable("nc", "-nc", False)
+        else:
+            self.add_experiment_variable("nc_type", "conforming", True)
+            self.add_experiment_variable("nc", "-no-nc", False)
 
         # Set the variables required by the experiment
         self.set_required_variables(
