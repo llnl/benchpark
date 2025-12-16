@@ -57,7 +57,7 @@ class Laghos(
                 "ny": 1,
                 "nz": 1,
                 "pool_size": 16,
-                "tf": 0.0033,
+                "ms": 250,
                 "rs": [4, 4, 4, 4, 4],
                 "rp": [0, 1, 2, 3, 4],
                 "resource_count": 4,
@@ -71,7 +71,7 @@ class Laghos(
                 "ny": 1,
                 "nz": 1,
                 "pool_size": 16,
-                "tf": 0.0033,
+                "ms": 250,
                 "rs": 4,
                 "rp": 4,
                 "resource_count": 4,
@@ -85,7 +85,7 @@ class Laghos(
                 "ny": 1,
                 "nz": 1,
                 "pool_size": 16,
-                "tf": 0.0033,
+                "ms": 250,
                 "rs": 4,
                 "rp": 4,
                 "resource_count": 4,
@@ -99,7 +99,7 @@ class Laghos(
                 "ny": 1,
                 "nz": 1,
                 "pool_size": 16,
-                "tf": 0.0033,
+                "ms": 250,
                 "rs": 4,
                 "rp": 4,
                 "resource_count": 4,
@@ -113,7 +113,7 @@ class Laghos(
         self.add_experiment_variable("nz", problem_spec["nz"], True)
         self.add_experiment_variable("rs", problem_spec["rs"], True)
         self.add_experiment_variable("rp", problem_spec["rp"], True)
-        self.add_experiment_variable("tf", problem_spec["tf"], True)
+        self.add_experiment_variable("ms", problem_spec["ms"], True)
 
         self.add_experiment_variable("resource_count", problem_spec["resource_count"], True)
 
@@ -144,7 +144,7 @@ class Laghos(
             self.add_experiment_variable("nz", 1, True)
             self.add_experiment_variable("rs", 3, True)
             self.add_experiment_variable("rp", 2, True)
-            self.add_experiment_variable("tf", 0.0033, True)
+            self.add_experiment_variable("ms", 250, True)
             self.add_experiment_variable("zones", "{nx}*{ny}*{nz}*(8**({rs}+{rp}))", False)
             self.add_experiment_variable("pool", 16, True)
             # resource_count is the number of resources used for this experiment:

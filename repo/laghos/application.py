@@ -26,11 +26,11 @@ class Laghos(ExecutableApplication):
                        ' -rs {rs} -rp {rp}' +
                        ' -ms {ms}' +
                        ' -ok {ok} -ot {ot} -oq {oq}' +
-                       ' --fom {gam}' +
+                       ' --mem --fom {gam}' +
                        ' --dev-pool-size {pool}' +
                        ' -d {device}' +
-                       ' {assembly}' +
-                       ' -tf {tf}', use_mpi=True)
+                       ' {assembly}',
+                       use_mpi=True)
 
     workload('triplept', executables=['prob'])
 
