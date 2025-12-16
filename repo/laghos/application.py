@@ -74,7 +74,7 @@ class Laghos(ExecutableApplication):
             description='Order (degree) of the thermodynamic finite element space',
             workloads=['triplept'])
 
-    workload_variable('oq', default='2',
+    workload_variable('oq', default='-1',
             description='Order  of the integration rule',
             workloads=['triplept'])
 
