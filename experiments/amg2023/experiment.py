@@ -37,6 +37,13 @@ class Amg2023(
     )
 
     variant(
+        "other",
+        default=False,
+        values=(True, False),
+        description="Set other input/environment variables",
+    )
+
+    variant(
         "mixedint",
         default=False,
         values=(True, False),
@@ -219,6 +226,15 @@ class Amg2023(
                 },
             }
         )
+
+        if self.spec.satisfies("+other"):
+            self.set_environment_variable("HSA_XNACK", 1)
+            self.set_environment_variable("HSA_ENABLE_SDMA", 1)
+            self.set_environment_variable("HSA_ENABLE_SDMA_COPY_SIZE_OVERRIDE", 0)
+            self.set_environment_variable("GPU_FORCE_BLIT_COPY_SIZE", 0)
+            self.set_environment_variable("HUGETLB_DEFAULT_PAGE_SIZE", "2M")
+            self.set_environment_variable("HUGETLB_MORECORE", "yes")
+            self.set_environment_variable("HUGETLB_VERBOSE", 2)
 
     def compute_applications_section(self):
         if self.spec.satisfies("exec_mode=perf"):
