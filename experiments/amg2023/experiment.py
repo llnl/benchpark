@@ -63,12 +63,12 @@ class Amg2023(
                 "px" : 1,
                 "py" : 1,
                 "pz" : 1,
-                "strong_n": lambda var, itr, dim, scaling_factor: None,
-                "strong_p": lambda var, itr, dim, scaling_factor: None,
-                "weak_n": lambda var, itr, dim, scaling_factor: None,
-                "weak_p": lambda var, itr, dim, scaling_factor: None,
-                "throughput_n": lambda var, itr, dim, scaling_factor: None,
-                "throughput_p": lambda var, itr, dim, scaling_factor: None,
+                "strong_n": None,
+                "strong_p": None,
+                "weak_n": None,
+                "weak_p": None,
+                "throughput_n": None,
+                "throughput_p": None,
             }
             problem_spec["px"] = [problem_spec["px"]] * len(problem_spec["nx"])
             problem_spec["py"] = [problem_spec["py"]] * len(problem_spec["ny"])
@@ -81,10 +81,10 @@ class Amg2023(
             #    "px" : 1,
             #    "py" : 1,
             #    "pz" : 1,
-            #    "strong_n": lambda var, itr, dim, scaling_factor: None,
-            #    "strong_p": lambda var, itr, dim, scaling_factor: None,
-            #    "weak_n": lambda var, itr, dim, scaling_factor: None,
-            #    "weak_p": lambda var, itr, dim, scaling_factor: None,
+            #    "strong_n": None,
+            #    "strong_p": None,
+            #    "weak_n": None,
+            #    "weak_p": None,
             #    "throughput_n": lambda var, itr, dim, scaling_factor: [50+(itr+1)*10, 50+(itr+1)*10, 50+(itr+1)*10],
             #    "throughput_p": lambda var, itr, dim, scaling_factor: var.val(dim),
             #}
@@ -99,10 +99,10 @@ class Amg2023(
                 "pz": 1,
                 "strong_n": lambda var, itr, dim, scaling_factor: var.val(dim) // scaling_factor,
                 "strong_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
-                "weak_n": lambda var, itr, dim, scaling_factor: None,
-                "weak_p": lambda var, itr, dim, scaling_factor: None,
-                "throughput_n": lambda var, itr, dim, scaling_factor: None,
-                "throughput_p": lambda var, itr, dim, scaling_factor: None,
+                "weak_n": None,
+                "weak_p": None,
+                "throughput_n": None,
+                "throughput_p": None,
             }
         elif self.spec.satisfies("+weak"):
             # High - SPX
@@ -114,12 +114,12 @@ class Amg2023(
                 "px": 1,
                 "py": 1,
                 "pz": 1,
-                "strong_n": lambda var, itr, dim, scaling_factor: None,
-                "strong_p": lambda var, itr, dim, scaling_factor: None,
-                "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+                "strong_n": None,
+                "strong_p": None,
+                "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim),
                 "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
-                "throughput_n": lambda var, itr, dim, scaling_factor: None,
-                "throughput_p": lambda var, itr, dim, scaling_factor: None,
+                "throughput_n": None,
+                "throughput_p": None,
             }
             # High - CPX
             #problem_spec = {
@@ -130,12 +130,12 @@ class Amg2023(
             #    "px": 1,
             #    "py": 1,
             #    "pz": 1,
-            #    "strong_n": lambda var, itr, dim, scaling_factor: None,
-            #    "strong_p": lambda var, itr, dim, scaling_factor: None,
-            #    "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+            #    "strong_n": None,
+            #    "strong_p": None,
+            #    "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim),
             #    "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
-            #    "throughput_n": lambda var, itr, dim, scaling_factor: None,
-            #    "throughput_p": lambda var, itr, dim, scaling_factor: None,
+            #    "throughput_n": None,
+            #    "throughput_p": None,
             #}
             # Low - SPX
             #problem_spec = {
@@ -146,12 +146,12 @@ class Amg2023(
             #    "px": 1,
             #    "py": 1,
             #    "pz": 1,
-            #    "strong_n": lambda var, itr, dim, scaling_factor: None,
-            #    "strong_p": lambda var, itr, dim, scaling_factor: None,
-            #    "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+            #    "strong_n": None,
+            #    "strong_p": None,
+            #    "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim),
             #    "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
-            #    "throughput_n": lambda var, itr, dim, scaling_factor: None,
-            #    "throughput_p": lambda var, itr, dim, scaling_factor: None,
+            #    "throughput_n": None,
+            #    "throughput_p": None,
             #}
             # Low - CPX
             #problem_spec = {
@@ -162,12 +162,12 @@ class Amg2023(
             #    "px": 1,
             #    "py": 1,
             #    "pz": 1,
-            #    "strong_n": lambda var, itr, dim, scaling_factor: lambda var, itr, dim, scaling_factor: None,
-            #    "strong_p": lambda var, itr, dim, scaling_factor: lambda var, itr, dim, scaling_factor: None,
-            #    "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+            #    "strong_n": None,
+            #    "strong_p": None,
+            #    "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim),
             #    "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
-            #    "throughput_n": lambda var, itr, dim, scaling_factor: lambda var, itr, dim, scaling_factor: None,
-            #    "throughput_p": lambda var, itr, dim, scaling_factor: lambda var, itr, dim, scaling_factor: None,
+            #    "throughput_n": None,
+            #    "throughput_p": None,
             #}
         else:
             problem_spec = {
@@ -180,7 +180,7 @@ class Amg2023(
                 "pz": [2, 2],
                 "strong_n": lambda var, itr, dim, scaling_factor: var.val(dim) // scaling_factor,
                 "strong_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
-                "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+                "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim),
                 "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
                 "throughput_n": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
                 "throughput_p": lambda var, itr, dim, scaling_factor: var.val(dim),
