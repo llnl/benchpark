@@ -82,7 +82,7 @@ class Laghos(
                 "ms": 100,
                 "tf": 10000,
                 "rs": 4,
-                "rp": 4,
+                "rp": 3,
                 "resource_count": 4,
                 "strong": lambda var, itr, dim, scaling_factor: var.val(dim)
                 * scaling_factor,
@@ -113,7 +113,7 @@ class Laghos(
                 "ms": 100,
                 "tf": 10000,
                 "rs": 4,
-                "rp": 4,
+                "rp": 3,
                 "resource_count": 4,
                 "strong": None,
                 "weak": None,
