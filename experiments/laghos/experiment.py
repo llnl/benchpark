@@ -64,8 +64,8 @@ class Laghos(
                 "ny": 1,
                 "nz": 1,
                 "pool_size": 16,
-                "ms": 250,
-                "tf": 5.0,
+                "ms": 100,
+                "tf": 10000,
                 "rs": [4, 4, 4, 4, 4],
                 "rp": [0, 1, 2, 3, 4],
                 "resource_count": 4,
@@ -79,8 +79,8 @@ class Laghos(
                 "ny": 1,
                 "nz": 1,
                 "pool_size": 16,
-                "ms": 250,
-                "tf": 5.0,
+                "ms": 100,
+                "tf": 10000,
                 "rs": 4,
                 "rp": 4,
                 "resource_count": 4,
@@ -95,8 +95,8 @@ class Laghos(
                 "ny": [1, 2, 3, 4, 5],
                 "nz": [1, 2, 3, 4, 5],
                 "pool_size": 16,
-                "ms": 250,
-                "tf": 5.0,
+                "ms": 100,
+                "tf": 10000,
                 "rs": 4,
                 "rp": 3,
                 "resource_count": [4, 32, 108, 256, 500],
@@ -110,8 +110,8 @@ class Laghos(
                 "ny": 1,
                 "nz": 1,
                 "pool_size": 16,
-                "ms": 250,
-                "tf": 5.0,
+                "ms": 100,
+                "tf": 10000,
                 "rs": 4,
                 "rp": 4,
                 "resource_count": 4,
@@ -162,8 +162,8 @@ class Laghos(
             self.add_experiment_variable("nz", 1, True)
             self.add_experiment_variable("rs", 3, True)
             self.add_experiment_variable("rp", 2, True)
-            self.add_experiment_variable("ms", 250, True)
-            self.add_experiment_variable("tf", 5.0, True)
+            self.add_experiment_variable("ms", 100, True)
+            self.add_experiment_variable("tf", 10000, True)
             self.add_experiment_variable(
                 "zones", "{nx}*{ny}*{nz}*(8**({rs}+{rp}))", False
             )
