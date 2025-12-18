@@ -59,27 +59,58 @@ class Laghos(
     def generate_perf_specs(self):
         # Add problem specs as needed here
         if self.spec.satisfies("+throughput"):
-            problem_spec = {
-                "nx": 1,
-                "ny": 1,
-                "nz": 1,
-                "pool_size": 16,
-                "ms": 100,
-                "tf": 10000,
-                "rs": [4, 4, 4, 4, 4],
-                "rp": [0, 1, 2, 3, 4],
-                "resource_count": 4,
-                "strong": None,
-                "weak": None,
-                "throughput": None,
-            }
+            if self.spec.satisfies("order=linear"):
+                problem_spec = {
+                    "nx": 1,
+                    "ny": 1,
+                    "nz": 1,
+                    "pool_size": 16,
+                    "ms": 250,
+                    "tf": 10000,
+                    "rs": [4, 4, 4],
+                    "rp": [2, 3, 4],
+                    "resource_count": 4,
+                    "strong": None,
+                    "weak": None,
+                    "throughput": None,
+                }
+            elif self.spec.satisfies("order=quadratic"):
+                problem_spec = {
+                    "nx": 1,
+                    "ny": 1,
+                    "nz": 1,
+                    "pool_size": 16,
+                    "ms": 250,
+                    "tf": 10000,
+                    "rs": [4, 4, 4],
+                    "rp": [1, 2, 3],
+                    "resource_count": 4,
+                    "strong": None,
+                    "weak": None,
+                    "throughput": None,
+                }
+            elif self.spec.satisfies("order=cubic"):
+                problem_spec = {
+                    "nx": 1,
+                    "ny": 1,
+                    "nz": 1,
+                    "pool_size": 16,
+                    "ms": 250,
+                    "tf": 10000,
+                    "rs": [4, 4, 4],
+                    "rp": [1, 2, 3],
+                    "resource_count": 4,
+                    "strong": None,
+                    "weak": None,
+                    "throughput": None,
+                }
         elif self.spec.satisfies("+strong"):
             problem_spec = {
                 "nx": 1,
                 "ny": 1,
                 "nz": 1,
                 "pool_size": 16,
-                "ms": 100,
+                "ms": 250,
                 "tf": 10000,
                 "rs": 4,
                 "rp": 3,
@@ -95,7 +126,7 @@ class Laghos(
                 "ny": [1, 2, 3, 4, 5],
                 "nz": [1, 2, 3, 4, 5],
                 "pool_size": 16,
-                "ms": 100,
+                "ms": 250,
                 "tf": 10000,
                 "rs": 4,
                 "rp": 3,
@@ -110,7 +141,7 @@ class Laghos(
                 "ny": 1,
                 "nz": 1,
                 "pool_size": 16,
-                "ms": 100,
+                "ms": 250,
                 "tf": 10000,
                 "rs": 4,
                 "rp": 3,
@@ -162,7 +193,7 @@ class Laghos(
             self.add_experiment_variable("nz", 1, True)
             self.add_experiment_variable("rs", 3, True)
             self.add_experiment_variable("rp", 2, True)
-            self.add_experiment_variable("ms", 100, True)
+            self.add_experiment_variable("ms", 250, True)
             self.add_experiment_variable("tf", 10000, True)
             self.add_experiment_variable(
                 "zones", "{nx}*{ny}*{nz}*(8**({rs}+{rp}))", False
