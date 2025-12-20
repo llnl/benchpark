@@ -23,8 +23,9 @@ class Laghos(
 
     variant(
         "workload",
-        default="triplept",
-        description="triplept or other problem",
+        default="sedov",
+        values=("sedov", "triplept"),
+        description="problem type",
     )
 
     variant(
@@ -49,7 +50,7 @@ class Laghos(
 
     variant(
         "nc",
-        default=True,
+        default=False,
         values=(True, False),
         description="nonconforming or conforming",
     )
@@ -57,99 +58,57 @@ class Laghos(
     maintainers("wdhawkins")
 
     def generate_perf_specs(self):
+        problem_spec = {
+            "nx": 1,
+            "ny": 1,
+            "nz": 1,
+            "pool_size": 16,
+            "ms": 250,
+            "tf": 10000,
+            "resource_count": 4,
+            "strong": None,
+            "weak": None,
+            "throughput": None,
+        }
         # Add problem specs as needed here
         if self.spec.satisfies("+throughput"):
             if self.spec.satisfies("order=linear"):
-                problem_spec = {
-                    "nx": 1,
-                    "ny": 1,
-                    "nz": 1,
-                    "pool_size": 16,
-                    "ms": 250,
-                    "tf": 10000,
-                    "rs": [4, 4, 4],
-                    "rp": [2, 3, 4],
-                    "resource_count": 4,
-                    "strong": None,
-                    "weak": None,
-                    "throughput": None,
-                }
+                problem_spec["rs"] = [4, 4, 4, 4]
+                problem_spec["rp"] = [2, 3, 4, 5]
             elif self.spec.satisfies("order=quadratic"):
-                problem_spec = {
-                    "nx": 1,
-                    "ny": 1,
-                    "nz": 1,
-                    "pool_size": 16,
-                    "ms": 250,
-                    "tf": 10000,
-                    "rs": [4, 4, 4],
-                    "rp": [1, 2, 3],
-                    "resource_count": 4,
-                    "strong": None,
-                    "weak": None,
-                    "throughput": None,
-                }
+                problem_spec["rs"] = [4, 4, 4, 4]
+                problem_spec["rp"] = [1, 2, 3, 4]
             elif self.spec.satisfies("order=cubic"):
-                problem_spec = {
-                    "nx": 1,
-                    "ny": 1,
-                    "nz": 1,
-                    "pool_size": 16,
-                    "ms": 250,
-                    "tf": 10000,
-                    "rs": [4, 4, 4],
-                    "rp": [1, 2, 3],
-                    "resource_count": 4,
-                    "strong": None,
-                    "weak": None,
-                    "throughput": None,
-                }
+                problem_spec["rs"] = [4, 4, 4, 4]
+                problem_spec["rp"] = [1, 2, 3, 4]
         elif self.spec.satisfies("+strong"):
-            problem_spec = {
-                "nx": 1,
-                "ny": 1,
-                "nz": 1,
-                "pool_size": 16,
-                "ms": 250,
-                "tf": 10000,
-                "rs": 4,
-                "rp": 3,
-                "resource_count": 4,
-                "strong": lambda var, itr, dim, scaling_factor: var.val(dim)
-                * scaling_factor,
-                "weak": None,
-                "throughput": None,
-            }
+            problem_spec["strong"] = lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor
+            if self.spec.satisfies("order=linear"):
+                problem_spec["rs"] = 4
+                problem_spec["rp"] = 3
+            elif self.spec.satisfies("order=quadratic"):
+                problem_spec["rs"] = 4
+                problem_spec["rp"] = 2
+            elif self.spec.satisfies("order=cubic"):
+                problem_spec["rs"] = 4
+                problem_spec["rp"] = 1
         elif self.spec.satisfies("+weak"):
-            problem_spec = {
-                "nx": [1, 2, 3, 4, 5],
-                "ny": [1, 2, 3, 4, 5],
-                "nz": [1, 2, 3, 4, 5],
-                "pool_size": 16,
-                "ms": 250,
-                "tf": 10000,
-                "rs": 4,
-                "rp": 3,
-                "resource_count": [4, 32, 108, 256, 500],
-                "strong": None,
-                "weak": None,
-                "throughput": None,
-            }
+            problem_spec["nx"] = [1, 2, 3, 4, 5, 6]
+            problem_spec["ny"] = [1, 2, 3, 4, 5, 6]
+            problem_spec["nz"] = [1, 2, 3, 4, 5, 6]
+            problem_spec["resource_count"] = [4, 32, 108, 256, 500, 864]
+            if self.spec.satisfies("order=linear"):
+                problem_spec["rs"] = 4
+                problem_spec["rp"] = 3
+            elif self.spec.satisfies("order=quadratic"):
+                problem_spec["rs"] = 4
+                problem_spec["rp"] = 2
+            elif self.spec.satisfies("order=cubic"):
+                problem_spec["rs"] = 4
+                problem_spec["rp"] = 1
         else:
-            problem_spec = {
-                "nx": 1,
-                "ny": 1,
-                "nz": 1,
-                "pool_size": 16,
-                "ms": 250,
-                "tf": 10000,
-                "rs": 4,
-                "rp": 3,
-                "resource_count": 4,
-                "strong": None,
-                "weak": None,
-                "throughput": None,
-            }
+            problem_spec["rs"] = 4
+            problem_spec["rp"] = 1
 
         self.add_experiment_variable("nx", problem_spec["nx"], True)
         self.add_experiment_variable("ny", problem_spec["ny"], True)
@@ -167,7 +126,7 @@ class Laghos(
         self.add_experiment_variable("zones", "{nx}*{ny}*{nz}*(8**({rs}+{rp}))", False)
 
         # Umpire device pool size
-        self.add_experiment_variable("pool", problem_spec["pool_size"], True)
+        self.add_experiment_variable("pool", problem_spec["pool_size"], False)
 
         self.register_scaling_config(
             {
