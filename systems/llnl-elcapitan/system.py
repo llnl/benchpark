@@ -130,7 +130,7 @@ class LlnlElcapitan(System):
     variant(
         "rocm",
         default="6.4.0",
-        values=("5.7.1", "6.2.4", "6.3.1", "6.4.0", "6.4.1", "6.4.2"),
+        values=("5.7.1", "6.2.4", "6.3.1", "6.4.0", "6.4.1", "6.4.2", "6.4.3", "7.0.1"),
         description="ROCm version",
     )
     variant(
