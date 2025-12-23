@@ -3,8 +3,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from spack_repo.builtin.packages.boost.package import Boost
-
 from spack.package import *
 
 
@@ -41,10 +39,6 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
 
     depends_on("mpi@2:")
 
-    # TODO: replace this with an explicit list of components of Boost,
-    # for instance depends_on('boost +filesystem')
-    # See https://github.com/spack/spack/pull/22303 for reference
-    depends_on(Boost.with_default_variants, when="@:0.81")
     depends_on("metis")
     depends_on("parmetis", when="@:0.81")
     depends_on("caliper", when="+caliper")
