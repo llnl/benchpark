@@ -181,7 +181,7 @@ class Amg2023(
                     "throughput_n": None,
                     "throughput_p": None,
                 }
-                if self.spec.satisfies("target=MI300-SPX"):
+                if self.spec.satisfies("target=MI300-SPX") or self.spec.satisfies("target=MI250"):
                     problem_spec["pool_size"] = [1, 1, 1, 2, 3, 3, 4, 5, 6, 8, 9, 12, 14, 16, 18, 21, 24, 28, 31, 36, 42, 46, 52]
                 elif self.spec.satisfies("target=H100"):
                     problem_spec["pool_size"] = [1, 1, 1, 1, 2, 3, 3, 4, 5, 6, 7, 8, 10, 12, 14, 15, 18, 20, 23, 27, 30, 33, 38]
@@ -240,7 +240,7 @@ class Amg2023(
                 "throughput_n": None,
                 "throughput_p": None,
             }
-            if self.spec.satisfies("target=MI300-SPX") or self.spec.satisfies("target=H100"):
+            if self.spec.satisfies("target=MI300-SPX") or self.spec.satisfies("target=MI250") or self.spec.satisfies("target=H100"):
                 problem_spec["nx"] = 171
                 problem_spec["ny"] = 171
                 problem_spec["nz"] = 171
