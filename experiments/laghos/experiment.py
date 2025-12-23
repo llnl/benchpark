@@ -82,7 +82,9 @@ class Laghos(
                 problem_spec["rs"] = [4, 4, 4, 4]
                 problem_spec["rp"] = [1, 2, 3, 4]
         elif self.spec.satisfies("+strong"):
-            problem_spec["strong"] = lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor
+            problem_spec["strong"] = (
+                lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor
+            )
             if self.spec.satisfies("order=linear"):
                 problem_spec["rs"] = 4
                 problem_spec["rp"] = 3
