@@ -3,14 +3,14 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+from benchpark.caliper import Caliper
+from benchpark.cuda import CudaExperiment
 from benchpark.directives import variant
 from benchpark.experiment import Experiment
 from benchpark.mpi import MpiOnlyExperiment
 from benchpark.openmp import OpenMPExperiment
-from benchpark.cuda import CudaExperiment
 from benchpark.rocm import ROCmExperiment
-from benchpark.scaling import ScalingMode, Scaling
-from benchpark.caliper import Caliper
+from benchpark.scaling import Scaling, ScalingMode
 
 
 class Branson(
