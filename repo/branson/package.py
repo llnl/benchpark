@@ -40,8 +40,6 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
 
     variant("openmp", default=False, description="Enable OpenMP support")
     variant("caliper", default=False, description="Enable Caliper monitoring")
-    variant("metis", default=False, description="Enable METIS")
-    variant("viz", default=False, description="Enable VIZ")
     variant("n_groups", default=30, values=int, description="Number of groups")
 
     depends_on("mpi@2:")
@@ -76,14 +74,14 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
         args.append(f"-DCMAKE_CXX_COMPILER={spec['mpi'].mpicxx}")
         args.append(f"-DCMAKE_Fortran_COMPILER={spec['mpi'].mpifc}")
         args.append(f"-DCMAKE_CXX_STANDARD=17")
+        args.append(f"-DMPI_C_COMPILER={spec['mpi'].mpicc}")
+        args.append(f"-DMPI_CXX_COMPILER={spec['mpi'].mpicxx}")
 
-        args.append(self.define_from_variant("ENABLE_METIS", "metis"))
         args.append(f"-DMETIS_ROOT_DIR={spec['metis'].prefix}")
 
-        args.append(self.define_from_variant("ENABLE_VIZ", "viz"))
-
         if '+cuda' in spec:
-            args.append("-DENABLE_CUDA=ON")
+            args.append("-DUSE_CUDA=ON")
+            args.append("-DUSE_GPU=ON")
             args.append(f"-DCMAKE_CUDA_COMPILER={spec['cuda'].prefix}/bin/nvcc")
             cuda_arch_vals = spec.variants["cuda_arch"].value
             if cuda_arch_vals:
@@ -91,10 +89,12 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
               cuda_arch = cuda_arch_sorted[0]
               args.append(f"-DCUDA_ARCH={cuda_arch}")
         else:
-            args.append("-DENABLE_CUDA=OFF")
+            args.append("-DUSE_CUDA=OFF")
+            args.append("-DUSE_GPU=OFF")
 
         if '+rocm' in spec:
-            args.append("-DENABLE_HIP=ON")
+            args.append("-DUSE_HIP=ON")
+            args.append("-DUSE_GPU=ON")
             rocm_arch_vals = spec.variants["amdgpu_target"].value
             args.append(f"-DROCM_PATH={spec['hip'].prefix}")
             if rocm_arch_vals:
@@ -103,12 +103,13 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
               args.append(f"-DROCM_ARCH={rocm_arch}")
               args.append(f"-DHIP_ARCH={rocm_arch}")
         else:
-            args.append("-DENABLE_HIP=OFF")
+            args.append("-DUSE_HIP=OFF")
+            args.append("-DUSE_GPU=OFF")
 
-        args.append(self.define_from_variant("ENABLE_OPENMP", "openmp"))
+        args.append(self.define_from_variant("USE_OPENMP", "openmp"))
 
         if '+caliper' in spec:
-            args.append(self.define_from_variant("ENABLE_CALIPER", "caliper"))
+            args.append(self.define_from_variant("USE_CALIPER", "caliper"))
             args.append(f"-Dcaliper_DIR={spec['caliper'].prefix}")
 
         args.append("-DBUILD_TESTING=OFF")

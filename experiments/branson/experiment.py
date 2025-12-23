@@ -86,6 +86,6 @@ class Branson(
         self.add_package_spec(
             self.name,
             [
-                f"branson@{app_version} +metis n_groups={self.spec.variants['n_groups'][0]} ",
+                f"branson@{app_version} n_groups={self.spec.variants['n_groups'][0]} ",
             ],
         )
