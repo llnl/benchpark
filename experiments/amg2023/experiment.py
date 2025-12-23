@@ -63,13 +63,109 @@ class Amg2023(
         # Add problem specs as needed here
         if self.spec.satisfies("+throughput"):
             problem_spec = {
-                "nx": [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270],
-                "ny": [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270],
-                "nz": [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270],
-                "pool_size": [1, 2, 3, 3, 4, 5, 6, 8, 9, 11, 13, 16, 18, 21, 24, 28, 32, 36, 42, 46, 50, 64, 64],
-                "px" : 1,
-                "py" : 1,
-                "pz" : 1,
+                "nx": [
+                    50,
+                    60,
+                    70,
+                    80,
+                    90,
+                    100,
+                    110,
+                    120,
+                    130,
+                    140,
+                    150,
+                    160,
+                    170,
+                    180,
+                    190,
+                    200,
+                    210,
+                    220,
+                    230,
+                    240,
+                    250,
+                    260,
+                    270,
+                ],
+                "ny": [
+                    50,
+                    60,
+                    70,
+                    80,
+                    90,
+                    100,
+                    110,
+                    120,
+                    130,
+                    140,
+                    150,
+                    160,
+                    170,
+                    180,
+                    190,
+                    200,
+                    210,
+                    220,
+                    230,
+                    240,
+                    250,
+                    260,
+                    270,
+                ],
+                "nz": [
+                    50,
+                    60,
+                    70,
+                    80,
+                    90,
+                    100,
+                    110,
+                    120,
+                    130,
+                    140,
+                    150,
+                    160,
+                    170,
+                    180,
+                    190,
+                    200,
+                    210,
+                    220,
+                    230,
+                    240,
+                    250,
+                    260,
+                    270,
+                ],
+                "pool_size": [
+                    1,
+                    2,
+                    3,
+                    3,
+                    4,
+                    5,
+                    6,
+                    8,
+                    9,
+                    11,
+                    13,
+                    16,
+                    18,
+                    21,
+                    24,
+                    28,
+                    32,
+                    36,
+                    42,
+                    46,
+                    50,
+                    64,
+                    64,
+                ],
+                "px": 1,
+                "py": 1,
+                "pz": 1,
                 "strong_n": None,
                 "strong_p": None,
                 "weak_n": None,
@@ -80,7 +176,7 @@ class Amg2023(
             problem_spec["px"] = [problem_spec["px"]] * len(problem_spec["nx"])
             problem_spec["py"] = [problem_spec["py"]] * len(problem_spec["ny"])
             problem_spec["pz"] = [problem_spec["pz"]] * len(problem_spec["nz"])
-            #problem_spec = {
+            # problem_spec = {
             #    "nx": 50,
             #    "ny": 50,
             #    "nz": 50,
@@ -94,7 +190,7 @@ class Amg2023(
             #    "weak_p": None,
             #    "throughput_n": lambda var, itr, dim, scaling_factor: [50+(itr+1)*10, 50+(itr+1)*10, 50+(itr+1)*10],
             #    "throughput_p": lambda var, itr, dim, scaling_factor: var.val(dim),
-            #}
+            # }
         elif self.spec.satisfies("+strong"):
             problem_spec = {
                 "nx": 270,
@@ -104,8 +200,10 @@ class Amg2023(
                 "px": 1,
                 "py": 1,
                 "pz": 1,
-                "strong_n": lambda var, itr, dim, scaling_factor: var.val(dim) // scaling_factor,
-                "strong_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+                "strong_n": lambda var, itr, dim, scaling_factor: var.val(dim)
+                // scaling_factor,
+                "strong_p": lambda var, itr, dim, scaling_factor: var.val(dim)
+                * scaling_factor,
                 "weak_n": None,
                 "weak_p": None,
                 "throughput_n": None,
@@ -124,12 +222,13 @@ class Amg2023(
                 "strong_n": None,
                 "strong_p": None,
                 "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim),
-                "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+                "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim)
+                * scaling_factor,
                 "throughput_n": None,
                 "throughput_p": None,
             }
             # High - CPX
-            #problem_spec = {
+            # problem_spec = {
             #    "nx": 94,
             #    "ny": 94,
             #    "nz": 94,
@@ -143,9 +242,9 @@ class Amg2023(
             #    "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
             #    "throughput_n": None,
             #    "throughput_p": None,
-            #}
+            # }
             # Low - SPX
-            #problem_spec = {
+            # problem_spec = {
             #    "nx": 86,
             #    "ny": 86,
             #    "nz": 86,
@@ -159,9 +258,9 @@ class Amg2023(
             #    "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
             #    "throughput_n": None,
             #    "throughput_p": None,
-            #}
+            # }
             # Low - CPX
-            #problem_spec = {
+            # problem_spec = {
             #    "nx": 48,
             #    "ny": 48,
             #    "nz": 48,
@@ -175,7 +274,7 @@ class Amg2023(
             #    "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
             #    "throughput_n": None,
             #    "throughput_p": None,
-            #}
+            # }
         else:
             problem_spec = {
                 "nx": [128, 256],
@@ -185,30 +284,42 @@ class Amg2023(
                 "px": [2, 2],
                 "py": [2, 2],
                 "pz": [2, 2],
-                "strong_n": lambda var, itr, dim, scaling_factor: var.val(dim) // scaling_factor,
-                "strong_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+                "strong_n": lambda var, itr, dim, scaling_factor: var.val(dim)
+                // scaling_factor,
+                "strong_p": lambda var, itr, dim, scaling_factor: var.val(dim)
+                * scaling_factor,
                 "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim),
-                "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
-                "throughput_n": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+                "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim)
+                * scaling_factor,
+                "throughput_n": lambda var, itr, dim, scaling_factor: var.val(dim)
+                * scaling_factor,
                 "throughput_p": lambda var, itr, dim, scaling_factor: var.val(dim),
             }
 
         # Per-process size (in zones) in each dimension
-        self.add_experiment_variable("process_problem_size_dict", {
-            "nx": problem_spec["nx"],
-            "ny": problem_spec["ny"], 
-            "nz": problem_spec["nz"], 
-        }, True)
+        self.add_experiment_variable(
+            "process_problem_size_dict",
+            {
+                "nx": problem_spec["nx"],
+                "ny": problem_spec["ny"],
+                "nz": problem_spec["nz"],
+            },
+            True,
+        )
 
         # Umpire device pool size
         self.add_experiment_variable("pool", problem_spec["pool_size"], True)
 
         # Number of processes in each dimension
-        self.add_experiment_variable("n_resources_dict", {
-            "px": problem_spec["px"],
-            "py": problem_spec["py"],
-            "pz": problem_spec["pz"],
-        }, True)
+        self.add_experiment_variable(
+            "n_resources_dict",
+            {
+                "px": problem_spec["px"],
+                "py": problem_spec["py"],
+                "pz": problem_spec["pz"],
+            },
+            True,
+        )
 
         self.register_scaling_config(
             {
