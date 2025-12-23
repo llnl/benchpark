@@ -35,6 +35,7 @@ class LlnlCluster(System):
             "hardware_key": str(hardware_descriptions)
             + "/Supermicro-icelake-OmniPath/hardware_description.yaml",
             "queues": [JobQueue("pdebug", 60, 12), JobQueue("pbatch", 1440, 520)],
+            "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
         },
         "magma": {
             "sys_cores_per_node": 96,
@@ -42,6 +43,7 @@ class LlnlCluster(System):
             "hardware_key": str(hardware_descriptions)
             + "/Penguin-icelake-OmniPath/hardware_description.yaml",
             "queues": [JobQueue("pdebug", 60, 4), JobQueue("pbatch", 2160, 64)],
+            "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
         },
         "dane": {
             "sys_cores_per_node": 112,
@@ -56,13 +58,40 @@ class LlnlCluster(System):
             "hardware_key": str(hardware_descriptions)
             + "/DELL-sapphirerapids-OmniPath/hardware_description.yaml",
             "queues": [JobQueue("pdebug", 60, 20), JobQueue("pbatch", 1440, 520)],
+            "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
+        },
+        "rzgenie": {
+            "sys_cores_per_node": 36,
+            "system_site": "llnl",
+            "sys_sockets_per_node": 2,
+            "sys_cpu_L2_KB": 256,
+            "sys_cpu_L3_MB": 45,
+            "hardware_key": str(hardware_descriptions)
+            + "/Penguin-haswell-OmniPath/hardware_description.yaml",
+            "queues": [JobQueue("pdebug", 720, 43)],
+            "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
+        },
+        "poodle": {
+            "sys_cores_per_node": 112,
+            "sys_sockets_per_node": 2,
+            "sys_cpu_L2_KB": 2048,
+            "sys_cpu_L3_MB": 112.5,  # Depends on partition (could be 105)
+            "system_site": "llnl",
+            "hardware_key": str(hardware_descriptions)
+            + "/DELL-sapphirerapids-OmniPath/hardware_description.yaml",
+            "queues": [
+                JobQueue("pdebug", 30, 3),
+                JobQueue("pbatch", 12000, 29),
+                JobQueue("phighmem", 12000, 4),
+            ],
+            "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
         },
     }
 
     variant(
         "cluster",
         default="dane",
-        values=("ruby", "magma", "dane"),
+        values=("ruby", "magma", "dane", "rzgenie", "poodle"),
         description="Which cluster to run on",
     )
 
@@ -71,6 +100,13 @@ class LlnlCluster(System):
         default="oneapi",
         values=("oneapi", "gcc", "intel"),
         description="Which compiler to use",
+    )
+
+    variant(
+        "mpi",
+        default="mvapich2",
+        values=("mvapich2", "openmpi"),
+        description="Which MPI implementation to use",
     )
 
     variant(
@@ -84,7 +120,7 @@ class LlnlCluster(System):
     variant(
         "queue",
         default="none",
-        values=("none", "pbatch", "pdebug"),
+        values=("none", "pbatch", "pdebug", "phighmem"),
         multi=False,
         description="Submit to queue other than the default queue (e.g. pdebug)",
     )
@@ -92,7 +128,7 @@ class LlnlCluster(System):
     variant(
         "mount_point",
         default="none",
-        values=("none", "/p/lustre1", "/p/lustre2", "/p/lustre3"),
+        values=("none", "l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"),
         multi=False,
         description="Which mount point to use for IO benchmarks",
     )
@@ -105,6 +141,16 @@ class LlnlCluster(System):
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
+
+        mount_point = self.spec.variants["mount_point"][0]
+        if mount_point not in self.mount_points + ["none"]:
+            raise KeyError(
+                f'"{mount_point}" is not a valid mount point for the cluster "{self.spec.variants["cluster"][0]}"'
+            )
+        if mount_point == "none":
+            self.full_io_path = None
+        else:
+            self.full_io_path = mount_point + "/$USER/test.bat"
 
     def compute_packages_section(self):
         selections = {
@@ -220,66 +266,89 @@ class LlnlCluster(System):
             }
         }
 
+        mpi_type = self.spec.variants["mpi"][0]
+        mpi_dict = {
+            "mpi": {
+                "buildable": False,
+            },
+        }
         if self.spec.satisfies("compiler=gcc"):
-            selections |= {
-                "packages": selections["packages"]
-                | {
-                    "mpi": {
-                        "buildable": False,
-                    },
-                    "mvapich2": {
-                        "externals": [
-                            {
-                                "spec": "mvapich2@2.3.7-gcc1211",
-                                "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-12.1.1",
-                                "extra_attributes": {
-                                    "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-12.1.1/lib -lmpi"
-                                },
-                            }
-                        ],
-                    },
+            if mpi_type == "mvapich2":
+                mpi_dict["mvapich2"] = {
+                    "externals": [
+                        {
+                            "spec": "mvapich2@2.3.7",
+                            "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-12.1.1",
+                            "extra_attributes": {
+                                "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-12.1.1/lib -lmpi"
+                            },
+                        }
+                    ],
                 }
-            }
+            elif mpi_type == "openmpi":
+                mpi_dict["openmpi"] = {
+                    "externals": [
+                        {
+                            "spec": "openmpi@4.1.2",
+                            "prefix": "/usr/tce/packages/openmpi/openmpi-4.1.2-gcc-12.1.1",
+                            "extra_attributes": {
+                                "ldflags": "-L/usr/tce/packages/openmpi/openmpi-4.1.2-gcc-12.1.1/lib -lmpi"
+                            },
+                        }
+                    ],
+                }
         elif self.spec.satisfies("compiler=intel"):
-            selections |= {
-                "packages": selections["packages"]
-                | {
-                    "mpi": {
-                        "buildable": False,
-                    },
-                    "mvapich2": {
-                        "externals": [
-                            {
-                                "spec": "mvapich2@2.3.7-intel202160classic",
-                                "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-classic-2021.6.0",
-                                "extra_attributes": {
-                                    "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-classic-2021.6.0/lib -lmpi"
-                                },
-                            }
-                        ],
-                    },
+            if mpi_type == "mvapich2":
+                mpi_dict["mvapich2"] = {
+                    "externals": [
+                        {
+                            "spec": "mvapich2@2.3.7",
+                            "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-classic-2021.6.0",
+                            "extra_attributes": {
+                                "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-classic-2021.6.0/lib -lmpi"
+                            },
+                        }
+                    ],
                 }
-            }
+            elif mpi_type == "openmpi":
+                mpi_dict["openmpi"] = {
+                    "externals": [
+                        {
+                            "spec": "openmpi@4.1.2",
+                            "prefix": "/usr/tce/packages/openmpi/openmpi-4.1.2-intel-classic-2021.6.0",
+                            "extra_attributes": {
+                                "ldflags": "-L/usr/tce/packages/openmpi/openmpi-4.1.2-intel-classic-2021.6.0/lib -lmpi"
+                            },
+                        }
+                    ],
+                }
         elif self.spec.satisfies("compiler=oneapi"):
-            selections |= {
-                "packages": selections["packages"]
-                | {
-                    "mpi": {
-                        "buildable": False,
-                    },
-                    "mvapich2": {
-                        "externals": [
-                            {
-                                "spec": "mvapich2@2.3.7-intel202321",
-                                "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2023.2.1",
-                                "extra_attributes": {
-                                    "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2023.2.1/lib -lmpi"
-                                },
-                            }
-                        ],
-                    },
+            if mpi_type == "mvapich2":
+                mpi_dict["mvapich2"] = {
+                    "externals": [
+                        {
+                            "spec": "mvapich2@2.3.7",
+                            "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2023.2.1",
+                            "extra_attributes": {
+                                "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2023.2.1/lib -lmpi"
+                            },
+                        }
+                    ],
                 }
-            }
+            elif mpi_type == "openmpi":
+                mpi_dict["openmpi"] = {
+                    "externals": [
+                        {
+                            "spec": "openmpi@4.1.2",
+                            "prefix": "/usr/tce/packages/openmpi/openmpi-4.1.2-intel-2023.2.1",
+                            "extra_attributes": {
+                                "ldflags": "-L/usr/tce/packages/openmpi/openmpi-4.1.2-intel-2023.2.1/lib -lmpi"
+                            },
+                        }
+                    ],
+                }
+
+        selections |= {"packages": selections["packages"] | mpi_dict}
 
         return selections
 
@@ -344,13 +413,10 @@ class LlnlCluster(System):
             "software": {
                 "packages": {
                     "default-compiler": {"pkg_spec": default_compiler},
-                    "default-mpi": {"pkg_spec": "mvapich2"},
                     "compiler-gcc": {"pkg_spec": "gcc"},
                     "compiler-intel": {"pkg_spec": "intel"},
                     "blas": {"pkg_spec": "intel-oneapi-mkl"},
                     "lapack": {"pkg_spec": "intel-oneapi-mkl"},
-                    "mpi-gcc": {"pkg_spec": "mvapich2"},
-                    "mpi-intel": {"pkg_spec": "mvapich2"},
                 }
             }
         }

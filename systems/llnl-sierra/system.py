@@ -27,6 +27,7 @@ class LlnlSierra(System):
         "lassen": {
             "cuda_arch": 70,
             "sys_cores_per_node": 40,
+            "sys_sockets_per_node": 2,
             "sys_cores_os_reserved_per_node": 4,
             "sys_cores_os_reserved_per_node_list": [
                 0,
@@ -160,13 +161,13 @@ class LlnlSierra(System):
                     "buildable": False,
                 },
                 "python": {
+                    "buildable": False,
                     "externals": [
                         {
                             "spec": "python@3.8.2",
                             "prefix": "/usr/tce/packages/python/python-3.8.2",
-                            "buildable": False,
                         }
-                    ]
+                    ],
                 },
                 "mpi": {"buildable": False},
             }

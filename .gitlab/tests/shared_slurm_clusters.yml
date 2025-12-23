@@ -111,6 +111,11 @@ run_tests_slurm_dane:
         ARCHCONFIG: llnl-cluster
         SYSTEM_ARGS: [mount_point="/p/lustre1"]
         BENCHMARK: ior
+      # Test openmpi
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SYSTEM_ARGS: [mpi=openmpi]
+        BENCHMARK: osu-micro-benchmarks
 run_tests_slurm_matrix:
   extends: .run_tests_slurm
   tags: [shell, matrix]
@@ -128,3 +133,7 @@ run_tests_slurm_matrix:
           - raja-perf
           - saxpy
         VARIANT: [+cuda]
+      - HOST: matrix
+        ARCHCONFIG: llnl-matrix
+        BENCHMARK: [sparta-snl]
+        VARIANT: [+cuda~gpu-aware-mpi]

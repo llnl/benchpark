@@ -4,8 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Compare System Specs
-====================
+######################
+ Compare System Specs
+######################
 
 ``lib/scripts/diffSystemSpecs.py``
 
@@ -18,8 +19,9 @@ system configuration.
 Stages that occur during this script:
     - ``benchpark system init``
 
-Example: Identical System
--------------------------
+***************************
+ Example: Identical System
+***************************
 
 In this example, we compare the ``llnl-sierra/system.py`` on the ``develop`` branch
 against the ``develop`` branch. As we expect, the generated system configuration files
@@ -41,8 +43,9 @@ are identical, since no changes were made to the system.py
          llnl-sierra/auxiliary_software_files/compilers.yaml
                  The YAML files benchpark-old/llnl-sierra/auxiliary_software_files/compilers.yaml and benchpark-new/llnl-sierra/auxiliary_software_files/compilers.yaml are identical.
 
-Example: Different CMake Version
---------------------------------
+**********************************
+ Example: Different CMake Version
+**********************************
 
 In another example, we have modified the ``cmake`` package version from ``3.29.2`` to
 ``3.23.1``.

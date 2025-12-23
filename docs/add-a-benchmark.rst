@@ -4,14 +4,16 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Adding a Benchmark
-==================
+####################
+ Adding a Benchmark
+####################
 
 This guide is intended for application developers who want to add a benchmark so that it
 can be run with Benchpark.
 
-Create a New Benchmark
-----------------------
+************************
+ Create a New Benchmark
+************************
 
 The following system-independent specification is required for each ${Benchmark1}:
 
