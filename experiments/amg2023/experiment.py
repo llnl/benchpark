@@ -181,19 +181,189 @@ class Amg2023(
                     "throughput_n": None,
                     "throughput_p": None,
                 }
-                if self.spec.satisfies("target=MI300-SPX") or self.spec.satisfies("target=MI250"):
-                    problem_spec["pool_size"] = [1, 1, 1, 2, 3, 3, 4, 5, 6, 8, 9, 12, 14, 16, 18, 21, 24, 28, 31, 36, 42, 46, 52]
+                if self.spec.satisfies("target=MI300-SPX") or self.spec.satisfies(
+                    "target=MI250"
+                ):
+                    problem_spec["pool_size"] = [
+                        1,
+                        1,
+                        1,
+                        2,
+                        3,
+                        3,
+                        4,
+                        5,
+                        6,
+                        8,
+                        9,
+                        12,
+                        14,
+                        16,
+                        18,
+                        21,
+                        24,
+                        28,
+                        31,
+                        36,
+                        42,
+                        46,
+                        52,
+                    ]
                 elif self.spec.satisfies("target=H100"):
-                    problem_spec["pool_size"] = [1, 1, 1, 1, 2, 3, 3, 4, 5, 6, 7, 8, 10, 12, 14, 15, 18, 20, 23, 27, 30, 33, 38]
+                    problem_spec["pool_size"] = [
+                        1,
+                        1,
+                        1,
+                        1,
+                        2,
+                        3,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        10,
+                        12,
+                        14,
+                        15,
+                        18,
+                        20,
+                        23,
+                        27,
+                        30,
+                        33,
+                        38,
+                    ]
             elif self.spec.satisfies("workload=problem2"):
                 problem_spec = {
-                    "nx": [80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360],
-                    "ny": [80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360],
-                    "nz": [80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360],
-                    "pool_size": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                    "px" : 1,
-                    "py" : 1,
-                    "pz" : 1,
+                    "nx": [
+                        80,
+                        90,
+                        100,
+                        110,
+                        120,
+                        130,
+                        140,
+                        150,
+                        160,
+                        170,
+                        180,
+                        190,
+                        200,
+                        210,
+                        220,
+                        230,
+                        240,
+                        250,
+                        260,
+                        270,
+                        280,
+                        290,
+                        300,
+                        310,
+                        320,
+                        330,
+                        340,
+                        350,
+                        360,
+                    ],
+                    "ny": [
+                        80,
+                        90,
+                        100,
+                        110,
+                        120,
+                        130,
+                        140,
+                        150,
+                        160,
+                        170,
+                        180,
+                        190,
+                        200,
+                        210,
+                        220,
+                        230,
+                        240,
+                        250,
+                        260,
+                        270,
+                        280,
+                        290,
+                        300,
+                        310,
+                        320,
+                        330,
+                        340,
+                        350,
+                        360,
+                    ],
+                    "nz": [
+                        80,
+                        90,
+                        100,
+                        110,
+                        120,
+                        130,
+                        140,
+                        150,
+                        160,
+                        170,
+                        180,
+                        190,
+                        200,
+                        210,
+                        220,
+                        230,
+                        240,
+                        250,
+                        260,
+                        270,
+                        280,
+                        290,
+                        300,
+                        310,
+                        320,
+                        330,
+                        340,
+                        350,
+                        360,
+                    ],
+                    "pool_size": [
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                        1,
+                    ],
+                    "px": 1,
+                    "py": 1,
+                    "pz": 1,
                     "strong_n": None,
                     "strong_p": None,
                     "weak_n": None,
@@ -201,7 +371,37 @@ class Amg2023(
                     "throughput_n": None,
                     "throughput_p": None,
                 }
-                problem_spec["pool_size"] = [1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 5, 6, 7, 8, 8, 9, 10, 11, 13, 14, 15, 17, 18, 20, 22, 24]
+                problem_spec["pool_size"] = [
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    2,
+                    2,
+                    2,
+                    3,
+                    3,
+                    3,
+                    4,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    8,
+                    9,
+                    10,
+                    11,
+                    13,
+                    14,
+                    15,
+                    17,
+                    18,
+                    20,
+                    22,
+                    24,
+                ]
             problem_spec["px"] = [problem_spec["px"]] * len(problem_spec["nx"])
             problem_spec["py"] = [problem_spec["py"]] * len(problem_spec["ny"])
             problem_spec["pz"] = [problem_spec["pz"]] * len(problem_spec["nz"])
@@ -240,20 +440,24 @@ class Amg2023(
                 "throughput_n": None,
                 "throughput_p": None,
             }
-            if self.spec.satisfies("target=MI300-SPX") or self.spec.satisfies("target=MI250") or self.spec.satisfies("target=H100"):
+            if (
+                self.spec.satisfies("target=MI300-SPX")
+                or self.spec.satisfies("target=MI250")
+                or self.spec.satisfies("target=H100")
+            ):
                 problem_spec["nx"] = 171
                 problem_spec["ny"] = 171
                 problem_spec["nz"] = 171
                 problem_spec["pool_size"] = 16
-                #problem_spec["nx"] = 86
-                #problem_spec["ny"] = 86
-                #problem_spec["nz"] = 86
-                #problem_spec["pool_size"] = 2
+                # problem_spec["nx"] = 86
+                # problem_spec["ny"] = 86
+                # problem_spec["nz"] = 86
+                # problem_spec["pool_size"] = 2
             elif self.spec.satisfies("target=MI300-CPX"):
-                #problem_spec["nx"] = 94
-                #problem_spec["ny"] = 94
-                #problem_spec["nz"] = 94
-                #problem_spec["pool_size"] = 3
+                # problem_spec["nx"] = 94
+                # problem_spec["ny"] = 94
+                # problem_spec["nz"] = 94
+                # problem_spec["pool_size"] = 3
                 problem_spec["nx"] = 48
                 problem_spec["ny"] = 48
                 problem_spec["nz"] = 48
