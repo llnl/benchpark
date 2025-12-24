@@ -12,7 +12,6 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
     methods for domain decomposition."""
 
     homepage = "https://github.com/lanl/branson"
-    url = "https://github.com/lanl/branson/archive/0.82.tar.gz"
     git = "https://github.com/lanl/branson.git"
 
     tags = ["proxy-app"]
