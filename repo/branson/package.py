@@ -13,7 +13,7 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
 
     homepage = "https://github.com/lanl/branson"
     url = "https://github.com/lanl/branson/archive/0.82.tar.gz"
-    git = "https://github.com/rfhaque/branson.git"
+    git = "https://github.com/lanl/branson.git"
 
     tags = ["proxy-app"]
 
