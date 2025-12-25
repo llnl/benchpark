@@ -146,31 +146,7 @@ class Amg2023(
                         260,
                         270,
                     ],
-                    "pool_size": [
-                        1,
-                        2,
-                        3,
-                        3,
-                        4,
-                        5,
-                        6,
-                        8,
-                        9,
-                        11,
-                        13,
-                        16,
-                        18,
-                        21,
-                        24,
-                        28,
-                        32,
-                        36,
-                        42,
-                        46,
-                        50,
-                        64,
-                        64,
-                    ],
+                    "pool_size": 1,
                     "px": 1,
                     "py": 1,
                     "pz": 1,
@@ -330,37 +306,7 @@ class Amg2023(
                         350,
                         360,
                     ],
-                    "pool_size": [
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                        1,
-                    ],
+                    "pool_size": 1,
                     "px": 1,
                     "py": 1,
                     "pz": 1,
@@ -454,14 +400,14 @@ class Amg2023(
                 # problem_spec["nz"] = 86
                 # problem_spec["pool_size"] = 2
             elif self.spec.satisfies("target=MI300-CPX"):
-                # problem_spec["nx"] = 94
-                # problem_spec["ny"] = 94
-                # problem_spec["nz"] = 94
-                # problem_spec["pool_size"] = 3
-                problem_spec["nx"] = 48
-                problem_spec["ny"] = 48
-                problem_spec["nz"] = 48
-                problem_spec["pool_size"] = 1
+                problem_spec["nx"] = 94
+                problem_spec["ny"] = 94
+                problem_spec["nz"] = 94
+                problem_spec["pool_size"] = 3
+                # problem_spec["nx"] = 48
+                # problem_spec["ny"] = 48
+                # problem_spec["nz"] = 48
+                # problem_spec["pool_size"] = 1
                 problem_spec["px"] = 4
                 problem_spec["py"] = 3
                 problem_spec["pz"] = 2
