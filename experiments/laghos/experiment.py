@@ -73,14 +73,14 @@ class Laghos(
         # Add problem specs as needed here
         if self.spec.satisfies("+throughput"):
             if self.spec.satisfies("order=linear"):
-                problem_spec["rs"] = [4, 4, 4, 4]
-                problem_spec["rp"] = [2, 3, 4, 5]
+                problem_spec["rs"] = [4, 4, 4]
+                problem_spec["rp"] = [2, 3, 4]
             elif self.spec.satisfies("order=quadratic"):
-                problem_spec["rs"] = [4, 4, 4, 4]
-                problem_spec["rp"] = [1, 2, 3, 4]
+                problem_spec["rs"] = [4, 4, 4]
+                problem_spec["rp"] = [1, 2, 3]
             elif self.spec.satisfies("order=cubic"):
-                problem_spec["rs"] = [4, 4, 4, 4]
-                problem_spec["rp"] = [1, 2, 3, 4]
+                problem_spec["rs"] = [4, 4, 4]
+                problem_spec["rp"] = [1, 2, 3]
         elif self.spec.satisfies("+strong"):
             problem_spec["strong"] = (
                 lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor
