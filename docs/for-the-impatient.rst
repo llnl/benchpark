@@ -28,14 +28,14 @@ You need git and Python 3.8+:
 
 ::
 
-    benchpark system init --dest=</output/path/to/system_def_dir> <SystemName> compiler=<Compiler>
-    benchpark experiment init --dest=</output/path/to/experiment_def_dir> <Benchmark> +/~<Boolean Variant> <String Variant>=<value> --system=</output/path/to/system_def_dir>
-    benchpark setup </output/path/to/experiment_def> </output/path/to/workspace>
+    benchpark system init --dest=</output/path/to/system_def_dir/mySystemName> <SystemName> compiler=<Compiler>
+    benchpark experiment init <mySystemName> <Benchmark> +/~<Boolean Variant> <String Variant>=<value>
+    benchpark setup <mySystemName>/<Benchmark> </output/path/to/workspace>
 
 where:
 
 - ``<Benchmark>``: amg2023 | saxpy | etc. (predefined choices in :doc:`benchmark-list`)
-- ``<System>``: Cts | Tioga | etc. (predefined systems in :doc:`system-list`)
+- ``<SystemName>``: Cts | Tioga | etc. (predefined systems in :doc:`system-list`)
 
 ``benchpark setup`` will output instructions to follow:
 
@@ -49,7 +49,7 @@ where:
 
 ::
 
-    cd <experiments_root>/<Benchmark>/<System>/workspace
+    cd <experiments_root>/<System>/<Benchmark>/workspace
     ramble --workspace-dir . workspace setup
 
 ********************

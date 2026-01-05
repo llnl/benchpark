@@ -15,8 +15,10 @@ class Mfem(BuiltinMfem):
 
     variant("caliper", default=False, description="Build Caliper support")
 
+    depends_on("camp", when="+umpire")
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
+    depends_on("hypre+shared", when="+mpi~cuda")
 
     requires("+caliper", when="^hypre+caliper")
 
@@ -39,6 +41,23 @@ class Mfem(BuiltinMfem):
             return "YES" if varstr in self.spec else "NO"
 
         options = super().get_make_config_options(spec, prefix)
+
+        if "+umpire" in spec:
+            umpire = spec["umpire"]
+            umpire_opts = umpire.headers
+            umpire_libs = umpire.libs
+            if "^camp" in umpire:
+                umpire_opts += umpire["camp"].headers
+                umpire_libs += umpire["camp"].libs
+            if "^fmt" in umpire:
+                umpire_opts += umpire["fmt"].headers
+                umpire_libs += umpire["fmt"].libs
+            options = [
+                "UMPIRE_OPT=%s" % umpire_opts.cpp_flags if opt.startswith("UMPIRE_OPT=")
+                else "UMPIRE_LIB=%s" % self.ld_flags_from_library_list(umpire_libs) if opt.startswith("UMPIRE_LIB=")
+                else opt for opt in options
+            ]
+
         options.append("MFEM_USE_CALIPER=%s" % yes_no("+caliper"))
         if "+caliper" in self.spec: 
             options.append("CALIPER_DIR=%s" % self.spec["caliper"].prefix)

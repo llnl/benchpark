@@ -358,6 +358,7 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
             "deprecated": True,
             "benchpark_experiment_command": "benchpark " + " ".join(sys.argv[1:]),
             "system": system_dict,
+            "spec": str(self.spec),
         }
         if "spack" in self.spec.variants["package_manager"][0]:
             default_config["spack_flags"] = {
