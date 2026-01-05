@@ -102,7 +102,6 @@ jobs:
           name: workspace-archive
           path: ./workspace/generic-x86/saxpy/openmp/workspace/archive/**
       - name: Upload Binaries to CI Cache
-        if: github.ref == 'refs/heads/develop'
         env:
           SPACK_OCI_USER: ${{ github.actor }}
           SPACK_OCI_TOKEN: ${{ secrets.GITHUB_TOKEN }}
