@@ -6,8 +6,7 @@
 from os import environ as env
 
 from spack.package import *
-from spack_repo.builtin.packages.raja_perf.package import \
-    RajaPerf as BuiltinRajaPerf
+from spack_repo.builtin.packages.raja_perf.package import RajaPerf as BuiltinRajaPerf
 
 
 class RajaPerf(BuiltinRajaPerf, CachedCMakePackage, CudaPackage, ROCmPackage):
