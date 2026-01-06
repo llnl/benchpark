@@ -413,6 +413,22 @@ def prepare_data(**kwargs):
         [x_axis_metadata] if not isinstance(x_axis_metadata, list) else x_axis_metadata
     )
 
+    region_names = kwargs.get("query_regions_byname", "")
+    if region_names:
+        query = (
+            th.query.Query()
+            .match(
+                ".", lambda row: row["name"].apply(lambda n: n in region_names).all()
+            )
+            .rel("*")
+        )
+
+        tk = tk.query(query)
+
+    prefix = kwargs.get("filter_regions_byname", "")
+    if prefix:
+        tk.dataframe = pd.concat([tk.dataframe.filter(like=p, axis=0) for p in prefix])
+
     if kwargs.get("group_regions_name"):
         logger.info(
             "Computing sum of metrics for regions with the same name. Warning: this operation also sums Calls/rank value in figure legend, for affected regions."
@@ -434,22 +450,6 @@ def prepare_data(**kwargs):
         )
         tk.dataframe = grouped
         tk = tk.squash()
-
-    region_names = kwargs.get("query_regions_byname", "")
-    if region_names:
-        query = (
-            th.query.Query()
-            .match(
-                ".", lambda row: row["name"].apply(lambda n: n in region_names).all()
-            )
-            .rel("*")
-        )
-
-        tk = tk.query(query)
-
-    prefix = kwargs.get("filter_regions_byname", "")
-    if prefix:
-        tk.dataframe = pd.concat([tk.dataframe.filter(like=p, axis=0) for p in prefix])
 
     cluster_col = "cluster" if "cluster" in tk.metadata.columns else "host.cluster"
     tk.metadata_columns_to_perfdata([cluster_col] + list(NAME_REMAP.keys()))
