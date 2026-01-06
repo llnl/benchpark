@@ -103,11 +103,13 @@ jobs:
           path: ./workspace/generic-x86/saxpy/openmp/workspace/archive/**
       - name: Upload Binaries to CI Cache
         if: github.ref == 'refs/heads/develop'
+        env:
+          SPACK_OCI_USER: ${{ github.actor }}
+          SPACK_OCI_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          spack mirror set \
-            --push \
-            --oci-username ${{ github.actor }} \
-            --oci-password "${{ secrets.GITHUB_TOKEN }}" \
+          spack mirror set --push \
+            --oci-username-variable SPACK_OCI_USER \
+            --oci-password-variable SPACK_OCI_TOKEN \
             ci-buildcache
           spack buildcache push \
             -j $(($(nproc) + 1)) \
