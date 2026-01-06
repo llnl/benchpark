@@ -135,6 +135,7 @@ jobs:
             --executor '{execute_experiment}' \
             --where '{n_nodes} == 1'
       - name: Upload coverage to Codecov
+        if: ${{ !contains(github.head_ref, 'dependabot/') }}
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
@@ -168,6 +169,7 @@ jobs:
           ./bin/benchpark bootstrap
           BENCHPARK_RUN_COVERAGE=${{ matrix.testtype }} ./bin/benchpark-python .github/utils/dryruns.py --test ${{ matrix.testtype }}
       - name: Upload coverage to Codecov
+        if: ${{ !contains(github.head_ref, 'dependabot/') }}
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
