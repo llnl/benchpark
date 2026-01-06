@@ -406,10 +406,10 @@ def prepare_data(**kwargs):
         or {
             "strong": ["n_nodes", "n_resources"],
             "weak": ["n_nodes", "n_resources", "total_problem_size"],
-            "throughput": "total_problem_size",
+            "throughput": ["total_problem_size"],
         }[scaling]
     )
-    kwargs["xaxis_parameter"] = x_axis_metadata
+    kwargs["xaxis_parameter"] = [x_axis_metadata] if not isinstance(x_axis_metadata, list) else x_axis_metadata
 
     if kwargs.get("group_regions_name"):
         logger.info(
