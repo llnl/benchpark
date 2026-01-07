@@ -13,6 +13,7 @@ import tarfile
 import warnings
 from datetime import datetime
 from glob import glob
+from importlib.metadata import version
 
 import hatchet as ht
 import matplotlib as mpl
@@ -20,7 +21,22 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn
 import thicket as th
+from packaging.version import Version
 from tqdm import tqdm
+
+min_hatchet = "2025.2.0"
+min_thicket = "2026.1.0"
+
+hatchet_v = version("llnl-hatchet")
+thicket_v = version("llnl-thicket")
+
+assert Version(hatchet_v) >= Version(min_hatchet), (
+    f"llnl-hatchet {hatchet_v} installed; " f"require >= {min_hatchet}"
+)
+
+assert Version(thicket_v) >= Version(min_thicket), (
+    f"llnl-thicket {thicket_v} installed; " f"require >= {min_thicket}"
+)
 
 # -----------------------------
 # Constants
