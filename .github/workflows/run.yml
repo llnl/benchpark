@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout Benchpark
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
@@ -24,7 +24,7 @@ jobs:
           # 1) Non-MPIOnlyExperiment Test
           set +e
           # babelstream is not an MPIOnlyExperiment
-          stderr_output="$({ ./bin/benchpark experiment init --dest babelstream --system dane babelstream; } 2>&1)"
+          stderr_output="$({ ./bin/benchpark experiment init dane babelstream; } 2>&1)"
           status=$?
           set -e
           [[ $status -ne 0 ]] || fail "Expected non-zero exit status, got $status"
@@ -35,7 +35,7 @@ jobs:
           # 2) Multiple scaling options
           set +e
           # Cannot use both +strong and +weak
-          stderr_output="$({ ./bin/benchpark experiment init --dest kripke --system dane kripke+strong+weak; } 2>&1)"
+          stderr_output="$({ ./bin/benchpark experiment init dane kripke+strong+weak; } 2>&1)"
           status=$?
           set -e
           [[ $status -ne 0 ]] || fail "Expected non-zero exit status, got $status"
@@ -46,15 +46,15 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout Benchpark
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
       - name: Build Saxpy Workspace
         run: |
           ./bin/benchpark system init --dest=generic-x86 generic-x86
-          ./bin/benchpark experiment init --dest=saxpy/openmp --system=generic-x86 saxpy+openmp
-          ./bin/benchpark setup saxpy/openmp workspace/
+          ./bin/benchpark experiment init --dest=saxpy/openmp generic-x86 saxpy+openmp
+          ./bin/benchpark setup generic-x86/saxpy/openmp workspace/
       - name: Setup Ramble & Spack
         run: |
           . workspace/setup.sh
@@ -64,7 +64,7 @@ jobs:
           env | grep RAMBLE >> "$GITHUB_ENV"
           echo "PATH=$PATH" >> "$GITHUB_ENV"
       - name: Setup Saxpy Workspace
-        working-directory: ./workspace/saxpy/openmp/generic-x86/workspace/
+        working-directory: ./workspace/generic-x86/saxpy/openmp/workspace/
         run: |
           ramble \
             --workspace-dir . \
@@ -72,7 +72,7 @@ jobs:
             -c config:spack_flags:install:'--no-check-signature' \
             workspace setup
       - name: Run Saxpy Experiments
-        working-directory: ./workspace/saxpy/openmp/generic-x86/workspace/
+        working-directory: ./workspace/generic-x86/saxpy/openmp/workspace/
         run: |
           ramble \
             --workspace-dir . \
@@ -81,14 +81,14 @@ jobs:
             --executor '{execute_experiment}' \
             --where '{n_nodes} == 1'
       - name: Analyze Saxpy Results
-        working-directory: ./workspace/saxpy/openmp/generic-x86/workspace/
+        working-directory: ./workspace/generic-x86/saxpy/openmp/workspace/
         run: |
           ramble \
             --workspace-dir . \
             --disable-logger \
             workspace analyze
       - name: Archive Experiment Workspace
-        working-directory: ./workspace/saxpy/openmp/generic-x86/workspace/
+        working-directory: ./workspace/generic-x86/saxpy/openmp/workspace/
         if: always()
         run: |
           ramble \
@@ -97,17 +97,19 @@ jobs:
             workspace archive
       - name: Upload Workspace Archive as CI Artifact
         if: always()
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
           name: workspace-archive
-          path: ./workspace/saxpy/openmp/generic-x86/workspace/archive/**
+          path: ./workspace/generic-x86/saxpy/openmp/workspace/archive/**
       - name: Upload Binaries to CI Cache
         if: github.ref == 'refs/heads/develop'
+        env:
+          SPACK_OCI_USER: ${{ github.actor }}
+          SPACK_OCI_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          spack mirror set \
-            --push \
-            --oci-username ${{ github.actor }} \
-            --oci-password "${{ secrets.GITHUB_TOKEN }}" \
+          spack mirror set --push \
+            --oci-username-variable SPACK_OCI_USER \
+            --oci-password-variable SPACK_OCI_TOKEN \
             ci-buildcache
           spack buildcache push \
             -j $(($(nproc) + 1)) \
@@ -120,19 +122,20 @@ jobs:
           OUTPUT=$(spack find --paths saxpy)
           SAXPY_PATH=$(echo "$OUTPUT" | grep 'saxpy@' | awk '{print $2}')/bin/saxpy
           echo "Extracted Path: $SAXPY_PATH"
-          BENCHPARK_RUN_COVERAGE=binary ./bin/benchpark experiment init --dest=saxpy/binary --system=generic-x86 saxpy+openmp package_manager="user-managed" append_path="$SAXPY_PATH"
-          ./bin/benchpark setup saxpy/openmp workspace-binary/
+          BENCHPARK_RUN_COVERAGE=binary ./bin/benchpark experiment init --dest=saxpy/binary generic-x86 saxpy+openmp package_manager="user-managed" append_path="$SAXPY_PATH"
+          ./bin/benchpark setup generic-x86/saxpy/binary workspace-binary/
           ./workspace-binary/ramble/bin/ramble \
             --workspace-dir \
-            /home/runner/work/benchpark/benchpark/workspace-binary/saxpy/openmp/generic-x86/workspace \
+            /home/runner/work/benchpark/benchpark/workspace-binary/generic-x86/saxpy/binary/workspace \
             workspace setup
           ./workspace-binary/ramble/bin/ramble \
             --workspace-dir \
-            /home/runner/work/benchpark/benchpark/workspace-binary/saxpy/openmp/generic-x86/workspace \
+            /home/runner/work/benchpark/benchpark/workspace-binary/generic-x86/saxpy/binary/workspace \
             on \
             --executor '{execute_experiment}' \
             --where '{n_nodes} == 1'
       - name: Upload coverage to Codecov
+        if: ${{ !contains(github.head_ref, 'dependabot/') }}
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
@@ -157,7 +160,7 @@ jobs:
           - modifiers
     steps:
       - name: Checkout Benchpark
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
@@ -166,6 +169,7 @@ jobs:
           ./bin/benchpark bootstrap
           BENCHPARK_RUN_COVERAGE=${{ matrix.testtype }} ./bin/benchpark-python .github/utils/dryruns.py --test ${{ matrix.testtype }}
       - name: Upload coverage to Codecov
+        if: ${{ !contains(github.head_ref, 'dependabot/') }}
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
@@ -177,7 +181,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout Benchpark
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
@@ -188,7 +192,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout Benchpark
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
@@ -210,7 +214,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
       - name: Setup Python
         uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548
         with:
