@@ -5,7 +5,13 @@
 
 
 from benchpark.directives import variant, maintainers
-from benchpark.system import System, JobQueue
+from benchpark.system import (
+    System,
+    JobQueue,
+    compiler_def,
+    compiler_section_for,
+    merge_dicts,
+)
 from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.paths import hardware_descriptions
 
@@ -81,7 +87,7 @@ class LanlRocinante(System):
                     "externals": [
                         {
                             "spec": "intel-oneapi-mkl@2023.2.0",
-                            "prefix": "/usr/projects/hpcsoft/pe/installs/cos3-x86_64/oneapi/2023.2.0.49397/mkl/2023.2.0"
+                            "prefix": "/usr/projects/hpcsoft/pe/installs/cos3-x86_64/oneapi/2023.2.0.49397/mkl/2023.2.0",
                         }
                     ],
                 },
@@ -90,7 +96,7 @@ class LanlRocinante(System):
                     "externals": [
                         {
                             "spec": "intel-oneapi-mkl@2023.2.0",
-                            "prefix": "/usr/projects/hpcsoft/pe/installs/cos3-x86_64/oneapi/2023.2.0.49397/mkl/2023.2.0"
+                            "prefix": "/usr/projects/hpcsoft/pe/installs/cos3-x86_64/oneapi/2023.2.0.49397/mkl/2023.2.0",
                         }
                     ],
                 },
@@ -99,7 +105,7 @@ class LanlRocinante(System):
                     "externals": [
                         {
                             "spec": "fftw@3.3.10.6",
-                            "prefix": "/cpe/23.12/fftw/3.3.10.6/x86_spr"
+                            "prefix": "/cpe/23.12/fftw/3.3.10.6/x86_spr",
                         }
                     ],
                 },
@@ -109,8 +115,10 @@ class LanlRocinante(System):
                 },
                 "cmake": {
                     "externals": [
-                        {"spec": "cmake@3.20.4", "prefix": "/usr"},
-                        {"spec": "cmake@3.29.6", "prefix": "/usr/projects/hpcsoft/tce/23.12/cos3-x86_64/packages/cmake/cmake-3.29.6"},
+                        {
+                            "spec": "cmake@3.29.6",
+                            "prefix": "/usr/projects/hpcsoft/tce/23.12/cos3-x86_64/packages/cmake/cmake-3.29.6",
+                        },
                     ],
                     "buildable": False,
                 },
@@ -132,13 +140,10 @@ class LanlRocinante(System):
                             "spec": "python@3.11.5",
                             "prefix": "/cpe/23.12/python/3.11.5",
                         },
-                    ],
-                    "buildable": False,
-                },
-                "hwloc": {
-                    "externals": [
-                        {"spec": "hwloc@2.9.0", "prefix": "/usr"},
-                        {"spec": "hwloc@2.12.2", "prefix": "/users/sriram/software/hwloc-i23-mpich8"}
+                        {
+                            "spec": "python@3.13.9",
+                            "prefix": "/usr/projects/hpcsoft/pe/installs/cos3-x86_64/python/3.13.9/bin/python",
+                        },
                     ],
                     "buildable": False,
                 },
@@ -149,90 +154,99 @@ class LanlRocinante(System):
             }
         }
 
-        if self.spec.satisfies("compiler=oneapi"):
-            selections |= {
-                "packages": selections["packages"]
-                | {
-                    "mpi": {
-                        "buildable": False,
-                        "externals": [
-                            {
-                                "spec": "cray-mpich@8.1.28",
-                                "prefix": "/cpe/23.12/mpich/8.1.28/ofi/intel/2022.1",
-                                "extra_attributes": {
-                                    "ldflags": "-L/cpe/23.12/mpich/8.1.28/ofi/intel/2022.1/lib -lmpi"
-                                },
-                            }
-                        ],
-                    }
-                }
+        if self.spec.satisfies("compiler=gcc"):
+            base_mpich_gcc = "/cpe/23.12/mpich/8.1.28/ofi/gnu/12.3"
+            base_openmpi_gcc = "/usr/projects/hpcsoft/tce/23.12/cos3-x86_64/packages/openmpi/openmpi-5.0.6-gcc-12.3.0"
+            selections["packages"] |= {
+                "mpich": {
+                    "externals": [
+                        {
+                            "spec": "cray-mpich@8.1.28",
+                            "prefix": base_mpich_gcc,
+                            "extra_attributes": {
+                                "ldflags": f"-L{base_mpich_gcc}/lib -lmpi"
+                            },
+                        },
+                    ],
+                },
+            }
+        elif self.spec.satisfies("compiler=oneapi"):
+            base_mpich_oneapi = "/cpe/23.12/mpich/8.1.28/ofi/intel/2022.1"
+            selections["packages"] |= {
+                "mpi": {
+                    "buildable": False,
+                },
+                "mpich": {
+                    "externals": [
+                        {
+                            "spec": "mpich@3.4a2~hydra device=ch4 netmod=ofi",
+                            "prefix": base_mpich_oneapi,
+                            "extra_attributes": {
+                                "ldflags": f"-L{base_mpich_oneapi}/lib -lmpi"
+                            },
+                        }
+                    ],
+                },
             }
 
-        selections["packages"] |= self.compiler_weighting_cfg()["packages"]
-
         return selections
-
-    def compiler_weighting_cfg(self):
-        if self.spec.satisfies("compiler=oneapi"):
-            return {"packages": {"all": {"require": [{"one_of": ["%oneapi"]}]}}}
-        else:
-            return {"packages": {}}
 
     def compute_compilers_section(self):
-        selections = {
-            "compilers": [
-                {
-                    "compiler": {
-                        "spec": "gcc@12.3.0",
-                        "paths": {
-                            "cc": "/usr/projects/hpcsoft/tce/23.12/cos3-x86_64/compilers/gcc/12.3.0/bin/gcc",
-                            "cxx": "/usr/projects/hpcsoft/tce/23.12/cos3-x86_64/compilers/gcc/12.3.0/bin/g++",
-                            "f77": "/usr/projects/hpcsoft/tce/23.12/cos3-x86_64/compilers/gcc/12.3.0/bin/gfortran",
-                            "fc": "/usr/projects/hpcsoft/tce/23.12/cos3-x86_64/compilers/gcc/12.3.0/bin/gfortran",
-                        },
-                        "flags": {},
-                        "operating_system": "sles15",
-                        "target": "x86_64",
-                        "modules": [],
-                        "environment": {},
-                        "extra_rpaths": [],
-                    }
-                }
-            ]
-        }
-        if self.spec.satisfies("compiler=oneapi"):
-            selections["compilers"] += [
-                    {
-                        "compiler": {
-                            "spec": "oneapi@2023.2.0",
-                            "paths": {
-                                "cxx": "/usr/projects/hpcsoft/pe/installs/cos3-x86_64/oneapi/2023.2.0.49397/compiler/2023.2.0/linux/bin/icpx",
-                                "cc": "/usr/projects/hpcsoft/pe/installs/cos3-x86_64/oneapi/2023.2.0.49397/compiler/2023.2.0/linux/bin/icx",
-                                "f77": "/usr/projects/hpcsoft/pe/installs/cos3-x86_64/oneapi/2023.2.0.49397/compiler/2023.2.0/linux/bin/ifx",
-                                "fc": "/usr/projects/hpcsoft/pe/installs/cos3-x86_64/oneapi/2023.2.0.49397/compiler/2023.2.0/linux/bin/ifx",
-                            },
-                            "flags": {},
-                            "operating_system": "sles15",
-                            "target": "x86_64",
-                            "modules": [],
-                            "environment": {},
-                            "extra_rpaths": [],
-                        }
-                    },
-                ]
+        if self.spec.satisfies("compiler=gcc"):
+            cfg = compiler_section_for(
+                "gcc",
+                [
+                    compiler_def(
+                        "gcc@12.3.0 languages:=c,c++,fortran",
+                        "/usr/projects/hpcsoft/tce/23.12/cos3-x86_64/compilers/gcc/12.3.0",
+                        {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                    )
+                ],
+            )
+        elif self.spec.satisfies("compiler=oneapi"):
+            gcc_cfg = compiler_section_for(
+                "gcc",
+                [
+                    compiler_def(
+                        "gcc@12.3.0",
+                        "/usr/projects/hpcsoft/tce/23.12/cos3-x86_64/compilers/gcc/12.3.0",
+                        {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                    )
+                ],
+            )
+            oneapi_cfg = compiler_section_for(
+                "oneapi",
+                [
+                    compiler_def(
+                        "oneapi@2023.2.0",
+                        "/usr/projects/hpcsoft/pe/installs/cos3-x86_64/oneapi/2023.2.0.49397/compiler/2023.2.0/linux",
+                        {"c": "icx", "cxx": "icpx", "fortran": "ifx"},
+                    ),
+                ],
+            )
+            prefs = {"one_of": ["%oneapi", "%gcc"], "when": "%c"}
+            weighting_cfg = {"packages": {"all": {"require": [prefs]}}}
+            cfg = merge_dicts(gcc_cfg, oneapi_cfg, weighting_cfg)
 
-        return selections
+        return cfg
 
     def compute_software_section(self):
+        if self.spec.satisfies("compiler=oneapi"):
+            default_compiler = "oneapi"
+        else:
+            default_compiler = "gcc"
+
         return {
             "software": {
                 "packages": {
-                    "default-compiler": {"pkg_spec": self.spec.variants["compiler"][0]},
-                    "default-mpi": {"pkg_spec": "cray-mpich"},
+                    "default-compiler": {"pkg_spec": default_compiler},
+                    "default-mpi": {"pkg_spec": "mpich"},
+                    "compiler-gcc": {"pkg_spec": "gcc"},
+                    "mpi-gcc": {"pkg_spec": "openmpi"},
                     "compiler-oneapi": {"pkg_spec": "oneapi"},
+                    "mpi-oneapi": {"pkg_spec": "mpich"},
                     "blas": {"pkg_spec": "intel-oneapi-mkl"},
                     "lapack": {"pkg_spec": "intel-oneapi-mkl"},
-                    "mpi-intel": {"pkg_spec": "cray-mpich"},
                 }
             }
         }
