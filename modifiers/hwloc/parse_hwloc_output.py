@@ -4,9 +4,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import argparse
-import re
 import json
+import re
 from collections import defaultdict
+
 import xmltodict
 
 

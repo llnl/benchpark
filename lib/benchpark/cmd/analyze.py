@@ -3,21 +3,40 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import logging
 import os
 import re
-import logging
-import sys
 import shlex
-import tarfile
 import shutil
+import sys
+import tarfile
 import warnings
-from glob import glob
 from datetime import datetime
+from glob import glob
+from importlib.metadata import version
 
-import matplotlib.pyplot as plt
+import hatchet as ht
 import matplotlib as mpl
+import matplotlib.pyplot as plt
 import pandas as pd
+import seaborn
 import thicket as th
+from packaging.version import Version
+from tqdm import tqdm
+
+min_hatchet = "2025.2.0"
+min_thicket = "2026.1.0"
+
+hatchet_v = version("llnl-hatchet")
+thicket_v = version("llnl-thicket")
+
+assert Version(hatchet_v) >= Version(min_hatchet), (
+    f"llnl-hatchet {hatchet_v} installed; " f"require >= {min_hatchet}"
+)
+
+assert Version(thicket_v) >= Version(min_thicket), (
+    f"llnl-thicket {thicket_v} installed; " f"require >= {min_thicket}"
+)
 
 # -----------------------------
 # Constants
@@ -56,6 +75,32 @@ warnings.filterwarnings("ignore")
 # Configure logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s: %(message)s")
+
+
+class RAJAPerf:
+    def __init__(self, tk):
+        self.tk = tk
+        # Matches application_name column in metadata
+        self.name = "raja-perf"
+
+    def set_metrics(self):
+        self.tk.dataframe["Memory Bandwidth (GB/s)"] = (
+            self.tk.dataframe["Bytes/Rep"]
+            / self.tk.dataframe["Avg time/rank (exc)"]
+            / 10**9
+            * self.tk.dataframe["Reps"]
+            * self.tk.metadata["mpi.world.size"]
+        )
+
+        self.tk.dataframe["FLOP Rate (GFLOPS)"] = (
+            self.tk.dataframe["Flops/Rep"]
+            / self.tk.dataframe["Avg time/rank (exc)"]
+            / 10**9
+            * self.tk.dataframe["Reps"]
+            * self.tk.metadata["mpi.world.size"]
+        )
+
+        return ["Memory Bandwidth (GB/s)", "FLOP Rate (GFLOPS)"]
 
 
 # -----------------------------
@@ -109,10 +154,6 @@ def _validate_workspace_dir(workspace_dir):
     if not os.path.isdir(workspace_dir):
         raise ValueError(
             f"Workspace dir '{workspace_dir}' does not exist or is not a directory"
-        )
-    if ".ramble-workspace" not in os.listdir(workspace_dir):
-        raise ValueError(
-            f"Directory '{workspace_dir}' must be a valid ramble workspace (missing .ramble-workspace)"
         )
     return os.path.abspath(workspace_dir)
 
@@ -169,9 +210,9 @@ def analyze_archive(analyze_dir, cali_files, output=None):
 # -----------------------------
 # Chart Generation
 # -----------------------------
-def make_stacked_line_chart(**kwargs):
+def make_chart(**kwargs):
     """
-    Generates a stacked area line chart based on Thicket DataFrame.
+    Generates a chart based on Thicket DataFrame.
 
     Args:
         df (pd.DataFrame): DataFrame to plot.
@@ -191,23 +232,22 @@ def make_stacked_line_chart(**kwargs):
     x_axis = kwargs.get("x_axis")
     yaxis_metric = kwargs.get("yaxis_metric")
 
-    value = "perc" if chart_type == "percentage" else yaxis_metric
     y_label = kwargs.get("chart_ylabel") or (
         f"Percentage of {yaxis_metric}" if chart_type == "percentage" else yaxis_metric
+    )
+    yaxis_metric = (
+        yaxis_metric + "-perc" if chart_type == "percentage" else yaxis_metric
     )
 
     os.makedirs(kwargs["out_dir"], exist_ok=True)
 
-    tdf_calls = df[[(i, "Calls/rank (max)") for i in x_axis]].T.reset_index(
-        level=1, drop=True
-    )
-    calls_list = []
-    for column in tdf_calls.columns:
-        mx = max(tdf_calls[column])
-        val = int(mx) if mx > 0 else 0
-        calls_list.append((column, val))
+    # Calls/rank in legend
+    calls_dict = {}
+    for node in set(df.index.get_level_values("node")):
+        v = df.loc[node, "Calls/rank (max)"].max()
+        name = node.frame["name"] if isinstance(node, ht.node.Node) else node
+        calls_dict[name] = int(v) if pd.notna(v) else v
 
-    tdf = df[[(i, value) for i in x_axis]].T.reset_index(level=1, drop=True)
     mpl.rcParams["axes.prop_cycle"] = mpl.cycler(color=COLOR_PALETTE)
     if kwargs.get("chart_fontsize"):
         mpl.rcParams.update({"font.size": kwargs.get("chart_fontsize")})
@@ -218,15 +258,53 @@ def make_stacked_line_chart(**kwargs):
     else:
         if xlabel in NAME_REMAP:
             xlabel = NAME_REMAP[xlabel]
-    fig, ax = plt.subplots()
-    tdf.plot(
-        kind="area",
-        title=kwargs.get("chart_title", ""),
-        xlabel=xlabel,
-        ylabel=y_label,
-        figsize=kwargs["chart_figsize"] if kwargs["chart_figsize"] else (12, 7),
+    fig, ax = plt.subplots(figsize=kwargs.get("chart_figsize", (12, 7)))
+    kind = kwargs.get("chart_kind", "line")
+    ax.set_title(kwargs.get("chart_title", ""))
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(y_label)
+    if kwargs["yaxis_log"]:
+        ax.set_yscale("log", base=2)
+    plt.grid(True)
+    df = df.sort_values(by=x_axis)
+    plot_args = dict(
         ax=ax,
     )
+    if kind == "area":
+        plot_args["kind"] = "area"
+        df["xaxis"] = df.apply(lambda row: tuple(row[col] for col in x_axis), axis=1)
+    else:
+        plot_args["data"] = df
+        plot_args["x"] = "xaxis"
+        plot_args["y"] = yaxis_metric
+        df["xaxis"] = df.apply(
+            lambda row: ", ".join([str(row[col]) for col in x_axis]), axis=1
+        )
+    if yaxis_metric not in df.columns:
+        raise KeyError(f"'{yaxis_metric}' not in the data. Choose from: {df.columns}")
+    if kwargs["cluster"] == "multiple":
+        plot_args["hue"] = "cluster"
+    # Add marker only if line plot
+    if kind == "line":
+        plot_args["marker"] = "o"
+        seaborn.lineplot(**plot_args)
+    elif kind == "area":
+        tdf = df[[yaxis_metric, "name", "xaxis"]].reset_index().sort_values("xaxis")
+        tdf["node"] = tdf["node"].apply(
+            lambda i: (
+                ht.node.Node(ht.frame.Frame({"name": i})) if isinstance(i, str) else i
+            )
+        )
+        tdf = tdf.pivot(index="xaxis", columns="node", values=yaxis_metric)
+        tdf = tdf.rename(columns={col: col.frame["name"] for col in tdf.columns})
+        tdf.plot(**plot_args)
+    elif kind == "scatter":
+        seaborn.scatterplot(**plot_args)
+    elif kind == "bar":
+        seaborn.barplot(**plot_args)
+    else:
+        raise NotImplementedError(f"Unknown plot kind {kind}")
+
     y_axis_limits = kwargs.get("chart_yaxis_limits")
     if y_axis_limits is not None:
         ax.set_ylim(y_axis_limits[0], y_axis_limits[1])
@@ -234,27 +312,28 @@ def make_stacked_line_chart(**kwargs):
     handles, labels = ax.get_legend_handles_labels()
     handles = list(reversed(handles))
     labels = list(reversed(labels))
-    calls_list = list(reversed(calls_list))
-    for i, label in enumerate(labels):
-        obj = calls_list[i][0]
-        name = obj if isinstance(obj, str) else obj[0].frame["name"]
-        if name not in label:
-            raise ValueError(f"Name '{name}' is not in label '{label}'")
-        labels[i] = str(name) + " (" + str(calls_list[i][1]) + ")"
-    ax.legend(
-        handles,
-        labels,
-        bbox_to_anchor=(1, 0.5),
-        loc="center left",
-        title="Region (Calls/rank (max))",
+    if kwargs["cluster"] != "multiple":
+        for i, label in enumerate(labels):
+            labels[i] = str(label) + " (" + str(calls_dict[label]) + ")"
+    title = (
+        "Region (Calls/rank (max))" if kwargs["cluster"] != "multiple" else "Cluster"
     )
+    if not kwargs["disable_legend"]:
+        ax.legend(
+            handles,
+            labels,
+            bbox_to_anchor=(1, 0.5),
+            loc="center left",
+            title=title,
+        )
+    ax.set_xlabel(xlabel)
 
     fig.autofmt_xdate()
     plt.tight_layout()
 
     filename = os.path.join(kwargs["out_dir"], kwargs["chart_file_name"])
     logger.info(f"Saving figure data points to {filename}.csv")
-    tdf.to_csv(filename + ".csv")
+    df.to_csv(filename + ".csv")
     logger.info(f"Saving figure to {filename}.png")
     plt.savefig(filename + ".png")
     logger.info(
@@ -279,27 +358,48 @@ def prepare_data(**kwargs):
     tk = th.Thicket.from_caliperreader(
         files, intersection=intersection, disable_tqdm=True
     )
-    tk.update_inclusive_columns()
+    if kwargs["yaxis_metric"] in tk.inc_metrics and not kwargs["no_update_inc_cols"]:
+        pbar = tqdm(total=1, desc="Updating inclusive columns")
+        tk.update_inclusive_columns()
+        pbar.update(1)
+        pbar.close()
 
     clean_tree = tk.tree(kwargs["tree_metric"], render_header=True)
     clean_tree = re.compile(r"\x1b\[([0-9;]*m)").sub("", clean_tree)
 
-    # Remove MPI regions, if necesasry
+    exclude_regions = []
+    # Remove MPI regions, if necessary
     if kwargs.get("no_mpi"):
+        exclude_regions.append("MPI_")
+    if kwargs.get("exclude_regions"):
+        exclude_regions.extend(kwargs.get("exclude_regions"))
+    if len(exclude_regions) > 0:
+        logger.info(
+            f"Removing regions that match the following pattern: {exclude_regions}"
+        )
         query = th.query.Query().match(
             ".",
             lambda row: row["name"]
             .apply(
                 # 'n is None' avoid comparison for MPI in n (will cause error)
                 lambda n: n is None
-                or "MPI_" not in n
+                or all(excl not in n for excl in exclude_regions)
             )
             .all(),
         )
         tk = tk.query(query)
 
-    # Remove singular roots if inclusive metric
     metric = kwargs["yaxis_metric"]
+
+    known_applications = {"raja-perf": RAJAPerf}
+    for ta in tk.metadata["application_name"].unique():
+        if ta in known_applications.keys():
+            added_mets = known_applications[ta](tk).set_metrics()
+            logger.info(
+                f"Added the following derived metrics for app '{ta}':\n\t{added_mets}\n\tUse them via the '--yaxis-metric' parameter."
+            )
+
+    # Remove singular roots if inclusive metric
     if metric in tk.inc_metrics and len(tk.graph.roots) == 1:
         root_name = tk.graph.roots[0].frame["name"]
         logger.info(
@@ -322,10 +422,28 @@ def prepare_data(**kwargs):
         or {
             "strong": ["n_nodes", "n_resources"],
             "weak": ["n_nodes", "n_resources", "total_problem_size"],
-            "throughput": "total_problem_size",
+            "throughput": ["total_problem_size"],
         }[scaling]
     )
-    kwargs["xaxis_parameter"] = x_axis_metadata
+    kwargs["xaxis_parameter"] = (
+        [x_axis_metadata] if not isinstance(x_axis_metadata, list) else x_axis_metadata
+    )
+
+    region_names = kwargs.get("query_regions_byname", "")
+    if region_names:
+        query = (
+            th.query.Query()
+            .match(
+                ".", lambda row: row["name"].apply(lambda n: n in region_names).all()
+            )
+            .rel("*")
+        )
+
+        tk = tk.query(query)
+
+    prefix = kwargs.get("filter_regions_byname", "")
+    if prefix:
+        tk.dataframe = pd.concat([tk.dataframe.filter(like=p, axis=0) for p in prefix])
 
     if kwargs.get("group_regions_name"):
         logger.info(
@@ -349,32 +467,20 @@ def prepare_data(**kwargs):
         tk.dataframe = grouped
         tk = tk.squash()
 
-    region_names = kwargs.get("query_regions_byname", "")
-    if region_names:
-        query = (
-            th.query.Query()
-            .match(
-                ".", lambda row: row["name"].apply(lambda n: n in region_names).all()
-            )
-            .rel("*")
-        )
-
-        tk = tk.query(query)
-
-    prefix = kwargs.get("filter_regions_byname", "")
-    if prefix:
-        tk.dataframe = pd.concat([tk.dataframe.filter(like=p, axis=0) for p in prefix])
-
-    # Group by varied parameters
-    grouped = tk.groupby(x_axis_metadata)
-    ctk = th.Thicket.concat_thickets(
-        list(grouped.values()), headers=list(grouped.keys()), axis="columns"
-    )
-
     cluster_col = "cluster" if "cluster" in tk.metadata.columns else "host.cluster"
+    tk.metadata_columns_to_perfdata([cluster_col] + list(NAME_REMAP.keys()))
+
     # Check these values are constant
     app = validate_single_metadata_value("application_name", tk)
-    cluster = validate_single_metadata_value(cluster_col, tk)
+    try:
+        cluster = validate_single_metadata_value(cluster_col, tk)
+    except ValueError:
+        print("Multiple clusters detected. Using multi-cluster mode.")
+        cluster = "multiple"
+        if kwargs.get("chart_kind") == "area":
+            raise ValueError(
+                "Data from multiple workspaces (clusters) not allowed for 'area' chart type."
+            )
     version = validate_single_metadata_value("version", tk)
 
     # Find programming model from spec
@@ -389,12 +495,18 @@ def prepare_data(**kwargs):
         "weak": ["process_problem_size"],
         "throughput": ["n_resources", "n_nodes"],
     }[scaling]
-    constant_str = ", ".join(
-        f"{int(tk.metadata[key].iloc[0]):,} {NAME_REMAP[key]}" for key in constant_keys
+    constant_str = (
+        ", ".join(
+            f"{int(tk.metadata[key].iloc[0]):,} {NAME_REMAP[key]}"
+            for key in constant_keys
+        )
+        if cluster != "multiple"
+        else ""
     )
     # Check constant
-    for key in constant_keys:
-        validate_single_metadata_value(key, tk)
+    if cluster != "multiple":
+        for key in constant_keys:
+            validate_single_metadata_value(key, tk)
 
     if not kwargs.get("chart_title"):
         kwargs["chart_title"] = (
@@ -414,36 +526,45 @@ def prepare_data(**kwargs):
         f.write(clean_tree)
     logger.info(f"Saving Input Calltree to {tree_file}")
 
-    for key in grouped.keys():
-        ctk.dataframe[(key, "perc")] = (
-            ctk.dataframe[(key, metric)] / ctk.dataframe[(key, metric)].sum()
-        ) * 100
+    # Compute percentage
+    if kwargs.get("chart_type") == "percentage":
+        tk.dataframe[metric + "-perc"] = 0
+        for profile in tk.profile:
+            tk.dataframe.loc[(slice(None), profile), metric + "-perc"] = (
+                tk.dataframe.loc[(slice(None), profile), metric]
+                * 100
+                / tk.dataframe.loc[(slice(None), profile), metric].sum()
+            )
 
     top_n = kwargs.get("top_n_regions", -1)
     if top_n != -1:
-        num_nodes = len(ctk.graph)
-        if num_nodes < kwargs.get("top_n_regions", -1):
-            raise ValueError(
-                f"Value for '--top-n-regions' must be less than number of regions ({num_nodes})"
-            )
-        temp_df_idx = ctk.dataframe.nlargest(
-            top_n, [(list(grouped.keys())[0], metric)]
-        ).index
-        temp_df = ctk.dataframe[ctk.dataframe.index.isin(temp_df_idx)]
-        temp_df.loc["Sum(removed_regions)"] = 0
-        for p in ctk.profile:
-            diff = (
-                ctk.dataframe.loc[:, (p[1], metric)].sum()
-                - temp_df.loc[:, (p[1], metric)].sum()
-            )
-            if isinstance(diff, pd.Series):
-                assert len(diff) == 1
-                diff = diff.iloc[0]
-            temp_df.loc["Sum(removed_regions)", (p[1], metric)] = diff
-        ctk.dataframe = temp_df
-        logger.info(
-            f"Filtered top {top_n} regions for chart display. Added the sum of the regions that were removed as single region."
+        chosen_profile = tk.profile[0]
+        temp_df_idx = (
+            tk.dataframe.loc[(slice(None), chosen_profile), :]
+            .nlargest(top_n, metric)
+            .index.get_level_values("node")
         )
+        temp_df = tk.dataframe[
+            tk.dataframe.index.get_level_values("node").isin(temp_df_idx)
+        ]
+        for p in tk.profile:
+            temp_df.loc[("Sum(removed_regions)", p), metric] = (
+                tk.dataframe.loc[(slice(None), p), metric].sum()
+                - temp_df.loc[(slice(None), p), metric].sum()
+            )
+            for xp in kwargs["xaxis_parameter"]:
+                temp_df.loc[("Sum(removed_regions)", p), xp] = tk.dataframe.loc[
+                    (slice(None), p), xp
+                ].iloc[0]
+        temp_df.loc[("Sum(removed_regions)",), "name"] = "Sum(removed_regions)"
+        tk.dataframe = temp_df
+        logger.info(
+            f"Filtered top {top_n} regions for chart display (based on first profile in Thicket.profile). Added the sum of the regions that were removed as single region."
+        )
+
+    # Convert int-like columns to int
+    for col in kwargs["xaxis_parameter"]:
+        tk.dataframe[col] = tk.dataframe[col].astype(int)
 
     if not kwargs.get("chart_xlabel"):
         kwargs["chart_xlabel"] = x_axis_metadata
@@ -456,8 +577,20 @@ def prepare_data(**kwargs):
             raise ValueError(
                 f"Expected one scaling factor, found: {list(scaling_factors)}"
             )
+    kwargs["cluster"] = cluster
 
-    make_stacked_line_chart(df=ctk.dataframe, x_axis=list(grouped.keys()), **kwargs)
+    if metric in tk.metadata.columns:
+        tk.metadata_columns_to_perfdata(metric)
+        logger.info(
+            f"Adding metadata column '{metric}' to the performance data from the metadata."
+        )
+
+    norm_col = kwargs.get("normalize_by", "")
+    if norm_col != "":
+        logger.info(f"Normalizing '{kwargs['yaxis_metric']}' by '{norm_col}'")
+        tk.dataframe[kwargs["yaxis_metric"]] /= tk.dataframe[norm_col]
+
+    make_chart(df=tk.dataframe, x_axis=x_axis_metadata, **kwargs)
 
 
 def setup_parser(root_parser):
@@ -469,7 +602,7 @@ def setup_parser(root_parser):
         "--workspace-dir",
         required=True,
         type=str,
-        help="Directory of ramble workspace.",
+        help="Directory Caliper files. Files will be found recursively.",
         metavar="RAMBLE_WORKSPACE_DIR",
     )
     root_parser.add_argument(
@@ -532,6 +665,14 @@ def setup_parser(root_parser):
         "--no-mpi", action="store_true", help="Hide MPI regions in the tree."
     )
     root_parser.add_argument(
+        "--normalize-by",
+        default="",
+        type=str,
+        required=False,
+        help="Optionally normalize the y-axis column by this column.",
+        metavar="COLUMN",
+    )
+    root_parser.add_argument(
         "--chart-title",
         default=None,
         type=str,
@@ -573,6 +714,32 @@ def setup_parser(root_parser):
         type=str,
         default="Calls/rank (max)",
         help="Metric to show on the tree output",
+    )
+    root_parser.add_argument(
+        "--chart-kind",
+        type=str,
+        default="area",
+        choices=["area", "line", "bar", "scatter"],
+        help="Type of chart to generate",
+    )
+    root_parser.add_argument(
+        "--no-update-inc-cols",
+        action="store_true",
+        help="Don't call Thicket.update_inclusive_columns() which can take a while.",
+    )
+    root_parser.add_argument(
+        "--yaxis-log", action="store_true", help="Change yaxis to log base 2."
+    )
+    root_parser.add_argument(
+        "--disable-legend",
+        action="store_true",
+        help="Turn off the legend on the figure",
+    )
+    root_parser.add_argument(
+        "--exclude-regions",
+        nargs="+",
+        type=str,
+        help="One or more patterns to exclude based on region name",
     )
 
     # Workspace commands

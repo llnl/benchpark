@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout Benchpark
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
@@ -17,6 +17,7 @@ jobs:
         run: |
           ./bin/benchpark unit-test --cov=./ --cov-branch --cov-report=xml --durations=20 -ra
       - name: Upload coverage to Codecov
+        if: ${{ !contains(github.head_ref, 'dependabot/') }}
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}

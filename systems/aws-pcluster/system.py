@@ -4,10 +4,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.system import System, compiler_def, compiler_section_for
-from benchpark.directives import variant, maintainers
+from benchpark.directives import maintainers, variant
 from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.paths import hardware_descriptions
+from benchpark.system import System, compiler_def, compiler_section_for
 
 
 class AwsPcluster(System):
@@ -54,11 +54,18 @@ class AwsPcluster(System):
         description="AWS instance type",
     )
 
+    variant(
+        "scheduler",
+        values=("slurm", "flux", "pbs"),
+        default="slurm",
+        description="Workload scheduler that will be used for this instance",
+    )
+
     def __init__(self, spec):
         super().__init__(spec)
         self.programming_models = [OpenMPCPUOnlySystem()]
 
-        self.scheduler = "slurm"
+        self.scheduler = self.spec.variants["scheduler"][0]
         # TODO: for some reason I have to index to get value, even if multi=False
         attrs = self.id_to_resources.get(self.spec.variants["instance_type"][0])
         for k, v in attrs.items():

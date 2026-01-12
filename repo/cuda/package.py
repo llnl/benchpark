@@ -6,9 +6,9 @@
 import pathlib
 
 import llnl.util.tty as tty
-from spack.package import *
 import spack_repo.builtin.packages.cuda.package
 from llnl.util.filesystem import find_headers
+from spack.package import *
 
 
 class Cuda(spack_repo.builtin.packages.cuda.package.Cuda):

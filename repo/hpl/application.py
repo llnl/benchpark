@@ -5,8 +5,8 @@
 
 import sys
 
-from ramble.appkit import *
 from ramble.app.builtin.hpl import Hpl as HplBase
+from ramble.appkit import *
 
 
 class Hpl(HplBase):

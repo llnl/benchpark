@@ -4,14 +4,28 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+from itertools import product
 
 from spack.package import *
+from spack_repo.builtin.build_systems.rocm import ROCmPackage
+from spack_repo.builtin.packages.hypre.package import (
+    AutotoolsBuilder as HypreAutotoolsBuilder,
+)
+from spack_repo.builtin.packages.hypre.package import CMakeBuilder as HypreCMakeBuilder
 from spack_repo.builtin.packages.hypre.package import Hypre as BuiltinHypre
 
 
 class Hypre(BuiltinHypre):
     requires("+rocm", when="^rocblas")
     requires("+rocm", when="^rocsolver")
+
+    with when("+cuda"):
+        for pkg, sm_ in product(["umpire", "magma"], CudaPackage.cuda_arch_values):
+            depends_on(f"{pkg} cuda_arch={sm_}", when=f"+{pkg} cuda_arch={sm_}")
+
+    with when("+rocm"):
+        for pkg, gfx in product(["umpire", "magma"], ROCmPackage.amdgpu_targets):
+            depends_on(f"{pkg} amdgpu_target={gfx}", when=f"+{pkg} amdgpu_target={gfx}")
 
     compiler_to_cpe_name = {
         "cce": "cray",
@@ -52,3 +66,9 @@ class Hypre(BuiltinHypre):
             env.append_flags("LDFLAGS", f"-L{spec['lapack'].prefix}/lib -l{libsci_name}")
         if "+cuda" in self.spec:
             env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
+
+class CMakeBuilder(HypreCMakeBuilder):
+    pass
+
+class AutotoolsBuilder(HypreAutotoolsBuilder):
+    pass
