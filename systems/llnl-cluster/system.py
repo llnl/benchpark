@@ -278,9 +278,9 @@ class LlnlCluster(System):
                     "externals": [
                         {
                             "spec": "mvapich2@2.3.7",
-                            "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-12.1.1",
+                            "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-13.3.1",
                             "extra_attributes": {
-                                "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-12.1.1/lib -lmpi"
+                                "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-13.3.1/lib -lmpi"
                             },
                         }
                     ],
@@ -290,9 +290,9 @@ class LlnlCluster(System):
                     "externals": [
                         {
                             "spec": "openmpi@4.1.2",
-                            "prefix": "/usr/tce/packages/openmpi/openmpi-4.1.2-gcc-12.1.1",
+                            "prefix": "/usr/tce/packages/openmpi/openmpi-4.1.2-gcc-13.3.1",
                             "extra_attributes": {
-                                "ldflags": "-L/usr/tce/packages/openmpi/openmpi-4.1.2-gcc-12.1.1/lib -lmpi"
+                                "ldflags": "-L/usr/tce/packages/openmpi/openmpi-4.1.2-gcc-13.3.1/lib -lmpi"
                             },
                         }
                     ],
@@ -383,8 +383,8 @@ class LlnlCluster(System):
                 "gcc",
                 [
                     compiler_def(
-                        "gcc@12.1.1 languages:=c,c++,fortran",
-                        "/usr/tce/packages/gcc/gcc-12.1.1/",
+                        "gcc@13.3.1 languages:=c,c++,fortran",
+                        "/usr/tce/packages/gcc/gcc-13.3.1/",
                         {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
                     )
                 ],
@@ -405,8 +405,8 @@ class LlnlCluster(System):
                 "gcc",
                 [
                     compiler_def(
-                        "gcc@12.1.1",
-                        "/usr/tce/packages/gcc/gcc-12.1.1/",
+                        "gcc@13.3.1",
+                        "/usr/tce/packages/gcc/gcc-13.3.1/",
                         {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
                     )
                 ],
