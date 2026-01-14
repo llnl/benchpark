@@ -93,7 +93,10 @@ class LanlRocinante(System):
                 },
                 "libfabric": {
                     "externals": [
-                        {"spec": "libfabric@1.3", "prefix": "/usr/projects/hpcsoft/pe/installs/cos3-x86_64/oneapi/2023.2.0.49397/mpi/2021.10.0/libfabric/lib"}
+                        {
+                            "spec": "libfabric@1.3",
+                            "prefix": "/usr/projects/hpcsoft/pe/installs/cos3-x86_64/oneapi/2023.2.0.49397/mpi/2021.10.0/libfabric/lib",
+                        }
                     ],
                     "buildable": False,
                 },
@@ -227,8 +230,8 @@ class LanlRocinante(System):
                 ],
             )
             prefs = {"one_of": ["intel-oneapi-compilers", "gcc"]}
-            weighting_cfg = {"packages":
-                {
+            weighting_cfg = {
+                "packages": {
                     "c": {"require": [prefs]},
                     "cxx": {"require": [prefs]},
                     "fortran": {"require": [prefs]},
