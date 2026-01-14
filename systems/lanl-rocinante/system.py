@@ -91,6 +91,12 @@ class LanlRocinante(System):
                         }
                     ],
                 },
+                "libfabric": {
+                    "externals": [
+                        {"spec": "libfabric@1.3", "prefix": "/usr/projects/hpcsoft/pe/installs/cos3-x86_64/oneapi/2023.2.0.49397/mpi/2021.10.0/libfabric/lib"}
+                    ],
+                    "buildable": False,
+                },
                 "lapack": {
                     "buildable": False,
                     "externals": [
@@ -142,7 +148,7 @@ class LanlRocinante(System):
                         },
                         {
                             "spec": "python@3.13.9",
-                            "prefix": "/usr/projects/hpcsoft/pe/installs/cos3-x86_64/python/3.13.9/bin/python",
+                            "prefix": "/usr/projects/hpcsoft/pe/installs/cos3-x86_64/python/3.13.9",
                         },
                     ],
                     "buildable": False,
@@ -192,47 +198,49 @@ class LanlRocinante(System):
         return selections
 
     def compute_compilers_section(self):
+        gcc_cfg = compiler_section_for(
+            "gcc",
+            [
+                compiler_def(
+                    "gcc@12.3.0",
+                    "/usr/projects/hpcsoft/tce/23.12/cos3-x86_64/compilers/gcc/12.3.0",
+                    {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                )
+            ],
+        )
         if self.spec.satisfies("compiler=gcc"):
-            cfg = compiler_section_for(
-                "gcc",
-                [
-                    compiler_def(
-                        "gcc@12.3.0 languages:=c,c++,fortran",
-                        "/usr/projects/hpcsoft/tce/23.12/cos3-x86_64/compilers/gcc/12.3.0",
-                        {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
-                    )
-                ],
-            )
+            cfg = gcc_cfg
         elif self.spec.satisfies("compiler=oneapi"):
-            gcc_cfg = compiler_section_for(
-                "gcc",
-                [
-                    compiler_def(
-                        "gcc@12.3.0",
-                        "/usr/projects/hpcsoft/tce/23.12/cos3-x86_64/compilers/gcc/12.3.0",
-                        {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
-                    )
-                ],
-            )
             oneapi_cfg = compiler_section_for(
-                "oneapi",
+                "intel-oneapi-compilers",
                 [
                     compiler_def(
-                        "oneapi@2023.2.0",
+                        "intel-oneapi-compilers@2023.2.0 ~envmods",
                         "/usr/projects/hpcsoft/pe/installs/cos3-x86_64/oneapi/2023.2.0.49397/compiler/2023.2.0/linux",
                         {"c": "icx", "cxx": "icpx", "fortran": "ifx"},
+                        env={
+                            "prepend_path": {
+                                "LD_LIBRARY_PATH": f"/usr/projects/hpcsoft/pe/installs/cos3-x86_64/oneapi/2023.2.0.49397/mpi/2021.10.0/libfabric/lib:/cpe/23.12/pmi/6.1.13/lib",
+                            },
+                        },
                     ),
                 ],
             )
-            prefs = {"one_of": ["%oneapi", "%gcc"], "when": "%c"}
-            weighting_cfg = {"packages": {"all": {"require": [prefs]}}}
+            prefs = {"one_of": ["intel-oneapi-compilers", "gcc"]}
+            weighting_cfg = {"packages":
+                {
+                    "c": {"require": [prefs]},
+                    "cxx": {"require": [prefs]},
+                    "fortran": {"require": [prefs]},
+                }
+            }
             cfg = merge_dicts(gcc_cfg, oneapi_cfg, weighting_cfg)
 
         return cfg
 
     def compute_software_section(self):
         if self.spec.satisfies("compiler=oneapi"):
-            default_compiler = "oneapi"
+            default_compiler = "intel-oneapi-compilers"
         else:
             default_compiler = "gcc"
 
