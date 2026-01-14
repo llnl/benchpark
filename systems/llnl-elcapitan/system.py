@@ -770,7 +770,7 @@ class LlnlElcapitan(System):
                 },
                 flags={
                     "cflags": "-g -O2",
-                    "cxxflags": "-g -O2 -std=c++14",
+                    "cxxflags": "-g -O2 -std=c++17",
                     "fflags": "-g -O2 -hnopattern",
                     "ldflags": "-ldl",
                 },
