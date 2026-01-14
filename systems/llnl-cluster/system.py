@@ -98,7 +98,7 @@ class LlnlCluster(System):
     variant(
         "compiler",
         default="oneapi",
-        values=("oneapi", "gcc", "intel"),
+        values=("oneapi", "gcc", "intel", "clang"),
         description="Which compiler to use",
     )
 
@@ -278,9 +278,9 @@ class LlnlCluster(System):
                     "externals": [
                         {
                             "spec": "mvapich2@2.3.7",
-                            "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-12.1.1",
+                            "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-13.3.1",
                             "extra_attributes": {
-                                "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-12.1.1/lib -lmpi"
+                                "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-13.3.1/lib -lmpi"
                             },
                         }
                     ],
@@ -290,9 +290,9 @@ class LlnlCluster(System):
                     "externals": [
                         {
                             "spec": "openmpi@4.1.2",
-                            "prefix": "/usr/tce/packages/openmpi/openmpi-4.1.2-gcc-12.1.1",
+                            "prefix": "/usr/tce/packages/openmpi/openmpi-4.1.2-gcc-13.3.1",
                             "extra_attributes": {
-                                "ldflags": "-L/usr/tce/packages/openmpi/openmpi-4.1.2-gcc-12.1.1/lib -lmpi"
+                                "ldflags": "-L/usr/tce/packages/openmpi/openmpi-4.1.2-gcc-13.3.1/lib -lmpi"
                             },
                         }
                     ],
@@ -328,9 +328,9 @@ class LlnlCluster(System):
                     "externals": [
                         {
                             "spec": "mvapich2@2.3.7",
-                            "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2023.2.1",
+                            "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2025.2.0",
                             "extra_attributes": {
-                                "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2023.2.1/lib -lmpi"
+                                "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2025.2.0/lib -lmpi"
                             },
                         }
                     ],
@@ -340,9 +340,34 @@ class LlnlCluster(System):
                     "externals": [
                         {
                             "spec": "openmpi@4.1.2",
-                            "prefix": "/usr/tce/packages/openmpi/openmpi-4.1.2-intel-2023.2.1",
+                            "prefix": "/usr/tce/packages/openmpi/openmpi-4.1.2-intel-2025.2.0",
                             "extra_attributes": {
-                                "ldflags": "-L/usr/tce/packages/openmpi/openmpi-4.1.2-intel-2023.2.1/lib -lmpi"
+                                "ldflags": "-L/usr/tce/packages/openmpi/openmpi-4.1.2-intel-2025.2.0/lib -lmpi"
+                            },
+                        }
+                    ],
+                }
+        elif self.spec.satisfies("compiler=clang"):
+            if mpi_type == "mvapich2":
+                mpi_dict["mvapich2"] = {
+                    "externals": [
+                        {
+                            "spec": "mvapich2@2.3.7",
+                            "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-clang-19.1.3",
+                            "extra_attributes": {
+                                "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-clang-19.1.3/lib -lmpi"
+                            },
+                        }
+                    ],
+                }
+            elif mpi_type == "openmpi":
+                mpi_dict["openmpi"] = {
+                    "externals": [
+                        {
+                            "spec": "openmpi@4.1.2",
+                            "prefix": "/usr/tce/packages/openmpi/openmpi-4.1.2-clang-19.1.3",
+                            "extra_attributes": {
+                                "ldflags": "-L/usr/tce/packages/openmpi/openmpi-4.1.2-clang-19.1.3/lib -lmpi"
                             },
                         }
                     ],
@@ -358,8 +383,8 @@ class LlnlCluster(System):
                 "gcc",
                 [
                     compiler_def(
-                        "gcc@12.1.1 languages:=c,c++,fortran",
-                        "/usr/tce/packages/gcc/gcc-12.1.1/",
+                        "gcc@13.3.1 languages:=c,c++,fortran",
+                        "/usr/tce/packages/gcc/gcc-13.3.1/",
                         {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
                     )
                 ],
@@ -380,8 +405,8 @@ class LlnlCluster(System):
                 "gcc",
                 [
                     compiler_def(
-                        "gcc@12.1.1",
-                        "/usr/tce/packages/gcc/gcc-12.1.1/",
+                        "gcc@13.3.1",
+                        "/usr/tce/packages/gcc/gcc-13.3.1/",
                         {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
                     )
                 ],
@@ -390,8 +415,8 @@ class LlnlCluster(System):
                 "intel-oneapi-compilers",
                 [
                     compiler_def(
-                        "intel-oneapi-compilers@2023.2.1~envmods",
-                        "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/",
+                        "intel-oneapi-compilers@2025.2.0~envmods",
+                        "/usr/tce/packages/intel/intel-2025.2.0/compiler/2025.2/",
                         {"c": "icx", "cxx": "icpx", "fortran": "ifx"},
                     )
                 ],
@@ -399,6 +424,17 @@ class LlnlCluster(System):
             prefs = {"one_of": ["%oneapi", "%gcc"], "when": "%c"}
             weighting_cfg = {"packages": {"all": {"require": [prefs]}}}
             cfg = merge_dicts(gcc_cfg, oneapi_cfg, weighting_cfg)
+        elif self.spec.satisfies("compiler=clang"):
+            cfg = compiler_section_for(
+                "clang",
+                [
+                    compiler_def(
+                        "clang@19.1.3",
+                        "/usr/tce/packages/clang/clang-19.1.3/",
+                        {"c": "clang", "cxx": "clang++", "fortran": "flang-new"},
+                    )
+                ],
+            )
 
         return cfg
 
@@ -408,6 +444,8 @@ class LlnlCluster(System):
             default_compiler = "intel-oneapi-compilers-classic"
         elif self.spec.satisfies("compiler=oneapi"):
             default_compiler = "intel-oneapi-compilers"
+        elif self.spec.satisfies("compiler=clang"):
+            default_compiler = "clang"
 
         return {
             "software": {
