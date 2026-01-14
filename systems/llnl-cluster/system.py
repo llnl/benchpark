@@ -416,7 +416,7 @@ class LlnlCluster(System):
                 [
                     compiler_def(
                         "intel-oneapi-compilers@2025.2.0~envmods",
-                        "/usr/tce/packages/intel/intel-2025.2.0/compiler/2025.2.0/linux/",
+                        "/usr/tce/packages/intel/intel-2025.2.0/compiler/2025.2/",
                         {"c": "icx", "cxx": "icpx", "fortran": "ifx"},
                     )
                 ],
