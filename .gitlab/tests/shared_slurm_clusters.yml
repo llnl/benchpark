@@ -119,7 +119,7 @@ run_tests_slurm_dane:
       # Compilers
       - HOST: dane
         ARCHCONFIG: llnl-cluster
-        SYSTEM_ARGS: ['compiler=gcc', 'compiler=clang']
+        SYSTEM_ARGS: [compiler=gcc, compiler=clang]
         BENCHMARK: osu-micro-benchmarks
 run_tests_slurm_matrix:
   extends: .run_tests_slurm
