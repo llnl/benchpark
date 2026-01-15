@@ -6,8 +6,8 @@
 
 from benchpark.directives import variant, maintainers
 from benchpark.system import (
-    System,
     JobQueue,
+    System,
     compiler_def,
     compiler_section_for,
     merge_dicts,
