@@ -93,7 +93,7 @@ def _exprs():
 def _systems():
     cfg = benchpark.config.configuration().repos
     sys_repos = [cfg.resolve_path(x) for x in cfg.systems]
-    import pdb; pdb.set_trace()
+    #import pdb; pdb.set_trace()
     return _add_repo(sys_repos, ObjectTypes.systems)
 
 
