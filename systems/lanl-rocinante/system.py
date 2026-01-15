@@ -28,6 +28,7 @@ class LanlRocinante(System):
             "system_site": "lanl",
             "hardware_key": str(hardware_descriptions)
             + "HPECray-sapphirerapids-Slingshot/hardware_description.yaml",
+            "queues": [JobQueue("debug", 60, 12), JobQueue("hbm", 60, 12), JobQueue("standard", 1440, 520)],
         },
     }
 
@@ -165,7 +166,7 @@ class LanlRocinante(System):
 
         if self.spec.satisfies("compiler=gcc"):
             base_mpich_gcc = "/cpe/23.12/mpich/8.1.28/ofi/gnu/12.3"
-            base_openmpi_gcc = "/usr/projects/hpcsoft/tce/23.12/cos3-x86_64/packages/openmpi/openmpi-5.0.6-gcc-12.3.0"
+            # base_openmpi_gcc = "/usr/projects/hpcsoft/tce/23.12/cos3-x86_64/packages/openmpi/openmpi-5.0.6-gcc-12.3.0"
             selections["packages"] |= {
                 "mpich": {
                     "externals": [
@@ -223,7 +224,7 @@ class LanlRocinante(System):
                         {"c": "icx", "cxx": "icpx", "fortran": "ifx"},
                         env={
                             "prepend_path": {
-                                "LD_LIBRARY_PATH": f"/usr/projects/hpcsoft/pe/installs/cos3-x86_64/oneapi/2023.2.0.49397/mpi/2021.10.0/libfabric/lib:/cpe/23.12/pmi/6.1.13/lib",
+                                "LD_LIBRARY_PATH": "/usr/projects/hpcsoft/pe/installs/cos3-x86_64/oneapi/2023.2.0.49397/mpi/2021.10.0/libfabric/lib:/cpe/23.12/pmi/6.1.13/lib",
                             },
                         },
                     ),
