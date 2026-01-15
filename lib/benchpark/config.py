@@ -15,8 +15,9 @@ class RequiredClassAttr:
 
 
 class ConfigSection:
-    def __init__(self, data):
+    def __init__(self, data, path):
         self.data = data
+        self.path = pathlib.Path(path)
 
     filename = RequiredClassAttr("filename")
     name = RequiredClassAttr("section")
@@ -26,7 +27,13 @@ class ConfigSection:
         cfg_path = pathlib.Path(cfg_dir) / cls.filename
         if cfg_path.exists():
             with open(cfg_path, "r") as f:
-                return cls(yaml.load(f)[cls.section])
+                data = yaml.safe_load(f)
+                return cls(data[cls.section], cfg_path)
+
+    def resolve_path(self, value):
+        path = pathlib.Path(value)
+        if not path.is_absolute():
+            return (self.path.parents[0] / path).resolve()
 
 
 class PropertyDict:
@@ -59,7 +66,7 @@ class Configuration:
 
     def __getattr__(self, name):
         if name in self.sections:
-            return PropertyDict(self.sections[name])
+            return self.sections[name]
         elif name in Configuration.section_names:
             raise Exception("This section is not present in this config")
         else:
@@ -79,14 +86,15 @@ def determine_config():
     """
     if _user_input_cfg is _unset:
         raise Exception("Internal error: config initialization")
-    elif _user_input_cfg and not _user_input_cfg.exists():
-        raise Exception(f"Specific config dir does not exist: {_user_input_cfg}")
-    else:
-        return Configuration(_user_input_cfg)
+    elif _user_input_cfg:
+        if not _user_input_cfg.exists():
+            raise Exception(f"Specific config dir does not exist: {_user_input_cfg}")
+        else:
+            return Configuration(_user_input_cfg)
 
     possible_dirs = [
         benchpark.paths.invocation_working_dir / "benchpark-config",
-        benchpark.paths.benchpark_root / "benchpark-config"
+        benchpark.paths.benchpark_root / "config"
     ]
     for pd in possible_dirs:
         if pd.exists():
