@@ -5,4 +5,4 @@
 versions:
   ramble: 6b4ecac  # develop on 5/06/2025 (newer than 0.6.0 release)
   spack: a85ec51  # Dec. 1 2025 v1.1.0
-  spack-packages: 7a3a7ad  # Jan. 5 2026
+  spack-packages: 7746ad9  # Jan. 12 2026
