@@ -28,4 +28,3 @@ system_definition:
       runtime:
       mpi: cray-mpich
       installation-year: 2022
-
