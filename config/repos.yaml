@@ -1,0 +1,7 @@
+repos:
+  experiments:
+  - ../experiments
+  systems:
+  - ../systems
+  applications:
+  - ../repo
