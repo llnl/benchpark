@@ -14,9 +14,7 @@ import sys
 import yaml
 
 __version__ = "0.1.0"
-if "-V" in sys.argv or "--version" in sys.argv:
-    print(__version__)
-    exit()
+
 helpstr = """usage: main.py [-h] [-V] {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze,configure} ...
 
 Benchpark
@@ -41,14 +39,11 @@ Subcommands:
     analyze             Perform pre-defined analysis on the performance data (caliper files) after 'ramble on'
     configure           Configure options relating to the Benchpark environment
     """
-if len(sys.argv) == 1 or "-h" == sys.argv[1] or "--help" == sys.argv[1]:
-    print(helpstr)
-    exit()
 
 import benchpark.paths  # noqa: E402
 from benchpark.runtime import RuntimeResources  # noqa: E402
 
-if sys.argv[1] == "configure":
+if len(sys.argv) > 1 and sys.argv[1] == "configure":
     import benchpark.cmd.configure  # noqa: E402
 
     parser = argparse.ArgumentParser(description="Benchpark")
@@ -106,6 +101,12 @@ def main():
     if no_args:
         parser.print_help()
         return 1
+    #if args.help:
+    #    parser.print_help()
+    #    return 0
+    if args.version:
+        print(__version__)
+        return 0
 
     exit_code = 0
 
