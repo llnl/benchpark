@@ -20,7 +20,7 @@ class ConfigSection:
         self.path = pathlib.Path(path)
 
     filename = RequiredClassAttr("filename")
-    name = RequiredClassAttr("section")
+    name = RequiredClassAttr("name")
 
     @classmethod
     def try_load(cls, cfg_dir):
@@ -28,7 +28,7 @@ class ConfigSection:
         if cfg_path.exists():
             with open(cfg_path, "r") as f:
                 data = yaml.safe_load(f)
-                return cls(data[cls.section], cfg_path)
+                return cls(data[cls.name], cfg_path)
 
     def resolve_path(self, value):
         path = pathlib.Path(value)
