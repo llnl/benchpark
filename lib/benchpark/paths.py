@@ -35,3 +35,5 @@ global_spack_path = benchpark_home / "spack"
 hardware_descriptions = benchpark_root / "systems" / "all_hardware_descriptions"
 checkout_versions = benchpark_root / "checkout-versions.yaml"
 remote_urls = benchpark_root / "remote-urls.yaml"
+
+invocation_working_dir = None

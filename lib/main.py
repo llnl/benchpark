@@ -7,6 +7,8 @@
 
 import argparse
 import inspect
+import os
+import pathlib
 import shlex
 import subprocess
 import sys
@@ -16,6 +18,7 @@ import yaml
 __version__ = "0.1.0"
 
 import benchpark.paths  # noqa: E402
+import benchpark.config
 from benchpark.runtime import RuntimeResources  # noqa: E402
 
 # TODO: because this is not integrated as a subcommand, no help is
@@ -58,6 +61,8 @@ except ModuleNotFoundError:
 
 
 def main():
+    benchpark.paths.invocation_working_dir = pathlib.Path(os.getcwd()).absolute().resolve()
+
     if sys.version_info[:2] < (3, 8):
         raise Exception("Benchpark requires at least python 3.8+.")
 
@@ -84,6 +89,11 @@ def main():
     if args.version:
         print(__version__)
         return 0
+
+    if args.config:
+        benchpark.config._user_input_cfg = pathlib.path(args.config)
+    else:
+        benchpark.config._user_input_cfg = None
 
     exit_code = 0
 

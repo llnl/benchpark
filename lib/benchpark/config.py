@@ -1,13 +1,7 @@
+import benchpark.paths
+
 import pathlib
 import yaml
-
-
-def determine_config():
-    """
-    Benchpark configs don't merge or override like Spack/Ramble. You
-    just point it at a directory and that's where all your config is.
-    """
-    pass
 
 
 class RequiredClassAttr:
@@ -40,21 +34,9 @@ class PropertyDict:
         return val
 
 
-class Repos(ConfigSection):
+class Repos(ConfigSection, PropertyDict):
     filename = "repos.yaml"
-    section = "repos"
-
-    @property
-    def system_repos(self):
-        return self.data["systems"]
-
-    @property
-    def experiment_repos(self):
-        return self.data["experiments"]
-
-    @property
-    def application_repos(self):
-        return self.data["applications"]
+    name = "repos"
 
 
 _section_types = [
@@ -63,9 +45,58 @@ _section_types = [
 
 
 class Configuration:
+    section_names = [st.name for st in _section_types]
+
     def __init__(self, cfg_dir):
         self.sections = {}
         for st in _section_types:
             attempt = st.try_load(cfg_dir)
             if attempt:
-                self.sections[st.section] = attempt
+                self.sections[st.name] = attempt
+
+    def __getattr__(self, name):
+        if name in self.sections:
+            return PropertyDict(self.sections[name])
+        elif name in Configuration.section_names:
+            raise Exception("This section is not present in this config")
+        else:
+            raise AttributeError("No such section")
+
+
+_unset = object()
+
+
+_user_input_cfg = _unset
+
+
+def determine_config():
+    """
+    Benchpark configs don't merge or override like Spack/Ramble. You
+    just point it at a directory and that's where all your config is.
+    """
+    if _user_input_cfg is _unset:
+        raise Exception("Internal error: config initialization")
+    elif _user_input_cfg and not _user_input_cfg.exists():
+        raise Exception(f"Specific config dir does not exist: {_user_input_cfg}")
+    else:
+        return Configuration(_user_input_cfg)
+
+    possible_dirs = [
+        benchpark.paths.invocation_working_dir / "benchpark-config",
+        benchpark.paths.benchpark_root / "benchpark-config"
+    ]
+    for pd in possible_dirs:
+        if pd.exists():
+            return Configuration(pd)
+
+
+_configuration = None
+
+
+def configuration():
+    global _configuration
+    if not _configuration:
+        _configuration = determine_config()
+
+    return _configuration
+    
