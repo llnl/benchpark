@@ -31,7 +31,7 @@ class LanlRocinante(System):
             "queues": [
                 JobQueue("debug", 60, 12),
                 JobQueue("hbm", 60, 12),
-                JobQueue("standard", 1440, 520)
+                JobQueue("standard", 1440, 520),
             ],
         },
     }
