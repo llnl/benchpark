@@ -28,7 +28,11 @@ class LanlRocinante(System):
             "system_site": "lanl",
             "hardware_key": str(hardware_descriptions)
             + "HPECray-sapphirerapids-Slingshot/hardware_description.yaml",
-            "queues": [JobQueue("debug", 60, 12), JobQueue("hbm", 60, 12), JobQueue("standard", 1440, 520)],
+            "queues": [
+                JobQueue("debug", 60, 12),
+                JobQueue("hbm", 60, 12),
+                JobQueue("standard", 1440, 520)
+            ],
         },
     }
 
