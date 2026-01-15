@@ -1,6 +1,7 @@
 repos:
   experiments:
   - ../experiments
+  - ../experiments/test
   systems:
   - ../systems
   applications:
