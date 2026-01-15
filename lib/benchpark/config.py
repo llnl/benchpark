@@ -5,9 +5,12 @@ import yaml
 
 
 class RequiredClassAttr:
+    def __init__(self, name):
+        self.name = name
+
     def __get__(self, obj, owner):
         raise NotImplementedError(
-            f"{owner.__name__} must define class attribute 'filename'"
+            f"{owner.__name__} must define class attribute '{self.name}'"
         )
 
 
@@ -15,8 +18,8 @@ class ConfigSection:
     def __init__(self, data):
         self.data = data
 
-    filename = RequiredClassAttr()
-    section = RequiredClassAttr()
+    filename = RequiredClassAttr("filename")
+    name = RequiredClassAttr("section")
 
     @classmethod
     def try_load(cls, cfg_dir):
