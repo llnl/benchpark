@@ -18,7 +18,7 @@ from benchpark.system import (
 
 class LanlRocinante(System):
 
-    maintainers("sriram")
+    maintainers("sriram-LANL")
 
     id_to_resources = {
         "crossroads": {
