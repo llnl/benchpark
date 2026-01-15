@@ -15,31 +15,6 @@ import yaml
 
 __version__ = "0.1.0"
 
-helpstr = """usage: main.py [-h] [-V] {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze,configure} ...
-
-Benchpark
-
-options:
-  -h, --help            show this help message and exit
-  -V, --version         show version number and exit
-
-Subcommands:
-  {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze,configure}
-    tags                Tags in Benchpark experiments
-    system              Initialize a system config
-    experiment          Interact with experiments
-    setup               Set up an experiment and prepare it to build/run
-    unit-test           Run benchpark unit tests
-    audit               Look for problems in System/Experiment repos
-    mirror              Copy a benchpark workspace
-    info                Get information about Systems and Experiments
-    show-build          Show how spack built a benchmark
-    list                List experiments, systems, benchmarks, and modifiers
-    bootstrap           Bootstrap benchpark or update an existing bootstrap
-    analyze             Perform pre-defined analysis on the performance data (caliper files) after 'ramble on'
-    configure           Configure options relating to the Benchpark environment
-    """
-
 import benchpark.paths  # noqa: E402
 from benchpark.runtime import RuntimeResources  # noqa: E402
 
@@ -88,6 +63,9 @@ def main():
     parser.add_argument(
         "-V", "--version", action="store_true", help="show version number and exit"
     )
+    parser.add_argument(
+        "-C", "--config", help=""
+    )
 
     subparsers = parser.add_subparsers(title="Subcommands", dest="subcommand")
 
@@ -101,9 +79,6 @@ def main():
     if no_args:
         parser.print_help()
         return 1
-    #if args.help:
-    #    parser.print_help()
-    #    return 0
     if args.version:
         print(__version__)
         return 0
