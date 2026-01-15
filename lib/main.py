@@ -18,6 +18,8 @@ __version__ = "0.1.0"
 import benchpark.paths  # noqa: E402
 from benchpark.runtime import RuntimeResources  # noqa: E402
 
+# TODO: because this is not integrated as a subcommand, no help is
+# auto-generated for it
 if len(sys.argv) > 1 and sys.argv[1] == "configure":
     import benchpark.cmd.configure  # noqa: E402
 
@@ -64,7 +66,7 @@ def main():
         "-V", "--version", action="store_true", help="show version number and exit"
     )
     parser.add_argument(
-        "-C", "--config", help=""
+        "-C", "--config", help="use config related to system/experiment/workspace generation"
     )
 
     subparsers = parser.add_subparsers(title="Subcommands", dest="subcommand")
