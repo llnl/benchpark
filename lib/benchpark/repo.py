@@ -74,18 +74,6 @@ def override_ramble_hardcoded_globals():
     ramble.language.language_base.namespaces = _old[2]
 
 
-# Experiments
-def _exprs():
-    """Get the singleton RepoPath instance for Ramble.
-
-    Create a RepoPath, add it to sys.meta_path, and return it.
-
-    TODO: consider not making this a singleton.
-    """
-    experiments_repo = benchpark.paths.benchpark_root / "experiments"
-    return _add_repo(experiments_repo, ObjectTypes.experiments)
-
-
 def _add_repo(repo_dir, obj_type):
     if repo_dir.exists():
         repo_dirs = [str(repo_dir)]
@@ -98,7 +86,11 @@ def _add_repo(repo_dir, obj_type):
     return path
 
 
-# Systems
+def _exprs():
+    experiments_repo = benchpark.paths.benchpark_root / "experiments"
+    return _add_repo(experiments_repo, ObjectTypes.experiments)
+
+
 def _systems():
     systems_repo = benchpark.paths.benchpark_root / "systems"
     return _add_repo(systems_repo, ObjectTypes.systems)
