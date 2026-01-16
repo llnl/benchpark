@@ -6,3 +6,5 @@ repos:
   - ../systems
   applications:
   - ../repo
+  packages:
+  - ../repo

@@ -12,6 +12,7 @@ import sys
 
 import ruamel.yaml as yaml
 
+import benchpark.config
 import benchpark.paths
 from benchpark.debug import debug_print
 from benchpark.runtime import RuntimeResources
@@ -203,6 +204,8 @@ def command(args):
         experiments_root, upstream=RuntimeResources(benchpark.paths.benchpark_home)
     )
 
+    repos_cfg = benchpark.config.configuration().repos
+
     pkg_str = ""
     if pkg_manager == "spack":
         spack_build_stage = experiments_root / "builds"
@@ -212,14 +215,16 @@ def command(args):
             site_repos = (
                 per_workspace_setup.spack_location / "etc" / "spack" / "repos.yaml"
             )
+            repos = {}
+            for repo_dir in reversed(repos_cfg.packages):
+                repo_dir = repos_cfg.resolve_path(repo_dir)
+                with open(repo_dir / "repo.yaml", "r") as f:
+                    repo_data = yaml.safe_load(f)
+                    namespace = repo_data["repo"]["namespace"]
+                    repos[namespace] = str(repo_dir)
+            repos["builtin"] = f"{per_workspace_setup.pkgs_location}/repos/spack_repo/builtin/"
             with open(site_repos, "w") as f:
-                f.write(
-                    f"""\
-repos::
-  benchpark: {source_dir}/repo
-  builtin: {per_workspace_setup.pkgs_location}/repos/spack_repo/builtin/
-"""
-                )
+                yaml.dump({"repos:": repos}, f, default_flow_style=False)
             spack(
                 f"config --scope=site add \"config:build_stage:['{spack_build_stage}']\""
             )
@@ -232,7 +237,9 @@ export SPACK_DISABLE_LOCAL_CONFIG=1
 
     ramble, first_time_ramble = per_workspace_setup.ramble_first_time_setup()
     if first_time_ramble:
-        ramble(f"repo add --scope=site {source_dir}/repo")
+        for repo_dir in reversed(repos_cfg.applications):
+            repo_dir = repos_cfg.resolve_path(repo_dir)
+            ramble(f"repo add --scope=site {repo_dir}")
         ramble('config --scope=site add "config:disable_progress_bar:true"')
         ramble(f"repo add -t modifiers --scope=site {source_dir}/modifiers")
         ramble("config --scope=site add \"config:spack:global:args:'-d'\"")
