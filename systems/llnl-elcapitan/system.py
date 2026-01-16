@@ -753,6 +753,15 @@ class LlnlElcapitan(System):
                     ],
                     "buildable": False,
                 },
+                "rccl": {
+                    "externals": [
+                        {
+                            "spec": f"rccl@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
             }
         }
 
