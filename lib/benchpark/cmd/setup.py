@@ -222,7 +222,9 @@ def command(args):
                     repo_data = yaml.safe_load(f)
                     namespace = repo_data["repo"]["namespace"]
                     repos[namespace] = str(repo_dir)
-            repos["builtin"] = f"{per_workspace_setup.pkgs_location}/repos/spack_repo/builtin/"
+            repos["builtin"] = (
+                f"{per_workspace_setup.pkgs_location}/repos/spack_repo/builtin/"
+            )
             with open(site_repos, "w") as f:
                 yaml.dump({"repos:": repos}, f, default_flow_style=False)
             spack(

@@ -61,7 +61,9 @@ except ModuleNotFoundError:
 
 
 def main():
-    benchpark.paths.invocation_working_dir = pathlib.Path(os.getcwd()).absolute().resolve()
+    benchpark.paths.invocation_working_dir = (
+        pathlib.Path(os.getcwd()).absolute().resolve()
+    )
 
     if sys.version_info[:2] < (3, 8):
         raise Exception("Benchpark requires at least python 3.8+.")
@@ -71,7 +73,9 @@ def main():
         "-V", "--version", action="store_true", help="show version number and exit"
     )
     parser.add_argument(
-        "-C", "--config", help="use config related to system/experiment/workspace generation"
+        "-C",
+        "--config",
+        help="use config related to system/experiment/workspace generation",
     )
 
     subparsers = parser.add_subparsers(title="Subcommands", dest="subcommand")

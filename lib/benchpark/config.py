@@ -49,9 +49,7 @@ class Repos(ConfigSection, PropertyDict):
     name = "repos"
 
 
-_section_types = [
-    Repos
-]
+_section_types = [Repos]
 
 
 class Configuration:
@@ -94,7 +92,7 @@ def determine_config():
 
     possible_dirs = [
         benchpark.paths.invocation_working_dir / "benchpark-config",
-        benchpark.paths.benchpark_root / "config"
+        benchpark.paths.benchpark_root / "config",
     ]
     for pd in possible_dirs:
         if pd.exists():
@@ -110,4 +108,3 @@ def configuration():
         _configuration = determine_config()
 
     return _configuration
-    
