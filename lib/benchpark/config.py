@@ -1,6 +1,6 @@
-import benchpark.paths
-
 import pathlib
+
+import benchpark.paths
 import yaml
 
 

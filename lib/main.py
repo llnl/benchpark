@@ -17,8 +17,8 @@ import yaml
 
 __version__ = "0.1.0"
 
-import benchpark.paths  # noqa: E402
 import benchpark.config
+import benchpark.paths  # noqa: E402
 from benchpark.runtime import RuntimeResources  # noqa: E402
 
 # TODO: because this is not integrated as a subcommand, no help is
