@@ -386,31 +386,50 @@ class Amg2023(
                 "throughput_n": None,
                 "throughput_p": None,
             }
-            if (
-                self.spec.satisfies("target=MI300-SPX")
-                or self.spec.satisfies("target=MI250")
-                or self.spec.satisfies("target=H100")
-            ):
-                problem_spec["nx"] = 171
-                problem_spec["ny"] = 171
-                problem_spec["nz"] = 171
-                problem_spec["pool_size"] = 16
-                # problem_spec["nx"] = 86
-                # problem_spec["ny"] = 86
-                # problem_spec["nz"] = 86
-                # problem_spec["pool_size"] = 2
-            elif self.spec.satisfies("target=MI300-CPX"):
-                problem_spec["nx"] = 94
-                problem_spec["ny"] = 94
-                problem_spec["nz"] = 94
-                problem_spec["pool_size"] = 3
-                # problem_spec["nx"] = 48
-                # problem_spec["ny"] = 48
-                # problem_spec["nz"] = 48
-                # problem_spec["pool_size"] = 1
-                problem_spec["px"] = 4
-                problem_spec["py"] = 3
-                problem_spec["pz"] = 2
+            if self.spec.satisfies("workload=problem1"):
+                if (
+                    self.spec.satisfies("target=MI300-SPX")
+                    or self.spec.satisfies("target=MI250")
+                    or self.spec.satisfies("target=H100")
+                ):
+                    problem_spec["nx"] = 171
+                    problem_spec["ny"] = 171
+                    problem_spec["nz"] = 171
+                    problem_spec["pool_size"] = 16
+                    # problem_spec["nx"] = 86
+                    # problem_spec["ny"] = 86
+                    # problem_spec["nz"] = 86
+                    # problem_spec["pool_size"] = 2
+                elif self.spec.satisfies("target=MI300-CPX"):
+                    problem_spec["nx"] = 94
+                    problem_spec["ny"] = 94
+                    problem_spec["nz"] = 94
+                    problem_spec["pool_size"] = 3
+                    # problem_spec["nx"] = 48
+                    # problem_spec["ny"] = 48
+                    # problem_spec["nz"] = 48
+                    # problem_spec["pool_size"] = 1
+                    problem_spec["px"] = 4
+                    problem_spec["py"] = 3
+                    problem_spec["pz"] = 2
+            elif self.spec.satisfies("workload=problem2"):
+                if (
+                    self.spec.satisfies("target=MI300-SPX")
+                    or self.spec.satisfies("target=MI250")
+                    or self.spec.satisfies("target=H100")
+                ):
+                    problem_spec["nx"] = 292
+                    problem_spec["ny"] = 292
+                    problem_spec["nz"] = 292
+                    problem_spec["pool_size"] = 13
+                elif self.spec.satisfies("target=MI300-CPX"):
+                    problem_spec["nx"] = 160
+                    problem_spec["ny"] = 160
+                    problem_spec["nz"] = 160
+                    problem_spec["pool_size"] = 3
+                    problem_spec["px"] = 4
+                    problem_spec["py"] = 3
+                    problem_spec["pz"] = 2
         else:
             problem_spec = {
                 "nx": [128, 256],
