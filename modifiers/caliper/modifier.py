@@ -35,6 +35,8 @@ class Caliper(BasicModifier):
     # The filename for metadata forwarded from Benchpark to Caliper
     _caliper_metadata_file = "{experiment_run_dir}/{experiment_name}_metadata.json"
 
+    modifier_conflict("name_mode")
+
     _default_mode = "time"
 
     add_mode(
