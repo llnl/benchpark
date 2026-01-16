@@ -350,17 +350,14 @@ class LlnlElcapitan(System):
                         {
                             "spec": "python@3.9.12",
                             "prefix": "/usr/tce/packages/python/python-3.9.12",
-                            "buildable": False,
                         },
                         {
                             "spec": "python@3.11.5",
                             "prefix": "/usr/tce/packages/python/python-3.11.5",
-                            "buildable": False,
                         },
                         {
                             "spec": "python@3.12.2",
                             "prefix": "/usr/tce/packages/python/python-3.12.2",
-                            "buildable": False,
                         },
                     ]
                 },

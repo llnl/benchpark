@@ -64,6 +64,14 @@ class LlnlMatrix(System):
         description="Submit a job to a specific named bank",
     )
 
+    variant(
+        "queue",
+        default="none",
+        values=("none", "pbatch", "pdebug"),
+        multi=False,
+        description="Submit to named queue"
+    )
+
     def __init__(self, spec):
         super().__init__(spec)
         self.programming_models = [CudaSystem(), OpenMPCPUOnlySystem()]
@@ -151,21 +159,19 @@ class LlnlMatrix(System):
                     "buildable": False,
                 },
                 "python": {
+                    "buildable": False,
                     "externals": [
                         {
                             "spec": "python@3.9.12",
                             "prefix": "/usr/tce/packages/python/python-3.9.12",
-                            "buildable": False,
                         },
                         {
                             "spec": "python@3.11.9",
                             "prefix": "/usr/tce/packages/python/python-3.11.9",
-                            "buildable": False,
                         },
                         {
                             "spec": "python@3.12.4",
                             "prefix": "/usr/tce/packages/python/python-3.12.4",
-                            "buildable": False,
                         },
                     ]
                 },
