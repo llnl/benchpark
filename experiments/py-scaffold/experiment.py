@@ -34,7 +34,13 @@ class PyScaffold(
         description="Path to local repository of ScaFFold (i.e. git clone), since it is private.",
     )
 
-    variant("version", default="main", values=("main", "sharedmem"), description="app version")
+    variant(
+        "distconv_path",
+        default=" ",
+        description="Path to private distconv repository (required package)",
+    )
+
+    variant("version", default="main", values=("main", "sharedmem", "procruns"), description="app version")
 
     def compute_applications_section(self):
         self.add_experiment_variable(
@@ -43,13 +49,13 @@ class PyScaffold(
 
         if self.spec.satisfies("+strong"):
             n_gpus = 4
-            problem_scale = 7
+            problem_scale = 6
         elif self.spec.satisfies("+weak"):
             n_gpus = 1
             problem_scale = 5
         else:
             n_gpus = 1
-            problem_scale = 7
+            problem_scale = 6
 
         self.add_experiment_variable("n_gpus", n_gpus, True)
         self.add_experiment_variable("problem_scale", problem_scale, True)
@@ -78,8 +84,13 @@ class PyScaffold(
 
     def compute_package_section(self):
         # Spec that will be written into requirements.txt for pip install
+        sys_name = self.system_spec._name
         if self.spec.satisfies("+rocm"):
-            model = "rocm"
+            if "llnl" in sys_name:
+                # site-specific wheel for rocm
+                model = "rocmwci"
+            else:
+                model = "rocm"
         elif self.spec.satisfies("+cuda"):
             model = "cuda"
         self.add_package_spec(
@@ -87,11 +98,13 @@ class PyScaffold(
             [f"py-scaffold@{self.spec.variants['version'][0]}"],
             package_manager="spack",
         )
+        if self.spec.variants["distconv_path"][0] == " ":
+            raise ValueError("Must set distconv_path variant to valid repository path")
         self.add_package_spec(
             self.name,
             [
                 # extra index for torch wheel and pypi index for packages that won't be found on WCI
-                f"--extra-index-url https://download.pytorch.org/whl/\n--extra-index-url https://pypi.org/simple\n{self.spec.variants['scaffold_path'][0]}[{model}]",
+                f"--extra-index-url https://download.pytorch.org/whl/\n--extra-index-url https://pypi.org/simple\n{self.spec.variants['scaffold_path'][0]}[{model}]\n{self.spec.variants['distconv_path'][0]}",
             ],
             package_manager="pip",
         )
