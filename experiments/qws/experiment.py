@@ -8,9 +8,16 @@ from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
 from benchpark.mpi import MpiOnlyExperiment
 from benchpark.openmp import OpenMPExperiment
+from benchpark.scaling import Scaling, ScalingMode
 
 
-class Qws(Experiment, MpiOnlyExperiment, OpenMPExperiment, Caliper):
+class Qws(
+    Experiment,
+    MpiOnlyExperiment,
+    OpenMPExperiment,
+    Scaling(ScalingMode.Strong, ScalingMode.Weak),
+    Caliper,
+):
 
     variant(
         "workload",
@@ -29,9 +36,9 @@ class Qws(Experiment, MpiOnlyExperiment, OpenMPExperiment, Caliper):
     def compute_applications_section(self):
 
         self.add_experiment_variable("experiment_setup", "")
-        self.add_experiment_variable("lx", "32")
-        self.add_experiment_variable("ly", "6")
-        self.add_experiment_variable("lz", "4")
+        self.add_experiment_variable(
+            "total_problem_size_dict", {"lx": 32, "ly": 6, "lz": 4}, True
+        )
         self.add_experiment_variable("lt", "3")
         self.add_experiment_variable("px", "1")
         self.add_experiment_variable("py", "1")
@@ -45,16 +52,45 @@ class Qws(Experiment, MpiOnlyExperiment, OpenMPExperiment, Caliper):
         if self.spec.satisfies("+openmp"):
             self.add_experiment_variable("n_nodes", ["1"], True)
             self.add_experiment_variable("processes_per_node", ["1"])
-            self.add_experiment_variable("n_ranks", "{processes_per_node} * {n_nodes}")
             self.add_experiment_variable("omp_num_threads", ["48"])
             self.add_experiment_variable("arch", "OpenMP")
+            self.add_experiment_variable(
+                "n_resources_dict",
+                {"n_ranks": "{processes_per_node} * {n_nodes}"},
+                True,
+            )
         else:
             self.add_experiment_variable("n_nodes", ["1"], True)
+            self.add_experiment_variable("n_resources_dict", {"n_ranks": 1}, True)
 
         self.set_required_variables(
             n_resources="{n_ranks}",
             process_problem_size="{lx}*{ly}*{lz}/{n_ranks}",
             total_problem_size="{lx}*{ly}*{lz}",
+        )
+
+        self.register_scaling_config(
+            {
+                ScalingMode.Strong: {
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
+                    * scaling_factor,
+                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    ),
+                },
+                ScalingMode.Weak: {
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
+                    * scaling_factor,
+                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
+                    * scaling_factor,
+                },
+            }
         )
 
     def compute_package_section(self):
