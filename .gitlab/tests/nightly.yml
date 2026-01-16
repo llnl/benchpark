@@ -49,6 +49,7 @@ include:
         BENCHMARK:
           - amg2023
           - babelstream
+          - branson
           - kripke
           - laghos
           - lammps
@@ -64,6 +65,7 @@ include:
         BENCHMARK:
           - amg2023
           - babelstream
+          - branson
           - genesis
           - hpcg
           - hpl
@@ -84,6 +86,7 @@ include:
         BENCHMARK:
           - amg2023
           - babelstream
+          - branson
           - gromacs
           - kripke
           - laghos
