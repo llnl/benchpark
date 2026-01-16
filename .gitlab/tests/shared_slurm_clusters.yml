@@ -116,11 +116,6 @@ run_tests_slurm_dane:
         ARCHCONFIG: llnl-cluster
         SYSTEM_ARGS: [mpi=openmpi]
         BENCHMARK: osu-micro-benchmarks
-      # Compilers
-      - HOST: dane
-        ARCHCONFIG: llnl-cluster
-        SYSTEM_ARGS: [compiler=gcc, compiler=clang]
-        BENCHMARK: osu-micro-benchmarks
 run_tests_slurm_matrix:
   extends: .run_tests_slurm
   tags: [shell, matrix]

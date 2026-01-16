@@ -13,7 +13,6 @@ import tarfile
 import warnings
 from datetime import datetime
 from glob import glob
-from importlib.metadata import version
 
 import hatchet as ht
 import matplotlib as mpl
@@ -21,22 +20,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn
 import thicket as th
-from packaging.version import Version
 from tqdm import tqdm
-
-min_hatchet = "2025.2.0"
-min_thicket = "2026.1.0"
-
-hatchet_v = version("llnl-hatchet")
-thicket_v = version("llnl-thicket")
-
-assert Version(hatchet_v) >= Version(min_hatchet), (
-    f"llnl-hatchet {hatchet_v} installed; " f"require >= {min_hatchet}"
-)
-
-assert Version(thicket_v) >= Version(min_thicket), (
-    f"llnl-thicket {thicket_v} installed; " f"require >= {min_thicket}"
-)
 
 # -----------------------------
 # Constants
@@ -422,28 +406,10 @@ def prepare_data(**kwargs):
         or {
             "strong": ["n_nodes", "n_resources"],
             "weak": ["n_nodes", "n_resources", "total_problem_size"],
-            "throughput": ["total_problem_size"],
+            "throughput": "total_problem_size",
         }[scaling]
     )
-    kwargs["xaxis_parameter"] = (
-        [x_axis_metadata] if not isinstance(x_axis_metadata, list) else x_axis_metadata
-    )
-
-    region_names = kwargs.get("query_regions_byname", "")
-    if region_names:
-        query = (
-            th.query.Query()
-            .match(
-                ".", lambda row: row["name"].apply(lambda n: n in region_names).all()
-            )
-            .rel("*")
-        )
-
-        tk = tk.query(query)
-
-    prefix = kwargs.get("filter_regions_byname", "")
-    if prefix:
-        tk.dataframe = pd.concat([tk.dataframe.filter(like=p, axis=0) for p in prefix])
+    kwargs["xaxis_parameter"] = x_axis_metadata
 
     if kwargs.get("group_regions_name"):
         logger.info(
@@ -466,6 +432,22 @@ def prepare_data(**kwargs):
         )
         tk.dataframe = grouped
         tk = tk.squash()
+
+    region_names = kwargs.get("query_regions_byname", "")
+    if region_names:
+        query = (
+            th.query.Query()
+            .match(
+                ".", lambda row: row["name"].apply(lambda n: n in region_names).all()
+            )
+            .rel("*")
+        )
+
+        tk = tk.query(query)
+
+    prefix = kwargs.get("filter_regions_byname", "")
+    if prefix:
+        tk.dataframe = pd.concat([tk.dataframe.filter(like=p, axis=0) for p in prefix])
 
     cluster_col = "cluster" if "cluster" in tk.metadata.columns else "host.cluster"
     tk.metadata_columns_to_perfdata([cluster_col] + list(NAME_REMAP.keys()))
@@ -585,11 +567,6 @@ def prepare_data(**kwargs):
             f"Adding metadata column '{metric}' to the performance data from the metadata."
         )
 
-    norm_col = kwargs.get("normalize_by", "")
-    if norm_col != "":
-        logger.info(f"Normalizing '{kwargs['yaxis_metric']}' by '{norm_col}'")
-        tk.dataframe[kwargs["yaxis_metric"]] /= tk.dataframe[norm_col]
-
     make_chart(df=tk.dataframe, x_axis=x_axis_metadata, **kwargs)
 
 
@@ -663,14 +640,6 @@ def setup_parser(root_parser):
     )
     root_parser.add_argument(
         "--no-mpi", action="store_true", help="Hide MPI regions in the tree."
-    )
-    root_parser.add_argument(
-        "--normalize-by",
-        default="",
-        type=str,
-        required=False,
-        help="Optionally normalize the y-axis column by this column.",
-        metavar="COLUMN",
     )
     root_parser.add_argument(
         "--chart-title",

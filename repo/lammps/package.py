@@ -14,9 +14,6 @@ class Lammps(BuiltinLammps):
 
   depends_on("kokkos+openmp cxxstd=17", when="+openmp")
   depends_on("kokkos+wrapper", when="+cuda")
-
-  # Kokkos 5 not building
-  depends_on("kokkos@:4", when="@:20250722 +kokkos")
   
   flag_handler = build_system_flags
 

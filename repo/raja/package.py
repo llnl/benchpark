@@ -9,13 +9,6 @@ from spack_repo.builtin.packages.raja.package import Raja as BuiltinRaja
 
 class Raja(BuiltinRaja):
 
-    version(
-        "2025.12.0",
-        tag="v2025.12.0",
-        commit="e827035c630e71a9358e2f21c2f3cf6fd5fb6605",
-        submodules=False,
-    )
-    
     def setup_build_environment(self, env):
         super().setup_build_environment(env)
         if "+cuda" in self.spec:

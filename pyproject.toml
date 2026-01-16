@@ -73,7 +73,7 @@ explicit_start = false
 
 [project.optional-dependencies]
 analyze = [
-  "llnl-hatchet>=2025.2.0",
-  "llnl-thicket[plotting]>=2026.1.0",
+  "llnl-hatchet==2024.1.3",
+  "llnl-thicket[plotting]==2025.1.0",
   "matplotlib"
 ]

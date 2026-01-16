@@ -185,6 +185,12 @@ class LanlVenado(System):
                         "cce@18.0.0",
                         "/opt/cray/pe/cce/18.0.0/",
                         {"c": "cracc", "cxx": "crayCC", "fortran": "crayftn"},
+                        flags={
+                            "cflags": "-g -O2 --gcc-toolchain=/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0",
+                            "cxxflags": "-g -O2 --gcc-toolchain=/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0",
+                            "fflags": "-g -O2 -hnopattern",
+                            "ldflags": "-ldl",
+                        },
                         env={
                             "prepend_path": {
                                 "LD_LIBRARY_PATH": "/opt/cray/pe/cce/18.0.0/cce/aarch64/lib:/opt/cray/libfabric/1.20.1/lib64:/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/lib:/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/lib64:/opt/cray/pe/gcc-libs"
