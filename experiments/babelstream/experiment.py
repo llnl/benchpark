@@ -51,7 +51,7 @@ class Babelstream(
             self.add_experiment_variable("n_gpus", n_resources, True)
         else:
             self.add_experiment_variable("n_ranks", n_resources, True)
-        
+
         self.set_required_variables(
             n_resources=f"{n_resources}",
             process_problem_size="{n}/" + str(n_resources),
