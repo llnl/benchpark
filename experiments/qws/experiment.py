@@ -65,7 +65,7 @@ class Qws(
                 {"px": [1, 1, 1], "py": [1, 1, 1], "pz": [1, 1, 1]},
                 True,
             )
-            self.add_experiment_variable("pt", "1")    
+            self.add_experiment_variable("pt", "1")
 
         self.set_required_variables(
             n_resources="{px}*{py}*{pz}",
