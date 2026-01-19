@@ -15,7 +15,7 @@ class Qws(
     Experiment,
     MpiOnlyExperiment,
     OpenMPExperiment,
-    Scaling(ScalingMode.Strong, ScalingMode.Weak),
+    Scaling(ScalingMode.Strong, ScalingMode.Weak, ScalingMode.Throughput),
     Caliper,
 ):
 
@@ -34,38 +34,42 @@ class Qws(
     maintainers("jdomke", "SBA0486")
 
     def compute_applications_section(self):
-
         self.add_experiment_variable("experiment_setup", "")
-        self.add_experiment_variable(
-            "total_problem_size_dict", {"lx": 32, "ly": 6, "lz": 4}, True
-        )
-        self.add_experiment_variable("lt", "3")
-        self.add_experiment_variable("px", "1")
-        self.add_experiment_variable("py", "1")
-        self.add_experiment_variable("pz", "1")
-        self.add_experiment_variable("pt", "1")
         self.add_experiment_variable("tol_outer", "-1")
         self.add_experiment_variable("tol_inner", "-1")
         self.add_experiment_variable("maxiter_plus1_outer", "6")
         self.add_experiment_variable("maxiter_inner", "50")
 
-        if self.spec.satisfies("+openmp"):
+        if self.spec.satisfies("exec_mode=test"):
             self.add_experiment_variable("n_nodes", ["1"], True)
-            self.add_experiment_variable("processes_per_node", ["1"])
-            self.add_experiment_variable("omp_num_threads", ["48"])
-            self.add_experiment_variable("arch", "OpenMP")
             self.add_experiment_variable(
-                "n_resources_dict",
-                {"n_ranks": "{processes_per_node} * {n_nodes}"},
+                "total_problem_size_dict", {"lx": 32, "ly": 6, "lz": 4}, True
+            )
+            self.add_experiment_variable("lt", "3")
+            self.add_experiment_variable(
+                n_resources_dict = {"px": 1, "py": 1, "pz": 1}, True
+            )
+            self.add_experiment_variable("pt", "1")
+        # Must be exec_mode=perf
+        else:
+            # Per-process size (in zones) in each dimension
+            self.add_experiment_variable(
+                "total_problem_size_dict",
+                {"lx": [32, 32, 32], "ly": [6, 6, 6], "lz": [4, 4, 4]},
                 True,
             )
-        else:
-            self.add_experiment_variable("n_nodes", ["1"], True)
-            self.add_experiment_variable("n_resources_dict", {"n_ranks": 1}, True)
+            self.add_experiment_variable("lt", "3")
+            # Number of processes in each dimension
+            self.add_experiment_variable(
+                "n_resources_dict",
+                {"px": [1, 1, 1], "py": [1, 1, 1], "pz": [1, 1, 1]},
+                True,
+            )
+            self.add_experiment_variable("pt", "1")    
 
         self.set_required_variables(
-            n_resources="{n_ranks}",
-            process_problem_size="{lx}*{ly}*{lz}/{n_ranks}",
+            n_resources="{px}*{py}*{pz}",
+            process_problem_size="{lx}*{ly}*{lz}/{px}*{py}*{pz}",
             total_problem_size="{lx}*{ly}*{lz}",
         )
 
@@ -85,6 +89,15 @@ class Qws(
                         dim
                     )
                     * scaling_factor,
+                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
+                    * scaling_factor,
+                },
+                ScalingMode.Throughput: {
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    ),
                     "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
                         dim
                     )
