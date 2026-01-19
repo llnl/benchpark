@@ -47,7 +47,7 @@ class Qws(
             )
             self.add_experiment_variable("lt", "3")
             self.add_experiment_variable(
-                n_resources_dict = {"px": 1, "py": 1, "pz": 1}, True
+                "n_resources_dict", {"px": 1, "py": 1, "pz": 1}, True
             )
             self.add_experiment_variable("pt", "1")
         # Must be exec_mode=perf
