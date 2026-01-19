@@ -10,10 +10,11 @@ from benchpark.openmp import OpenMPExperiment
 from benchpark.scaling import Scaling, ScalingMode
 
 
-class Genesis(Experiment, 
-              MpiOnlyExperiment, 
-              OpenMPExperiment,
-              Scaling(ScalingMode.Strong, ScalingMode.Weak, ScalingMode.Throughput),
+class Genesis(
+  Experiment,
+  MpiOnlyExperiment,
+  OpenMPExperiment,
+  Scaling(ScalingMode.Strong, ScalingMode.Weak, ScalingMode.Throughput),
 ):
 
     variant(
@@ -38,7 +39,7 @@ class Genesis(Experiment,
         self.add_experiment_variable("tol_inner", "-1")
         self.add_experiment_variable("maxiter_plus1_outer", "6")
         self.add_experiment_variable("maxiter_inner", "50")
-        
+
         if self.spec.satisfies("exec_mode=test"):
             self.add_experiment_variable("n_nodes", ["1"], True)
             self.add_experiment_variable(
@@ -46,7 +47,7 @@ class Genesis(Experiment,
             )
             self.add_experiment_variable("lt", "3")
             self.add_experiment_variable(
-                "n_resources_dict", {"px": 1, "py": 1, "pz": 1}, True
+              "n_resources_dict", {"px": 1, "py": 1, "pz": 1}, True
             )
             self.add_experiment_variable("pt", "1")
         # Must be exec_mode=perf
@@ -65,7 +66,7 @@ class Genesis(Experiment,
                 {"px": [1, 1, 1], "py": [1, 1, 1], "pz": [1, 1, 1]},
                 True,
             )
-            self.add_experiment_variable("pt", "1")    
+            self.add_experiment_variable("pt", "1")
 
         self.set_required_variables(
             n_resources="{px}*{py}*{pz}",
@@ -105,7 +106,6 @@ class Genesis(Experiment,
                 },
             }
         )
-
 
     def compute_package_section(self):
         self.add_package_spec(self.name, [f"genesis{self.determine_version()}"])
