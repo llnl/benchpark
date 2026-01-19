@@ -47,7 +47,7 @@ class Babelstream(
             self.add_experiment_variable("execute", "omp-stream", False)
 
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
-            self.add_experiment_variable("n_gpus", "{n_nodes}*{sys_gpus_per_node}", True)
+            self.add_experiment_variable("n_gpus", "{n_nodes}*{sys_gpus_per_node}")
             n_resources = "{n_gpus}"
         else:
             self.add_experiment_variable("n_ranks", "{n_nodes}*{sys_cores_per_node}")
