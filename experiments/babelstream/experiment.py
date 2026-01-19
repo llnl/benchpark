@@ -35,10 +35,9 @@ class Babelstream(
 
     def compute_applications_section(self):
 
-        self.add_experiment_variable("processes_per_node", "1", True)
         self.add_experiment_variable("n", "35", False)
         self.add_experiment_variable("o", "0", False)
-        n_nodes = 1
+        self.add_experiment_variable("n_nodes", 1, True)
 
         if self.spec.satisfies("+cuda"):
             self.add_experiment_variable("execute", "cuda-stream", False)
@@ -48,11 +47,11 @@ class Babelstream(
             self.add_experiment_variable("execute", "omp-stream", False)
 
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
-            n_resources = 1
-            self.add_experiment_variable("n_gpus", n_resources, True)
+            self.add_experiment_variable("n_gpus", "{n_nodes}*{sys_gpus_per_node}", True)
+            n_resources = "{n_gpus}"
         else:
-            n_resources = sys_cores_per_node
-            self.add_experiment_variable("n_ranks", n_resources, True)
+            self.add_experiment_variable("n_ranks", "{n_nodes}*{sys_cores_per_node}")
+            n_resources = "{n_ranks}"
 
         self.set_required_variables(
             n_resources=f"{n_resources}",
