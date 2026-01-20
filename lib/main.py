@@ -72,6 +72,7 @@ import benchpark.cmd.experiment  # noqa: E402
 import benchpark.cmd.info  # noqa: E402
 import benchpark.cmd.list  # noqa: E402
 import benchpark.cmd.mirror  # noqa: E402
+import benchpark.cmd.redo  # noqa: E402
 import benchpark.cmd.setup  # noqa: E402
 import benchpark.cmd.show_build  # noqa: E402
 import benchpark.cmd.system  # noqa: E402
@@ -248,6 +249,11 @@ def init_commands(subparsers, actions_dict):
     )
     benchpark.cmd.aggregate.setup_parser(aggregate_parser)
 
+    redo_parser = subparsers.add_parser(
+        "redo", help="Re-instantiate all experiments in a system"
+    )
+    benchpark.cmd.redo.setup_parser(redo_parser)
+
     actions_dict["system"] = benchpark.cmd.system.command
     actions_dict["experiment"] = benchpark.cmd.experiment.command
     actions_dict["setup"] = benchpark.cmd.setup.command
@@ -259,6 +265,7 @@ def init_commands(subparsers, actions_dict):
     actions_dict["list"] = benchpark.cmd.list.command
     actions_dict["bootstrap"] = benchpark.cmd.bootstrap.command
     actions_dict["aggregate"] = benchpark.cmd.aggregate.command
+    actions_dict["redo"] = benchpark.cmd.redo.command
     if analyze_installed:
         benchpark.cmd.analyze.setup_parser(analyze_parser)
         actions_dict["analyze"] = benchpark.cmd.analyze.command

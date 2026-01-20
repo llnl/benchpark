@@ -130,7 +130,7 @@ class LlnlElcapitan(System):
     variant(
         "rocm",
         default="6.4.0",
-        values=("5.7.1", "6.2.4", "6.3.1", "6.4.0", "6.4.1", "6.4.2"),
+        values=("5.7.1", "6.2.4", "6.3.1", "6.4.0", "6.4.1", "6.4.2", "6.4.3", "7.0.1"),
         description="ROCm version",
     )
     variant(
@@ -161,7 +161,7 @@ class LlnlElcapitan(System):
     variant(
         "bank",
         default="none",
-        values=("none", "guests", "asccasc", "lc", "fractale"),
+        values=("none", "guests", "asccasc", "lc", "fractale", "wbronze"),
         multi=False,
         description="Submit a job to a specific named bank",
     )
@@ -339,13 +339,13 @@ class LlnlElcapitan(System):
                 "texinfo": {"externals": [{"spec": "texinfo@6.5", "prefix": "/usr"}]},
                 "bison": {"externals": [{"spec": "bison@3.0.4", "prefix": "/usr"}]},
                 "python": {
+                    "buildable": False,
                     "externals": [
                         {
                             "spec": "python@3.9.12",
                             "prefix": "/usr/tce/packages/python/python-3.9.12",
-                            "buildable": False,
                         }
-                    ]
+                    ],
                 },
                 "unzip": {
                     "buildable": False,
@@ -353,9 +353,8 @@ class LlnlElcapitan(System):
                 },
                 "hypre": {"variants": f"amdgpu_target={self.rocm_arch}"},
                 "hwloc": {
-                    "externals": [
-                        {"spec": "hwloc@2.9.1", "prefix": "/usr", "buildable": False}
-                    ]
+                    "buildable": False,
+                    "externals": [{"spec": "hwloc@2.9.1", "prefix": "/usr"}],
                 },
                 "fftw": {"buildable": False},
                 "intel-oneapi-mkl": {
@@ -371,7 +370,7 @@ class LlnlElcapitan(System):
                     "buildable": False,
                     "require": "intel-oneapi-mkl",
                 },
-                "mpi": {"buildable": False},
+                "mpi": {"require": "cray-mpich-gtl"},
                 "libfabric": {
                     "externals": [
                         {"spec": "libfabric@2.1", "prefix": "/opt/cray/libfabric/2.1"}
@@ -724,6 +723,15 @@ class LlnlElcapitan(System):
                     ],
                     "buildable": False,
                 },
+                "rccl": {
+                    "externals": [
+                        {
+                            "spec": f"rccl@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
             }
         }
 
@@ -745,7 +753,6 @@ class LlnlElcapitan(System):
             f"/opt/rocm-{self.rocm_version}/",
             {"c": "amdclang", "cxx": "amdclang++", "fortran": "amdflang"},
             modules=[f"rocm/{self.rocm_version}"],
-            flags={"cflags": "-g -O2", "cxxflags": "-g -O2"},
             extra_rpaths=list(rpaths),
             env={
                 "set": {"RFE_811452_DISABLE": "1"},
@@ -768,12 +775,6 @@ class LlnlElcapitan(System):
                     "prepend_path": {
                         "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/rocm-{self.rocm_version}/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib"
                     }
-                },
-                flags={
-                    "cflags": "-g -O2",
-                    "cxxflags": "-g -O2 -std=c++14",
-                    "fflags": "-g -O2 -hnopattern",
-                    "ldflags": "-ldl",
                 },
             )
             cfgs.append(compiler_section_for("cce", [cce_entry]))

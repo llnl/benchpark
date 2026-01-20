@@ -151,8 +151,19 @@ class Variable:
 
     def scale_dim(self, itr, dim, scaling_func, sf):
         key = self._dims[0] if self.ndims == 1 else self._dims[dim]
-        for k in self._dims:
-            if k == key:
-                self._var[k].append(scaling_func(self, itr, k, sf))
-            else:
-                self._var[k].append(self.val(k))
+
+        next_val = scaling_func(self, itr, key, sf)
+
+        if not next_val:
+            return
+        elif isinstance(next_val, list):
+            idx = 0
+            for k in self._dims:
+                self._var[k].append(next_val[idx])
+                idx += 1
+        else:
+            for k in self._dims:
+                if k == key:
+                    self._var[k].append(scaling_func(self, itr, k, sf))
+                else:
+                    self._var[k].append(self.val(k))
