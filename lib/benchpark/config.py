@@ -7,8 +7,9 @@
 
 import pathlib
 
-import benchpark.paths
 import yaml
+
+import benchpark.paths
 
 
 class RequiredClassAttr:
