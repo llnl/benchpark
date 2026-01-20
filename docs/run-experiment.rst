@@ -49,8 +49,9 @@ the experiments benchpark would run in the second run. Generally, we would advis
 user to remove the ``$workspace/experiments`` directory before re-running the
 experiments using ``ramble --workspace-dir . on``.
 
-Running Different Experiments in the Same Allocation
-====================================================
+******************************************************
+ Running Different Experiments in the Same Allocation
+******************************************************
 
 The ``benchpark aggregate`` command provides the functionality to batch experiments from
 the same workspace or multiple workspaces together. To use ``benchpark aggregate``,
