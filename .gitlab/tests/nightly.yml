@@ -27,10 +27,15 @@ include:
           - phloem
           - raja-perf
           - remhos
-          - salmon-tddft
           - smb
           - sparta-snl
           - stream
+      # salmon-tddft doesn't build with oneAPI, use gcc
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: $DANE_PARAMS
+        SYSTEM_ARGS: [compiler=gcc]
+        BENCHMARK: salmon-tddft
       # IOR needs a mount_point
       - HOST: dane
         ARCHCONFIG: llnl-cluster
@@ -44,6 +49,7 @@ include:
         BENCHMARK:
           - amg2023
           - babelstream
+          - branson
           - kripke
           - laghos
           - lammps
@@ -59,15 +65,20 @@ include:
         BENCHMARK:
           - amg2023
           - babelstream
+          - branson
           - genesis
           - hpcg
           - hpl
           - kripke
           - lammps
-          - qws
           - raja-perf
-          - salmon-tddft
         VARIANT: [+openmp]
+      # qws/salmon-tddft don't build with oneAPI, use gcc
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: $DANE_PARAMS
+        SYSTEM_ARGS: [compiler=gcc]
+        BENCHMARK: [qws, salmon-tddft]
       # +cuda tests
       - HOST: matrix
         ARCHCONFIG: llnl-matrix
@@ -75,6 +86,7 @@ include:
         BENCHMARK:
           - amg2023
           - babelstream
+          - branson
           - gromacs
           - kripke
           - laghos
@@ -83,8 +95,12 @@ include:
           - raja-perf
           - remhos
           - saxpy
-          - sparta-snl
         VARIANT: [+cuda]
+      - HOST: matrix
+        ARCHCONFIG: llnl-matrix
+        SCHEDULER_PARAMETERS: $MATRIX_PARAMS
+        BENCHMARK: [sparta-snl]
+        VARIANT: [+cuda~gpu-aware-mpi]
       #############
       # Other tests
       #############
@@ -105,31 +121,43 @@ include:
       # Lammps workload=pace
       - HOST: dane
         ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: $DANE_PARAMS
         BENCHMARK: [lammps]
         VARIANT: [workload=pace]
       - HOST: matrix
         ARCHCONFIG: llnl-matrix
+        SCHEDULER_PARAMETERS: $MATRIX_PARAMS
         BENCHMARK: [lammps]
         VARIANT: [+cuda workload=pace]
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
+        SCHEDULER_PARAMETERS: $ELCAP_PARAMS
         BENCHMARK: [lammps]
         VARIANT: [+rocm workload=pace]
         GPUMODE: SPX
       # AMG2023 workload=problem2
       - HOST: dane
         ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: $DANE_PARAMS
         BENCHMARK: [amg2023]
         VARIANT: [workload=problem2]
       - HOST: matrix
         ARCHCONFIG: llnl-matrix
+        SCHEDULER_PARAMETERS: $MATRIX_PARAMS
         BENCHMARK: [amg2023]
         VARIANT: [+cuda workload=problem2]
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
+        SCHEDULER_PARAMETERS: $ELCAP_PARAMS
         BENCHMARK: [amg2023]
         VARIANT: [+rocm workload=problem2]
         GPUMODE: SPX
+      # Rabbit test
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        SCHEDULER_PARAMETERS: $ELCAP_PARAMS -S dw=lustre_small
+        BENCHMARK: [ior]
+        SYSTEM_ARGS: [mount_point=rabbits_lustre_small]
 nightly_test_run:
   extends: .nightly_rules
   resource_group: $HOST

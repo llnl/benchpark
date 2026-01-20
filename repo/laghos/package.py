@@ -16,17 +16,18 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     tags = ["proxy-app", "ecp-proxy-app"]
 
     homepage = "https://github.com/CEED/Laghos"
-    git = "https://github.com/wdhawkins/Laghos.git"
+    git = "https://github.com/CEED/Laghos.git"
 
     maintainers("wdhawkins")
 
     license("BSD-2-Clause")
 
-    version("develop", branch="caliper")
+    version("develop", branch="master")
 
     variant("metis", default=True, description="Enable/disable METIS support")
     variant("caliper", default=False, description="Enable/disable Caliper support")
     variant("ofast", default=False, description="Enable gcc optimization flags")
+    variant("gpu-aware-mpi", default=False, description="Enable GPU aware MPI")
 
     depends_on("c", type="build")
     depends_on("cxx", type="build")
@@ -62,6 +63,8 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         depends_on(f"mfem cuda_arch={arch}", when=f"cuda_arch={arch}")
     depends_on("mfem +cuda+mpi", when="+cuda")
     depends_on("mfem +rocm+mpi", when="+rocm")
+    depends_on("mfem +umpire", when="+cuda")
+    depends_on("mfem +umpire", when="+rocm")
 
     depends_on("hypre +rocm+mpi", when="+rocm")
     requires("+rocm", when="^hypre+rocm")
@@ -69,7 +72,9 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         depends_on(f"hypre amdgpu_target={target}", when=f"amdgpu_target={target}")
         depends_on(f"mfem amdgpu_target={target}", when=f"amdgpu_target={target}")
 
-    depends_on("hypre+gpu-aware-mpi", when="^cray-mpich+gtl")
+    depends_on("hypre+umpire", when="+cuda")
+    depends_on("hypre+umpire", when="+rocm")
+    depends_on("hypre+gpu-aware-mpi", when="+gpu-aware-mpi")
 
     # Replace MPI_Session
     patch(
@@ -77,6 +82,10 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         sha256="e783a71c3cb36886eb539c0f7ac622883ed5caf7ccae597d545d48eaf051d15d",
         when="@3.1 ^mfem@4.4:",
     )
+
+    def setup_run_environment(self, env):
+        if "+gpu-aware-mpi" in self.spec:
+            env.set("MFEM_GPU_AWARE_MPI", "1")
 
     def setup_build_environment(self, env):
         if "+cuda" in self.spec:
@@ -91,6 +100,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         targets.append("CONFIG_MK=%s" % spec["mfem"].package.config_mk)
         targets.append("TEST_MK=%s" % spec["mfem"].package.test_mk)
         if "+caliper" in self.spec:
+            targets.append("USE_CALIPER=ON")
             targets.append("CALIPER_DIR=%s" % spec["caliper"].prefix)
             targets.append("ADIAK_DIR=%s" % spec["adiak"].prefix)
         if spec.satisfies("@:2.0"):

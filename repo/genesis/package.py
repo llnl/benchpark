@@ -14,10 +14,16 @@ class Genesis(AutotoolsPackage):
     
     tags = ['genesis','benchmark']
     
-    homepage = "https://www.r-ccs.riken.jp/labs/cbrt/"
+    homepage = "https://mdgenesis.org/"
     git = "https://github.com/genesis-release-r-ccs/genesis"
 
     version("main", branch="main", submodules=False)
+    version(
+        "2.1.6", submodules=False, tag="v2.1.6", commit="025e9eba262ac9f1b5447573b5ad73af87cfc4b0"
+    )
+    version(
+        "2.1.5", submodules=False, tag="v2.1.5", commit="5c5ac814a4ab081a6852362444ef88d50c1e9d0f"
+    )
     version(
         "2.1.4", submodules=False, tag="v2.1.4", commit="48fa5654ae1ecdf606fb6cd0bdcc2952f5caaa65"
     )

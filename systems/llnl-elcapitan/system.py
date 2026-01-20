@@ -44,6 +44,7 @@ class LlnlElcapitan(System):
             "hardware_key": str(hardware_descriptions)
             + "/HPECray-zen3-MI250X-Slingshot/hardware_description.yaml",
             "queues": [JobQueue("pdebug", 720, 24)],
+            "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
         },
         "elcapitan": {
             "rocm_arch": "gfx942",
@@ -86,12 +87,32 @@ class LlnlElcapitan(System):
                 JobQueue("pbatch", 1440, 4150),
                 JobQueue("plarge", 1440, 11040),
             ],
+            "mount_points": [
+                "/l/ssd",
+                "/p/lustre4",
+                "rabbits_xfs_small",
+                "rabbits_xfs_large",
+                "rabbits_lustre_small",
+                "rabbits_lustre_large",
+                "rabbits_gfs2_small",
+                "rabbits_gfs2_large",
+            ],
         },
     }
     id_to_resources["tuolumne"] = id_to_resources["elcapitan"]
     id_to_resources["tuolumne"]["queues"] = [
         JobQueue("pdebug", 60, 16),
         JobQueue("pbatch", 1440, 256),
+    ]
+    id_to_resources["tuolumne"]["mount_points"] = [
+        "/l/ssd",
+        "/p/lustre5",
+        "rabbits_xfs_small",
+        "rabbits_xfs_large",
+        "rabbits_lustre_small",
+        "rabbits_lustre_large",
+        "rabbits_gfs2_small",
+        "rabbits_gfs2_large",
     ]
 
     variant(
@@ -109,7 +130,7 @@ class LlnlElcapitan(System):
     variant(
         "rocm",
         default="6.4.0",
-        values=("5.7.1", "6.2.4", "6.3.1", "6.4.0", "6.4.1", "6.4.2"),
+        values=("5.7.1", "6.2.4", "6.3.1", "6.4.0", "6.4.1", "6.4.2", "6.4.3", "7.0.1"),
         description="ROCm version",
     )
     variant(
@@ -140,7 +161,7 @@ class LlnlElcapitan(System):
     variant(
         "bank",
         default="none",
-        values=("none", "guests", "asccasc", "lc", "fractale"),
+        values=("none", "guests", "asccasc", "lc", "fractale", "wbronze"),
         multi=False,
         description="Submit a job to a specific named bank",
     )
@@ -156,7 +177,21 @@ class LlnlElcapitan(System):
     variant(
         "mount_point",
         default="none",
-        values=("none", "/p/lustre5"),
+        values=(
+            "none",
+            "/l/ssd",
+            "/p/lustre1",
+            "/p/lustre2",
+            "/p/lustre3",
+            "/p/lustre4",
+            "/p/lustre5",
+            "rabbits_xfs_small",
+            "rabbits_xfs_large",
+            "rabbits_lustre_small",
+            "rabbits_lustre_large",
+            "rabbits_gfs2_small",
+            "rabbits_gfs2_large",
+        ),
         multi=False,
         description="Which mount point to use for IO benchmarks",
     )
@@ -178,29 +213,23 @@ class LlnlElcapitan(System):
             if self.rocm_version >= Version("6.4.0"):
                 self.cce_version = Version("20.0.0")
                 self.mpi_version = Version("9.0.1")
-                self.short_cce_version = (
-                    f"{self.cce_version.major}.{self.cce_version.minor}"
-                )
             elif self.rocm_version >= Version("6.0.0"):
                 self.cce_version = Version("18.0.1")
                 self.mpi_version = Version("8.1.31")
-                self.short_cce_version = (
-                    f"{self.cce_version.major}.{self.cce_version.minor}"
-                )
             else:
                 self.cce_version = Version("16.0.0")
                 self.mpi_version = Version("8.1.26")
-                self.short_cce_version = (
-                    f"{self.cce_version.major}.{self.cce_version.minor}"
-                )
         if self.rocm_version >= Version("6.0.0"):
             self.pmi_version = Version("6.1.15.6")
             self.pals_version = Version("1.2.12")
             self.llvm_version = Version("18.0.1")
+
         else:
             self.pmi_version = Version("6.1.12")
             self.pals_version = Version("1.2.9")
             self.llvm_version = Version("16.0.0")
+        self.short_cce_version = f"{self.cce_version.major}.{self.cce_version.minor}"
+        self.short_rocm_version = f"{self.rocm_version.major}.0"
         # TODO: Replace this with lookups into the working set
 
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
@@ -217,6 +246,21 @@ class LlnlElcapitan(System):
                 self.sys_gpus_per_node = 24
             else:
                 raise ValueError(f"Invalid gpumode in spec: {self.spec}")
+
+        mount_point = self.spec.variants["mount_point"][0]
+        if mount_point not in self.mount_points + ["none"]:
+            raise KeyError(
+                f'"{mount_point}" is not a valid mount point for the cluster "{self.spec.variants["cluster"][0]}"'
+            )
+        if mount_point == "none":
+            self.full_io_path = None
+        elif "rabbits" in mount_point:
+            self.full_io_path = (
+                f"$DW_JOB_{''.join(mount_point.lstrip('rabbits_').split('_'))}"
+                + "/test.bat"
+            )
+        else:
+            self.full_io_path = mount_point + "/$USER/test.bat"
 
     def compute_packages_section(self):
         selections = {
@@ -295,13 +339,13 @@ class LlnlElcapitan(System):
                 "texinfo": {"externals": [{"spec": "texinfo@6.5", "prefix": "/usr"}]},
                 "bison": {"externals": [{"spec": "bison@3.0.4", "prefix": "/usr"}]},
                 "python": {
+                    "buildable": False,
                     "externals": [
                         {
                             "spec": "python@3.9.12",
                             "prefix": "/usr/tce/packages/python/python-3.9.12",
-                            "buildable": False,
                         }
-                    ]
+                    ],
                 },
                 "unzip": {
                     "buildable": False,
@@ -309,9 +353,8 @@ class LlnlElcapitan(System):
                 },
                 "hypre": {"variants": f"amdgpu_target={self.rocm_arch}"},
                 "hwloc": {
-                    "externals": [
-                        {"spec": "hwloc@2.9.1", "prefix": "/usr", "buildable": False}
-                    ]
+                    "buildable": False,
+                    "externals": [{"spec": "hwloc@2.9.1", "prefix": "/usr"}],
                 },
                 "fftw": {"buildable": False},
                 "intel-oneapi-mkl": {
@@ -327,7 +370,7 @@ class LlnlElcapitan(System):
                     "buildable": False,
                     "require": "intel-oneapi-mkl",
                 },
-                "mpi": {"buildable": False},
+                "mpi": {"require": "cray-mpich-gtl"},
                 "libfabric": {
                     "externals": [
                         {"spec": "libfabric@2.1", "prefix": "/opt/cray/libfabric/2.1"}
@@ -444,7 +487,7 @@ class LlnlElcapitan(System):
         elif self.spec.satisfies("compiler=rocmcc"):
             dont_use_gtl = {
                 "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
-                "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}/lib -lmpi "
+                "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/amd/{self.short_rocm_version}/lib -lmpi "
                 f"-L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib "
                 f"-Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
             }
@@ -454,7 +497,7 @@ class LlnlElcapitan(System):
                 "fi_cxi_ats": "0",
                 "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
                 "gtl_libs": "libmpi_gtl_hsa",
-                "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}/lib -lmpi "
+                "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/amd/{self.short_rocm_version}/lib -lmpi "
                 f"-L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib "
                 f"-Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -lmpi_gtl_hsa",
             }
@@ -471,8 +514,8 @@ class LlnlElcapitan(System):
                     "cray-mpich": {
                         "externals": [
                             {
-                                "spec": f"cray-mpich@{self.mpi_version}{gtl_spec}+wrappers %cce@{self.cce_version}",
-                                "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}",
+                                "spec": f"cray-mpich@{self.mpi_version}{gtl_spec}+wrappers %rocmcc@{self.rocm_version}",
+                                "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/amd/{self.short_rocm_version}",
                                 "extra_attributes": gtl_cfg,
                             }
                         ]
@@ -680,6 +723,15 @@ class LlnlElcapitan(System):
                     ],
                     "buildable": False,
                 },
+                "rccl": {
+                    "externals": [
+                        {
+                            "spec": f"rccl@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
             }
         }
 
@@ -700,8 +752,7 @@ class LlnlElcapitan(System):
             f"llvm-amdgpu@{self.rocm_version}",
             f"/opt/rocm-{self.rocm_version}/",
             {"c": "amdclang", "cxx": "amdclang++", "fortran": "amdflang"},
-            modules=[f"cce/{self.cce_version}"],
-            flags={"cflags": "-g -O2", "cxxflags": "-g -O2"},
+            modules=[f"rocm/{self.rocm_version}"],
             extra_rpaths=list(rpaths),
             env={
                 "set": {"RFE_811452_DISABLE": "1"},
@@ -725,31 +776,33 @@ class LlnlElcapitan(System):
                         "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/rocm-{self.rocm_version}/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib"
                     }
                 },
-                flags={
-                    "cflags": "-g -O2",
-                    "cxxflags": "-g -O2 -std=c++14",
-                    "fflags": "-g -O2 -hnopattern",
-                    "ldflags": "-ldl",
-                },
             )
             cfgs.append(compiler_section_for("cce", [cce_entry]))
         return merge_dicts(*cfgs)
 
     def system_specific_variables(self):
         opts = super().system_specific_variables()
-        # MI300A modes
+
+        extra_batch_opts = ""
         if self.rocm_arch == "gfx942":
+            # MI300A modes
             if self.spec.satisfies("gpumode=SPX"):
                 gpu_factor = 1
             elif self.spec.satisfies("gpumode=TPX"):
                 gpu_factor = 3
             elif self.spec.satisfies("gpumode=CPX"):
                 gpu_factor = 6
+            extra_batch_opts += f"--setattr=gpumode={self.spec.variants['gpumode'][0]}\n--conf=resource.rediscover=true"
+
+            # Rabbits
+            mt_point = self.spec.variants["mount_point"][0]
+            if mt_point != "none" and "rabbits" in mt_point:
+                extra_batch_opts += f"\n-S dw={mt_point.lstrip('rabbits_')}"
 
             opts.update(
                 {
                     "gpu_factor": gpu_factor,
-                    "extra_batch_opts": f"--setattr=gpumode={self.spec.variants['gpumode'][0]}\n--conf=resource.rediscover=true",
+                    "extra_batch_opts": extra_batch_opts,
                 }
             )
         return opts

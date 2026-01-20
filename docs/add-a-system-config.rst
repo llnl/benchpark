@@ -4,8 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Adding a System
-===============
+#################
+ Adding a System
+#################
 
 This guide is intended for those who would like to add a new system to benchpark, such
 as vendors, system administrators, or application developers. Benchpark provides an API
@@ -36,8 +37,9 @@ To determine if you need to create a new system:
 
 .. _adding-system-hardware-specs:
 
-A. Adding System Hardware Specs
--------------------------------
+*********************************
+ A. Adding System Hardware Specs
+*********************************
 
 We list hardware descriptions of Systems specified in Benchpark in the System Catalogue
 in :doc:`system-list`. If you are running on a system with an accelerator, find an
@@ -98,8 +100,9 @@ In the ``systems/all_hardware_descriptions/system_name`` directory, add a
 
 .. _system-specification:
 
-B. Creating the System Definition (``system.py``)
--------------------------------------------------
+***************************************************
+ B. Creating the System Definition (``system.py``)
+***************************************************
 
 Now that you have defined the hardware description for your system, you can now create
 the ``system.py``, which involves defining the software on your system. This includes
@@ -114,7 +117,7 @@ create a ``system.py`` are:
 .. _creating-sys-class:
 
 1. Creating the System Class
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+============================
 
 In this example, we will recreate a fully-functional example of the AWS ``system.py``
 that we use for benchpark tutorials (see `aws-tutorial/system.py
@@ -155,7 +158,7 @@ instances that share this same hardware and software specification using the
 .. _class-init-and-resources:
 
 2. Specify the Class Initializer and Resources
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+==============================================
 
 When defining ``__init__()`` for our system, we invoke the parent class
 ``System::__init__()``, and set important system attributes using the
@@ -226,7 +229,7 @@ experiment initialized with your chosen instance.
 .. _compiler-def:
 
 3. Add Compiler Definitions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+===========================
 
 We define compilers that are available on our system by implementing
 ``compute_compilers_section()`` function. Here are the general steps for how to write
@@ -281,7 +284,7 @@ For our AWS system, the compiler we define is ``gcc@11.4.0``. For the
 .. _software-section:
 
 4. Add a Software Section
-~~~~~~~~~~~~~~~~~~~~~~~~~
+=========================
 
 Here we define the ``compute_software_section()``, where at minimum we must define the
 ``default-compiler`` for Ramble. This is trivial for the single compiler that we have,
@@ -311,7 +314,7 @@ Here we define the ``compute_software_section()``, where at minimum we must defi
 .. _software-definitions:
 
 5. Add Software Definitions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+===========================
 
 Finally, we define the ``compute_packages_section()`` function, where you can include
 any package that you would like the package manager, such as Spack, to find on the
@@ -381,7 +384,7 @@ your system.
             }
 
 6. Validating the System
-~~~~~~~~~~~~~~~~~~~~~~~~
+========================
 
 To manually validate that your new system works, you should start by initializing your
 system:
@@ -393,13 +396,14 @@ system:
 If this completes without errors, you can continue by creating a benchmark
 :doc:`add-a-benchmark`.
 
-System Appendix
----------------
+*****************
+ System Appendix
+*****************
 
 .. _adding-sys-packages:
 
 1. Adding/Updating System Packages
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+==================================
 
 External package definitions can be added/updated from the output of ``benchpark system
 external``. If you don't have any packages yet, define ``compute_packages_section`` as

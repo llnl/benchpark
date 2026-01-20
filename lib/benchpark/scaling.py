@@ -126,9 +126,10 @@ def Scaling(*modes):
         for itr in range(num_exprs):
             dim = (start_dim + itr) % ndims
             for var_name, scaling_func in scaling_config.items():
-                getattr(self.expr_vars, var_name).scale_dim(
-                    itr, dim, scaling_func, scaling_factor
-                )
+                if scaling_func:
+                    getattr(self.expr_vars, var_name).scale_dim(
+                        itr, dim, scaling_func, scaling_factor
+                    )
 
     BaseScaling.scale_params = scale_params
 
