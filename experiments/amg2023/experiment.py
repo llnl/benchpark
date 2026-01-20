@@ -140,6 +140,6 @@ class Amg2023(
             )
         else:
             self.add_package_spec(
-                self.name, [f"amg2023{self.determine_version()} {mixedint}"]
+                self.name, [f"amg2023{self.determine_version()} {mixedint} +mpi"]
             )
         self.add_package_spec("hypre", ["hypre+lapack"])
