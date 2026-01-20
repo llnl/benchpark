@@ -131,7 +131,7 @@ class Kripke(
                 },
             }
         )
-        
+
         if self.spec.satisfies("+openmp"):
             self.add_experiment_variable("n_threads_per_proc", 1, True)
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
@@ -139,7 +139,6 @@ class Kripke(
         else:
             self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
-    
     def compute_package_section(self):
         # get package version
         single_memory = (
