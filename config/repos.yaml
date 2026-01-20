@@ -1,10 +1,5 @@
 repos:
-  experiments:
-  - ../experiments
-  - ../experiments/test
-  systems:
-  - ../systems
-  applications:
-  - ../repo
-  packages:
-  - ../repo
+  experiments: [../experiments, ../experiments/test]
+  systems: [../systems]
+  applications: [../repo]
+  packages: [../repo]
