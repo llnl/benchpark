@@ -41,36 +41,27 @@ class Qws(
         self.add_experiment_variable("maxiter_inner", "50")
 
         if self.spec.satisfies("exec_mode=test"):
-            self.add_experiment_variable("n_nodes", ["1"], True)
             self.add_experiment_variable(
-                "total_problem_size_dict", {"lx": 32, "ly": 6, "lz": 4}, True
+                "total_problem_size_dict", {"lx": 32, "ly": 6, "lz": 4, "lt": 3}, True
             )
-            self.add_experiment_variable("lt", "3")
             self.add_experiment_variable(
-                "n_resources_dict", {"px": 1, "py": 1, "pz": 1}, True
+                "n_resources_dict", {"px": 1, "py": 1, "pz": 1, "pt": 1}, True
             )
-            self.add_experiment_variable("pt", "1")
         # Must be exec_mode=perf
         else:
             # Per-process size (in zones) in each dimension
             self.add_experiment_variable(
-                "total_problem_size_dict",
-                {"lx": [32, 32, 32], "ly": [6, 6, 6], "lz": [4, 4, 4]},
-                True,
+                "total_problem_size_dict", {"lx": 64, "ly": 12, "lz": 8, "lt": 3}, True
             )
-            self.add_experiment_variable("lt", "3")
             # Number of processes in each dimension
             self.add_experiment_variable(
-                "n_resources_dict",
-                {"px": [1, 1, 1], "py": [1, 1, 1], "pz": [1, 1, 1]},
-                True,
+                "n_resources_dict", {"px": 2, "py": 2, "pz": 2, "pt": 1}, True
             )
-            self.add_experiment_variable("pt", "1")
 
         self.set_required_variables(
-            n_resources="{px}*{py}*{pz}",
-            process_problem_size="{lx}*{ly}*{lz}/{px}*{py}*{pz}",
-            total_problem_size="{lx}*{ly}*{lz}",
+            n_resources="{px}*{py}*{pz}*{pt}",
+            process_problem_size="({lx}*{ly}*{lz}*{lt})/({px}*{py}*{pz}*{pt})",
+            total_problem_size="{lx}*{ly}*{lz}*{lt}",
         )
 
         self.register_scaling_config(
@@ -105,6 +96,11 @@ class Qws(
                 },
             }
         )
+
+        if self.spec.satisfies("+openmp"):
+            self.add_experiment_variable("n_threads_per_proc", 1, True)
+        else:
+            self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
     def compute_package_section(self):
         self.add_package_spec(self.name, [f"qws{self.determine_version()}"])
