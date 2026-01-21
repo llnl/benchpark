@@ -49,7 +49,7 @@ import benchpark.config
 import benchpark.paths  # noqa: E402
 from benchpark.runtime import RuntimeResources  # noqa: E402
 
-if len(sys.argv) > 1 and sys.argv[1] == "configure":
+if sys.argv[1] == "configure":
     import benchpark.cmd.configure  # noqa: E402
 
     parser = argparse.ArgumentParser(description="Benchpark")
