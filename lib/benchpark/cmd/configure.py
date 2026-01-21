@@ -21,17 +21,16 @@ def setup_parser(root_parser):
 
 
 def command(args):
-    data = {}
-
-    if args.bootstrap_location:
-        loc = os.path.expandvars(os.path.expanduser(args.bootstrap_location))
-        bl = str(Path(loc).resolve()).rstrip("/") + "/.benchpark/"
-        data["bootstrap"] = {
-            "location": bl,
-        }
-
     bootstrap_cfg = benchpark.config.bootstrap
 
-    print(f"Writing configuration to {bootstrap_cfg.path}")
-    with open(bootstrap_cfg.path, "w") as yaml_file:
-        yaml.safe_dump(data, yaml_file)
+    if args.bootstrap_location or not bootstrap_cfg.path.exists():
+        where = args.bootstrap_location or "~"
+        loc = os.path.expandvars(os.path.expanduser(where))
+        bl = str(Path(loc).resolve()).rstrip("/") + "/.benchpark/"
+        data = {
+            "bootstrap": {"location": bl}
+        }
+
+        print(f"Writing configuration to {bootstrap_cfg.path}")
+        with open(bootstrap_cfg.path, "w") as yaml_file:
+            yaml.safe_dump(data, yaml_file)
