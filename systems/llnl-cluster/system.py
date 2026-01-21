@@ -255,6 +255,10 @@ class LlnlCluster(System):
                     "externals": [{"spec": "gmake@4.2.1", "prefix": "/usr"}],
                     "buildable": False,
                 },
+                "perl": {
+                    "externals": [{"spec": "perl@5.26.3", "prefix": "/usr"}],
+                    "buildable": False,
+                }
             }
         }
 
