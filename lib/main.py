@@ -138,9 +138,6 @@ def main():
     if no_args:
         parser.print_help()
         return 1
-    if args.version:
-        print(__version__)
-        return 0
 
     exit_code = 0
 
