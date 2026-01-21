@@ -6,7 +6,7 @@
 import os
 from collections import defaultdict
 
-import benchpark.paths
+from benchpark.paths import paths
 
 PROGRAMMING_MODEL_CATEGORY = "programming_model"
 SCALING_CATEGORY = "scaling"
@@ -30,7 +30,7 @@ MOD_DICT = {
 
 
 def benchpark_experiments(exp_dict=EXP_DICT, exclude_variants=[]):
-    source_dir = benchpark.paths.benchpark_root
+    source_dir = paths.benchpark_root
     experiments = []
     experiments_dir = source_dir / "experiments"
 
@@ -60,7 +60,7 @@ def benchpark_experiments(exp_dict=EXP_DICT, exclude_variants=[]):
 
 def benchpark_modifiers():
     all_benchmark_modifiers = ["affinity", "allocation", "hwloc"]
-    source_dir = benchpark.paths.benchpark_root
+    source_dir = paths.benchpark_root
     experiments_dir = source_dir / "experiments"
     modifiers = []
     exclude = ["modifier_repo.yaml"]
@@ -88,7 +88,7 @@ def benchpark_modifiers():
 def benchpark_systems(programming_model=None):
     from benchpark.spec import SystemSpec
 
-    source_dir = benchpark.paths.benchpark_root
+    source_dir = paths.benchpark_root
     systems = []
     exclude = ["all_hardware_descriptions", "common", "repo.yaml"]
     for x in sorted(os.listdir(source_dir / "systems")):
@@ -128,7 +128,7 @@ def benchpark_systems(programming_model=None):
 
 
 def benchpark_benchmarks():
-    source_dir = benchpark.paths.benchpark_root
+    source_dir = paths.benchpark_root
     benchmarks = []
     experiments_dir = source_dir / "experiments"
     for x in sorted(os.listdir(experiments_dir)):

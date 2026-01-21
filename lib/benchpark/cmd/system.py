@@ -16,7 +16,7 @@ import llnl.util.tty.color as color
 import yaml
 from deepdiff import DeepDiff
 
-import benchpark.paths
+from benchpark.paths import paths
 import benchpark.spec
 import benchpark.system
 
@@ -63,7 +63,7 @@ def system_external(args):
     if args.new_system:
         subprocess.run(
             [
-                benchpark.paths.benchpark_home / "spack/bin/spack",
+                paths.benchpark_home / "spack/bin/spack",
                 "external",
                 "find",
                 "--not-buildable",
@@ -71,7 +71,7 @@ def system_external(args):
         )
 
         with open(
-            benchpark.paths.benchpark_home / "spack/etc/spack/packages.yaml", "r"
+            paths.benchpark_home / "spack/etc/spack/packages.yaml", "r"
         ) as file:
             new_packages = yaml.safe_load(file)["packages"]
 
@@ -86,7 +86,7 @@ def system_external(args):
     pkg_list = list(packages.keys())
     subprocess.run(
         [
-            benchpark.paths.benchpark_home / "spack/bin/spack",
+            paths.benchpark_home / "spack/bin/spack",
             "external",
             "find",
             "--not-buildable",
@@ -95,7 +95,7 @@ def system_external(args):
     )
 
     with open(
-        benchpark.paths.benchpark_home / "spack/etc/spack/packages.yaml", "r"
+        paths.benchpark_home / "spack/etc/spack/packages.yaml", "r"
     ) as file:
         new_packages = yaml.safe_load(file)["packages"]
 

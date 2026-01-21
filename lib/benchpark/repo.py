@@ -10,7 +10,6 @@ import sys
 from enum import Enum
 
 import benchpark.config
-import benchpark.paths
 
 # isort: off
 

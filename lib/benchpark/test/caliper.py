@@ -10,7 +10,7 @@ import tempfile
 from ramble.expander import Expander
 
 import benchpark.caliper
-import benchpark.paths
+from benchpark.paths import paths
 import benchpark.spec
 
 
@@ -58,7 +58,7 @@ def test_caliper_modifier(monkeypatch):
     expr_vars_section = get_caliper_vars_section(expr_spec)
 
     # Append path to enable import of modifier and application
-    sys.path.append(str(benchpark.paths.benchpark_root))
+    sys.path.append(str(paths.benchpark_root))
     from modifiers.caliper.modifier import Caliper as CaliperModifier
     from repo.saxpy.application import Saxpy
 

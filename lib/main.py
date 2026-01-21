@@ -15,6 +15,8 @@ import sys
 
 import yaml
 
+# Process --version/--help early and exit before doing any further imports
+# (which can result in expensive cloning operations).
 __version__ = "0.1.0"
 if "-V" in sys.argv or "--version" in sys.argv:
     print(__version__)
@@ -45,10 +47,28 @@ if len(sys.argv) == 1 or "-h" == sys.argv[1] or "--help" == sys.argv[1]:
     print(helpstr)
     exit()
 
-import benchpark.config
-import benchpark.paths  # noqa: E402
-from benchpark.runtime import RuntimeResources  # noqa: E402
+from benchpark.base_paths import base_paths # noqa: E402
 
+# Set paths here that are important for configuration: after this block
+# commands that use config can be imported and run
+_found_cfg = False
+for i, arg in enumerate(sys.argv):
+    if arg.startswith("-C") or arg.startswith("--config"):
+        _found_cfg = True
+        if "=" in arg:
+            val = arg.split("=")[1]
+        else:
+            val = sys.argv[i+1]
+        base_paths.user_input_cfg = pathlib.path(val)
+if not _found_cfg:
+    base_paths.user_input_cfg = None
+
+base_paths.invocation_working_dir = (
+    pathlib.Path(os.getcwd()).absolute().resolve()
+)
+
+# Later imports initiate bootstrapping, and the configure command may want
+# to configure this behavior, so we handle it before doing remaining imports
 if sys.argv[1] == "configure":
     import benchpark.cmd.configure  # noqa: E402
 
@@ -62,7 +82,9 @@ if sys.argv[1] == "configure":
     benchpark.cmd.configure.command(args)
     sys.exit(0)
 
-bootstrapper = RuntimeResources(benchpark.paths.benchpark_home)  # noqa
+from benchpark.paths import paths  # noqa: E402
+from benchpark.runtime import RuntimeResources  # noqa: E402
+bootstrapper = RuntimeResources(paths.benchpark_home)  # noqa
 bootstrapper.bootstrap()  # noqa
 
 import benchpark.cmd.audit  # noqa: E402
@@ -87,10 +109,6 @@ except ModuleNotFoundError:
 
 
 def main():
-    benchpark.paths.invocation_working_dir = (
-        pathlib.Path(os.getcwd()).absolute().resolve()
-    )
-
     if sys.version_info[:2] < (3, 8):
         raise Exception("Benchpark requires at least python 3.8+.")
 
@@ -119,11 +137,6 @@ def main():
     if args.version:
         print(__version__)
         return 0
-
-    if args.config:
-        benchpark.config._user_input_cfg = pathlib.path(args.config)
-    else:
-        benchpark.config._user_input_cfg = None
 
     exit_code = 0
 
@@ -159,7 +172,7 @@ def supports_unknown_args(command):
 
 
 def benchpark_get_tags():
-    f = benchpark.paths.benchpark_root / "taxonomy.yaml"
+    f = paths.benchpark_root / "taxonomy.yaml"
     tags = []
 
     with open(f, "r") as stream:
@@ -344,8 +357,8 @@ def benchpark_tags_handler(args):
     """
     Filter ramble tags by benchpark benchmarks
     """
-    source_dir = benchpark.paths.benchpark_root
-    ramble_exe = benchpark.paths.benchpark_home / "ramble/bin/ramble"
+    source_dir = paths.benchpark_root
+    ramble_exe = paths.benchpark_home / "ramble/bin/ramble"
     subprocess.run([ramble_exe, "repo", "add", "--scope=site", f"{source_dir}/repo"])
     benchmarks = benchpark_benchmarks()
 

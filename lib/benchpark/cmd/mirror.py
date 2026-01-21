@@ -12,7 +12,7 @@ import re
 import shutil
 import tempfile
 
-import benchpark.paths
+from benchpark.paths import paths
 from benchpark.runtime import run_command, working_dir
 
 
@@ -115,7 +115,7 @@ def mirror_create(args):
         )
 
     cache_storage = os.path.join(dest, "pip-cache")
-    ramble_pip_reqs = os.path.join(benchpark.paths.benchpark_root, "requirements.txt")
+    ramble_pip_reqs = os.path.join(paths.benchpark_root, "requirements.txt")
     if not os.path.exists(cache_storage):
         run_command(f"pip download -r {ramble_pip_reqs} -d {cache_storage}")
 
@@ -161,7 +161,7 @@ export SPACK_DISABLE_LOCAL_CONFIG=1
     env_dir = os.path.dirname(find_one(ramble_workspace, "spack.yaml"))
     git_repo_dst = os.path.join(dest, "git-repos")
     repo_copy_script = os.path.join(
-        benchpark.paths.benchpark_root, "lib", "scripts", "env-collect-branch-tips.py"
+        paths.benchpark_root, "lib", "scripts", "env-collect-branch-tips.py"
     )
     out, err = run_command(
         f"spack -e {env_dir} python {repo_copy_script} {git_repo_dst}"
@@ -203,12 +203,12 @@ ramble config --scope=site add \"config:spack:global:args:'-d'\"
             )
 
     modifiers_dest = os.path.join(dest, "modifiers")
-    modifiers_src = os.path.join(benchpark.paths.benchpark_root, "modifiers")
+    modifiers_src = os.path.join(paths.benchpark_root, "modifiers")
     if not os.path.exists(modifiers_dest):
         shutil.copytree(modifiers_src, modifiers_dest)
 
     bp_repo_dest = os.path.join(dest, "repo")
-    bp_repo_src = os.path.join(benchpark.paths.benchpark_root, "repo")
+    bp_repo_src = os.path.join(paths.benchpark_root, "repo")
     if not os.path.exists(bp_repo_dest):
         shutil.copytree(bp_repo_src, bp_repo_dest)
 

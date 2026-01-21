@@ -13,7 +13,7 @@ import sys
 import ruamel.yaml as yaml
 
 import benchpark.config
-import benchpark.paths
+from benchpark.paths import paths
 from benchpark.debug import debug_print
 from benchpark.runtime import RuntimeResources
 
@@ -96,7 +96,7 @@ def command(args):
                     return result
 
     experiments_root = pathlib.Path(os.path.abspath(args.experiments_root))
-    source_dir = benchpark.paths.benchpark_root
+    source_dir = paths.benchpark_root
 
     experiment_src_dir = pathlib.Path(os.path.abspath(str(args.experiment)))
 
@@ -201,7 +201,7 @@ def command(args):
     run_script = experiments_root / ".latest-experiment.sh"
 
     per_workspace_setup = RuntimeResources(
-        experiments_root, upstream=RuntimeResources(benchpark.paths.benchpark_home)
+        experiments_root, upstream=RuntimeResources(paths.benchpark_home)
     )
 
     repos_cfg = benchpark.config.configuration().repos

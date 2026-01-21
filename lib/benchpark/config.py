@@ -9,7 +9,7 @@ import pathlib
 
 import yaml
 
-import benchpark.paths
+import benchpark.base_paths
 
 
 class RequiredClassAttr:
@@ -57,7 +57,12 @@ class Repos(ConfigSection, PropertyDict):
     name = "repos"
 
 
-_section_types = [Repos]
+class Bootstrap(ConfigSection, PropertyDict):
+    filename = "bootstrap.yaml"
+    name = "bootstrap"
+
+
+_section_types = [Repos, Bootstrap]
 
 
 class Configuration:
@@ -79,40 +84,12 @@ class Configuration:
             raise AttributeError("No such section")
 
 
-_unset = object()
-
-
-_user_input_cfg = _unset
-
-
-def determine_config():
-    """
-    Benchpark configs don't merge or override like Spack/Ramble. You
-    just point it at a directory and that's where all your config is.
-    """
-    if _user_input_cfg is _unset:
-        raise Exception("Internal error: config initialization")
-    elif _user_input_cfg:
-        if not _user_input_cfg.exists():
-            raise Exception(f"Specific config dir does not exist: {_user_input_cfg}")
-        else:
-            return Configuration(_user_input_cfg)
-
-    possible_dirs = [
-        benchpark.paths.invocation_working_dir / "benchpark-config",
-        benchpark.paths.benchpark_root / "config",
-    ]
-    for pd in possible_dirs:
-        if pd.exists():
-            return Configuration(pd)
-
-
 _configuration = None
 
 
 def configuration():
     global _configuration
     if not _configuration:
-        _configuration = determine_config()
+        _configuration = Configuration(benchpark.base_paths.determine_config_dir())
 
     return _configuration

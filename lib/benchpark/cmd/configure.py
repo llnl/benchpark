@@ -8,7 +8,7 @@ from pathlib import Path
 
 import yaml
 
-import benchpark.paths
+import benchpark.config
 
 
 def setup_parser(root_parser):
@@ -30,6 +30,8 @@ def command(args):
             "location": bl,
         }
 
-    print(f"Writing configuration to {benchpark.paths.benchpark_config}")
-    with open(benchpark.paths.benchpark_config, "w") as yaml_file:
+    bootstrap_cfg = benchpark.config.bootstrap
+
+    print(f"Writing configuration to {bootstrap_cfg.path}")
+    with open(bootstrap_cfg.path, "w") as yaml_file:
         yaml.safe_dump(data, yaml_file)

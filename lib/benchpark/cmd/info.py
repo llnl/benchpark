@@ -5,7 +5,7 @@ import textwrap
 import llnl.util.tty.color as color
 import yaml
 
-import benchpark.paths
+from benchpark.paths import paths
 
 
 def indent():
@@ -71,7 +71,7 @@ def info_system(args):
         key, value = query.split("=", 1)
         exclude = {"all_hardware_descriptions", "repo.yaml", "generic-x86"}
         all_system_specs = []
-        for d in set(os.listdir(benchpark.paths.benchpark_root / "systems")) - exclude:
+        for d in set(os.listdir(paths.benchpark_root / "systems")) - exclude:
             all_system_specs.append(benchpark.spec.SystemSpec(d))
 
         matching_systems = []
