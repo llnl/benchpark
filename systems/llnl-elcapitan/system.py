@@ -130,7 +130,7 @@ class LlnlElcapitan(System):
     variant(
         "rocm",
         default="6.4.0",
-        values=("5.7.1", "6.2.4", "6.3.1", "6.4.0", "6.4.1", "6.4.2", "6.4.3", "7.0.1"),
+        values=("5.7.1", "6.2.4", "6.3.1", "6.4.0", "6.4.1", "6.4.2", "6.4.3", "7.0.1", "7.1.0"),
         description="ROCm version",
     )
     variant(
@@ -619,6 +619,15 @@ class LlnlElcapitan(System):
                     "externals": [
                         {
                             "spec": f"hsa-rocr-dev@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "rocprofiler-sdk": {
+                    "externals": [
+                        {
+                            "spec": f"rocprofiler-sdk@{self.rocm_version}",
                             "prefix": f"/opt/rocm-{self.rocm_version}",
                         }
                     ],
