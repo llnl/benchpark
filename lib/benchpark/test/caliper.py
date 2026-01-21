@@ -10,8 +10,8 @@ import tempfile
 from ramble.expander import Expander
 
 import benchpark.caliper
-from benchpark.paths import paths
 import benchpark.spec
+from benchpark.paths import paths
 
 
 def get_caliper_vars_section(expr_spec):

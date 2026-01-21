@@ -13,8 +13,8 @@ import sys
 import ruamel.yaml as yaml
 
 import benchpark.config
-from benchpark.paths import paths
 from benchpark.debug import debug_print
+from benchpark.paths import paths
 from benchpark.runtime import RuntimeResources
 
 

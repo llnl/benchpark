@@ -12,8 +12,8 @@ from contextlib import contextmanager
 
 import yaml
 
-from benchpark.paths import paths
 from benchpark.debug import debug_print
+from benchpark.paths import paths
 
 
 @contextmanager

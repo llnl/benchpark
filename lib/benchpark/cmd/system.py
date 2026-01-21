@@ -16,9 +16,9 @@ import llnl.util.tty.color as color
 import yaml
 from deepdiff import DeepDiff
 
-from benchpark.paths import paths
 import benchpark.spec
 import benchpark.system
+from benchpark.paths import paths
 
 
 def system_init(args):
