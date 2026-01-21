@@ -5,6 +5,7 @@ import textwrap
 import llnl.util.tty.color as color
 import yaml
 
+import benchpark.spec
 from benchpark.paths import paths
 
 
