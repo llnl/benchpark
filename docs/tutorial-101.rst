@@ -20,15 +20,15 @@ presentations of this tutorial:
 - September 16, 2025. Half-day tutorial at `International Conference on eScience
   (eScience) <https://www.escience-conference.org/2025/>`_ on Benchpark and Ramble.
 
-.. image:: tutorial/HPCIC25-Tutorial-Slide-Preview.jpg
-    :target: _static/slides/HPCIC25-Tutorial-Slides.pdf
+.. image:: tutorial/RIKEN26-Tutorial-Slide-Preview.jpg
+    :target: _static/slides/RIKEN26-Tutorial-Slides.pdf
     :height: 72px
     :align: left
     :alt: Slide Preview
 
-:download:`Download Slides <_static/slides/HPCIC25-Tutorial-Slides.pdf>`.
+:download:`Download Slides <_static/slides/RIKEN26-Tutorial-Slides.pdf>`.
 
-`Watch Video <https://www.youtube.com/watch?v=AeaUfpybJfg>`_.
+`Watch HPCIC 2025 Tutorial Video <https://www.youtube.com/watch?v=AeaUfpybJfg>`_.
 
 By the end of this tutorial, you will be able to use Benchpark to:
 
