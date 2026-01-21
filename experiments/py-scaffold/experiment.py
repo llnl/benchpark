@@ -28,28 +28,15 @@ class PyScaffold(
         values=("sweep",),
     )
 
-    variant(
-        "scaffold_path",
-        default=" ",
-        description="Path to local repository of ScaFFold (i.e. git clone), since it is private.",
-    )
-
-    variant(
-        "distconv_path",
-        default=" ",
-        description="Path to private distconv repository (required package)",
-    )
-
-    variant("version", default="main", values=("main", "sharedmem", "procruns"), description="app version")
+    variant("version", default="main", values=("main"), description="app version")
 
     def compute_applications_section(self):
-        self.add_experiment_variable(
-            "package_path", self.spec.variants["scaffold_path"][0], False
-        )
-
         if self.spec.satisfies("+strong"):
             n_gpus = 4
-            problem_scale = 6
+            if self.spec.satisfies("exec_mode=test"):
+                problem_scale = 5
+            else:
+                problem_scale = 6
         elif self.spec.satisfies("+weak"):
             n_gpus = 1
             problem_scale = 5
@@ -68,11 +55,10 @@ class PyScaffold(
                     "problem_scale": lambda var, itr, dim, scaling_factor: var.val(dim),
                 },
                 ScalingMode.Weak: {
-                    "n_gpus": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * 2**3,
+                    "n_gpus": lambda var, itr, dim, scaling_factor: var.val(dim) * 2**3,
                     "problem_scale": lambda var, itr, dim, scaling_factor: var.val(dim)
                     + 1,
-                }
+                },
             }
         )
 
@@ -98,13 +84,11 @@ class PyScaffold(
             [f"py-scaffold@{self.spec.variants['version'][0]}"],
             package_manager="spack",
         )
-        if self.spec.variants["distconv_path"][0] == " ":
-            raise ValueError("Must set distconv_path variant to valid repository path")
         self.add_package_spec(
             self.name,
             [
                 # extra index for torch wheel and pypi index for packages that won't be found on WCI
-                f"--extra-index-url https://download.pytorch.org/whl/\n--extra-index-url https://pypi.org/simple\n{self.spec.variants['scaffold_path'][0]}[{model}]\n{self.spec.variants['distconv_path'][0]}",
+                f"--extra-index-url https://download.pytorch.org/whl/\n--extra-index-url https://pypi.org/simple\ngit+https://github.com/LBANN/ScaFFold.git[{model}]",
             ],
             package_manager="pip",
         )

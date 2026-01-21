@@ -12,11 +12,9 @@ from spack_repo.builtin.build_systems.python import PythonPackage
 class PyScaffold(PythonPackage, CudaPackage, ROCmPackage):
     """Scale-Free Fractal benchmark"""
 
-    git = "file:///usr/workspace/mckinsey/ScaFFold-bp-docsdatagen/ScaFFold"
+    git = "https://github.com/LBANN/ScaFFold.git"
 
     version("main", branch="main")
-    version("sharedmem", branch="sharedmem")
-    version("procruns", branch="procruns")
 
     maintainers("michaelmckinsey")
     license("Apache-2.0")
