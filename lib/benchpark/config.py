@@ -22,7 +22,15 @@ class RequiredClassAttr:
         )
 
 
-class ConfigSection:
+class PropertyDict:
+    def __getattr__(self, name):
+        val = self.data[name]
+        if isinstance(val, dict):
+            return PropertyDict(val)
+        return val
+
+
+class ConfigSection(PropertyDict):
     def __init__(self, data, path):
         self.data = data
         self.path = pathlib.Path(path)
@@ -45,21 +53,18 @@ class ConfigSection:
         if not path.is_absolute():
             return (self.path.parents[0] / path).resolve()
 
-
-class PropertyDict:
     def __getattr__(self, name):
-        val = self.data[name]
-        if isinstance(val, dict):
-            return PropertyDict(val)
-        return val
+        if not self.data:
+            raise Exception(f"Missing config in {self.path}")
+        return super().__getattr__(name)
 
 
-class Repos(ConfigSection, PropertyDict):
+class Repos(ConfigSection):
     filename = "repos.yaml"
     name = "repos"
 
 
-class Bootstrap(ConfigSection, PropertyDict):
+class Bootstrap(ConfigSection):
     filename = "bootstrap.yaml"
     name = "bootstrap"
 
