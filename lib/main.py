@@ -59,7 +59,7 @@ for i, arg in enumerate(sys.argv):
             val = arg.split("=")[1]
         else:
             val = sys.argv[i + 1]
-        base_paths.user_input_cfg = pathlib.path(val)
+        base_paths.user_input_cfg = pathlib.Path(val)
 if not _found_cfg:
     base_paths.user_input_cfg = None
 
@@ -67,10 +67,15 @@ base_paths.invocation_working_dir = pathlib.Path(os.getcwd()).absolute().resolve
 
 # Later imports initiate bootstrapping, and the configure command may want
 # to configure this behavior, so we handle it before doing remaining imports
-if sys.argv[1] == "configure":
+if "configure" in sys.argv:
     import benchpark.cmd.configure  # noqa: E402
 
     parser = argparse.ArgumentParser(description="Benchpark")
+    parser.add_argument(
+        "-C",
+        "--config",
+        help="use config related to system/experiment/workspace generation",
+    )
     subparsers = parser.add_subparsers(title="Subcommands", dest="subcommand")
     configure_parser = subparsers.add_parser(
         "configure", help="Configure options relating to the Benchpark environment"

@@ -45,7 +45,7 @@ def determine_config_dir():
                 f"Specific config dir does not exist: {base_paths.user_input_cfg}"
             )
         else:
-            return base_paths.__delattr__user_input_cfg
+            return base_paths.user_input_cfg
 
     possible_dirs = [
         base_paths.invocation_working_dir / "benchpark-config",
