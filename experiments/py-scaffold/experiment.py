@@ -3,13 +3,13 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.error import BenchparkError
-from benchpark.directives import variant, maintainers
-from benchpark.experiment import Experiment
-from benchpark.cuda import CudaExperiment
-from benchpark.rocm import ROCmExperiment
-from benchpark.scaling import ScalingMode, Scaling
 from benchpark.caliper import Caliper
+from benchpark.cuda import CudaExperiment
+from benchpark.directives import maintainers, variant
+from benchpark.error import BenchparkError
+from benchpark.experiment import Experiment
+from benchpark.rocm import ROCmExperiment
+from benchpark.scaling import Scaling, ScalingMode
 
 
 class PyScaffold(
