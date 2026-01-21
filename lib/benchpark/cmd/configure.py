@@ -24,9 +24,9 @@ def command(args):
     bootstrap_cfg = benchpark.config.configuration().bootstrap
 
     if args.bootstrap_location or not bootstrap_cfg.path.exists():
-        where = args.bootstrap_location or "~"
+        where = args.bootstrap_location or "~/.benchpark/"
         loc = os.path.expandvars(os.path.expanduser(where))
-        bl = str(Path(loc).resolve()).rstrip("/") + "/.benchpark/"
+        bl = str(Path(loc).resolve()).rstrip("/")
         data = {
             "bootstrap": {"location": bl}
         }
