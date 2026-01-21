@@ -69,7 +69,7 @@ class LlnlMatrix(System):
         default="none",
         values=("none", "pbatch", "pdebug"),
         multi=False,
-        description="Submit to named queue"
+        description="Submit to named queue",
     )
 
     def __init__(self, spec):
@@ -173,7 +173,7 @@ class LlnlMatrix(System):
                             "spec": "python@3.12.4",
                             "prefix": "/usr/tce/packages/python/python-3.12.4",
                         },
-                    ]
+                    ],
                 },
                 "hwloc": {
                     "externals": [{"spec": "hwloc@2.11.2", "prefix": "/usr"}],

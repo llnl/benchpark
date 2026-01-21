@@ -369,7 +369,7 @@ class LlnlElcapitan(System):
                             "spec": "python@3.12.2",
                             "prefix": "/usr/tce/packages/python/python-3.12.2",
                         },
-                    ]
+                    ],
                 },
                 "unzip": {
                     "buildable": False,
