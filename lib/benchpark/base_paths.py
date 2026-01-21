@@ -5,6 +5,7 @@
 
 import pathlib
 
+
 def _source_location() -> pathlib.Path:
     """Return the location of the project source files directory."""
     path_to_this_file = __file__
@@ -19,7 +20,9 @@ class BasePaths:
         self.benchpark_root = _source_location()
         self.lib_path = self.benchpark_root / "lib" / "benchpark"
         self.test_path = self.lib_path / "test"
-        self.hardware_descriptions = self.benchpark_root / "systems" / "all_hardware_descriptions"
+        self.hardware_descriptions = (
+            self.benchpark_root / "systems" / "all_hardware_descriptions"
+        )
         self.checkout_versions = self.benchpark_root / "checkout-versions.yaml"
         self.remote_urls = self.benchpark_root / "remote-urls.yaml"
         self.invocation_working_dir = None
@@ -38,7 +41,9 @@ def determine_config_dir():
         raise Exception("Internal error: config initialization")
     elif base_paths.user_input_cfg:
         if not base_paths.user_input_cfg.exists():
-            raise Exception(f"Specific config dir does not exist: {base_paths.user_input_cfg}")
+            raise Exception(
+                f"Specific config dir does not exist: {base_paths.user_input_cfg}"
+            )
         else:
             return base_paths.__delattr__user_input_cfg
 

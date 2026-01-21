@@ -27,9 +27,7 @@ def command(args):
         where = args.bootstrap_location or "~/.benchpark/"
         loc = os.path.expandvars(os.path.expanduser(where))
         bl = str(Path(loc).resolve()).rstrip("/")
-        data = {
-            "bootstrap": {"location": bl}
-        }
+        data = {"bootstrap": {"location": bl}}
 
         print(f"Writing configuration to {bootstrap_cfg.path}")
         with open(bootstrap_cfg.path, "w") as yaml_file:

@@ -47,7 +47,7 @@ if len(sys.argv) == 1 or "-h" == sys.argv[1] or "--help" == sys.argv[1]:
     print(helpstr)
     exit()
 
-from benchpark.base_paths import base_paths # noqa: E402
+from benchpark.base_paths import base_paths  # noqa: E402
 
 # Set paths here that are important for configuration: after this block
 # commands that use config can be imported and run
@@ -58,14 +58,12 @@ for i, arg in enumerate(sys.argv):
         if "=" in arg:
             val = arg.split("=")[1]
         else:
-            val = sys.argv[i+1]
+            val = sys.argv[i + 1]
         base_paths.user_input_cfg = pathlib.path(val)
 if not _found_cfg:
     base_paths.user_input_cfg = None
 
-base_paths.invocation_working_dir = (
-    pathlib.Path(os.getcwd()).absolute().resolve()
-)
+base_paths.invocation_working_dir = pathlib.Path(os.getcwd()).absolute().resolve()
 
 # Later imports initiate bootstrapping, and the configure command may want
 # to configure this behavior, so we handle it before doing remaining imports
@@ -84,6 +82,7 @@ if sys.argv[1] == "configure":
 
 from benchpark.paths import paths  # noqa: E402
 from benchpark.runtime import RuntimeResources  # noqa: E402
+
 bootstrapper = RuntimeResources(paths.benchpark_home)  # noqa
 bootstrapper.bootstrap()  # noqa
 
