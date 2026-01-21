@@ -16,13 +16,39 @@ import sys
 import yaml
 
 __version__ = "0.1.0"
+if "-V" in sys.argv or "--version" in sys.argv:
+    print(__version__)
+    exit()
+helpstr = """usage: main.py [-h] [-V] {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze,configure} ...
+Benchpark
+options:
+  -h, --help            show this help message and exit
+  -V, --version         show version number and exit
+Subcommands:
+  {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze,configure}
+    tags                Tags in Benchpark experiments
+    system              Initialize a system config
+    experiment          Interact with experiments
+    setup               Set up an experiment and prepare it to build/run
+    unit-test           Run benchpark unit tests
+    audit               Look for problems in System/Experiment repos
+    mirror              Copy a benchpark workspace
+    info                Get information about Systems and Experiments
+    show-build          Show how spack built a benchmark
+    list                List experiments, systems, benchmarks, and modifiers
+    bootstrap           Bootstrap benchpark or update an existing bootstrap
+    analyze             Perform pre-defined analysis on the performance data (caliper files) after 'ramble on'
+    redo                Re-instantiate all experiments in a system
+    configure           Configure options relating to the Benchpark environment
+    """
+if len(sys.argv) == 1 or "-h" == sys.argv[1] or "--help" == sys.argv[1]:
+    print(helpstr)
+    exit()
 
 import benchpark.config
 import benchpark.paths  # noqa: E402
 from benchpark.runtime import RuntimeResources  # noqa: E402
 
-# TODO: because this is not integrated as a subcommand, no help is
-# auto-generated for it
 if len(sys.argv) > 1 and sys.argv[1] == "configure":
     import benchpark.cmd.configure  # noqa: E402
 
