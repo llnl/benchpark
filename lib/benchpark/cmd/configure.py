@@ -21,7 +21,7 @@ def setup_parser(root_parser):
 
 
 def command(args):
-    bootstrap_cfg = benchpark.config.bootstrap
+    bootstrap_cfg = benchpark.config.configuration().bootstrap
 
     if args.bootstrap_location or not bootstrap_cfg.path.exists():
         where = args.bootstrap_location or "~"

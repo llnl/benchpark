@@ -35,8 +35,10 @@ class ConfigSection:
         cfg_path = pathlib.Path(cfg_dir) / cls.filename
         if cfg_path.exists():
             with open(cfg_path, "r") as f:
-                data = yaml.safe_load(f)
-                return cls(data[cls.name], cfg_path)
+                data = yaml.safe_load(f)[cls.name]
+        else:
+            data = {}
+        return cls(data, cfg_path)
 
     def resolve_path(self, value):
         path = pathlib.Path(value)
