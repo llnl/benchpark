@@ -344,6 +344,7 @@ class LlnlElcapitan(System):
                 "cvs": {"externals": [{"spec": "cvs@1.11.23", "prefix": "/usr"}]},
                 "git": {
                     "externals": [
+                        {"spec": "git@2.43.7", "prefix": "/usr"},
                         {"spec": "git@2.31.1+tcltk", "prefix": "/usr"},
                         {"spec": "git@2.29.1+tcltk", "prefix": "/usr/tce"},
                     ]
@@ -411,10 +412,6 @@ class LlnlElcapitan(System):
                 },
                 "opengl": {
                     "externals": [{"spec": "opengl@4.5", "prefix": "/usr"}],
-                    "buildable": False,
-                },
-                "git": {
-                    "externals": [{"spec": "git@2.43.7", "prefix": "/usr"}],
                     "buildable": False,
                 },
             }
