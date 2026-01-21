@@ -12,6 +12,13 @@ class Chai(BuiltinChai):
 
     conflicts("+single_memory", when="~rocm")
 
+    version(
+        "2025.12.0",
+        tag="v2025.12.0",
+        commit="26d5646707e1848b0524379b12a7716e4a830a27",
+        submodules=False,
+    )
+    
     def initconfig_hardware_entries(self):
         spec = self.spec
         entries = super().initconfig_hardware_entries()
