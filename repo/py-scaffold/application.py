@@ -33,8 +33,6 @@ class PyScaffold(ExecutableApplication):
 
         app_inst.variables["ld_paths"] = ":".join(paths)
 
-    software_spec("scaffold", None)
-
     # TODO: Figure out MPICH_GPU_SUPPORT_ENABLED=0, disabling GTL otherwise linker error.
     executable(
         "modules",
