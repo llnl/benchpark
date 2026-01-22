@@ -87,7 +87,7 @@ class PyScaffold(
             self.name,
             [
                 # extra index for torch wheel and pypi index for packages that won't be found on WCI
-                f"--extra-index-url https://download.pytorch.org/whl/\n--extra-index-url https://pypi.org/simple\ngit+https://github.com/LBANN/ScaFFold.git[{model}]",
+                f"--extra-index-url https://download.pytorch.org/whl/\n--extra-index-url https://pypi.org/simple\nScaFFold[{model}] @ git+https://github.com/LBANN/ScaFFold.git",
             ],
             package_manager="pip",
         )
