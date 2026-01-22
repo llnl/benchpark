@@ -9,7 +9,7 @@ from spack.package import *
 from spack_repo.builtin.packages.raja_perf.package import RajaPerf as BuiltinRajaPerf
 
 
-class RajaPerf(BuiltinRajaPerf, CachedCMakePackage, CudaPackage, ROCmPackage):
+class RajaPerf(BuiltinRajaPerf):
     """RAJA Performance Suite."""
 
     def setup_build_environment(self, env):

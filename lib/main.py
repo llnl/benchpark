@@ -315,7 +315,7 @@ def benchpark_tags(subparsers, actions_dict):
 
 def helper_experiments_tags(ramble_exe, benchmarks):
     # find all tags in Ramble applications (both in Ramble built-in and in Benchpark/repo)
-    (tags_stdout, tags_stderr) = run_command(f"{ramble_exe} attributes --tags --all")
+    tags_stdout, tags_stderr = run_command(f"{ramble_exe} attributes --tags --all")
     ramble_applications_tags = {}
     lines = tags_stdout.splitlines()
 
@@ -343,7 +343,7 @@ def benchpark_tags_handler(args):
     if args.tag:
         if benchpark_check_tag(args.tag):
             # find all applications in Ramble that have a given tag (both in Ramble built-in and in Benchpark/repo)
-            (tag_stdout, tag_stderr) = run_command(f"{ramble_exe} list -t {args.tag}")
+            tag_stdout, tag_stderr = run_command(f"{ramble_exe} list -t {args.tag}")
             lines = tag_stdout.splitlines()
 
             for line in lines:
