@@ -258,7 +258,7 @@ class LlnlCluster(System):
                 "perl": {
                     "externals": [{"spec": "perl@5.26.3", "prefix": "/usr"}],
                     "buildable": False,
-                }
+                },
             }
         }
 
