@@ -42,7 +42,7 @@ class Qws(
 
         if self.spec.satisfies("exec_mode=test"):
             self.add_experiment_variable(
-                "process_problem_size_dict", {"lx": 32, "ly": 6, "lz": 4, "lt": 3}, True
+                "process_problem_size_dict", {"lx": 32, "ly": 6, "lz": 4, "lt": 3}, True,
             )
             self.add_experiment_variable(
                 "n_resources_dict", {"px": 1, "py": 1, "pz": 1, "pt": 1}, True
@@ -51,7 +51,9 @@ class Qws(
         else:
             # Per-process size (in zones) in each dimension
             self.add_experiment_variable(
-                "process_problem_size_dict", {"lx": 64, "ly": 12, "lz": 8, "lt": 3}, True
+                "process_problem_size_dict",
+                {"lx": 64, "ly": 12, "lz": 8, "lt": 3},
+                True,
             )
             # Number of processes in each dimension
             self.add_experiment_variable(
