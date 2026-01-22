@@ -171,6 +171,8 @@ def main():
     for _, expr_spec_list, sys_spec_list in exprs_to_sys:
         for espec in expr_spec_list:
             for sspec in sys_spec_list:
+                if "py-scaffold" in espec:
+                    espec += " package_manager=spack-pip"
                 if "ior" in espec and "llnl-cluster" in sspec:
                     sspec += " mount_point=/p/lustre1"
                 elif "ior" in espec:
