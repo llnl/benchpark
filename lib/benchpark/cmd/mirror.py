@@ -147,16 +147,14 @@ def mirror_create(args):
     setup_dest = os.path.join(dest, "setup.sh")
     if not os.path.exists(setup_dest):
         with open(setup_dest, "w", encoding="utf-8") as f:
-            f.write(
-                """\
+            f.write("""\
 this_script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 . $this_script_dir/spack/share/spack/setup-env.sh
 . $this_script_dir/ramble/share/ramble/setup-env.sh
 
 export SPACK_DISABLE_LOCAL_CONFIG=1
-"""
-            )
+""")
 
     env_dir = os.path.dirname(find_one(ramble_workspace, "spack.yaml"))
     git_repo_dst = os.path.join(dest, "git-repos")
@@ -180,8 +178,7 @@ export SPACK_DISABLE_LOCAL_CONFIG=1
     first_time_dest = os.path.join(dest, "first-time.sh")
     if not os.path.exists(first_time_dest):
         with open(first_time_dest, "w", encoding="utf-8") as f:
-            f.write(
-                f"""\
+            f.write(f"""\
 this_script_dir=$(cd "$(dirname "${{BASH_SOURCE[0]}}")" && pwd)
 
 . $this_script_dir/setup.sh
@@ -199,8 +196,7 @@ ramble repo add --scope=site $this_script_dir/repo
 ramble repo add -t modifiers --scope=site $this_script_dir/modifiers
 ramble config --scope=site add "config:disable_progress_bar:true"
 ramble config --scope=site add \"config:spack:global:args:'-d'\"
-"""
-            )
+""")
 
     modifiers_dest = os.path.join(dest, "modifiers")
     modifiers_src = os.path.join(paths.benchpark_root, "modifiers")

@@ -248,12 +248,10 @@ export SPACK_DISABLE_LOCAL_CONFIG=1
 
     if not initializer_script.exists():
         with open(initializer_script, "w") as f:
-            f.write(
-                f"""\
+            f.write(f"""\
 {pkg_str}
 . {per_workspace_setup.ramble_location}/share/ramble/setup-env.sh
-"""
-            )
+""")
 
     ramble_setup = f"ramble --workspace-dir {ramble_workspace_dir} workspace setup"
     ramble_run = f"ramble --workspace-dir {ramble_workspace_dir} on"
