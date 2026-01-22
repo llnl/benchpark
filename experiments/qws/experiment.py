@@ -42,7 +42,7 @@ class Qws(
 
         if self.spec.satisfies("exec_mode=test"):
             self.add_experiment_variable(
-                "total_problem_size_dict", {"lx": 32, "ly": 6, "lz": 4, "lt": 3}, True
+                "process_problem_size_dict", {"lx": 32, "ly": 6, "lz": 4, "lt": 3}, True
             )
             self.add_experiment_variable(
                 "n_resources_dict", {"px": 1, "py": 1, "pz": 1, "pt": 1}, True
@@ -51,7 +51,7 @@ class Qws(
         else:
             # Per-process size (in zones) in each dimension
             self.add_experiment_variable(
-                "total_problem_size_dict", {"lx": 64, "ly": 12, "lz": 8, "lt": 3}, True
+                "process_problem_size_dict", {"lx": 64, "ly": 12, "lz": 8, "lt": 3}, True
             )
             # Number of processes in each dimension
             self.add_experiment_variable(
@@ -60,8 +60,8 @@ class Qws(
 
         self.set_required_variables(
             n_resources="{px}*{py}*{pz}*{pt}",
-            process_problem_size="({lx}*{ly}*{lz}*{lt})/({px}*{py}*{pz}*{pt})",
-            total_problem_size="{lx}*{ly}*{lz}*{lt}",
+            process_problem_size="({lx}*{ly}*{lz}*{lt})",
+            total_problem_size="{lx}*{ly}*{lz}*{lt}*{px}*{py}*{pz}*{pt}",
         )
 
         self.register_scaling_config(
@@ -71,25 +71,25 @@ class Qws(
                         dim
                     )
                     * scaling_factor,
-                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
+                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
                         dim
-                    ),
+                    )
+                    // scaling_factor,
                 },
                 ScalingMode.Weak: {
                     "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
                         dim
                     )
                     * scaling_factor,
-                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
+                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
                         dim
-                    )
-                    * scaling_factor,
+                    ),
                 },
                 ScalingMode.Throughput: {
                     "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
                         dim
                     ),
-                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
+                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
                         dim
                     )
                     * scaling_factor,
