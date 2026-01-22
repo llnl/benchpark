@@ -27,7 +27,7 @@ class PyScaffold(
         values=("sweep",),
     )
 
-    variant("version", default="main", values=("main"), description="app version")
+    variant("version", default="main", values=("main",), description="app version")
 
     def compute_applications_section(self):
         if self.spec.satisfies("+strong"):
