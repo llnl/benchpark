@@ -33,7 +33,8 @@ class Caliper:
         default="master",
         values=(
             "master",
-            "2.14.0" "2.13.1",
+            "2.14.0",
+            "2.13.1",
         ),
         description="version",
     )
