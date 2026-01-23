@@ -21,7 +21,6 @@ class PyScaffold(PythonPackage, CudaPackage, ROCmPackage):
 
     variant("mpi", default=True, description="MPI support")
     variant("caliper", default=False, description="Build with Caliper support enabled.")
-    depends_on("adiak+python", when="+caliper", type=("build", "run"))
 
     depends_on("python@3.11:", type=("build", "run"))
     # TODO: Get pip._vendor.pyproject_hooks._impl.BackendUnavailable: Cannot import 'setuptools.build_meta' from pip otherwise
@@ -33,6 +32,7 @@ class PyScaffold(PythonPackage, CudaPackage, ROCmPackage):
     depends_on("cxx", type="build")
 
     depends_on("caliper+python", when="+caliper", type=("build", "run"))
+    depends_on("adiak+python", when="+caliper", type=("build", "run"))
 
     def cmake_args(self):
         args = super().cmake_args(self)
