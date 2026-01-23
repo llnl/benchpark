@@ -40,7 +40,7 @@ Subcommands:
     list                List experiments, systems, benchmarks, and modifiers
     bootstrap           Bootstrap benchpark or update an existing bootstrap
     analyze             Perform pre-defined analysis on the performance data (caliper files) after 'ramble on'
-    redo                Re-instantiate all experiments in a system
+    redo                Re-instantiate system and all associated experiments
     configure           Configure options relating to the Benchpark environment
     """
 if len(sys.argv) == 1 or "-h" == sys.argv[1] or "--help" == sys.argv[1]:
@@ -74,7 +74,8 @@ if "configure" in sys.argv:
     parser.add_argument(
         "-C",
         "--config",
-        help="use config related to system/experiment/workspace generation",
+        help="Use config related to system/experiment/workspace generation."
+             " Default is <benchpark_root>/config/",
     )
     subparsers = parser.add_subparsers(title="Subcommands", dest="subcommand")
     configure_parser = subparsers.add_parser(
@@ -120,6 +121,9 @@ def main():
     parser.add_argument(
         "-V", "--version", action="store_true", help="show version number and exit"
     )
+    # -C is actually processed above here, in the imports, but must
+    # be registered here because otherwise argparse will think there
+    # is an invalid option.
     parser.add_argument(
         "-C",
         "--config",
