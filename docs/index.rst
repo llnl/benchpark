@@ -14,6 +14,7 @@
     getting-started
     benchpark-commands
     benchpark-workflow
+    configuration
     FAQ
 
 .. toctree::
