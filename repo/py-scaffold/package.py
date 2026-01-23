@@ -22,7 +22,8 @@ class PyScaffold(PythonPackage, CudaPackage, ROCmPackage):
     variant("mpi", default=True, description="MPI support")
     variant("caliper", default=False, description="Build with Caliper support enabled.")
 
-    depends_on("python@3.11:", type=("build", "run"))
+    # open3d package requires <=3.11
+    depends_on("python@3.11", type=("build", "run"))
     # TODO: Get pip._vendor.pyproject_hooks._impl.BackendUnavailable: Cannot import 'setuptools.build_meta' from pip otherwise
     depends_on("py-setuptools", type="build")
 
