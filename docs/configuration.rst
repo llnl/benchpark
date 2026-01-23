@@ -30,9 +30,18 @@ used by Ramble, and package repositories used by Spack. Note in the
 case of Spack, the builtin repository is always used (in addition to
 whatever package repositories are specified).
 
-********************
+*************************
+ ``benchpark configure``
+*************************
+
+Command that can generate config for you.
+
+Right now it can only generate bootstrap config. If no bootstrap config
+is detected in the chosen scope, this will auto-generate it.
+
+********
  Scopes
-********************
+********
 
 Benchpark can pull config from one location, with the following
 priority (highest first):
