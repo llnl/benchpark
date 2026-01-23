@@ -14,5 +14,8 @@ class Caliper(BuiltinCaliper):
     directly into applications and activate them at runtime.
     """
 
+    # rocp_sdk broken in upstream papi package for any ver less than 7.2
+    depends_on("papi@7.2:+topdown", when="+papi")
+
     patch('fix-caliper-find-rocprofiler-deps.patch')
 
