@@ -134,7 +134,7 @@ jobs:
             on \
             --executor '{execute_experiment}' \
             --where '{n_nodes} == 1'
-      - name: Upload coverage to Codecov
+      - name: Upload binary coverage to Codecov
         if: ${{ !contains(github.head_ref, 'dependabot/') }}
         uses: codecov/codecov-action@v4
         with:
@@ -143,6 +143,30 @@ jobs:
           flags: dryrunexperiments-binary
           verbose: true
           fail_ci_if_error: true
+      - name: Clean up binary coverage artifacts
+        run: |
+          echo "Cleaning up binary coverage artifacts"
+          rm -rf ./coverage-data-binary
+      - name: Test aggregate Command
+        run: |
+          ./bin/benchpark system init --dest=dane llnl-cluster cluster=dane
+          ./bin/benchpark experiment init --dest=saxpy-agg dane saxpy n_repeats=5
+          ./bin/benchpark setup dane/saxpy-agg workspace2/
+          ./workspace2/ramble/bin/ramble --workspace-dir /home/runner/work/benchpark/benchpark/workspace2/dane/saxpy-agg/workspace workspace setup --dry-run
+          BENCHPARK_RUN_COVERAGE=aggregate ./bin/benchpark aggregate --dest agg workspace2  # Aggregate multi-trial workspace
+      - name: Upload aggregate coverage to Codecov
+        if: ${{ !contains(github.head_ref, 'dependabot/') }}
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
+          directory: ./coverage-data-aggregate
+          flags: dryrunexperiments-aggregate
+          verbose: true
+          fail_ci_if_error: true
+      - name: Clean up aggregate coverage artifacts
+        run: |
+          echo "Cleaning up aggregate coverage artifacts"
+          rm -rf ./coverage-data-aggregate
   dryrunexperiments:
     runs-on: ubuntu-24.04
     strategy:
