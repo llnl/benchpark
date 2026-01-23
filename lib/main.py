@@ -75,7 +75,7 @@ if "configure" in sys.argv:
         "-C",
         "--config",
         help="Use config related to system/experiment/workspace generation."
-             " Default is <benchpark_root>/config/",
+        " Default is <benchpark_root>/config/",
     )
     subparsers = parser.add_subparsers(title="Subcommands", dest="subcommand")
     configure_parser = subparsers.add_parser(
