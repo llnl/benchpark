@@ -661,6 +661,15 @@ class LlnlElcapitan(System):
                     ],
                     "buildable": False,
                 },
+                "rocprofiler-sdk": {
+                    "externals": [
+                        {
+                            "spec": f"rocprofiler-sdk@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
                 "comgr": {
                     "externals": [
                         {

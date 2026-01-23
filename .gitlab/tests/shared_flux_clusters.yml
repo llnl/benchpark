@@ -131,6 +131,12 @@ run_tests_flux_tuolumne:
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK: [py-scaffold]
         VARIANT: ['+rocm package_manager=spack-pip caliper=mpi,time,rocm']
+      # rocm7
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [raja-perf]
+        VARIANT: ['+rocm caliper=time,rocm']
+        SYSTEM_ARGS: [rocm=7.1.0]
         GPUMODE: SPX
 run_tests_flux_tioga:
   extends: .run_tests_flux
