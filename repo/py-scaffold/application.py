@@ -36,6 +36,10 @@ class PyScaffold(ExecutableApplication):
     with when("package_manager_family=pip"):
         software_spec("scaffold", pkg_spec="py-scaffold")
 
+    input_file('config_file', url='https://github.com/LBANN/ScaFFold/blob/main/ScaFFold/configs/benchmark_default.yml',
+               md5='eb9b1337aa16dfc7feed0936e61b410c8f2caa89773fd60321254e9ba8cf3771',
+               description='')
+
     # TODO: Figure out MPICH_GPU_SUPPORT_ENABLED=0, disabling GTL otherwise linker error.
     executable(
         "modules",
@@ -43,12 +47,12 @@ class PyScaffold(ExecutableApplication):
     )
     executable(
         "generate",
-        "scaffold generate_fractals -c {package_path}ScaFFold/configs/benchmark_default.yml --problem-scale {problem_scale}",
+        "scaffold generate_fractals -c {config_file} --problem-scale {problem_scale}",
         use_mpi=True,
     )
     executable(
         "run",
-        "scaffold benchmark -c {package_path}ScaFFold/configs/benchmark_default.yml --problem-scale {problem_scale}",
+        "scaffold benchmark -c {config_file} --problem-scale {problem_scale}",
         use_mpi=True,
     )
 
