@@ -46,6 +46,7 @@ class LlnlCluster(System):
             "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
         },
         "dane": {
+            "cpu_arch": "sapphirerapids",
             "sys_cores_per_node": 112,
             "sys_cores_os_reserved_per_node": 0,  # No explicit core reservation, first thread on each core reserved (2 threads per core)
             "sys_cores_os_reserved_per_node_list": None,
@@ -159,15 +160,6 @@ class LlnlCluster(System):
                     "externals": [{"spec": "elfutils@0.190", "prefix": "/usr"}],
                     "buildable": False,
                 },
-                "papi": {
-                    "buildable": False,
-                    "externals": [
-                        {
-                            "spec": "papi@6.0.0.1",
-                            "prefix": "/usr/tce/packages/papi/papi-6.0.0.1",
-                        }
-                    ],
-                },
                 "unwind": {
                     "externals": [{"spec": "unwind@8.0.1", "prefix": "/usr"}],
                     "buildable": False,
@@ -261,6 +253,10 @@ class LlnlCluster(System):
                 },
                 "gmake": {
                     "externals": [{"spec": "gmake@4.2.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "perl": {
+                    "externals": [{"spec": "perl@5.26.3", "prefix": "/usr"}],
                     "buildable": False,
                 },
             }
