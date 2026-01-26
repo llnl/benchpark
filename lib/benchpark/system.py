@@ -29,7 +29,7 @@ class MPISystem:
     name = "mpi"
 
     def system_specific_variables(self, system):
-        return {}
+        return {"cpu_arch": getattr(system, "cpu_arch", "unknown")}
 
 
 class JobQueue:

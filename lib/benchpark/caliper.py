@@ -54,6 +54,8 @@ class Caliper:
                 system_specs["cuda_arch"] = "{cuda_arch}"
             if self.spec.satisfies("caliper=rocm"):
                 system_specs["rocm_arch"] = "{rocm_arch}"
+            if any("topdown" in var for var in self.spec.variants["caliper"]):
+                system_specs["cpu_arch"] = "{cpu_arch}"
 
             # set package spack specs
             package_specs = {}
@@ -65,7 +67,9 @@ class Caliper:
                 if any("topdown" in var for var in self.spec.variants["caliper"]):
                     papi_support = True  # check if target system supports papi
                     if papi_support:
-                        package_specs["caliper"]["pkg_spec"] += "+papi"
+                        package_specs["caliper"][
+                            "pkg_spec"
+                        ] += "+papi target={}".format(system_specs["cpu_arch"])
                     else:
                         raise NotImplementedError(
                             "Target system does not support the papi interface"
