@@ -103,6 +103,13 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
             env.set("CUDAHOSTCXX", self.spec["mpi"].mpicxx)
             env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
 
+    def setup_run_environment(self, env):
+      super().setup_run_environment(env)
+
+      if self.compiler.extra_rpaths:
+        for rpath in self.compiler.extra_rpaths:
+          env.prepend_path("LD_LIBRARY_PATH", rpath)
+
     def cmake_args(self):
         spec = self.spec
         args = []
