@@ -41,7 +41,7 @@ class PyScaffold(
             problem_scale = 5
         else:
             n_gpus = 1
-            problem_scale = 6
+            problem_scale = 5
 
         self.add_experiment_variable("n_gpus", n_gpus, True)
         self.add_experiment_variable("problem_scale", problem_scale, True)
