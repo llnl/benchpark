@@ -4,29 +4,43 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-###############
- Configuration
-###############
+#######################
+ Configuring Benchpark
+#######################
 
-********************
- Bootstrap Location
-********************
+Benchpark offers several options to configure usage. This includes:
 
-Benchpark clones Ramble to use as a library automatically as part of running. It clones
-both Ramble and Spack to allow building and running benchmarks. Benchmarks are organized
-into workspaces, which have their own clones of Spack/Ramble, and these are staged from
-a centralized location. The default is in ~/.benchpark, but you can pick another
-location if desired. This default can be set in
-``<benchpark_root>/config/bootstrap.yaml``.
+   1. Configuring the location of the bootstrap directory (default is
+      ``~/.benchpark``). This is useful to change from the default value
+      if you do not have much space in your home directory, as the bootstrap
+      contains the ``spack``, ``spack-packages``, and ``ramble`` repositories.
+   1. Configuring which repositories benchpark uses for objects in the
+      ``experiments/systems/repos`` directories (``experiment.py``,
+      ``system.py``, ``package.py``, and ``application.py``).
 
-*******
- Repos
-*******
+**********************************************
+ Configuring the Benchpark Bootstrap Location
+**********************************************
 
-See ``<benchpark_root>/config/repos.yaml``: with this you can fully customize
-system/experiment repos used by Benchpark, application repos used by Ramble, and package
-repositories used by Spack. Note in the case of Spack, the builtin repository is always
-used (in addition to whatever package repositories are specified).
+Benchpark clones ``ramble``, ``spack``, and ``spack-packages`` into a centralized
+location (by default this is ``~/.benchpark``) to enable building and running
+benchmarks. Benchpark workspaces copy over these repositories from the centralized
+location to avoid downloading from the internet when initializing a Benchpark
+workspace. The bootstrap location can be configured in
+``<benchpark_root>/config/bootstrap.yaml`` or by running
+``benchpark configure --bootstrap-location <location>``.
+
+***********************************************
+ Configuring Which Repositories Benchpark Uses
+***********************************************
+
+The ``<benchpark_root>/config/repos.yaml`` file is used to fully customize
+``system`` and ``experiment`` repositories used by Benchpark, ``application``
+repositories used by Ramble, and package repositories used by Spack. For Spack
+and Ramble, the builtin repository is always used (in addition to whatever package
+repositories are specified). The order in which repositories appear in
+``<benchpark_root>/config/repos.yaml`` will determine their precedence, so if you
+desire to use a custom repository, it should be listed before any other repositories.
 
 *************************
  ``benchpark configure``
@@ -37,15 +51,15 @@ Command that can generate config for you.
 Right now it can only generate bootstrap config. If no bootstrap config is detected in
 the chosen scope, this will auto-generate it.
 
-********
- Scopes
-********
+**********************
+ Configuration Scopes
+**********************
 
-Benchpark can pull config from one location, with the following priority (highest
+Benchpark can pull configurations from one location, with the following priority (highest
 first):
 
 - ``benchpark -C <dir>...``
-- If CWD where you call benchpark has benchpark-config directory
+- If the CWD where you invoke the benchpark executable has ``benchpark-config`` directory
 - If ``<benchpark_root>/config`` is a directory (this must exist if the first two don't)
 
 There is no mixing and matching between these tiers: if you are using ``-C``, then the

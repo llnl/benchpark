@@ -14,7 +14,6 @@
     getting-started
     benchpark-commands
     benchpark-workflow
-    configuration
     FAQ
 
 .. toctree::
@@ -41,6 +40,7 @@
     run-experiment
     analyze-experiment
     benchpark-analyze
+    configuration
     modifiers
     set-of-experiments
     run-binary
