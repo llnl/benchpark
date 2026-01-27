@@ -22,7 +22,7 @@ class RajaPerf(BuiltinRajaPerf):
     depends_on("hip-wrapper", when="+rocm")
     
     git="https://github.com/amroakmal/RAJAPerf-Fork.git"
-    version('amr-raja-perf-fork', branch='amr-raja-perf-fork')
+    version('amr-raja-perf-fork', branch='amr-raja-perf-fork', submodules=True)
     
     def setup_build_environment(self, env):
         super().setup_build_environment(env)
