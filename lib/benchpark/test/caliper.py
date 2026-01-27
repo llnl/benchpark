@@ -58,7 +58,7 @@ def test_caliper_modifier(monkeypatch):
 
     # Append path to enable import of modifier and application
     sys.path.append(str(benchpark.paths.benchpark_root))
-    from repo.saxpy.application import Saxpy
+    from repos.ramble_applications.saxpy.application import Saxpy
 
     from modifiers.caliper.modifier import Caliper as CaliperModifier
 
