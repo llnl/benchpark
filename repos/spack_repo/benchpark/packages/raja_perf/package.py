@@ -19,9 +19,11 @@ from spack_repo.builtin.packages.raja_perf.package import RajaPerf as BuiltinRaj
 
 class RajaPerf(BuiltinRajaPerf):
     """RAJA Performance Suite."""
-
     depends_on("hip-wrapper", when="+rocm")
-
+    
+    git="https://github.com/amroakmal/RAJAPerf-Fork.git"
+    version('amr-raja-perf-fork', branch='amr-raja-perf-fork')
+    
     def setup_build_environment(self, env):
         super().setup_build_environment(env)
         if "+cuda" in self.spec:
