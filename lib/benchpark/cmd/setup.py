@@ -216,7 +216,7 @@ def command(args):
                 f.write(
                     f"""\
 repos::
-  benchpark: {source_dir}/repo
+  benchpark: {source_dir}/repos/spack_repo/benchpark
   builtin: {per_workspace_setup.pkgs_location}/repos/spack_repo/builtin/
 """
                 )
@@ -232,7 +232,7 @@ export SPACK_DISABLE_LOCAL_CONFIG=1
 
     ramble, first_time_ramble = per_workspace_setup.ramble_first_time_setup()
     if first_time_ramble:
-        ramble(f"repo add --scope=site {source_dir}/repo")
+        ramble(f"repo add --scope=site {source_dir}/repos/apps")
         ramble('config --scope=site add "config:disable_progress_bar:true"')
         ramble(f"repo add -t modifiers --scope=site {source_dir}/modifiers")
         ramble("config --scope=site add \"config:spack:global:args:'-d'\"")
