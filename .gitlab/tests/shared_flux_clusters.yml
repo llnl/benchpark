@@ -126,6 +126,13 @@ run_tests_flux_tuolumne:
         BENCHMARK: [kripke]
         VARIANT: ['+rocm caliper=mpi,time,rocm']
         GPUMODE: SPX
+      # rocm7
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [raja-perf]
+        VARIANT: ['+rocm caliper=time,rocm']
+        SYSTEM_ARGS: [rocm=7.1.0]
+        GPUMODE: SPX
 run_tests_flux_tioga:
   extends: .run_tests_flux
   tags: [shell, tioga]

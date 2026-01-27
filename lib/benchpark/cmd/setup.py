@@ -213,13 +213,11 @@ def command(args):
                 per_workspace_setup.spack_location / "etc" / "spack" / "repos.yaml"
             )
             with open(site_repos, "w") as f:
-                f.write(
-                    f"""\
+                f.write(f"""\
 repos::
   benchpark: {source_dir}/repos/spack_repo/benchpark
   builtin: {per_workspace_setup.pkgs_location}/repos/spack_repo/builtin/
-"""
-                )
+""")
             spack(
                 f"config --scope=site add \"config:build_stage:['{spack_build_stage}']\""
             )
@@ -239,12 +237,10 @@ export SPACK_DISABLE_LOCAL_CONFIG=1
 
     if not initializer_script.exists():
         with open(initializer_script, "w") as f:
-            f.write(
-                f"""\
+            f.write(f"""\
 {pkg_str}
 . {per_workspace_setup.ramble_location}/share/ramble/setup-env.sh
-"""
-            )
+""")
 
     ramble_setup = f"ramble --workspace-dir {ramble_workspace_dir} workspace setup"
     ramble_run = f"ramble --workspace-dir {ramble_workspace_dir} on"
