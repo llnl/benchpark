@@ -230,7 +230,7 @@ export SPACK_DISABLE_LOCAL_CONFIG=1
 
     ramble, first_time_ramble = per_workspace_setup.ramble_first_time_setup()
     if first_time_ramble:
-        ramble(f"repo add --scope=site {source_dir}/repos/apps")
+        ramble(f"repo add --scope=site {source_dir}/repos/ramble_applications")
         ramble('config --scope=site add "config:disable_progress_bar:true"')
         ramble(f"repo add -t modifiers --scope=site {source_dir}/modifiers")
         ramble("config --scope=site add \"config:spack:global:args:'-d'\"")
