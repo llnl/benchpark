@@ -7,6 +7,7 @@ import os
 from itertools import product
 
 from spack.package import *
+from spack_repo.builtin.build_systems.cuda import CudaPackage
 from spack_repo.builtin.build_systems.rocm import ROCmPackage
 from spack_repo.builtin.packages.hypre.package import (
     AutotoolsBuilder as HypreAutotoolsBuilder,
