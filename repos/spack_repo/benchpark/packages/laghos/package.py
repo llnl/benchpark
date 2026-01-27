@@ -3,11 +3,10 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+from spack.package import *
 from spack_repo.builtin.build_systems.cuda import CudaPackage
 from spack_repo.builtin.build_systems.makefile import MakefilePackage
 from spack_repo.builtin.build_systems.rocm import ROCmPackage
-
-from spack.package import *
 
 
 class Laghos(MakefilePackage, CudaPackage, ROCmPackage):

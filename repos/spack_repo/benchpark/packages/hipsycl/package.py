@@ -6,12 +6,11 @@
 import json
 from os import path
 
+from llnl.util import filesystem
+from spack.package import *
 from spack_repo.builtin.build_systems.cmake import CMakePackage
 from spack_repo.builtin.build_systems.cuda import CudaPackage
 from spack_repo.builtin.build_systems.rocm import ROCmPackage
-
-from llnl.util import filesystem
-from spack.package import *
 
 
 class Hipsycl(CMakePackage, CudaPackage, ROCmPackage):

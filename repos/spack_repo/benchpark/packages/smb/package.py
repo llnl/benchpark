@@ -4,10 +4,9 @@
 # SPDX-License-Identifier: Apache-2.0
 import inspect
 
-from spack_repo.builtin.build_systems.makefile import MakefilePackage
-
 import llnl.util.filesystem as fs
 from spack.package import *
+from spack_repo.builtin.build_systems.makefile import MakefilePackage
 
 
 class Smb(MakefilePackage):

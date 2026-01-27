@@ -7,10 +7,9 @@ import os
 import os.path
 import stat
 
-from spack_repo.builtin.build_systems.bundle import BundlePackage
-
 from spack.package import *
 from spack.package import LinkTree
+from spack_repo.builtin.build_systems.bundle import BundlePackage
 from spack_repo.builtin.packages.mpich.package import MpichEnvironmentModifications
 
 
