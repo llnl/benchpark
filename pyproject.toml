@@ -27,7 +27,7 @@ exclude = '''
   | buck-out
   | build
   | dist
-  | repo
+  | repos
 )/
 '''
 force-exclude = '''
@@ -63,7 +63,7 @@ per-file-ignores = """
 """
 
 [tool.codespell]
-skip = './docs/_build,./docs/_static,./taxonomy.yaml,./repo/**/*.patch'
+skip = './docs/_build,./docs/_static,./taxonomy.yaml,./repos/**/*.patch'
 ignore-words-list = 'fom'
 
 [tool.yamlfix]
