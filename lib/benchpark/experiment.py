@@ -486,6 +486,16 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
         }
 
     def add_package_spec(self, package_name, spec=None, package_manager="spack"):
+
+        # "user-managed" and "environment-variables" package managers will not use spack.
+        self_pkg_manager = self.spec.variants["package_manager"][0]
+        if self_pkg_manager != package_manager and self_pkg_manager in [
+            "environment-modules",
+            "user-managed",
+        ]:
+            print(f"Using '{self_pkg_manager}' instead of '{package_manager}'")
+            package_manager = self_pkg_manager.replace("-", "_")
+
         if spec:
             if package_name not in self.package_specs:
                 self.package_specs[package_name] = {
@@ -522,14 +532,21 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
                 f"Package section must be defined for application package {self.name}"
             )
 
-        if "spack" in pkg_manager:
-            spack_variants = list(
-                filter(
-                    lambda v: v is not None,
-                    (cls.get_spack_variants() for cls in self.helpers),
-                )
+        spack_variants = list(
+            filter(
+                lambda v: v is not None,
+                (cls.get_spack_variants() for cls in self.helpers),
             )
+        )
+
+        # Specific to spack-pip, note: not the same as pkg_manager == "spack"
+        if "spack" in pkg_manager:
             self.package_specs[self.name]["spack_pkg_spec"] += " ".join(
+                spack_variants
+            ).strip()
+        else:
+            pkg_spec_name = pkg_manager.replace("-", "_") + "_pkg_spec"
+            self.package_specs[self.name][pkg_spec_name] += " ".join(
                 spack_variants
             ).strip()
 
