@@ -31,7 +31,7 @@ class RajaPerf(
 
     variant(
         "version",
-        default="2025.03.0",
+        default="amr-raja-perf-fork",
         values=("develop", "latest", "2025.03.0", "2024.07.0", "amr-raja-perf-fork"),
         description="app version",
     )
