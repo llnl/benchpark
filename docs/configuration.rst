@@ -42,14 +42,14 @@ The order in which repositories appear in ``<benchpark_root>/config/repos.yaml``
 determine their precedence, so if you desire to use a custom repository, it should be
 listed before any other repositories.
 
-*************************
- ``benchpark configure``
-*************************
+**********************************************************************
+ Automatically Generating Configurations with ``benchpark configure``
+**********************************************************************
 
-Command that can generate config for you.
-
-Right now it can only generate bootstrap config. If no bootstrap config is detected in
-the chosen scope, this will auto-generate it.
+``benchpark configure`` is designed to create the ``yaml`` configurations for you. As of
+now, it can only generate bootstrap config (``bootstrap.yaml``). If no bootstrap config
+is detected in the chosen scope, this will auto-generate it. ``benchpark configure``
+cannot generate a ``repos.yaml`` file at the moment, this must be written manually.
 
 **********************
  Configuration Scopes
