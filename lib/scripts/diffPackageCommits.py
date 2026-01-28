@@ -6,6 +6,7 @@ import subprocess
 import sys
 
 from benchpark.paths import paths
+import benchpark.util.color as color
 
 EXIT_CODE = 0
 
@@ -31,9 +32,6 @@ print(f"Comparing benchpark packages to packages in spack {args.spack_tag}")
 if "spack" not in os.listdir(os.getcwd()):
     subprocess.run(["git", "clone", "https://github.com/spack/spack.git"])
 subprocess.run(["git", "checkout", args.spack_tag], cwd="spack")
-
-sys.path.append("spack/lib/spack")
-import llnl.util.tty.color as color  # noqa: E402
 
 
 def main():
