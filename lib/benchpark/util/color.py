@@ -120,6 +120,17 @@ def _color_when_value(when: Union[str, bool, None]) -> Optional[bool]:
     return color_when_values[when]
 
 
+def _color_from_environ() -> Optional[bool]:
+    try:
+        return _color_when_value(os.environ.get("SPACK_COLOR", "auto"))
+    except ValueError:
+        return None
+
+
+#: When `None` colorize when stdout is tty, when `True` or `False` always or never colorize resp.
+_force_color = _color_from_environ()
+
+
 def get_color_when() -> bool:
     """Return whether commands should print color or not."""
     if _force_color is not None:
