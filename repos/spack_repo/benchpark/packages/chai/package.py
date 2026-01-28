@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from spack.package import *
+from spack_repo.builtin.build_systems.cached_cmake import cmake_cache_option
 from spack_repo.builtin.packages.chai.package import Chai as BuiltinChai
 
 
