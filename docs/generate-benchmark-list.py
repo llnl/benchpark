@@ -8,7 +8,6 @@ import yaml
 
 sys.path.append("../lib/")
 import benchpark.accounting  # noqa: E402
-import benchpark.paths  # noqa: E402
 
 
 def construct_tag_groups(tag_groups, tag_dicts, dictionary):

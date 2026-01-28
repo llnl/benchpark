@@ -5,7 +5,7 @@ import os
 import subprocess
 import sys
 
-import benchpark.paths
+from benchpark.paths import paths
 
 EXIT_CODE = 0
 
@@ -39,7 +39,7 @@ import llnl.util.tty.color as color  # noqa: E402
 def main():
     global EXIT_CODE
     spack_dir = "spack/var/spack/repos/builtin/packages/"
-    benchpark_dir = str(benchpark.paths.benchpark_root) + "/repo/"
+    benchpark_dir = str(paths.benchpark_root) + "/repo/"
 
     # Get the list of packages to process
     if args.packages:

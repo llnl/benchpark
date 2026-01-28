@@ -18,7 +18,6 @@ import ramble.language.language_helpers
 import ramble.language.shared_language
 from ramble.language.language_base import DirectiveError
 
-import benchpark.paths
 import benchpark.repo
 import benchpark.runtime
 import benchpark.spec

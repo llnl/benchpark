@@ -12,8 +12,8 @@ from contextlib import contextmanager
 
 import yaml
 
-import benchpark.paths
 from benchpark.debug import debug_print
+from benchpark.paths import paths
 
 
 @contextmanager
@@ -75,7 +75,7 @@ class RuntimeResources:
         )
 
         # Read pinned versions of ramble and spack
-        with open(benchpark.paths.checkout_versions, "r") as yaml_file:
+        with open(paths.checkout_versions, "r") as yaml_file:
             data = yaml.safe_load(yaml_file)["versions"]
             self.ramble_commit, self.spack_commit, self.pkgs_commit = (
                 data["ramble"],
@@ -84,7 +84,7 @@ class RuntimeResources:
             )
 
         # Read remote urls for ramble and spack
-        with open(benchpark.paths.remote_urls, "r") as yaml_file:
+        with open(paths.remote_urls, "r") as yaml_file:
             data = yaml.safe_load(yaml_file)["urls"]
             remote_ramble_url, remote_spack_url, remote_pkgs_url = (
                 data["ramble"],
