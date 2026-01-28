@@ -222,10 +222,10 @@ jobs:
           pip install -r ./requirements.txt
       - name: Run
         run: |-
-          output=$(./bin/benchpark configure --bootstrap-location . && ./bin/benchpark bootstrap 2>&1)
+          output=$(./bin/benchpark configure --bootstrap-location ./bootstrap && ./bin/benchpark bootstrap 2>&1)
 
           # 1. Check the path is present
-          echo "$output" | grep -q "/home/runner/work/benchpark/benchpark/.benchpark/ramble" \
+          echo "$output" | grep -q "/home/runner/work/benchpark/benchpark/bootstrap/ramble" \
             || { echo "Expected path not found"; exit 1; }
 
           # 2. Check "Cloning Ramble" appears exactly once

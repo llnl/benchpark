@@ -4,9 +4,9 @@ import shutil
 import subprocess
 import sys
 
-import benchpark.paths
+from benchpark.paths import paths
 
-sys.path.append(str(benchpark.paths.benchpark_home) + "/spack/lib/spack")
+sys.path.append(str(paths.benchpark_home) + "/spack/lib/spack")
 import llnl.util.tty.color as color  # noqa: E402
 
 
