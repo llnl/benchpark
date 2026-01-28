@@ -5,8 +5,8 @@ import os
 import subprocess
 import sys
 
-from benchpark.base_paths import base_paths
 import benchpark.util.color as color
+from benchpark.base_paths import base_paths
 
 EXIT_CODE = 0
 
