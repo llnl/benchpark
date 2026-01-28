@@ -7,10 +7,11 @@ import json
 import sys
 import tempfile
 
+from ramble.expander import Expander
+
 import benchpark.caliper
 import benchpark.paths
 import benchpark.spec
-from ramble.expander import Expander
 
 
 def get_caliper_vars_section(expr_spec):
