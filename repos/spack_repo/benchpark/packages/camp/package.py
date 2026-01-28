@@ -9,6 +9,13 @@ from spack_repo.builtin.packages.camp.package import Camp as BuiltinCamp
 
 class Camp(BuiltinCamp):
 
+    version(
+        "2025.12.0",
+        tag="v2025.12.0",
+        commit="a8caefa9f4c811b1a114b4ed2c9b681d40f12325",
+        submodules=False,
+    )
+
     def setup_build_environment(self, env):
         super().setup_build_environment(env)
         if "+cuda" in self.spec:
