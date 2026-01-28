@@ -40,6 +40,7 @@
     run-experiment
     analyze-experiment
     benchpark-analyze
+    configuration
     modifiers
     set-of-experiments
     run-binary

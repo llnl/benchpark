@@ -12,8 +12,9 @@ import sys
 
 import ruamel.yaml as yaml
 
-import benchpark.paths
+import benchpark.config
 from benchpark.debug import debug_print
+from benchpark.paths import paths
 from benchpark.runtime import RuntimeResources
 
 
@@ -95,7 +96,7 @@ def command(args):
                     return result
 
     experiments_root = pathlib.Path(os.path.abspath(args.experiments_root))
-    source_dir = benchpark.paths.benchpark_root
+    source_dir = paths.benchpark_root
 
     experiment_src_dir = pathlib.Path(os.path.abspath(str(args.experiment)))
 
@@ -200,8 +201,10 @@ def command(args):
     run_script = experiments_root / ".latest-experiment.sh"
 
     per_workspace_setup = RuntimeResources(
-        experiments_root, upstream=RuntimeResources(benchpark.paths.benchpark_home)
+        experiments_root, upstream=RuntimeResources(paths.benchpark_home)
     )
+
+    repos_cfg = benchpark.config.configuration().repos
 
     pkg_str = ""
     if pkg_manager == "spack":
@@ -212,12 +215,18 @@ def command(args):
             site_repos = (
                 per_workspace_setup.spack_location / "etc" / "spack" / "repos.yaml"
             )
+            repos = {}
+            for repo_dir in reversed(repos_cfg.packages):
+                repo_dir = repos_cfg.resolve_path(repo_dir)
+                with open(repo_dir / "repo.yaml", "r") as f:
+                    repo_data = yaml.safe_load(f)
+                    namespace = repo_data["repo"]["namespace"]
+                    repos[namespace] = str(repo_dir)
+            repos["builtin"] = (
+                f"{per_workspace_setup.pkgs_location}/repos/spack_repo/builtin/"
+            )
             with open(site_repos, "w") as f:
-                f.write(f"""\
-repos::
-  benchpark: {source_dir}/repo
-  builtin: {per_workspace_setup.pkgs_location}/repos/spack_repo/builtin/
-""")
+                yaml.dump({"repos:": repos}, f, default_flow_style=False)
             spack(
                 f"config --scope=site add \"config:build_stage:['{spack_build_stage}']\""
             )
@@ -230,7 +239,9 @@ export SPACK_DISABLE_LOCAL_CONFIG=1
 
     ramble, first_time_ramble = per_workspace_setup.ramble_first_time_setup()
     if first_time_ramble:
-        ramble(f"repo add --scope=site {source_dir}/repo")
+        for repo_dir in reversed(repos_cfg.applications):
+            repo_dir = repos_cfg.resolve_path(repo_dir)
+            ramble(f"repo add --scope=site {repo_dir}")
         ramble('config --scope=site add "config:disable_progress_bar:true"')
         ramble(f"repo add -t modifiers --scope=site {source_dir}/modifiers")
         ramble("config --scope=site add \"config:spack:global:args:'-d'\"")
