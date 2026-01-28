@@ -59,6 +59,7 @@ The console can be reset later to plain text with ``@.``.
 
 To output an ``@``, use ``@@``.  To output a ``}`` inside braces, use ``}}``.
 """
+
 import io
 import os
 import re
@@ -218,7 +219,9 @@ def colorize(
     return COLOR_RE.sub(match_to_ansi, string).replace("}}", "}")
 
 
-def cwrite(string: str, stream: Optional[io.IOBase] = None, color: Optional[bool] = None) -> None:
+def cwrite(
+    string: str, stream: Optional[io.IOBase] = None, color: Optional[bool] = None
+) -> None:
     """Replace all color expressions in string with ANSI control
     codes and write the result to the stream.  If color is
     False, this will write plain text with no color.  If True,
@@ -231,7 +234,9 @@ def cwrite(string: str, stream: Optional[io.IOBase] = None, color: Optional[bool
     stream.write(colorize(string, color=color))
 
 
-def cprint(string: str, stream: Optional[io.IOBase] = None, color: Optional[bool] = None) -> None:
+def cprint(
+    string: str, stream: Optional[io.IOBase] = None, color: Optional[bool] = None
+) -> None:
     """Same as cwrite, but writes a trailing newline to the stream."""
     cwrite(string + "\n", stream, color)
 
