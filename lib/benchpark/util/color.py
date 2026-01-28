@@ -64,9 +64,8 @@ import io
 import os
 import re
 import sys
-import textwrap
 from contextlib import contextmanager
-from typing import Iterator, List, NamedTuple, Optional, Tuple, Union
+from typing import Iterator, Optional, Union
 
 
 class ColorParseError(Exception):

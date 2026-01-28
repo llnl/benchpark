@@ -2,7 +2,6 @@ import argparse
 import os
 import shutil
 import subprocess
-import sys
 
 import benchpark.util.color as color
 

@@ -1,7 +1,6 @@
 import argparse
 import os
 import subprocess
-import sys
 from pprint import pprint
 
 import yaml

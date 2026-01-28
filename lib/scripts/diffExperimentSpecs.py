@@ -1,7 +1,6 @@
 import argparse
 import os
 import subprocess
-import sys
 
 from diffSystems import compare_yaml
 
