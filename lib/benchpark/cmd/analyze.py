@@ -469,7 +469,9 @@ def prepare_data(**kwargs):
 
     cluster_col = "cluster" if "cluster" in tk.metadata.columns else "host.cluster"
     if cluster_col not in tk.metadata.columns:
-        logger.info("Neither 'cluster' or 'host.cluster' found in metadata. Using default value of 'Cluster' for the chart title")
+        logger.info(
+            "Neither 'cluster' or 'host.cluster' found in metadata. Using default value of 'Cluster' for the chart title"
+        )
         tk.metadata[cluster_col] = "Cluster"
     tk.metadata_columns_to_perfdata([cluster_col] + list(NAME_REMAP.keys()))
 
