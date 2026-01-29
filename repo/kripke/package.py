@@ -62,7 +62,10 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("cxx", type="build")
     depends_on("fortran", type="build")
 
-    depends_on("chai@2024.07.0+raja", when="@1.2.7.0:")
+    depends_on("chai@2025.12.0+raja", when="@develop")
+    depends_on("fmt@9.1", when=f"^chai@2024.07.0")
+    depends_on("chai@2024.07.0+raja", when="@:2025-07")
+    depends_on("chai@2024.07.0+raja", when="@1.2.7.0:2025-07")
     depends_on("fmt@9.1", when=f"^chai@2024.07.0")
 
     depends_on("mpi", when="+mpi")
@@ -70,7 +73,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("caliper", when="+caliper")
     depends_on("adiak@0.4:", when="+caliper")
     conflicts("^blt@:0.3.6", when="+rocm")
-    conflicts("^blt@0.7:")
+    conflicts("^blt@0.7:", when="^chai@:2024.07.0")
 
     depends_on("blt@0.6.2:", type="build", when=f"@1.2.7:")
 
@@ -99,6 +102,13 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
         if "+cuda" in spec:
             env.set("CUDAHOSTCXX", self.spec["mpi"].mpicxx)
             env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
+
+    def setup_run_environment(self, env):
+      super().setup_run_environment(env)
+
+      if self.compiler.extra_rpaths:
+        for rpath in self.compiler.extra_rpaths:
+          env.prepend_path("LD_LIBRARY_PATH", rpath)
 
     def cmake_args(self):
         spec = self.spec
