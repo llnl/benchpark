@@ -12,8 +12,11 @@
  Details
 *********
 
-- When: 09:00 - 05:00 on Monday, July 6, 2026, held in conjunction with ICS26.
-- Where: Held in conjunction with ICS26 in Belfast, Northern Ireland, UK.
+- When: 09:00 - 05:00 on Monday, July 6, 2026, held in conjunction with
+  `ICS26 <https://dipsa-qub.github.io/ICS2026-webpage/>`_
+- Where: Held in conjunction with
+  `ICS26 <https://dipsa-qub.github.io/ICS2026-webpage/>`_ in
+  Belfast, Northern Ireland, UK
 
 *************
  Description
@@ -69,9 +72,12 @@ Topics of interest include, but are not limited to:
 - Testing methodologies and procedures for future reproducibility
 - Experiment portability for code, performance, and related metrics
 - Reproducibility-aware testing infrastructure
-- Automation of testing and continuous regression testing and performance monitoring
-- Efforts to improve reproducibility and sustainability of tests that can be leveraged by the community.
-- Hardware and component focused testing (compute, memory, network, storage) at all scales from a single server (CPU/GPU) to clusters and cloud environments
+- Automation of testing and continuous regression testing and performance
+  monitoring
+- Efforts to improve reproducibility and sustainability of tests that can be
+  leveraged by the community.
+- Hardware and component focused testing (compute, memory, network, storage) at
+  all scales from a single server (CPU/GPU) to clusters and cloud environments
 - System software, programming languages, and library testing
 - Best practices and lessons
 
@@ -79,8 +85,15 @@ Topics of interest include, but are not limited to:
  Paper Submissions
 ===================
 
-The workshop will publish its proceedings with the ICS conference. ACM is
-transitioning in 2026 to 100% Open Access. More details to come.
+The workshop will publish its proceedings with the ICS 2026 conference. Authors must
+follow the same formatting guidelines as main conference papers
+(`ACM template <https://www.acm.org/publications/proceedings-template>`_,
+``\documentclass[sigconf]{acmart}`` in LaTeX). The formatting guidelines for 
+ICS 2026 Papers are available `here <https://dipsa-qub.github.io/ICS2026-webpage/for-authors/information.html>`_.
+Submissions can be in the form of a short or full paper (at most 4 pages for a
+short paper, at least 5 pages for a full one).
+
+More details to come about the submission system.
 
 ====================
  Workshop Deadlines
