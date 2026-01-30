@@ -130,7 +130,7 @@ run_tests_flux_tuolumne:
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK: [raja-perf]
-        VARIANT: ['+rocm caliper=time,rocm']
+        VARIANT: ['+rocm caliper=time,rocm version=develop']
         SYSTEM_ARGS: [rocm=7.1.0]
         GPUMODE: SPX
 run_tests_flux_tioga:
