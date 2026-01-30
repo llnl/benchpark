@@ -20,22 +20,44 @@ class Branson(ExecutableApplication):
            template=[
                'cp {branson}/inputs/* {experiment_run_dir}/.',
                'sed -i "s|<photons>[0-9]*</photons>|<photons>{num_particles}</photons>|g" {experiment_run_dir}/{input_file}',
-               'sed -i "s|<use_gpu_transporter>.*</use_gpu_transporter>|<use_gpu_transporter>{use_gpu}</use_gpu_transporter>|g" {experiment_run_dir}/{input_file}'
+               'grep -q "<photons>" {experiment_run_dir}/{input_file} || sed -i "/<\/common>/ i \  <photons>{num_particles}<\/photons>" {experiment_run_dir}/{input_file}',
+               'sed -i "s|<use_gpu_transporter>.*</use_gpu_transporter>|<use_gpu_transporter>{use_gpu}</use_gpu_transporter>|g" {experiment_run_dir}/{input_file}',
+               'grep -q "<use_gpu_transporter>" {experiment_run_dir}/{input_file} || sed -i "/<\/common>/ i \  <use_gpu_transporter>{use_gpu}<\/use_gpu_transporter>" {experiment_run_dir}/{input_file}',
+               'sed -i "s|<dd_transport_type>.*</dd_transport_type>|<dd_transport_type>{decomposition}</dd_transport_type>|g" {experiment_run_dir}/{input_file}',
+               'grep -q "<dd_transport_type>" {experiment_run_dir}/{input_file} || sed -i "/<\/common>/ i \  <dd_transport_type>{decomposition}<\/dd_transport_type>" {experiment_run_dir}/{input_file}',
+               'sed -i "s|<particle_storage>.*</particle_storage>|<particle_storage>{layout}</particle_storage>|g" {experiment_run_dir}/{input_file}',
+               'grep -q "<particle_storage>" {experiment_run_dir}/{input_file} || sed -i "/<\/common>/ i \  <particle_storage>{layout}<\/particle_storage>" {experiment_run_dir}/{input_file}',
+               'sed -i "s|<particle_algorithm>.*</particle_algorithm>|<particle_algorithm>{algorithm}</particle_algorithm>|g" {experiment_run_dir}/{input_file}',
+               'grep -q "<particle_algorithm>" {experiment_run_dir}/{input_file} || sed -i "/<\/common>/ i \  <particle_algorithm>{algorithm}<\/particle_algorithm>" {experiment_run_dir}/{input_file}',
            ])
 
     executable('p', '{branson}/bin/BRANSON {experiment_run_dir}/{input_file}', use_mpi=True)
 
     workload('branson', executables=['setup_experiment','p'])
     
-    workload_variable('input_file', default='3D_hohlraum_single_node.xml',
+    workload_variable('input_file', default='3D_hohlraum_multi_node.xml',
     	description='input file name',
       	workloads=['branson'])
-
 
     workload_variable('num_particles', default='250000000',
     	description='procs on node',
       	workloads=['branson'])
 
+    workload_variable('use_gpu', default='FALSE',
+    	description='Use GPU (TRUE|FALSE)',
+      	workloads=['branson'])
+
+    workload_variable('decomposition', default='PARTICLE_PASS',
+    	description='dommain decomposition type (PARTICLE_PASS|REPLICATED)',
+      	workloads=['branson'])
+
+    workload_variable('layout', default='SOA',
+    	description='storage layout (SOA|AOS)',
+      	workloads=['branson'])
+
+    workload_variable('algorithm', default='EVENT',
+    	description='particle transport algorithm (EVENT|HISTORY)',
+      	workloads=['branson'])
 
     figure_of_merit('Photons per Second',
                     log_file='{experiment_run_dir}/{experiment_name}.out',

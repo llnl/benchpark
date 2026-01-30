@@ -42,11 +42,32 @@ class Branson(
         description="Number of groups",
     )
 
+    variant(
+        "decomposition",
+        default="PARTICLE_PASS",
+        values=("PARTICLE_PASS", "REPLICATED"),
+        description="Domain decomposition type",
+    )
+
+    variant(
+        "layout",
+        default="SOA",
+        values=("SOA", "AOS"),
+        description="Particle storage layout",
+    )
+
+    variant(
+        "algorithm",
+        default="EVENT",
+        values=("EVENT", "HISTORY"),
+        description="Particle transport algorithm",
+    )
+
     def compute_applications_section(self):
         if self.spec.satisfies("exec_mode=test"):
             self.add_experiment_variable("num_particles", 1000000, True)
         else:
-            self.add_experiment_variable("num_particles", 850000000, True)
+            self.add_experiment_variable("num_particles", 200000000, True)
         self.add_experiment_variable("resource_count", 1, False)
 
         self.register_scaling_config(
@@ -63,6 +84,10 @@ class Branson(
                 },
             }
         )
+
+        self.add_experiment_variable("decomposition", self.spec.variants["decomposition"][0], True)
+        self.add_experiment_variable("layout", self.spec.variants["layout"][0], True)
+        self.add_experiment_variable("algorithm", self.spec.variants["algorithm"][0], True)
 
         # Set the variables required by the experiment
         self.set_required_variables(
