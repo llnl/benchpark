@@ -28,6 +28,17 @@ class Caliper:
         description="caliper mode",
     )
 
+    variant(
+        "cali_version",
+        default="master",
+        values=(
+            "master",
+            "2.14.0",
+            "2.13.1",
+        ),
+        description="version",
+    )
+
     class Helper(ExperimentHelper):
         def compute_modifiers_section(self):
             modifier_list = []
@@ -44,7 +55,7 @@ class Caliper:
 
         def compute_package_section(self):
             # set package versions
-            caliper_version = "master"
+            caliper_version = self.spec.variants["cali_version"][0]
 
             # get system config options
             # TODO: Get compiler/mpi/package handles directly from system.py
@@ -62,13 +73,13 @@ class Caliper:
 
             if not self.spec.satisfies("caliper=none"):
                 package_specs["caliper"] = {
-                    "pkg_spec": f"caliper@{caliper_version}+adiak+mpi~libunwind~libdw",
+                    "spack_pkg_spec": f"caliper@{caliper_version}+adiak+mpi~libunwind~libdw",
                 }
                 if any("topdown" in var for var in self.spec.variants["caliper"]):
                     papi_support = True  # check if target system supports papi
                     if papi_support:
                         package_specs["caliper"][
-                            "pkg_spec"
+                            "spack_pkg_spec"
                         ] += "+papi target={}".format(system_specs["cpu_arch"])
                     else:
                         raise NotImplementedError(
@@ -80,7 +91,7 @@ class Caliper:
                     )  # check if target system supports cuda
                     if cuda_support:
                         package_specs["caliper"][
-                            "pkg_spec"
+                            "spack_pkg_spec"
                         ] += "~papi+cuda cuda_arch={}".format(system_specs["cuda_arch"])
                     else:
                         raise NotImplementedError(
@@ -92,7 +103,7 @@ class Caliper:
                     )  # check if target system supports rocm
                     if rocm_support:
                         package_specs["caliper"][
-                            "pkg_spec"
+                            "spack_pkg_spec"
                         ] += "~papi+rocm amdgpu_target={}".format(
                             system_specs["rocm_arch"]
                         )
@@ -103,7 +114,7 @@ class Caliper:
                 elif self.spec.satisfies("caliper=time") or self.spec.satisfies(
                     "caliper=mpi"
                 ):
-                    package_specs["caliper"]["pkg_spec"] += "~papi"
+                    package_specs["caliper"]["spack_pkg_spec"] += "~papi"
 
             return {
                 "packages": {k: v for k, v in package_specs.items() if v},
