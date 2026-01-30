@@ -31,7 +31,12 @@ print(f"Comparing benchpark packages to packages in spack {args.spack_tag}")
 
 if "spack-packages" not in os.listdir(os.getcwd()):
     subprocess.run(
-        ["git", "clone", "https://github.com/spack/spack-packages.git", "spack-packages"]
+        [
+            "git",
+            "clone",
+            "https://github.com/spack/spack-packages.git",
+            "spack-packages",
+        ]
     )
 subprocess.run(["git", "checkout", args.spack_tag], cwd="spack-packages")
 
