@@ -64,6 +64,14 @@ class LlnlMatrix(System):
         description="Submit a job to a specific named bank",
     )
 
+    variant(
+        "queue",
+        default="none",
+        values=("none", "pbatch", "pdebug"),
+        multi=False,
+        description="Submit to named queue",
+    )
+
     def __init__(self, spec):
         super().__init__(spec)
         self.programming_models = [CudaSystem(), OpenMPCPUOnlySystem()]
@@ -151,13 +159,21 @@ class LlnlMatrix(System):
                     "buildable": False,
                 },
                 "python": {
+                    "buildable": False,
                     "externals": [
                         {
-                            "spec": "python@3.9.12+bz2+crypt+ctypes+dbm+lzma+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
-                            "prefix": "/usr/tce",
+                            "spec": "python@3.9.12",
+                            "prefix": "/usr/tce/packages/python/python-3.9.12",
+                        },
+                        {
+                            "spec": "python@3.11.9",
+                            "prefix": "/usr/tce/packages/python/python-3.11.9",
+                        },
+                        {
+                            "spec": "python@3.12.4",
+                            "prefix": "/usr/tce/packages/python/python-3.12.4",
                         },
                     ],
-                    "buildable": False,
                 },
                 "hwloc": {
                     "externals": [{"spec": "hwloc@2.11.2", "prefix": "/usr"}],
@@ -169,6 +185,10 @@ class LlnlMatrix(System):
                 },
                 "curl": {
                     "externals": [{"spec": "curl@7.61.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "git": {
+                    "externals": [{"spec": "git@2.43.7", "prefix": "/usr"}],
                     "buildable": False,
                 },
                 "mpi": {"buildable": False},

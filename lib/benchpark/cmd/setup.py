@@ -207,7 +207,7 @@ def command(args):
     repos_cfg = benchpark.config.configuration().repos
 
     pkg_str = ""
-    if pkg_manager == "spack":
+    if "spack" in pkg_manager:
         spack_build_stage = experiments_root / "builds"
         spack_user_cache_path = experiments_root / "spack-cache"
         spack, first_time_spack = per_workspace_setup.spack_first_time_setup()
