@@ -23,6 +23,9 @@ SKIP_EXPR = [
     "stream generic-x86",
     # Broken URL's in application.py going to cause dryrun failure
     "genesis",
+    # Not mpionlyexperiment
+    "py-scaffold+strong",
+    "py-scaffold+weak",
 ]
 
 
