@@ -76,6 +76,12 @@
     showBuild
 
 .. toctree::
+    :maxdepth: 1
+    :caption: Outreach
+
+    ics
+
+.. toctree::
     :maxdepth: 2
     :caption: API Docs
 
