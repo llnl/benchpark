@@ -85,9 +85,13 @@ class Branson(
             }
         )
 
-        self.add_experiment_variable("decomposition", self.spec.variants["decomposition"][0], True)
+        self.add_experiment_variable(
+            "decomposition", self.spec.variants["decomposition"][0], True
+        )
         self.add_experiment_variable("layout", self.spec.variants["layout"][0], True)
-        self.add_experiment_variable("algorithm", self.spec.variants["algorithm"][0], True)
+        self.add_experiment_variable(
+            "algorithm", self.spec.variants["algorithm"][0], True
+        )
 
         # Set the variables required by the experiment
         self.set_required_variables(
