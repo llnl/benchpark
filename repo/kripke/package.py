@@ -114,6 +114,11 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
         spec = self.spec
         args = []
 
+        if "+rocm" in spec or "+cuda" in spec:
+            enable_chai = "ON"
+        else:
+            enable_chai = "OFF"
+
         args.extend(
             [
                 "-DCAMP_DIR=%s" % self.spec["camp"].prefix,
@@ -121,7 +126,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
                 "-Dumpire_DIR=%s" % self.spec["umpire"].prefix,
                 "-DRAJA_DIR=%s" % self.spec["raja"].prefix,
                 "-Dchai_DIR=%s" % self.spec["chai"].prefix,
-                "-DENABLE_CHAI=ON",
+                "-DENABLE_CHAI=%s" % enable_chai,
                 "-DMPI_CXX_LINK_FLAGS='%s'" % self.spec['mpi'].libs.ld_flags,
             ]
         )
