@@ -19,7 +19,7 @@ class Branson(
     OpenMPExperiment,
     CudaExperiment,
     ROCmExperiment,
-    Scaling(ScalingMode.Strong, ScalingMode.Weak),
+    Scaling(ScalingMode.Strong, ScalingMode.Weak, ScalingMode.Throughput),
     Caliper,
 ):
     variant(
@@ -67,8 +67,34 @@ class Branson(
         if self.spec.satisfies("exec_mode=test"):
             self.add_experiment_variable("num_particles", 1000000, True)
         else:
-            self.add_experiment_variable("num_particles", 200000000, True)
-        self.add_experiment_variable("resource_count", 1, False)
+            if self.spec.satisfies("+throughput"):
+                photons = [
+                    400000,
+                    800000,
+                    1200000,
+                    1600000,
+                    2000000,
+                    2400000,
+                    2800000,
+                    3200000,
+                    3600000,
+                    4000000,
+                    8000000,
+                    12000000,
+                    16000000,
+                    20000000,
+                    26400000,
+                    40000000,
+                    53200000,
+                    80000000,
+                    200000000,
+                    400000000,
+                    800000000,
+                ]
+            else:
+                photons = 800000000
+            self.add_experiment_variable("num_particles", photons, True)
+        self.add_experiment_variable("resource_count", 4, False)
 
         self.register_scaling_config(
             {
@@ -81,6 +107,10 @@ class Branson(
                     * scaling_factor,
                     "num_particles": lambda var, itr, dim, scaling_factor: var.val(dim)
                     * scaling_factor,
+                },
+                ScalingMode.Throughput: {
+                    "resource_count": None,
+                    "num_particles": None,
                 },
             }
         )
@@ -96,8 +126,8 @@ class Branson(
         # Set the variables required by the experiment
         self.set_required_variables(
             n_resources="{resource_count}",
-            process_problem_size="{num_particles}",
-            total_problem_size="{num_particles} * {resource_count}",
+            process_problem_size="{num_particles} / {resource_count}",
+            total_problem_size="{num_particles}",
         )
 
         if self.spec.satisfies("+openmp"):
