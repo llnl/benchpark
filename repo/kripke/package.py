@@ -63,7 +63,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("cxx", type="build")
     depends_on("fortran", type="build")
 
-    depends_on("chai@2025.12.0+raja", when="@develop")
+    depends_on("chai@2025.12.0+raja", when="@2025.12.0")
     depends_on("fmt@9.1", when=f"^chai@2024.07.0")
     depends_on("chai@2024.07.0+raja", when="@:2025.07.0")
     depends_on("chai@2024.07.0+raja", when="@1.2.7.0:2025.07.0")
