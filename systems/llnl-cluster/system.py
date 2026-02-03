@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import yaml
 
 from benchpark.directives import maintainers, variant
 from benchpark.openmpsystem import OpenMPCPUOnlySystem
@@ -46,7 +47,6 @@ class LlnlCluster(System):
             "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
         },
         "dane": {
-            "cpu_arch": "sapphirerapids",
             "sys_cores_per_node": 112,
             "sys_cores_os_reserved_per_node": 0,  # No explicit core reservation, first thread on each core reserved (2 threads per core)
             "sys_cores_os_reserved_per_node_list": None,
@@ -142,6 +142,9 @@ class LlnlCluster(System):
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
+
+        with open(self.hardware_key, "r") as f:
+            self.hardware_dict = yaml.safe_load(f)
 
         mount_point = self.spec.variants["mount_point"][0]
         if mount_point not in self.mount_points + ["none"]:

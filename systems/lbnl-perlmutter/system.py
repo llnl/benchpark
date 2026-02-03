@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-
+import yaml
 from packaging.version import Version
 
 from benchpark.cudasystem import CudaSystem
@@ -83,6 +83,9 @@ class LbnlPerlmutter(System):
         attrs = self.id_to_resources.get("perlmutter")
         for k, v in attrs.items():
             setattr(self, k, v)
+
+        with open(self.hardware_key, "r") as f:
+            self.hardware_dict = yaml.safe_load(f)
 
     def mpi_config(self):
         gtl = self.spec.variants["gtl"][0]

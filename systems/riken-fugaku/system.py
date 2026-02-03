@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import yaml
 
 from benchpark.directives import maintainers, variant
 from benchpark.openmpsystem import OpenMPCPUOnlySystem
@@ -39,6 +40,9 @@ class RikenFugaku(System):
         attrs = self.id_to_resources.get("fugaku")
         for k, v in attrs.items():
             setattr(self, k, v)
+
+        with open(self.hardware_key, "r") as f:
+            self.hardware_dict = yaml.safe_load(f)
 
     def compute_packages_section(self):
         # Doesn't look like we need to switch MPI based on compiler from old definition, verify this

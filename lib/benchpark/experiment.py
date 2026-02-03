@@ -375,7 +375,20 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
         modifier_list = [{"name": "allocation"}, {"name": "exit-code"}]
         modifier_list += self.compute_modifiers_section()
         for cls in self.helpers:
-            modifier_list += cls.compute_modifiers_section()
+            cls_list = cls.compute_modifiers_section()
+            modifier_list += cls_list
+
+            # topdown specific logic
+            if len(cls_list) > 0:
+                for mod_obj in cls_list:
+                    if mod_obj["name"] == "caliper" and "topdown" in mod_obj["mode"]:
+                        data = self.system_spec.system.hardware_dict
+                        vendor = data["system_definition"]["processor"]["vendor"]
+                        if vendor.lower() != "intel":
+                            raise ValueError(
+                                f"Topdown analysis is not supported on the provided system with vendor='{vendor}'"
+                            )
+
         return modifier_list
 
     def add_experiment_variable(self, name, values, named=False, matrixed=False):

@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import yaml
 from packaging.version import Version
 
 from benchpark.directives import maintainers, variant
@@ -41,6 +42,9 @@ class CscsEiger(System):
         attrs = self.id_to_resources.get("eiger")
         for k, v in attrs.items():
             setattr(self, k, v)
+
+        with open(self.hardware_key, "r") as f:
+            self.hardware_dict = yaml.safe_load(f)
 
     def compute_compilers_section(self):
         return compiler_section_for(

@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-
+import yaml
 from packaging.version import Version
 
 from benchpark.directives import maintainers, variant
@@ -136,6 +136,9 @@ class SnlEldorado(System):
 
         for k, v in self.id_to_resources["eldorado"].items():
             setattr(self, k, v)
+
+        with open(self.hardware_key, "r") as f:
+            self.hardware_dict = yaml.safe_load(f)
 
         # MI300A modes
         if self.rocm_arch == "gfx942":
