@@ -21,7 +21,8 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     license("BSD-3-Clause")
 
     version("develop", branch="develop", submodules=False)
-    version("2025-07", submodules=False, commit="8cf38433a6a11e0dcd17864e649b2d045159ee9c")
+    version("2025.12.0", submodules=False, commit="01f6f85c02ceffcd2bc06e42cee997867dd142c5")
+    version("2025.07.0", submodules=False, commit="8cf38433a6a11e0dcd17864e649b2d045159ee9c")
     version(
         "1.2.7.0", submodules=False, commit="db920c1f5e1dcbb9e949d120e7d86efcdb777635"
     )
@@ -64,8 +65,8 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
 
     depends_on("chai@2025.12.0+raja", when="@develop")
     depends_on("fmt@9.1", when=f"^chai@2024.07.0")
-    depends_on("chai@2024.07.0+raja", when="@:2025-07")
-    depends_on("chai@2024.07.0+raja", when="@1.2.7.0:2025-07")
+    depends_on("chai@2024.07.0+raja", when="@:2025.07.0")
+    depends_on("chai@2024.07.0+raja", when="@1.2.7.0:2025.07.0")
     depends_on("fmt@9.1", when=f"^chai@2024.07.0")
 
     depends_on("mpi", when="+mpi")
