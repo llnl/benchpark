@@ -422,10 +422,10 @@ class LlnlCluster(System):
             cfg = merge_dicts(gcc_cfg, oneapi_cfg, weighting_cfg)
         elif self.spec.satisfies("compiler=clang"):
             cfg = compiler_section_for(
-                "clang",
+                "llvm",
                 [
                     compiler_def(
-                        "clang@19.1.3",
+                        "llvm@19.1.3+flang",
                         "/usr/tce/packages/clang/clang-19.1.3/",
                         {"c": "clang", "cxx": "clang++", "fortran": "flang-new"},
                     )
