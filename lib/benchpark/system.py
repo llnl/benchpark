@@ -29,7 +29,9 @@ class MPISystem:
     name = "mpi"
 
     def system_specific_variables(self, system):
-        return {"cpu_arch": getattr(system, "cpu_arch", "unknown")}
+        return {
+            "cpu_arch": system.hardware_dict["system_definition"]["processor"]["uArch"]
+        }
 
 
 class JobQueue:
