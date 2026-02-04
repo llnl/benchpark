@@ -34,9 +34,7 @@ class MPISystem:
         except (AttributeError, KeyError, TypeError):
             cpu_arch = "Unknown"
 
-        return {
-            "cpu_arch": cpu_arch
-        }
+        return {"cpu_arch": cpu_arch}
 
 
 class JobQueue:
