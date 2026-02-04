@@ -29,8 +29,13 @@ class MPISystem:
     name = "mpi"
 
     def system_specific_variables(self, system):
+        try:
+            cpu_arch = system.hardware_dict["system_definition"]["processor"]["uArch"]
+        except (AttributeError, KeyError, TypeError):
+            cpu_arch = "Unknown"
+
         return {
-            "cpu_arch": system.hardware_dict["system_definition"]["processor"]["uArch"]
+            "cpu_arch": cpu_arch
         }
 
 
