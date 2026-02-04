@@ -99,7 +99,7 @@ class LlnlCluster(System):
     variant(
         "compiler",
         default="oneapi",
-        values=("oneapi", "gcc", "intel", "clang"),
+        values=("oneapi", "gcc", "intel", "llvm"),
         description="Which compiler to use",
     )
 
@@ -343,7 +343,7 @@ class LlnlCluster(System):
                         }
                     ],
                 }
-        elif self.spec.satisfies("compiler=clang"):
+        elif self.spec.satisfies("compiler=llvm"):
             if mpi_type == "mvapich2":
                 mpi_dict["mvapich2"] = {
                     "externals": [
@@ -420,12 +420,12 @@ class LlnlCluster(System):
             prefs = {"one_of": ["%oneapi", "%gcc"], "when": "%c"}
             weighting_cfg = {"packages": {"all": {"require": [prefs]}}}
             cfg = merge_dicts(gcc_cfg, oneapi_cfg, weighting_cfg)
-        elif self.spec.satisfies("compiler=clang"):
+        elif self.spec.satisfies("compiler=llvm"):
             cfg = compiler_section_for(
-                "clang",
+                "llvm",
                 [
                     compiler_def(
-                        "clang@19.1.3",
+                        "llvm@19.1.3+flang",
                         "/usr/tce/packages/clang/clang-19.1.3/",
                         {"c": "clang", "cxx": "clang++", "fortran": "flang-new"},
                     )
@@ -440,8 +440,8 @@ class LlnlCluster(System):
             default_compiler = "intel-oneapi-compilers-classic"
         elif self.spec.satisfies("compiler=oneapi"):
             default_compiler = "intel-oneapi-compilers"
-        elif self.spec.satisfies("compiler=clang"):
-            default_compiler = "clang"
+        elif self.spec.satisfies("compiler=llvm"):
+            default_compiler = "llvm"
 
         return {
             "software": {
