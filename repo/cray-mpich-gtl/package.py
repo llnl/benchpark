@@ -30,7 +30,8 @@ class CrayMpichGtl(MpichEnvironmentModifications, BundlePackage):
             env.set("SPACK_GTL", "cuda")
 
     def setup_dependent_run_environment(self, env, dependent_spec):
-        env.set("MPICH_GPU_SUPPORT_ENABLED", "1")
+        if dependent_spec.satisfies("+rocm") or dependent_spec.satisfies("+cuda"):
+            env.set("MPICH_GPU_SUPPORT_ENABLED", "1")
 
     def setup_run_environment(self, env: EnvironmentModifications) -> None:
         self.setup_mpi_wrapper_variables(env)
