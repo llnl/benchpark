@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+
 from packaging.version import Version
 
 from benchpark.directives import maintainers, variant
@@ -17,6 +18,7 @@ class CscsEiger(System):
 
     id_to_resources = {
         "eiger": {
+            "cpu_arch": "zen2",
             "sys_cores_per_node": 128,
             "timeout": 30,
             "system_site": "cscs",
