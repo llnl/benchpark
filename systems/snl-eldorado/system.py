@@ -23,6 +23,7 @@ class SnlEldorado(System):
 
     id_to_resources = {
         "eldorado": {
+            "cpu_arch": "zen4",
             "rocm_arch": "gfx942",
             "sys_cores_per_node": 84,
             "sys_cores_os_reserved_per_node": 12,

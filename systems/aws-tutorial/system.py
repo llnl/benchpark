@@ -18,22 +18,27 @@ class AwsTutorial(System):
 
     id_to_resources = {
         "c7i.48xlarge": {
+            "cpu_arch": "sapphirerapids",
             "sys_cores_per_node": 192,
             "sys_mem_per_node_GB": 384,
         },
         "c7i.metal-48xl": {
+            "cpu_arch": "sapphirerapids",
             "sys_cores_per_node": 192,
             "sys_mem_per_node_GB": 384,
         },
         "c7i.24xlarge": {
+            "cpu_arch": "sapphirerapids",
             "sys_cores_per_node": 96,
             "sys_mem_per_node_GB": 192,
         },
         "c7i.metal-24xl": {
+            "cpu_arch": "sapphirerapids",
             "sys_cores_per_node": 96,
             "sys_mem_per_node_GB": 192,
         },
         "c7i.12xlarge": {
+            "cpu_arch": "sapphirerapids",
             "sys_cores_per_node": 48,
             "sys_mem_per_node_GB": 96,
         },

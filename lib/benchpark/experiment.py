@@ -379,14 +379,14 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
             modifier_list += cls_list
 
             # topdown specific logic
+            uarch_whitelist = ["sapphirerapids", "emeraldrappids"]
             if len(cls_list) > 0:
                 for mod_obj in cls_list:
                     if mod_obj["name"] == "caliper" and "topdown" in mod_obj["mode"]:
-                        data = self.system_spec.system.hardware_dict
-                        vendor = data["system_definition"]["processor"]["vendor"]
-                        if vendor.lower() != "intel":
+                        cpu_arch = self.system_spec.system.cpu_arch
+                        if cpu_arch.lower() not in uarch_whitelist:
                             raise ValueError(
-                                f"Topdown analysis is not supported on the provided system with vendor='{vendor}'"
+                                f"Topdown analysis is not supported on the provided system with uarch='{cpu_arch}'. Must be one of:\n\t{uarch_whitelist}"
                             )
 
         return modifier_list

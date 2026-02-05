@@ -18,6 +18,7 @@ class JscJuwels(System):
 
     id_to_resources = {
         "juwels": {
+            "cpu_arch": "rome",
             "sys_cores_per_node": 48,
             "timeout": 120,
             "sys_gpus_per_node": 4,

@@ -18,6 +18,7 @@ class CscLumi(System):
 
     id_to_resources = {
         "lumi": {
+            "cpu_arch": "zen3",
             "rocm_arch": "gfx90a",
             "gtl_flag": "",
             "sys_cores_per_node": 64,
