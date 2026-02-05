@@ -68,6 +68,9 @@ class PyScaffold(
         )
 
     def compute_package_section(self):
+        if self.spec.variants["package_manager"][0] != "spack-pip":
+            raise ValueError("Use the 'spack-pip' package manager for this benchmark. Set 'package_manager=spack-pip'")
+
         # Spec that will be written into requirements.txt for pip install
         sys_name = self.system_spec._name
         if self.spec.satisfies("+rocm"):
