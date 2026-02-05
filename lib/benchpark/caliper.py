@@ -76,15 +76,9 @@ class Caliper:
                     "spack_pkg_spec": f"caliper@{caliper_version}+adiak+mpi~libunwind~libdw",
                 }
                 if any("topdown" in var for var in self.spec.variants["caliper"]):
-                    papi_support = True  # check if target system supports papi
-                    if papi_support:
-                        package_specs["caliper"][
-                            "spack_pkg_spec"
-                        ] += "+papi target={}".format(system_specs["cpu_arch"])
-                    else:
-                        raise NotImplementedError(
-                            "Target system does not support the papi interface"
-                        )
+                    package_specs["caliper"][
+                        "spack_pkg_spec"
+                    ] += "+libpfm~papi target={}".format(system_specs["cpu_arch"])
                 elif self.spec.satisfies("caliper=cuda"):
                     cuda_support = (
                         self.spec.satisfies("caliper=cuda") and True

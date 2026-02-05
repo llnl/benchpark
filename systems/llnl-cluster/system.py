@@ -22,6 +22,7 @@ class LlnlCluster(System):
 
     id_to_resources = {
         "ruby": {
+            "cpu_arch": "icelake",
             "sys_cores_per_node": 56,
             "sys_cores_os_reserved_per_node": 0,  # No core or thread reservation
             "sys_cores_os_reserved_per_node_list": None,
@@ -38,6 +39,7 @@ class LlnlCluster(System):
             "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
         },
         "magma": {
+            "cpu_arch": "icelake",
             "sys_cores_per_node": 96,
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
@@ -62,6 +64,7 @@ class LlnlCluster(System):
             "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
         },
         "rzgenie": {
+            "cpu_arch": "haswell",
             "sys_cores_per_node": 36,
             "system_site": "llnl",
             "sys_sockets_per_node": 2,
@@ -73,6 +76,7 @@ class LlnlCluster(System):
             "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
         },
         "poodle": {
+            "cpu_arch": "sapphirerapids",
             "sys_cores_per_node": 112,
             "sys_sockets_per_node": 2,
             "sys_cpu_L2_KB": 2048,
@@ -99,7 +103,7 @@ class LlnlCluster(System):
     variant(
         "compiler",
         default="oneapi",
-        values=("oneapi", "gcc", "intel", "clang"),
+        values=("oneapi", "gcc", "intel", "llvm"),
         description="Which compiler to use",
     )
 
@@ -343,7 +347,7 @@ class LlnlCluster(System):
                         }
                     ],
                 }
-        elif self.spec.satisfies("compiler=clang"):
+        elif self.spec.satisfies("compiler=llvm"):
             if mpi_type == "mvapich2":
                 mpi_dict["mvapich2"] = {
                     "externals": [
@@ -420,12 +424,12 @@ class LlnlCluster(System):
             prefs = {"one_of": ["%oneapi", "%gcc"], "when": "%c"}
             weighting_cfg = {"packages": {"all": {"require": [prefs]}}}
             cfg = merge_dicts(gcc_cfg, oneapi_cfg, weighting_cfg)
-        elif self.spec.satisfies("compiler=clang"):
+        elif self.spec.satisfies("compiler=llvm"):
             cfg = compiler_section_for(
-                "clang",
+                "llvm",
                 [
                     compiler_def(
-                        "clang@19.1.3",
+                        "llvm@19.1.3+flang",
                         "/usr/tce/packages/clang/clang-19.1.3/",
                         {"c": "clang", "cxx": "clang++", "fortran": "flang-new"},
                     )
@@ -440,8 +444,8 @@ class LlnlCluster(System):
             default_compiler = "intel-oneapi-compilers-classic"
         elif self.spec.satisfies("compiler=oneapi"):
             default_compiler = "intel-oneapi-compilers"
-        elif self.spec.satisfies("compiler=clang"):
-            default_compiler = "clang"
+        elif self.spec.satisfies("compiler=llvm"):
+            default_compiler = "llvm"
 
         return {
             "software": {

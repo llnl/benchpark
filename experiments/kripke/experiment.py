@@ -31,8 +31,8 @@ class Kripke(
 
     variant(
         "version",
-        default="2025-07",
-        values=("develop", "latest", "2025-07", "1.2.7.0"),
+        default="2025.12.0",
+        values=("develop", "latest", "2025.12.0", "2025.07.0", "1.2.7.0"),
         description="app version",
     )
 
@@ -131,6 +131,15 @@ class Kripke(
                 },
             }
         )
+
+        if self.spec.satisfies("+openmp"):
+            self.add_experiment_variable("arch", "OpenMP")
+        elif self.spec.satisfies("+cuda"):
+            self.add_experiment_variable("arch", "CUDA")
+        elif self.spec.satisfies("+rocm"):
+            self.add_experiment_variable("arch", "HIP")
+        else:
+            self.add_experiment_variable("arch", "Sequential")
 
         if self.spec.satisfies("+openmp"):
             self.add_experiment_variable("n_threads_per_proc", 1, True)
