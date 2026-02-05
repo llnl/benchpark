@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import yaml
+
 from packaging.version import Version
 
 from benchpark.directives import maintainers, variant
@@ -251,9 +251,6 @@ class LlnlElcapitan(System):
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
-
-        with open(self.hardware_key, "r") as f:
-            self.hardware_dict = yaml.safe_load(f)
 
         # MI300A modes
         if self.rocm_arch == "gfx942":

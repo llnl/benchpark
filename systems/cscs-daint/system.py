@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import yaml
+
 from packaging.version import Version
 
 from benchpark.cudasystem import CudaSystem
@@ -69,9 +69,6 @@ class CscsDaint(System):
         attrs = self.id_to_resources.get("daint")
         for k, v in attrs.items():
             setattr(self, k, v)
-
-        with open(self.hardware_key, "r") as f:
-            self.hardware_dict = yaml.safe_load(f)
 
     def compute_packages_section(self):
         selections = self.cuda_config(self.cuda_version)

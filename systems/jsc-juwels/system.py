@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import yaml
+
 from packaging.version import Version
 
 from benchpark.cudasystem import CudaSystem
@@ -54,9 +54,6 @@ class JscJuwels(System):
         attrs = self.id_to_resources.get("juwels")
         for k, v in attrs.items():
             setattr(self, k, v)
-
-        with open(self.hardware_key, "r") as f:
-            self.hardware_dict = yaml.safe_load(f)
 
     def compute_compilers_section(self):
         nvhpc_cfg = compiler_section_for(

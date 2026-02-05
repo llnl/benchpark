@@ -3,7 +3,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import yaml
 
 from benchpark.directives import maintainers, variant
 from benchpark.openmpsystem import OpenMPCPUOnlySystem
@@ -68,9 +67,6 @@ class AwsTutorial(System):
         attrs = self.id_to_resources.get(self.spec.variants["instance_type"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
-
-        with open(self.hardware_key, "r") as f:
-            self.hardware_dict = yaml.safe_load(f)
 
     def compute_packages_section(self):
         return {
