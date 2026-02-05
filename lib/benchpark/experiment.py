@@ -379,7 +379,7 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
             modifier_list += cls_list
 
             # topdown specific logic
-            uarch_whitelist = ["sapphirerapids", "emeraldrappids"]
+            uarch_whitelist = ["sapphirerapids", "emeraldrapids"]
             if len(cls_list) > 0:
                 for mod_obj in cls_list:
                     if mod_obj["name"] == "caliper" and "topdown" in mod_obj["mode"]:
