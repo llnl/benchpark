@@ -151,4 +151,5 @@ run_tests_slurm_matrix:
       - HOST: matrix
         ARCHCONFIG: llnl-matrix
         BENCHMARK: [py-scaffold]
-        VARIANT: ['+cuda package_manager=spack-pip caliper=mpi,time,cuda allocation=torchrun-hpc']
+        VARIANT:
+          - +cuda package_manager=spack-pip caliper=mpi,time,cuda allocation=torchrun-hpc
