@@ -117,8 +117,10 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
 
         if "+rocm" in spec or "+cuda" in spec:
             enable_chai = "ON"
+            enable_chai_single_memory = "ON" if "+single_memory" in spec else "OFF"
         else:
             enable_chai = "OFF"
+            enable_chai_single_memory = "OFF"
 
         args.extend(
             [
@@ -128,6 +130,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
                 "-DRAJA_DIR=%s" % self.spec["raja"].prefix,
                 "-Dchai_DIR=%s" % self.spec["chai"].prefix,
                 "-DENABLE_CHAI=%s" % enable_chai,
+                "-DENABLE_CHAI_SINGLE_MEMORY=%s" % enable_chai_single_memory,
                 "-DMPI_CXX_LINK_FLAGS='%s'" % self.spec['mpi'].libs.ld_flags,
             ]
         )
