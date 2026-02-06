@@ -166,12 +166,12 @@ class LlnlMatrix(System):
                             "prefix": "/usr/tce/packages/python/python-3.9.12",
                         },
                         {
-                            "spec": "python@3.11.9",
-                            "prefix": "/usr/tce/packages/python/python-3.11.9",
+                            "spec": "python@3.11.5",
+                            "prefix": "/usr/tce/packages/python/python-3.11.5",
                         },
                         {
-                            "spec": "python@3.12.4",
-                            "prefix": "/usr/tce/packages/python/python-3.12.4",
+                            "spec": "python@3.12.2",
+                            "prefix": "/usr/tce/packages/python/python-3.12.2",
                         },
                     ],
                 },

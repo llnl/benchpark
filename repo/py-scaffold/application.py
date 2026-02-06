@@ -47,12 +47,12 @@ class PyScaffold(ExecutableApplication):
     )
     executable(
         "generate",
-        "scaffold generate_fractals -c {config_file} --problem-scale {problem_scale}",
-        use_mpi=True,
+        "$(which scaffold) generate_fractals -c {config_file} --problem-scale {problem_scale}",
+        use_mpi=False,
     )
     executable(
         "run",
-        "scaffold benchmark -c {config_file} --problem-scale {problem_scale}",
+        "$(which scaffold) benchmark -c {config_file} --problem-scale {problem_scale}",
         use_mpi=True,
     )
 

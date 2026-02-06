@@ -69,7 +69,13 @@ class PyScaffold(
 
     def compute_package_section(self):
         if self.spec.variants["package_manager"][0] != "spack-pip":
-            raise ValueError("Use the 'spack-pip' package manager for this benchmark. Set 'package_manager=spack-pip'")
+            raise ValueError(
+                "Use the 'spack-pip' package manager for this benchmark. Set 'package_manager=spack-pip'"
+            )
+        elif self.spec.variants["allocation"][0] != "torchrun-hpc":
+            raise ValueError(
+                "Use the 'torchrun-hpc' launcher mode for this benchmark. Set 'allocation=torchrun-hpc'"
+            )
 
         # Spec that will be written into requirements.txt for pip install
         sys_name = self.system_spec._name
