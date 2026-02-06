@@ -38,8 +38,8 @@ class LlnlMatrix(System):
 
     variant(
         "cuda",
-        default="12.6.0",
-        values=("12.6.0", "12.2.2", "11.8.0"),
+        default="12.9.1",
+        values=("13.1.1", "12.9.1", "12.6.0", "12.2.2", "11.8.0"),
         description="CUDA version",
     )
 

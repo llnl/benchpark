@@ -253,7 +253,7 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
                     helper_instance = cls.Helper(self)
                     self.helpers.append(helper_instance)
 
-        self.name = self.spec.name
+        self.name = self.spec.name.replace("-", "_")
 
         if "workload" in self.spec.variants:
             self.workload = self.spec.variants["workload"]
