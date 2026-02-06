@@ -90,6 +90,7 @@ def test_caliper_modifier(monkeypatch):
     # Check file
     assert data == {
         "sys_cores_per_node": 84,
+        "allocation": "standard",
         "scheduler": "flux",
         "rocm_arch": "gfx942",
         "sys_cores_os_reserved_per_node": 12,
