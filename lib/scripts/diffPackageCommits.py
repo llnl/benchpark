@@ -5,6 +5,9 @@ import os
 import subprocess
 import sys
 
+import benchpark.util.color as color
+from benchpark.base_paths import base_paths
+
 EXIT_CODE = 0
 
 parser = argparse.ArgumentParser(
@@ -26,18 +29,24 @@ args = parser.parse_args()
 
 print(f"Comparing benchpark packages to packages in spack {args.spack_tag}")
 
-if "spack" not in os.listdir(os.getcwd()):
-    subprocess.run(["git", "clone", "https://github.com/spack/spack.git"])
-subprocess.run(["git", "checkout", args.spack_tag], cwd="spack")
-
-sys.path.append("spack/lib/spack")
-import llnl.util.tty.color as color  # noqa: E402
+if "spack-packages" not in os.listdir(os.getcwd()):
+    subprocess.run(
+        [
+            "git",
+            "clone",
+            "https://github.com/spack/spack-packages.git",
+            "spack-packages",
+        ]
+    )
+subprocess.run(["git", "checkout", args.spack_tag], cwd="spack-packages")
 
 
 def main():
     global EXIT_CODE
-    spack_dir = "spack/var/spack/repos/builtin/packages/"
-    benchpark_dir = str(os.environ.get("BENCHPARK_SCRIPT_DIR")) + "../repo/"
+    spack_dir = "spack-packages/repos/spack_repo/builtin/packages/"
+    benchpark_dir = (
+        str(base_paths.benchpark_root) + "/repos/spack_repo/benchpark/packages/"
+    )
 
     # Get the list of packages to process
     if args.packages:
