@@ -18,6 +18,7 @@ class AwsPcluster(System):
 
     id_to_resources = {
         "c4.xlarge": {
+            "cpu_arch": "zen",
             "sys_cores_per_node": 4,
             "sys_mem_per_node_GB": 7.5,
             "system_site": "aws",
@@ -25,6 +26,7 @@ class AwsPcluster(System):
             + "/AWS_PCluster-zen-EFA/hardware_description.yaml",
         },
         "c6g.xlarge": {
+            "cpu_arch": "zen",
             "sys_cores_per_node": 4,
             "sys_mem_per_node_GB": 8,
             "system_site": "aws",
@@ -32,6 +34,7 @@ class AwsPcluster(System):
             + "/AWS_PCluster-zen-EFA/hardware_description.yaml",
         },
         "hpc7a.48xlarge": {
+            "cpu_arch": "zen",
             "sys_cores_per_node": 96,
             "sys_mem_per_node_GB": 768,
             "system_site": "aws",
@@ -39,6 +42,7 @@ class AwsPcluster(System):
             + "/AWS_PCluster-zen-EFA/hardware_description.yaml",
         },
         "hpc6a.48xlarge": {
+            "cpu_arch": "zen",
             "sys_cores_per_node": 96,
             "sys_mem_per_node_GB": 384,
             "system_site": "aws",

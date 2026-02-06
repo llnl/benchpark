@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+
 from packaging.version import Version
 
 from benchpark.cudasystem import CudaSystem
@@ -17,6 +18,7 @@ class JscJuwels(System):
 
     id_to_resources = {
         "juwels": {
+            "cpu_arch": "rome",
             "sys_cores_per_node": 48,
             "timeout": 120,
             "sys_gpus_per_node": 4,

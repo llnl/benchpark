@@ -25,6 +25,7 @@ class LlnlMatrix(System):
 
     id_to_resources = {
         "matrix": {
+            "cpu_arch": "sapphirerapids",
             "cuda_arch": 90,
             "sys_cores_per_node": 112,
             "sys_gpus_per_node": 4,

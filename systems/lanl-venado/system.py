@@ -18,6 +18,7 @@ class LanlVenado(System):
 
     id_to_resources = {
         "grace-hopper": {
+            "cpu_arch": "neoverse",
             "cuda_arch": 90,
             "sys_cores_per_node": 144,
             "sys_gpus_per_node": 4,
@@ -27,6 +28,7 @@ class LanlVenado(System):
             + "/HPECray-neoverse-H100-Slingshot/hardware_description.yaml",
         },
         "grace-grace": {
+            "cpu_arch": "neoverse",
             "sys_cores_per_node": 144,
             "system_site": "lanl",
             "hardware_key": str(hardware_descriptions)

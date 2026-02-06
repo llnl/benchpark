@@ -22,6 +22,7 @@ class LlnlCluster(System):
 
     id_to_resources = {
         "ruby": {
+            "cpu_arch": "icelake",
             "sys_cores_per_node": 56,
             "sys_cores_os_reserved_per_node": 0,  # No core or thread reservation
             "sys_cores_os_reserved_per_node_list": None,
@@ -38,6 +39,7 @@ class LlnlCluster(System):
             "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
         },
         "magma": {
+            "cpu_arch": "icelake",
             "sys_cores_per_node": 96,
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
@@ -62,6 +64,7 @@ class LlnlCluster(System):
             "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
         },
         "rzgenie": {
+            "cpu_arch": "haswell",
             "sys_cores_per_node": 36,
             "system_site": "llnl",
             "sys_sockets_per_node": 2,
@@ -73,6 +76,7 @@ class LlnlCluster(System):
             "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
         },
         "poodle": {
+            "cpu_arch": "sapphirerapids",
             "sys_cores_per_node": 112,
             "sys_sockets_per_node": 2,
             "sys_cpu_L2_KB": 2048,
