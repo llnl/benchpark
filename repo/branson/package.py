@@ -12,7 +12,7 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
     methods for domain decomposition."""
 
     homepage = "https://github.com/lanl/branson"
-    git = "https://github.com/lanl/branson.git"
+    git = "https://github.com/LANL/branson.git"
 
     tags = ["proxy-app"]
 
@@ -35,6 +35,17 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
     variant("openmp", default=False, description="Enable OpenMP support")
     variant("caliper", default=False, description="Enable Caliper monitoring")
     variant("n_groups", default=30, values=int, description="Number of groups")
+    variant("umpire", default=False, description="Use umpire memory pool")
+
+    depends_on("umpire+cuda", when="+umpire+cuda")
+    for arch in ("none", "50", "60", "70", "80", "90"):
+        depends_on(f"umpire cuda_arch={arch}", when=f"cuda_arch={arch}")
+
+    depends_on("umpire+rocm", when="+umpire+rocm")
+    for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
+        depends_on(f"umpire amdgpu_target={target}", when=f"amdgpu_target={target}")
+
+    conflicts("+umpire", when="~cuda~rocm")
 
     depends_on("mpi@2:")
 
@@ -95,6 +106,10 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
         else:
             args.append("-DUSE_HIP=OFF")
             args.append("-DUSE_GPU=OFF")
+
+        if '+umpire' in spec:
+            args.append("-DUSE_UMPIRE=ON")
+            args.append(f"-Dumpire_DIR={spec['umpire'].prefix}")
 
         args.append(self.define_from_variant("USE_OPENMP", "openmp"))
 

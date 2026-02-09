@@ -92,9 +92,11 @@ class Branson(
                     800000000,
                 ]
             else:
-                photons = 800000000
+                photons = 8000000
             self.add_experiment_variable("num_particles", photons, True)
         self.add_experiment_variable("resource_count", 4, False)
+        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+            self.add_experiment_variable("pool", 20, False)
 
         self.register_scaling_config(
             {
@@ -142,9 +144,13 @@ class Branson(
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
+        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+            umpire = "+umpire"
+        else:
+            umpire = "~umpire"
         self.add_package_spec(
             self.name,
             [
-                f"branson@{app_version} n_groups={self.spec.variants['n_groups'][0]} ",
+                f"branson@{app_version}{umpire} n_groups={self.spec.variants['n_groups'][0]} ",
             ],
         )
