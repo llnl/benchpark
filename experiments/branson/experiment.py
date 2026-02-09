@@ -92,7 +92,7 @@ class Branson(
                     800000000,
                 ]
             else:
-                photons = 8000000
+                photons = 800000000
             self.add_experiment_variable("num_particles", photons, True)
         self.add_experiment_variable("resource_count", 4, False)
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):

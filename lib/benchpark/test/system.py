@@ -22,7 +22,7 @@ def test_system_compute_variables_section(monkeypatch):
             "n_ranks": 2**64 - 1,
             "n_nodes": 2**64 - 1,
             "batch_submit": "placeholder",
-            "cpu_arch": "unknown",
+            "cpu_arch": "zen4",
             "mpi_command": "placeholder",
             "sys_cores_os_reserved_per_node": 12,
             "sys_cores_os_reserved_per_node_list": [

@@ -16,6 +16,7 @@ class RikenFugaku(System):
 
     id_to_resources = {
         "fugaku": {
+            "cpu_arch": "A64FX",
             "sys_cores_per_node": 48,
             "sys_mem_per_node_GB": 32,
             "system_site": "riken",

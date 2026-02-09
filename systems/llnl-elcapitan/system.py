@@ -25,6 +25,7 @@ class LlnlElcapitan(System):
 
     id_to_resources = {
         "tioga": {
+            "cpu_arch": "zen3",
             "rocm_arch": "gfx90a",
             "sys_cores_per_node": 56,
             "sys_cores_os_reserved_per_node": 8,
@@ -47,6 +48,7 @@ class LlnlElcapitan(System):
             "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
         },
         "elcapitan": {
+            "cpu_arch": "zen4",
             "rocm_arch": "gfx942",
             "sys_cores_per_node": 84,
             "sys_cores_os_reserved_per_node": 12,

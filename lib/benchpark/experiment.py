@@ -246,7 +246,7 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
                     helper_instance = cls.Helper(self)
                     self.helpers.append(helper_instance)
 
-        self.name = self.spec.name
+        self.name = self.spec.name.replace("-", "_")
 
         if "workload" in self.spec.variants:
             self.workload = self.spec.variants["workload"]
@@ -375,7 +375,20 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
         modifier_list = [{"name": "allocation"}, {"name": "exit-code"}]
         modifier_list += self.compute_modifiers_section()
         for cls in self.helpers:
-            modifier_list += cls.compute_modifiers_section()
+            cls_list = cls.compute_modifiers_section()
+            modifier_list += cls_list
+
+            # topdown specific logic
+            uarch_whitelist = ["sapphirerapids", "emeraldrapids"]
+            if len(cls_list) > 0:
+                for mod_obj in cls_list:
+                    if mod_obj["name"] == "caliper" and "topdown" in mod_obj["mode"]:
+                        cpu_arch = self.system_spec.system.cpu_arch
+                        if cpu_arch.lower() not in uarch_whitelist:
+                            raise ValueError(
+                                f"Topdown analysis is not supported on the provided system with uarch='{cpu_arch}'. Must be one of:\n\t{uarch_whitelist}"
+                            )
+
         return modifier_list
 
     def add_experiment_variable(self, name, values, named=False, matrixed=False):

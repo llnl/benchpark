@@ -114,10 +114,9 @@ Workshop 2026 Program Committee
 
 - Robert Bird, Google, USA
 - Sunita Chandrasekaran, University of Delaware, USA
-- Florina Ciorba, University of Basel, Switzerland
 - Jens Domke, RIKEN Center for Computational Science, Japan
-- Vasileios Karakasis, NVIDIA, Switzerland
+- Andreas Herten, Juelich Supercomputing Centre, Germany
+- Doug Jacobsen, Google, USA
 - Tuomas Koskela, University College London, UK
-- Veronica G. Melesse Vergara, Oak Ridge National Laboratory, USA
 - Olga Pearce, Lawrence Livermore National Laboratory, USA
 - Keita Teranishi, Oak Ridge National Laboratory, USA
