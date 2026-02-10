@@ -83,11 +83,15 @@ class Kripke(
                 "ds": 128,
                 "lorder": 4,
                 "layout": "GDZ",
-                "strong_n": lambda var, itr, dim, scaling_factor: var.val(dim), 
-                "strong_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
-                "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
-                "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
-                "throughput_n": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+                "strong_n": lambda var, itr, dim, scaling_factor: var.val(dim),
+                "strong_p": lambda var, itr, dim, scaling_factor: var.val(dim)
+                * scaling_factor,
+                "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim)
+                * scaling_factor,
+                "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim)
+                * scaling_factor,
+                "throughput_n": lambda var, itr, dim, scaling_factor: var.val(dim)
+                * scaling_factor,
                 "throughput_p": lambda var, itr, dim, scaling_factor: var.val(dim),
             }
         # Must be exec_mode=perf
@@ -156,10 +160,13 @@ class Kripke(
                     "ds": 80,
                     "lorder": 4,
                     "layout": "GDZ",
-                    "strong_n": lambda var, itr, dim, scaling_factor: var.val(dim), 
-                    "strong_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
-                    "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
-                    "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+                    "strong_n": lambda var, itr, dim, scaling_factor: var.val(dim),
+                    "strong_p": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
                     "throughput_n": None,
                     "throughput_p": None,
                 }
