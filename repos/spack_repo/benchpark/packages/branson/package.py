@@ -40,15 +40,21 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
     variant("n_groups", default=30, values=int, description="Number of groups")
     variant("umpire", default=False, description="Use umpire memory pool")
 
-    depends_on("umpire+cuda", when="+umpire+cuda")
-    for arch in ("none", "50", "60", "70", "80", "90"):
-        depends_on(f"umpire cuda_arch={arch}", when=f"cuda_arch={arch}")
+    with when("+cuda @0.12.0:"):
+        depends_on("camp+cuda")
+        for sm_ in CudaPackage.cuda_arch_values:
+            depends_on("camp +cuda cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
 
-    depends_on("umpire+rocm", when="+umpire+rocm")
-    for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
-        depends_on(f"umpire amdgpu_target={target}", when=f"amdgpu_target={target}")
+    with when("+umpire"):
+        depends_on("umpire+cuda", when="+cuda")
+        for sm_ in CudaPackage.cuda_arch_values:
+            depends_on("umpire cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
 
-    conflicts("+umpire", when="~cuda~rocm")
+        depends_on("umpire+rocm", when="+rocm")
+        for arch in ROCmPackage.amdgpu_targets:
+            depends_on("umpire amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
+
+        conflicts("~cuda~rocm")
 
     depends_on("mpi@2:")
 
