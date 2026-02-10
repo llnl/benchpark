@@ -3,4 +3,4 @@ flake8==7.3.0
 isort[colors]==7.0.0
 codespell==2.4.1
 yamlfix==1.19.1
-docstrfmt==2.0.1
+docstrfmt==2.0.2
