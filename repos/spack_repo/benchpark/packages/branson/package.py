@@ -40,11 +40,6 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
     variant("n_groups", default=30, values=int, description="Number of groups")
     variant("umpire", default=False, description="Use umpire memory pool")
 
-    with when("+cuda @0.12.0:"):
-        depends_on("camp+cuda")
-        for sm_ in CudaPackage.cuda_arch_values:
-            depends_on("camp +cuda cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
-
     with when("+umpire"):
         depends_on("umpire+cuda", when="+cuda")
         for sm_ in CudaPackage.cuda_arch_values:
