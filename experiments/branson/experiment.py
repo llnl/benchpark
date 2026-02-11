@@ -96,7 +96,7 @@ class Branson(
             self.add_experiment_variable("num_particles", photons, True)
         self.add_experiment_variable("resource_count", 4, False)
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
-            self.add_experiment_variable("pool", 20, False)
+            self.add_experiment_variable("pool", 64, False)
 
         self.register_scaling_config(
             {
