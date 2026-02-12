@@ -52,27 +52,25 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
     depends_on("mfem cxxstd=17")
 
     requires("^[virtuals=zlib-api] zlib")
-
-    depends_on("mpi")
-    depends_on("hypre+mpi")
-    depends_on("hypre+cuda+mpi", when="+cuda")
-    depends_on("hypre+mixedint~fortran")
-    depends_on("hypre+caliper", when="+caliper")
-
-    depends_on("hypre+cuda", when="+cuda")
+    depends_on("hypre+cuda+mpi+umpire", when="+cuda")
     depends_on("hypre~cuda", when="~cuda")
-    depends_on("mfem+cuda+mpi", when="+cuda")
+    depends_on("mfem+cuda+mpi+umpire", when="+cuda")
     depends_on("mfem~cuda", when="~cuda")
 
     for sm_ in CudaPackage.cuda_arch_values:
         depends_on("hypre cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
         depends_on("mfem cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
+        depends_on("umpire cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
 
-    depends_on("hypre+rocm", when="+rocm")
-    depends_on("mfem +rocm+mpi", when="+rocm")
+    depends_on("hypre+rocm+mpi+umpire", when="+rocm")
+    depends_on("hypre~rocm", when="~rocm")
+    depends_on("mfem+rocm+mpi+umpire", when="+rocm")
+    depends_on("mfem~rocm", when="~rocm")
+    
     for arch in ROCmPackage.amdgpu_targets:
         depends_on("hypre amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
         depends_on("mfem amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
+        depends_on("umpire amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
 
     depends_on("hypre+gpu-aware-mpi", when="^cray-mpich+gtl")
 
