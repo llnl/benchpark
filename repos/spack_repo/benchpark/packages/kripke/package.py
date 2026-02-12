@@ -15,7 +15,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     """
 
     homepage = "https://computing.llnl.gov/projects/co-design/kripke"
-    git = "https://github.com/LLNL/Kripke.git"
+    git = "https://github.com/michaelmckinsey1/Kripke.git"
 
     tags = ["proxy-app"]
 
@@ -23,6 +23,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
 
     license("BSD-3-Clause")
 
+    version("fix-policies", branch="fix-policies", submodules=False)
     version("develop", branch="develop", submodules=False)
     version("2025.12.0", submodules=False, commit="01f6f85c02ceffcd2bc06e42cee997867dd142c5")
     version("2025.07.0", submodules=False, commit="8cf38433a6a11e0dcd17864e649b2d045159ee9c")
@@ -66,10 +67,10 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("cxx", type="build")
     depends_on("fortran", type="build")
 
+    depends_on("raja@2025.12.1", when="@fix-policies")
     depends_on("chai@2025.12.0+raja", when="@2025.12.0")
+    depends_on("chai@2025.12.0+raja", when="@fix-policies")
     depends_on("fmt@9.1", when=f"^chai@2024.07.0")
-    depends_on("chai@2024.07.0+raja", when="@:2025.07.0")
-    depends_on("chai@2024.07.0+raja", when="@1.2.7.0:2025.07.0")
     depends_on("fmt@9.1", when=f"^chai@2024.07.0")
 
     depends_on("mpi", when="+mpi")
@@ -78,6 +79,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("adiak@0.4:", when="+caliper")
     conflicts("^blt@:0.3.6", when="+rocm")
     conflicts("^blt@0.7:", when="^chai@:2024.07.0")
+    depends_on("blt@0.7.1", when="@fix-policies")
 
     depends_on("blt@0.6.2:", type="build", when=f"@1.2.7:")
 
