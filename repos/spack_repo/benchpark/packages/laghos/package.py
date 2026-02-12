@@ -56,27 +56,29 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
 
     depends_on("mpi")
     depends_on("hypre+mpi")
-    depends_on("hypre+cuda+mpi", when="+cuda")
-    depends_on("hypre+mixedint~fortran", when="@develop")
+    depends_on("hypre+mixedint~fortran")
     depends_on("hypre+caliper", when="+caliper")
 
-    requires("+cuda", when="^hypre+cuda")
-    for arch in ("none", "50", "60", "70", "80", "90"):
-        depends_on(f"hypre cuda_arch={arch}", when=f"cuda_arch={arch}")
-        depends_on(f"mfem cuda_arch={arch}", when=f"cuda_arch={arch}")
-    depends_on("mfem +cuda+mpi", when="+cuda")
-    depends_on("mfem +rocm+mpi", when="+rocm")
-    depends_on("mfem +umpire", when="+cuda")
-    depends_on("mfem +umpire", when="+rocm")
+    depends_on("hypre+cuda+mpi+umpire", when="+cuda")
+    depends_on("hypre~cuda", when="~cuda")
+    depends_on("mfem+cuda+mpi+umpire", when="+cuda")
+    depends_on("mfem~cuda", when="~cuda")
 
-    depends_on("hypre +rocm+mpi", when="+rocm")
-    requires("+rocm", when="^hypre+rocm")
-    for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
-        depends_on(f"hypre amdgpu_target={target}", when=f"amdgpu_target={target}")
-        depends_on(f"mfem amdgpu_target={target}", when=f"amdgpu_target={target}")
+    for sm_ in CudaPackage.cuda_arch_values:
+        depends_on("hypre cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
+        depends_on("mfem cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
+        depends_on("umpire cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
 
-    depends_on("hypre+umpire", when="+cuda")
-    depends_on("hypre+umpire", when="+rocm")
+    depends_on("hypre+rocm+mpi+umpire", when="+rocm")
+    depends_on("hypre~rocm", when="~rocm")
+    depends_on("mfem+rocm+mpi+umpire", when="+rocm")
+    depends_on("mfem~rocm", when="~rocm")
+    
+    for arch in ROCmPackage.amdgpu_targets:
+        depends_on("hypre amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
+        depends_on("mfem amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
+        depends_on("umpire amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
+
     depends_on("hypre+gpu-aware-mpi", when="+gpu-aware-mpi")
 
     # Replace MPI_Session
