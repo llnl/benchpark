@@ -1,4 +1,6 @@
+# BASH_SOURCE[0] if it exists, or ${(%):-%N} in zsh, or $0 as a final fallback
 _this_file="${BASH_SOURCE[0]-${(%):-%N}-$0}"
+# Get abspath
 _this_dir="$(CDPATH= cd -- "$(dirname -- "$_this_file")" 2>/dev/null && pwd -P)"
 
 case ":$PATH:" in
