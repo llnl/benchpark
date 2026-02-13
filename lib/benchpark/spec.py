@@ -323,15 +323,22 @@ class ConcreteSpec(Spec):
             name, values = variants_to_check.pop()
             checked.add((name, values))
 
-            conditions = [
-                w
-                for w, v_by_n in self.object_class.variants.items()
-                for n, v in v_by_n.items()
-                if n == name and v.validate_values_bool(values)
-            ]
+            conditions = []
+            possible_variants = set()
+            for when, v_by_n in self.object_class.variants.items():
+                possible_variants.update(v_by_n.keys())
+                for n, v in v_by_n.items():
+                    if n == name:
+                        if not v.validate_values_bool(values):
+                            raise Exception(f"'{values}' is not valid for variant '{name}' on {self.name}")
+                        conditions.append(when)
 
-            if not conditions:
+            if name not in possible_variants:
                 raise Exception(f"{name} is not a valid variant of {self.name}")
+
+            #if not conditions:
+            #    import pdb; pdb.set_trace()
+            #    print('hi')
 
             # This variant is already valid on self
             if any(self.satisfies(c) for c in conditions):
