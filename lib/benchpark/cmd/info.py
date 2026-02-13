@@ -141,7 +141,7 @@ def info_experiment(args):
 
     experiment_spec = benchpark.spec.ExperimentSpec(" ".join(args.name))
     conc = experiment_spec.concretize()
-    experiment_class = conc.experiment
+    experiment = conc.experiment
 
     if args.spack:
         subprocess.run(
@@ -149,9 +149,9 @@ def info_experiment(args):
                 "spack",
                 "info",
                 (
-                    experiment_class.spack_name
-                    if experiment_class.spack_name
-                    else experiment_class.name
+                    experiment.spack_name
+                    if experiment.spack_name
+                    else experiment.name
                 ),
             ]
         )
@@ -162,19 +162,19 @@ def info_experiment(args):
                 "ramble",
                 "info",
                 (
-                    experiment_class.ramble_name
-                    if experiment_class.ramble_name
-                    else experiment_class.name
+                    experiment.ramble_name
+                    if experiment.ramble_name
+                    else experiment.name
                 ),
             ]
         )
         return
     else:
         actions = {
-            "maintainers": (info_maintainers, [experiment_class]),
-            "ramble_name": (_info_ramble_name, [experiment_class]),
-            "spack_name": (_info_spack_name, [experiment_class]),
-            "variants": (info_variants, [experiment_class]),
+            "maintainers": (info_maintainers, [experiment]),
+            "ramble_name": (_info_ramble_name, [experiment]),
+            "spack_name": (_info_spack_name, [experiment]),
+            "variants": (info_variants, [experiment]),
         }
 
         # Call functions for enabled options, or all if no flag is set
