@@ -4,13 +4,15 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-CI Developer Guide
-==================
+####################
+ CI Developer Guide
+####################
 
 This guide is intended for people who want to modify the GitHub/Gitlab CI for benchpark
 
-GitLab
-------
+********
+ GitLab
+********
 
 The Benchpark GitLab tests run on LC systems as a part of the
 ``https://lc.llnl.gov/gitlab``. The goal is to build and run the benchmarks on systems
@@ -81,8 +83,9 @@ specified by the ``.gitlab-ci.yml`` configuration file:
       ``run-experiment.sh``
    e. Reporting GitLab status to GitHub PRs ``status.yml``.
 
-GitHub
-------
+********
+ GitHub
+********
 
 Although the GitLab tests cover the most critical step (building and running the
 benchmarks across multiple LC systems) they do not test all of the benchmarks/systems or
@@ -91,10 +94,10 @@ runners to test mostly python functionality, which is platform independent. The
 following is a description of the different types of GitHub testing:
 
 run.yml
-~~~~~~~
+=======
 
 Dryruns
-+++++++
+-------
 
 Dryruns can be thought of similarly to the GitLab tests, but only involve testing up to
 the ``ramble workspace setup`` step with the ``--dry-run`` flag, which sets up the
@@ -120,7 +123,7 @@ instead. While much of the testing covered by dryruns is likely redundant, they 
 relatively inexpensive to run.
 
 Saxpy
-+++++
+-----
 
 There is a singular job that builds and runs the ``saxpy`` experiment on a GitHub
 virtual machine runner. This step additionally tests ramble workspace analyze & archive,
@@ -128,7 +131,7 @@ uploading the binary as a CI cache, and the benchpark functionality to run a pre
 binary (reusing the spack-built binary).
 
 Pytest
-++++++
+------
 
 The Pytest unit tests are designed to cover as many different cases of the benchpark
 library as possible, useful for checking Python object properties that cannot be checked
@@ -138,18 +141,27 @@ our Pytest coverage is not comprehensive on its own, since we have other testing
 GitLab and GitHub (dryruns), that covers many cases.
 
 style.yml - Lint
-~~~~~~~~~~~~~~~~
+================
 
 The linter step checks:
 
 - Check Python code formatting using ``black``
+      - Fix black linter errors using ``python -m black dir/filename.py`` or
+            ``python -m black .`` (in source code dir).
 - Check spelling using ``codespell``
+      - Fix the spelling errors manually.
 - Sort imports using ``isort``
+      - Fix isort linter errors using ``isort .``
 - ``flake8`` for checking Python style enforcement
+      - Fix flake linter errors manually
 - ``yamlfix`` for formatting ``.yaml``/``.yml`` files
+      - Fix yaml linter errors using ``yamlfix dir.filename.yaml``
+- ``docstrfmt`` for formatting ``.rst`` files
+      - Fix docs linter errors using ``docstrfmt -p
+        .github/workflows/requirements/docstrfmt.toml docs/``
 
 Code Coverage
-~~~~~~~~~~~~~
+=============
 
 `Code coverage <https://about.codecov.io/>`_ measures the amount of lines that are
 "covered" by a given test, i.e. if a line was executed it counts as coverage. Code
@@ -173,8 +185,9 @@ following form.:
 Additionally, for each upload step added, ``after_n_builds`` in ``codecov.yml`` needs to
 be incremented by 1.
 
-CDash
------
+*******
+ CDash
+*******
 
 The successes/failures of our GitLab tests are posted to our CDash dashboard `CDash
 dashboard <https://my.cdash.org/index.php?project=Benchpark>`_. There is a dashboard for

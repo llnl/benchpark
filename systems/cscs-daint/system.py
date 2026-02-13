@@ -4,11 +4,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.directives import variant, maintainers
-from benchpark.system import System, compiler_def, compiler_section_for, merge_dicts
-from benchpark.cudasystem import CudaSystem
 from packaging.version import Version
+
+from benchpark.cudasystem import CudaSystem
+from benchpark.directives import maintainers, variant
 from benchpark.paths import hardware_descriptions
+from benchpark.system import System, compiler_def, compiler_section_for, merge_dicts
 
 
 class CscsDaint(System):
@@ -17,6 +18,7 @@ class CscsDaint(System):
 
     id_to_resources = {
         "daint": {
+            "cpu_arch": "haswell",
             "sys_cores_per_node": 12,
             "sys_gpus_per_node": 1,
             "sys_mem_per_node_GB": 64,

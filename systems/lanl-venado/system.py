@@ -4,11 +4,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.directives import variant, maintainers
-from benchpark.cudasystem import CudaSystem
-from benchpark.system import System, compiler_def, compiler_section_for, merge_dicts
-from benchpark.paths import hardware_descriptions
 from packaging.version import Version
+
+from benchpark.cudasystem import CudaSystem
+from benchpark.directives import maintainers, variant
+from benchpark.paths import hardware_descriptions
+from benchpark.system import System, compiler_def, compiler_section_for, merge_dicts
 
 
 class LanlVenado(System):
@@ -17,6 +18,7 @@ class LanlVenado(System):
 
     id_to_resources = {
         "grace-hopper": {
+            "cpu_arch": "neoverse",
             "cuda_arch": 90,
             "sys_cores_per_node": 144,
             "sys_gpus_per_node": 4,
@@ -26,6 +28,7 @@ class LanlVenado(System):
             + "/HPECray-neoverse-H100-Slingshot/hardware_description.yaml",
         },
         "grace-grace": {
+            "cpu_arch": "neoverse",
             "sys_cores_per_node": 144,
             "system_site": "lanl",
             "hardware_key": str(hardware_descriptions)
@@ -184,12 +187,6 @@ class LanlVenado(System):
                         "cce@18.0.0",
                         "/opt/cray/pe/cce/18.0.0/",
                         {"c": "cracc", "cxx": "crayCC", "fortran": "crayftn"},
-                        flags={
-                            "cflags": "-g -O2 --gcc-toolchain=/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0",
-                            "cxxflags": "-g -O2 --gcc-toolchain=/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0",
-                            "fflags": "-g -O2 -hnopattern",
-                            "ldflags": "-ldl",
-                        },
                         env={
                             "prepend_path": {
                                 "LD_LIBRARY_PATH": "/opt/cray/pe/cce/18.0.0/cce/aarch64/lib:/opt/cray/libfabric/1.20.1/lib64:/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/lib:/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/lib64:/opt/cray/pe/gcc-libs"

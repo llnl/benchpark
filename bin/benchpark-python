@@ -18,6 +18,7 @@
 #
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 export PYTHONPATH="${SCRIPT_DIR}/../lib":$PYTHONPATH
+export BENCHPARK_SCRIPT_DIR=$SCRIPT_DIR
 # Check if the first argument is -i
 if [ "$1" = "-i" ]; then
     # Shift the arguments to remove the first one (-i)

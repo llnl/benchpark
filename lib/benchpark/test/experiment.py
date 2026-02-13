@@ -3,10 +3,10 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import yaml
 import sys
 
 import pytest
+import yaml
 
 import benchpark.spec
 
@@ -116,6 +116,11 @@ def test_default_config_section():
     experiment = spec.experiment
 
     config_section = experiment.compute_config_section()
+
+    the_spec = config_section["spec"]
+    del config_section["spec"]
+
+    assert benchpark.spec.ExperimentSpec(the_spec) == spec
 
     assert config_section == {
         "benchpark_experiment_command": "benchpark "

@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainers
+from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
 from benchpark.mpi import MpiOnlyExperiment
 from benchpark.openmp import OpenMPExperiment
@@ -20,13 +20,19 @@ class Genesis(Experiment, MpiOnlyExperiment, OpenMPExperiment):
 
     variant(
         "version",
-        default="main",
+        default="2.1.6",
+        values=("2.1.6", "main"),
         description="app version",
     )
 
     maintainers("jdomke", "SBA0486")
 
     def compute_applications_section(self):
+        if self.spec.satisfies("exec_mode=test"):
+            self.add_experiment_variable("n_nodes", ["1"], True)
+        # Must be exec_mode=perf
+        else:
+            self.add_experiment_variable("n_nodes", ["2"], True)
 
         self.add_experiment_variable("experiment_setup", "")
         self.add_experiment_variable("lx", "32")
@@ -43,13 +49,10 @@ class Genesis(Experiment, MpiOnlyExperiment, OpenMPExperiment):
         self.add_experiment_variable("maxiter_inner", "50")
 
         if self.spec.satisfies("+openmp"):
-            self.add_experiment_variable("n_nodes", ["2"], True)
-            self.add_experiment_variable("processes_per_node", ["4"])
+            self.add_experiment_variable("processes_per_node", ["8"])
             self.add_experiment_variable("n_ranks", "{processes_per_node} * {n_nodes}")
             self.add_experiment_variable("omp_num_threads", ["12"])
             self.add_experiment_variable("arch", "OpenMP")
-        else:
-            self.add_experiment_variable("n_nodes", ["2"], True)
 
         self.set_required_variables(
             n_resources="{n_ranks}",

@@ -4,8 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Run an Experiment
-=================
+###################
+ Run an Experiment
+###################
 
 To run all of the experiments in the workspace:
 
@@ -47,5 +48,25 @@ directory. Further, if the benchmark has restart capability, existing output may
 the experiments benchpark would run in the second run. Generally, we would advise the
 user to remove the ``$workspace/experiments`` directory before re-running the
 experiments using ``ramble --workspace-dir . on``.
+
+******************************************************
+ Running Different Experiments in the Same Allocation
+******************************************************
+
+The ``benchpark aggregate`` command provides the functionality to batch experiments from
+the same workspace or multiple workspaces together. To use ``benchpark aggregate``,
+provide a destination for the job script, and the workspaces as positional arguments:
+
+::
+
+    $ benchpark aggregate --dest agg/ workspace1/ workspace2/ ...
+
+Then, submit the newly created job script to the scheduler:
+
+::
+    $ flux batch agg/0.sh
+
+Output from the experiments will still be written to the respective experiment
+directory.
 
 Once you have run your experiment you can try :doc:`analyze-experiment`.

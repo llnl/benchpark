@@ -5,16 +5,16 @@
 import argparse
 import collections
 import io
-import pytest
 import os
 import re
 import sys
 
 import llnl.util.filesystem
-import llnl.util.tty.color as color
 import llnl.util.tty.colify as colify
+import llnl.util.tty.color as color
+import pytest
 
-import benchpark.paths
+from benchpark.paths import paths
 
 
 def setup_parser(subparser):
@@ -111,10 +111,10 @@ def do_list(args, extra_args):
     # which doesn't need to wait for pytest collection and doesn't
     # require parsing pytest output
     files = llnl.util.filesystem.find(
-        root=benchpark.paths.test_path, files="*.py", recursive=True
+        root=paths.test_path, files="*.py", recursive=True
     )
     files = [
-        os.path.relpath(f, start=benchpark.paths.benchpark_root)
+        os.path.relpath(f, start=paths.benchpark_root)
         for f in files
         if not f.endswith(("conftest.py", "__init__.py"))
     ]
@@ -145,7 +145,7 @@ def do_list(args, extra_args):
 
         len_indent = len(indent)
         if os.path.isabs(name):
-            name = os.path.relpath(name, start=benchpark.paths.benchpark_root)
+            name = os.path.relpath(name, start=paths.benchpark_root)
 
         item = (len_indent, name, nodetype)
 
@@ -212,7 +212,7 @@ def command(args, unknown_args):
 
     # add back any parsed pytest args we need to pass to pytest
     pytest_args = add_back_pytest_args(args, unknown_args)
-    pytest_root = benchpark.paths.benchpark_root
+    pytest_root = paths.benchpark_root
 
     if args.numprocesses is not None and args.numprocesses > 1:
         pytest_args.extend(

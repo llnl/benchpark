@@ -90,7 +90,7 @@ run_tests_slurm_dane:
     matrix:
       - HOST: dane
         ARCHCONFIG: llnl-cluster
-        BENCHMARK: [hpl, hpcg, amg2023, kripke]
+        BENCHMARK: [hpl, hpcg, amg2023, kripke, sparta-snl]
         VARIANT: [+openmp, '']
       - HOST: dane
         ARCHCONFIG: llnl-cluster
@@ -106,6 +106,26 @@ run_tests_slurm_dane:
         ARCHCONFIG: llnl-cluster
         BENCHMARK: [kripke]
         VARIANT: ['caliper=mpi,time hwloc=on affinity=on']
+      # Topdown
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        BENCHMARK: [kripke]
+        VARIANT: ['caliper=topdown-all,time']
+      # IOR needs a mount_point
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SYSTEM_ARGS: [mount_point="/p/lustre1"]
+        BENCHMARK: ior
+      # Test openmpi
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SYSTEM_ARGS: [mpi=openmpi]
+        BENCHMARK: osu-micro-benchmarks
+      # Compilers
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SYSTEM_ARGS: [compiler=gcc, compiler=clang]
+        BENCHMARK: osu-micro-benchmarks
 run_tests_slurm_matrix:
   extends: .run_tests_slurm
   tags: [shell, matrix]
@@ -123,3 +143,12 @@ run_tests_slurm_matrix:
           - raja-perf
           - saxpy
         VARIANT: [+cuda]
+      - HOST: matrix
+        ARCHCONFIG: llnl-matrix
+        BENCHMARK: [sparta-snl]
+        VARIANT: [+cuda~gpu-aware-mpi]
+      # spack-pip
+      - HOST: matrix
+        ARCHCONFIG: llnl-matrix
+        BENCHMARK: [py-scaffold]
+        VARIANT: ['+cuda package_manager=spack-pip caliper=mpi,time,cuda']

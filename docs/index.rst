@@ -40,10 +40,12 @@
     run-experiment
     analyze-experiment
     benchpark-analyze
+    configuration
     modifiers
     set-of-experiments
     run-binary
     create-mirror
+    io-benchmarking
 
 .. toctree::
     :maxdepth: 1
@@ -72,6 +74,12 @@
     diffPackageCommits
     diffSystemSpecs
     showBuild
+
+.. toctree::
+    :maxdepth: 1
+    :caption: Outreach
+
+    ics
 
 .. toctree::
     :maxdepth: 2

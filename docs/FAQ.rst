@@ -10,11 +10,13 @@ Spack Slack <https://spackpm.slack.com/archives/C061R1M9HNJ>`_ or `GitHub Discus
 <https://github.com/llnl/benchpark/discussions>`_. If you’ve learned the answer to a
 question that you think should be here, please consider contributing to this page.
 
-Frequently Asked Questions
-==========================
+############################
+ Frequently Asked Questions
+############################
 
-Benchmark not yet in Spack/Ramble
----------------------------------
+***********************************
+ Benchmark not yet in Spack/Ramble
+***********************************
 
 By default, Benchpark will use ${Benchmark1} specifications (``package.py`` and
 ``application.py``) provided in the Spack and Ramble repos. It is possible to overwrite
@@ -38,8 +40,9 @@ Benchpark, we would like to encourage the contributors to upstream the ``package
 Spack, and the ``application.py`` to Ramble. When those PRs are approved and merged,
 please submit a PR to remove the duplicated specification from ``benchpark/repo``.
 
-Spack/Ramble versions in Benchpark
-----------------------------------
+************************************
+ Spack/Ramble versions in Benchpark
+************************************
 
 Benchpark depends on the build functionality provided in `Spack
 <https://github.com/spack/spack>`_, and run functionality provided in `Ramble
@@ -61,8 +64,9 @@ Alternatively, the user may temporarily copy the needed packages into
 ``benchpark/repo``, and remove them when Benchpark updates to the next version of
 Spack/Ramble.
 
-What to rerun after edits
--------------------------
+***************************
+ What to rerun after edits
+***************************
 
 .. list-table:: I made changes.  What should I rerun?
     :widths: 35 65
@@ -80,3 +84,19 @@ What to rerun after edits
       - delete ``workspace/experiments``
     - - wish to rerun experiments
       - delete ``workspace/experiments``
+
+**********************************************************************
+ How to move the Benchpark bootstrap location from the home directory
+**********************************************************************
+
+Remove your current bootstrap in home (``~``) and then use: ``benchpark configure`` to
+set your preferred location.
+
+::
+
+    rm -rf ~/.benchpark
+    benchpark configure --bootstrap-location /my/path
+    benchpark bootstrap
+
+benchpark will save this location, and you can optionally set a new bootstrap location
+for each clone of benchpark, or reuse the same location.

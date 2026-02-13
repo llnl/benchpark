@@ -12,8 +12,9 @@ import sys
 
 import ruamel.yaml as yaml
 
-import benchpark.paths
+import benchpark.config
 from benchpark.debug import debug_print
+from benchpark.paths import paths
 from benchpark.runtime import RuntimeResources
 
 
@@ -23,6 +24,8 @@ def symlink_tree(src, dst, include_fn=None):
     """Like ``cp -R`` but instead of files, create symlinks"""
     src = os.path.abspath(src)
     dst = os.path.abspath(dst)
+    if pathlib.Path(src) in pathlib.Path(dst).parents:
+        raise Exception(f"Recursive copy from parent to child:\n\t{src}\n\t{dst}")
     # By default, we include all filenames
     include_fn = include_fn or (lambda f: True)
     for x in [src, dst]:
@@ -53,17 +56,33 @@ def setup_parser(root_parser):
     )
 
 
+def determine_experiment_id(exp_src_dir):
+    x = pathlib.Path(exp_src_dir)
+    for y in x.parents:
+        if (y / "system_id.yaml").exists():
+            # y is the system dir, we want that and everything after it
+            return str(x.relative_to(y.parent))
+    raise Exception(
+        f"No benchpark system dir detected in {exp_src_dir}"
+        " or any parent (no directories containing system_id.yaml)."
+    )
+
+
+_workspace_indicator_file = ".benchpark-ramble-workspace"
+
+
 def command(args):
     """
     experiments_root/
         spack/
         ramble/
-        <experiment>/
+        <experiment root>
             <system>/
-                workspace/
-                    configs/
-                        (everything from source/configs/<system>)
-                        (everything from source/experiments/<experiment>)
+                <experiment>/
+                    workspace/
+                        configs/
+                            (everything from source/configs/<system>)
+                            (everything from source/experiments/<experiment>)
     """
 
     # Parse experiment YAML for package_manager, system_id
@@ -77,37 +96,52 @@ def command(args):
                     return result
 
     experiments_root = pathlib.Path(os.path.abspath(args.experiments_root))
-    experiment_id = args.experiment
-    source_dir = benchpark.paths.benchpark_root
+    source_dir = paths.benchpark_root
 
-    experiment_src_dir = pathlib.Path(os.path.abspath(str(experiment_id)))
+    experiment_src_dir = pathlib.Path(os.path.abspath(str(args.experiment)))
 
     with open(str(experiment_src_dir / "ramble.yaml"), "r") as file:
         parsed_yaml = yaml.safe_load(file)
     pkg_manager = _find(parsed_yaml, "package_manager")
     system_id = _find(parsed_yaml, "destdir")
+    experiment_id = determine_experiment_id(experiment_src_dir)
 
     debug_print(f"source_dir = {source_dir}")
-    debug_print(f"specified experiment = {experiment_id}")
-    debug_print(f"specified system = {system_id}")
+    debug_print(f"specified system/experiment = {experiment_id}")
 
     configs_src_dir = pathlib.Path(os.path.abspath(str(system_id)))
 
     experiments_root = pathlib.Path(os.path.abspath(experiments_root))
-    experiment_id = pathlib.Path(os.path.abspath(experiment_id))
     system_id = pathlib.Path(os.path.abspath(system_id))
-    common_root = pathlib.Path(
-        os.path.commonpath([experiments_root, experiment_id, system_id])
-    )
-    workspace_dir = (
-        common_root
-        / experiments_root.relative_to(common_root)
-        / experiment_id.relative_to(common_root)
-        / system_id.relative_to(common_root)
-    )
+
+    workspace_dir = pathlib.Path(experiments_root) / experiment_id
 
     if workspace_dir.exists():
         if workspace_dir.is_dir():
+            if not (workspace_dir / _workspace_indicator_file).exists():
+                msg = (
+                    f"Derived workspace {workspace_dir} already exists and does not"
+                    " appear to have been created by `benchpark setup`. Please choose"
+                    " a different directory or clear this dir manually"
+                )
+                if workspace_dir == pathlib.Path(experiment_src_dir):
+                    # if you did `benchpark system init --dest=x/y`
+                    # and `benchpark experiment init x/y z`
+                    # then for an experiment_root R, `benchpark setup` wants
+                    # to make R/y/z (and manage it). Therefore you cannot pick
+                    # R=x (note that if you just `benchpark system init --dest=y`
+                    # where y is relative, that x is your CWD)
+                    msg = (
+                        "<experiments_root> cannot be the directory containing"
+                        " the `--dest` of `benchpark system init`"
+                    )
+                msg += (
+                    "\n\nIt is recommended to choose a nonexistent directory as the"
+                    " <experiments_root> or a directory that has been used as the"
+                    " <experiments_root> before"
+                )
+                print(msg)
+                sys.exit(1)
             print(f"Clearing existing workspace {workspace_dir}")
             shutil.rmtree(workspace_dir)
         else:
@@ -117,6 +151,7 @@ def command(args):
             sys.exit(1)
 
     workspace_dir.mkdir(parents=True)
+    (workspace_dir / _workspace_indicator_file).touch()
 
     ramble_workspace_dir = workspace_dir / "workspace"
     ramble_configs_dir = ramble_workspace_dir / "configs"
@@ -166,46 +201,57 @@ def command(args):
     run_script = experiments_root / ".latest-experiment.sh"
 
     per_workspace_setup = RuntimeResources(
-        experiments_root, upstream=RuntimeResources(benchpark.paths.benchpark_home)
+        experiments_root, upstream=RuntimeResources(paths.benchpark_home)
     )
 
+    repos_cfg = benchpark.config.configuration().repos
+
     pkg_str = ""
-    if pkg_manager == "spack":
+    if "spack" in pkg_manager:
+        spack_build_stage = experiments_root / "builds"
+        spack_user_cache_path = experiments_root / "spack-cache"
         spack, first_time_spack = per_workspace_setup.spack_first_time_setup()
         if first_time_spack:
             site_repos = (
                 per_workspace_setup.spack_location / "etc" / "spack" / "repos.yaml"
             )
+            repos = {}
+            for repo_dir in reversed(repos_cfg.packages):
+                repo_dir = repos_cfg.resolve_path(repo_dir)
+                with open(repo_dir / "repo.yaml", "r") as f:
+                    repo_data = yaml.safe_load(f)
+                    namespace = repo_data["repo"]["namespace"]
+                    repos[namespace] = str(repo_dir)
+            repos["builtin"] = (
+                f"{per_workspace_setup.pkgs_location}/repos/spack_repo/builtin/"
+            )
             with open(site_repos, "w") as f:
-                f.write(
-                    f"""\
-repos::
-  benchpark: {source_dir}/repo
-  builtin: {per_workspace_setup.pkgs_location}/repos/spack_repo/builtin/
-"""
-                )
+                yaml.dump({"repos:": repos}, f, default_flow_style=False)
+            spack(
+                f"config --scope=site add \"config:build_stage:['{spack_build_stage}']\""
+            )
 
         pkg_str = f"""\
-. {per_workspace_setup.spack_location}/share/spack/setup-env.sh
-
+export SPACK_USER_CACHE_PATH={spack_user_cache_path}
 export SPACK_DISABLE_LOCAL_CONFIG=1
+. {per_workspace_setup.spack_location}/share/spack/setup-env.sh
 """
 
     ramble, first_time_ramble = per_workspace_setup.ramble_first_time_setup()
     if first_time_ramble:
-        ramble(f"repo add --scope=site {source_dir}/repo")
+        for repo_dir in reversed(repos_cfg.applications):
+            repo_dir = repos_cfg.resolve_path(repo_dir)
+            ramble(f"repo add --scope=site {repo_dir}")
         ramble('config --scope=site add "config:disable_progress_bar:true"')
         ramble(f"repo add -t modifiers --scope=site {source_dir}/modifiers")
         ramble("config --scope=site add \"config:spack:global:args:'-d'\"")
 
     if not initializer_script.exists():
         with open(initializer_script, "w") as f:
-            f.write(
-                f"""\
+            f.write(f"""\
 {pkg_str}
 . {per_workspace_setup.ramble_location}/share/ramble/setup-env.sh
-"""
-            )
+""")
 
     ramble_setup = f"ramble --workspace-dir {ramble_workspace_dir} workspace setup"
     ramble_run = f"ramble --workspace-dir {ramble_workspace_dir} on"
