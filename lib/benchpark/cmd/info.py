@@ -148,7 +148,7 @@ def info_experiment(args):
         msg = (
             f"'{experiment_spec_str}' must be a valid experiment spec;"
             " some experiments require specifying additional variants"
-            " (e.g. experiments not inheriting MpiOnlyExperiment must" \
+            " (e.g. experiments not inheriting MpiOnlyExperiment must"
             " set +rocm or +cuda)."
         )
         raise ValueError(msg) from e
@@ -158,11 +158,7 @@ def info_experiment(args):
             [
                 "spack",
                 "info",
-                (
-                    experiment.spack_name
-                    if experiment.spack_name
-                    else experiment.name
-                ),
+                (experiment.spack_name if experiment.spack_name else experiment.name),
             ]
         )
         return
@@ -171,11 +167,7 @@ def info_experiment(args):
             [
                 "ramble",
                 "info",
-                (
-                    experiment.ramble_name
-                    if experiment.ramble_name
-                    else experiment.name
-                ),
+                (experiment.ramble_name if experiment.ramble_name else experiment.name),
             ]
         )
         return
@@ -229,7 +221,9 @@ def setup_parser(root_parser):
     experiment_parser.add_argument(
         "--maintainers", action="store_true", help="Maintainers"
     )
-    experiment_parser.add_argument("name", nargs=argparse.REMAINDER, help="Experiment name")
+    experiment_parser.add_argument(
+        "name", nargs=argparse.REMAINDER, help="Experiment name"
+    )
 
 
 def command(args):

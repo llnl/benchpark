@@ -330,13 +330,15 @@ class ConcreteSpec(Spec):
                 for n, v in v_by_n.items():
                     if n == name:
                         if not v.validate_values_bool(values):
-                            raise Exception(f"'{values}' is not valid for variant '{name}' on {self.name}")
+                            raise Exception(
+                                f"'{values}' is not valid for variant '{name}' on {self.name}"
+                            )
                         conditions.append(when)
 
             if name not in possible_variants:
                 raise Exception(f"{name} is not a valid variant of {self.name}")
 
-            #if not conditions:
+            # if not conditions:
             #    import pdb; pdb.set_trace()
             #    print('hi')
 
