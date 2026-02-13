@@ -139,9 +139,19 @@ def info_experiment(args):
             )
         )
 
-    experiment_spec = benchpark.spec.ExperimentSpec(" ".join(args.name))
+    experiment_spec_str = " ".join(args.name)
+    experiment_spec = benchpark.spec.ExperimentSpec(experiment_spec_str)
     conc = experiment_spec.concretize()
-    experiment = conc.experiment
+    try:
+        experiment = conc.experiment
+    except Exception as e:
+        msg = (
+            f"'{experiment_spec_str}' must be a valid experiment spec;"
+            " some experiments require specifying additional variants"
+            " (e.g. experiments not inheriting MpiOnlyExperiment must" \
+            " set +rocm or +cuda)."
+        )
+        raise ValueError(msg) from e
 
     if args.spack:
         subprocess.run(
