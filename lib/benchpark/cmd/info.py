@@ -1,3 +1,4 @@
+import argparse
 import os
 import subprocess
 import textwrap
@@ -138,7 +139,7 @@ def info_experiment(args):
             )
         )
 
-    experiment_spec = benchpark.spec.ExperimentSpec(args.name)
+    experiment_spec = benchpark.spec.ExperimentSpec(" ".join(args.name))
     conc = experiment_spec.concretize()
     experiment_class = conc.experiment
 
@@ -218,7 +219,7 @@ def setup_parser(root_parser):
     experiment_parser.add_argument(
         "--maintainers", action="store_true", help="Maintainers"
     )
-    experiment_parser.add_argument("name", help="Experiment name")
+    experiment_parser.add_argument("name", nargs=argparse.REMAINDER, help="Experiment name")
 
 
 def command(args):
