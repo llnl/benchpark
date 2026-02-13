@@ -338,10 +338,6 @@ class ConcreteSpec(Spec):
             if name not in possible_variants:
                 raise Exception(f"{name} is not a valid variant of {self.name}")
 
-            # if not conditions:
-            #    import pdb; pdb.set_trace()
-            #    print('hi')
-
             # This variant is already valid on self
             if any(self.satisfies(c) for c in conditions):
                 continue
