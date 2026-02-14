@@ -114,6 +114,7 @@ Workshop 2026 Program Committee
 
 - Robert Bird, Google, USA
 - Sunita Chandrasekaran, University of Delaware, USA
+- Florina Ciorba, University of Basel, Switzerland
 - Jens Domke, RIKEN Center for Computational Science, Japan
 - Andreas Herten, Juelich Supercomputing Centre, Germany
 - Doug Jacobsen, Google, USA
