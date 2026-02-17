@@ -49,19 +49,19 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("blas")
     depends_on("lapack")
 
-    depends_on("umpire", when="+umpire")
-    depends_on("hypre+umpire", when="+umpire")
-    depends_on("hypre~umpire", when="~umpire")
-    depends_on("hypre+cuda", when="+cuda")
-    depends_on("hypre+openmp", when="+openmp")
-    requires("+cuda", when="^hypre+cuda")
-    for arch in ("none", "50", "60", "70", "80", "90"):
-        depends_on(f"hypre cuda_arch={arch}", when=f"cuda_arch={arch}")
+    depends_on("hypre+cuda+mpi+umpire", when="+cuda")
+    depends_on("hypre~cuda", when="~cuda")
 
-    depends_on("hypre+rocm", when="+rocm")
-    requires("+rocm", when="^hypre+rocm")
-    for target in ("none", "gfx803", "gfx900", "gfx906", "gfx908", "gfx90a", "gfx942"):
-        depends_on(f"hypre amdgpu_target={target}", when=f"amdgpu_target={target}")
+    for sm_ in CudaPackage.cuda_arch_values:
+        depends_on("hypre cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
+        depends_on("umpire cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
+
+    depends_on("hypre+rocm+mpi+umpire", when="+rocm")
+    depends_on("hypre~rocm", when="~rocm")
+    
+    for arch in ROCmPackage.amdgpu_targets:
+        depends_on("hypre amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
+        depends_on("umpire amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
 
     depends_on("hypre+gpu-aware-mpi", when="+mpi+gpu-aware-mpi")
 
