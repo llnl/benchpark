@@ -25,6 +25,7 @@ class LlnlElcapitan(System):
 
     id_to_resources = {
         "tioga": {
+            "cpu_arch": "zen3",
             "rocm_arch": "gfx90a",
             "sys_cores_per_node": 56,
             "sys_cores_os_reserved_per_node": 8,
@@ -47,6 +48,7 @@ class LlnlElcapitan(System):
             "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
         },
         "elcapitan": {
+            "cpu_arch": "zen4",
             "rocm_arch": "gfx942",
             "sys_cores_per_node": 84,
             "sys_cores_os_reserved_per_node": 12,
@@ -129,8 +131,18 @@ class LlnlElcapitan(System):
     )
     variant(
         "rocm",
-        default="6.4.0",
-        values=("5.7.1", "6.2.4", "6.3.1", "6.4.0", "6.4.1", "6.4.2", "6.4.3", "7.0.1"),
+        default="6.4.3",
+        values=(
+            "5.7.1",
+            "6.2.4",
+            "6.3.1",
+            "6.4.0",
+            "6.4.1",
+            "6.4.2",
+            "6.4.3",
+            "7.0.1",
+            "7.1.0",
+        ),
         description="ROCm version",
     )
     variant(
@@ -161,7 +173,7 @@ class LlnlElcapitan(System):
     variant(
         "bank",
         default="none",
-        values=("none", "guests", "asccasc", "lc", "fractale"),
+        values=("none", "guests", "asccasc", "lc", "fractale", "wbronze"),
         multi=False,
         description="Submit a job to a specific named bank",
     )
@@ -213,17 +225,23 @@ class LlnlElcapitan(System):
             if self.rocm_version >= Version("6.4.0"):
                 self.cce_version = Version("20.0.0")
                 self.mpi_version = Version("9.0.1")
+                self.rccl_version = Version("6.4.1")
             elif self.rocm_version >= Version("6.0.0"):
                 self.cce_version = Version("18.0.1")
                 self.mpi_version = Version("8.1.31")
+                self.rccl_version = Version("6.3.1")
             else:
                 self.cce_version = Version("16.0.0")
                 self.mpi_version = Version("8.1.26")
-        if self.rocm_version >= Version("6.0.0"):
+                self.rccl_version = Version("5.4.3")
+        if self.rocm_version >= Version("6.4.0"):
+            self.pmi_version = Version("6.1.15.6")
+            self.pals_version = Version("1.2.12")
+            self.llvm_version = Version("19.0.0")
+        elif self.rocm_version >= Version("6.0.0"):
             self.pmi_version = Version("6.1.15.6")
             self.pals_version = Version("1.2.12")
             self.llvm_version = Version("18.0.1")
-
         else:
             self.pmi_version = Version("6.1.12")
             self.pals_version = Version("1.2.9")
@@ -328,6 +346,7 @@ class LlnlElcapitan(System):
                 "cvs": {"externals": [{"spec": "cvs@1.11.23", "prefix": "/usr"}]},
                 "git": {
                     "externals": [
+                        {"spec": "git@2.43.7", "prefix": "/usr"},
                         {"spec": "git@2.31.1+tcltk", "prefix": "/usr"},
                         {"spec": "git@2.29.1+tcltk", "prefix": "/usr/tce"},
                     ]
@@ -344,7 +363,15 @@ class LlnlElcapitan(System):
                         {
                             "spec": "python@3.9.12",
                             "prefix": "/usr/tce/packages/python/python-3.9.12",
-                        }
+                        },
+                        {
+                            "spec": "python@3.11.5",
+                            "prefix": "/usr/tce/packages/python/python-3.11.5",
+                        },
+                        {
+                            "spec": "python@3.12.2",
+                            "prefix": "/usr/tce/packages/python/python-3.12.2",
+                        },
                     ],
                 },
                 "unzip": {
@@ -375,6 +402,18 @@ class LlnlElcapitan(System):
                     "externals": [
                         {"spec": "libfabric@2.1", "prefix": "/opt/cray/libfabric/2.1"}
                     ],
+                    "buildable": False,
+                },
+                "ncurses": {
+                    "externals": [{"spec": "ncurses@6.1.20180224", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "libxcrypt": {
+                    "externals": [{"spec": "libxcrypt@4.1.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "opengl": {
+                    "externals": [{"spec": "opengl@4.5", "prefix": "/usr"}],
                     "buildable": False,
                 },
             }
@@ -624,6 +663,15 @@ class LlnlElcapitan(System):
                     ],
                     "buildable": False,
                 },
+                "rocprofiler-sdk": {
+                    "externals": [
+                        {
+                            "spec": f"rocprofiler-sdk@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
                 "comgr": {
                     "externals": [
                         {
@@ -701,7 +749,7 @@ class LlnlElcapitan(System):
                         {
                             "spec": f"llvm@{self.llvm_version}",
                             "prefix": f"/opt/rocm-{self.rocm_version}/llvm",
-                        }
+                        },
                     ],
                     "buildable": False,
                 },
@@ -723,6 +771,15 @@ class LlnlElcapitan(System):
                     ],
                     "buildable": False,
                 },
+                "rccl": {
+                    "externals": [
+                        {
+                            "spec": f"rccl@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
             }
         }
 
@@ -731,6 +788,7 @@ class LlnlElcapitan(System):
             f"/opt/rocm-{self.rocm_version}/lib",
             "/opt/cray/pe/gcc-libs",
             f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib",
+            f"/collab/usr/global/tools/rccl/toss_4_x86_64_ib_cray/rocm-{self.rccl_version}/install/lib",
         ]
         # Avoid libunwind.so.1 error on tioga
         if self.spec.variants["cluster"][0] in ["tioga", "tuolumne"]:
@@ -744,7 +802,6 @@ class LlnlElcapitan(System):
             f"/opt/rocm-{self.rocm_version}/",
             {"c": "amdclang", "cxx": "amdclang++", "fortran": "amdflang"},
             modules=[f"rocm/{self.rocm_version}"],
-            flags={"cflags": "-g -O2", "cxxflags": "-g -O2"},
             extra_rpaths=list(rpaths),
             env={
                 "set": {"RFE_811452_DISABLE": "1"},
@@ -767,12 +824,6 @@ class LlnlElcapitan(System):
                     "prepend_path": {
                         "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/rocm-{self.rocm_version}/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib"
                     }
-                },
-                flags={
-                    "cflags": "-g -O2",
-                    "cxxflags": "-g -O2 -std=c++14",
-                    "fflags": "-g -O2 -hnopattern",
-                    "ldflags": "-ldl",
                 },
             )
             cfgs.append(compiler_section_for("cce", [cce_entry]))

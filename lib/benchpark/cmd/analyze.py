@@ -468,6 +468,11 @@ def prepare_data(**kwargs):
         tk = tk.squash()
 
     cluster_col = "cluster" if "cluster" in tk.metadata.columns else "host.cluster"
+    if cluster_col not in tk.metadata.columns:
+        logger.info(
+            "Neither 'cluster' or 'host.cluster' found in metadata. Using default value of 'Cluster' for the chart title"
+        )
+        tk.metadata[cluster_col] = "Cluster"
     tk.metadata_columns_to_perfdata([cluster_col] + list(NAME_REMAP.keys()))
 
     # Check these values are constant
@@ -585,6 +590,11 @@ def prepare_data(**kwargs):
             f"Adding metadata column '{metric}' to the performance data from the metadata."
         )
 
+    norm_col = kwargs.get("normalize_by", "")
+    if norm_col != "":
+        logger.info(f"Normalizing '{kwargs['yaxis_metric']}' by '{norm_col}'")
+        tk.dataframe[kwargs["yaxis_metric"]] /= tk.dataframe[norm_col]
+
     make_chart(df=tk.dataframe, x_axis=x_axis_metadata, **kwargs)
 
 
@@ -658,6 +668,14 @@ def setup_parser(root_parser):
     )
     root_parser.add_argument(
         "--no-mpi", action="store_true", help="Hide MPI regions in the tree."
+    )
+    root_parser.add_argument(
+        "--normalize-by",
+        default="",
+        type=str,
+        required=False,
+        help="Optionally normalize the y-axis column by this column.",
+        metavar="COLUMN",
     )
     root_parser.add_argument(
         "--chart-title",

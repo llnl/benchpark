@@ -25,6 +25,7 @@ class LlnlMatrix(System):
 
     id_to_resources = {
         "matrix": {
+            "cpu_arch": "sapphirerapids",
             "cuda_arch": 90,
             "sys_cores_per_node": 112,
             "sys_gpus_per_node": 4,
@@ -37,8 +38,8 @@ class LlnlMatrix(System):
 
     variant(
         "cuda",
-        default="12.6.0",
-        values=("12.6.0", "12.2.2", "11.8.0"),
+        default="12.9.1",
+        values=("13.1.1", "12.9.1", "12.6.0", "12.2.2", "11.8.0"),
         description="CUDA version",
     )
 
@@ -59,9 +60,17 @@ class LlnlMatrix(System):
     variant(
         "bank",
         default="none",
-        values=("none", "guests", "asccasc", "lc", "fractale"),
+        values=("none", "guests", "asccasc", "lc", "fractale", "wbronze"),
         multi=False,
         description="Submit a job to a specific named bank",
+    )
+
+    variant(
+        "queue",
+        default="none",
+        values=("none", "pbatch", "pdebug"),
+        multi=False,
+        description="Submit to named queue",
     )
 
     def __init__(self, spec):
@@ -151,13 +160,21 @@ class LlnlMatrix(System):
                     "buildable": False,
                 },
                 "python": {
+                    "buildable": False,
                     "externals": [
                         {
-                            "spec": "python@3.9.12+bz2+crypt+ctypes+dbm+lzma+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
-                            "prefix": "/usr/tce",
+                            "spec": "python@3.9.12",
+                            "prefix": "/usr/tce/packages/python/python-3.9.12",
+                        },
+                        {
+                            "spec": "python@3.11.5",
+                            "prefix": "/usr/tce/packages/python/python-3.11.5",
+                        },
+                        {
+                            "spec": "python@3.12.2",
+                            "prefix": "/usr/tce/packages/python/python-3.12.2",
                         },
                     ],
-                    "buildable": False,
                 },
                 "hwloc": {
                     "externals": [{"spec": "hwloc@2.11.2", "prefix": "/usr"}],
@@ -169,6 +186,10 @@ class LlnlMatrix(System):
                 },
                 "curl": {
                     "externals": [{"spec": "curl@7.61.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "git": {
+                    "externals": [{"spec": "git@2.43.7", "prefix": "/usr"}],
                     "buildable": False,
                 },
                 "mpi": {"buildable": False},

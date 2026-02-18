@@ -1,14 +1,10 @@
 import argparse
 import os
 import subprocess
-import sys
 
 from diffSystems import compare_yaml
 
-import benchpark.paths
-
-sys.path.append(str(benchpark.paths.benchpark_home) + "/spack/lib/spack")
-import llnl.util.tty.color as color  # noqa: E402
+import benchpark.util.color as color
 
 
 def main():

@@ -24,6 +24,7 @@ class LbnlPerlmutter(System):
 
     id_to_resources = {
         "perlmutter": {
+            "cpu_arch": "zen3",
             "cuda_arch": "80",
             "sys_cores_per_node": 64,
             "sys_gpus_per_node": 4,

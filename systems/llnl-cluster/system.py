@@ -22,6 +22,7 @@ class LlnlCluster(System):
 
     id_to_resources = {
         "ruby": {
+            "cpu_arch": "icelake",
             "sys_cores_per_node": 56,
             "sys_cores_os_reserved_per_node": 0,  # No core or thread reservation
             "sys_cores_os_reserved_per_node_list": None,
@@ -38,6 +39,7 @@ class LlnlCluster(System):
             "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
         },
         "magma": {
+            "cpu_arch": "icelake",
             "sys_cores_per_node": 96,
             "system_site": "llnl",
             "hardware_key": str(hardware_descriptions)
@@ -46,6 +48,7 @@ class LlnlCluster(System):
             "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
         },
         "dane": {
+            "cpu_arch": "sapphirerapids",
             "sys_cores_per_node": 112,
             "sys_cores_os_reserved_per_node": 0,  # No explicit core reservation, first thread on each core reserved (2 threads per core)
             "sys_cores_os_reserved_per_node_list": None,
@@ -61,6 +64,7 @@ class LlnlCluster(System):
             "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
         },
         "rzgenie": {
+            "cpu_arch": "haswell",
             "sys_cores_per_node": 36,
             "system_site": "llnl",
             "sys_sockets_per_node": 2,
@@ -72,6 +76,7 @@ class LlnlCluster(System):
             "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
         },
         "poodle": {
+            "cpu_arch": "sapphirerapids",
             "sys_cores_per_node": 112,
             "sys_sockets_per_node": 2,
             "sys_cpu_L2_KB": 2048,
@@ -98,7 +103,7 @@ class LlnlCluster(System):
     variant(
         "compiler",
         default="oneapi",
-        values=("oneapi", "gcc", "intel"),
+        values=("oneapi", "gcc", "intel", "llvm"),
         description="Which compiler to use",
     )
 
@@ -112,7 +117,7 @@ class LlnlCluster(System):
     variant(
         "bank",
         default="none",
-        values=("none", "guests", "asccasc", "lc", "fractale"),
+        values=("none", "guests", "asccasc", "lc", "fractale", "wbronze"),
         multi=False,
         description="Submit a job to a specific named bank",
     )
@@ -158,15 +163,6 @@ class LlnlCluster(System):
                 "elfutils": {
                     "externals": [{"spec": "elfutils@0.190", "prefix": "/usr"}],
                     "buildable": False,
-                },
-                "papi": {
-                    "buildable": False,
-                    "externals": [
-                        {
-                            "spec": "papi@6.0.0.1",
-                            "prefix": "/usr/tce/packages/papi/papi-6.0.0.1",
-                        }
-                    ],
                 },
                 "unwind": {
                     "externals": [{"spec": "unwind@8.0.1", "prefix": "/usr"}],
@@ -263,6 +259,10 @@ class LlnlCluster(System):
                     "externals": [{"spec": "gmake@4.2.1", "prefix": "/usr"}],
                     "buildable": False,
                 },
+                "perl": {
+                    "externals": [{"spec": "perl@5.26.3", "prefix": "/usr"}],
+                    "buildable": False,
+                },
             }
         }
 
@@ -278,9 +278,9 @@ class LlnlCluster(System):
                     "externals": [
                         {
                             "spec": "mvapich2@2.3.7",
-                            "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-12.1.1",
+                            "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-13.3.1",
                             "extra_attributes": {
-                                "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-12.1.1/lib -lmpi"
+                                "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-gcc-13.3.1/lib -lmpi"
                             },
                         }
                     ],
@@ -290,9 +290,9 @@ class LlnlCluster(System):
                     "externals": [
                         {
                             "spec": "openmpi@4.1.2",
-                            "prefix": "/usr/tce/packages/openmpi/openmpi-4.1.2-gcc-12.1.1",
+                            "prefix": "/usr/tce/packages/openmpi/openmpi-4.1.2-gcc-13.3.1",
                             "extra_attributes": {
-                                "ldflags": "-L/usr/tce/packages/openmpi/openmpi-4.1.2-gcc-12.1.1/lib -lmpi"
+                                "ldflags": "-L/usr/tce/packages/openmpi/openmpi-4.1.2-gcc-13.3.1/lib -lmpi"
                             },
                         }
                     ],
@@ -328,9 +328,9 @@ class LlnlCluster(System):
                     "externals": [
                         {
                             "spec": "mvapich2@2.3.7",
-                            "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2023.2.1",
+                            "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2025.2.0",
                             "extra_attributes": {
-                                "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2023.2.1/lib -lmpi"
+                                "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2025.2.0/lib -lmpi"
                             },
                         }
                     ],
@@ -340,9 +340,34 @@ class LlnlCluster(System):
                     "externals": [
                         {
                             "spec": "openmpi@4.1.2",
-                            "prefix": "/usr/tce/packages/openmpi/openmpi-4.1.2-intel-2023.2.1",
+                            "prefix": "/usr/tce/packages/openmpi/openmpi-4.1.2-intel-2025.2.0",
                             "extra_attributes": {
-                                "ldflags": "-L/usr/tce/packages/openmpi/openmpi-4.1.2-intel-2023.2.1/lib -lmpi"
+                                "ldflags": "-L/usr/tce/packages/openmpi/openmpi-4.1.2-intel-2025.2.0/lib -lmpi"
+                            },
+                        }
+                    ],
+                }
+        elif self.spec.satisfies("compiler=llvm"):
+            if mpi_type == "mvapich2":
+                mpi_dict["mvapich2"] = {
+                    "externals": [
+                        {
+                            "spec": "mvapich2@2.3.7",
+                            "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-clang-19.1.3",
+                            "extra_attributes": {
+                                "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-clang-19.1.3/lib -lmpi"
+                            },
+                        }
+                    ],
+                }
+            elif mpi_type == "openmpi":
+                mpi_dict["openmpi"] = {
+                    "externals": [
+                        {
+                            "spec": "openmpi@4.1.2",
+                            "prefix": "/usr/tce/packages/openmpi/openmpi-4.1.2-clang-19.1.3",
+                            "extra_attributes": {
+                                "ldflags": "-L/usr/tce/packages/openmpi/openmpi-4.1.2-clang-19.1.3/lib -lmpi"
                             },
                         }
                     ],
@@ -358,8 +383,8 @@ class LlnlCluster(System):
                 "gcc",
                 [
                     compiler_def(
-                        "gcc@12.1.1 languages:=c,c++,fortran",
-                        "/usr/tce/packages/gcc/gcc-12.1.1/",
+                        "gcc@13.3.1 languages:=c,c++,fortran",
+                        "/usr/tce/packages/gcc/gcc-13.3.1/",
                         {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
                     )
                 ],
@@ -380,8 +405,8 @@ class LlnlCluster(System):
                 "gcc",
                 [
                     compiler_def(
-                        "gcc@12.1.1",
-                        "/usr/tce/packages/gcc/gcc-12.1.1/",
+                        "gcc@13.3.1",
+                        "/usr/tce/packages/gcc/gcc-13.3.1/",
                         {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
                     )
                 ],
@@ -390,8 +415,8 @@ class LlnlCluster(System):
                 "intel-oneapi-compilers",
                 [
                     compiler_def(
-                        "intel-oneapi-compilers@2023.2.1~envmods",
-                        "/usr/tce/packages/intel/intel-2023.2.1/compiler/2023.2.1/linux/",
+                        "intel-oneapi-compilers@2025.2.0~envmods",
+                        "/usr/tce/packages/intel/intel-2025.2.0/compiler/2025.2/",
                         {"c": "icx", "cxx": "icpx", "fortran": "ifx"},
                     )
                 ],
@@ -399,6 +424,17 @@ class LlnlCluster(System):
             prefs = {"one_of": ["%oneapi", "%gcc"], "when": "%c"}
             weighting_cfg = {"packages": {"all": {"require": [prefs]}}}
             cfg = merge_dicts(gcc_cfg, oneapi_cfg, weighting_cfg)
+        elif self.spec.satisfies("compiler=llvm"):
+            cfg = compiler_section_for(
+                "llvm",
+                [
+                    compiler_def(
+                        "llvm@19.1.3+flang",
+                        "/usr/tce/packages/clang/clang-19.1.3/",
+                        {"c": "clang", "cxx": "clang++", "fortran": "flang-new"},
+                    )
+                ],
+            )
 
         return cfg
 
@@ -408,6 +444,8 @@ class LlnlCluster(System):
             default_compiler = "intel-oneapi-compilers-classic"
         elif self.spec.satisfies("compiler=oneapi"):
             default_compiler = "intel-oneapi-compilers"
+        elif self.spec.satisfies("compiler=llvm"):
+            default_compiler = "llvm"
 
         return {
             "software": {

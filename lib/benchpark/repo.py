@@ -9,7 +9,7 @@ import contextlib
 import sys
 from enum import Enum
 
-import benchpark.paths
+import benchpark.config
 
 # isort: off
 
@@ -74,23 +74,8 @@ def override_ramble_hardcoded_globals():
     ramble.language.language_base.namespaces = _old[2]
 
 
-# Experiments
-def _exprs():
-    """Get the singleton RepoPath instance for Ramble.
-
-    Create a RepoPath, add it to sys.meta_path, and return it.
-
-    TODO: consider not making this a singleton.
-    """
-    experiments_repo = benchpark.paths.benchpark_root / "experiments"
-    return _add_repo(experiments_repo, ObjectTypes.experiments)
-
-
-def _add_repo(repo_dir, obj_type):
-    if repo_dir.exists():
-        repo_dirs = [str(repo_dir)]
-    else:
-        raise ValueError(f"Repo dir does not exist: {repo_dir}")
+def _add_repo(repo_dirs, obj_type):
+    repo_dirs = [str(x) for x in repo_dirs]
 
     with override_ramble_hardcoded_globals():
         path = ramble.repository.RepoPath(*repo_dirs, object_type=obj_type)
@@ -98,10 +83,16 @@ def _add_repo(repo_dir, obj_type):
     return path
 
 
-# Systems
+def _exprs():
+    cfg = benchpark.config.configuration().repos
+    exp_repos = [cfg.resolve_path(x) for x in cfg.experiments]
+    return _add_repo(exp_repos, ObjectTypes.experiments)
+
+
 def _systems():
-    systems_repo = benchpark.paths.benchpark_root / "systems"
-    return _add_repo(systems_repo, ObjectTypes.systems)
+    cfg = benchpark.config.configuration().repos
+    sys_repos = [cfg.resolve_path(x) for x in cfg.systems]
+    return _add_repo(sys_repos, ObjectTypes.systems)
 
 
 paths = {

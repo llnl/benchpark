@@ -18,6 +18,7 @@ class CscsDaint(System):
 
     id_to_resources = {
         "daint": {
+            "cpu_arch": "haswell",
             "sys_cores_per_node": 12,
             "sys_gpus_per_node": 1,
             "sys_mem_per_node_GB": 64,
