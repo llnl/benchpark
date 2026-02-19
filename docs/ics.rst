@@ -88,7 +88,9 @@ Papers are available `here
 Submissions can be in the form of a short or full paper (at most 4 pages for a short
 paper, at least 5 pages for a full one).
 
-More details to come about the submission system.
+Submissions will be accepted through `EasyChair
+<https://easychair.org/conferences/?conf=rshpcbench2026>`_. After creating an account,
+you will be able to make a submission to RS-HPCBench-2026.
 
 Workshop Deadlines
 ==================
