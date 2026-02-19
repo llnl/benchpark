@@ -59,7 +59,7 @@ jobs:
         run: |
           . workspace/setup.sh
           spack mirror add ci-buildcache oci://ghcr.io/llnl/benchpark-binary-cache
-          spack config add "packages:all:target:[x86_64_v3]"
+          spack config add "packages:all:target:[x86_64_v2]"
           env | grep SPACK >> "$GITHUB_ENV"
           env | grep -P 'RAMBLE(?!_WORKSPACE)' >> "$GITHUB_ENV"
           echo "PATH=$PATH" >> "$GITHUB_ENV"
