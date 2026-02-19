@@ -408,7 +408,7 @@ class LlnlElcapitan(System):
                 "mpi": {"require": "cray-mpich-gtl"},
                 "libfabric": {
                     "externals": [
-                        {"spec": "libfabric@2.1", "prefix": "/opt/cray/libfabric/2.1"}
+                        {"spec": "libfabric@2.3.1", "prefix": "/usr"}
                     ],
                     "buildable": False,
                 },
