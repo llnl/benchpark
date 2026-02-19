@@ -38,8 +38,8 @@ class LlnlMatrix(System):
 
     variant(
         "cuda",
-        default="12.6.0",
-        values=("12.6.0", "12.2.2", "11.8.0"),
+        default="12.9.1",
+        values=("13.1.1", "12.9.1", "12.6.0", "12.2.2", "11.8.0"),
         description="CUDA version",
     )
 
@@ -167,12 +167,12 @@ class LlnlMatrix(System):
                             "prefix": "/usr/tce/packages/python/python-3.9.12",
                         },
                         {
-                            "spec": "python@3.11.9",
-                            "prefix": "/usr/tce/packages/python/python-3.11.9",
+                            "spec": "python@3.11.5",
+                            "prefix": "/usr/tce/packages/python/python-3.11.5",
                         },
                         {
-                            "spec": "python@3.12.4",
-                            "prefix": "/usr/tce/packages/python/python-3.12.4",
+                            "spec": "python@3.12.2",
+                            "prefix": "/usr/tce/packages/python/python-3.12.2",
                         },
                     ],
                 },

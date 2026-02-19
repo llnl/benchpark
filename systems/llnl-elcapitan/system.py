@@ -140,8 +140,8 @@ class LlnlElcapitan(System):
             "6.4.1",
             "6.4.2",
             "6.4.3",
-            "7.0.1",
             "7.1.0",
+            "7.2.0",
         ),
         description="ROCm version",
     )
@@ -222,7 +222,11 @@ class LlnlElcapitan(System):
                 f"{self.gcc_version.major}.{self.gcc_version.minor}"
             )
         else:
-            if self.rocm_version >= Version("6.4.0"):
+            if self.rocm_version >= Version("7.1.0"):
+                self.cce_version = Version("21.0.0")
+                self.mpi_version = Version("9.1.0")
+                # No working self.rccl_version
+            elif self.rocm_version >= Version("6.4.0"):
                 self.cce_version = Version("20.0.0")
                 self.mpi_version = Version("9.0.1")
                 self.rccl_version = Version("6.4.1")
@@ -234,7 +238,11 @@ class LlnlElcapitan(System):
                 self.cce_version = Version("16.0.0")
                 self.mpi_version = Version("8.1.26")
                 self.rccl_version = Version("5.4.3")
-        if self.rocm_version >= Version("6.4.0"):
+        if self.rocm_version >= Version("7.1.0"):
+            self.pmi_version = Version("6.1.16")
+            self.pals_version = Version("1.2.12")
+            self.llvm_version = Version("20.0.0")
+        elif self.rocm_version >= Version("6.4.0"):
             self.pmi_version = Version("6.1.15.6")
             self.pals_version = Version("1.2.12")
             self.llvm_version = Version("19.0.0")
@@ -399,9 +407,7 @@ class LlnlElcapitan(System):
                 },
                 "mpi": {"require": "cray-mpich-gtl"},
                 "libfabric": {
-                    "externals": [
-                        {"spec": "libfabric@2.1", "prefix": "/opt/cray/libfabric/2.1"}
-                    ],
+                    "externals": [{"spec": "libfabric@2.3.1", "prefix": "/usr"}],
                     "buildable": False,
                 },
                 "ncurses": {
