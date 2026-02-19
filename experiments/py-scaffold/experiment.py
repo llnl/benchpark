@@ -30,6 +30,11 @@ class PyScaffold(
     variant("version", default="main", values=("main",), description="app version")
 
     def compute_applications_section(self):
+        if self.spec.satisfies("exec_mode=test"):
+            self.add_experiment_variable("config_url", "https://raw.githubusercontent.com/LBANN/ScaFFold/refs/heads/main/ScaFFold/configs/benchmark_testing.yml", False)
+        else:
+            self.add_experiment_variable("config_url", "https://raw.githubusercontent.com/LBANN/ScaFFold/refs/heads/main/ScaFFold/configs/benchmark_default.yml", False)
+
         if self.spec.satisfies("+strong"):
             n_gpus = 4
             if self.spec.satisfies("exec_mode=test"):

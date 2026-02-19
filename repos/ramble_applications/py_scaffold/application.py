@@ -25,7 +25,7 @@ class PyScaffold(ExecutableApplication):
         app_inst.variables["rocm_mods"] = ""
         if "rocm_arch" in app_inst.variables.keys():
             app_inst.variables["rocm_mods"] = (
-                "module load rocm/6.4.2 rccl/fast-env-slows-mpi libfabric\nexport SPINDLE_FLUXOPT=off\nexport LD_PRELOAD=/opt/rocm-6.4.2/llvm/lib/libomp.so\nexport MPICH_GPU_SUPPORT_ENABLED=0\nexport LD_LIBRARY_PATH=/collab/usr/global/tools/rccl/toss_4_x86_64_ib_cray/rocm-6.4.1/install/lib/:$LD_LIBRARY_PATH\nexport LD_LIBRARY_PATH=/opt/cray/pe/cce/20.0.0/cce/x86_64/lib:$LD_LIBRARY_PATH\n"
+                "module load rocm/6.4.2 rccl/fast-env-slows-mpi libfabric\nexport SPINDLE_FLUXOPT=off\nexport LD_PRELOAD=/opt/rocm-6.4.2/llvm/lib/libomp.so\nexport MPICH_GPU_SUPPORT_ENABLED=0\nexport LD_LIBRARY_PATH=/collab/usr/global/tools/rccl/toss_4_x86_64_ib_cray/rocm-6.4.1/install/lib/:$LD_LIBRARY_PATH\nexport LD_LIBRARY_PATH=/opt/cray/pe/cce/20.0.0/cce/x86_64/lib:$LD_LIBRARY_PATH\nexport CALI_SERVICES_ENABLE=roctx\n"
             )
 
         app_inst.variables["ld_paths"] = ":".join(paths)
@@ -35,7 +35,7 @@ class PyScaffold(ExecutableApplication):
 
     input_file(
         "config_file",
-        url="https://raw.githubusercontent.com/LBANN/ScaFFold/refs/heads/main/ScaFFold/configs/benchmark_default.yml",
+        url="{config_url}",
         expand=False,
         description="",
     )
