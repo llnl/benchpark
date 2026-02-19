@@ -131,7 +131,7 @@ run_tests_flux_tuolumne:
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK: [py-scaffold]
         VARIANT:
-          - +rocm package_manager=spack-pip caliper=mpi,time,rocm allocation=torchrun-hpc
+          - +rocm package_manager=spack-pip caliper=mpi,time allocation=torchrun-hpc
       # rocm7
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
@@ -154,4 +154,4 @@ run_tests_flux_tioga:
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK: [py-scaffold]
         VARIANT:
-          - +rocm package_manager=spack-pip caliper=mpi,time,rocm allocation=torchrun-hpc
+          - +rocm package_manager=spack-pip caliper=mpi,time allocation=torchrun-hpc
