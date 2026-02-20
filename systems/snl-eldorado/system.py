@@ -23,6 +23,7 @@ class SnlEldorado(System):
 
     id_to_resources = {
         "eldorado": {
+            "cpu_arch": "zen4",
             "rocm_arch": "gfx942",
             "sys_cores_per_node": 84,
             "sys_cores_os_reserved_per_node": 12,
@@ -229,9 +230,9 @@ class SnlEldorado(System):
                         {
                             "spec": "python@3.9.12",
                             "prefix": "/usr/tce/packages/python/python-3.9.12",
-                            "buildable": False,
                         }
-                    ]
+                    ],
+                    "buildable": False,
                 },
                 "unzip": {
                     "buildable": False,
@@ -239,9 +240,8 @@ class SnlEldorado(System):
                 },
                 "hypre": {"variants": f"amdgpu_target={self.rocm_arch}"},
                 "hwloc": {
-                    "externals": [
-                        {"spec": "hwloc@2.9.1", "prefix": "/usr", "buildable": False}
-                    ]
+                    "externals": [{"spec": "hwloc@2.9.1", "prefix": "/usr"}],
+                    "buildable": False,
                 },
                 "fftw": {"buildable": False},
                 "intel-oneapi-mkl": {
@@ -629,7 +629,6 @@ class SnlEldorado(System):
             f"/opt/rocm-{self.rocm_version}/",
             {"c": "amdclang", "cxx": "amdclang++", "fortran": "amdflang"},
             modules=[f"cce/{self.cce_version}"],
-            flags={"cflags": "-g -O2", "cxxflags": "-g -O2"},
             extra_rpaths=list(rpaths),
             env={
                 "set": {"RFE_811452_DISABLE": "1"},
@@ -652,12 +651,6 @@ class SnlEldorado(System):
                     "prepend_path": {
                         "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/rocm-{self.rocm_version}/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib"
                     }
-                },
-                flags={
-                    "cflags": "-g -O2",
-                    "cxxflags": "-g -O2 -std=c++14",
-                    "fflags": "-g -O2 -hnopattern",
-                    "ldflags": "-ldl",
                 },
             )
             cfgs.append(compiler_section_for("cce", [cce_entry]))

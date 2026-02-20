@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+
 from packaging.version import Version
 
 from benchpark.cudasystem import CudaSystem
@@ -25,6 +26,7 @@ class LlnlSierra(System):
 
     id_to_resources = {
         "lassen": {
+            "cpu_arch": "power9",
             "cuda_arch": 70,
             "sys_cores_per_node": 40,
             "sys_sockets_per_node": 2,
@@ -161,13 +163,13 @@ class LlnlSierra(System):
                     "buildable": False,
                 },
                 "python": {
+                    "buildable": False,
                     "externals": [
                         {
                             "spec": "python@3.8.2",
                             "prefix": "/usr/tce/packages/python/python-3.8.2",
-                            "buildable": False,
                         }
-                    ]
+                    ],
                 },
                 "mpi": {"buildable": False},
             }
@@ -455,12 +457,6 @@ class LlnlSierra(System):
         }
         cuda_modules = cuda_module_map[cuda_ver]
 
-        flags = {
-            "cflags": "-g -O2",
-            "cxxflags": "-g -O2",
-            "fflags": "-g -O2",
-        }
-
         if (compiler, cuda_ver) == ("clang-ibm", "11-8-0"):
             cfg1 = compiler_section_for(
                 "llvm",
@@ -469,7 +465,6 @@ class LlnlSierra(System):
                         "llvm@16.0.6",
                         "/usr/tce/packages/clang/clang-ibm-16.0.6-cuda-11.8.0-gcc-11.2.1/",
                         {"c": "clang", "cxx": "clang++"},
-                        flags=flags,
                         modules=cuda_modules
                         + ["clang/ibm-16.0.6-cuda-11.8.0-gcc-11.2.1"],
                     )
@@ -482,7 +477,6 @@ class LlnlSierra(System):
                         "xl@2023.06.28",
                         "/usr/tce/packages/xl/xl-2023.06.28-cuda-11.8.0-gcc-11.2.1/",
                         {"c": "xlc", "cxx": "xlC", "fortran": "xlf"},
-                        flags=flags,
                     )
                 ],
             )
@@ -495,7 +489,6 @@ class LlnlSierra(System):
                         "xl@2023.06.28",
                         "/usr/tce/packages/xl/xl-2023.06.28-cuda-11.8.0-gcc-11.2.1/",
                         {"c": "xlc", "cxx": "xlC", "fortran": "xlf"},
-                        flags=flags,
                         modules=cuda_modules + ["xl/2023.06.28-cuda-11.8.0-gcc-11.2.1"],
                     )
                 ],
@@ -508,7 +501,6 @@ class LlnlSierra(System):
                         "xl@16.1.1-2022.08.19-cuda10.1.243",
                         "/usr/tce/packages/xl/xl-2022.08.19/",
                         {"c": "xlc", "cxx": "xlC", "fortran": "xlf"},
-                        flags=flags,
                         modules=cuda_modules + ["xl/2022.08.19"],
                     )
                 ],
@@ -521,16 +513,11 @@ class LlnlSierra(System):
                         "xl@16.1.1-2022.08.19-cuda11.8.0",
                         "/usr/tce/packages/xl/xl-2022.08.19-cuda-11.8.0/",
                         {"c": "xlc", "cxx": "xlC", "fortran": "xlf"},
-                        flags=flags,
                         modules=cuda_modules + ["xl/2022.08.19-cuda-11.8.0"],
                     )
                 ],
             )
         elif (compiler, cuda_ver) == ("clang", "11-8-0"):
-            custom_flags = {
-                "cflags": "-g -O2",
-                "cxxflags": "-g -O2",
-            }
             cfg1 = compiler_section_for(
                 "llvm",
                 [
@@ -538,7 +525,6 @@ class LlnlSierra(System):
                         "llvm@16.0.6",
                         "/usr/tce/packages/clang/clang-ibm-16.0.6-cuda-11.8.0-gcc-11.2.1/",
                         {"c": "clang", "cxx": "clang++"},
-                        flags=custom_flags,
                     )
                 ],
             )
@@ -549,7 +535,6 @@ class LlnlSierra(System):
                         "gcc@11.2.1 languages:=c,c++,fortran",
                         "/usr/tce/packages/gcc/gcc-11.2.1/",
                         {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
-                        flags=custom_flags,
                     )
                 ],
             )

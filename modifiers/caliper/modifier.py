@@ -35,6 +35,8 @@ class Caliper(BasicModifier):
     # The filename for metadata forwarded from Benchpark to Caliper
     _caliper_metadata_file = "{experiment_run_dir}/{experiment_name}_metadata.json"
 
+    modifier_conflict("name_mode")
+
     _default_mode = "time"
 
     add_mode(
@@ -154,6 +156,6 @@ class Caliper(BasicModifier):
         with open(cali_metadata_file, "w") as f:
             f.write(json.dumps(cali_metadata))
 
-    software_spec("caliper", pkg_spec="caliper")
-
-    required_package("caliper")
+        with when("package_manager_family=spack"):
+            software_spec("caliper", pkg_spec="caliper", package_manager="spack")
+            required_package("caliper")

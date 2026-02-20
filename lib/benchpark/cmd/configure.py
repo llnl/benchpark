@@ -3,11 +3,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import os
 from pathlib import Path
 
 import yaml
 
-import benchpark.paths
+import benchpark.config
 
 
 def setup_parser(root_parser):
@@ -20,17 +21,14 @@ def setup_parser(root_parser):
 
 
 def command(args):
-    data = {}
+    bootstrap_cfg = benchpark.config.configuration().bootstrap
 
-    if args.bootstrap_location:
-        bl = (
-            str(Path(args.bootstrap_location).expanduser().resolve()).rstrip("/")
-            + "/.benchpark/"
-        )
-        data["bootstrap"] = {
-            "location": bl,
-        }
+    if args.bootstrap_location or not bootstrap_cfg.path.exists():
+        where = args.bootstrap_location or "~/.benchpark/"
+        loc = os.path.expandvars(os.path.expanduser(where))
+        bl = str(Path(loc).resolve()).rstrip("/")
+        data = {"bootstrap": {"location": bl}}
 
-    print(f"Writing configuration to {benchpark.paths.benchpark_config}")
-    with open(benchpark.paths.benchpark_config, "w") as yaml_file:
-        yaml.safe_dump(data, yaml_file)
+        print(f"Writing configuration to {bootstrap_cfg.path}")
+        with open(bootstrap_cfg.path, "w") as yaml_file:
+            yaml.safe_dump(data, yaml_file)

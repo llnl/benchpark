@@ -4,14 +4,16 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Adding a Benchmark
-==================
+####################
+ Adding a Benchmark
+####################
 
 This guide is intended for application developers who want to add a benchmark so that it
 can be run with Benchpark.
 
-Create a New Benchmark
-----------------------
+************************
+ Create a New Benchmark
+************************
 
 The following system-independent specification is required for each ${Benchmark1}:
 
@@ -22,11 +24,11 @@ The following system-independent specification is required for each ${Benchmark1
   Spack, benchpark will use that version of the ``package.py``, unless you define a
   version in ``benchpark/repo/``.
 - ``application.py`` is a Ramble specification that defines the ${Benchmark1} input and
-  parameters. See the `Ramble Application Definition Developers Guide
-  <https://ramble.readthedocs.io/en/latest/dev_guides/application_dev_guide.html>`_ to
-  learn how to create a Ramble ``application.py``. We recommend testing your
-  ``application.py`` using the `Ramble Usage While Developing
-  <https://ramble.readthedocs.io/en/latest/dev_guides/application_dev_guide.html#usage-while-developing>`_
+  parameters. See the `Ramble Application Definition Developers Tutorial
+  <https://ramble.readthedocs.io/en/latest/dev_guides/1_basic_application_definition_tutorial.html>`_
+  to learn how to create a Ramble ``application.py``. We recommend testing your
+  ``application.py`` using the `Ramble Testing Application Definitions
+  <https://ramble.readthedocs.io/en/latest/dev_guides/1_basic_application_definition_tutorial.html#testing-application-definitions>`_
   instructions. If your benchmark already exists in Ramble, benchpark will use that
   version of the ``application.py``, unless you define a version in ``benchpark/repo/``.
 

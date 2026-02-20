@@ -49,6 +49,7 @@ include:
         BENCHMARK:
           - amg2023
           - babelstream
+          - branson
           - kripke
           - laghos
           - lammps
@@ -64,6 +65,7 @@ include:
         BENCHMARK:
           - amg2023
           - babelstream
+          - branson
           - genesis
           - hpcg
           - hpl
@@ -84,6 +86,7 @@ include:
         BENCHMARK:
           - amg2023
           - babelstream
+          - branson
           - gromacs
           - kripke
           - laghos
@@ -92,8 +95,12 @@ include:
           - raja-perf
           - remhos
           - saxpy
-          - sparta-snl
         VARIANT: [+cuda]
+      - HOST: matrix
+        ARCHCONFIG: llnl-matrix
+        SCHEDULER_PARAMETERS: $MATRIX_PARAMS
+        BENCHMARK: [sparta-snl]
+        VARIANT: [+cuda~gpu-aware-mpi]
       #############
       # Other tests
       #############
@@ -150,7 +157,7 @@ include:
         ARCHCONFIG: llnl-elcapitan
         SCHEDULER_PARAMETERS: $ELCAP_PARAMS -S dw=lustre_small
         BENCHMARK: [ior]
-        SYSTEM_ARGS: [mount_point=rabbits io_config=lustre_small]
+        SYSTEM_ARGS: [mount_point=rabbits_lustre_small]
 nightly_test_run:
   extends: .nightly_rules
   resource_group: $HOST
