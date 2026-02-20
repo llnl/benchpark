@@ -287,11 +287,6 @@ class Allocation(BasicModifier):
             if v.n_gpus:
                 if v.sys_gpus_per_node:
                     gpus_node_request = math.ceil(v.n_gpus / float(v.sys_gpus_per_node))
-                    if gpus_node_request > v.sys_gpus_per_node:
-                        raise ValueError(
-                            f"Requested GPUs ({v.n_gpus}) exceeds available GPUs "
-                            f"({v.n_nodes * v.sys_gpus_per_node}) on {v.n_nodes} nodes"
-                        )
                 else:
                     raise ValueError(
                         "Experiment requests GPUs, but sys_gpus_per_node "
@@ -479,10 +474,10 @@ class Allocation(BasicModifier):
             v.n_ranks_per_node = math.ceil(v.n_ranks / v.n_nodes)
 
         node_spec = [f"select={v.n_nodes}"]
+        node_spec.append(f"mpiprocs={v.n_ranks_per_node}")
 
         if v.n_ranks:
             cmd_opts.append(f"-np {v.n_ranks}")
-            node_spec.append(f"mpiprocs={v.n_ranks_per_node}")
 
         if v.n_threads_per_proc and v.n_threads_per_proc != 1:
             node_spec.append(f"ompthreads={v.n_threads_per_proc}")
