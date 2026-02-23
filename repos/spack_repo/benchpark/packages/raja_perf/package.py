@@ -20,6 +20,8 @@ from spack_repo.builtin.packages.raja_perf.package import RajaPerf as BuiltinRaj
 class RajaPerf(BuiltinRajaPerf):
     """RAJA Performance Suite."""
 
+    depends_on("blt@0.6.2:", type="build")
+
     def setup_build_environment(self, env):
         super().setup_build_environment(env)
         if "+cuda" in self.spec:
