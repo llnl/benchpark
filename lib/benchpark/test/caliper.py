@@ -39,6 +39,7 @@ def test_experiment_compute_variables_section_caliper(monkeypatch):
             "n_threads_per_proc": "{n_threads_per_proc}",
             "benchpark_spec": ["~cuda+mpi~openmp~rocm"],
             "append_path": "'",
+            "cali_version": "master",
             "caliper": "time",
             "exec_mode": "test",
             "package_manager": "spack",
@@ -60,7 +61,7 @@ def test_caliper_modifier(monkeypatch):
     # Append path to enable import of modifier and application
     sys.path.append(str(paths.benchpark_root))
     from modifiers.caliper.modifier import Caliper as CaliperModifier
-    from repo.saxpy.application import Saxpy
+    from repos.ramble_applications.saxpy.application import Saxpy
 
     app_inst = Saxpy("")
 
@@ -119,6 +120,7 @@ def test_caliper_modifier(monkeypatch):
         "benchpark_spec": "['~cuda+mpi~openmp~rocm']",
         "affinity": "none",
         "append_path": "'",
+        "cali_version": "master",
         "caliper": "time",
         "exec_mode": "test",
         "hwloc": "none",

@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+
 from packaging.version import Version
 
 from benchpark.cudasystem import CudaSystem
@@ -25,6 +26,7 @@ class LlnlSierra(System):
 
     id_to_resources = {
         "lassen": {
+            "cpu_arch": "power9",
             "cuda_arch": 70,
             "sys_cores_per_node": 40,
             "sys_sockets_per_node": 2,

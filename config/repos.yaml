@@ -5,5 +5,5 @@
 repos:
   experiments: [../experiments, ../experiments/test]
   systems: [../systems]
-  applications: [../repo]
-  packages: [../repo]
+  applications: [../repos/ramble_applications]
+  packages: [../repos/spack_repo/benchpark]

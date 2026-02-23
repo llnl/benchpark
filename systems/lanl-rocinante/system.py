@@ -22,6 +22,7 @@ class LanlRocinante(System):
 
     id_to_resources = {
         "crossroads": {
+            "cpu_arch": "sapphirerapids",
             "sys_cores_per_node": 112,
             "sys_cores_os_reserved_per_node": 0,  # No core or thread reservation
             "sys_cores_os_reserved_per_node_list": None,
@@ -40,6 +41,7 @@ class LanlRocinante(System):
             ],
         },
         "rocinante": {
+            "cpu_arch": "sapphirerapids",
             "sys_cores_per_node": 112,
             "sys_cores_os_reserved_per_node": 0,  # No core or thread reservation
             "sys_cores_os_reserved_per_node_list": None,
@@ -58,6 +60,7 @@ class LanlRocinante(System):
             ],
         },
         "tycho": {
+            "cpu_arch": "sapphirerapids",
             "sys_cores_per_node": 112,
             "sys_cores_os_reserved_per_node": 0,  # No core or thread reservation
             "sys_cores_os_reserved_per_node_list": None,

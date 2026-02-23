@@ -88,7 +88,9 @@ Papers are available `here
 Submissions can be in the form of a short or full paper (at most 4 pages for a short
 paper, at least 5 pages for a full one).
 
-More details to come about the submission system.
+Submissions will be accepted through `EasyChair
+<https://easychair.org/conferences/?conf=rshpcbench2026>`_. After creating an account,
+you will be able to make a submission to RS-HPCBench-2026.
 
 Workshop Deadlines
 ==================
@@ -116,8 +118,8 @@ Workshop 2026 Program Committee
 - Sunita Chandrasekaran, University of Delaware, USA
 - Florina Ciorba, University of Basel, Switzerland
 - Jens Domke, RIKEN Center for Computational Science, Japan
-- Vasileios Karakasis, NVIDIA, Switzerland
+- Andreas Herten, Juelich Supercomputing Centre, Germany
+- Doug Jacobsen, Google, USA
 - Tuomas Koskela, University College London, UK
-- Veronica G. Melesse Vergara, Oak Ridge National Laboratory, USA
 - Olga Pearce, Lawrence Livermore National Laboratory, USA
 - Keita Teranishi, Oak Ridge National Laboratory, USA
