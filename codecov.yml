@@ -7,4 +7,4 @@ comment:
   require_changes: false
   require_base: false
   require_head: true
-  after_n_builds: 10  # Number of SEPARATE codecov uploads expected, e.g. "Upload coverage to Codecov" jobs
+  after_n_builds: 11  # Number of SEPARATE codecov uploads expected, e.g. "Upload coverage to Codecov" jobs

@@ -4,8 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Benchpark Modifiers
-===================
+#####################
+ Benchpark Modifiers
+#####################
 
 In Benchpark, a ``modifier`` follows the `Ramble Modifier
 <https://ramble.readthedocs.io/en/latest/tutorials/10_using_modifiers.html>`_ and is an
@@ -14,8 +15,9 @@ Modifiers are intended to encapsulate reusable patterns that perform a specific
 configuration of an experiment. This may include injecting performance analysis or
 setting up system resources.
 
-Affinity: Threads, GPUs
------------------------
+*************************
+ Affinity: Threads, GPUs
+*************************
 
 We are using (with permission) the following implementation of `Linux thread and GPU
 affinity checks <https://github.com/bcumming/affinity>`_. The following checks are
@@ -30,8 +32,8 @@ To use the Affinity modifier:
 - When you initialize your experiment, add ``affinity=on`` to ``experiment init``.
 - A small, separate run will execute in your allocation to record the information.
 - The Affinity modifier will output a text file in the experiment directory which will
-  look like this for ``benchpark experiment init --dest=saxpy --system=system-name
-  saxpy+openmp affinity=on`` on 8 ranks, 2 threads/proc, 1 node:
+  look like this for ``benchpark experiment init --dest=saxpy system-name saxpy+openmp
+  affinity=on`` on 8 ranks, 2 threads/proc, 1 node:
 
 .. code-block:: console
 
@@ -66,8 +68,9 @@ To use the Affinity modifier:
 If also running with the ``caliper`` modifier, ``affinity`` information will be included
 in the Caliper metadata.
 
-Caliper: Profiling
-------------------
+********************
+ Caliper: Profiling
+********************
 
 `Caliper <https://github.com/LLNL/Caliper/>`_ is an instrumentation and performance
 profiling library. We have implemented a Caliper modifier to enable profiling of
@@ -78,7 +81,7 @@ init setup step:
 
 ::
 
-    benchpark experiment init --dest=</path/to/experiment_root> --system=</path/to/system> <benchmark> caliper=<caliper_variant>
+    benchpark experiment init --dest=</path/to/experiment_root> </path/to/system> <benchmark> caliper=<caliper_variant>
 
 Valid values for ``<caliper_variant>`` are found in the **Caliper Variant** column of
 the table below. Benchpark will link the experiment to Caliper, and inject appropriate
@@ -104,11 +107,11 @@ running, a ``.cali`` file is created which contains the collected performance me
     - - cuda
       - NVIDIA GPUs
       - |   - CUDA API functions
-      - |   - GPU time
+        |   - GPU time
     - - rocm
       - AMD GPUs
       - |   - HIP API functions
-      - |   - GPU time
+        |   - GPU time
     - - topdown-counters-all
       - x86 Intel CPUs
       - |   - Raw counter values for Intel top-down analysis (all levels)
@@ -130,8 +133,9 @@ experiment, it is as simple as adding it to the class definition signature. For 
 
     class Amg2023(Experiment, Caliper):
 
-Allocation: Resources
----------------------
+***********************
+ Allocation: Resources
+***********************
 
 Given:
 
@@ -143,9 +147,8 @@ the ``Allocation Modifier`` generates the appropriate scheduler request for thes
 resources (how many nodes are required to run a given experiment, etc.).
 
 .. list-table:: Hardware resources as specified by the system, and requested for the experiment
-
-        :widths: 20 40 40
-        :header-rows: 1
+    :widths: 20 40 40
+    :header-rows: 1
 
     - - Resource
       - Available on the System
@@ -206,8 +209,9 @@ If you do not specify values, it will assign the default values as listed below.
     - - n_threads_per_proc
       - 1
 
-Hwloc: Hardware Map
--------------------
+*********************
+ Hwloc: Hardware Map
+*********************
 
 The hwloc modifier enables using `hwloc <https://github.com/open-mpi/hwloc>`_ in
 Benchpark to record the hierarchical map of key computing elements on the given system,
@@ -219,7 +223,7 @@ modifier is disabled by default (``hwloc=none``).:
 
 ::
 
-    benchpark experiment init --dest=</path/to/experiment_root> --system=</path/to/system> <benchmark> caliper=<caliper_variant> hwloc=on
+    benchpark experiment init --dest=</path/to/experiment_root> </path/to/system> <benchmark> caliper=<caliper_variant> hwloc=on
 
 The hwloc modifier will output the hardware information in a flattened JSON file in the
 experiment directory.

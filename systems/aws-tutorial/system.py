@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+
 from benchpark.directives import maintainers, variant
 from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.paths import hardware_descriptions
@@ -17,22 +18,27 @@ class AwsTutorial(System):
 
     id_to_resources = {
         "c7i.48xlarge": {
+            "cpu_arch": "sapphirerapids",
             "sys_cores_per_node": 192,
             "sys_mem_per_node_GB": 384,
         },
         "c7i.metal-48xl": {
+            "cpu_arch": "sapphirerapids",
             "sys_cores_per_node": 192,
             "sys_mem_per_node_GB": 384,
         },
         "c7i.24xlarge": {
+            "cpu_arch": "sapphirerapids",
             "sys_cores_per_node": 96,
             "sys_mem_per_node_GB": 192,
         },
         "c7i.metal-24xl": {
+            "cpu_arch": "sapphirerapids",
             "sys_cores_per_node": 96,
             "sys_mem_per_node_GB": 192,
         },
         "c7i.12xlarge": {
+            "cpu_arch": "sapphirerapids",
             "sys_cores_per_node": 48,
             "sys_mem_per_node_GB": 96,
         },
@@ -75,9 +81,10 @@ class AwsTutorial(System):
                     "buildable": False,
                 },
                 "gmake": {"externals": [{"spec": "gmake@4.3", "prefix": "/usr"}]},
-                "lapack": {
-                    "externals": [{"spec": "lapack@0.29.2", "prefix": "/usr"}],
-                    "buildable": False,
+                "blas": {"buildable": False},
+                "lapack": {"buildable": False},
+                "atlas": {
+                    "externals": [{"spec": "atlas@3.10.3", "prefix": "/usr"}],
                 },
                 "mpi": {"buildable": False},
                 "openmpi": {
@@ -89,7 +96,7 @@ class AwsTutorial(System):
                     ]
                 },
                 "cmake": {
-                    "externals": [{"spec": "cmake@4.0.2", "prefix": "/usr"}],
+                    "externals": [{"spec": "cmake@4.1.1", "prefix": "/usr"}],
                     "buildable": False,
                 },
                 "git": {
@@ -145,19 +152,6 @@ class AwsTutorial(System):
                             "prefix": "/usr",
                         }
                     ],
-                    "buildable": False,
-                },
-                "caliper": {
-                    "externals": [
-                        {
-                            "spec": "caliper@master+adiak+mpi%gcc@11.4.0",
-                            "prefix": "/usr",
-                        }
-                    ],
-                    "buildable": False,
-                },
-                "adiak": {
-                    "externals": [{"spec": "adiak@0.4.1", "prefix": "/usr"}],
                     "buildable": False,
                 },
                 "groff": {

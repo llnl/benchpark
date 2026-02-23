@@ -86,7 +86,13 @@ run_tests_flux_tuolumne:
     matrix:
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [amg2023, kripke, laghos, raja-perf]
+        BENCHMARK:
+          - amg2023
+          - kripke
+          - laghos
+          - lammps
+          - raja-perf
+          - sparta-snl
         VARIANT: [+rocm]
         GPUMODE: SPX
       # Test TPX, CPX
@@ -120,6 +126,18 @@ run_tests_flux_tuolumne:
         BENCHMARK: [kripke]
         VARIANT: ['+rocm caliper=mpi,time,rocm']
         GPUMODE: SPX
+      # spack-pip
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [py-scaffold]
+        VARIANT: ['+rocm package_manager=spack-pip caliper=mpi,time,rocm']
+      # rocm7
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [raja-perf]
+        VARIANT: ['+rocm caliper=time,rocm version=develop']
+        SYSTEM_ARGS: [rocm=7.1.0]
+        GPUMODE: SPX
 run_tests_flux_tioga:
   extends: .run_tests_flux
   tags: [shell, tioga]
@@ -130,3 +148,8 @@ run_tests_flux_tioga:
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK: [amg2023, kripke, laghos, raja-perf]
         VARIANT: [+rocm]
+      # spack-pip
+      - HOST: tioga
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [py-scaffold]
+        VARIANT: ['+rocm package_manager=spack-pip caliper=mpi,time,rocm']

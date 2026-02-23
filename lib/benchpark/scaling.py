@@ -4,10 +4,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.error import BenchparkError
-from benchpark.directives import variant
-from benchpark.experiment import ExperimentHelper
 from enum import Enum
+
+from benchpark.directives import variant
+from benchpark.error import BenchparkError
+from benchpark.experiment import ExperimentHelper
 
 
 class ScalingMode(Enum):
@@ -125,9 +126,10 @@ def Scaling(*modes):
         for itr in range(num_exprs):
             dim = (start_dim + itr) % ndims
             for var_name, scaling_func in scaling_config.items():
-                getattr(self.expr_vars, var_name).scale_dim(
-                    itr, dim, scaling_func, scaling_factor
-                )
+                if scaling_func:
+                    getattr(self.expr_vars, var_name).scale_dim(
+                        itr, dim, scaling_func, scaling_factor
+                    )
 
     BaseScaling.scale_params = scale_params
 

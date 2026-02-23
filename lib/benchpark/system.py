@@ -5,14 +5,15 @@
 
 import hashlib
 import os
-import packaging.version
-import yaml
 import sys
 from typing import Dict, Tuple
 
-from benchpark.directives import ExperimentSystemBase, provides, variant
+import packaging.version
+import yaml
+
 import benchpark.spec
 import benchpark.variant
+from benchpark.directives import ExperimentSystemBase, provides, variant
 
 
 def _hash_id(content_list):
@@ -28,7 +29,7 @@ class MPISystem:
     name = "mpi"
 
     def system_specific_variables(self, system):
-        return {}
+        return {"cpu_arch": getattr(system, "cpu_arch", "unknown")}
 
 
 class JobQueue:

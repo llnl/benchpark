@@ -1,11 +1,13 @@
+import argparse
 import os
 import subprocess
 import textwrap
 
-import yaml
 import llnl.util.tty.color as color
+import yaml
 
-import benchpark.paths
+import benchpark.spec
+from benchpark.paths import paths
 
 
 def indent():
@@ -71,7 +73,7 @@ def info_system(args):
         key, value = query.split("=", 1)
         exclude = {"all_hardware_descriptions", "repo.yaml", "generic-x86"}
         all_system_specs = []
-        for d in set(os.listdir(benchpark.paths.benchpark_root / "systems")) - exclude:
+        for d in set(os.listdir(paths.benchpark_root / "systems")) - exclude:
             all_system_specs.append(benchpark.spec.SystemSpec(d))
 
         matching_systems = []
@@ -137,20 +139,26 @@ def info_experiment(args):
             )
         )
 
-    experiment_spec = benchpark.spec.ExperimentSpec(args.name)
+    experiment_spec_str = " ".join(args.name)
+    experiment_spec = benchpark.spec.ExperimentSpec(experiment_spec_str)
     conc = experiment_spec.concretize()
-    experiment_class = conc.experiment
+    try:
+        experiment = conc.experiment
+    except Exception as e:
+        msg = (
+            f"'{experiment_spec_str}' must be a valid experiment spec;"
+            " some experiments require specifying additional variants"
+            " (e.g. experiments not inheriting MpiOnlyExperiment must"
+            " set +rocm or +cuda)."
+        )
+        raise ValueError(msg) from e
 
     if args.spack:
         subprocess.run(
             [
                 "spack",
                 "info",
-                (
-                    experiment_class.spack_name
-                    if experiment_class.spack_name
-                    else experiment_class.name
-                ),
+                (experiment.spack_name if experiment.spack_name else experiment.name),
             ]
         )
         return
@@ -159,20 +167,16 @@ def info_experiment(args):
             [
                 "ramble",
                 "info",
-                (
-                    experiment_class.ramble_name
-                    if experiment_class.ramble_name
-                    else experiment_class.name
-                ),
+                (experiment.ramble_name if experiment.ramble_name else experiment.name),
             ]
         )
         return
     else:
         actions = {
-            "maintainers": (info_maintainers, [experiment_class]),
-            "ramble_name": (_info_ramble_name, [experiment_class]),
-            "spack_name": (_info_spack_name, [experiment_class]),
-            "variants": (info_variants, [experiment_class]),
+            "maintainers": (info_maintainers, [experiment]),
+            "ramble_name": (_info_ramble_name, [experiment]),
+            "spack_name": (_info_spack_name, [experiment]),
+            "variants": (info_variants, [experiment]),
         }
 
         # Call functions for enabled options, or all if no flag is set
@@ -217,7 +221,9 @@ def setup_parser(root_parser):
     experiment_parser.add_argument(
         "--maintainers", action="store_true", help="Maintainers"
     )
-    experiment_parser.add_argument("name", help="Experiment name")
+    experiment_parser.add_argument(
+        "name", nargs=argparse.REMAINDER, help="Experiment name"
+    )
 
 
 def command(args):

@@ -6,23 +6,23 @@
 import os
 import pathlib
 
-
-def _source_location() -> pathlib.Path:
-    """Return the location of the project source files directory."""
-    path_to_this_file = __file__
-    return pathlib.Path(path_to_this_file).resolve().parents[2]
+import benchpark.base_paths
+import benchpark.config
 
 
-benchpark_root = _source_location()
-lib_path = benchpark_root / "lib" / "benchpark"
-test_path = lib_path / "test"
+class Paths:
+    def __init__(self, base_paths):
+        bootstrap_cfg = benchpark.config.configuration().bootstrap
 
-benchpark_home = pathlib.Path(
-    os.getenv("BENCHPARK_HOME", default=os.path.expanduser("~/.benchpark"))
-)
+        self.benchpark_home = pathlib.Path(os.path.expanduser(bootstrap_cfg.location))
+        self.global_ramble_path = self.benchpark_home / "ramble"
+        self.global_spack_path = self.benchpark_home / "spack"
 
-global_ramble_path = benchpark_home / "ramble"
-global_spack_path = benchpark_home / "spack"
-hardware_descriptions = benchpark_root / "systems" / "all_hardware_descriptions"
-checkout_versions = benchpark_root / "checkout-versions.yaml"
-remote_urls = benchpark_root / "remote-urls.yaml"
+        self.base_paths = base_paths
+
+    def __getattr__(self, name):
+        return getattr(self.base_paths, name)
+
+
+paths = Paths(benchpark.base_paths.base_paths)
+hardware_descriptions = paths.hardware_descriptions

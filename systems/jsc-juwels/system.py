@@ -3,11 +3,13 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainers
-from benchpark.system import System, compiler_def, compiler_section_for, merge_dicts
-from benchpark.cudasystem import CudaSystem
+
 from packaging.version import Version
+
+from benchpark.cudasystem import CudaSystem
+from benchpark.directives import maintainers, variant
 from benchpark.paths import hardware_descriptions
+from benchpark.system import System, compiler_def, compiler_section_for, merge_dicts
 
 
 class JscJuwels(System):
@@ -16,6 +18,7 @@ class JscJuwels(System):
 
     id_to_resources = {
         "juwels": {
+            "cpu_arch": "rome",
             "sys_cores_per_node": 48,
             "timeout": 120,
             "sys_gpus_per_node": 4,
@@ -33,12 +36,6 @@ class JscJuwels(System):
         description="CUDA version",
     )
     variant(
-        "gtl",
-        default=False,
-        values=(True, False),
-        description="Use GTL-enabled MPI",
-    )
-    variant(
         "compiler",
         default="gcc",
         description="Which compiler to use",
@@ -48,7 +45,7 @@ class JscJuwels(System):
         super().__init__(spec)
         self.programming_models = [CudaSystem()]
         self.cuda_version = Version(self.spec.variants["cuda"][0])
-        self.gtl_flag = self.spec.variants["gtl"][0]
+        self.gtl_flag = None
 
         if self.spec.satisfies("compiler=gcc"):
             self.gcc_version = Version("12.3.0")
@@ -99,12 +96,12 @@ class JscJuwels(System):
                     "buildable": False,
                 },
                 "cmake": {
+                    "buildable": False,
                     "externals": [
                         {
                             "spec": "cmake@3.26.3",
                             "prefix": "/p/software/juwelsbooster/stages/2024/software/CMake/3.26.3-GCCcore-12.3.0",
                             "modules": ["Stages/2024", "CMake"],
-                            "buildable": False,
                         }
                     ],
                 },

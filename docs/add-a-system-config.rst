@@ -4,8 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Adding a System
-===============
+#################
+ Adding a System
+#################
 
 This guide is intended for those who would like to add a new system to benchpark, such
 as vendors, system administrators, or application developers. Benchpark provides an API
@@ -36,8 +37,9 @@ To determine if you need to create a new system:
 
 .. _adding-system-hardware-specs:
 
-A. Adding System Hardware Specs
--------------------------------
+*********************************
+ A. Adding System Hardware Specs
+*********************************
 
 We list hardware descriptions of Systems specified in Benchpark in the System Catalogue
 in :doc:`system-list`. If you are running on a system with an accelerator, find an
@@ -98,8 +100,9 @@ In the ``systems/all_hardware_descriptions/system_name`` directory, add a
 
 .. _system-specification:
 
-B. Creating the System Definition (``system.py``)
--------------------------------------------------
+***************************************************
+ B. Creating the System Definition (``system.py``)
+***************************************************
 
 Now that you have defined the hardware description for your system, you can now create
 the ``system.py``, which involves defining the software on your system. This includes
@@ -114,7 +117,7 @@ create a ``system.py`` are:
 .. _creating-sys-class:
 
 1. Creating the System Class
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+============================
 
 In this example, we will recreate a fully-functional example of the AWS ``system.py``
 that we use for benchpark tutorials (see `aws-tutorial/system.py
@@ -155,7 +158,7 @@ instances that share this same hardware and software specification using the
 .. _class-init-and-resources:
 
 2. Specify the Class Initializer and Resources
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+==============================================
 
 When defining ``__init__()`` for our system, we invoke the parent class
 ``System::__init__()``, and set important system attributes using the
@@ -226,7 +229,7 @@ experiment initialized with your chosen instance.
 .. _compiler-def:
 
 3. Add Compiler Definitions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+===========================
 
 We define compilers that are available on our system by implementing
 ``compute_compilers_section()`` function. Here are the general steps for how to write
@@ -237,7 +240,7 @@ this function, followed by our AWS example:
    ``compiler_section_for()``.
 3. Merge the compiler definitions with merge_dicts (this part is unnecessary if you have
    only one type of compiler).
-4. Generally, you will want to compose a minimal list of compilers: e.g. if you want to
+4. Generally, you will want to compose a minimal list of compilers: e.g., if you want to
    compile your benchmark with the oneAPI compiler, and have multiple versions to choose
    from, you would add a variant to the system, and the config would expose only one of
    them.
@@ -247,9 +250,9 @@ For our AWS system, the compiler we define is ``gcc@11.4.0``. For the
 
 1. ``spec`` - Similar to package specs, ``name@version``. GCC in particular also needs
    the ``languages`` variant, where the list of languages depends on the available
-   ``exes`` (e.g. do not include "fortran" if ``gfortran`` is not available). If you are
-   **not** using GCC or Spack as your package manager, ``languages`` is unnecessary.
-2. ``prefix`` - Prefix to the compiler binary directory, e.g. ``/usr/`` for
+   ``exes`` (e.g., do not include "fortran" if ``gfortran`` is not available). If you
+   are **not** using GCC or Spack as your package manager, ``languages`` is unnecessary.
+2. ``prefix`` - Prefix to the compiler binary directory, e.g., ``/usr/`` for
    ``/usr/bin/gcc``
 3. ``exes`` - Dictionary to map ``c``, ``cxx``, and ``fortran`` to the appropriate file
    found in the prefix.
@@ -281,7 +284,7 @@ For our AWS system, the compiler we define is ``gcc@11.4.0``. For the
 .. _software-section:
 
 4. Add a Software Section
-~~~~~~~~~~~~~~~~~~~~~~~~~
+=========================
 
 Here we define the ``compute_software_section()``, where at minimum we must define the
 ``default-compiler`` for Ramble. This is trivial for the single compiler that we have,
@@ -311,7 +314,7 @@ Here we define the ``compute_software_section()``, where at minimum we must defi
 .. _software-definitions:
 
 5. Add Software Definitions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+===========================
 
 Finally, we define the ``compute_packages_section()`` function, where you can include
 any package that you would like the package manager, such as Spack, to find on the
@@ -320,23 +323,27 @@ instead. For each package that you include, you need to define its spec ``name@v
 and the system path ``prefix`` to the package. Additionally for Spack, you need to set
 ``buildable: False`` to tell Spack not to build that package.
 
-At minimum, we recommend you define externals for ``cmake`` and ``mpi`` (users also
-typically define externals for other libraries, e.g. math libraries like ``blas`` and
-``lapack``). This is because certain packages (e.g. ``cmake``) can take a long time to
+At minimum, we recommend to define externals for ``cmake`` and ``mpi`` (users also
+typically define externals for other libraries, e.g., math libraries like ``blas`` and
+``lapack``). This is because certain packages (e.g., ``cmake``) can take a long time to
 build, and packages such as ``mpi``, ``blas``, and ``lapack`` can influence runtime
-performance significantly. Additionally, for systems with accelerators, define externals
-for CUDA and ROCm runtime libraries (see externals examples for a `CUDA system
+performance significantly so it is prudent to use the versions optimized for our system.
+Additionally, for systems with accelerators, define externals for CUDA and ROCm runtime
+libraries (see externals examples for a `CUDA system
 <https://github.com/LLNL/benchpark/blob/e82e3a26aef54855cf281c088b8f149ab7d87d9d/systems/llnl-matrix/system.py#L274>`_,
 or a `ROCm system
 <https://github.com/LLNL/benchpark/blob/e82e3a26aef54855cf281c088b8f149ab7d87d9d/systems/llnl-elcapitan/system.py#L483>`_).
-Also, see :ref:`adding-sys-packages`, for help on how to search for the packages
-available on your system.
+See :ref:`adding-sys-packages`, for help on how to search for the packages available on
+your system.
 
 .. note::
 
-    For ``mpi``, you need to define ``"mpi": {"buildable": False},`` as a virtual
-    package, and then define your MPI package as we have for the ``openmpi`` package.
-    This is to ensure Spack uses our MPI, and does not try to build another MPI package.
+    For packages that declare virtual dependencies, e.g., ``depends_on("mpi")``, you
+    need to define a virtual package ``"mpi": {"buildable": False},``, followed by a
+    definition of at least one provider of this package (see the provider definition for
+    ``openmpi`` in our example). This is to ensure Spack uses the provider we specified,
+    and does not try to build another MPI package. See a similar example for ``blas``,
+    ``lapack``, and their provider ``atlas``.
 
 ::
 
@@ -354,6 +361,11 @@ available on your system.
         def compute_packages_section(self):
             return {
                 "packages": {
+                    "blas": {"buildable": False},
+                    "lapack": {"buildable": False},
+                    "atlas": {
+                        "externals": [{"spec": "atlas@3.10.3", "prefix": "/usr"}],
+                    },
                     "mpi": {"buildable": False},
                     "openmpi": {
                         "externals": [
@@ -364,7 +376,7 @@ available on your system.
                         ]
                     },
                     "cmake": {
-                        "externals": [{"spec": "cmake@4.0.2", "prefix": "/usr"}],
+                        "externals": [{"spec": "cmake@4.1.1", "prefix": "/usr"}],
                         "buildable": False,
                     },
                     ...
@@ -372,7 +384,7 @@ available on your system.
             }
 
 6. Validating the System
-~~~~~~~~~~~~~~~~~~~~~~~~
+========================
 
 To manually validate that your new system works, you should start by initializing your
 system:
@@ -384,13 +396,14 @@ system:
 If this completes without errors, you can continue by creating a benchmark
 :doc:`add-a-benchmark`.
 
-System Appendix
----------------
+*****************
+ System Appendix
+*****************
 
 .. _adding-sys-packages:
 
 1. Adding/Updating System Packages
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+==================================
 
 External package definitions can be added/updated from the output of ``benchpark system
 external``. If you don't have any packages yet, define ``compute_packages_section`` as
@@ -462,7 +475,7 @@ cluster=<cluster>``:
     'tar': {'buildable': False,
             'externals': [{'prefix': '/usr', 'spec': 'tar@1.30'}]}}
 
-where the command should be ran on a cluster that is defined for the given system, e.g.
+where the command should be ran on a cluster that is defined for the given system, e.g.,
 ruby for llnl-cluster. Use this output to update your package definitions in your
 ``system.py``'s ``compute_package_section()``.
 
