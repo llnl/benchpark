@@ -60,6 +60,7 @@ jobs:
               - 'docs/conf.py'
               - 'experiments/**'
               - 'lib/**'
+              - 'modifiers/**'
               - 'repo/**'
               - 'systems/**'
               - 'var/**'
