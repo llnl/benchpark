@@ -6,13 +6,13 @@
 from benchpark.caliper import Caliper
 from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
-from benchpark.models import ModelsType, Models
+from benchpark.programming_model import ProgrammingModelType, ProgrammingModel
 from benchpark.scaling import ScalingMode, Scaling
 
 
 class Kripke(
     Experiment,
-    Models(ModelsType.Mpionly, ModelsType.Openmp, ModelsType.Cuda, ModelsType.Rocm),
+    ProgrammingModel(ProgrammingModelType.Mpionly, ProgrammingModelType.Openmp, ProgrammingModelType.Cuda, ProgrammingModelType.Rocm),
     Scaling(ScalingMode.Strong, ScalingMode.Weak, ScalingMode.Throughput),
     Caliper,
 ):

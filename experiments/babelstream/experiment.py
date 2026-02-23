@@ -6,12 +6,12 @@
 from benchpark.caliper import Caliper
 from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
-from benchpark.models import ModelsType, Models
+from benchpark.programming_model import ProgrammingModelType, ProgrammingModel
 
 class Babelstream(
     Experiment,
     Caliper,
-    Models(ModelsType.Openmp, ModelsType.Cuda, ModelsType.Rocm),
+    ProgrammingModel(ProgrammingModelType.Openmp, ProgrammingModelType.Cuda, ProgrammingModelType.Rocm),
 ):
     variant(
         "workload",

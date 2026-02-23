@@ -10,16 +10,16 @@ from benchpark.experiment import ExperimentHelper
 from enum import Enum
 
 
-class ModelsType(Enum):
+class ProgrammingModelType(Enum):
     Mpionly = "mpi"
     Openmp = "openmp"
     Cuda = "cuda"
     Rocm = "rocm"
 
 
-def Models(*types):
+def ProgrammingModel(*types):
     for ty in types:
-        if not isinstance(ty, ModelsType):
+        if not isinstance(ty, ProgrammingModelType):
             raise ValueError(f"Invalid programming model: {ty}")
 
     # Normalize once so we can reuse
@@ -58,10 +58,10 @@ def Models(*types):
         def get_helper_name_prefix(self):
             models = []
             for s in [
-                ModelsType.Mpionly.value,
-                ModelsType.Openmp.value,
-                ModelsType.Cuda.value,
-                ModelsType.Rocm.value,
+                ProgrammingModelType.Mpionly.value,
+                ProgrammingModelType.Openmp.value,
+                ProgrammingModelType.Cuda.value,
+                ProgrammingModelType.Rocm.value,
             ]:
                 if self.spec.satisfies("+" + s):
                     models.append(s)
@@ -77,7 +77,7 @@ def Models(*types):
             return tuple(sorted(models))
 
     return type(
-        "ProgrammingModel",
+        "ProgrammingModelType",
         (BaseModel,),
         {
             "Helper": Helper,
