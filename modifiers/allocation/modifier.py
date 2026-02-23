@@ -513,7 +513,7 @@ class Allocation(BasicModifier):
         if v.n_gpus:
             gpus_per_rank = self.gpus_as_gpus_per_rank(v.n_gpus)
             node_spec.append(f"gpus={gpus_per_rank}")
-        
+    
         if node_spec:
             batch_opts.append(f"-l {':'.join(node_spec)}")
         else:
