@@ -23,6 +23,7 @@ class SpartaSnl(CMakePackage, CudaPackage, ROCmPackage):
     variant("openmp", default=False, description="Enable OpenMP support")
     variant("jpeg", default=False, description="Build with jpeg support")
     variant("png", default=False, description="Build with png support")
+    variant("apu", default=False, description="Enable APU support", when="@4.5: +rocm")
 
     variant(
         "kokkos",
@@ -56,6 +57,7 @@ class SpartaSnl(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("kokkos+openmp cxxstd=17", when="+openmp")
     depends_on("kokkos+rocm", when="+rocm")
     depends_on("kokkos+wrapper+cuda cxxstd=17", when="+cuda")
+    depends_on("kokkos+apu", when="+apu")
     # Kokkos 5 not building
     depends_on("kokkos@:4", when="+kokkos")
 
