@@ -16,7 +16,7 @@ def test_programming_model_checks():
         experiment = spec.experiment  # noqa: F841
 
     # stream+openmp not valid
-    with pytest.raises(Exception, match="not a valid variant"):
+    with pytest.raises(Exception, match="are not valid programming models"):
         spec = benchpark.spec.ExperimentSpec(
             "stream+openmp workload=stream"
         ).concretize()

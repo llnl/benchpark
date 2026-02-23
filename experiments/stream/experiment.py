@@ -6,12 +6,12 @@
 from benchpark.caliper import Caliper
 from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
-from benchpark.mpi import MpiOnlyExperiment
+from benchpark.models import ModelsType, Models
 
 
 class Stream(
     Experiment,
-    MpiOnlyExperiment,
+    Models(ModelsType.Mpionly),
     Caliper,
 ):
     variant(
