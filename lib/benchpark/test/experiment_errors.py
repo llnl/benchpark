@@ -24,9 +24,9 @@ def test_programming_model_checks():
         spec = benchpark.spec.ExperimentSpec(
             "stream+openmp workload=stream"
         ).concretize()
-        experiment = spec.experiment
+        experiment = spec.experiment  # noqa: F841
 
     # Multiple scaling options not valid
     with pytest.raises(BenchparkError, match="cannot specify multiple scaling options"):
         spec = benchpark.spec.ExperimentSpec("kripke+strong+weak").concretize()
-        experiment = spec.experiment
+        experiment = spec.experiment  # noqa: F841

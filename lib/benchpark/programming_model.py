@@ -7,7 +7,6 @@
 from enum import Enum
 
 from benchpark.directives import requires, variant
-from benchpark.error import BenchparkError
 from benchpark.experiment import ExperimentHelper
 
 
