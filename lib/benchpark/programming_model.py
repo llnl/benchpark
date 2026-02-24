@@ -4,10 +4,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.error import BenchparkError
-from benchpark.directives import variant, requires
-from benchpark.experiment import ExperimentHelper
 from enum import Enum
+
+from benchpark.directives import requires, variant
+from benchpark.error import BenchparkError
+from benchpark.experiment import ExperimentHelper
 
 
 class ProgrammingModelType(Enum):
