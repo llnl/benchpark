@@ -374,7 +374,7 @@ def benchpark_tags_handler(args):
     """
     source_dir = paths.benchpark_root
     ramble_exe = paths.benchpark_home / "ramble/bin/ramble"
-    subprocess.run([ramble_exe, "repo", "add", "--scope=site", f"{source_dir}/repo"])
+    subprocess.run([ramble_exe, "repo", "add", "--scope=site", f"{source_dir}/repos/ramble_applications"])
     benchmarks = benchpark_benchmarks()
 
     if args.tag:
