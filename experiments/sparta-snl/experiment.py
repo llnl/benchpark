@@ -55,6 +55,20 @@ class SpartaSnl(
         description="Enable GPU-aware MPI",
     )
 
+    variant(
+        "apu",
+        default=False,
+        values=(True, False),
+        description="Enable APU support",
+    )
+
+    variant(
+        "other",
+        default=False,
+        values=(True, False),
+        description="Set other input/environment variables",
+    )
+
     maintainers("rfhaque")
 
     def compute_applications_section(self):
@@ -87,6 +101,14 @@ class SpartaSnl(
 
         self.add_experiment_variable("stats", stats, True)
         self.add_experiment_variable("run", run, True)
+
+        if self.spec.satisfies("+rocm"):
+            if self.spec.satisfies("+other"):
+                self.set_environment_variable("MPICH_OFI_NIC_POLICY", "GPU")
+                self.set_environment_variable("FI_HMEM", "rocr")
+                self.set_environment_variable("HUGETLB_MORECORE", "yes")
+                self.set_environment_variable("HUGETLB_RESTRICT_EXE", "defrag:lmp")
+                self.set_environment_variable("HSA_XNACK", 1)
 
         if self.spec.satisfies("+rocm") or self.spec.satisfies("+cuda"):
             kokkos_mode = "g 1"
@@ -126,10 +148,14 @@ class SpartaSnl(
             fft_kokkos = "cufft"
         if self.spec.satisfies("+rocm"):
             fft_kokkos = "hipfft"
+            if self.spec.satisfies("+apu"):
+                apu = "+apu"
+            else:
+                apu = "~apu"
 
         self.add_package_spec(
             self.name,
             [
-                f"sparta-snl{self.determine_version()} +mpi+kokkos fft_kokkos={fft_kokkos} fft={fft} "
+                f"sparta-snl{self.determine_version()} +mpi+kokkos fft_kokkos={fft_kokkos} fft={fft} {apu} "
             ],
         )

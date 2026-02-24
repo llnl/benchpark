@@ -114,6 +114,14 @@ class SpartaSnl(CMakePackage, CudaPackage, ROCmPackage):
 
         return (wrapper_flags, [], build_system_flags)
 
+    def flag_handler(self, name, flags):
+        if spec.satisfies("+apu"):
+            if name == "cxxflags":
+                flags.append("-fdenormal-fp-math=ieee")
+                flags.append("-fgpu-flush-denormals-to-zero")
+
+        return flags, None, None
+
     def cmake_args(self):
         spec = self.spec
     
@@ -149,6 +157,16 @@ class SpartaSnl(CMakePackage, CudaPackage, ROCmPackage):
             args.append(f"-DFFT_KOKKOS={spec.variants['fft_kokkos'].value.upper()}")
         else:
             args.append(self.define("PKG_KOKKOS", False))
+
+        if spec.satisfies("+apu"):
+            existing_ldflags = self.spec.compiler_flags.get("ldflags", [])
+            existing = " ".join(existing_ldflags)
+            extra = " -lxpmem -lhugetlbfs"
+            if existing:
+                combined = f"{existing} {extra}"
+            else:
+                combined = extra
+            args.append(f"-DCMAKE_EXE_LINKER_FLAGS={combined}")
 
         return args
 
