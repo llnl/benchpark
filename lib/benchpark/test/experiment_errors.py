@@ -11,12 +11,12 @@ from benchpark.error import BenchparkError
 
 def test_programming_model_checks():
     # babelstream mpi-only not valid
-    with pytest.raises(BenchparkError, match=r"mpi.*are not valid programming models"):
+    with pytest.raises(BenchparkError, match=r"mpi.*are not valid programming models for.*babelstream"):
         spec = benchpark.spec.ExperimentSpec("babelstream").concretize()
         experiment = spec.experiment  # noqa: F841
 
     # stream+openmp not valid
-    with pytest.raises(Exception, match="are not valid programming models"):
+    with pytest.raises(Exception, match=r"openmp.*are not valid programming models for.*stream.*mpi"):
         spec = benchpark.spec.ExperimentSpec(
             "stream+openmp workload=stream"
         ).concretize()
