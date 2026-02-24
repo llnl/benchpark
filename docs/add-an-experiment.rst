@@ -57,8 +57,9 @@ We create the ``experiment.py`` file under ``benchpark/experiments/hpl/experimen
 The naming of this directory will affect how the experiment is initialized, e.g.,
 ``benchpark experiment init ... hpl``. There are multiple scaling options, modifiers,
 and programming models we can inherit from, but at minimum our experiment should inherit
-from the base ``Experiment`` class and ``ProgrammingModel(ProgrammingModelType.Mpionly)`` indicating that our
-experiment can be executed with MPI.
+from the base ``Experiment`` class and
+``ProgrammingModel(ProgrammingModelType.Mpionly)`` indicating that our experiment can be
+executed with MPI.
 
 ::
 
@@ -78,9 +79,9 @@ supports the ``OpenMP`` programming model. The HPL package.py defines the ``Cali
 variant because the HPL source code is instrumented with the ``Caliper`` performance
 profiling library (via a `fork <https://github.com/daboehme/HPL-caliper.git>`__ of the
 source code) and the build links to Caliper. Enabling these variants in our Benchpark
-experiment only requires inheritance from the pre-defined ``ProgrammingModelType.Openmp`` and
-``Caliper`` classes. For more details on the configurability of experiment variants, see
-:ref:`experiment-variants`.
+experiment only requires inheritance from the pre-defined
+``ProgrammingModelType.Openmp`` and ``Caliper`` classes. For more details on the
+configurability of experiment variants, see :ref:`experiment-variants`.
 
 ::
 
