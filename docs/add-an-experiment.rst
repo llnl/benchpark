@@ -78,7 +78,7 @@ supports the ``OpenMP`` programming model. The HPL package.py defines the ``Cali
 variant because the HPL source code is instrumented with the ``Caliper`` performance
 profiling library (via a `fork <https://github.com/daboehme/HPL-caliper.git>`__ of the
 source code) and the build links to Caliper. Enabling these variants in our Benchpark
-experiment only requires inheritance from the pre-defined ``OpenMPExperiment`` and
+experiment only requires inheritance from the pre-defined ``ProgrammingModelType.Openmp`` and
 ``Caliper`` classes. For more details on the configurability of experiment variants, see
 :ref:`experiment-variants`.
 
@@ -86,13 +86,11 @@ experiment only requires inheritance from the pre-defined ``OpenMPExperiment`` a
 
     from benchpark.experiment import Experiment
     from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
-    from benchpark.openmp import OpenMPExperiment
     from benchpark.caliper import Caliper
 
     class Hpl(
       Experiment,
-      ProgrammingModel(ProgrammingModelType.Mpionly),
-      OpenMPExperiment,
+      ProgrammingModel(ProgrammingModelType.Mpionly, ProgrammingModelType.Openmp),
       Caliper,
     ):
 
@@ -119,14 +117,12 @@ experiment.
 
     from benchpark.experiment import Experiment
     from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
-    from benchpark.openmp import OpenMPExperiment
     from benchpark.caliper import Caliper
     from benchpark.directives import variant, maintainers
 
     class Hpl(
       Experiment,
-      ProgrammingModel(ProgrammingModelType.Mpionly),
-      OpenMPExperiment,
+      ProgrammingModel(ProgrammingModelType.Mpionly, ProgrammingModelType.Openmp),
       Caliper,
     ):
 
@@ -191,14 +187,12 @@ by default.
 
     from benchpark.experiment import Experiment
     from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
-    from benchpark.openmp import OpenMPExperiment
     from benchpark.caliper import Caliper
     from benchpark.directives import variant, maintainers
 
     class Hpl(
       Experiment,
-      ProgrammingModel(ProgrammingModelType.Mpionly),
-      OpenMPExperiment,
+      ProgrammingModel(ProgrammingModelType.Mpionly, ProgrammingModelType.Openmp),
       Caliper,
     ):
 
@@ -286,15 +280,13 @@ runtime parameters during experiment initialization, e.g., ``benchpark experimen
 
     from benchpark.experiment import Experiment
     from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
-    from benchpark.openmp import OpenMPExperiment
     from benchpark.scaling import ScalingMode, Scaling
     from benchpark.caliper import Caliper
     from benchpark.directives import variant, maintainers
 
     class Hpl(
       Experiment,
-      ProgrammingModel(ProgrammingModelType.Mpionly),
-      OpenMPExperiment,
+      ProgrammingModel(ProgrammingModelType.Mpionly, ProgrammingModelType.Openmp),
       Scaling(ScalingMode.Strong, ScalingMode.Weak),
       Caliper,
     ):
@@ -353,15 +345,13 @@ not list required packages for the benchmark here, since they are already define
 
     from benchpark.experiment import Experiment
     from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
-    from benchpark.openmp import OpenMPExperiment
     from benchpark.scaling import ScalingMode, Scaling
     from benchpark.caliper import Caliper
     from benchpark.directives import variant, maintainers
 
     class Hpl(
       Experiment,
-      ProgrammingModel(ProgrammingModelType.Mpionly),
-      OpenMPExperiment,
+      ProgrammingModel(ProgrammingModelType.Mpionly, ProgrammingModelType.Openmp),
       Scaling(ScalingMode.Strong, ScalingMode.Weak),
       Caliper,
     ):
