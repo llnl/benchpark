@@ -57,17 +57,17 @@ We create the ``experiment.py`` file under ``benchpark/experiments/hpl/experimen
 The naming of this directory will affect how the experiment is initialized, e.g.,
 ``benchpark experiment init ... hpl``. There are multiple scaling options, modifiers,
 and programming models we can inherit from, but at minimum our experiment should inherit
-from the base ``Experiment`` class and ``MpiOnlyExperiment`` indicating that our
+from the base ``Experiment`` class and ``ProgrammingModel(ProgrammingModelType.Mpionly)`` indicating that our
 experiment can be executed with MPI.
 
 ::
 
     from benchpark.experiment import Experiment
-    from benchpark.mpi import MpiOnlyExperiment
+    from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
 
     class Hpl(
       Experiment,
-      MpiOnlyExperiment,
+      ProgrammingModel(ProgrammingModelType.Mpionly),
     ):
 
 Looking at the `HPL package
@@ -85,13 +85,13 @@ experiment only requires inheritance from the pre-defined ``OpenMPExperiment`` a
 ::
 
     from benchpark.experiment import Experiment
-    from benchpark.mpi import MpiOnlyExperiment
+    from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
     from benchpark.openmp import OpenMPExperiment
     from benchpark.caliper import Caliper
 
     class Hpl(
       Experiment,
-      MpiOnlyExperiment,
+      ProgrammingModel(ProgrammingModelType.Mpionly),
       OpenMPExperiment,
       Caliper,
     ):
@@ -118,14 +118,14 @@ experiment.
 ::
 
     from benchpark.experiment import Experiment
-    from benchpark.mpi import MpiOnlyExperiment
+    from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
     from benchpark.openmp import OpenMPExperiment
     from benchpark.caliper import Caliper
     from benchpark.directives import variant, maintainers
 
     class Hpl(
       Experiment,
-      MpiOnlyExperiment,
+      ProgrammingModel(ProgrammingModelType.Mpionly),
       OpenMPExperiment,
       Caliper,
     ):
@@ -190,14 +190,14 @@ by default.
 ::
 
     from benchpark.experiment import Experiment
-    from benchpark.mpi import MpiOnlyExperiment
+    from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
     from benchpark.openmp import OpenMPExperiment
     from benchpark.caliper import Caliper
     from benchpark.directives import variant, maintainers
 
     class Hpl(
       Experiment,
-      MpiOnlyExperiment,
+      ProgrammingModel(ProgrammingModelType.Mpionly),
       OpenMPExperiment,
       Caliper,
     ):
@@ -285,7 +285,7 @@ runtime parameters during experiment initialization, e.g., ``benchpark experimen
 ::
 
     from benchpark.experiment import Experiment
-    from benchpark.mpi import MpiOnlyExperiment
+    from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
     from benchpark.openmp import OpenMPExperiment
     from benchpark.scaling import ScalingMode, Scaling
     from benchpark.caliper import Caliper
@@ -293,7 +293,7 @@ runtime parameters during experiment initialization, e.g., ``benchpark experimen
 
     class Hpl(
       Experiment,
-      MpiOnlyExperiment,
+      ProgrammingModel(ProgrammingModelType.Mpionly),
       OpenMPExperiment,
       Scaling(ScalingMode.Strong, ScalingMode.Weak),
       Caliper,
@@ -352,7 +352,7 @@ not list required packages for the benchmark here, since they are already define
 ::
 
     from benchpark.experiment import Experiment
-    from benchpark.mpi import MpiOnlyExperiment
+    from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
     from benchpark.openmp import OpenMPExperiment
     from benchpark.scaling import ScalingMode, Scaling
     from benchpark.caliper import Caliper
@@ -360,7 +360,7 @@ not list required packages for the benchmark here, since they are already define
 
     class Hpl(
       Experiment,
-      MpiOnlyExperiment,
+      ProgrammingModel(ProgrammingModelType.Mpionly),
       OpenMPExperiment,
       Scaling(ScalingMode.Strong, ScalingMode.Weak),
       Caliper,
@@ -423,10 +423,12 @@ experiment using CUDA (on an NVIDIA GPU), or ``openmp`` for an experiment using 
 
     class Amg2023(
       Experiment,
-      MpiOnlyExperiment
-      OpenMPExperiment,
-      CudaExperiment,
-      ROCmExperiment,
+      ProgrammingModel(
+          ProgrammingModelType.Mpionly,
+          ProgrammingModelType.Openmp,
+          ProgrammingModelType.Cuda,
+          ProgrammingModelType.Rocm,
+      ),
       Scaling(ScalingMode.Strong, ScalingMode.Weak, ScalingMode.Throughput),
       Caliper,
     ):
