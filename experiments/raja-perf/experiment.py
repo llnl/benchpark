@@ -6,21 +6,20 @@
 import math
 
 from benchpark.caliper import Caliper
-from benchpark.cuda import CudaExperiment
 from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
-from benchpark.mpi import MpiOnlyExperiment
-from benchpark.openmp import OpenMPExperiment
-from benchpark.rocm import ROCmExperiment
+from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
 from benchpark.scaling import Scaling, ScalingMode
 
 
 class RajaPerf(
     Experiment,
-    MpiOnlyExperiment,
-    CudaExperiment,
-    ROCmExperiment,
-    OpenMPExperiment,
+    ProgrammingModel(
+        ProgrammingModelType.Mpionly,
+        ProgrammingModelType.Openmp,
+        ProgrammingModelType.Cuda,
+        ProgrammingModelType.Rocm,
+    ),
     Scaling(ScalingMode.Strong, ScalingMode.Weak, ScalingMode.Throughput),
     Caliper,
 ):
