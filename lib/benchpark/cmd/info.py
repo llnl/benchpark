@@ -148,7 +148,7 @@ def info_experiment(args):
         msg = (
             f"'{experiment_spec_str}' must be a valid experiment spec;"
             " some experiments require specifying additional variants"
-            " (e.g. experiments not inheriting MpiOnlyExperiment must"
+            " (e.g. experiments not inheriting ProgrammingModelType.Mpionly must"
             " set +rocm or +cuda)."
         )
         raise ValueError(msg) from e

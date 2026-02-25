@@ -4,19 +4,19 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from benchpark.caliper import Caliper
-from benchpark.cuda import CudaExperiment
 from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
-from benchpark.mpi import MpiOnlyExperiment
-from benchpark.rocm import ROCmExperiment
+from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
 from benchpark.scaling import Scaling, ScalingMode
 
 
 class Remhos(
     Experiment,
-    MpiOnlyExperiment,
-    CudaExperiment,
-    ROCmExperiment,
+    ProgrammingModel(
+        ProgrammingModelType.Mpionly,
+        ProgrammingModelType.Cuda,
+        ProgrammingModelType.Rocm,
+    ),
     Scaling(ScalingMode.Strong),
     Caliper,
 ):
@@ -30,8 +30,8 @@ class Remhos(
 
     variant(
         "version",
-        default="gpu-opt",
-        values=("develop", "latest", "1.0"),
+        default="develop",
+        values=("develop", "latest", "gpu-fom", "1.0"),
         description="app version",
     )
 

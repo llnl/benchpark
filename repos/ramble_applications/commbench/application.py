@@ -14,7 +14,8 @@ class Commbench(ExecutableApplication):
 
     maintainers("arhag23")
 
-    software_spec("commbench", pkg_spec="commbench", package_manager="spack*")
+    with when("package_manager_family=spack"):
+        software_spec("commbench", pkg_spec="commbench")
 
     executable("execute-bench", "CommBench --use {lib} --pattern {pat}", use_mpi=True)
     # executable("execute-test", "mpiexec -n {n_ranks} CommBench --use {lib} --pattern {pat} --validate", use_mpi=True)
