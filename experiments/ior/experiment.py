@@ -5,11 +5,15 @@
 
 from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
-from benchpark.mpi import MpiOnlyExperiment
+from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
 from benchpark.scaling import Scaling, ScalingMode
 
 
-class Ior(Experiment, MpiOnlyExperiment, Scaling(ScalingMode.Strong, ScalingMode.Weak)):
+class Ior(
+    Experiment,
+    ProgrammingModel(ProgrammingModelType.Mpionly),
+    Scaling(ScalingMode.Strong, ScalingMode.Weak),
+):
     variant(
         "workload",
         default="mpiio-write",
