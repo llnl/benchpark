@@ -255,31 +255,34 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
 
         self.package_specs = {}
 
+        # Set available programming models for checks
+        models = set()
+        for cls in self.__class__.mro():
+            models.update(getattr(cls, "_available_programming_models", ()))
+        self.programming_models = list(models)
+
         # Explicitly ordered list. "mpi" first
         models = ["mpi"] + ["openmp", "cuda", "rocm"]
+        valid_models = []
         invalid_models = []
         for model in models:
-            # Experiment specifying model in add_package_spec that it doesn't implement
-            if (
-                self.spec.satisfies("+" + model)
-                and model not in self.programming_models
-            ):
-                invalid_models.append(model)
+            if self.spec.satisfies("+" + model):
+                valid_models.append(model)
+                # Experiment specifying model in add_package_spec that it doesn't implement
+                if model not in self.programming_models:
+                    invalid_models.append(model)
+        # MPI is always valid if with another programming model, even if no mpionly
+        if "mpi" in invalid_models and len(valid_models) > 1:
+            invalid_models.remove("mpi")
         # Case where there are no experiments specified in experiment.py
         if len(self.programming_models) == 0:
-            raise NotImplementedError(
-                f"Please specify a programming model in your {self.name}/experiment.py (e.g. MpiOnlyExperiment, OpenMPExperiment, CudaExperiment, ROCmExperiment). See other experiments for examples."
+            raise BenchparkError(
+                f"Please specify a programming model in your {self.name}/experiment.py (e.g. ProgrammingModelType.Mpionly, ProgrammingModelType.Openmp, ProgrammingModelType.Cuda, ProgrammingModelType.Rocm). See other experiments for examples."
             )
         elif len(invalid_models) > 0:
-            raise NotImplementedError(
+            print(self.spec)
+            raise BenchparkError(
                 f'{invalid_models} are not valid programming models for "{self.name}". Choose from {self.programming_models}.'
-            )
-        # Check if experiment is trying to run in MpiOnly mode without being an MpiOnlyExperiment
-        elif "mpi" not in str(self.spec) and not any(
-            self.spec.satisfies("+" + model) for model in models[1:]
-        ):
-            raise NotImplementedError(
-                f'"{self.name}" cannot run with MPI only without inheriting from MpiOnlyExperiment. Choose from {self.programming_models}'
             )
 
         if (
@@ -469,7 +472,10 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
         for cls in self.helpers:
             helper_prefix = cls.get_helper_name_prefix()
             if helper_prefix:
-                expr_helper_list.append(helper_prefix)
+                if isinstance(helper_prefix, list):
+                    expr_helper_list.extend(helper_prefix)
+                else:
+                    expr_helper_list.append(helper_prefix)
         expr_name_suffix = "_".join(expr_helper_list + self.expr_var_names)
 
         self.check_required_variables()

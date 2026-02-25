@@ -4,19 +4,19 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from benchpark.caliper import Caliper
-from benchpark.cuda import CudaExperiment
 from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
-from benchpark.mpi import MpiOnlyExperiment
-from benchpark.rocm import ROCmExperiment
+from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
 from benchpark.scaling import Scaling, ScalingMode
 
 
 class Laghos(
     Experiment,
-    MpiOnlyExperiment,
-    CudaExperiment,
-    ROCmExperiment,
+    ProgrammingModel(
+        ProgrammingModelType.Mpionly,
+        ProgrammingModelType.Cuda,
+        ProgrammingModelType.Rocm,
+    ),
     Scaling(ScalingMode.Strong, ScalingMode.Weak, ScalingMode.Throughput),
     Caliper,
 ):
