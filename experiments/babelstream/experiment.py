@@ -4,19 +4,19 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from benchpark.caliper import Caliper
-from benchpark.cuda import CudaExperiment
 from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
-from benchpark.openmp import OpenMPExperiment
-from benchpark.rocm import ROCmExperiment
+from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
 
 
 class Babelstream(
     Experiment,
     Caliper,
-    CudaExperiment,
-    ROCmExperiment,
-    OpenMPExperiment,
+    ProgrammingModel(
+        ProgrammingModelType.Openmp,
+        ProgrammingModelType.Cuda,
+        ProgrammingModelType.Rocm,
+    ),
 ):
     variant(
         "workload",
