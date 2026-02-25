@@ -5,13 +5,13 @@
 
 from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
-from benchpark.mpi import MpiOnlyExperiment
+from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
 from benchpark.scaling import Scaling, ScalingMode
 
 
 class MdTest(
     Experiment,
-    MpiOnlyExperiment,
+    ProgrammingModel(ProgrammingModelType.Mpionly),
     Scaling(ScalingMode.Strong),
 ):
     variant(
