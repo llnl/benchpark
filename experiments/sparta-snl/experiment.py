@@ -83,12 +83,12 @@ class SpartaSnl(
         else:
             L = 2  # will increase problem size by 4X
             ppc = 64
-            stats = 10
-            run = 100
-            xmin = -1.0
-            xmax = 1.1
-            ymin = -1.1
-            ymax = 1.1
+            stats = 100
+            run = 10000000
+            xmin = -5.0
+            xmax = 5.1
+            ymin = -5.1
+            ymax = 5.1
 
         if self.spec.satisfies("workload=cylinder"):
             self.add_experiment_variable("L", L, True)

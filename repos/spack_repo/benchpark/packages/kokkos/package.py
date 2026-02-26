@@ -13,12 +13,3 @@ class Kokkos(BuiltinKokkos):
   def setup_build_environment(self, env):
     if "+cuda" in self.spec:
       env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
-
-  def flag_handler(self, name, flags):
-    if spec.satisfies("+apu"):
-      if name == "cxxflags":
-        flags.append("-munsafe-fp-atomics")
-
-    return flags, None, None
-
-      

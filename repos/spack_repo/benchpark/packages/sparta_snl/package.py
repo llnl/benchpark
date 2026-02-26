@@ -112,15 +112,12 @@ class SpartaSnl(CMakePackage, CudaPackage, ROCmPackage):
         else:
             wrapper_flags.extend(flags)
 
-        return (wrapper_flags, [], build_system_flags)
-
-    def flag_handler(self, name, flags):
-        if spec.satisfies("+apu"):
+        if self.spec.satisfies("+apu"):
             if name == "cxxflags":
-                flags.append("-fdenormal-fp-math=ieee")
-                flags.append("-fgpu-flush-denormals-to-zero")
+                build_system_flags.append("-fdenormal-fp-math=ieee")
+                build_system_flags.append("-fgpu-flush-denormals-to-zero")
 
-        return flags, None, None
+        return (wrapper_flags, [], build_system_flags)
 
     def cmake_args(self):
         spec = self.spec
