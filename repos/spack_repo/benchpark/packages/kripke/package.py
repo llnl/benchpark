@@ -72,7 +72,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("chai@2024.07.0+raja", when="@1.2.7.0:2025.07.0")
     depends_on("fmt@9.1", when=f"^chai@2024.07.0")
 
-    depends_on('hip-wrapper", when="+rocm")
+    depends_on("hip-wrapper", when="+rocm")
 
     depends_on("mpi", when="+mpi")
     depends_on("chai+mpi", when="+mpi")
@@ -112,9 +112,9 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     def setup_run_environment(self, env):
       super().setup_run_environment(env)
 
-      if self.compiler.extra_rpaths:
-        for rpath in self.compiler.extra_rpaths:
-          env.prepend_path("LD_LIBRARY_PATH", rpath)
+      #if self.compiler.extra_rpaths:
+      #  for rpath in self.compiler.extra_rpaths:
+      #    env.prepend_path("LD_LIBRARY_PATH", rpath)
 
     def cmake_args(self):
         spec = self.spec

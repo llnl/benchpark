@@ -21,13 +21,13 @@ class HipWrapper(BundlePackage):
 
     def setup_dependent_build_environment(self, env, dependent_spec):
         rpaths = []
-        if dependent_spec.compiler.extra_rpaths:
-            for rpath in dependent_spec.compiler.extra_rpaths:
+        if dependent_spec.package.compiler.extra_rpaths:
+            for rpath in dependent_spec.package.compiler.extra_rpaths:
                 rpaths.append(f"-Wl,-rpath,{rpath}")
         env.set("SPACK_HIP_WRAPPER_LIBS", " ".join(rpaths))
 
     def dependent_cmake_args(self, dependent_spec: Spec) -> List[str]:
-        x = self.spec.prefix.hipwrapper
+        x = self.spec.prefix.bin.hipwrapper
         return [f"-DCMAKE_HIP_COMPILER_LAUNCHER={x}"]
 
     def install(self, spec, prefix):
@@ -53,7 +53,7 @@ if [[ $is_compile -eq 1 ]]; then
     exec "$compiler" "$@"
 else
     exec "$compiler" $SPACK_HIP_WRAPPER_LIBS "$@"
-done
+fi
 """
                     )
         st = os.stat(fpath)
