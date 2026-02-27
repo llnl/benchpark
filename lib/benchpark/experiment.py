@@ -255,11 +255,8 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
 
         self.package_specs = {}
 
-        # Set available programming models for checks
-        models = set()
-        for cls in self.__class__.mro():
-            models.update(getattr(cls, "_available_programming_models", ()))
-        self.programming_models = list(models)
+        # Get available programming models for checks
+        self.programming_models = list(self._available_programming_models)
 
         # Explicitly ordered list. "mpi" first
         models = ["mpi"] + ["openmp", "cuda", "rocm"]
