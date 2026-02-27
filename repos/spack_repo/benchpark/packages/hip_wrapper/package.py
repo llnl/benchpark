@@ -28,7 +28,11 @@ class HipWrapper(BundlePackage):
 
     def dependent_cmake_args(self, dependent_spec: Spec) -> List[str]:
         x = self.spec.prefix.bin.hipwrapper
-        return [f"-DCMAKE_HIP_COMPILER_LAUNCHER={x}"]
+        return [
+            f"-DCMAKE_HIP_COMPILER_LAUNCHER={x}",
+            #f"-DCMAKE_HIP_LINKER_LAUNCHER={x}",
+            f"-DCMAKE_RULE_LAUNCH_LINK={x}",
+        ]
 
     def install(self, spec, prefix):
         mkdir(self.prefix.bin)
