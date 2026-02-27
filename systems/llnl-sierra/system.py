@@ -37,6 +37,7 @@ class LlnlSierra(System):
                 22,
                 23,
             ],  # First two cores on each socket reserved.
+            "sys_sockets_per_node": 2,
             "sys_gpus_per_node": 4,
             "sys_mem_per_node_GB": 256,
             "sys_cpu_mem_per_node_MB": 40,

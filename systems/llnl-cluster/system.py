@@ -51,6 +51,7 @@ class LlnlCluster(System):
             "cpu_arch": "sapphirerapids",
             "sys_cores_per_node": 112,
             "sys_cores_os_reserved_per_node": 0,  # No explicit core reservation, first thread on each core reserved (2 threads per core)
+            "sys_sockets_per_node": 2,
             "sys_cores_os_reserved_per_node_list": None,
             "sys_mem_per_node_GB": 256,
             "sys_cpu_mem_per_node_MB": 210,
