@@ -92,6 +92,7 @@ run_tests_flux_tuolumne:
           - laghos
           - lammps
           - raja-perf
+          - remhos
           - sparta-snl
         VARIANT: [+rocm]
         GPUMODE: SPX
@@ -147,7 +148,7 @@ run_tests_flux_tioga:
     matrix:
       - HOST: tioga
         ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [amg2023, kripke, laghos, raja-perf]
+        BENCHMARK: [amg2023, kripke, laghos, raja-perf, remhos]
         VARIANT: [+rocm]
       # spack-pip
       - HOST: tioga
