@@ -76,6 +76,31 @@ def ProgrammingModel(*types):
                 models.update(getattr(cls, "_available_programming_models", ()))
             return tuple(sorted(models))
 
+        def get_spack_variants(self):
+            models = []
+            model_dict = {
+                ProgrammingModelType.Openmp.value: ["+openmp", "~openmp"],
+                ProgrammingModelType.Cuda.value: [
+                    "+cuda cuda_arch={cuda_arch}",
+                    "~cuda",
+                ],
+                ProgrammingModelType.Rocm.value: [
+                    "+rocm amdgpu_target={rocm_arch}",
+                    "~rocm",
+                ],
+            }
+            for s in [
+                ProgrammingModelType.Openmp.value,
+                ProgrammingModelType.Cuda.value,
+                ProgrammingModelType.Rocm.value,
+            ]:
+                if self.spec.satisfies("+" + s):
+                    models.append(model_dict[s][0])
+                else:
+                    models.append(model_dict[s][1])
+
+            return " ".join(models)
+
     return type(
         "ProgrammingModelType",
         (BaseModel,),
