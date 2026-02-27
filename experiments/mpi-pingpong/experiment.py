@@ -11,7 +11,9 @@ from benchpark.rocm import ROCmExperiment
 from benchpark.cuda import CudaExperiment
 
 
-class MpiPingpong(Experiment, MpiOnlyExperiment, ROCmExperiment, CudaExperiment, Caliper):
+class MpiPingpong(
+    Experiment, MpiOnlyExperiment, ROCmExperiment, CudaExperiment, Caliper
+):
 
     variant(
         "workload",
