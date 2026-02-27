@@ -223,6 +223,13 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
         description="Number of experiment repetitions",
     )
 
+    variant(
+        "allocation",
+        default="standard",
+        values=("standard", "torchrun-hpc"),
+        description="Allocation modifier mode",
+    )
+
     def __init__(self, spec):
         self.spec: "benchpark.spec.ConcreteExperimentSpec" = spec
         # Device type must be set before super with absence of mpionly experiment type
@@ -363,7 +370,10 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
 
     def compute_modifiers_section_wrapper(self):
         # by default we use the allocation modifier and no others
-        modifier_list = [{"name": "allocation"}, {"name": "exit-code"}]
+        modifier_list = [
+            {"name": "allocation", "mode": self.spec.variants["allocation"][0]},
+            {"name": "exit-code"},
+        ]
         modifier_list += self.compute_modifiers_section()
         for cls in self.helpers:
             cls_list = cls.compute_modifiers_section()
