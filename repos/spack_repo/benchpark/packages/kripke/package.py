@@ -152,7 +152,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
             args.append("-DENABLE_HIP=ON")
             args.append("-DHIP_ROOT_DIR={0}".format(spec["hip"].prefix))
             rocm_archs = spec.variants["amdgpu_target"].value
-            #args.append(f"-DCMAKE_HIP_COMPILER={env['CC']}")
+            args.append(f"-DCMAKE_HIP_COMPILER={spec['hip-wrapper'].prefix.bin.hipwrapper}")
             if "none" not in rocm_archs:
                 arch_str = ",".join(rocm_archs)
                 args.append("-DHIP_HIPCC_FLAGS=--amdgpu-target={0}".format(arch_str))

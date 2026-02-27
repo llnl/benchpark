@@ -26,24 +26,22 @@ class HipWrapper(BundlePackage):
                 rpaths.append(f"-Wl,-rpath,{rpath}")
         env.set("SPACK_HIP_WRAPPER_LIBS", " ".join(rpaths))
 
-    def dependent_cmake_args(self, dependent_spec: Spec) -> List[str]:
-        x = self.spec.prefix.bin.hipwrapper
-        return [
-            f"-DCMAKE_HIP_COMPILER_LAUNCHER={x}",
-            #f"-DCMAKE_HIP_LINKER_LAUNCHER={x}",
-            f"-DCMAKE_RULE_LAUNCH_LINK={x}",
-        ]
+    #def dependent_cmake_args(self, dependent_spec: Spec) -> List[str]:
+    #    x = self.spec.prefix.bin.hipwrapper
+    #    return [
+    #        f"-DCMAKE_HIP_COMPILER_LAUNCHER={x}",
+    #        #f"-DCMAKE_HIP_LINKER_LAUNCHER={x}",
+    #        f"-DCMAKE_RULE_LAUNCH_LINK={x}",
+    #    ]
 
     def install(self, spec, prefix):
         mkdir(self.prefix.bin)
         fpath = os.path.join(self.prefix.bin, "hipwrapper")
+        hip_compiler = os.path.join(spec["llvm-amdgpu"].prefix.llvm.bin, "clang++")
         with open(fpath, "w") as f:
             f.write(
                 f"""\
 #!/bin/bash
-
-compiler="$1"
-shift
 
 is_compile=0
 for arg in "$@"; do
@@ -54,9 +52,9 @@ for arg in "$@"; do
 done
 
 if [[ $is_compile -eq 1 ]]; then
-    exec "$compiler" "$@"
+    exec {hip_compiler} "$@"
 else
-    exec "$compiler" $SPACK_HIP_WRAPPER_LIBS "$@"
+    exec {hip_compiler} $SPACK_HIP_WRAPPER_LIBS "$@"
 fi
 """
                     )
