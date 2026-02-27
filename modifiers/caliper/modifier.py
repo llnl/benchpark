@@ -157,5 +157,5 @@ class Caliper(BasicModifier):
             f.write(json.dumps(cali_metadata))
 
         with when("package_manager_family=spack"):
-            software_spec("caliper", pkg_spec="caliper", package_manager="spack")
+            software_spec("caliper", pkg_spec="caliper")
             required_package("caliper")

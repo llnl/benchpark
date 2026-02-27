@@ -6,15 +6,13 @@
 from benchpark.caliper import Caliper
 from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
-from benchpark.mpi import MpiOnlyExperiment
-from benchpark.openmp import OpenMPExperiment
+from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
 from benchpark.scaling import Scaling, ScalingMode
 
 
 class Qws(
     Experiment,
-    MpiOnlyExperiment,
-    OpenMPExperiment,
+    ProgrammingModel(ProgrammingModelType.Mpionly, ProgrammingModelType.Openmp),
     Scaling(ScalingMode.Strong, ScalingMode.Weak, ScalingMode.Throughput),
     Caliper,
 ):

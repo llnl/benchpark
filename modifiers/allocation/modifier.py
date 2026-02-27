@@ -227,10 +227,11 @@ class Allocation(BasicModifier):
 
     tags("infrastructure")
 
-    # Currently there is only one mode. The only behavior supported right
-    # now is to attempt to request "enough" resources for a given
-    # request (e.g. to make sure we request enough nodes, assuming we
-    # know how many CPUs we want)"
+    mode(
+        name="torchrun-hpc",
+        description="Use torchrun-hpc as launcher instead of default scheduler launcher.",
+    )
+
     mode("standard", description="Standard execution mode for allocation")
     default_mode("standard")
 
@@ -295,6 +296,9 @@ class Allocation(BasicModifier):
 
             v.n_nodes = max(cores_node_request or 0, gpus_node_request or 0)
 
+        if not v.n_ranks_per_node:
+            v.n_ranks_per_node = v.n_ranks // v.n_nodes
+
         if not v.n_threads_per_proc:
             v.n_threads_per_proc = 1
 
@@ -314,10 +318,20 @@ class Allocation(BasicModifier):
     def slurm_instructions(self, v):
         sbatch_opts, srun_opts = Allocation._init_batch_and_cmd_opts(v)
 
+        launch_cmd = "srun" if self._usage_mode == "standard" else self._usage_mode
+
         if v.n_ranks:
-            srun_opts.append(f"-n {v.n_ranks}")
+            if self._usage_mode == "torchrun-hpc":
+                srun_opts.append(f"-n {v.n_ranks_per_node}")
+            else:
+                srun_opts.append(f"-n {v.n_ranks}")
+            sbatch_opts.append(f"-n {v.n_ranks}")
         if v.n_gpus:
-            srun_opts.append(f"--gpus {v.n_gpus}")
+            if self._usage_mode == "torchrun-hpc":
+                srun_opts.append("--gpus-per-proc=1")
+            else:
+                srun_opts.append(f"--gpus {v.n_gpus}")
+            sbatch_opts.append(f"--gpus {v.n_gpus}")
         if v.n_nodes:
             srun_opts.append(f"-N {v.n_nodes}")
 
@@ -332,9 +346,9 @@ class Allocation(BasicModifier):
 
         sbatch_opts.append("--exclusive")
 
-        sbatch_directives = list(f"#SBATCH {x}" for x in (srun_opts + sbatch_opts))
+        sbatch_directives = list(f"#SBATCH {x}" for x in (sbatch_opts))
 
-        v.mpi_command = f"srun {' '.join(srun_opts)}"
+        v.mpi_command = f"{launch_cmd} {' '.join(srun_opts)}"
         v.batch_submit = "sbatch {execute_experiment}"
         v.allocation_directives = "\n".join(sbatch_directives)
 
@@ -385,18 +399,29 @@ class Allocation(BasicModifier):
     def flux_instructions(self, v):
         batch_opts, cmd_opts = Allocation._init_batch_and_cmd_opts(v)
 
+        launch_cmd = "flux run" if self._usage_mode == "standard" else self._usage_mode
+
         # Always run exclusive for mpibind + flux.
         # Otherwise, binding may oversubscribe cores before all cores are allocated.
         cmd_opts.append("--exclusive")
+        batch_opts.append("--exclusive")
         # Required for '--exclusive'. Will be computed, if not defined, from initialization
         cmd_opts.append(f"-N {v.n_nodes}")
+        batch_opts.append(f"-N {v.n_nodes}")
 
         cmd_ranks = ""
         if v.n_ranks:
-            cmd_ranks = f"-n {v.n_ranks}"
+            if self._usage_mode == "torchrun-hpc":
+                cmd_ranks = f"-n {v.n_ranks_per_node}"
+            else:
+                cmd_ranks = f"-n {v.n_ranks}"
         if v.n_gpus:
             gpus_per_rank = 1  # self.gpus_as_gpus_per_rank(v)
-            cmd_opts.append(f"-g={gpus_per_rank}")
+            if self._usage_mode == "torchrun-hpc":
+                cmd_opts.append(f"--gpus-per-proc={gpus_per_rank}")
+            else:
+                cmd_opts.append(f"-g={gpus_per_rank}")
+            batch_opts.append(f"-g={gpus_per_rank}")
 
         if v.queue:
             batch_opts.append(f"-q {v.queue}")
@@ -407,9 +432,9 @@ class Allocation(BasicModifier):
         if v.bank:
             batch_opts.append(f"-B {v.bank}")
 
-        batch_directives = list(f"# flux: {x}" for x in (cmd_opts + batch_opts))
+        batch_directives = list(f"# flux: {x}" for x in (batch_opts))
 
-        v.mpi_command = f"flux run {' '.join([cmd_ranks] + cmd_opts)}"
+        v.mpi_command = f"{launch_cmd} {' '.join([cmd_ranks] + cmd_opts)}"
         v.batch_submit = "flux batch {execute_experiment}"
         v.allocation_directives = "\n".join(batch_directives)
 
@@ -488,7 +513,7 @@ class Allocation(BasicModifier):
         if v.n_gpus:
             gpus_per_rank = self.gpus_as_gpus_per_rank(v.n_gpus)
             node_spec.append(f"gpus={gpus_per_rank}")
-        
+
         if node_spec:
             batch_opts.append(f"-l {':'.join(node_spec)}")
         else:

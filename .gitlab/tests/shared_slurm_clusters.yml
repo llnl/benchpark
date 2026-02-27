@@ -94,7 +94,7 @@ run_tests_slurm_dane:
         VARIANT: [+openmp, '']
       - HOST: dane
         ARCHCONFIG: llnl-cluster
-        BENCHMARK: [laghos, lammps, raja-perf, phloem, mpi-pingpong]
+        BENCHMARK: [laghos, lammps, raja-perf, remhos, phloem, mpi-pingpong]
       # Strong scaling runs for "benchpark analyze" test
       - HOST: dane
         ARCHCONFIG: llnl-cluster
@@ -124,7 +124,7 @@ run_tests_slurm_dane:
       # Compilers
       - HOST: dane
         ARCHCONFIG: llnl-cluster
-        SYSTEM_ARGS: [compiler=gcc, compiler=clang]
+        SYSTEM_ARGS: [compiler=gcc, compiler=llvm]
         BENCHMARK: osu-micro-benchmarks
 run_tests_slurm_matrix:
   extends: .run_tests_slurm
@@ -141,6 +141,7 @@ run_tests_slurm_matrix:
           - laghos
           - lammps
           - raja-perf
+          - remhos
           - saxpy
         VARIANT: [+cuda]
       - HOST: matrix
@@ -151,4 +152,5 @@ run_tests_slurm_matrix:
       - HOST: matrix
         ARCHCONFIG: llnl-matrix
         BENCHMARK: [py-scaffold]
-        VARIANT: ['+cuda package_manager=spack-pip caliper=mpi,time,cuda']
+        VARIANT:
+          - +cuda package_manager=spack-pip caliper=mpi,time allocation=torchrun-hpc
