@@ -12,15 +12,14 @@ from benchpark.error import BenchparkError
 def test_programming_model_checks():
     # babelstream mpi-only not valid
     with pytest.raises(
-        BenchparkError, match=r"mpi.*are not valid programming models for.*babelstream"
+        BenchparkError,
+        match=r"babelstream.*cannot run with MPI only without inheriting from",
     ):
         spec = benchpark.spec.ExperimentSpec("babelstream").concretize()
         experiment = spec.experiment  # noqa: F841
 
     # stream+openmp not valid
-    with pytest.raises(
-        Exception, match=r"openmp.*are not valid programming models for.*stream.*mpi"
-    ):
+    with pytest.raises(Exception, match=r"openmp is not a valid variant of stream"):
         spec = benchpark.spec.ExperimentSpec(
             "stream+openmp workload=stream"
         ).concretize()

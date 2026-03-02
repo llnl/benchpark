@@ -25,16 +25,23 @@ def ProgrammingModel(*types):
     # Normalize once so we can reuse
     _available = tuple(t.value for t in types)
 
-    class BaseModel:
-        requires("mpi", when="+mpi")
-        requires("rocm", when="+rocm")
-        requires("cuda", when="+cuda")
-        requires("openmp", when="+openmp")
+    @staticmethod
+    def is_available(mod):
+        return mod in _available
 
-        variant("mpi", default=True, description="Run with MPI")
-        variant("rocm", default=False, description="Build and run with ROCm")
-        variant("cuda", default=False, description="Build and run with CUDA")
-        variant("openmp", default=False, description="Build and run with OpenMP")
+    class BaseModel:
+        if "mpi" in _available:
+            requires("mpi", when="+mpi")
+            variant("mpi", default=True, description="Run with MPI")
+        if "rocm" in _available:
+            requires("rocm", when="+rocm")
+            variant("rocm", default=False, description="Build and run with ROCm")
+        if "cuda" in _available:
+            requires("cuda", when="+cuda")
+            variant("cuda", default=False, description="Build and run with CUDA")
+        if "openmp" in _available:
+            requires("openmp", when="+openmp")
+            variant("openmp", default=False, description="Build and run with OpenMP")
 
         # Class-level list of supported models for any class that includes this mixin
         _available_programming_models = _available
@@ -48,12 +55,7 @@ def ProgrammingModel(*types):
                 models.update(getattr(cls, "_available_programming_models", ()))
             return tuple(sorted(models))
 
-        # Quick check helper
-        @staticmethod
-        def supports_model(name: str) -> bool:
-            return name in _available
-
-    # Helper class (unchanged except for optional new method)
+    # Helper class
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):
             models = []
@@ -69,12 +71,31 @@ def ProgrammingModel(*types):
                 return models
             return "no_model"
 
-        # Optional: expose *available* (not selected) models via helper, too
-        def get_available_models(self):
-            models = set()
-            for cls in type(self).__mro__:
-                models.update(getattr(cls, "_available_programming_models", ()))
-            return tuple(sorted(models))
+        def get_spack_variants(self):
+            models = []
+            model_dict = {
+                ProgrammingModelType.Openmp.value: ["+openmp", "~openmp"],
+                ProgrammingModelType.Cuda.value: [
+                    "+cuda cuda_arch={cuda_arch}",
+                    "~cuda",
+                ],
+                ProgrammingModelType.Rocm.value: [
+                    "+rocm amdgpu_target={rocm_arch}",
+                    "~rocm",
+                ],
+            }
+            for s in [
+                ProgrammingModelType.Openmp.value,
+                ProgrammingModelType.Cuda.value,
+                ProgrammingModelType.Rocm.value,
+            ]:
+                if is_available(s):
+                    if self.spec.satisfies("+" + s):
+                        models.append(model_dict[s][0])
+                    else:
+                        models.append(model_dict[s][1])
+
+            return " ".join(models)
 
     return type(
         "ProgrammingModelType",
