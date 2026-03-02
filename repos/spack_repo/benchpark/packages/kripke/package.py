@@ -72,6 +72,8 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("chai@2024.07.0+raja", when="@1.2.7.0:2025.07.0")
     depends_on("fmt@9.1", when=f"^chai@2024.07.0")
 
+    depends_on("hip-wrapper", when="+rocm")
+
     depends_on("mpi", when="+mpi")
     depends_on("chai+mpi", when="+mpi")
     depends_on("caliper", when="+caliper")
@@ -110,9 +112,9 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     def setup_run_environment(self, env):
       super().setup_run_environment(env)
 
-      if self.compiler.extra_rpaths:
-        for rpath in self.compiler.extra_rpaths:
-          env.prepend_path("LD_LIBRARY_PATH", rpath)
+      #if self.compiler.extra_rpaths:
+      #  for rpath in self.compiler.extra_rpaths:
+      #    env.prepend_path("LD_LIBRARY_PATH", rpath)
 
     def cmake_args(self):
         spec = self.spec
@@ -150,6 +152,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
             args.append("-DENABLE_HIP=ON")
             args.append("-DHIP_ROOT_DIR={0}".format(spec["hip"].prefix))
             rocm_archs = spec.variants["amdgpu_target"].value
+            args.append(f"-DCMAKE_HIP_COMPILER={spec['hip-wrapper'].prefix.bin.hipwrapper}")
             if "none" not in rocm_archs:
                 arch_str = ",".join(rocm_archs)
                 args.append("-DHIP_HIPCC_FLAGS=--amdgpu-target={0}".format(arch_str))

@@ -23,14 +23,18 @@ class RajaPerf(BuiltinRajaPerf):
     git="https://github.com/amroakmal/RAJAPerf-Fork.git"
     version('amr-raja-perf-fork', branch='amr-raja-perf-fork', submodules=True)
     
+    depends_on("hip-wrapper", when="+rocm")
+
     def setup_build_environment(self, env):
         super().setup_build_environment(env)
         if "+cuda" in self.spec:
             env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
 
-    def setup_run_environment(self, env):
-        super().setup_run_environment(env)
+    def cmake_args(self):
+        spec = self.spec
+        args = []
 
-        if self.compiler.extra_rpaths:
-            for rpath in self.compiler.extra_rpaths:
-                env.prepend_path("LD_LIBRARY_PATH", rpath)
+        if "+rocm" in spec:
+            args.append(f"-DCMAKE_HIP_COMPILER={spec['hip-wrapper'].prefix.bin.hipwrapper}")
+
+        return args
