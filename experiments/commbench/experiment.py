@@ -3,16 +3,14 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.cuda import CudaExperiment
 from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
-from benchpark.rocm import ROCmExperiment
+from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
 
 
 class Commbench(
     Experiment,
-    CudaExperiment,
-    ROCmExperiment,
+    ProgrammingModel(ProgrammingModelType.Cuda, ProgrammingModelType.Rocm),
 ):
     variant("workload", description="workload name", default="basic")
     maintainers("arhag23")
