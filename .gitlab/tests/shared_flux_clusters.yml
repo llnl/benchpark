@@ -88,6 +88,7 @@ run_tests_flux_tuolumne:
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK:
           - amg2023
+          - branson
           - kripke
           - laghos
           - lammps
@@ -131,7 +132,8 @@ run_tests_flux_tuolumne:
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK: [py-scaffold]
-        VARIANT: ['+rocm package_manager=spack-pip caliper=mpi,time,rocm']
+        VARIANT:
+          - +rocm package_manager=spack-pip caliper=mpi,time allocation=torchrun-hpc
       # rocm7
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
@@ -153,4 +155,5 @@ run_tests_flux_tioga:
       - HOST: tioga
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK: [py-scaffold]
-        VARIANT: ['+rocm package_manager=spack-pip caliper=mpi,time,rocm']
+        VARIANT:
+          - +rocm package_manager=spack-pip caliper=mpi,time allocation=torchrun-hpc

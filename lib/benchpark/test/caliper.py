@@ -30,6 +30,7 @@ def test_experiment_compute_variables_section_caliper(monkeypatch):
     assert vars_section == {
         "caliper_metadata": {
             "affinity": "none",
+            "allocation": "standard",
             "hwloc": "none",
             "application_name": "{application_name}",
             "experiment_name": "{experiment_name}",
@@ -89,6 +90,7 @@ def test_caliper_modifier(monkeypatch):
     # Check file
     assert data == {
         "sys_cores_per_node": 84,
+        "allocation": "standard",
         "scheduler": "flux",
         "rocm_arch": "gfx942",
         "sys_cores_os_reserved_per_node": 12,

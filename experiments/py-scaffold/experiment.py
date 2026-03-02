@@ -28,6 +28,19 @@ class PyScaffold(
     variant("version", default="main", values=("main",), description="app version")
 
     def compute_applications_section(self):
+        if self.spec.satisfies("exec_mode=test"):
+            self.add_experiment_variable(
+                "config_url",
+                "https://raw.githubusercontent.com/LBANN/ScaFFold/refs/heads/main/ScaFFold/configs/benchmark_testing.yml",
+                False,
+            )
+        else:
+            self.add_experiment_variable(
+                "config_url",
+                "https://raw.githubusercontent.com/LBANN/ScaFFold/refs/heads/main/ScaFFold/configs/benchmark_default.yml",
+                False,
+            )
+
         if self.spec.satisfies("+strong"):
             n_gpus = 4
             if self.spec.satisfies("exec_mode=test"):
@@ -66,6 +79,15 @@ class PyScaffold(
         )
 
     def compute_package_section(self):
+        if self.spec.variants["package_manager"][0] != "spack-pip":
+            raise ValueError(
+                "Use the 'spack-pip' package manager for this benchmark. Set 'package_manager=spack-pip'"
+            )
+        elif self.spec.variants["allocation"][0] != "torchrun-hpc":
+            raise ValueError(
+                "Use the 'torchrun-hpc' launcher mode for this benchmark. Set 'allocation=torchrun-hpc'"
+            )
+
         # Spec that will be written into requirements.txt for pip install
         sys_name = self.system_spec._name
         if self.spec.satisfies("+rocm"):
