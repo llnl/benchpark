@@ -5,10 +5,13 @@
 
 from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
-from benchpark.mpi import MpiOnlyExperiment
+from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
 
 
-class Ad(Experiment, MpiOnlyExperiment):
+class Ad(
+    Experiment,
+    ProgrammingModel(ProgrammingModelType.Mpionly),
+):
     variant(
         "workload",
         default="ad",

@@ -23,9 +23,12 @@ SKIP_EXPR = [
     "stream generic-x86",
     # Broken URL's in application.py going to cause dryrun failure
     "genesis",
-    # Not mpionlyexperiment
+    # Not ProgrammingModelType.Mpionly
     "py-scaffold+strong",
     "py-scaffold+weak",
+    # Needs package_manager=spack-pip
+    "py-scaffold+rocm",
+    "py-scaffold+cuda",
 ]
 
 

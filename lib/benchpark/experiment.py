@@ -223,6 +223,13 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
         description="Number of experiment repetitions",
     )
 
+    variant(
+        "allocation",
+        default="standard",
+        values=("standard", "torchrun-hpc"),
+        description="Allocation modifier mode",
+    )
+
     def __init__(self, spec):
         self.spec: "benchpark.spec.ConcreteExperimentSpec" = spec
         # Device type must be set before super with absence of mpionly experiment type
@@ -255,31 +262,22 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
 
         self.package_specs = {}
 
+        # Get available programming models for checks
+        self.programming_models = list(self._available_programming_models)
+
         # Explicitly ordered list. "mpi" first
         models = ["mpi"] + ["openmp", "cuda", "rocm"]
-        invalid_models = []
-        for model in models:
-            # Experiment specifying model in add_package_spec that it doesn't implement
-            if (
-                self.spec.satisfies("+" + model)
-                and model not in self.programming_models
-            ):
-                invalid_models.append(model)
         # Case where there are no experiments specified in experiment.py
         if len(self.programming_models) == 0:
-            raise NotImplementedError(
-                f"Please specify a programming model in your {self.name}/experiment.py (e.g. MpiOnlyExperiment, OpenMPExperiment, CudaExperiment, ROCmExperiment). See other experiments for examples."
+            raise BenchparkError(
+                f"Please specify a programming model in your {self.name}/experiment.py (e.g. ProgrammingModelType.Mpionly, ProgrammingModelType.Openmp, ProgrammingModelType.Cuda, ProgrammingModelType.Rocm). See other experiments for examples."
             )
-        elif len(invalid_models) > 0:
-            raise NotImplementedError(
-                f'{invalid_models} are not valid programming models for "{self.name}". Choose from {self.programming_models}.'
-            )
-        # Check if experiment is trying to run in MpiOnly mode without being an MpiOnlyExperiment
+        # Check if experiment is trying to run in MpiOnly mode without being an ProgrammingModelType.Mpionly experiment
         elif "mpi" not in str(self.spec) and not any(
             self.spec.satisfies("+" + model) for model in models[1:]
         ):
-            raise NotImplementedError(
-                f'"{self.name}" cannot run with MPI only without inheriting from MpiOnlyExperiment. Choose from {self.programming_models}'
+            raise BenchparkError(
+                f'"{self.name}" cannot run with MPI only without inheriting from ProgrammingModelType.Mpionly. Choose from {self.programming_models}'
             )
 
         if (
@@ -372,7 +370,10 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
 
     def compute_modifiers_section_wrapper(self):
         # by default we use the allocation modifier and no others
-        modifier_list = [{"name": "allocation"}, {"name": "exit-code"}]
+        modifier_list = [
+            {"name": "allocation", "mode": self.spec.variants["allocation"][0]},
+            {"name": "exit-code"},
+        ]
         modifier_list += self.compute_modifiers_section()
         for cls in self.helpers:
             cls_list = cls.compute_modifiers_section()
@@ -469,7 +470,10 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
         for cls in self.helpers:
             helper_prefix = cls.get_helper_name_prefix()
             if helper_prefix:
-                expr_helper_list.append(helper_prefix)
+                if isinstance(helper_prefix, list):
+                    expr_helper_list.extend(helper_prefix)
+                else:
+                    expr_helper_list.append(helper_prefix)
         expr_name_suffix = "_".join(expr_helper_list + self.expr_var_names)
 
         self.check_required_variables()
