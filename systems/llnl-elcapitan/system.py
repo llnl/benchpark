@@ -798,7 +798,9 @@ class LlnlElcapitan(System):
         ]
         # self.rccl_version non-existent for rocm7
         if self.rccl_version:
-            rpaths.append(f"/collab/usr/global/tools/rccl/toss_4_x86_64_ib_cray/rocm-{self.rccl_version}/install/lib")
+            rpaths.append(
+                f"/collab/usr/global/tools/rccl/toss_4_x86_64_ib_cray/rocm-{self.rccl_version}/install/lib"
+            )
         # Avoid libunwind.so.1 error on tioga
         if self.spec.variants["cluster"][0] in ["tioga", "tuolumne"]:
             rpaths.append(f"/opt/cray/pe/cce/{self.cce_version}/cce-clang/x86_64/lib/")
