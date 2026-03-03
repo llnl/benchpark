@@ -226,6 +226,7 @@ class LlnlElcapitan(System):
                 self.cce_version = Version("21.0.0")
                 self.mpi_version = Version("9.1.0")
                 # No working self.rccl_version
+                self.rccl_version = None
             elif self.rocm_version >= Version("6.4.0"):
                 self.cce_version = Version("20.0.0")
                 self.mpi_version = Version("9.0.1")
@@ -794,8 +795,10 @@ class LlnlElcapitan(System):
             f"/opt/rocm-{self.rocm_version}/lib",
             "/opt/cray/pe/gcc-libs",
             f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib",
-            f"/collab/usr/global/tools/rccl/toss_4_x86_64_ib_cray/rocm-{self.rccl_version}/install/lib",
         ]
+        # self.rccl_version non-existent for rocm7
+        if self.rccl_version:
+            rpaths.append(f"/collab/usr/global/tools/rccl/toss_4_x86_64_ib_cray/rocm-{self.rccl_version}/install/lib")
         # Avoid libunwind.so.1 error on tioga
         if self.spec.variants["cluster"][0] in ["tioga", "tuolumne"]:
             rpaths.append(f"/opt/cray/pe/cce/{self.cce_version}/cce-clang/x86_64/lib/")
