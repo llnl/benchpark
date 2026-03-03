@@ -26,6 +26,9 @@ SKIP_EXPR = [
     # Not ProgrammingModelType.Mpionly
     "py-scaffold+strong",
     "py-scaffold+weak",
+    # Needs package_manager=spack-pip
+    "py-scaffold+rocm",
+    "py-scaffold+cuda",
 ]
 
 

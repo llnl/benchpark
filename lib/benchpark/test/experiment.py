@@ -141,7 +141,10 @@ def test_default_modifiers_section():
 
     modifiers_section = experiment.compute_modifiers_section_wrapper()
 
-    assert modifiers_section == [{"name": "allocation"}, {"name": "exit-code"}]
+    assert modifiers_section == [
+        {"name": "allocation", "mode": "standard"},
+        {"name": "exit-code"},
+    ]
 
 
 def test_multiple_models():
