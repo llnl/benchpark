@@ -57,6 +57,7 @@ def test_system_timeout():
         ).concretize()
         sys_spec.system.compute_variables_section()
 
+
 def test_rocm7():
     sys_spec = benchpark.spec.SystemSpec(
         "llnl-elcapitan cluster=tuolumne rocm=7.1.0"
