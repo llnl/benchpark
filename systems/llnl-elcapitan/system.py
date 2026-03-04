@@ -257,7 +257,11 @@ class LlnlElcapitan(System):
             self.pmi_version = Version("6.1.12")
             self.pals_version = Version("1.2.9")
             self.llvm_version = Version("16.0.0")
-        self.short_cce_version = f"{self.cce_version.major}.{self.cce_version.minor}" if not self.override_cce_shortpath else self.override_cce_shortpath
+        self.short_cce_version = (
+            f"{self.cce_version.major}.{self.cce_version.minor}"
+            if self.override_cce_shortpath is None
+            else self.override_cce_shortpath
+        )
         self.short_rocm_version = f"{self.rocm_version.major}.0"
         # TODO: Replace this with lookups into the working set
 
