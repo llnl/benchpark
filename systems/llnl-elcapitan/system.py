@@ -225,6 +225,8 @@ class LlnlElcapitan(System):
             if self.rocm_version >= Version("7.1.0"):
                 self.cce_version = Version("21.0.0")
                 self.mpi_version = Version("9.1.0")
+                # Modules for cce/21.0 named as cce/20.0, so do not change this
+                self.override_cce_shortpath = Version("20.0")
                 # No working self.rccl_version
                 self.rccl_version = None
             elif self.rocm_version >= Version("6.4.0"):
@@ -255,7 +257,7 @@ class LlnlElcapitan(System):
             self.pmi_version = Version("6.1.12")
             self.pals_version = Version("1.2.9")
             self.llvm_version = Version("16.0.0")
-        self.short_cce_version = f"{self.cce_version.major}.{self.cce_version.minor}"
+        self.short_cce_version = f"{self.cce_version.major}.{self.cce_version.minor}" if not self.override_cce_shortpath else self.override_cce_shortpath
         self.short_rocm_version = f"{self.rocm_version.major}.0"
         # TODO: Replace this with lookups into the working set
 
