@@ -19,8 +19,8 @@ class Laghos(ExecutableApplication):
             'lagrangian','spatial-discretization','unstructured-grid',
             'network-latency-bound','network-collectives','unstructured-grid']
 
-    executable('triplept', 'laghos' +
-                       ' -p 3' +
+    executable('taylor-green', 'laghos' +
+                       ' -p 0' +
                        ' -m {mesh}' +
                        ' -nx {nx} -ny {ny} -nz {nz}' +
                        ' -rs {rs} -rp {rp}' +
@@ -29,9 +29,15 @@ class Laghos(ExecutableApplication):
                        ' {nc} --mem --fom {gam}' +
                        ' --dev-pool-size {pool}' +
                        ' -d {device}' +
+                       ' -cfl {cfl}' +
+                       ' -s {s}' +
+                       ' -dim {dim}' +
+                       ' -cfl {cfl}' +
+                       ' -cgm {cgm}' +
+                       ' -cgt {cgt}' +
                        ' {assembly}',
                        use_mpi=True)
-
+    
     executable('sedov', 'laghos' +
                        ' -p 1' +
                        ' -m {mesh}' +
@@ -42,11 +48,137 @@ class Laghos(ExecutableApplication):
                        ' {nc} --mem --fom {gam}' +
                        ' --dev-pool-size {pool}' +
                        ' -d {device}' +
+                       ' -cfl {cfl}' +
+                       ' -s {s}' +
+                       ' -dim {dim}' +
+                       ' -cfl {cfl}' +
+                       ' -cgm {cgm}' +
+                       ' -cgt {cgt}' +
+                       ' {assembly}',
+                       use_mpi=True)
+    
+    executable('1D-sod-shock', 'laghos' +
+                       ' -p 2' +
+                       ' -m {mesh}' +
+                       ' -nx {nx} -ny {ny} -nz {nz}' +
+                       ' -rs {rs} -rp {rp}' +
+                       ' -ms {ms}' +
+                       ' -ok {ok} -ot {ot} -oq {oq}' +
+                       ' {nc} --mem --fom {gam}' +
+                       ' --dev-pool-size {pool}' +
+                       ' -d {device}' +
+                       ' -cfl {cfl}' +
+                       ' -s {s}' +
+                       ' -dim {dim}' +
+                       ' -cfl {cfl}' +
+                       ' -cgm {cgm}' +
+                       ' -cgt {cgt}' +
                        ' {assembly}',
                        use_mpi=True)
 
-    workload('triplept', executables=['triplept'])
+    executable('triple-point', 'laghos' +
+                       ' -p 3' +
+                       ' -m {mesh}' +
+                       ' -nx {nx} -ny {ny} -nz {nz}' +
+                       ' -rs {rs} -rp {rp}' +
+                       ' -ms {ms}' +
+                       ' -ok {ok} -ot {ot} -oq {oq}' +
+                       ' {nc} --mem --fom {gam}' +
+                       ' --dev-pool-size {pool}' +
+                       ' -d {device}' +
+                       ' -cfl {cfl}' +
+                       ' -s {s}' +
+                       ' -dim {dim}' +
+                       ' -cfl {cfl}' +
+                       ' -cgm {cgm}' +
+                       ' -cgt {cgt}' +
+                       ' {assembly}',
+                       use_mpi=True)
+    
+    executable('gresho-vortex', 'laghos' +
+                       ' -p 4' +
+                       ' -m {mesh}' +
+                       ' -nx {nx} -ny {ny} -nz {nz}' +
+                       ' -rs {rs} -rp {rp}' +
+                       ' -ms {ms}' +
+                       ' -ok {ok} -ot {ot} -oq {oq}' +
+                       ' {nc} --mem --fom {gam}' +
+                       ' --dev-pool-size {pool}' +
+                       ' -d {device}' +
+                       ' -cfl {cfl}' +
+                       ' -s {s}' +
+                       ' -dim {dim}' +
+                       ' -cfl {cfl}' +
+                       ' -cgm {cgm}' +
+                       ' -cgt {cgt}' +
+                       ' {assembly}',
+                       use_mpi=True)
+    
+    executable('2D-riemann-12', 'laghos' +
+                       ' -p 5' +
+                       ' -m {mesh}' +
+                       ' -nx {nx} -ny {ny} -nz {nz}' +
+                       ' -rs {rs} -rp {rp}' +
+                       ' -ms {ms}' +
+                       ' -ok {ok} -ot {ot} -oq {oq}' +
+                       ' {nc} --mem --fom {gam}' +
+                       ' --dev-pool-size {pool}' +
+                       ' -d {device}' +
+                       ' -cfl {cfl}' +
+                       ' -s {s}' +
+                       ' -dim {dim}' +
+                       ' -cfl {cfl}' +
+                       ' -cgm {cgm}' +
+                       ' -cgt {cgt}' +
+                       ' {assembly}',
+                       use_mpi=True)
+
+    executable('2D-riemann-6', 'laghos' +
+                       ' -p 6' +
+                       ' -m {mesh}' +
+                       ' -nx {nx} -ny {ny} -nz {nz}' +
+                       ' -rs {rs} -rp {rp}' +
+                       ' -ms {ms}' +
+                       ' -ok {ok} -ot {ot} -oq {oq}' +
+                       ' {nc} --mem --fom {gam}' +
+                       ' --dev-pool-size {pool}' +
+                       ' -d {device}' +
+                       ' -cfl {cfl}' +
+                       ' -s {s}' +
+                       ' -dim {dim}' +
+                       ' -cfl {cfl}' +
+                       ' -cgm {cgm}' +
+                       ' -cgt {cgt}' +
+                       ' {assembly}',
+                       use_mpi=True)
+    
+    executable('2D-rayleigh-taylor', 'laghos' +
+                       ' -p 7' +
+                       ' -m {mesh}' +
+                       ' -nx {nx} -ny {ny} -nz {nz}' +
+                       ' -rs {rs} -rp {rp}' +
+                       ' -ms {ms}' +
+                       ' -ok {ok} -ot {ot} -oq {oq}' +
+                       ' {nc} --mem --fom {gam}' +
+                       ' --dev-pool-size {pool}' +
+                       ' -d {device}' +
+                       ' -cfl {cfl}' +
+                       ' -s {s}' +
+                       ' -dim {dim}' +
+                       ' -cfl {cfl}' +
+                       ' -cgm {cgm}' +
+                       ' -cgt {cgt}' +
+                       ' {assembly}',
+                       use_mpi=True)
+
+    workload('taylor-green', executables=['taylor-green'])
     workload('sedov', executables=['sedov'])
+    workload('1D-sod-shock', executables=['1D-sod-shock'])
+    workload('triple-point', executables=['triple-point'])
+    workload('gresho-vortex', executables=['gresho-vortex'])
+    workload('2D-riemann-12', executables=['2D-riemann-12'])
+    workload('2D-riemann-6', executables=['2D-riemann-6'])
+    workload('2D-rayleigh-taylor', executables=['2D-rayleigh-taylor'])
 
     workload_variable('mesh', default='default',
             description='mesh file',
