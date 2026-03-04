@@ -24,7 +24,7 @@ class Laghos(
     variant(
         "workload",
         default="sedov",
-        values=("sedov", "triplept"),
+        values=("taylor-green", "sedov", "1D-sod-shock", "triple-point", "gresho-vortex", "2D-riemann-12", "2D-riemann-6", "2D-rayleigh-taylor"),
         description="problem type",
     )
 
@@ -55,6 +55,46 @@ class Laghos(
         description="nonconforming or conforming",
     )
 
+    variant(
+        "vis",
+        default=False,
+        values=(True, False),
+        description="Enable or disable GLVis visualization",
+    )
+
+    variant(
+        "s",
+        default="4",
+        values=("1", "2", "3", "4", "5", "6", "7"),
+        description="ODE solver type",
+    )
+
+    variant(
+        "dim",
+        default="3",
+        values=("1", "2", "3"),
+        description="Dimension of the problem",
+    )
+
+    variant(
+        "cfl",
+        default="0.5",
+        description="CFL-condition number",
+    )
+
+    variant(
+        "cgm",
+        default="0.1",
+        description="Maximum number of CG iterations (velocity linear solve)",
+    )
+
+    variant(
+        "cgt",
+        default="1e-8",
+        description="Relative CG tolerance (velocity linear solve)",
+    )
+
+
     maintainers("wdhawkins")
 
     def generate_perf_specs(self):
@@ -69,6 +109,12 @@ class Laghos(
             "strong": None,
             "weak": None,
             "throughput": None,
+            "s": 4,
+            "dim": 3,
+            "cfl": 0.5,
+            "cgm": 300,
+            "cgt": 1e-8,
+            "vis": False
         }
         # Add problem specs as needed here
         if self.spec.satisfies("+throughput"):
@@ -120,6 +166,14 @@ class Laghos(
         self.add_experiment_variable("ms", problem_spec["ms"], True)
         self.add_experiment_variable("tf", problem_spec["tf"], True)
 
+        self.add_experiment_variable("vis", problem_spec["vis"], True)
+        self.add_experiment_variable("s", problem_spec["s"], True)
+        self.add_experiment_variable("dim", problem_spec["dim"], True)
+        self.add_experiment_variable("cfl", problem_spec["cfl"], True)
+        self.add_experiment_variable("cgm", problem_spec["cgm"], True)
+        self.add_experiment_variable("cgt", problem_spec["cgt"], True)
+        
+
         self.add_experiment_variable(
             "resource_count", problem_spec["resource_count"], True
         )
@@ -143,6 +197,7 @@ class Laghos(
                 },
             }
         )
+
 
     def compute_applications_section(self):
         if self.spec.satisfies("exec_mode=perf"):
@@ -229,6 +284,15 @@ class Laghos(
                 self.add_experiment_variable("gam", "--no-gpu-aware-mpi")
         else:
             self.add_experiment_variable("n_ranks", "{n_resources}", True)
+
+        if self.spec.satisfies("vis=True"):
+            self.add_experiment_variable("vis", True, True)
+
+        params_to_inspect = ["s", "dim", "cfl", "cgm", "cgt"]
+        for param in params_to_inspect:
+            if param in self.spec.variants:
+                self.add_experiment_variable(param, self.spec.variants[param][0], True)
+
 
     def compute_package_section(self):
         gam = "~gpu-aware-mpi"
