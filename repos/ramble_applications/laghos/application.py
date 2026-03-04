@@ -18,7 +18,7 @@ class Laghos(ExecutableApplication):
             'full-assembly','partial-assembly',
             'lagrangian','spatial-discretization','unstructured-grid',
             'network-latency-bound','network-collectives','unstructured-grid']
-
+    
     executable('taylor-green', 'laghos' +
                        ' -p 0' +
                        ' -m {mesh}' +
@@ -29,12 +29,12 @@ class Laghos(ExecutableApplication):
                        ' {nc} --mem --fom {gam}' +
                        ' --dev-pool-size {pool}' +
                        ' -d {device}' +
-                       ' -cfl {cfl}' +
                        ' -s {s}' +
                        ' -dim {dim}' +
                        ' -cfl {cfl}' +
                        ' -cgm {cgm}' +
                        ' -cgt {cgt}' +
+                       ' {vis}' +
                        ' {assembly}',
                        use_mpi=True)
     
@@ -48,12 +48,12 @@ class Laghos(ExecutableApplication):
                        ' {nc} --mem --fom {gam}' +
                        ' --dev-pool-size {pool}' +
                        ' -d {device}' +
-                       ' -cfl {cfl}' +
                        ' -s {s}' +
                        ' -dim {dim}' +
                        ' -cfl {cfl}' +
                        ' -cgm {cgm}' +
                        ' -cgt {cgt}' +
+                       ' {vis}' +
                        ' {assembly}',
                        use_mpi=True)
     
@@ -67,12 +67,12 @@ class Laghos(ExecutableApplication):
                        ' {nc} --mem --fom {gam}' +
                        ' --dev-pool-size {pool}' +
                        ' -d {device}' +
-                       ' -cfl {cfl}' +
                        ' -s {s}' +
                        ' -dim {dim}' +
                        ' -cfl {cfl}' +
                        ' -cgm {cgm}' +
                        ' -cgt {cgt}' +
+                       ' {vis}' +
                        ' {assembly}',
                        use_mpi=True)
 
@@ -86,12 +86,12 @@ class Laghos(ExecutableApplication):
                        ' {nc} --mem --fom {gam}' +
                        ' --dev-pool-size {pool}' +
                        ' -d {device}' +
-                       ' -cfl {cfl}' +
                        ' -s {s}' +
                        ' -dim {dim}' +
                        ' -cfl {cfl}' +
                        ' -cgm {cgm}' +
                        ' -cgt {cgt}' +
+                       ' {vis}' +
                        ' {assembly}',
                        use_mpi=True)
     
@@ -105,12 +105,12 @@ class Laghos(ExecutableApplication):
                        ' {nc} --mem --fom {gam}' +
                        ' --dev-pool-size {pool}' +
                        ' -d {device}' +
-                       ' -cfl {cfl}' +
                        ' -s {s}' +
                        ' -dim {dim}' +
                        ' -cfl {cfl}' +
                        ' -cgm {cgm}' +
                        ' -cgt {cgt}' +
+                       ' {vis}' +
                        ' {assembly}',
                        use_mpi=True)
     
@@ -124,12 +124,12 @@ class Laghos(ExecutableApplication):
                        ' {nc} --mem --fom {gam}' +
                        ' --dev-pool-size {pool}' +
                        ' -d {device}' +
-                       ' -cfl {cfl}' +
                        ' -s {s}' +
                        ' -dim {dim}' +
                        ' -cfl {cfl}' +
                        ' -cgm {cgm}' +
                        ' -cgt {cgt}' +
+                       ' {vis}' +
                        ' {assembly}',
                        use_mpi=True)
 
@@ -143,12 +143,12 @@ class Laghos(ExecutableApplication):
                        ' {nc} --mem --fom {gam}' +
                        ' --dev-pool-size {pool}' +
                        ' -d {device}' +
-                       ' -cfl {cfl}' +
                        ' -s {s}' +
                        ' -dim {dim}' +
                        ' -cfl {cfl}' +
                        ' -cgm {cgm}' +
                        ' -cgt {cgt}' +
+                       ' {vis}' +
                        ' {assembly}',
                        use_mpi=True)
     
@@ -162,12 +162,12 @@ class Laghos(ExecutableApplication):
                        ' {nc} --mem --fom {gam}' +
                        ' --dev-pool-size {pool}' +
                        ' -d {device}' +
-                       ' -cfl {cfl}' +
                        ' -s {s}' +
                        ' -dim {dim}' +
                        ' -cfl {cfl}' +
                        ' -cgm {cgm}' +
                        ' -cgt {cgt}' +
+                       ' {vis}' +
                        ' {assembly}',
                        use_mpi=True)
 

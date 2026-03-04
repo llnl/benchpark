@@ -24,7 +24,16 @@ class Laghos(
     variant(
         "workload",
         default="sedov",
-        values=("taylor-green", "sedov", "1D-sod-shock", "triple-point", "gresho-vortex", "2D-riemann-12", "2D-riemann-6", "2D-rayleigh-taylor"),
+        values=(
+            "taylor-green",
+            "sedov",
+            "1D-sod-shock",
+            "triple-point",
+            "gresho-vortex",
+            "2D-riemann-12",
+            "2D-riemann-6",
+            "2D-rayleigh-taylor",
+        ),
         description="problem type",
     )
 
@@ -84,7 +93,7 @@ class Laghos(
 
     variant(
         "cgm",
-        default="0.1",
+        default="300",
         description="Maximum number of CG iterations (velocity linear solve)",
     )
 
@@ -93,7 +102,6 @@ class Laghos(
         default="1e-8",
         description="Relative CG tolerance (velocity linear solve)",
     )
-
 
     maintainers("wdhawkins")
 
@@ -114,7 +122,7 @@ class Laghos(
             "cfl": 0.5,
             "cgm": 300,
             "cgt": 1e-8,
-            "vis": False
+            "vis": False,
         }
         # Add problem specs as needed here
         if self.spec.satisfies("+throughput"):
@@ -172,7 +180,6 @@ class Laghos(
         self.add_experiment_variable("cfl", problem_spec["cfl"], True)
         self.add_experiment_variable("cgm", problem_spec["cgm"], True)
         self.add_experiment_variable("cgt", problem_spec["cgt"], True)
-        
 
         self.add_experiment_variable(
             "resource_count", problem_spec["resource_count"], True
@@ -197,7 +204,6 @@ class Laghos(
                 },
             }
         )
-
 
     def compute_applications_section(self):
         if self.spec.satisfies("exec_mode=perf"):
@@ -285,14 +291,15 @@ class Laghos(
         else:
             self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
-        if self.spec.satisfies("vis=True"):
-            self.add_experiment_variable("vis", True, True)
+        if self.spec.satisfies("+vis"):
+            self.add_experiment_variable("vis", "-vis", True)
+        else:
+            self.add_experiment_variable("vis", "-no-vis", True)
 
         params_to_inspect = ["s", "dim", "cfl", "cgm", "cgt"]
         for param in params_to_inspect:
             if param in self.spec.variants:
                 self.add_experiment_variable(param, self.spec.variants[param][0], True)
-
 
     def compute_package_section(self):
         gam = "~gpu-aware-mpi"
