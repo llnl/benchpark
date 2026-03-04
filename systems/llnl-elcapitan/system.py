@@ -213,6 +213,7 @@ class LlnlElcapitan(System):
         self.programming_models = [ROCmSystem(), OpenMPCPUOnlySystem()]
         self.rocm_version = Version(self.spec.variants["rocm"][0])
         self.gtl_flag = self.spec.variants["gtl"][0]
+        self.override_cce_shortpath = None
 
         # TODO: Replace this with lookups into the working set
         if self.spec.satisfies("compiler=gcc"):
@@ -809,7 +810,13 @@ class LlnlElcapitan(System):
             )
         # Avoid libunwind.so.1 error on tioga
         if self.spec.variants["cluster"][0] in ["tioga", "tuolumne"]:
-            rpaths.append(f"/opt/cray/pe/cce/{self.cce_version}/cce-clang/x86_64/lib/")
+            # cce/21 does not have libunwind.so.1
+            unwind_path = (
+                f"/opt/cray/pe/cce/{self.cce_version}/cce-clang/x86_64/lib/"
+                if self.cce_version <= Version("20.0.0")
+                else "/opt/cray/pe/cce/20.0.0/cce-clang/x86_64/lib/"
+            )
+            rpaths.append(unwind_path)
 
         cfgs = []
         # Always need an instance of llvm-gpu as an external. Sometimes as a compiler
