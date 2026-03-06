@@ -54,6 +54,8 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
 
     requires("^[virtuals=zlib-api] zlib")
 
+    depends_on("hip-wrapper", when="+rocm")
+
     depends_on("mpi")
     depends_on("hypre+mpi")
     depends_on("hypre+cuda+mpi", when="+cuda")
@@ -121,5 +123,14 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         mkdirp(prefix.bin)
         install("laghos", prefix.bin)
         install_tree("data", prefix.data)
+
+    def cmake_args(self):
+        spec = self.spec
+        args = []
+
+        if "+rocm" in spec:
+            args.append(f"-DCMAKE_HIP_COMPILER={spec['hip-wrapper'].prefix.bin.hipwrapper}")
+
+        return args
 
     install_time_test_callbacks = []  # type: List[str]
