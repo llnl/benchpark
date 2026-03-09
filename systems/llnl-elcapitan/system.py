@@ -140,7 +140,6 @@ class LlnlElcapitan(System):
             "6.4.1",
             "6.4.2",
             "6.4.3",
-            "7.1.0",
             "7.2.0",
         ),
         description="ROCm version",
@@ -223,7 +222,7 @@ class LlnlElcapitan(System):
                 f"{self.gcc_version.major}.{self.gcc_version.minor}"
             )
         else:
-            if self.rocm_version >= Version("7.1.0"):
+            if self.rocm_version >= Version("7.0.0"):
                 self.cce_version = Version("21.0.0")
                 self.mpi_version = Version("9.1.0")
                 # Modules for cce/21.0 named as cce/20.0, so do not change this
