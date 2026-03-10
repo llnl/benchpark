@@ -22,7 +22,7 @@ class HipWrapper(BundlePackage):
     def install(self, spec, prefix):
         mkdir(self.prefix.bin)
         fpath = os.path.join(self.prefix.bin, "hipwrapper")
-        hip_compiler = os.path.join(spec["llvm-amdgpu"].prefix.llvm.bin, "clang++")
+        hip_compiler = os.path.join(spec["llvm-amdgpu"].prefix.llvm.bin, "amdclang++")
         # Usually spack sets CXX to be the spack compiler wrapper
         with open(fpath, "w") as f:
             f.write(
