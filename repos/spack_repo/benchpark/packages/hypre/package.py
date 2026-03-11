@@ -20,6 +20,8 @@ class Hypre(BuiltinHypre):
     requires("+rocm", when="^rocblas")
     requires("+rocm", when="^rocsolver")
 
+    depends_on("hip-wrapper", when="+rocm")
+
     with when("+cuda"):
         for pkg, sm_ in product(["umpire", "magma"], CudaPackage.cuda_arch_values):
             depends_on(f"{pkg} cuda_arch={sm_}", when=f"+{pkg} cuda_arch={sm_}")
@@ -69,7 +71,15 @@ class Hypre(BuiltinHypre):
             env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
 
 class CMakeBuilder(HypreCMakeBuilder):
-    pass
+    def cmake_args(self):
+        args = super().cmake_args()
+        spec = self.spec
+        args = [x for x in args if "CMAKE_HIP_COMPILER" not in x]
+
+        if "+rocm" in spec:
+            args.append(f"-DCMAKE_HIP_COMPILER={spec['hip-wrapper'].prefix.bin.hipwrapper}")
+
+        return args
 
 class AutotoolsBuilder(HypreAutotoolsBuilder):
     pass
