@@ -71,40 +71,40 @@ class Remhos(
         self.add_experiment_variable("vs", 1, False)
         self.add_experiment_variable("ms", 5, False)
 
-            # resource_count is the number of resources used for this experiment:
-            self.add_experiment_variable("resource_count", 1, False)
+        # resource_count is the number of resources used for this experiment:
+        self.add_experiment_variable("resource_count", 1, False)
 
-            # Set the variables required by the experiment
-            self.set_required_variables(
-                n_resources="{resource_count}",
-                process_problem_size="{epm}",
-                total_problem_size="{epm} * {n_resources}",
-            )
+        # Set the variables required by the experiment
+        self.set_required_variables(
+            n_resources="{resource_count}",
+            process_problem_size="{epm}",
+            total_problem_size="{epm} * {n_resources}",
+        )
 
-            # Register the scaling variables and their respective scaling functions
-            # required to correctly scale the experiment for the given scaliing policy
-            # Strong scaling scales up resource_count by the specified scaling_factor
-            # and scales epm down by scaling_factor to keep the problem size constant
-            self.register_scaling_config(
-                {
-                    ScalingMode.Strong: {
-                        "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
-                        * scaling_factor,
-                        "epm": lambda var, itr, dim, scaling_factor: var.val(dim)
-                        // scaling_factor,
-                    },
-                    ScalingMode.Weak: {
-                        "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
-                        * scaling_factor,
-                        "epm": lambda var, itr, dim, scaling_factor: var.val(dim),
-                    },
-                    ScalingMode.Throughput: {
-                        "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim),
-                        "epm": lambda var, itr, dim, scaling_factor: var.val(dim)
-                        * scaling_factor,
-                    },
-                }
-            )
+        # Register the scaling variables and their respective scaling functions
+        # required to correctly scale the experiment for the given scaliing policy
+        # Strong scaling scales up resource_count by the specified scaling_factor
+        # and scales epm down by scaling_factor to keep the problem size constant
+        self.register_scaling_config(
+            {
+                ScalingMode.Strong: {
+                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "epm": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    // scaling_factor,
+                },
+                ScalingMode.Weak: {
+                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "epm": lambda var, itr, dim, scaling_factor: var.val(dim),
+                },
+                ScalingMode.Throughput: {
+                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim),
+                    "epm": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                },
+            }
+        )
 
         if self.spec.satisfies("+cuda"):
             self.add_experiment_variable("device", "cuda", True)
