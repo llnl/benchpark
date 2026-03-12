@@ -17,7 +17,7 @@ class Remhos(
         ProgrammingModelType.Cuda,
         ProgrammingModelType.Rocm,
     ),
-    Scaling(ScalingMode.Strong),
+    Scaling(ScalingMode.Strong, ScalingMode.Weak, ScalingMode.Throughput),
     Caliper,
 ):
 
@@ -31,7 +31,7 @@ class Remhos(
     variant(
         "version",
         default="develop",
-        values=("develop", "latest", "gpu-fom", "1.0"),
+        values=("develop", "latest", "1.0"),
         description="app version",
     )
 
@@ -45,35 +45,66 @@ class Remhos(
     maintainers("rfhaque")
 
     def compute_applications_section(self):
-        if self.spec.variants["workload"][0] == "2d":
-            self.add_experiment_variable("epm", 1024, False)
-        elif self.spec.variants["workload"][0] == "3d":
-            self.add_experiment_variable("epm", 512, False)
+        if self.spec.satisfies("exec_mode=perf"):
+            if self.spec.satisfies("workload=2d"):
+                self.add_experiment_variable("epm", 1024, False)
+                self.add_experiment_variable("o", 3, False)
+                self.add_experiment_variable("p", 14, False)
+            elif self.spec.satisfies("workload=3d"):
+                self.add_experiment_variable("epm", 512, False)
+                self.add_experiment_variable("o", 2, False)
+                self.add_experiment_variable("p", 10, False)
+        else:
+            if self.spec.satisfies("workload=2d"):
+                self.add_experiment_variable("epm", 1024, False)
+                self.add_experiment_variable("o", 3, False)
+                self.add_experiment_variable("p", 14, False)
+            elif self.spec.satisfies("workload=3d"):
+                self.add_experiment_variable("epm", 512, False)
+                self.add_experiment_variable("o", 2, False)
+                self.add_experiment_variable("p", 10, False)
+        self.add_experiment_variable("dt", -1.0, False)
+        self.add_experiment_variable("tf", 0.5, False)
+        self.add_experiment_variable("ho", 3, False)
+        self.add_experiment_variable("lo", 5, False)
+        self.add_experiment_variable("fct", 2, False)
+        self.add_experiment_variable("vs", 1, False)
+        self.add_experiment_variable("ms", 5, False)
 
-        # resource_count is the number of resources used for this experiment:
-        self.add_experiment_variable("resource_count", 1, False)
+            # resource_count is the number of resources used for this experiment:
+            self.add_experiment_variable("resource_count", 1, False)
 
-        # Set the variables required by the experiment
-        self.set_required_variables(
-            n_resources="{resource_count}",
-            process_problem_size="{epm}",
-            total_problem_size="{epm} * {n_resources}",
-        )
+            # Set the variables required by the experiment
+            self.set_required_variables(
+                n_resources="{resource_count}",
+                process_problem_size="{epm}",
+                total_problem_size="{epm} * {n_resources}",
+            )
 
-        # Register the scaling variables and their respective scaling functions
-        # required to correctly scale the experiment for the given scaliing policy
-        # Strong scaling scales up resource_count by the specified scaling_factor
-        # and scales epm down by scaling_factor to keep the problem size constant
-        self.register_scaling_config(
-            {
-                ScalingMode.Strong: {
-                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
-                    "epm": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    // scaling_factor,
-                },
-            }
-        )
+            # Register the scaling variables and their respective scaling functions
+            # required to correctly scale the experiment for the given scaliing policy
+            # Strong scaling scales up resource_count by the specified scaling_factor
+            # and scales epm down by scaling_factor to keep the problem size constant
+            self.register_scaling_config(
+                {
+                    ScalingMode.Strong: {
+                        "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
+                        * scaling_factor,
+                        "epm": lambda var, itr, dim, scaling_factor: var.val(dim)
+                        // scaling_factor,
+                    },
+                    ScalingMode.Weak: {
+                        "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
+                        * scaling_factor,
+                        "epm": lambda var, itr, dim, scaling_factor: var.val(dim),
+                    },
+                    ScalingMode.Throughput: {
+                        "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim),
+                        "epm": lambda var, itr, dim, scaling_factor: var.val(dim)
+                        * scaling_factor,
+                    },
+                }
+            )
 
         if self.spec.satisfies("+cuda"):
             self.add_experiment_variable("device", "cuda", True)
