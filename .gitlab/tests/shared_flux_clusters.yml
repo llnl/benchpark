@@ -25,7 +25,7 @@ allocate_resources_tuolumne:
     matrix:
       - HOST: tuolumne
         SHARED_ALLOC: $TUOLUMNE_SHARED_ALLOC
-        GPUMODE: [SPX, TPX, CPX]
+        GPUMODE: SPX
   tags: [shell, tuolumne]
   needs: [tuolumne-up-check]
 allocate_resources_tioga:
@@ -49,7 +49,7 @@ release_resources_flux_tuolumne:
   parallel:
     matrix:
       - HOST: tuolumne
-        GPUMODE: [SPX, TPX, CPX]
+        GPUMODE: SPX
   tags: [shell, tuolumne]
 release_resources_flux_tioga:
   extends: .release_resources_flux
@@ -97,19 +97,6 @@ run_tests_flux_tuolumne:
           - sparta-snl
         VARIANT: [+rocm]
         GPUMODE: SPX
-      # Test TPX, CPX
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [amg2023, kripke, laghos]
-        VARIANT: [+rocm+strong scaling-iterations=2]
-        SYSTEM_ARGS: [gpumode=TPX]
-        GPUMODE: TPX
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [kripke, laghos]
-        VARIANT: [+rocm+strong scaling-iterations=2]
-        SYSTEM_ARGS: [gpumode=CPX]
-        GPUMODE: CPX
       # Test openmp on tuolumne
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
