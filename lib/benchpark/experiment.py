@@ -314,7 +314,6 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
 
     def set_required_variables(self, **kwargs):
         """Helper function to set required variables."""
-        self.add_experiment_variable("device_type", self.device_type, False)
         for var in kwargs.keys():
             if var not in self.req_vars:
                 raise ValueError(f"Unexpected experiment variable provided '{var}'")
