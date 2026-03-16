@@ -293,8 +293,10 @@ class Laghos(
 
         if self.spec.satisfies("+vis"):
             self.add_experiment_variable("vis", "-vis", True)
+            self.add_experiment_variable("k", "-k {experiment_run_dir}", False)
         else:
             self.add_experiment_variable("vis", "-no-vis", True)
+            self.add_experiment_variable("k", "", False)
 
         params_to_inspect = ["s", "dim", "cfl", "cgm", "cgt"]
         for param in params_to_inspect:

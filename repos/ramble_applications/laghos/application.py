@@ -35,6 +35,7 @@ class Laghos(ExecutableApplication):
                        ' -cgm {cgm}' +
                        ' -cgt {cgt}' +
                        ' {vis}' +
+                       ' {k}' +
                        ' {assembly}',
                        use_mpi=True)
     
@@ -54,6 +55,7 @@ class Laghos(ExecutableApplication):
                        ' -cgm {cgm}' +
                        ' -cgt {cgt}' +
                        ' {vis}' +
+                       ' {k}' +
                        ' {assembly}',
                        use_mpi=True)
     
@@ -73,6 +75,7 @@ class Laghos(ExecutableApplication):
                        ' -cgm {cgm}' +
                        ' -cgt {cgt}' +
                        ' {vis}' +
+                       ' {k}' +
                        ' {assembly}',
                        use_mpi=True)
 
@@ -92,6 +95,7 @@ class Laghos(ExecutableApplication):
                        ' -cgm {cgm}' +
                        ' -cgt {cgt}' +
                        ' {vis}' +
+                       ' {k}' +
                        ' {assembly}',
                        use_mpi=True)
     
@@ -111,6 +115,7 @@ class Laghos(ExecutableApplication):
                        ' -cgm {cgm}' +
                        ' -cgt {cgt}' +
                        ' {vis}' +
+                       ' {k}' +
                        ' {assembly}',
                        use_mpi=True)
     
@@ -130,6 +135,7 @@ class Laghos(ExecutableApplication):
                        ' -cgm {cgm}' +
                        ' -cgt {cgt}' +
                        ' {vis}' +
+                       ' {k}' +
                        ' {assembly}',
                        use_mpi=True)
 
@@ -149,6 +155,7 @@ class Laghos(ExecutableApplication):
                        ' -cgm {cgm}' +
                        ' -cgt {cgt}' +
                        ' {vis}' +
+                       ' {k}' +
                        ' {assembly}',
                        use_mpi=True)
     
@@ -168,6 +175,7 @@ class Laghos(ExecutableApplication):
                        ' -cgm {cgm}' +
                        ' -cgt {cgt}' +
                        ' {vis}' +
+                       ' {k}' +
                        ' {assembly}',
                        use_mpi=True)
 
@@ -247,6 +255,10 @@ class Laghos(ExecutableApplication):
     workload_variable('tf', default='0.8',
             description='Final time; start time is 0.',
             workloads=['*'])
+    
+    workload_variable('k', default='',
+        description='Enable -k flag when vis is active',
+        workloads=['*'])
     
     figure_of_merit('Major kernels total time',
                     log_file='{experiment_run_dir}/{experiment_name}.out',
