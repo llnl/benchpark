@@ -58,6 +58,8 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
 
+    depends_on("hip-wrapper", when="+rocm")
+
     root_cmakelists_dir = "src"
 
     flag_handler = build_system_flags
@@ -100,6 +102,7 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
         if '+rocm' in spec:
             args.append("-DUSE_HIP=ON")
             args.append("-DUSE_GPU=ON")
+            args.append(f"-DCMAKE_HIP_COMPILER={spec['hip-wrapper'].prefix.bin.hipwrapper}")
             rocm_arch_vals = spec.variants["amdgpu_target"].value
             args.append(f"-DROCM_PATH={spec['hip'].prefix}")
             if rocm_arch_vals:
