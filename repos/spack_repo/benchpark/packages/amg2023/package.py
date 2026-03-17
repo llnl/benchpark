@@ -22,7 +22,7 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
 
     license("Apache-2.0")
 
-    version("develop", branch="main")
+    version("develop", branch="rl_fix2")
     version("20240511", branch="20240511")
 
     variant("mpi", default=True, description="Enable MPI support")
@@ -43,11 +43,13 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("hypre~caliper")
     depends_on("hypre@:2.29.0", when="@20240511")
     depends_on("hypre@2.30.0:", when="@develop")
-    depends_on("hypre@:2.99")
+    #depends_on("hypre@:2.99")
     depends_on("hypre~fortran")
     depends_on("hypre+mixedint", when="+mixedint")
     depends_on("blas")
     depends_on("lapack")
+
+    depends_on("hip-wrapper", when="+rocm")
 
     depends_on("hypre+cuda+mpi+umpire", when="+cuda")
     depends_on("hypre~cuda", when="~cuda")
@@ -83,5 +85,7 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
             cmake_options.append("-DAMG_WITH_MPI=ON")
         if self.spec.satisfies("+cuda"):
             cmake_options.append(f'-DCMAKE_EXE_LINKER_FLAGS={self.spec["lapack"].libs.ld_flags} {self.spec["blas"].libs.ld_flags}')
+        if self.spec.satisfies("+rocm"):
+            cmake_options.append(f"-DCMAKE_HIP_COMPILER={self.spec['hip-wrapper'].prefix.bin.hipwrapper}")
 
         return cmake_options
