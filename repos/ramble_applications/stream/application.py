@@ -22,10 +22,10 @@ class Stream(ExecutableApplication):
             'high-memory-bandwidth','regular-memory-access',
             'mpi','c','fortran']
 
-    software_spec('stream',
-                  pkg_spec='stream@5.10 +openmp cflags="-O3 -DSTREAM_ARRAY_SIZE=80000000 -DNTIMES=20"',
-                  compiler='gcc12',
-                  package_manager='spack*')
+    with when("package_manager_family=spack"):
+        software_spec('stream',
+                    pkg_spec='stream@5.10 +openmp cflags="-O3 -DSTREAM_ARRAY_SIZE=80000000 -DNTIMES=20"',
+                    compiler='gcc12')
 
     required_package('stream')
 

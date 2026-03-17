@@ -103,7 +103,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         targets.append("CONFIG_MK=%s" % spec["mfem"].package.config_mk)
         targets.append("TEST_MK=%s" % spec["mfem"].package.test_mk)
         if "+caliper" in self.spec:
-            targets.append("USE_CALIPER=ON")
+            targets.append("LAGHOS_USE_CALIPER=ON")
             targets.append("CALIPER_DIR=%s" % spec["caliper"].prefix)
             targets.append("ADIAK_DIR=%s" % spec["adiak"].prefix)
         if spec.satisfies("@:2.0"):

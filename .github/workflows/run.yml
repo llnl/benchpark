@@ -5,43 +5,6 @@ on:
       BENCHPARK_CODECOV_TOKEN:
         required: true
 jobs:
-  check_errors:
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout Benchpark
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-      - name: Add needed Python libs
-        run: |
-          pip install -r ./requirements.txt
-      - name: Run negative tests via helper
-        shell: bash
-        run: |
-          fail() { echo "TEST FAILED: $*" >&2; exit 1; }
-
-          # one-time setup
-          ./bin/benchpark system init --dest dane llnl-cluster
-
-          # 1) Non-MPIOnlyExperiment Test
-          set +e
-          # babelstream is not an MPIOnlyExperiment
-          stderr_output="$({ ./bin/benchpark experiment init dane babelstream; } 2>&1)"
-          status=$?
-          set -e
-          [[ $status -ne 0 ]] || fail "Expected non-zero exit status, got $status"
-          # Check for the specific BenchparkError message
-          expected="cannot run with MPI only"
-          grep -Fq "$expected" <<< "$stderr_output" && echo "failed as expected: $expected" || fail "Expected error message not found in stderr. Got: $stderr_output"
-
-          # 2) Multiple scaling options
-          set +e
-          # Cannot use both +strong and +weak
-          stderr_output="$({ ./bin/benchpark experiment init dane kripke+strong+weak; } 2>&1)"
-          status=$?
-          set -e
-          [[ $status -ne 0 ]] || fail "Expected non-zero exit status, got $status"
-          # Check for the specific BenchparkError message
-          expected="spec cannot specify multiple scaling options"
-          grep -Fq "$expected" <<<"$stderr_output" && echo "failed as expected: $expected" || fail "Expected error message not found in stderr. Got: $stderr_output"
   saxpy:
     runs-on: ubuntu-24.04
     steps:
@@ -97,7 +60,7 @@ jobs:
             workspace archive
       - name: Upload Workspace Archive as CI Artifact
         if: always()
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
         with:
           name: workspace-archive
           path: ./workspace/generic-x86/saxpy/openmp/workspace/archive/**

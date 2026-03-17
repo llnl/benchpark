@@ -29,6 +29,8 @@ class Branson(ExecutableApplication):
                'grep -q "<particle_storage>" {experiment_run_dir}/{input_file} || sed -i "/<\/common>/ i \  <particle_storage>{layout}<\/particle_storage>" {experiment_run_dir}/{input_file}',
                'sed -i "s|<particle_algorithm>.*</particle_algorithm>|<particle_algorithm>{algorithm}</particle_algorithm>|g" {experiment_run_dir}/{input_file}',
                'grep -q "<particle_algorithm>" {experiment_run_dir}/{input_file} || sed -i "/<\/common>/ i \  <particle_algorithm>{algorithm}<\/particle_algorithm>" {experiment_run_dir}/{input_file}',
+               'sed -i "s|<umpire_device_pool_size>.*</umpire_device_pool_size>|<umpire_device_pool_size>{pool}</umpire_device_pool_size>|g" {experiment_run_dir}/{input_file}',
+               'grep -q "<umpire_device_pool_size>" {experiment_run_dir}/{input_file} || sed -i "/<\/common>/ i \  <umpire_device_pool_size>{pool}<\/umpire_device_pool_size>" {experiment_run_dir}/{input_file}',
            ])
 
     executable('p', '{branson}/bin/BRANSON {experiment_run_dir}/{input_file}', use_mpi=True)
@@ -58,6 +60,10 @@ class Branson(ExecutableApplication):
     workload_variable('algorithm', default='EVENT',
     	description='particle transport algorithm (EVENT|HISTORY)',
       	workloads=['branson'])
+
+    workload_variable('pool', default='4',
+        description='Device pool size in GB',
+        workloads=['branson'])
 
     figure_of_merit('Photons per Second',
                     log_file='{experiment_run_dir}/{experiment_name}.out',

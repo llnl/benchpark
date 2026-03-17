@@ -4,21 +4,20 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from benchpark.caliper import Caliper
-from benchpark.cuda import CudaExperiment
 from benchpark.directives import variant
 from benchpark.experiment import Experiment
-from benchpark.mpi import MpiOnlyExperiment
-from benchpark.openmp import OpenMPExperiment
-from benchpark.rocm import ROCmExperiment
+from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
 from benchpark.scaling import Scaling, ScalingMode
 
 
 class Branson(
     Experiment,
-    MpiOnlyExperiment,
-    OpenMPExperiment,
-    CudaExperiment,
-    ROCmExperiment,
+    ProgrammingModel(
+        ProgrammingModelType.Mpionly,
+        ProgrammingModelType.Openmp,
+        ProgrammingModelType.Cuda,
+        ProgrammingModelType.Rocm,
+    ),
     Scaling(ScalingMode.Strong, ScalingMode.Weak, ScalingMode.Throughput),
     Caliper,
 ):
@@ -95,6 +94,8 @@ class Branson(
                 photons = 800000000
             self.add_experiment_variable("num_particles", photons, True)
         self.add_experiment_variable("resource_count", 4, False)
+        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+            self.add_experiment_variable("pool", 64, False)
 
         self.register_scaling_config(
             {
@@ -142,9 +143,13 @@ class Branson(
     def compute_package_section(self):
         # get package version
         app_version = self.spec.variants["version"][0]
+        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+            umpire = "+umpire"
+        else:
+            umpire = "~umpire"
         self.add_package_spec(
             self.name,
             [
-                f"branson@{app_version} n_groups={self.spec.variants['n_groups'][0]} ",
+                f"branson@{app_version}{umpire} n_groups={self.spec.variants['n_groups'][0]} ",
             ],
         )
