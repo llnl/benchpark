@@ -35,6 +35,7 @@ class Laghos(ExecutableApplication):
                        ' -cgm {cgm}' +
                        ' -cgt {cgt}' +
                        ' {vis}' +
+                       ' {vs}' +
                        ' {k}' +
                        ' {assembly}',
                        use_mpi=True)
@@ -55,6 +56,7 @@ class Laghos(ExecutableApplication):
                        ' -cgm {cgm}' +
                        ' -cgt {cgt}' +
                        ' {vis}' +
+                       ' {vs}' +
                        ' {k}' +
                        ' {assembly}',
                        use_mpi=True)
@@ -75,6 +77,7 @@ class Laghos(ExecutableApplication):
                        ' -cgm {cgm}' +
                        ' -cgt {cgt}' +
                        ' {vis}' +
+                       ' {vs}' +
                        ' {k}' +
                        ' {assembly}',
                        use_mpi=True)
@@ -95,6 +98,7 @@ class Laghos(ExecutableApplication):
                        ' -cgm {cgm}' +
                        ' -cgt {cgt}' +
                        ' {vis}' +
+                       ' {vs}' +
                        ' {k}' +
                        ' {assembly}',
                        use_mpi=True)
@@ -115,6 +119,7 @@ class Laghos(ExecutableApplication):
                        ' -cgm {cgm}' +
                        ' -cgt {cgt}' +
                        ' {vis}' +
+                       ' {vs}' +
                        ' {k}' +
                        ' {assembly}',
                        use_mpi=True)
@@ -135,6 +140,7 @@ class Laghos(ExecutableApplication):
                        ' -cgm {cgm}' +
                        ' -cgt {cgt}' +
                        ' {vis}' +
+                       ' {vs}' +
                        ' {k}' +
                        ' {assembly}',
                        use_mpi=True)
@@ -155,6 +161,7 @@ class Laghos(ExecutableApplication):
                        ' -cgm {cgm}' +
                        ' -cgt {cgt}' +
                        ' {vis}' +
+                       ' {vs}' +
                        ' {k}' +
                        ' {assembly}',
                        use_mpi=True)
@@ -175,6 +182,7 @@ class Laghos(ExecutableApplication):
                        ' -cgm {cgm}' +
                        ' -cgt {cgt}' +
                        ' {vis}' +
+                       ' {vs}' +
                        ' {k}' +
                        ' {assembly}',
                        use_mpi=True)

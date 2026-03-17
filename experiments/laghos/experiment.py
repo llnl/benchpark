@@ -65,10 +65,10 @@ class Laghos(
     )
 
     variant(
-        "vis",
+        "visualizations",
         default=False,
         values=(True, False),
-        description="Enable or disable GLVis visualization",
+        description="Enable or disable GLVis and VIsit visualizations",
     )
 
     variant(
@@ -291,11 +291,13 @@ class Laghos(
         else:
             self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
-        if self.spec.satisfies("+vis"):
+        if self.spec.satisfies("+visualizations"):
             self.add_experiment_variable("vis", "-vis", True)
-            self.add_experiment_variable("k", "-k {experiment_run_dir}", False)
+            self.add_experiment_variable("vs", "-visit", True)
+            self.add_experiment_variable("k", "-k {experiment_run_dir}/VISUALIZATION_OUTPUT/", False)
         else:
             self.add_experiment_variable("vis", "-no-vis", True)
+            self.add_experiment_variable("vs", "-no-visit", True)
             self.add_experiment_variable("k", "", False)
 
         params_to_inspect = ["s", "dim", "cfl", "cgm", "cgt"]
