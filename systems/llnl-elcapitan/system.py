@@ -213,6 +213,7 @@ class LlnlElcapitan(System):
         self.programming_models = [ROCmSystem(), OpenMPCPUOnlySystem()]
         self.rocm_version = Version(self.spec.variants["rocm"][0])
         self.gtl_flag = self.spec.variants["gtl"][0]
+        self.override_cce_shortpath = None
 
         # TODO: Replace this with lookups into the working set
         if self.spec.satisfies("compiler=gcc"):
@@ -225,7 +226,10 @@ class LlnlElcapitan(System):
             if self.rocm_version >= Version("7.1.0"):
                 self.cce_version = Version("21.0.0")
                 self.mpi_version = Version("9.1.0")
+                # Modules for cce/21.0 named as cce/20.0, so do not change this
+                self.override_cce_shortpath = Version("20.0")
                 # No working self.rccl_version
+                self.rccl_version = None
             elif self.rocm_version >= Version("6.4.0"):
                 self.cce_version = Version("20.0.0")
                 self.mpi_version = Version("9.0.1")
@@ -254,7 +258,11 @@ class LlnlElcapitan(System):
             self.pmi_version = Version("6.1.12")
             self.pals_version = Version("1.2.9")
             self.llvm_version = Version("16.0.0")
-        self.short_cce_version = f"{self.cce_version.major}.{self.cce_version.minor}"
+        self.short_cce_version = (
+            f"{self.cce_version.major}.{self.cce_version.minor}"
+            if self.override_cce_shortpath is None
+            else self.override_cce_shortpath
+        )
         self.short_rocm_version = f"{self.rocm_version.major}.0"
         # TODO: Replace this with lookups into the working set
 
@@ -794,11 +802,21 @@ class LlnlElcapitan(System):
             f"/opt/rocm-{self.rocm_version}/lib",
             "/opt/cray/pe/gcc-libs",
             f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib",
-            f"/collab/usr/global/tools/rccl/toss_4_x86_64_ib_cray/rocm-{self.rccl_version}/install/lib",
         ]
+        # self.rccl_version non-existent for rocm7
+        if self.rccl_version:
+            rpaths.append(
+                f"/collab/usr/global/tools/rccl/toss_4_x86_64_ib_cray/rocm-{self.rccl_version}/install/lib"
+            )
         # Avoid libunwind.so.1 error on tioga
         if self.spec.variants["cluster"][0] in ["tioga", "tuolumne"]:
-            rpaths.append(f"/opt/cray/pe/cce/{self.cce_version}/cce-clang/x86_64/lib/")
+            # cce/21 does not have libunwind.so.1
+            unwind_path = (
+                f"/opt/cray/pe/cce/{self.cce_version}/cce-clang/x86_64/lib/"
+                if self.cce_version <= Version("20.0.0")
+                else "/opt/cray/pe/cce/20.0.0/cce-clang/x86_64/lib/"
+            )
+            rpaths.append(unwind_path)
 
         cfgs = []
         # Always need an instance of llvm-gpu as an external. Sometimes as a compiler
