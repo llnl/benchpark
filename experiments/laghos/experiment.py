@@ -72,13 +72,6 @@ class Laghos(
     )
 
     variant(
-        "s",
-        default="4",
-        values=("1", "2", "3", "4", "5", "6", "7"),
-        description="ODE solver type",
-    )
-
-    variant(
         "dim",
         default="3",
         values=("1", "2", "3"),
@@ -86,21 +79,33 @@ class Laghos(
     )
 
     variant(
-        "cfl",
-        default="0.5",
-        description="CFL-condition number",
+        "ms",
+        default="-1",
+        description="Maximum number of steps (negative means no restriction).",
     )
 
     variant(
-        "cgm",
-        default="300",
-        description="Maximum number of CG iterations (velocity linear solve)",
+        "tf",
+        default="0.6",
+        description="Final time; start time is 0.",
     )
 
     variant(
-        "cgt",
-        default="1e-8",
-        description="Relative CG tolerance (velocity linear solve)",
+        "nx",
+        default="2",
+        description="Elements in x-dimension (do not specify mesh_file). Note: this is mutually-exclusive with -epm. Use -epm 0 to use -nx, -ny, and -nz.",
+    )
+
+    variant(
+        "ny",
+        default="2",
+        description="Elements in y-dimension (do not specify mesh_file). Note: this is mutually-exclusive with -epm. Use -epm 0 to use -nx, -ny, and -nz.",
+    )
+
+    variant(
+        "nz",
+        default="2",
+        description="Elements in z-dimension (do not specify mesh_file). Note: this is mutually-exclusive with -epm. Use -epm 0 to use -nx, -ny, and -nz.",
     )
 
     maintainers("wdhawkins")
@@ -111,18 +116,10 @@ class Laghos(
             "ny": 1,
             "nz": 1,
             "pool_size": 16,
-            "ms": 250,
-            "tf": 10000,
             "resource_count": 4,
             "strong": None,
             "weak": None,
             "throughput": None,
-            "s": 4,
-            "dim": 3,
-            "cfl": 0.5,
-            "cgm": 300,
-            "cgt": 1e-8,
-            "vis": False,
         }
         # Add problem specs as needed here
         if self.spec.satisfies("+throughput"):
@@ -171,15 +168,6 @@ class Laghos(
         self.add_experiment_variable("nz", problem_spec["nz"], True)
         self.add_experiment_variable("rs", problem_spec["rs"], True)
         self.add_experiment_variable("rp", problem_spec["rp"], True)
-        self.add_experiment_variable("ms", problem_spec["ms"], True)
-        self.add_experiment_variable("tf", problem_spec["tf"], True)
-
-        self.add_experiment_variable("vis", problem_spec["vis"], True)
-        self.add_experiment_variable("s", problem_spec["s"], True)
-        self.add_experiment_variable("dim", problem_spec["dim"], True)
-        self.add_experiment_variable("cfl", problem_spec["cfl"], True)
-        self.add_experiment_variable("cgm", problem_spec["cgm"], True)
-        self.add_experiment_variable("cgt", problem_spec["cgt"], True)
 
         self.add_experiment_variable(
             "resource_count", problem_spec["resource_count"], True
@@ -215,8 +203,6 @@ class Laghos(
             self.add_experiment_variable("nz", 1, True)
             self.add_experiment_variable("rs", 3, True)
             self.add_experiment_variable("rp", 2, True)
-            self.add_experiment_variable("ms", 250, True)
-            self.add_experiment_variable("tf", 10000, True)
             self.add_experiment_variable(
                 "zones", "{nx}*{ny}*{nz}*(8**({rs}+{rp}))", False
             )
@@ -294,14 +280,16 @@ class Laghos(
         if self.spec.satisfies("+visualizations"):
             self.add_experiment_variable("vis", "-vis", True)
             self.add_experiment_variable("vs", "-visit", True)
-            self.add_experiment_variable("k", "-k {experiment_run_dir}/VISUALIZATION_OUTPUT/", False)
+            self.add_experiment_variable(
+                "k", "-k {experiment_run_dir}/VISUALIZATION_OUTPUT/", False
+            )
         else:
             self.add_experiment_variable("vis", "-no-vis", True)
             self.add_experiment_variable("vs", "-no-visit", True)
             self.add_experiment_variable("k", "", False)
 
-        params_to_inspect = ["s", "dim", "cfl", "cgm", "cgt"]
-        for param in params_to_inspect:
+        params_to_check = ["nx", "ny", "nz", "dim", "ms", "tf"]
+        for param in params_to_check:
             if param in self.spec.variants:
                 self.add_experiment_variable(param, self.spec.variants[param][0], True)
 
