@@ -112,9 +112,6 @@ class Laghos(
 
     def generate_perf_specs(self):
         problem_spec = {
-            "nx": 1,
-            "ny": 1,
-            "nz": 1,
             "pool_size": 16,
             "resource_count": 4,
             "strong": None,
@@ -198,9 +195,6 @@ class Laghos(
             self.generate_perf_specs()
         else:
             # "zones" defined from mesh file, we are hardcoding it here
-            self.add_experiment_variable("nx", 1, True)
-            self.add_experiment_variable("ny", 1, True)
-            self.add_experiment_variable("nz", 1, True)
             self.add_experiment_variable("rs", 3, True)
             self.add_experiment_variable("rp", 2, True)
             self.add_experiment_variable(
