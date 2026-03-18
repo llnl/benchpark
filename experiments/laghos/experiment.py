@@ -91,6 +91,13 @@ class Laghos(
     )
 
     variant(
+        "s",
+        default="4",
+        values=("1", "2", "3", "4", "6", "7"),
+        description="ODE solver type",
+    )
+
+    variant(
         "nx",
         default="2",
         description="Elements in x-dimension (do not specify mesh_file). Note: this is mutually-exclusive with -epm. Use -epm 0 to use -nx, -ny, and -nz.",
@@ -282,7 +289,7 @@ class Laghos(
             self.add_experiment_variable("vs", "-no-visit", True)
             self.add_experiment_variable("k", "", False)
 
-        params_to_check = ["nx", "ny", "nz", "dim", "ms", "tf"]
+        params_to_check = ["nx", "ny", "nz", "dim", "ms", "tf", "s"]
         for param in params_to_check:
             if param in self.spec.variants:
                 self.add_experiment_variable(param, self.spec.variants[param][0], True)

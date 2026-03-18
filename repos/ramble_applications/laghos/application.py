@@ -55,6 +55,7 @@ class Laghos(ExecutableApplication):
         + " {vs}"
         + " {k}"
         + " -tf {tf}"
+        + " -s {s}"
         + " {assembly}"
     )
 
