@@ -1,6 +1,6 @@
-black==26.1.0
+black==26.3.1
 flake8==7.3.0
-isort[colors]==8.0.0
-codespell==2.4.1
+isort[colors]==8.0.1
+codespell==2.4.2
 yamlfix==1.19.1
 docstrfmt==2.0.2
