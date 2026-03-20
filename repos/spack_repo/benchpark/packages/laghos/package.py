@@ -31,6 +31,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     variant("caliper", default=False, description="Enable/disable Caliper support")
     variant("ofast", default=False, description="Enable gcc optimization flags")
     variant("gpu-aware-mpi", default=False, description="Enable GPU aware MPI")
+    variant("raja", default=True, description="Use RAJA backend for MFEM")
 
     depends_on("c", type="build")
     depends_on("cxx", type="build")
