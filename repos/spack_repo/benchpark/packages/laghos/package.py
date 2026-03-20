@@ -38,6 +38,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
 
     depends_on("mfem+mpi+metis", when="+metis")
     depends_on("mfem+mpi~metis", when="~metis")
+    depends_on("mfem+raja", when="+raja")
     depends_on("caliper", when="+caliper")
     depends_on("adiak~shared", when="+caliper")
 
