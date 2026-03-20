@@ -20,9 +20,10 @@ class Mfem(BuiltinMfem):
     depends_on("adiak", when="+caliper")
     depends_on("hypre+shared", when="+mpi~cuda")
 
-    depends_on("raja+rocm", when="+rocm")
-    depends_on("raja+cuda", when="+cuda")
-    depends_on("raja", when="~rocm~cuda")
+    # MFEM upstream may already handle this
+    # depends_on("raja+rocm", when="+rocm")
+    # depends_on("raja+cuda", when="+cuda")
+    # depends_on("raja", when="~rocm~cuda")
 
     requires("+caliper", when="^hypre+caliper")
 
@@ -68,7 +69,8 @@ class Mfem(BuiltinMfem):
             options.append("MFEM_USE_ADIAK=%s" % yes_no("+adiak"))
             options.append("ADIAK_DIR=%s" % self.spec["adiak"].prefix)
 
-        if "+raja" in self.spec:
-            options.append("MFEM_USE_RAJA=YES")
+        # MFEM upstream should handle this
+        # if "+raja" in self.spec:
+        #     options.append("MFEM_USE_RAJA=YES")
 
         return options
