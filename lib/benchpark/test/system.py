@@ -56,3 +56,10 @@ def test_system_timeout():
             "llnl-elcapitan cluster=tioga queue=pdebug timeout=9999"
         ).concretize()
         sys_spec.system.compute_variables_section()
+
+
+def test_rocm7():
+    sys_spec = benchpark.spec.SystemSpec(
+        "llnl-elcapitan cluster=tuolumne rocm=7.2.0"
+    ).concretize()
+    sys_spec.system.compute_compilers_section()
