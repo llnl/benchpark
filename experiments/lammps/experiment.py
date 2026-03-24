@@ -28,9 +28,25 @@ class Lammps(
 
     variant(
         "version",
-        default="20250722",
-        values=("develop", "latest", "20250722"),
+        default="20251219",
+        values=("develop", "20251219", "20260211", "latest", "20250722"),
         description="app version",
+    )
+
+    variant(
+        "fft",
+        default="fftw3",
+        description="Which FFT library to use",
+        values=("fftw3", "mkl", "kiss"),
+        multi=False,
+    )
+
+    variant(
+        "fft_kokkos",
+        default="fftw3",
+        description="FFT library for Kokkos package",
+        values=("kiss", "fftw3", "mkl", "hipfft", "cufft"),
+        multi=False,
     )
 
     variant(
@@ -38,6 +54,20 @@ class Lammps(
         default=True,
         values=(True, False),
         description="Enable GPU-aware MPI",
+    )
+
+    variant(
+        "apu",
+        default=False,
+        values=(True, False),
+        description="Enable APU support",
+    )
+
+    variant(
+        "other",
+        default=False,
+        values=(True, False),
+        description="Set other input/environment variables",
     )
 
     maintainers("simongdg", "rfhaque")
@@ -92,6 +122,14 @@ class Lammps(
             }
         )
 
+        if self.spec.satisfies("+rocm"):
+            if self.spec.satisfies("+other"):
+                self.set_environment_variable("MPICH_OFI_NIC_POLICY", "GPU")
+                self.set_environment_variable("FI_HMEM", "rocr")
+                self.set_environment_variable("HUGETLB_MORECORE", "yes")
+                self.set_environment_variable("HUGETLB_RESTRICT_EXE", "defrag:lmp")
+                self.set_environment_variable("HSA_XNACK", 1)
+
         if self.spec.satisfies("+openmp"):
             self.add_experiment_variable("n_threads_per_proc", 1, True)
 
@@ -120,17 +158,22 @@ class Lammps(
             )
 
     def compute_package_section(self):
-        fft_kokkos = (
-            "fft_kokkos=cufft"
-            if self.spec.satisfies("+cuda")
-            else "fft_kokkos=hipfft" if self.spec.satisfies("+rocm") else ""
-        )
+        fft = self.spec.variants["fft"][0]
+        fft_kokkos = self.spec.variants["fft_kokkos"][0]
+        if self.spec.satisfies("+cuda"):
+            fft_kokkos = "cufft"
+        if self.spec.satisfies("+rocm"):
+            fft_kokkos = "hipfft"
+            if self.spec.satisfies("+apu"):
+                apu = "+apu"
+            else:
+                apu = "~apu"
 
-        pace = "+pace" if self.spec.satisfies("workload=pace") else "~pace"
+        pace = "+ml-pace" if self.spec.satisfies("workload=pace") else "~ml-pace"
 
         self.add_package_spec(
             self.name,
             [
-                f"lammps{self.determine_version()} +opt+manybody+molecule+kspace+rigid+kokkos+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth+reaxff lammps_sizes=bigbig {pace} {fft_kokkos} "
+                f"lammps{self.determine_version()} +opt+manybody+molecule+kspace+rigid+kokkos+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth+reaxff lammps_sizes=bigbig {pace} fft_kokkos={fft_kokkos} {apu}"
             ],
         )
