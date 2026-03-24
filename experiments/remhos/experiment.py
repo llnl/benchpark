@@ -99,7 +99,9 @@ class Remhos(
                     "epm": lambda var, itr, dim, scaling_factor: var.val(dim),
                 },
                 ScalingMode.Throughput: {
-                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim),
+                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    ),
                     "epm": lambda var, itr, dim, scaling_factor: var.val(dim)
                     * scaling_factor,
                 },
