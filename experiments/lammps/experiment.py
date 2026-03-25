@@ -81,17 +81,20 @@ class Lammps(
             if self.spec.satisfies("workload=hns-reaxff"):
                 total_problem_sizes = {"x": 8, "y": 8, "z": 8}
             if self.spec.satisfies("workload=pace"):
-                total_problem_sizes = {"x": 8, "y": 8, "z": 8}
+                total_problem_sizes = {"L": 4}
         else:
             if self.spec.satisfies("workload=hns-reaxff"):
                 total_problem_sizes = {"x": 20, "y": 40, "z": 32}
             if self.spec.satisfies("workload=pace"):
-                total_problem_sizes = {"x": 8, "y": 8, "z": 8}
+                total_problem_sizes = {"L": 64}
 
         self.add_experiment_variable(
             "total_problem_size_dict", total_problem_sizes, True
         )
-        input_sizes = " ".join(f"-v {k} {{{k}}}" for k in total_problem_sizes.keys())
+        input_sizes = " ".join(f"-var {k} {{{k}}}" for k in total_problem_sizes.keys())
+
+        if self.spec.satisfies("workload=pace"):
+            self.add_experiment_variable("thermo", "10", True)
 
         if self.spec.satisfies("+rocm") or self.spec.satisfies("+cuda"):
             kokkos_mode = "g 1"
@@ -104,7 +107,7 @@ class Lammps(
 
         self.add_experiment_variable(
             "lammps_flags",
-            f"{input_sizes} -k on {kokkos_mode} -sf kk -pk kokkos gpu/aware {kokkos_gpu_aware} neigh half comm {kokkos_comm} neigh/qeq full newton on -nocite",
+            f"{input_sizes} -sf kk -k on {kokkos_mode} -pk kokkos gpu/aware {kokkos_gpu_aware} neigh half comm {kokkos_comm} newton on",
             False,
         )
 
@@ -138,14 +141,18 @@ class Lammps(
         else:
             self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
-        self.add_experiment_variable("timesteps", 100, False)
+        if self.spec.satisfies("exec_mode=test"):
+            self.add_experiment_variable("timesteps", 100, False)
+        else:
+            self.add_experiment_variable("timesteps", 10000000, False)
+
         if self.spec.satisfies("workload=pace"):
             self.add_experiment_variable(
                 "input_file", "{input_path}/in.pace.product", False
             )
             self.set_required_variables(
-                process_problem_size="{x}*{y}*{z}*4/{n_resources}",  # placeholder value using fcc lattice with 4 atoms per unit cell
-                total_problem_size="{x}*{y}*{z}*4",  # placeholder value using fcc lattice with 4 atoms per unit cell
+                process_problem_size="{L}*{L}*{L}*4/{n_resources}",  # placeholder value using fcc lattice with 4 atoms per unit cell
+                total_problem_size="{L}*{L}*{L}*4",  # placeholder value using fcc lattice with 4 atoms per unit cell
             )
         if self.spec.satisfies("workload=hns-reaxff"):
             self.add_experiment_variable(

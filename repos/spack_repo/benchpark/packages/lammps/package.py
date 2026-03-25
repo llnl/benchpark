@@ -776,5 +776,6 @@ class Lammps(CMakePackage, CudaPackage, ROCmPackage, PythonExtension):
                 pip(*PythonPipBuilder.std_args(self), f"--prefix={self.prefix}", ".")
  
     def install(self, spec, prefix):
+        super().install(spec, prefix)
         mkdirp(prefix.src)
         install_tree(self.stage.source_path, prefix.src)
