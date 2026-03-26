@@ -81,7 +81,7 @@ class SpartaSnl(
             ymin = -1.1
             ymax = 1.1
         else:
-            L = 2  # will increase problem size by 4X
+            L = 1  # will increase problem size by 4X
             ppc = 47
             stats = 100
             run = 10000000
