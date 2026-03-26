@@ -18,6 +18,7 @@ class SpartaSnl(CMakePackage, CudaPackage, ROCmPackage):
 
     version("master", branch="master")
     version("20Jan2025", tag="20Jan2025")
+    version("20260102", commit="478143bcc766083a100480a0a6e8a0c42c85e7e4")
 
     variant("mpi", default=True, description="Build with mpi")
     variant("openmp", default=False, description="Enable OpenMP support")
@@ -53,13 +54,12 @@ class SpartaSnl(CMakePackage, CudaPackage, ROCmPackage):
 
     depends_on("mpi", when="+mpi")
 
+    depends_on("kokkos@5.0.0: +deprecated_code_4", when="@20260102: +kokkos")
     depends_on("kokkos", when="+kokkos")
     depends_on("kokkos+openmp cxxstd=17", when="+openmp")
     depends_on("kokkos+rocm", when="+rocm")
     depends_on("kokkos+wrapper+cuda cxxstd=17", when="+cuda")
     depends_on("kokkos+apu", when="+apu")
-    # Kokkos 5 not building
-    depends_on("kokkos@:4", when="+kokkos")
 
     depends_on("jpeg", when="+jpeg")
     depends_on("libpng", when="+png")
@@ -86,6 +86,10 @@ class SpartaSnl(CMakePackage, CudaPackage, ROCmPackage):
     def setup_run_environment(self, env):
         if self.spec.satisfies("+kokkos+rocm fft_kokkos=hipfft"):
             env.prepend_path("LD_LIBRARY_PATH", self.spec["hipfft"].prefix.lib)
+
+        if self.compiler.extra_rpaths:
+            for rpath in self.compiler.extra_rpaths:
+                env.prepend_path("LD_LIBRARY_PATH", rpath)
 
     def setup_build_environment(self, env):
         if "+cuda" in self.spec:

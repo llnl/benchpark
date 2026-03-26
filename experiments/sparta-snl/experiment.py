@@ -26,8 +26,8 @@ class SpartaSnl(
 
     variant(
         "version",
-        default="master",
-        values=("master",),
+        default="20260102",
+        values=("master","20260102"),
         description="app version",
     )
 
