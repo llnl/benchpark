@@ -181,6 +181,6 @@ class Lammps(
         self.add_package_spec(
             self.name,
             [
-                f"lammps{self.determine_version()} +opt+manybody+molecule+kspace+rigid+kokkos+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth+reaxff lammps_sizes=bigbig {pace} fft_kokkos={fft_kokkos} {apu}"
+                f"lammps{self.determine_version()} +opt+manybody+molecule+kspace+rigid+kokkos+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth+reaxff lammps_sizes=bigbig {pace} fft={fft} fft_kokkos={fft_kokkos} {apu}"
             ],
         )
