@@ -15,7 +15,7 @@ class Lammps(BuiltinLammps):
   variant("apu", default=False, description="Enable APU support", when="@4.5: +rocm")
 
   depends_on("kokkos@5.0.0:", when="@20251219: +kokkos")
-  depends_on("kokkos+openmp cxxstd=17", when="+openmp")
+  depends_on("kokkos+openmp", when="+openmp")
   depends_on("kokkos+wrapper", when="+cuda")
   depends_on("kokkos+apu", when="+apu")
 
