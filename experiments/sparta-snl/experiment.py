@@ -145,12 +145,11 @@ class SpartaSnl(
         fft_kokkos = self.spec.variants["fft_kokkos"][0]
         if self.spec.satisfies("+cuda"):
             fft_kokkos = "cufft"
+        apu = ""
         if self.spec.satisfies("+rocm"):
             fft_kokkos = "hipfft"
             if self.spec.satisfies("+apu"):
                 apu = "+apu"
-            else:
-                apu = "~apu"
 
         self.add_package_spec(
             self.name,

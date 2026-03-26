@@ -56,9 +56,9 @@ class SpartaSnl(CMakePackage, CudaPackage, ROCmPackage):
 
     depends_on("kokkos@5.0.0: +deprecated_code_4", when="@20260102: +kokkos")
     depends_on("kokkos", when="+kokkos")
-    depends_on("kokkos+openmp cxxstd=17", when="+openmp")
+    depends_on("kokkos+openmp", when="+openmp")
     depends_on("kokkos+rocm", when="+rocm")
-    depends_on("kokkos+wrapper+cuda cxxstd=17", when="+cuda")
+    depends_on("kokkos+wrapper", when="+cuda")
     depends_on("kokkos+apu", when="+apu")
 
     depends_on("jpeg", when="+jpeg")
