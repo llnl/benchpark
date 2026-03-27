@@ -232,8 +232,6 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
 
     def __init__(self, spec):
         self.spec: "benchpark.spec.ConcreteExperimentSpec" = spec
-        # Device type must be set before super with absence of mpionly experiment type
-        self.device_type = "cpu"
         self.programming_models = []
         super().__init__()
         self.helpers = []
@@ -244,7 +242,6 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
             "n_resources",
             "process_problem_size",
             "total_problem_size",
-            "device_type",
         ]
 
         for cls in self.__class__.mro()[1:]:
@@ -317,7 +314,6 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
 
     def set_required_variables(self, **kwargs):
         """Helper function to set required variables."""
-        self.add_experiment_variable("device_type", self.device_type, False)
         for var in kwargs.keys():
             if var not in self.req_vars:
                 raise ValueError(f"Unexpected experiment variable provided '{var}'")
