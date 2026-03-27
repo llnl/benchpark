@@ -55,6 +55,13 @@ class Laghos(
         description="nonconforming or conforming",
     )
 
+    variant(
+        "raja",
+        default=True,
+        values=(True, False),
+        description="Use RAJA backend for MFEM",
+    )
+
     maintainers("wdhawkins")
 
     def generate_perf_specs(self):
@@ -232,10 +239,13 @@ class Laghos(
 
     def compute_package_section(self):
         gam = "~gpu-aware-mpi"
+        raja = "~raja"
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             if self.spec.satisfies("+gpu-aware-mpi"):
                 gam = "+gpu-aware-mpi"
+        if self.spec.satisfies("+raja"):
+            raja = "+raja"
         self.add_package_spec(
-            self.name, [f"laghos{self.determine_version()} +metis {gam}"]
+            self.name, [f"laghos{self.determine_version()} +metis {gam} {raja}"]
         )
         self.add_package_spec("hypre", ["hypre@2.32.0: +lapack"])
