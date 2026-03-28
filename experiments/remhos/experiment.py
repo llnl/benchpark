@@ -47,20 +47,20 @@ class Remhos(
     def compute_applications_section(self):
         if self.spec.satisfies("exec_mode=perf"):
             if self.spec.satisfies("workload=2d"):
-                self.add_experiment_variable("epm", 1024, False)
+                self.add_experiment_variable("epm", 1024, True)
                 self.add_experiment_variable("o", 3, False)
                 self.add_experiment_variable("p", 14, False)
             elif self.spec.satisfies("workload=3d"):
-                self.add_experiment_variable("epm", 512, False)
+                self.add_experiment_variable("epm", 512, True)
                 self.add_experiment_variable("o", 2, False)
                 self.add_experiment_variable("p", 10, False)
         else:
             if self.spec.satisfies("workload=2d"):
-                self.add_experiment_variable("epm", 1024, False)
+                self.add_experiment_variable("epm", 1024, True)
                 self.add_experiment_variable("o", 3, False)
                 self.add_experiment_variable("p", 14, False)
             elif self.spec.satisfies("workload=3d"):
-                self.add_experiment_variable("epm", 512, False)
+                self.add_experiment_variable("epm", 512, True)
                 self.add_experiment_variable("o", 2, False)
                 self.add_experiment_variable("p", 10, False)
         self.add_experiment_variable("dt", -1.0, False)
