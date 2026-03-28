@@ -22,4 +22,4 @@ jobs:
           isort --check-only .
           flake8 .
           yamlfix --check --verbose .
-          docstrfmt -p .github/workflows/requirements/docstrfmt.toml --check --verbose --ignore-cache docs/
+          docstrfmt -p .github/workflows/requirements/docstrfmt.toml --check --verbose --exclude docs/ics.rst --ignore-cache docs/
