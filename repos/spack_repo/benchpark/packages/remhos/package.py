@@ -19,7 +19,7 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
     tags = ["proxy-app"]
 
     homepage = "https://github.com/CEED/Remhos"
-    git = "https://github.com/rfhaque/Remhos.git"
+    git = "https://github.com/CEED/Remhos.git"
 
     maintainers("v-dobrev", "tzanio", "vladotomov")
 
