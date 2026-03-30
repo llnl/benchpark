@@ -107,7 +107,6 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     for arch in ROCmPackage.amdgpu_targets:
         depends_on("umpire amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
 
-    
     def setup_build_environment(self, env):
         spec = self.spec
         if "+cuda" in spec:
