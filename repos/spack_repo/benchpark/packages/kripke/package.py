@@ -81,33 +81,31 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
 
     depends_on("blt@0.6.2:", type="build", when=f"@1.2.7:")
 
-    with when("+chai"):
-        depends_on("chai+openmp", when="+openmp")
-        depends_on("chai~openmp", when="~openmp")
-        
-        depends_on("chai+cuda", when="+cuda")
-        depends_on("chai~cuda", when="~cuda")
-        for sm_ in CudaPackage.cuda_arch_values:
-            depends_on("chai cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
+    depends_on("chai+openmp", when="+openmp")
+    depends_on("chai~openmp", when="~openmp")
 
-        depends_on("chai+rocm", when="+rocm")
-        depends_on("chai~rocm", when="~rocm")
-        for arch in ROCmPackage.amdgpu_targets:
-            depends_on("chai amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
+    depends_on("chai+cuda", when="+cuda")
+    depends_on("chai~cuda", when="~cuda")
+    for sm_ in CudaPackage.cuda_arch_values:
+        depends_on("chai cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
 
-    with when("+umpire"):
-        depends_on("umpire+openmp", when="+openmp")
-        depends_on("umpire~openmp", when="~openmp")
-        
-        depends_on("umpire+cuda", when="+cuda")
-        depends_on("umpire~cuda", when="~cuda")
-        for sm_ in CudaPackage.cuda_arch_values:
-            depends_on("umpire cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
+    depends_on("chai+rocm", when="+rocm")
+    depends_on("chai~rocm", when="~rocm")
+    for arch in ROCmPackage.amdgpu_targets:
+        depends_on("chai amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
 
-        depends_on("umpire+rocm", when="+rocm")
-        depends_on("umpire~rocm", when="~rocm")
-        for arch in ROCmPackage.amdgpu_targets:
-            depends_on("umpire amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
+    depends_on("umpire+openmp", when="+openmp")
+    depends_on("umpire~openmp", when="~openmp")
+    
+    depends_on("umpire+cuda", when="+cuda")
+    depends_on("umpire~cuda", when="~cuda")
+    for sm_ in CudaPackage.cuda_arch_values:
+        depends_on("umpire cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
+
+    depends_on("umpire+rocm", when="+rocm")
+    depends_on("umpire~rocm", when="~rocm")
+    for arch in ROCmPackage.amdgpu_targets:
+        depends_on("umpire amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
 
     
     def setup_build_environment(self, env):
