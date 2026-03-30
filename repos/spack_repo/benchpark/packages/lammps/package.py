@@ -9,16 +9,25 @@ from spack_repo.builtin.packages.lammps.package import Lammps as BuiltinLammps
 
 class Lammps(BuiltinLammps):
 
-  variant("pace", default=False, description="Enable the ML PACE module")
-  depends_on("pace", when="+pace")
+  # commit for FCR
+  version("20251219", commit="a51f9ba0e719be544293987bb3cbd9939f1b01ee")
 
-  depends_on("kokkos+openmp cxxstd=17", when="+openmp")
+  variant("apu", default=False, description="Enable APU support", when="@4.5: +rocm")
+
+  depends_on("kokkos@5.0.0:", when="@20251219: +kokkos")
+  depends_on("kokkos+openmp", when="+openmp")
   depends_on("kokkos+wrapper", when="+cuda")
+  depends_on("kokkos+apu", when="+apu")
 
-  # Kokkos 5 not building
-  depends_on("kokkos@:4", when="@:20250722 +kokkos")
-  
-  flag_handler = build_system_flags
+  def flag_handler(self, name, flags):
+    wrapper_flags, x, build_system_flags = super().flag_handler(name, flags)
+
+    if self.spec.satisfies("+apu"):
+      if name == "cxxflags":
+        build_system_flags.append("-fdenormal-fp-math=ieee")
+        build_system_flags.append("-fgpu-flush-denormals-to-zero")
+
+    return (wrapper_flags, x, build_system_flags)
 
   def setup_run_environment(self, env):
     super().setup_run_environment(env)
@@ -33,17 +42,21 @@ class Lammps(BuiltinLammps):
     if "+cuda" in self.spec:
       env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
 
-      if "+mpi" in self.spec:
-          if self.spec["mpi"].extra_attributes and "ldflags" in self.spec["mpi"].extra_attributes:
-              env.append_flags("LDFLAGS", self.spec["mpi"].extra_attributes["ldflags"])
-
   def cmake_args(self):
     args = super().cmake_args()
-    args.append(f"-DMPI_CXX_LINK_FLAGS='{self.spec['mpi'].libs.ld_flags}'")
-    args.append(f"-DMPI_C_COMPILER='{self.spec['mpi'].mpicc}'")
-    args.append(f"-DMPI_CXX_COMPILER={self.spec['mpi'].mpicxx}")
-    if "+pace" in self.spec:
+
+    if self.spec.satisfies("+ml-pace"):
         args.append(f"-DPKG_ML-PACE=ON")
+
+    if self.spec.satisfies("+apu"):
+      existing_ldflags = self.spec.compiler_flags.get("ldflags", [])
+      existing = " ".join(existing_ldflags)
+      extra = " -lxpmem -lhugetlbfs"
+      if existing:
+        combined = f"{existing} {extra}"
+      else:
+        combined = extra
+      args.append(f"-DCMAKE_EXE_LINKER_FLAGS={combined}")
 
     return args
  
