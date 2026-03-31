@@ -20,7 +20,6 @@ from spack_repo.builtin.packages.raja_perf.package import RajaPerf as BuiltinRaj
 class RajaPerf(BuiltinRajaPerf):
     """RAJA Performance Suite."""
 
-
     version(
         "2025.12.1",
         tag="v2025.12.1",
