@@ -491,3 +491,19 @@ modules:
 
 Therefore, the ``prefix`` is ``/usr/tce/packages/gcc/gcc-12.1.1/`` and the spec is
 ``gcc@12.1.1``.
+
+
+1. Alternative compilers on the System
+======================================
+
+When some of the dependencies don't build with the default compiler, we use this syntax to provide an alternative compiler
+while requiring that the main compiler is used where possible:
+
+::
+
+    packages:
+  all:
+    require:
+    - one_of: ["%cce", "%gcc"]  # this line makes Spack use cce to build where possible, gcc otherwise
+
+This functionality depends on `Spack's one_of syntax <https://spack.readthedocs.io/en/latest/packages_yaml.html>`.
