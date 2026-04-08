@@ -89,6 +89,18 @@ class Laghos(ExecutableApplication):
     )
 
     workload_variable(
+        "nx", default="2", description="Elements in x-dimension", workloads=["*"]
+    )
+
+    workload_variable(
+        "ny", default="2", description="Elements in y-dimension", workloads=["*"]
+    )
+
+    workload_variable(
+        "nz", default="2", description="Elements in z-dimension", workloads=["*"]
+    )
+
+    workload_variable(
         "problem", default="3", description="problem number", workloads=["*"]
     )
 

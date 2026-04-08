@@ -63,7 +63,7 @@ class Laghos(
         values=(True, False),
         description="nonconforming or conforming",
     )
-    
+
     variant(
         "raja",
         default=True,
@@ -87,13 +87,13 @@ class Laghos(
 
     variant(
         "ms",
-        default="-1",
+        default="250",
         description="Maximum number of steps (negative means no restriction).",
     )
 
     variant(
         "tf",
-        default="0.6",
+        default="10000",
         description="Final time; start time is 0.",
     )
 
@@ -104,28 +104,13 @@ class Laghos(
         description="ODE solver type",
     )
 
-    variant(
-        "nx",
-        default="2",
-        description="Elements in x-dimension (do not specify mesh_file). Note: this is mutually-exclusive with -epm. Use -epm 0 to use -nx, -ny, and -nz.",
-    )
-
-    variant(
-        "ny",
-        default="2",
-        description="Elements in y-dimension (do not specify mesh_file). Note: this is mutually-exclusive with -epm. Use -epm 0 to use -nx, -ny, and -nz.",
-    )
-
-    variant(
-        "nz",
-        default="2",
-        description="Elements in z-dimension (do not specify mesh_file). Note: this is mutually-exclusive with -epm. Use -epm 0 to use -nx, -ny, and -nz.",
-    )
-
     maintainers("wdhawkins")
 
     def generate_perf_specs(self):
         problem_spec = {
+            "nx": 1,
+            "ny": 1,
+            "nz": 1,
             "pool_size": 16,
             "resource_count": 4,
             "strong": None,
@@ -209,6 +194,10 @@ class Laghos(
             self.generate_perf_specs()
         else:
             # "zones" defined from mesh file, we are hardcoding it here
+            self.add_experiment_variable("nx", 1, True)
+            self.add_experiment_variable("ny", 1, True)
+            self.add_experiment_variable("nz", 1, True)
+            
             self.add_experiment_variable("rs", 3, True)
             self.add_experiment_variable("rp", 2, True)
             self.add_experiment_variable(
@@ -296,10 +285,10 @@ class Laghos(
             self.add_experiment_variable("vs", "-no-visit", True)
             self.add_experiment_variable("k", "", False)
 
-        params_to_check = ["nx", "ny", "nz", "dim", "ms", "tf", "s"]
-        for param in params_to_check:
-            if param in self.spec.variants:
-                self.add_experiment_variable(param, self.spec.variants[param][0], True)
+        self.add_experiment_variable("dim", self.spec.variants["dim"][0], True)
+        self.add_experiment_variable("ms", self.spec.variants["ms"][0], True)
+        self.add_experiment_variable("tf", self.spec.variants["tf"][0], True)
+        self.add_experiment_variable("s", self.spec.variants["s"][0], True)
 
     def compute_package_section(self):
         gam = "~gpu-aware-mpi"
