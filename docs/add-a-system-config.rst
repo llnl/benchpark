@@ -491,3 +491,52 @@ modules:
 
 Therefore, the ``prefix`` is ``/usr/tce/packages/gcc/gcc-12.1.1/`` and the spec is
 ``gcc@12.1.1``.
+
+2. Adding Accounts/Banks and Queues
+===================================
+
+Accounts and Banks
+------------------
+
+If you want to enable setting a bank when you initialize your system, add the ``bank``
+variant like the following:
+
+::
+
+    variant(
+        "bank",
+        default="none",
+        values=("none", "guests", "asccasc", "lc", "fractale", "wbronze"),
+        multi=False,
+        description="Submit a job to a specific named bank",
+    )
+
+where the values are the names of the accounts/banks on the system. The above is an
+example from a Slurm system, so by setting ``bank=lc`` during system initialization, the
+result would be the addition of ``#SBATCH -A lc`` to the generated job scripts.
+
+Queues
+------
+
+Queues are similar to banks, with one extra step. For queues set the variant like:
+
+::
+
+    variant(
+        "queue",
+        default="none",
+        values=("none", "pbatch", "pdebug"),
+        multi=False,
+        description="Submit to named queue",
+    )
+
+However, for queues you must also populate your ``id_to_resources`` dictionary with a
+new entry of the following form:
+
+::
+
+    "queues": [JobQueue("pdebug", 60, 1), JobQueue("pbatch", 1440, 28)],
+
+where for each available entry in your variant, you must add a ``JobQueue`` object where
+you specify (1) the name, (2) the maximum time limit of that queue, and (3) the maximum
+number of nodes you can allocate at one time in that queue.
