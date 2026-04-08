@@ -197,7 +197,7 @@ class Laghos(
             self.add_experiment_variable("nx", 1, True)
             self.add_experiment_variable("ny", 1, True)
             self.add_experiment_variable("nz", 1, True)
-            
+
             self.add_experiment_variable("rs", 3, True)
             self.add_experiment_variable("rp", 2, True)
             self.add_experiment_variable(
