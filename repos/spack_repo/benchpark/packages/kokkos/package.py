@@ -8,8 +8,6 @@ from spack_repo.builtin.packages.kokkos.package import Kokkos as BuiltinKokkos
 
 
 class Kokkos(BuiltinKokkos):
-  flag_handler = build_system_flags
-
   def setup_build_environment(self, env):
     if "+cuda" in self.spec:
       env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
