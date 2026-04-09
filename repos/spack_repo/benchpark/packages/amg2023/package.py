@@ -22,7 +22,7 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
 
     license("Apache-2.0")
 
-    version("develop", branch="rl_fix2")
+    version("develop", branch="main")
     version("20240511", branch="20240511")
 
     variant("mpi", default=True, description="Enable MPI support")
