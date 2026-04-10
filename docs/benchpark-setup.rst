@@ -23,6 +23,8 @@ where:
 - ``<Benchmark>``: amg2023 | saxpy | etc. (specified choices in :doc:`benchmark-list`)
 - ``<SystemName>``: Cts | Tioga | etc. (specified systems in :doc:`system-list`)
 
+We recommend a fast access resource for the workspace location as all necessary files 
+during the build process will be written to the workspace location.
 This command will assemble a Ramble workspace per experiment with a configuration for
 the specified benchmark and system with the following directory structure:
 
