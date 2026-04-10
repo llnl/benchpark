@@ -92,8 +92,8 @@ Spack/Ramble.
 **********************************************************************
 
 Remove your current bootstrap in home (``~``) and then use: ``benchpark configure`` to
-set your preferred location.  We recommend a fast access resource for the bootstrap location
-as all necessary files during the build process will be written to the bootstrap location.
+set your preferred location.  Keep in mind that Spack, Spack-packages, and Ramble will be
+cloned to this location, so if you are using slow storage this may take awhile. 
 
 ::
 
