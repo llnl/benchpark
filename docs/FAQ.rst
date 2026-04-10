@@ -60,7 +60,8 @@ The user might notice this delay in Spack and Ramble versions in two ways:
 At your own risk, you may go into the cloned Spack, Spack-packages, and Ramble
 directories and perform a git pull to grab those updates (these are located in your home
 directory (``~``) or an alternate location you indicated when bootstrapping Benchpark).
-This may be useful for package updates (i.e. Spack-packages), but perilous for functionality updates (i.e. Spack or Ramble).
+This may be useful for package updates (i.e. Spack-packages), but perilous for
+functionality updates (i.e. Spack or Ramble).
 
 Alternatively, the user may temporarily copy the needed packages into
 ``benchpark/repo``, and remove them when Benchpark updates to the next version of
