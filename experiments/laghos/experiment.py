@@ -222,9 +222,15 @@ class Laghos(
         )
 
         if self.spec.satisfies("+cuda"):
-            self.add_experiment_variable("device", "cuda", True)
+            if self.spec.satisfies("+raja"):
+                self.add_experiment_variable("device", "raja-gpu", True)
+            else:
+                self.add_experiment_variable("device", "cuda", True)
         elif self.spec.satisfies("+rocm"):
-            self.add_experiment_variable("device", "hip", True)
+            if self.spec.satisfies("+raja"):
+                self.add_experiment_variable("device", "raja-gpu", True)
+            else:
+                self.add_experiment_variable("device", "hip", True)
         else:
             self.add_experiment_variable("device", "cpu", True)
 
