@@ -45,7 +45,8 @@ please submit a PR to remove the duplicated specification from ``benchpark/repo`
 ************************************
 
 Benchpark depends on the build functionality provided in `Spack
-<https://github.com/spack/spack>`_, and run functionality provided in `Ramble
+<https://github.com/spack/spack>`_, the Spack packages provided in `Spack-packages
+<https://github.com/spack/spack-packages>`_, and run functionality provided in `Ramble
 <https://github.com/GoogleCloudPlatform/ramble>`_. To allow for testing before pulling
 in updates in Spack and Ramble, Benchpark clones and uses the versions of Spack and
 Ramble specified in ``checkout-versions.yaml``.
@@ -56,9 +57,10 @@ The user might notice this delay in Spack and Ramble versions in two ways:
 - The latest package.py specifications available in Spack and application.py
   specifications available in Ramble may not be available in Benchpark.
 
-At your own risk, you may go into the cloned Spack and Ramble directories and perform a
-git pull to grab those updates. This may be useful for package updates, but perilous for
-functionality updates.
+At your own risk, you may go into the cloned Spack, Spack-packages, and Ramble directories 
+and perform a git pull to grab those updates (these are located in your home directory (``~``)
+oran alternate location you indicated when bootstrapping Benchpark).  This may be useful for 
+package updates, but perilous for functionality updates.
 
 Alternatively, the user may temporarily copy the needed packages into
 ``benchpark/repo``, and remove them when Benchpark updates to the next version of
@@ -90,7 +92,8 @@ Spack/Ramble.
 **********************************************************************
 
 Remove your current bootstrap in home (``~``) and then use: ``benchpark configure`` to
-set your preferred location.
+set your preferred location.  We recommend a fast access resource for the bootstrap location
+as all necessary files during the build process will be written to the bootstrap location.
 
 ::
 
