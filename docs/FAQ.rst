@@ -57,10 +57,10 @@ The user might notice this delay in Spack and Ramble versions in two ways:
 - The latest package.py specifications available in Spack and application.py
   specifications available in Ramble may not be available in Benchpark.
 
-At your own risk, you may go into the cloned Spack, Spack-packages, and Ramble directories 
-and perform a git pull to grab those updates (these are located in your home directory (``~``)
-oran alternate location you indicated when bootstrapping Benchpark).  This may be useful for 
-package updates, but perilous for functionality updates.
+At your own risk, you may go into the cloned Spack, Spack-packages, and Ramble
+directories and perform a git pull to grab those updates (these are located in your home
+directory (``~``) oran alternate location you indicated when bootstrapping Benchpark).
+This may be useful for package updates, but perilous for functionality updates.
 
 Alternatively, the user may temporarily copy the needed packages into
 ``benchpark/repo``, and remove them when Benchpark updates to the next version of
@@ -92,8 +92,8 @@ Spack/Ramble.
 **********************************************************************
 
 Remove your current bootstrap in home (``~``) and then use: ``benchpark configure`` to
-set your preferred location.  Keep in mind that Spack, Spack-packages, and Ramble will be
-cloned to this location, so if you are using slow storage this may take awhile. 
+set your preferred location. Keep in mind that Spack, Spack-packages, and Ramble will be
+cloned to this location, so if you are using slow storage this may take awhile.
 
 ::
 
