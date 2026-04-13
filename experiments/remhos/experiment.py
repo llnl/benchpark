@@ -72,7 +72,8 @@ class Remhos(
         self.add_experiment_variable("ms", 5, False)
 
         # resource_count is the number of resources used for this experiment:
-        self.add_experiment_variable("resource_count", 1, False)
+        self.add_experiment_variable("resource_count", 4, False)
+        self.add_experiment_variable("pool", 120, False)
 
         # Set the variables required by the experiment
         self.set_required_variables(
@@ -109,9 +110,15 @@ class Remhos(
         )
 
         if self.spec.satisfies("+cuda"):
-            self.add_experiment_variable("device", "cuda", True)
+            if self.spec.satisfies("+raja"):
+                self.add_experiment_variable("device", "raja-gpu", True)
+            else:
+                self.add_experiment_variable("device", "cuda", True)
         elif self.spec.satisfies("+rocm"):
-            self.add_experiment_variable("device", "hip", True)
+            if self.spec.satisfies("+raja"):
+                self.add_experiment_variable("device", "raja-gpu", True)
+            else:
+                self.add_experiment_variable("device", "hip", True)
         else:
             self.add_experiment_variable("device", "cpu", True)
 
