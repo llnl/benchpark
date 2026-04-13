@@ -1,8 +1,8 @@
-import spack.config as config
-import spack.util.spack_yaml as syaml
-
 from pathlib import Path
 import sys
+
+import spack.config as config
+import spack.util.spack_yaml as syaml
 
 
 def find_dir(root, target_name):
