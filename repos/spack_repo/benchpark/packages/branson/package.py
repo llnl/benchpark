@@ -95,21 +95,19 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
               args.append(f"-DCUDA_ARCH={cuda_arch}")
         else:
             args.append("-DUSE_CUDA=OFF")
-            args.append("-DUSE_GPU=OFF")
-
-        if '+rocm' in spec:
-            args.append("-DUSE_HIP=ON")
-            args.append("-DUSE_GPU=ON")
-            rocm_arch_vals = spec.variants["amdgpu_target"].value
-            args.append(f"-DROCM_PATH={spec['hip'].prefix}")
-            if rocm_arch_vals:
-              rocm_arch_sorted = list(sorted(rocm_arch_vals, reverse=True))
-              rocm_arch = rocm_arch_sorted[0]
-              args.append(f"-DROCM_ARCH={rocm_arch}")
-              args.append(f"-DHIP_ARCH={rocm_arch}")
-        else:
-            args.append("-DUSE_HIP=OFF")
-            args.append("-DUSE_GPU=OFF")
+            if '+rocm' in spec:
+                args.append("-DUSE_HIP=ON")
+                args.append("-DUSE_GPU=ON")
+                rocm_arch_vals = spec.variants["amdgpu_target"].value
+                args.append(f"-DROCM_PATH={spec['hip'].prefix}")
+                if rocm_arch_vals:
+                  rocm_arch_sorted = list(sorted(rocm_arch_vals, reverse=True))
+                  rocm_arch = rocm_arch_sorted[0]
+                  args.append(f"-DROCM_ARCH={rocm_arch}")
+                  args.append(f"-DHIP_ARCH={rocm_arch}")
+            else:
+                args.append("-DUSE_HIP=OFF")
+                args.append("-DUSE_GPU=OFF")
 
         if '+umpire' in spec:
             args.append("-DUSE_UMPIRE=ON")
