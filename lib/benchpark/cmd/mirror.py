@@ -178,25 +178,25 @@ export SPACK_DISABLE_LOCAL_CONFIG=1
         f"spack -e {env_dir} python {repo_copy_script} {git_repo_dst}"
     )
     script_output = out.strip()
-    if script_output:
-        copied_pkgs = script_output.split("\n")
-    else:
-        copied_pkgs = []
-    git_redirects = list()
-    for pkg_name in copied_pkgs:
-        git_url = f"$this_script_dir/git-repos/{pkg_name}"
-        git_redirects.append(
-            f"spack config --scope=spack add packages:{pkg_name}:package_attributes:git:{git_url}"
-        )
-    git_redirects = "\n".join(git_redirects)
+
+    git_redirect_script = os.path.join(
+        paths.benchpark_root, "lib", "scripts", "redirect-git-urls.py"
+    )
+    shutil.copyfile(git_redirect_script, os.path.join(dest, "redirect-git-urls.py"))
 
     delete_configs_in(os.path.join(spack_dest, "etc", "spack"))
     delete_configs_in(os.path.join(ramble_dest, "etc", "ramble"))
+
     first_time_dest = os.path.join(dest, "first-time.sh")
+    benchpark_workspace_relative = pathlib.Path(ramble_workspace_relative).parts[0]
     if not os.path.exists(first_time_dest):
         with open(first_time_dest, "w", encoding="utf-8") as f:
             f.write(f"""\
 this_script_dir=$(cd "$(dirname "${{BASH_SOURCE[0]}}")" && pwd)
+
+venv_dir="$this_script_dir/mirror-venv"
+python3 -m venv $venv_dir && . $venv_dir/bin/activate
+pip install --no-index --find-links="$this_script_dir/pip-cache" "$this_script_dir/pip-cache"/*
 
 . $this_script_dir/setup.sh
 
@@ -205,8 +205,7 @@ spack repo add --scope=spack $this_script_dir/spack-packages/repos/spack_repo/bu
 spack repo add --scope=spack $this_script_dir/repos/spack_repo/benchpark/
 spack config --scope=spack add "config:misc_cache:$this_script_dir/spack-misc-cache"
 spack bootstrap add --scope=spack --trust local-sources "$this_script_dir/spack-bootstrap-mirror/metadata/sources/"
-# We store local copies of git repos for packages that install branch tips
-{git_redirects}
+spack python $this_script_dir/redirect-git-urls.py $this_script_dir/{benchpark_workspace_relative}
 
 # We deleted the repo config because it may have absolute paths;
 # it is reinstantiated here
