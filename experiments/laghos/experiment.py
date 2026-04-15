@@ -93,31 +93,55 @@ class Laghos(
                 lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor
             )
             if self.spec.satisfies("order=linear"):
-                problem_spec["rs"] = 4
+                problem_spec["rs"] = 0
                 problem_spec["rp"] = 3
             elif self.spec.satisfies("order=quadratic"):
-                problem_spec["rs"] = 4
+                problem_spec["rs"] = 0
                 problem_spec["rp"] = 2
             elif self.spec.satisfies("order=cubic"):
-                problem_spec["rs"] = 4
+                problem_spec["rs"] = 0
                 problem_spec["rp"] = 1
         elif self.spec.satisfies("+weak"):
-            problem_spec["nx"] = [1, 2, 3, 4, 5, 6]
-            problem_spec["ny"] = [1, 2, 3, 4, 5, 6]
-            problem_spec["nz"] = [1, 2, 3, 4, 5, 6]
-            problem_spec["resource_count"] = [4, 32, 108, 256, 500, 864]
             if self.spec.satisfies("order=linear"):
-                problem_spec["rs"] = 4
-                problem_spec["rp"] = 3
+                problem_spec["nx"] = [16, 20, 25, 16, 20, 25, 16, 20, 25, 16, 20, 25, 16]
+                problem_spec["ny"] = [16, 20, 25, 16, 20, 25, 16, 20, 25, 16, 20, 25, 16]
+                problem_spec["nz"] = [16, 20, 25, 16, 20, 25, 16, 20, 25, 16, 20, 25, 16]
+                problem_spec["resource_count"] = [4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384]
+                problem_spec["rs"] = 0
+                problem_spec["rp"] = [3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7]
             elif self.spec.satisfies("order=quadratic"):
-                problem_spec["rs"] = 4
-                problem_spec["rp"] = 2
+                problem_spec["nx"] = [16, 20, 25, 16, 20, 25, 16, 20, 25, 16, 20, 25, 16]
+                problem_spec["ny"] = [16, 20, 25, 16, 20, 25, 16, 20, 25, 16, 20, 25, 16]
+                problem_spec["nz"] = [16, 20, 25, 16, 20, 25, 16, 20, 25, 16, 20, 25, 16]
+                problem_spec["resource_count"] = [4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384]
+                problem_spec["rs"] = 0
+                problem_spec["rp"] = [2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6]
             elif self.spec.satisfies("order=cubic"):
-                problem_spec["rs"] = 4
-                problem_spec["rp"] = 1
+                problem_spec["nx"] = [21, 27, 34, 21, 27, 34, 21, 27, 34, 21, 27, 34, 21]
+                problem_spec["ny"] = [21, 27, 34, 21, 27, 34, 21, 27, 34, 21, 27, 34, 21]
+                problem_spec["nz"] = [21, 27, 34, 21, 27, 34, 21, 27, 34, 21, 27, 34, 21]
+                problem_spec["resource_count"] = [4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384]
+                problem_spec["rs"] = 0
+                problem_spec["rp"] = [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5]
         else:
-            problem_spec["rs"] = 4
-            problem_spec["rp"] = 1
+            if self.spec.satisfies("order=linear"):
+                problem_spec["rs"] = 0
+                problem_spec["rp"] = 3
+                problem_spec["nx"] = 16
+                problem_spec["ny"] = 16
+                problem_spec["nz"] = 16
+            elif self.spec.satisfies("order=quadratic"):
+                problem_spec["rs"] = 0
+                problem_spec["rp"] = 2
+                problem_spec["nx"] = 16
+                problem_spec["ny"] = 16
+                problem_spec["nz"] = 16
+            elif self.spec.satisfies("order=cubic"):
+                problem_spec["rs"] = 0
+                problem_spec["rp"] = 1
+                problem_spec["nx"] = 21
+                problem_spec["ny"] = 21
+                problem_spec["nz"] = 21
 
         self.add_experiment_variable("nx", problem_spec["nx"], True)
         self.add_experiment_variable("ny", problem_spec["ny"], True)
@@ -254,4 +278,3 @@ class Laghos(
         self.add_package_spec(
             self.name, [f"laghos{self.determine_version()} +metis {gam} {raja}"]
         )
-        self.add_package_spec("hypre", ["hypre@2.32.0: +lapack"])
