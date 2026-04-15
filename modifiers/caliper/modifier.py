@@ -94,13 +94,13 @@ class Caliper(BasicModifier):
     )
 
     add_mode(
-        mode_name="cuda-gpu",
+        mode_name="cuda-gputime",
         mode_option="cuda.gputime",
         description="Profile time spent in GPU kernels",
     )
 
     add_mode(
-        mode_name="rocm-gpu",
+        mode_name="rocm-gputime",
         mode_option="rocm.gputime",
         description="Profile time spent in GPU kernels",
     )
