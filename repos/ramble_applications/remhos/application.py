@@ -30,6 +30,7 @@ class Remhos(ExecutableApplication):
                      ' -vs {vs}' +
                      ' -ms {ms}' +
                      ' -no-vis' +
+                     ' --dev-pool-size {pool}' +
                      ' -pa' +
                      ' -d {device}' +
                      ' {gam}',
@@ -46,6 +47,7 @@ class Remhos(ExecutableApplication):
                      ' -vs {vs}' +
                      ' -ms {ms}' +
                      ' -no-vis' +
+                     ' --dev-pool-size {pool}' +
                      ' -pa' +
                      ' -d {device}' +
                      ' {gam}',
@@ -98,8 +100,12 @@ class Remhos(ExecutableApplication):
         description='ms',
         workloads=['2d','3d'])
 
+    workload_variable('pool', default='4',
+        description='Device pool size',
+        workloads=['2d', '3d'])
+
     workload_variable('device', default='cpu',
-        description='cpu, cuda or hip',
+        description='cpu, cuda, hip or raja-gpu',
         workloads=['2d','3d'])
 
     workload_variable('gam', default='--no-gpu-aware-mpi',

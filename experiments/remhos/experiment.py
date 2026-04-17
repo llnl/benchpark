@@ -42,6 +42,13 @@ class Remhos(
         description="Use GPU-aware MPI",
     )
 
+    variant(
+        "raja",
+        default=True,
+        values=(True, False),
+        description="Use RAJA backend for MFEM",
+    )
+
     maintainers("rfhaque")
 
     def compute_applications_section(self):
@@ -72,7 +79,8 @@ class Remhos(
         self.add_experiment_variable("ms", 5, False)
 
         # resource_count is the number of resources used for this experiment:
-        self.add_experiment_variable("resource_count", 1, False)
+        self.add_experiment_variable("resource_count", 4, False)
+        self.add_experiment_variable("pool", 120, False)
 
         # Set the variables required by the experiment
         self.set_required_variables(
@@ -109,9 +117,15 @@ class Remhos(
         )
 
         if self.spec.satisfies("+cuda"):
-            self.add_experiment_variable("device", "cuda", True)
+            if self.spec.satisfies("+raja"):
+                self.add_experiment_variable("device", "raja-gpu", True)
+            else:
+                self.add_experiment_variable("device", "cuda", True)
         elif self.spec.satisfies("+rocm"):
-            self.add_experiment_variable("device", "hip", True)
+            if self.spec.satisfies("+raja"):
+                self.add_experiment_variable("device", "raja-gpu", True)
+            else:
+                self.add_experiment_variable("device", "hip", True)
         else:
             self.add_experiment_variable("device", "cpu", True)
 
@@ -126,9 +140,12 @@ class Remhos(
 
     def compute_package_section(self):
         gam = "~gpu-aware-mpi"
+        raja = "~raja"
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             if self.spec.satisfies("+gpu-aware-mpi"):
                 gam = "+gpu-aware-mpi"
+        if self.spec.satisfies("+raja"):
+            raja = "+raja"
         self.add_package_spec(
-            self.name, [f"remhos{self.determine_version()} +metis {gam}"]
+            self.name, [f"remhos{self.determine_version()} +metis {gam} {raja}"]
         )
