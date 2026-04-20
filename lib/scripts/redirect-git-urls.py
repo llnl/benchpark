@@ -1,5 +1,5 @@
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import spack.config as config
 import spack.util.spack_yaml as syaml
