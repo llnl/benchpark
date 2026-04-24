@@ -54,6 +54,11 @@ def setup_parser(root_parser):
         type=str,
         help="Where to install packages and store results for the experiments. Benchpark expects to manage this directory, and it should be empty/nonexistent the first time you run benchpark setup experiments.",
     )
+    root_parser.add_argument(
+        "--spack",
+        type=str,
+        help="Use the designated, pre-existing Spack instance"
+    )
 
 
 def determine_experiment_id(exp_src_dir):
@@ -207,7 +212,23 @@ def command(args):
     repos_cfg = benchpark.config.configuration().repos
 
     pkg_str = ""
-    if "spack" in pkg_manager:
+    if "spack" in pkg_manager and args.spack:
+        # Things that are not applied:
+        # - the benchpark package repository
+        # - or any of the repositories configured
+        # - does not set a build stage
+        # basically these things are all configuration details of spack, and
+        # if the user says "use my specific spack instance" then I want to
+        # minimize changes to it. Note that Ramble may perform config commands
+        spack_user_cache_path = experiments_root / "spack-cache"
+        spack_location = str(experiments_root / spack)
+        os.symlink(args.spack, spack_location)
+        pkg_str = f"""\
+export SPACK_USER_CACHE_PATH={spack_user_cache_path}
+export SPACK_DISABLE_LOCAL_CONFIG=1
+. {spack_location}/share/spack/setup-env.sh
+"""
+    elif "spack" in pkg_manager and not args.spack:
         spack_build_stage = experiments_root / "builds"
         spack_user_cache_path = experiments_root / "spack-cache"
         spack, first_time_spack = per_workspace_setup.spack_first_time_setup()
