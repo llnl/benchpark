@@ -9,6 +9,7 @@ from pathlib import Path
 import yaml
 
 import benchpark.config
+from benchpark.base_paths import base_paths
 
 
 def setup_parser(root_parser):
@@ -29,6 +30,13 @@ def command(args):
         bl = str(Path(loc).resolve()).rstrip("/")
         data = {"bootstrap": {"location": bl}}
 
+        if (
+            bootstrap_cfg.path.resolve()
+            == (base_paths.benchpark_root / "config" / "bootstrap.yaml").resolve()
+        ):
+            user_dir = base_paths.benchpark_root / "user-config"
+            os.makedirs(user_dir)
+            bootstrap_cfg.path = user_dir / "bootstrap.yaml"
         print(f"Writing configuration to {bootstrap_cfg.path}")
         with open(bootstrap_cfg.path, "w") as yaml_file:
             yaml.safe_dump(data, yaml_file)
