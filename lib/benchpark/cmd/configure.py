@@ -30,6 +30,7 @@ def command(args):
         bl = str(Path(loc).resolve()).rstrip("/")
         data = {"bootstrap": {"location": bl}}
 
+        # If "user-config" dir has not been created yet (first run), create it
         if (
             bootstrap_cfg.path.resolve()
             == (base_paths.benchpark_root / "config" / "bootstrap.yaml").resolve()
