@@ -221,7 +221,7 @@ def command(args):
         # if the user says "use my specific spack instance" then I want to
         # minimize changes to it. Note that Ramble may perform config commands
         spack_user_cache_path = experiments_root / "spack-cache"
-        spack_location = str(experiments_root / spack)
+        spack_location = str(experiments_root / "spack")
         os.symlink(args.spack, spack_location)
         pkg_str = f"""\
 export SPACK_USER_CACHE_PATH={spack_user_cache_path}
