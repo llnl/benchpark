@@ -103,7 +103,7 @@ you will be able to make a submission to RS-HPCBench-2026.
 Workshop Deadlines
 ==================
 
-- Paper Submission Deadline: |ss| April 5, 2026\ |se| \ **April 15, 2026 (EXTENDED)**
+- Paper Submission Deadline: |ss| April 5, 2026\ |se| \ **April 19, 2026 (EXTENDED)**
 - Author Notification: April 22, 2026
 - Camera-Ready Upload: May 6, 2026
 
