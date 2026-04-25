@@ -107,7 +107,7 @@ class OsuMicroBenchmarks(
 
     def compute_applications_section(self):
 
-        num_nodes = {"n_nodes": 2, "n_ranks": 1}
+        num_nodes = {"n_nodes": 2, "n_ranks": 2}
 
         if self.spec.satisfies("exec_mode=test"):
             for pk, pv in num_nodes.items():
