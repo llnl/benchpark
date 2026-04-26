@@ -173,7 +173,6 @@ class Fluxtainer(System):
                 "packages": {
                     "compiler-gcc": {"pkg_spec": "gcc@14.3.1"},
                     "default-compiler": {"pkg_spec": "gcc"},
-                    "compiler-gcc": {"pkg_spec": "gcc@14.3.1"},
                     "default-mpi": {"pkg_spec": "mpich"},
                 }
             }
