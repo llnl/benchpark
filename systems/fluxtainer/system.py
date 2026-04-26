@@ -26,15 +26,12 @@ class Fluxtainer(System):
             "sys_cores_per_node": 32,
             "sys_mem_per_node_GB": 1,
             "n_nodes": 4,
-        }
+        },
     }
 
     variant(
         "instance_type",
-        values=(
-            "arm",
-            "x86"
-        ),
+        values=("arm", "x86"),
         default="x86",
         description="Target Architecture",
     )
