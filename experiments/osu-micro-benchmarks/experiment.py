@@ -119,7 +119,7 @@ class OsuMicroBenchmarks(
             self.add_experiment_variable("additional_args", " -d cuda", False)
         if self.spec.satisfies("+rocm") or self.spec.satisfies("+cuda"):
             resource = "n_gpus"
-            self.add_experiment_variable("n_gpus", 1, True)
+            self.add_experiment_variable("n_gpus", 2, True)
         else:
             resource = "n_nodes"
 

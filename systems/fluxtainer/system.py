@@ -17,13 +17,13 @@ class Fluxtainer(System):
     id_to_resources = {
         "arm": {
             "cpu_arch": "arm64",
-            "sys_cores_per_node": 32,
+            "sys_cores_per_node": 8,
             "sys_mem_per_node_GB": 1,
             "n_nodes": 4,
         },
         "x86": {
             "cpu_arch": "x86_64_v3",
-            "sys_cores_per_node": 32,
+            "sys_cores_per_node": 8,
             "sys_mem_per_node_GB": 1,
             "n_nodes": 4,
         },
@@ -41,7 +41,7 @@ class Fluxtainer(System):
         self.programming_models = [OpenMPCPUOnlySystem()]
 
         self.scheduler = "flux"
-        setattr(self, "sys_cores_per_node", 32)
+        setattr(self, "sys_cores_per_node", 8)
         setattr(self, "sys_mem_per_node_GB", 2)
         attrs = self.id_to_resources.get(self.spec.variants["instance_type"][0])
         for k, v in attrs.items():
