@@ -55,9 +55,7 @@ def setup_parser(root_parser):
         help="Where to install packages and store results for the experiments. Benchpark expects to manage this directory, and it should be empty/nonexistent the first time you run benchpark setup experiments.",
     )
     root_parser.add_argument(
-        "--spack",
-        type=str,
-        help="Use the designated, pre-existing Spack instance"
+        "--spack", type=str, help="Use the designated, pre-existing Spack instance"
     )
 
 
