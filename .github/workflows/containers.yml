@@ -1,9 +1,6 @@
 name: Build and Push Benchpark Container
 on:
   workflow_call:
-    paths:
-      - containerfiles/flux/el10/Dockerfile
-      - systems/fluxtainer/system.py
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}/benchpark-flux-el10
