@@ -107,6 +107,24 @@ Workshop Deadlines
 - Author Notification: April 22, 2026
 - Camera-Ready Upload: May 6, 2026
 
+********************
+ Agenda (Tentative)
+********************
+
++---------------------+-------------------------------+-----------+
+| Time                | Title                         | Materials |
++=====================+===============================+===========+
+| 09:00 AM - 09:00 AM | Welcome and Introduction      |           |
+| 09:10 AM - 10:30 AM | Accepted talks                |           |
+| 10:30 AM - 10:45 AM | Coffee Break                  |           |
+| 10:45 AM - 12:00 PM | Accepted talks                |           |
+| 12:00 PM - 01:00 PM | Lunch                         |           |
+| 01:00 PM - 03:00 PM | Benchpark and Ramble tutorial |           |
+| 03:00 PM - 03:15 PM | Coffee Break                  |           |
+| 03:15 PM - 04:45 PM | Benchpark and Ramble Tutorial |           |
+| 04:45 PM - 05:00 PM | Closing Remarks               |           |
++---------------------+-------------------------------+-----------+
+
 **********************
  Organizing Committee
 **********************
