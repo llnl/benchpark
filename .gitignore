@@ -8,4 +8,4 @@ configure.yaml
 .spack-env
 .env
 .DS_Store
-config/bootstrap.yaml
+user-config/*
