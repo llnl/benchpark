@@ -50,6 +50,13 @@ class Amg2023(
     )
 
     variant(
+        "hypre2",
+        default=False,
+        values=(True, False),
+        description="Use hypre v2.33.0",
+    )
+
+    variant(
         "gpu-aware-mpi",
         default=False,
         values=(True, False),
@@ -600,13 +607,14 @@ class Amg2023(
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             if self.spec.satisfies("+gpu-aware-mpi"):
                 gam = "+gpu-aware-mpi"
+        hypre2 = "+hypre2" if self.spec.satisfies("+hypre2") else "~hypre2"
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_package_spec(
                 self.name,
-                [f"amg2023{self.determine_version()} +umpire {mixedint} {gam}"],
+                [f"amg2023{self.determine_version()} +umpire {mixedint} {hypre2} {gam}"],
             )
         else:
             self.add_package_spec(
-                self.name, [f"amg2023{self.determine_version()} {mixedint} +mpi"]
+                self.name, [f"amg2023{self.determine_version()} {mixedint} {hypre2} +mpi"]
             )
         self.add_package_spec("hypre", ["hypre+lapack"])

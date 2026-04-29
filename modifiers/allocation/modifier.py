@@ -330,7 +330,7 @@ class Allocation(BasicModifier):
             if self._usage_mode == "torchrun-hpc":
                 srun_opts.append("--gpus-per-proc=1")
             else:
-                srun_opts.append(f"--gpus {v.n_gpus}")
+                srun_opts.append(f"--gpus {v.n_gpus} --exclusive")
             sbatch_opts.append(f"--gpus {v.n_gpus}")
         if v.n_nodes:
             srun_opts.append(f"-N {v.n_nodes}")
