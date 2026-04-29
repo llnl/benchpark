@@ -29,6 +29,17 @@ class Caliper:
     )
 
     variant(
+        "caliper_services",
+        default="none",
+        values=(
+            "none",
+            "rocprofiler",
+        ),
+        multi=True,
+        description="caliper services to enable",
+    )
+
+    variant(
         "cali_version",
         default="master",
         values=(
@@ -45,12 +56,14 @@ class Caliper:
             if not self.spec.satisfies("caliper=none"):
                 for var in list(self.spec.variants["caliper"]):
                     if var != "time":
-                        caliper_modifier_modes = {}
-                        caliper_modifier_modes["name"] = "caliper"
-                        caliper_modifier_modes["mode"] = var
-                        modifier_list.append(caliper_modifier_modes)
-                # Add time as the last mode
+                        modifier_list.append({"name": "caliper", "mode": var})
                 modifier_list.append({"name": "caliper", "mode": "time"})
+
+            if not self.spec.satisfies("caliper_services=none"):
+                for svc in list(self.spec.variants["caliper_services"]):
+                    if svc != "none":
+                        modifier_list.append({"name": "caliper", "mode": svc})
+
             return modifier_list
 
         def compute_package_section(self):
@@ -63,7 +76,10 @@ class Caliper:
             system_specs["compiler"] = "default-compiler"
             if self.spec.satisfies("caliper=cuda"):
                 system_specs["cuda_arch"] = "{cuda_arch}"
-            if self.spec.satisfies("caliper=rocm"):
+            if (
+                self.spec.satisfies("caliper=rocm")
+                or self.spec.satisfies("caliper_services=rocprofiler")
+            ):
                 system_specs["rocm_arch"] = "{rocm_arch}"
             if any("topdown" in var for var in self.spec.variants["caliper"]):
                 system_specs["cpu_arch"] = "{cpu_arch}"
@@ -71,7 +87,9 @@ class Caliper:
             # set package spack specs
             package_specs = {}
 
-            if not self.spec.satisfies("caliper=none"):
+            if not self.spec.satisfies("caliper=none") or not self.spec.satisfies(
+                "caliper_services=none"
+            ):
                 package_specs["caliper"] = {
                     "spack_pkg_spec": f"caliper@{caliper_version}+adiak+mpi~libunwind~libdw",
                 }
@@ -91,7 +109,10 @@ class Caliper:
                         raise NotImplementedError(
                             "Target system does not support the cuda interface"
                         )
-                elif self.spec.satisfies("caliper=rocm"):
+                elif (
+                    self.spec.satisfies("caliper=rocm")
+                    or self.spec.satisfies("caliper_services=rocprofiler")
+                ):
                     rocm_support = (
                         self.spec.satisfies("caliper=rocm") and True
                     )  # check if target system supports rocm
@@ -116,45 +137,59 @@ class Caliper:
             }
 
         def get_helper_name_prefix(self):
+            parts = ["caliper"]
+
             if not self.spec.satisfies("caliper=none"):
-                caliper_prefix = ["caliper"]
                 for var in list(self.spec.variants["caliper"]):
                     if self.spec.satisfies(f"caliper={var}"):
-                        caliper_prefix.append(var.replace("-", "_"))
-                return "_".join(caliper_prefix)
-            else:
+                        parts.append(var.replace("-", "_"))
+
+            if not self.spec.satisfies("caliper_services=none"):
+                for svc in list(self.spec.variants["caliper_services"]):
+                    if self.spec.satisfies(f"caliper_services={svc}"):
+                        parts.append(f"svc_{svc.replace('-', '_')}")
+
+            if len(parts) == 1:
                 return "caliper_none"
 
+            return "_".join(parts)
+
         def get_spack_variants(self):
-            return "~caliper" if self.spec.satisfies("caliper=none") else "+caliper"
+            if self.spec.satisfies("caliper=none") and self.spec.satisfies(
+                "caliper_services=none"
+            ):
+                return "~caliper"
+            return "+caliper"
 
         def compute_variables_section(self):
             """Add Caliper metadata variables for the ramble.yaml"""
-            if not self.spec.satisfies("caliper=none"):
-                metadata_dict = {
-                    "application_name": "{application_name}",
-                    "experiment_name": "{experiment_name}",
-                    "n_nodes": "{n_nodes}",
-                    "n_ranks": "{n_ranks}",
-                    "n_threads_per_proc": "{n_threads_per_proc}",
-                    "n_resources": "{n_resources}",
-                    "process_problem_size": "{process_problem_size}",
-                    "total_problem_size": "{total_problem_size}",
-                }
-                # parse the spec for more metadata
-                for i, variant_spec in enumerate(str.split(str(self.spec.variants))):
-                    values = variant_spec.split("=")
-                    if len(values) == 1:
-                        if i == 0:
-                            metadata_dict["benchpark_spec"] = values
-                        elif values[0] == "'":
-                            pass
-                    elif len(values) == 2:
-                        metadata_dict[values[0]] = values[1]
-                    else:
-                        warnings.warn(
-                            "Possible incorrect values sent to Caliper as metadata"
-                        )
-                return {"caliper_metadata": metadata_dict}
-            else:
+            if self.spec.satisfies("caliper=none") and self.spec.satisfies(
+                "caliper_services=none"
+            ):
                 return {}
+
+            metadata_dict = {
+                "application_name": "{application_name}",
+                "experiment_name": "{experiment_name}",
+                "n_nodes": "{n_nodes}",
+                "n_ranks": "{n_ranks}",
+                "n_threads_per_proc": "{n_threads_per_proc}",
+                "n_resources": "{n_resources}",
+                "process_problem_size": "{process_problem_size}",
+                "total_problem_size": "{total_problem_size}",
+            }
+            # parse the spec for more metadata
+            for i, variant_spec in enumerate(str.split(str(self.spec.variants))):
+                values = variant_spec.split("=")
+                if len(values) == 1:
+                    if i == 0:
+                        metadata_dict["benchpark_spec"] = values
+                    elif values[0] == "'":
+                        pass
+                elif len(values) == 2:
+                    metadata_dict[values[0]] = values[1]
+                else:
+                    warnings.warn(
+                        "Possible incorrect values sent to Caliper as metadata"
+                    )
+            return {"caliper_metadata": metadata_dict}

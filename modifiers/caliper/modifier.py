@@ -1,8 +1,3 @@
-# Copyright 2023 Lawrence Livermore National Security, LLC and other
-# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
-#
-# SPDX-License-Identifier: Apache-2.0
-
 import json
 
 from ramble.modkit import *
@@ -14,13 +9,14 @@ def add_mode(mode_name, mode_option, description):
         description=description,
     )
 
-    env_var_modification(
-        "CALI_CONFIG_MODE",
-        mode_option,
-        method="append",
-        separator=",",
-        modes=[mode_name],
-    )
+    if mode_option:
+        env_var_modification(
+            "CALI_CONFIG_MODE",
+            mode_option,
+            method="append",
+            separator=",",
+            modes=[mode_name],
+        )
 
 
 def add_service(service_name, service_option, description):
@@ -65,7 +61,10 @@ class Caliper(BasicModifier):
         Config parameters are parsed out into SPOT_CONFIG and OTHER_CALI_CONFIG if the application still requires them.
         """
         SPOT_CONFIG = r"spot(${CALI_CONFIG_MODE})"
-        OTHER_CALI_CONFIG = f'metadata(file={self._caliper_metadata_file}),metadata(file=/etc/node_info.json,keys="host.name,host.cluster,host.os")'
+        OTHER_CALI_CONFIG = (
+            f'metadata(file={self._caliper_metadata_file}),'
+            'metadata(file=/etc/node_info.json,keys="host.name,host.cluster,host.os")'
+        )
 
         if "builtin-caliper" not in app.tags:
             # Normal mode
@@ -171,20 +170,17 @@ class Caliper(BasicModifier):
             "system_site",
         ]
         for key in system_metadata:
-            # Certain keys not required or may not be present
             if key in app_inst.variables.keys():
                 cali_metadata[key] = app_inst.variables[key]
 
-        # Load the Caliper metadata variable from ramble.yaml
         experiment_metadata = app_inst.expander.expand_var_name(
             "caliper_metadata", typed=True, merge_used_stage=False
         )
         app_inst.expander.flush_used_variable_stage()
-        # rebuild dictionary with expanded variables
+
         for key, val in experiment_metadata.items():
             cali_metadata[key] = app_inst.expander.expand_var(val)
 
-        # Write to the Caliper metadata file
         cali_metadata_file = self.expander.expand_var(self._caliper_metadata_file)
         with open(cali_metadata_file, "w") as f:
             f.write(json.dumps(cali_metadata))
