@@ -23,6 +23,21 @@ def add_mode(mode_name, mode_option, description):
     )
 
 
+def add_service(service_name, service_option, description):
+    mode(
+        name=service_name,
+        description=description,
+    )
+
+    env_var_modification(
+        "CALI_SERVICES_ENABLE",
+        service_option,
+        method="append",
+        separator=",",
+        modes=[service_name],
+    )
+
+
 class Caliper(BasicModifier):
     """Define a modifier for Caliper"""
 
@@ -91,6 +106,12 @@ class Caliper(BasicModifier):
         mode_name="rocm",
         mode_option="profile.hip",
         description="Profile HIP API functions",
+    )
+
+    add_service(
+        service_name="rocprofiler",
+        service_option="rocprofiler",
+        description="Enable ROCm rocprofiler service",
     )
 
     add_mode(
