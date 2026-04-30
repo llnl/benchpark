@@ -162,6 +162,7 @@ jobs:
   containers:
     if: ${{ needs.changes.outputs.containers == 'true' }}
     needs: changes
+    uses: ./.github/workflows/containers.yml
   all:
     needs:
       - changes
