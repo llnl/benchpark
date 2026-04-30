@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+import shutil
 from pathlib import Path
 
 import yaml
@@ -36,8 +37,16 @@ def command(args):
             == (base_paths.benchpark_root / "config" / "bootstrap.yaml").resolve()
         ):
             user_dir = base_paths.benchpark_root / "user-config"
-            os.makedirs(user_dir)
+            os.makedirs(user_dir, exist_ok=True)
+
+            # Update bootstrap path
             bootstrap_cfg.path = user_dir / "bootstrap.yaml"
+
+            # Copy repos.yaml into user-config if it exists
+            src_repos = base_paths.benchpark_root / "config" / "repos.yaml"
+            dst_repos = user_dir / "repos.yaml"
+            if src_repos.exists() and not dst_repos.exists():
+                shutil.copy(src_repos, dst_repos)
         print(f"Writing configuration to {bootstrap_cfg.path}")
         with open(bootstrap_cfg.path, "w") as yaml_file:
             yaml.safe_dump(data, yaml_file)
