@@ -162,6 +162,9 @@ jobs:
   containers:
     if: ${{ needs.changes.outputs.containers == 'true' }}
     needs: changes
+    permissions:
+      contents: read
+      packages: write
     uses: ./.github/workflows/containers.yml
   all:
     needs:
