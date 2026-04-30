@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
-from pathlib import Path
 import shutil
+from pathlib import Path
 
 import yaml
 
