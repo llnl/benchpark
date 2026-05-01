@@ -165,6 +165,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
+      attestations: write
     uses: ./.github/workflows/containers.yml
   all:
     needs:
