@@ -15,12 +15,8 @@ class Fluxtainer(System):
     maintainers("nhanford")
 
     id_to_resources = {
-        "arm": {
-            "cpu_arch": "arm64"
-        },
-        "x86": {
-            "cpu_arch": "x86_64_v3"
-        },
+        "arm": {"cpu_arch": "arm64"},
+        "x86": {"cpu_arch": "x86_64_v3"},
     }
 
     variant(
