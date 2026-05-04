@@ -76,9 +76,8 @@ class Caliper:
             system_specs["compiler"] = "default-compiler"
             if self.spec.satisfies("caliper=cuda"):
                 system_specs["cuda_arch"] = "{cuda_arch}"
-            if (
-                self.spec.satisfies("caliper=rocm")
-                or self.spec.satisfies("caliper_services=rocprofiler")
+            if self.spec.satisfies("caliper=rocm") or self.spec.satisfies(
+                "caliper_services=rocprofiler"
             ):
                 system_specs["rocm_arch"] = "{rocm_arch}"
             if any("topdown" in var for var in self.spec.variants["caliper"]):
@@ -93,14 +92,15 @@ class Caliper:
                 package_specs["caliper"] = {
                     "spack_pkg_spec": f"caliper@{caliper_version}+adiak+mpi~libunwind~libdw",
                 }
+                cuda_support = self.spec.satisfies("caliper=cuda")
+                rocm_support = self.spec.satisfies(
+                    "caliper=rocm"
+                ) or self.spec.satisfies("caliper_services=rocprofiler")
                 if any("topdown" in var for var in self.spec.variants["caliper"]):
                     package_specs["caliper"][
                         "spack_pkg_spec"
                     ] += "+libpfm~papi target={}".format(system_specs["cpu_arch"])
-                elif self.spec.satisfies("caliper=cuda"):
-                    cuda_support = (
-                        self.spec.satisfies("caliper=cuda") and True
-                    )  # check if target system supports cuda
+                elif cuda_support:
                     if cuda_support:
                         package_specs["caliper"][
                             "spack_pkg_spec"
@@ -109,13 +109,7 @@ class Caliper:
                         raise NotImplementedError(
                             "Target system does not support the cuda interface"
                         )
-                elif (
-                    self.spec.satisfies("caliper=rocm")
-                    or self.spec.satisfies("caliper_services=rocprofiler")
-                ):
-                    rocm_support = (
-                        self.spec.satisfies("caliper=rocm") and True
-                    )  # check if target system supports rocm
+                elif rocm_support:
                     if rocm_support:
                         package_specs["caliper"][
                             "spack_pkg_spec"
