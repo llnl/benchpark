@@ -134,6 +134,11 @@ run_tests_flux_tuolumne:
         BENCHMARK: [kripke]
         VARIANT: [+rocm caliper_services=rocprofiler]
         GPUMODE: SPX
+      # gcc
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [stream]
+        SYSTEM_ARGS: [compiler=gcc]
 run_tests_flux_tioga:
   extends: .run_tests_flux
   tags: [shell, tioga]
