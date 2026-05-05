@@ -141,6 +141,7 @@ class LlnlElcapitan(System):
             "6.4.2",
             "6.4.3",
             "7.2.0",
+            "7.2.1",
         ),
         description="ROCm version",
     )
