@@ -125,6 +125,18 @@ running, a ``.cali`` file is created which contains the collected performance me
       - x86 Intel CPUs
       - |   - Top-down analysis for Intel CPUs (top level)
 
+Caliper services can also be enabled independently of the main ``caliper`` mode by
+adding ``caliper_services=<service>`` to the experiment spec:
+
+::
+
+    benchpark experiment init --dest=</path/to/experiment_root> </path/to/system> <benchmark> caliper_services=<service>
+
+Available services are:
+
+- ``nvtx`` for CUDA systems
+- ``rocprofiler`` for ROCm systems
+
 An experiment must inherit from the Caliper experiment class to make use of the Caliper
 functionality. Most existing experiments should already do this, but if adding to a new
 experiment, it is as simple as adding it to the class definition signature. For example:
