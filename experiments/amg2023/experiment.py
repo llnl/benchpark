@@ -384,9 +384,9 @@ class Amg2023(
             }
         elif self.spec.satisfies("+weak"):
             problem_spec = {
-                "nx": 171,
-                "ny": 171,
-                "nz": 171,
+                "nx": 292,
+                "ny": 292,
+                "nz": 292,
                 "pool_size": 16,
                 "px": 1,
                 "py": 1,
@@ -405,23 +405,23 @@ class Amg2023(
                     or self.spec.satisfies("target=MI250")
                     or self.spec.satisfies("target=H100")
                 ):
-                    if self.spec.satisfies("problem-type=large"):
+                    if self.spec.satisfies("problem-size=large"):
                         problem_spec["nx"] = 171
                         problem_spec["ny"] = 171
                         problem_spec["nz"] = 171
                         problem_spec["pool_size"] = 16
-                    elif self.spec.satisfies("problem-type=small"):
+                    elif self.spec.satisfies("problem-size=small"):
                         problem_spec["nx"] = 86
                         problem_spec["ny"] = 86
                         problem_spec["nz"] = 86
                         problem_spec["pool_size"] = 4
                 elif self.spec.satisfies("target=MI300-CPX"):
-                    if self.spec.satisfies("problem-type=large"):
+                    if self.spec.satisfies("problem-size=large"):
                         problem_spec["nx"] = 94
                         problem_spec["ny"] = 94
                         problem_spec["nz"] = 94
                         problem_spec["pool_size"] = 3
-                    elif self.spec.satisfies("problem-type=small"):
+                    elif self.spec.satisfies("problem-size=small"):
                         problem_spec["nx"] = 48
                         problem_spec["ny"] = 48
                         problem_spec["nz"] = 48
@@ -435,23 +435,23 @@ class Amg2023(
                     or self.spec.satisfies("target=MI250")
                     or self.spec.satisfies("target=H100")
                 ):
-                    if self.spec.satisfies("problem-type=large"):
-                        problem_spec["nx"] = 292
-                        problem_spec["ny"] = 292
-                        problem_spec["nz"] = 292
-                        problem_spec["pool_size"] = 16
-                    elif self.spec.satisfies("problem-type=small"):
-                        problem_spec["nx"] = 141
-                        problem_spec["ny"] = 141
-                        problem_spec["nz"] = 141
-                        problem_spec["pool_size"] = 13
+                    if self.spec.satisfies("problem-size=large"):
+                        problem_spec["nx"] = 360
+                        problem_spec["ny"] = 360
+                        problem_spec["nz"] = 360
+                        problem_spec["pool_size"] = 25
+                    elif self.spec.satisfies("problem-size=small"):
+                        problem_spec["nx"] = 205
+                        problem_spec["ny"] = 205
+                        problem_spec["nz"] = 205
+                        problem_spec["pool_size"] = 8
                 elif self.spec.satisfies("target=MI300-CPX"):
-                    if self.spec.satisfies("problem-type=large"):
+                    if self.spec.satisfies("problem-size=large"):
                         problem_spec["nx"] = 160
                         problem_spec["ny"] = 160
                         problem_spec["nz"] = 160
                         problem_spec["pool_size"] = 3
-                    elif self.spec.satisfies("problem-type=small"):
+                    elif self.spec.satisfies("problem-size=small"):
                         problem_spec["nx"] = 90
                         problem_spec["ny"] = 90
                         problem_spec["nz"] = 90

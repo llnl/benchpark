@@ -18,11 +18,11 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
 
     tags = ["benchmark"]
     homepage = "https://github.com/LLNL/AMG2023"
-    git = "https://github.com/rfhaque/AMG2023.git"
+    git = "https://github.com/LLNL/AMG2023.git"
 
     license("Apache-2.0")
 
-    version("develop", branch="rfhaque_main")
+    version("develop", branch="main")
     version("20240511", branch="20240511")
 
     variant("hypre2", default=False, description="Use hypre v2.33.0")
