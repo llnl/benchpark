@@ -62,7 +62,7 @@ class Caliper(BasicModifier):
         """
         SPOT_CONFIG = r"spot(${CALI_CONFIG_MODE})"
         OTHER_CALI_CONFIG = (
-            f'metadata(file={self._caliper_metadata_file}),'
+            f"metadata(file={self._caliper_metadata_file}),"
             'metadata(file=/etc/node_info.json,keys="host.name,host.cluster,host.os")'
         )
 
@@ -105,6 +105,12 @@ class Caliper(BasicModifier):
         mode_name="rocm",
         mode_option="profile.hip",
         description="Profile HIP API functions",
+    )
+
+    add_service(
+        service_name="nvtx",
+        service_option="nvtx",
+        description="Enable CUDA NVTX service",
     )
 
     add_service(

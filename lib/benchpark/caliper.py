@@ -33,6 +33,7 @@ class Caliper:
         default="none",
         values=(
             "none",
+            "nvtx",
             "rocprofiler",
         ),
         multi=True,
@@ -74,7 +75,9 @@ class Caliper:
             # TODO: Get compiler/mpi/package handles directly from system.py
             system_specs = {}
             system_specs["compiler"] = "default-compiler"
-            if self.spec.satisfies("caliper=cuda"):
+            if self.spec.satisfies("caliper=cuda") or self.spec.satisfies(
+                "caliper_services=nvtx"
+            ):
                 system_specs["cuda_arch"] = "{cuda_arch}"
             if self.spec.satisfies("caliper=rocm") or self.spec.satisfies(
                 "caliper_services=rocprofiler"
@@ -92,7 +95,9 @@ class Caliper:
                 package_specs["caliper"] = {
                     "spack_pkg_spec": f"caliper@{caliper_version}+adiak+mpi~libunwind~libdw",
                 }
-                cuda_support = self.spec.satisfies("caliper=cuda")
+                cuda_support = self.spec.satisfies(
+                    "caliper=cuda"
+                ) or self.spec.satisfies("caliper_services=nvtx")
                 rocm_support = self.spec.satisfies(
                     "caliper=rocm"
                 ) or self.spec.satisfies("caliper_services=rocprofiler")
