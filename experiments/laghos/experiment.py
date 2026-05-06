@@ -24,7 +24,16 @@ class Laghos(
     variant(
         "workload",
         default="sedov",
-        values=("sedov", "triplept"),
+        values=(
+            "taylor-green",
+            "sedov",
+            "1D-sod-shock",
+            "triple-point",
+            "gresho-vortex",
+            "2D-riemann-12",
+            "2D-riemann-6",
+            "2D-rayleigh-taylor",
+        ),
         description="problem type",
     )
 
@@ -55,6 +64,46 @@ class Laghos(
         description="nonconforming or conforming",
     )
 
+    variant(
+        "raja",
+        default=True,
+        values=(True, False),
+        description="Use RAJA backend for MFEM",
+    )
+
+    variant(
+        "visualizations",
+        default=False,
+        values=(True, False),
+        description="Enable or disable GLVis and VIsit visualizations",
+    )
+
+    variant(
+        "dim",
+        default="3",
+        values=("1", "2", "3"),
+        description="Dimension of the problem",
+    )
+
+    variant(
+        "ms",
+        default="250",
+        description="Maximum number of steps (negative means no restriction).",
+    )
+
+    variant(
+        "tf",
+        default="10000",
+        description="Final time; start time is 0.",
+    )
+
+    variant(
+        "s",
+        default="4",
+        values=("1", "2", "3", "4", "6", "7"),
+        description="ODE solver type",
+    )
+
     maintainers("wdhawkins")
 
     def generate_perf_specs(self):
@@ -63,8 +112,6 @@ class Laghos(
             "ny": 1,
             "nz": 1,
             "pool_size": 16,
-            "ms": 250,
-            "tf": 10000,
             "resource_count": 4,
             "strong": None,
             "weak": None,
@@ -117,8 +164,6 @@ class Laghos(
         self.add_experiment_variable("nz", problem_spec["nz"], True)
         self.add_experiment_variable("rs", problem_spec["rs"], True)
         self.add_experiment_variable("rp", problem_spec["rp"], True)
-        self.add_experiment_variable("ms", problem_spec["ms"], True)
-        self.add_experiment_variable("tf", problem_spec["tf"], True)
 
         self.add_experiment_variable(
             "resource_count", problem_spec["resource_count"], True
@@ -152,10 +197,9 @@ class Laghos(
             self.add_experiment_variable("nx", 1, True)
             self.add_experiment_variable("ny", 1, True)
             self.add_experiment_variable("nz", 1, True)
+
             self.add_experiment_variable("rs", 3, True)
             self.add_experiment_variable("rp", 2, True)
-            self.add_experiment_variable("ms", 250, True)
-            self.add_experiment_variable("tf", 10000, True)
             self.add_experiment_variable(
                 "zones", "{nx}*{ny}*{nz}*(8**({rs}+{rp}))", False
             )
@@ -215,9 +259,15 @@ class Laghos(
         )
 
         if self.spec.satisfies("+cuda"):
-            self.add_experiment_variable("device", "cuda", True)
+            if self.spec.satisfies("+raja"):
+                self.add_experiment_variable("device", "raja-gpu", True)
+            else:
+                self.add_experiment_variable("device", "cuda", True)
         elif self.spec.satisfies("+rocm"):
-            self.add_experiment_variable("device", "hip", True)
+            if self.spec.satisfies("+raja"):
+                self.add_experiment_variable("device", "raja-gpu", True)
+            else:
+                self.add_experiment_variable("device", "hip", True)
         else:
             self.add_experiment_variable("device", "cpu", True)
 
@@ -230,12 +280,31 @@ class Laghos(
         else:
             self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
+        if self.spec.satisfies("+visualizations"):
+            self.add_experiment_variable("vis", "-vis", True)
+            self.add_experiment_variable("vs", "-visit", True)
+            self.add_experiment_variable(
+                "k", "-k {experiment_run_dir}/VISUALIZATION_OUTPUT/", False
+            )
+        else:
+            self.add_experiment_variable("vis", "-no-vis", True)
+            self.add_experiment_variable("vs", "-no-visit", True)
+            self.add_experiment_variable("k", "", False)
+
+        self.add_experiment_variable("dim", self.spec.variants["dim"][0], True)
+        self.add_experiment_variable("ms", self.spec.variants["ms"][0], True)
+        self.add_experiment_variable("tf", self.spec.variants["tf"][0], True)
+        self.add_experiment_variable("s", self.spec.variants["s"][0], True)
+
     def compute_package_section(self):
         gam = "~gpu-aware-mpi"
+        raja = "~raja"
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             if self.spec.satisfies("+gpu-aware-mpi"):
                 gam = "+gpu-aware-mpi"
+        if self.spec.satisfies("+raja"):
+            raja = "+raja"
         self.add_package_spec(
-            self.name, [f"laghos{self.determine_version()} +metis {gam}"]
+            self.name, [f"laghos{self.determine_version()} +metis {gam} {raja}"]
         )
         self.add_package_spec("hypre", ["hypre@2.32.0: +lapack"])

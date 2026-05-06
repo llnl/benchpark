@@ -31,8 +31,8 @@ class RajaPerf(
 
     variant(
         "version",
-        default="2025.03.0",
-        values=("develop", "latest", "2025.03.0", "2024.07.0"),
+        default="2025.12.1",
+        values=("develop", "latest", "2025.12.1", "2025.03.0", "2024.07.0"),
         description="app version",
     )
 
