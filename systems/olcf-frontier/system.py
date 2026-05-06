@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import os
 
 from packaging.version import Version
 
@@ -178,7 +179,7 @@ class OlcfFrontier(System):
         if mount_point == "none":
             self.full_io_path = None
         elif mount_point == '/lustre/orion':
-            self.full_io_path = mount_point + "/$USER/test.bat"
+            self.full_io_path = f'{mount_point}/{self.spec.variants["bank"][0]}/scratch/{os.environ["USER"]}'
 
     def compute_packages_section(self):
         selections = {
