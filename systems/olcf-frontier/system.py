@@ -77,14 +77,14 @@ class OlcfFrontier(System):
     )
     variant(
         "lapack",
-        default="intel-oneapi-mkl",
-        values=("intel-oneapi-mkl", "cray-libsci"),
+        default="cray-libsci",
+        values=("cray-libsci"),
         description="Which lapack to use",
     )
     variant(
         "blas",
-        default="intel-oneapi-mkl",
-        values=("intel-oneapi-mkl",),
+        default="cray-libsci",
+        values=("cray-libsci",),
         description="Which blas to use",
     )
     variant(
@@ -282,20 +282,6 @@ class OlcfFrontier(System):
                 "hwloc": {
                     "buildable": False,
                     "externals": [{"spec": "hwloc@2.9.1", "prefix": "/usr"}],
-                },
-                "fftw": {"buildable": False},
-                "intel-oneapi-mkl": {
-                    "externals": [
-                        {
-                            "spec": "intel-oneapi-mkl@2023.2.0",
-                            "prefix": "/opt/intel/oneapi",
-                        }
-                    ],
-                    "buildable": False,
-                },
-                "fftw-api": {
-                    "buildable": False,
-                    "require": "intel-oneapi-mkl",
                 },
                 "mpi": {"require": "cray-mpich-gtl"},
                 "libfabric": {
@@ -779,7 +765,6 @@ class OlcfFrontier(System):
                     "blas": {"pkg_spec": f"{self.spec.variants['blas'][0]}"},
                     "blas-rocm": {"pkg_spec": "rocblas"},
                     "lapack": {"pkg_spec": f"{self.spec.variants['lapack'][0]}"},
-                    "lapack-oneapi": {"pkg_spec": "intel-oneapi-mkl"},
                     "lapack-rocm": {"pkg_spec": "rocsolver"},
                 }
             }
