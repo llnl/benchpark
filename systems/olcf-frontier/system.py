@@ -1,0 +1,784 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+
+from packaging.version import Version
+
+from benchpark.directives import maintainers, variant
+from benchpark.openmpsystem import OpenMPCPUOnlySystem
+from benchpark.paths import hardware_descriptions
+from benchpark.rocmsystem import ROCmSystem
+from benchpark.system import (
+    JobQueue,
+    System,
+    compiler_def,
+    compiler_section_for,
+    merge_dicts,
+)
+
+
+class OlcfFrontier(System):
+
+    maintainers("hagertnl")
+
+    id_to_resources = {
+        "frontier": {
+            "cpu_arch": "zen3",
+            "rocm_arch": "gfx90a",
+            "sys_cores_per_node": 56,
+            "sys_cores_os_reserved_per_node": 8,
+            "sys_cores_os_reserved_per_node_list": [0, 8, 16, 24, 32, 40, 48, 56],
+            "sys_gpus_per_node": 8,
+            "sys_mem_per_node_GB": 512,
+            "sys_cpu_mem_per_node_MB": 2048,
+            "sys_gpu_mem_per_node_GB": 512,
+            "sys_gpu_num_L1": 110,
+            "sys_gpu_L1_KB": 16,
+            "sys_gpu_L2_KB": 8192,
+            "sys_cpu_L1_KB": 32,
+            "sys_cpu_L2_KB": 512,  # 512 KB
+            "sys_cpu_L3_MB": 32,  # 32MB
+            "system_site": "olcf",
+            "scheduler": "slurm",
+            "hardware_key": str(hardware_descriptions)
+            + "/HPECray-zen3-MI250X-Slingshot/hardware_description.yaml",
+            "queues": [JobQueue("batch", 720, 24)],
+            "mount_points": ["/lustre/orion"],
+        },
+    }
+
+    variant(
+        "rocm",
+        default="6.4.2",
+        values=(
+            "5.7.1",
+            "6.2.4",
+            "6.3.1",
+            "6.4.2",
+            "7.0.2",
+            "7.1.1",
+            "7.2.0",
+        ),
+        description="ROCm version",
+    )
+    variant(
+        "gtl",
+        default=True,
+        values=(True, False),
+        description="Use GTL-enabled MPI",
+    )
+    variant(
+        "compiler",
+        default="cce",
+        values=("cce", "gcc", "rocmcc"),
+        description="Which compiler to use",
+    )
+    variant(
+        "lapack",
+        default="intel-oneapi-mkl",
+        values=("intel-oneapi-mkl", "cray-libsci"),
+        description="Which lapack to use",
+    )
+    variant(
+        "blas",
+        default="intel-oneapi-mkl",
+        values=("intel-oneapi-mkl",),
+        description="Which blas to use",
+    )
+    variant(
+        "queue",
+        default="batch",
+        values=("batch"),
+        multi=False,
+        description="Submit to queue other than the default queue (e.g. pdebug)",
+    )
+
+    variant(
+        "mount_point",
+        default="none",
+        values=(
+            "none",
+            "/mnt/bb",
+            "/lustre/orion",
+        ),
+        multi=False,
+        description="Which mount point to use for IO benchmarks",
+    )
+
+    def __init__(self, spec):
+        super().__init__(spec)
+        self.programming_models = [ROCmSystem(), OpenMPCPUOnlySystem()]
+        self.rocm_version = Version(self.spec.variants["rocm"][0])
+        self.gtl_flag = self.spec.variants["gtl"][0]
+        self.override_cce_shortpath = None
+
+        # TODO: Replace this with lookups into the working set
+        if self.spec.satisfies("compiler=gcc"):
+            self.gcc_version = Version("14.2.0")
+            self.mpi_version = Version("9.0.1")
+            self.short_gcc_version = (
+                f"{self.gcc_version.major}.{self.gcc_version.minor}"
+            )
+        else:
+            if self.rocm_version >= Version("7.0.0"):
+                raise 
+            elif self.rocm_version >= Version("6.4.0"):
+                self.cce_version = Version("20.0.0")
+                self.mpi_version = Version("9.0.1")
+                self.rccl_version = self.rocm_version
+            elif self.rocm_version >= Version("6.0.0"):
+                self.cce_version = Version("18.0.1")
+                self.mpi_version = Version("8.1.31")
+                self.rccl_version = self.rocm_version
+            else:
+                self.cce_version = Version("16.0.1")
+                self.mpi_version = Version("8.1.27")
+                self.rccl_version = self.rocm_version
+        if self.rocm_version >= Version("7.2.0"):
+            self.pmi_version = Version("6.1.16")
+            self.pals_version = Version("1.2.12")
+            self.llvm_version = Version("22.0.0")
+        elif self.rocm_version >= Version("7.0.0"):
+            self.pmi_version = Version("6.1.16")
+            self.pals_version = Version("1.2.12")
+            self.llvm_version = Version("20.0.0")
+        elif self.rocm_version >= Version("6.4.0"):
+            self.pmi_version = Version("6.1.15.6")
+            self.pals_version = Version("1.2.12")
+            self.llvm_version = Version("19.0.0")
+        elif self.rocm_version >= Version("6.0.0"):
+            self.pmi_version = Version("6.1.15.6")
+            self.pals_version = Version("1.2.12")
+            self.llvm_version = Version("18.0.1")
+        else:
+            self.pmi_version = Version("6.1.12")
+            self.pals_version = Version("1.2.9")
+            self.llvm_version = Version("16.0.0")
+        self.short_cce_version = (
+            f"{self.cce_version.major}.{self.cce_version.minor}"
+            if self.override_cce_shortpath is None
+            else self.override_cce_shortpath
+        )
+        self.short_rocm_version = f"{self.rocm_version.major}.0"
+        # TODO: Replace this with lookups into the working set
+
+        attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
+        for k, v in attrs.items():
+            setattr(self, k, v)
+
+        mount_point = self.spec.variants["mount_point"][0]
+        if mount_point not in self.mount_points + ["none"]:
+            raise KeyError(
+                f'"{mount_point}" is not a valid mount point.'
+            )
+        if mount_point == "none":
+            self.full_io_path = None
+        elif mount_point == '/lustre/orion':
+            self.full_io_path = mount_point + "/$USER/test.bat"
+
+    def compute_packages_section(self):
+        selections = {
+            "packages": {
+                "all": {"require": [{"spec": "target=x86_64:"}]},
+                "tar": {"externals": [{"spec": "tar@1.30", "prefix": "/usr"}]},
+                "coreutils": {
+                    "externals": [{"spec": "coreutils@8.30", "prefix": "/usr"}]
+                },
+                "libtool": {"externals": [{"spec": "libtool@2.4.6", "prefix": "/usr"}]},
+                "flex": {"externals": [{"spec": "flex@2.6.1+lex", "prefix": "/usr"}]},
+                "openssl": {
+                    "externals": [{"spec": "openssl@1.1.1k", "prefix": "/usr"}]
+                },
+                "m4": {"externals": [{"spec": "m4@1.4.18", "prefix": "/usr"}]},
+                "groff": {"externals": [{"spec": "groff@1.22.3", "prefix": "/usr"}]},
+                "cmake": {
+                    "externals": [
+                        {"spec": "cmake@3.20.2", "prefix": "/usr"},
+                        {"spec": "cmake@3.23.1", "prefix": "/usr/tce"},
+                        {"spec": "cmake@3.24.2", "prefix": "/usr/tce"},
+                    ],
+                    "buildable": False,
+                },
+                "elfutils": {
+                    "externals": [{"spec": "elfutils@0.190", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "papi": {
+                    "externals": [{"spec": "papi@5.6.0.0", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "unwind": {
+                    "externals": [{"spec": "unwind@8.0.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "pkgconf": {"externals": [{"spec": "pkgconf@1.4.2", "prefix": "/usr"}]},
+                "curl": {
+                    "externals": [
+                        {"spec": "curl@7.61.1+gssapi+ldap+nghttp2", "prefix": "/usr"}
+                    ]
+                },
+                "gmake": {"externals": [{"spec": "gmake@4.2.1", "prefix": "/usr"}]},
+                "subversion": {
+                    "externals": [{"spec": "subversion@1.10.2", "prefix": "/usr"}]
+                },
+                "diffutils": {
+                    "externals": [{"spec": "diffutils@3.6", "prefix": "/usr"}]
+                },
+                "swig": {"externals": [{"spec": "swig@3.0.12", "prefix": "/usr"}]},
+                "gawk": {"externals": [{"spec": "gawk@4.2.1", "prefix": "/usr"}]},
+                "binutils": {
+                    "externals": [{"spec": "binutils@2.30.113", "prefix": "/usr"}]
+                },
+                "findutils": {
+                    "externals": [{"spec": "findutils@4.6.0", "prefix": "/usr"}]
+                },
+                "git-lfs": {
+                    "externals": [{"spec": "git-lfs@2.11.0", "prefix": "/usr/tce"}]
+                },
+                "ccache": {"externals": [{"spec": "ccache@3.7.7", "prefix": "/usr"}]},
+                "automake": {
+                    "externals": [{"spec": "automake@1.16.1", "prefix": "/usr"}]
+                },
+                "cvs": {"externals": [{"spec": "cvs@1.11.23", "prefix": "/usr"}]},
+                "git": {
+                    "externals": [
+                        {"spec": "git@2.43.7", "prefix": "/usr"},
+                        {"spec": "git@2.31.1+tcltk", "prefix": "/usr"},
+                        {"spec": "git@2.29.1+tcltk", "prefix": "/usr/tce"},
+                    ]
+                },
+                "openssh": {"externals": [{"spec": "openssh@8.0p1", "prefix": "/usr"}]},
+                "autoconf": {
+                    "externals": [{"spec": "autoconf@2.69", "prefix": "/usr"}]
+                },
+                "texinfo": {"externals": [{"spec": "texinfo@6.5", "prefix": "/usr"}]},
+                "bison": {"externals": [{"spec": "bison@3.0.4", "prefix": "/usr"}]},
+                "python": {
+                    "buildable": False,
+                    "externals": [
+                        {
+                            "spec": "python@3.9.12",
+                            "prefix": "/usr/tce/packages/python/python-3.9.12",
+                        },
+                        {
+                            "spec": "python@3.11.5",
+                            "prefix": "/usr/tce/packages/python/python-3.11.5",
+                        },
+                        {
+                            "spec": "python@3.12.2",
+                            "prefix": "/usr/tce/packages/python/python-3.12.2",
+                        },
+                    ],
+                },
+                "unzip": {
+                    "buildable": False,
+                    "externals": [{"spec": "unzip@6.0", "prefix": "/usr"}],
+                },
+                "hypre": {"variants": f"amdgpu_target={self.rocm_arch}"},
+                "hwloc": {
+                    "buildable": False,
+                    "externals": [{"spec": "hwloc@2.9.1", "prefix": "/usr"}],
+                },
+                "fftw": {"buildable": False},
+                "intel-oneapi-mkl": {
+                    "externals": [
+                        {
+                            "spec": "intel-oneapi-mkl@2023.2.0",
+                            "prefix": "/opt/intel/oneapi",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "fftw-api": {
+                    "buildable": False,
+                    "require": "intel-oneapi-mkl",
+                },
+                "mpi": {"require": "cray-mpich-gtl"},
+                "libfabric": {
+                    "externals": [{"spec": "libfabric@2.3.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "ncurses": {
+                    "externals": [{"spec": "ncurses@6.1.20180224", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "libxcrypt": {
+                    "externals": [{"spec": "libxcrypt@4.1.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "opengl": {
+                    "externals": [{"spec": "opengl@4.5", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+            }
+        }
+
+        selections["packages"] |= self.rocm_config()["packages"]
+
+        selections["packages"] |= self.mpi_config()["packages"]
+
+        if self.spec.satisfies("compiler=cce"):
+            selections["packages"] |= {
+                "cray-libsci": {
+                    "externals": [
+                        {
+                            "spec": "cray-libsci@25.09.0%cce",
+                            "prefix": "/opt/cray/pe/libsci/25.09.0/cray/20.0/x86_64/",
+                        }
+                    ]
+                }
+            }
+        elif self.spec.satisfies("compiler=gcc"):
+            selections["packages"] |= {
+                "cray-libsci": {
+                    "externals": [
+                        {
+                            "spec": "cray-libsci@25.09.0%gcc",
+                            "prefix": "/opt/cray/pe/libsci/25.09.0/gnu/12.2/x86_64/",
+                        }
+                    ]
+                }
+            }
+
+        return selections
+
+    def compiler_weighting_cfg(self):
+        compiler = self.spec.variants["compiler"][0]
+
+        if compiler == "cce":
+            prefs = {"one_of": ["%cce", "%gcc"], "when": "%c"}
+            return {"packages": {"all": {"require": [prefs]}}}
+        elif compiler == "gcc":
+            prefs = {"one_of": ["%gcc"], "when": "%c"}
+            return {"packages": {"all": {"require": [prefs]}}}
+        elif compiler == "rocmcc":
+            prefs = {"one_of": ["%rocmcc", "%gcc"], "when": "%c"}
+            return {"packages": {"all": {"require": [prefs]}}}
+        else:
+            raise ValueError(f"Unexpected value for compiler: {compiler}")
+
+    def compute_compilers_section(self):
+        cfg = compiler_section_for(
+            "gcc",
+            [
+                compiler_def(
+                    "gcc@12.2.0 languages=c,c++,fortran",
+                    "/opt/cray/pe/gcc/12.2.0/",
+                    {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                )
+            ],
+        )
+
+        # gcc because we want llvm-amdgpu for hip, even if using gcc for c
+        if (
+            self.spec.satisfies("compiler=gcc")
+            or self.spec.satisfies("compiler=cce")
+            or self.spec.satisfies("compiler=rocmcc")
+        ):
+            cfg = merge_dicts(cfg, self.rocm_cce_compiler_cfg())
+
+        return merge_dicts(cfg, self.compiler_weighting_cfg())
+
+    def mpi_config(self):
+        gtl = self.spec.variants["gtl"][0]
+
+        if self.spec.satisfies("compiler=cce"):
+            dont_use_gtl = {
+                "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
+                "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
+            }
+
+            use_gtl = {
+                "gtl_flags": "$MV2_COMM_WORLD_LOCAL_RANK",
+                "gtl_cutoff_size": "4096",
+                "fi_cxi_ats": "0",
+                "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
+                "gtl_libs": "libmpi_gtl_hsa",
+                "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -lmpi_gtl_hsa",
+            }
+
+            if gtl:
+                gtl_spec = "+gtl"
+                gtl_cfg = use_gtl
+            else:
+                gtl_spec = "~gtl"
+                gtl_cfg = dont_use_gtl
+
+            return {
+                "packages": {
+                    "cray-mpich": {
+                        "externals": [
+                            {
+                                "spec": f"cray-mpich@{self.mpi_version}{gtl_spec}+wrappers %cce@{self.cce_version}",
+                                "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/crayclang/{self.short_cce_version}",
+                                "extra_attributes": gtl_cfg,  # Assuming `gtl_cfg` is already defined elsewhere
+                            }
+                        ]
+                    }
+                }
+            }
+        elif self.spec.satisfies("compiler=rocmcc"):
+            dont_use_gtl = {
+                "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
+                "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/amd/{self.short_rocm_version}/lib -lmpi "
+                f"-L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib "
+                f"-Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
+            }
+
+            use_gtl = {
+                "gtl_cutoff_size": "4096",
+                "fi_cxi_ats": "0",
+                "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
+                "gtl_libs": "libmpi_gtl_hsa",
+                "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/amd/{self.short_rocm_version}/lib -lmpi "
+                f"-L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib "
+                f"-Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -lmpi_gtl_hsa",
+            }
+
+            if gtl:
+                gtl_spec = "+gtl"
+                gtl_cfg = use_gtl
+            else:
+                gtl_spec = "~gtl"
+                gtl_cfg = dont_use_gtl
+
+            return {
+                "packages": {
+                    "cray-mpich": {
+                        "externals": [
+                            {
+                                "spec": f"cray-mpich@{self.mpi_version}{gtl_spec}+wrappers %rocmcc@{self.rocm_version}",
+                                "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/amd/{self.short_rocm_version}",
+                                "extra_attributes": gtl_cfg,
+                            }
+                        ]
+                    }
+                }
+            }
+
+        elif self.spec.satisfies("compiler=gcc"):
+            if gtl:
+                gtl_spec = "+gtl"
+            else:
+                gtl_spec = "~gtl"
+
+            return {
+                "packages": {
+                    "cray-mpich": {
+                        "externals": [
+                            {
+                                "spec": f"cray-mpich@{self.mpi_version}{gtl_spec}+wrappers %gcc@{self.gcc_version}",
+                                "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/{self.short_gcc_version}",
+                                "extra_attributes": {
+                                    "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
+                                    "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/{self.short_gcc_version}/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
+                                    "gtl_libs": "libmpi_gtl_hsa",
+                                },
+                            }
+                        ]
+                    }
+                }
+            }
+
+    def rocm_config(self):
+        return {
+            "packages": {
+                "blas": {"require": [f"{self.spec.variants['blas'][0]}"]},
+                "lapack": {"require": [f"{self.spec.variants['lapack'][0]}"]},
+                "hipfft": {
+                    "externals": [
+                        {
+                            "spec": f"hipfft@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "rocfft": {
+                    "externals": [
+                        {
+                            "spec": f"rocfft@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "rocprim": {
+                    "externals": [
+                        {
+                            "spec": f"rocprim@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "rocrand": {
+                    "externals": [
+                        {
+                            "spec": f"rocrand@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "rocsparse": {
+                    "externals": [
+                        {
+                            "spec": f"rocsparse@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "rocthrust": {
+                    "externals": [
+                        {
+                            "spec": f"rocthrust@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "hip": {
+                    "externals": [
+                        {
+                            "spec": f"hip@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "hsa-rocr-dev": {
+                    "externals": [
+                        {
+                            "spec": f"hsa-rocr-dev@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "rocprofiler-sdk": {
+                    "externals": [
+                        {
+                            "spec": f"rocprofiler-sdk@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "comgr": {
+                    "externals": [
+                        {
+                            "spec": f"comgr@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}/",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "hiprand": {
+                    "externals": [
+                        {
+                            "spec": f"hiprand@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "hipsparse": {
+                    "externals": [
+                        {
+                            "spec": f"hipsparse@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "hipblas": {
+                    "externals": [
+                        {
+                            "spec": f"hipblas@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}/",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "hipsolver": {
+                    "externals": [
+                        {
+                            "spec": f"hipsolver@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}/",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "hsakmt-roct": {
+                    "externals": [
+                        {
+                            "spec": f"hsakmt-roct@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}/",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "roctracer-dev-api": {
+                    "externals": [
+                        {
+                            "spec": f"roctracer-dev-api@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}/",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "rocminfo": {
+                    "externals": [
+                        {
+                            "spec": f"rocminfo@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}/",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "llvm": {
+                    "externals": [
+                        {
+                            "spec": f"llvm@{self.llvm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}/llvm",
+                        },
+                    ],
+                    "buildable": False,
+                },
+                "rocblas": {
+                    "externals": [
+                        {
+                            "spec": f"rocblas@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "rocsolver": {
+                    "externals": [
+                        {
+                            "spec": f"rocsolver@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+                "rccl": {
+                    "externals": [
+                        {
+                            "spec": f"rccl@{self.rocm_version}",
+                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                        }
+                    ],
+                    "buildable": False,
+                },
+            }
+        }
+
+    def rocm_cce_compiler_cfg(self):
+        rpaths = [
+            f"/opt/rocm-{self.rocm_version}/lib",
+            "/opt/cray/pe/gcc-libs",
+            f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib",
+        ]
+
+        cfgs = []
+        # Always need an instance of llvm-gpu as an external. Sometimes as a compiler
+        # and sometimes just for ROCm support
+        rocmcc_entry = compiler_def(
+            f"llvm-amdgpu@{self.rocm_version}",
+            f"/opt/rocm-{self.rocm_version}/",
+            {"c": "amdclang", "cxx": "amdclang++", "fortran": "amdflang"},
+            modules=[f"rocm/{self.rocm_version}"],
+            extra_rpaths=list(rpaths),
+            env={
+                "set": {"RFE_811452_DISABLE": "1"},
+                "append_path": {"LD_LIBRARY_PATH": "/opt/cray/pe/gcc-libs"},
+                "prepend_path": {
+                    "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib",
+                    "LIBRARY_PATH": f"/opt/rocm-{self.rocm_version}/lib",
+                },
+            },
+        )
+        cfgs.append(compiler_section_for("llvm-amdgpu", [rocmcc_entry]))
+        if self.spec.satisfies("compiler=cce"):
+            cce_entry = compiler_def(
+                f"cce@{self.cce_version}-rocm{self.rocm_version}",
+                f"/opt/cray/pe/cce/{self.cce_version}/",
+                {"c": "craycc", "cxx": "crayCC", "fortran": "crayftn"},
+                modules=[f"cce/{self.cce_version}"],
+                extra_rpaths=list(rpaths),
+                env={
+                    "prepend_path": {
+                        "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/rocm-{self.rocm_version}/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib"
+                    }
+                },
+            )
+            cfgs.append(compiler_section_for("cce", [cce_entry]))
+        return merge_dicts(*cfgs)
+
+    def system_specific_variables(self):
+        opts = super().system_specific_variables()
+
+        extra_batch_opts = ""
+        if self.rocm_arch == "gfx942":
+            # MI300A modes
+            if self.spec.satisfies("gpumode=SPX"):
+                gpu_factor = 1
+            elif self.spec.satisfies("gpumode=TPX"):
+                gpu_factor = 3
+            elif self.spec.satisfies("gpumode=CPX"):
+                gpu_factor = 6
+            extra_batch_opts += f"--setattr=gpumode={self.spec.variants['gpumode'][0]}\n--conf=resource.rediscover=true"
+
+            # Rabbits
+            mt_point = self.spec.variants["mount_point"][0]
+            if mt_point != "none" and "rabbits" in mt_point:
+                extra_batch_opts += f"\n-S dw={mt_point.lstrip('rabbits_')}"
+
+            opts.update(
+                {
+                    "gpu_factor": gpu_factor,
+                    "extra_batch_opts": extra_batch_opts,
+                }
+            )
+        return opts
+
+    def compute_software_section(self):
+        """This is somewhat vestigial: for the Tioga config that is committed
+        to the repo, multiple instances of mpi/compilers are stored and
+        and these variables were used to choose consistent dependencies.
+        The configs generated by this class should only ever have one
+        instance of MPI etc., so there is no need for that. The experiments
+        will fail if these variables are not defined though, so for now
+        they are still generated (but with more-generic values).
+        """
+        default_compiler = "gcc"
+        if self.spec.satisfies("compiler=cce"):
+            default_compiler = "cce"
+        elif self.spec.satisfies("compiler=rocmcc"):
+            default_compiler = "llvm-amdgpu"
+
+        return {
+            "software": {
+                "packages": {
+                    "default-compiler": {"pkg_spec": default_compiler},
+                    "default-mpi": {"pkg_spec": "cray-mpich"},
+                    "compiler-rocm": {"pkg_spec": "cce"},
+                    "compiler-amdclang": {"pkg_spec": "clang"},
+                    "compiler-gcc": {"pkg_spec": "gcc"},
+                    "mpi-rocm-gtl": {"pkg_spec": "cray-mpich+gtl"},
+                    "mpi-rocm-no-gtl": {"pkg_spec": "cray-mpich~gtl"},
+                    "mpi-gcc": {"pkg_spec": "cray-mpich+gtl"},
+                    "blas": {"pkg_spec": f"{self.spec.variants['blas'][0]}"},
+                    "blas-rocm": {"pkg_spec": "rocblas"},
+                    "lapack": {"pkg_spec": f"{self.spec.variants['lapack'][0]}"},
+                    "lapack-oneapi": {"pkg_spec": "intel-oneapi-mkl"},
+                    "lapack-rocm": {"pkg_spec": "rocsolver"},
+                }
+            }
+        }
