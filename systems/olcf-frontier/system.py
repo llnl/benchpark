@@ -117,13 +117,15 @@ class OlcfFrontier(System):
         # TODO: Replace this with lookups into the working set
         if self.spec.satisfies("compiler=gcc"):
             self.gcc_version = Version("14.2.0")
-            self.mpi_version = Version("9.0.1")
+            self.mpi_version = Version("9.1.0")
             self.short_gcc_version = (
                 f"{self.gcc_version.major}.{self.gcc_version.minor}"
             )
         else:
             if self.rocm_version >= Version("7.0.0"):
-                raise 
+                self.cce_version = Version("21.0.0")
+                self.mpi_version = Version("9.1.0")
+                self.rccl_version = self.rocm_version
             elif self.rocm_version >= Version("6.4.0"):
                 self.cce_version = Version("20.0.0")
                 self.mpi_version = Version("9.0.1")
