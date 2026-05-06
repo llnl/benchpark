@@ -18,7 +18,17 @@ class RajaPerf(ExecutableApplication):
             'mpi','network-point-to-point','network-latency-bound',
             'c++','raja','sycl','builtin-caliper']
 
-    executable('run', 'raja-perf.exe --size {process_problem_size} -atsc ${CALI_CONFIG_MODE} -atcc ${OTHER_CALI_CONFIG}', use_mpi=True)
+    register_phase(
+        "compute_cali_args", pipeline="setup", run_before=["make_experiments"]
+    )
+
+    def _compute_cali_args(self, workspace, app_inst=None):
+        cali_args = ""
+        if "caliper_metadata" in app_inst.variables:
+            cali_args = "-atsc ${CALI_CONFIG_MODE} -atcc ${OTHER_CALI_CONFIG}"
+        app_inst.variables["custom_cali_args"] = cali_args
+
+    executable('run', 'raja-perf.exe --size {process_problem_size} {custom_cali_args}', use_mpi=True)
 
     workload('suite', executables=['run'])
 

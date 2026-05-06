@@ -27,8 +27,11 @@ Benchpark clones ``ramble``, ``spack``, and ``spack-packages`` into a centralize
 location (by default this is ``~/.benchpark``) to enable building and running
 benchmarks. Benchpark workspaces copy over these repositories from the centralized
 location to avoid downloading from the internet when initializing a Benchpark workspace.
-The bootstrap location can be configured in ``<benchpark_root>/config/bootstrap.yaml``
-or by running ``benchpark configure --bootstrap-location <location>``.
+Keep in mind that the speed of writing a clone of ``ramble``, ``spack``, and
+``spack-packages``, as well as the speed of copying what is needed into workspaces, will
+depend on the speed of the storage you select for the bootstrap location. The bootstrap
+location can be configured in ``<benchpark_root>/config/bootstrap.yaml`` or by running
+``benchpark configure --bootstrap-location <location>``.
 
 ***********************************************
  Configuring Which Repositories Benchpark Uses
@@ -61,7 +64,10 @@ Benchpark can pull configurations from one location, with the following priority
 - As an argument to ``benchpark``: ``benchpark -C <dir>...``
 - If the CWD where you invoke the benchpark executable has ``benchpark-config``
   directory
-- If ``<benchpark_root>/config`` is a directory; this must exist if the first two don't
+- If ``<benchpark_root>/user-config`` is a directory; this will be created on the first
+  run of benchpark.
+- If ``<benchpark_root>/config`` is a directory; this must exist if the first three
+  don't
 
 There is no mixing and matching between these tiers. If you are using ``-C``, then the
 specified directory must contain a ``bootstrap.yaml`` and a ``repos.yaml`` (you can copy
