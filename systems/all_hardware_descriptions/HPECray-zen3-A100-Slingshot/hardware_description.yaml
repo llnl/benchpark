@@ -35,12 +35,6 @@ system_definition:
       runtime: rocm
       mpi: cray-mpich
   top500-system-instances:
-    Frontier:
+    Perlmutter:
       benchpark_system:
-      top500: <https://www.top500.org/system/180047>
-    Lumi:
-      benchpark_system: csc-lumi
-      top500: <https://www.top500.org/system/180048>
-    Tioga:
-      benchpark_system: llnl-elcapitan
-      top500: <https://www.top500.org/system/180052>
+      top500: <https://www.top500.org/system/179972>
