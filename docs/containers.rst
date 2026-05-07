@@ -45,7 +45,7 @@ for macOS:
 ..
     code-block::bash
 
-        security find-certificate -a -p /Library/Keychains/System.keychain | \
+    security find-certificate -a -p /Library/Keychains/System.keychain | \
     podman machine ssh sudo tee /etc/pki/ca-trust/source/anchors/macos-system-certs.pem > /dev/null
 
 and then you will need to restart the machine as above.
@@ -77,7 +77,6 @@ Let's run some simple Benchpark commands to poke around:
     $ benchpark list systems
 
 .. program-output:: ../bin/benchpark list systems
-    :ellipsis: 10
 
 This will show you all the systems available. This particular one is called
 ``fluxtainer``. Let's get some more info on it:
@@ -87,7 +86,6 @@ This will show you all the systems available. This particular one is called
     $ benchpark info system fluxtainer
 
 .. program-output:: ../bin/benchpark info system fluxtainer
-
 
 In the output, we can see that there is a ``variant`` called ``instance_type``. Let's
 keep that in mind as we initialize the system. In my case, the architecture is ``arm``,
@@ -106,7 +104,6 @@ Okay now let's look at some benchmarks:
 
 .. program-output:: ../bin/benchpark list experiments
 
-
 Let's look at the ``osu-micro-benchmarks``:
 
 ::
@@ -114,7 +111,6 @@ Let's look at the ``osu-micro-benchmarks``:
     $ benchpark info experiment osu-micro-benchmarks
 
 .. program-output:: ../bin/benchpark info experiment osu-micro-benchmarks
-
 
 Okay that was a lot to take in. Most of it is ``variants`` yet again. We'll discuss a
 couple in detail: ``affinity`` will run the `affinity
@@ -320,7 +316,7 @@ plays nice with cloud, containers, orchestrators, and more. We're using it here 
 2. It can run under other workload managers such as Slurm, Spectrum LSF, etc., so you
    can run it easily on your own cluster.
 
-       This seems complicated.
+    This seems complicated.
 
 You're right, it is, but portable reproducible benchmarking across many different system
 types has a great deal of inherent complexity. Many have built test harnesses that
