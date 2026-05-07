@@ -299,6 +299,8 @@ plays nice with cloud, containers, orchestrators, and more. We're using it here 
 2. It can run under other workload managers such as Slurm, Spectrum LSF, etc., so you
    can run it easily on your own cluster.
 
+.
+
     This seems complicated.
 
 You're right, it is, but portable reproducible benchmarking across many different system
@@ -322,5 +324,5 @@ with a relatively stable ABI, which is important when building so much from sour
    <https://github.com/llnl/mpibind>`_.
 2. Describe and build on system externals deterministically with Spack.
 
-More on how to do that second part for your own cluster is featured in
-:doc:`Adding a System <add-a-system-config>`
+More on how to do that second part for your own cluster is featured in :doc:`Adding a
+System <add-a-system-config>`
