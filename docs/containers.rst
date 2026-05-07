@@ -125,10 +125,10 @@ caveats:
 **Caveats and known issues**
 
 1. The OSU benchmarks are a work in progress, and we are still working out the details
-on scaling ranks at this stage, so we will stick with 2 ranks on 2 fake nodes. 
+on scaling ranks at this stage, so we will stick with 2 ranks on 2 fake nodes.
 
-2.  Collectives *can* hang in this configuration as this multi-node trick we're playing on
-the Flux broker is really more for testing broker throughput, scheduling algorithms,
+2. Collectives *can* hang in this configuration as this multi-node trick we're playing
+on the Flux broker is really more for testing broker throughput, scheduling algorithms,
 etc., not actual applications. We will demonstrate a more robust single-node
 configuration a bit later.
 
@@ -316,7 +316,7 @@ plays nice with cloud, containers, orchestrators, and more. We're using it here 
 2. It can run under other workload managers such as Slurm, Spectrum LSF, etc., so you
    can run it easily on your own cluster.
 
-    This seems complicated.
+       This seems complicated.
 
 You're right, it is, but portable reproducible benchmarking across many different system
 types has a great deal of inherent complexity. Many have built test harnesses that
