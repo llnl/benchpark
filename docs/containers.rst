@@ -18,7 +18,7 @@ to work through running on a real cluster.
 *************************************************
 
 If you haven't used containers on your local system before, allow us to recommend the
-`Podman Desktop <https://podman-desktop.io/>` container runtime suite. It can be
+`Podman Desktop <https://podman-desktop.io/>`_ container runtime suite. It can be
 installed using the instructions from their official site or with ``brew``. It is free
 and quite robust. The CLI is more or less the same, so if you are following along with
 Docker, the commands here should work equally well, but let us know if that is not the
@@ -29,8 +29,7 @@ case.
 For the purposes of this tutorial, I recommend setting at least 8 cores and about 16 GiB
 of memory as follows:
 
-..
-    code-block::bash
+.. code-block:: bash
 
     podman machine stop
     podman machine set --cpus=8 --memory 15258
@@ -42,8 +41,7 @@ If you are behind a firewall, you may need to tell your VM about the firewall
 self-signed certificate to avoid errors involving pulling containers. Here is an example
 for macOS:
 
-..
-    code-block::bash
+.. code-block:: bash
 
     security find-certificate -a -p /Library/Keychains/System.keychain | \
     podman machine ssh sudo tee /etc/pki/ca-trust/source/anchors/macos-system-certs.pem > /dev/null
@@ -56,8 +54,7 @@ and then you will need to restart the machine as above.
 
 Now, let's pull and run a Benchpark Container:
 
-..
-    code-block::bash
+.. code-block:: bash
 
     podman pull ghcr.io/llnl/benchpark/benchpark-flux-el10
     podman run -it benchpark-flux-el10
@@ -91,8 +88,7 @@ In the output, we can see that there is a ``variant`` called ``instance_type``. 
 keep that in mind as we initialize the system. In my case, the architecture is ``arm``,
 but yours might be ``x86``.
 
-..
-    code-block::bash
+.. code-block:: bash
 
     benchpark system init --dest=my-fluxtainer fluxtainer instance_type=arm
 
@@ -114,7 +110,7 @@ Let's look at the ``osu-micro-benchmarks``:
 
 Okay that was a lot to take in. Most of it is ``variants`` yet again. We'll discuss a
 couple in detail: ``affinity`` will run the `affinity
-<https://github.com/bcumming/affinity>` test to show where different communicating
+<https://github.com/bcumming/affinity>`_ test to show where different communicating
 processes ended up *within* a node, be they MPI ranks or OpenMP threads, on CPU cores or
 GPUs. This can be very helpful for debugging common parallel performance issues.
 
@@ -135,36 +131,31 @@ configuration a bit later.
 Okay now that we have that out of the way, let's initialize, setup, and run an
 experiment:
 
-..
-    code-block::bash
+.. code-block:: bash
 
     benchpark experiment init my-fluxtainer osu-micro-benchmarks workload=osu_allreduce,osu_mbw_mr affinity=on
 
 Now we get a message back telling us what to run next:
 
-..
-    code-block::text
+.. code-block:: text
 
-    Run `benchpark setup my-fluxtainer/osu-micro-benchmarks <experiments_root>` to generate Ramble workspace
+    Run `benchpark setup my-fluxtainer/osu-micro-benchmarks <experiments_root>`_ to generate Ramble workspace
 
 Let's call the ``experiments_root`` ``wkp`` for now...
 
-..
-    code-block::bash
+.. code-block:: bash
 
     benchpark setup my-fluxtainer/osu-micro-benchmarks wkp
 
 If you get the error
 
-..
-    code-block::text
+.. code-block:: text
 
     fatal: hardlink different from source at ...
 
 Run:
 
-..
-    code-block::bash
+.. code-block:: bash
 
     rm -rf ~/.benchpark
     benchpark bootstrap
@@ -172,8 +163,7 @@ Run:
 and reattempt the above ``benchpark setup ...`` command. And yet again, Benchpark tells
 us what to run next:
 
-..
-    code-block::text
+.. code-block:: text
 
     Clearing existing workspace /home/fluxuser/benchpark/wkp/my-fluxtainer/osu-micro-benchmarks
     Setting up configs for Ramble workspace /home/fluxuser/benchpark/wkp/my-fluxtainer/osu-micro-benchmarks/workspace/configs
@@ -188,8 +178,7 @@ us what to run next:
 
 So let's do that:
 
-..
-    code-block::bash
+.. code-block:: bash
 
     . /home/fluxuser/benchpark/wkp/setup.sh
     ramble --workspace-dir /home/fluxuser/benchpark/wkp/my-fluxtainer/osu-micro-benchmarks/workspace workspace setup
@@ -197,8 +186,8 @@ So let's do that:
 
 And Ramble tells us it built the software:
 
-..
-    code-block::text
+.. code-block:: text
+
     ==> Streaming details to log:
     ==>   /home/fluxuser/benchpark/wkp/my-fluxtainer/osu-micro-benchmarks/workspace/logs/setup.2026-05-06_23.38.34.out
     ==>   Setting up 2 out of 2 experiments:
@@ -215,8 +204,7 @@ And Ramble tells us it built the software:
 
 And Ramble and Flux tell us they ran the jobs:
 
-..
-    code-block::text
+.. code-block:: text
 
     ==> Streaming details to log:
     ==>   /home/fluxuser/benchpark/wkp/my-fluxtainer/osu-micro-benchmarks/workspace/logs/execute.2026-05-06_23.43.29.out
@@ -240,15 +228,13 @@ Finally, Ramble executed the benchmarks using the Flux scheduler.
 
 Now let's analyze the results:
 
-..
-    code-block::bash
+.. code-block:: bash
 
     ramble --workspace-dir /home/fluxuser/benchpark/wkp/my-fluxtainer/osu-micro-benchmarks/workspace workspace analyze -f json
 
 And Ramble tells us it performed the analysis:
 
-..
-    code-block::text
+.. code-block:: text
 
     ==> Streaming details to log:
     ==>   /home/fluxuser/benchpark/wkp/my-fluxtainer/osu-micro-benchmarks/workspace/logs/analyze.2026-05-06_23.46.25.out
@@ -272,8 +258,7 @@ And Ramble tells us it performed the analysis:
 
 So let's look at one:
 
-..
-    code-block::bash
+.. code-block:: bash
 
     cat /home/fluxuser/benchpark/wkp/my-fluxtainer/osu-micro-benchmarks/workspace/results/results.latest.json | jq
 
@@ -283,15 +268,13 @@ our benchmarks, most importantly, the performance data.
 Hey remember we set ``affinity=on``? Where did that end up? Let's poke around this
 workspace and see:
 
-..
-    code-block::bash
+.. code-block:: bash
 
     cat /home/fluxuser/benchpark/wkp/my-fluxtainer/osu-micro-benchmarks/workspace/experiments/osu_micro_benchmarks/osu_allreduce/osu_micro_benchmarks_osu_allreduce_test_mpi_2_2/affinity.mpi.out
 
 Shows:
 
-..
-    code-block::text
+.. code-block:: text
 
     affinity test for 2 MPI ranks
     rank   0 @ d26f4eea6a52: thread 0 -> core   0
@@ -306,9 +289,9 @@ but this will certainly come in handy for more complex cases...
 
     What is Flux and why are you using it here?
 
-The `Flux Framework <https://flux-framework.readthedocs.io/en/latest/>` is the *only*
+The `Flux Framework <https://flux-framework.readthedocs.io/en/latest/>`_ is the *only*
 workload manager on the `El Capitan
-<https://hpc.llnl.gov/hardware/compute-platforms/el-capitan>` supercomputer. It is a
+<https://hpc.llnl.gov/hardware/compute-platforms/el-capitan>`_ supercomputer. It is a
 hierarchical, highly-portable, security-aware workload manager and job scheduler that
 plays nice with cloud, containers, orchestrators, and more. We're using it here because:
 
@@ -316,13 +299,13 @@ plays nice with cloud, containers, orchestrators, and more. We're using it here 
 2. It can run under other workload managers such as Slurm, Spectrum LSF, etc., so you
    can run it easily on your own cluster.
 
-       This seems complicated.
+    This seems complicated.
 
 You're right, it is, but portable reproducible benchmarking across many different system
 types has a great deal of inherent complexity. Many have built test harnesses that
 either compromise on one of those features or slowly grows more complex with time in an
 unsustainable manner. Benchpark and Ramble take the complexity bull by the horns and use
-much of `Spack <https://spack.io>`'s design philosophy to pay the cost up-front. The
+much of `Spack <https://spack.io>`_'s design philosophy to pay the cost up-front. The
 learning curve is admittedly somewhat steep, but the payoff is (hopefully) portability
 and reproducibility with a relatively stable set of interfaces.
 
@@ -330,14 +313,14 @@ and reproducibility with a relatively stable set of interfaces.
     cluster?
 
 The containerfile for this particular container is `here
-<https://github.com/llnl/benchpark/blob/b872919ccdc5b0171f999eed545162ae55cc2b11/containerfiles/flux/el10/Dockerfile>`.
+<https://github.com/llnl/benchpark/blob/b872919ccdc5b0171f999eed545162ae55cc2b11/containerfiles/flux/el10/Dockerfile>`_.
 We based it on the Flux containers and picked EL10 because that's a common OS for HPC
 with a relatively stable ABI, which is important when building so much from source. The
 2 key tricks it demonstrates for HPC/AI practitioners are:
 
 1. Manage affinity portably with a tool like `mpibind
-   <https://github.com/llnl/mpibind>`.
+   <https://github.com/llnl/mpibind>`_.
 2. Describe and build on system externals deterministically with Spack.
 
-More on how to do that second part for your own cluster is featured in :doc:`Adding a
-System <.add-a-system-config>`.
+More on how to do that second part for your own cluster is featured in
+:doc:`Adding a System <add-a-system-config>`
