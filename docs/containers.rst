@@ -72,45 +72,22 @@ is also installed and available.
 
 Let's run some simple Benchpark commands to poke around:
 
-..
-    code-block::bash
+::
 
-    benchpark list systems
+    $ benchpark list systems
+
+.. program-output:: ../bin/benchpark list systems
+    :ellipsis: 10
 
 This will show you all the systems available. This particular one is called
 ``fluxtainer``. Let's get some more info on it:
 
-..
-    code-block::bash
+::
 
-    benchpark info system fluxtainer
+    $ benchpark info system fluxtainer
 
-..
-    code-block::text
+.. program-output:: ../bin/benchpark info system fluxtainer
 
-    Hardware:
-            arm:
-                    cpu_arch: arm64
-            x86:
-                    cpu_arch: x86_64_v3
-    Maintainers:
-            nhanford
-    Variants:
-            name: timeout
-            default: 120
-            description: Set job timeout limit (in minutes). Has to be under the limit for selected 'queue'.
-            values: None
-            validator: <function variant.<locals>._always_true at 0xffff8a851260>
-            multi: False
-            sticky: False
-
-            name: instance_type
-            default: x86
-            description: Target Architecture
-            values: ('arm', 'x86')
-            validator: <function Variant.__init__.<locals>.<lambda> at 0xffff8a2faac0>
-            multi: False
-            sticky: False
 
 In the output, we can see that there is a ``variant`` called ``instance_type``. Let's
 keep that in mind as we initialize the system. In my case, the architecture is ``arm``,
@@ -123,163 +100,21 @@ but yours might be ``x86``.
 
 Okay now let's look at some benchmarks:
 
-..
-    code-block::bash
+::
 
-    benchpark list experiments
+    $ benchpark list experiments
 
-..
-    code-block::text
+.. program-output:: ../bin/benchpark list experiments
 
-    Experiments - BENCHMARK+PROGRAMMING_MODEL+SCALING
-            ad+[mpi]
-            amg2023+[openmp|cuda|rocm|mpi]+[strong|weak|throughput]
-            babelstream+[openmp|cuda|rocm]
-            branson+[openmp|cuda|rocm|mpi]+[strong|weak|throughput]
-            commbench+[cuda|rocm]
-            genesis+[openmp|mpi]
-            gpcnet+[mpi]
-            gromacs+[openmp|cuda|rocm|mpi]
-            hpcg+[openmp|mpi]+[strong|weak]
-            hpl+[openmp|mpi]+[strong|weak]
-            ior+[mpi]+[strong|weak]
-            kripke+[openmp|cuda|rocm|mpi]+[strong|weak|throughput]
-            laghos+[cuda|rocm|mpi]+[strong|weak|throughput]
-            lammps+[openmp|cuda|rocm|mpi]+[strong]
-            md-test+[mpi]+[strong]
-            osu-micro-benchmarks+[cuda|rocm|mpi]
-            phloem+[mpi]
-            py-scaffold+[cuda|rocm]+[strong|weak]
-            quicksilver+[openmp|mpi]+[strong|weak]
-            qws+[openmp|mpi]+[strong|weak|throughput]
-            raja-perf+[openmp|cuda|rocm|mpi]+[strong|weak|throughput]
-            remhos+[cuda|rocm|mpi]+[strong|weak|throughput]
-            salmon-tddft+[openmp|mpi]
-            smb+[mpi]
-            sparta-snl+[openmp|cuda|rocm|mpi]
-            stream+[mpi]
-            test
 
 Let's look at the ``osu-micro-benchmarks``:
 
-..
-    code-block::bash
+::
 
-    benchpark info experiment osu-micro-benchmarks
+    $ benchpark info experiment osu-micro-benchmarks
 
-..
-    code-block::text
+.. program-output:: ../bin/benchpark info experiment osu-micro-benchmarks
 
-    Maintainers:
-            nhanford
-    Ramble Name:
-            osu_micro_benchmarks
-    Spack Name:
-            osu_micro_benchmarks
-    Variants:
-            name: exec_mode
-            default: test
-            description: Execution mode
-            values: ('test', 'perf')
-            validator: <function Variant.__init__.<locals>.<lambda> at 0xffff9f85f6a0>
-            multi: False
-            sticky: False
-
-            name: affinity
-            default: none
-            description: Build and run the affinity package
-            values: ('none', 'on')
-            validator: <function Variant.__init__.<locals>.<lambda> at 0xffff9f85f740>
-            multi: False
-            sticky: False
-
-            name: hwloc
-            default: none
-            description: Get underlying infrastructure topology
-            values: ('none', 'on')
-            validator: <function Variant.__init__.<locals>.<lambda> at 0xffff9f85f7e0>
-            multi: False
-            sticky: False
-
-            name: package_manager
-            default: spack
-            description: package manager to use
-            values: ('spack', 'environment-modules', 'user-managed', 'pip', 'spack-pip')
-            validator: <function Variant.__init__.<locals>.<lambda> at 0xffff9f85f880>
-            multi: False
-            sticky: False
-
-            name: append_path
-            default:
-            description: Append to environment PATH during experiment execution
-            values: None
-            validator: <function variant.<locals>._always_true at 0xffff9f85c9a0>
-            multi: False
-            sticky: False
-
-            name: prepend_path
-            default:
-            description: Prepend to environment PATH during experiment execution
-            values: None
-            validator: <function variant.<locals>._always_true at 0xffff9f85cb80>
-            multi: False
-            sticky: False
-
-            name: n_repeats
-            default: 0
-            description: Number of experiment repetitions
-            values: None
-            validator: <function variant.<locals>._always_true at 0xffff9f85cd60>
-            multi: False
-            sticky: False
-
-            name: allocation
-            default: standard
-            description: Allocation modifier mode
-            values: ('standard', 'torchrun-hpc')
-            validator: <function Variant.__init__.<locals>.<lambda> at 0xffff9f85f920>
-            multi: False
-            sticky: False
-
-            name: mpi
-            default: True
-            description: Run with MPI
-            values: (True, False)
-            validator: <function Variant.__init__.<locals>.<lambda> at 0xffff9f85fa60>
-            multi: False
-            sticky: False
-
-            name: rocm
-            default: False
-            description: Build and run with ROCm
-            values: (True, False)
-            validator: <function Variant.__init__.<locals>.<lambda> at 0xffff9f85fce0>
-            multi: False
-            sticky: False
-
-            name: cuda
-            default: False
-            description: Build and run with CUDA
-            values: (True, False)
-            validator: <function Variant.__init__.<locals>.<lambda> at 0xffff9f85fc40>
-            multi: False
-            sticky: False
-
-            name: workload
-            default: osu_latency
-            description: workloads available
-            values: ('osu_bibw', 'osu_bw', 'osu_latency', 'osu_latency_mp', 'osu_latency_mt', 'osu_mbw_mr', 'osu_multi_lat', 'osu_allgather', 'osu_allreduce_persistent', 'osu_alltoallw', 'osu_bcast_persistent', 'osu_iallgather', 'osu_ialltoallw', 'osu_ineighbor_allgather', 'osu_ireduce', 'osu_neighbor_allgatherv', 'osu_reduce_persistent', 'osu_scatterv', 'osu_allgather_persistent', 'osu_alltoall', 'osu_alltoallw_persistent', 'osu_gather', 'osu_iallgatherv', 'osu_ibarrier', 'osu_ineighbor_allgatherv', 'osu_ireduce_scatter', 'osu_neighbor_alltoall', 'osu_reduce_scatter', 'osu_scatterv_persistent', 'osu_allgatherv', 'osu_alltoall_persistent', 'osu_barrier', 'osu_gather_persistent', 'osu_iallreduce', 'osu_ibcast', 'osu_ineighbor_alltoall', 'osu_iscatter', 'osu_neighbor_alltoallv', 'osu_reduce_scatter_persistent', 'osu_allgatherv_persistent', 'osu_alltoallv', 'osu_barrier_persistent', 'osu_gatherv', 'osu_ialltoall', 'osu_igather', 'osu_ineighbor_alltoallv', 'osu_iscatterv', 'osu_neighbor_alltoallw', 'osu_scatter', 'osu_allreduce', 'osu_alltoallv_persistent', 'osu_bcast', 'osu_gatherv_persistent', 'osu_ialltoallv', 'osu_igatherv', 'osu_ineighbor_alltoallw', 'osu_neighbor_allgather', 'osu_reduce', 'osu_scatter_persistent', 'osu_acc_latency', 'osu_cas_latency', 'osu_fop_latency', 'osu_get_acc_latency', 'osu_get_bw', 'osu_get_latency', 'osu_put_bibw', 'osu_put_bw', 'osu_put_latency', 'osu_hello', 'osu_init')
-            validator: <function Variant.__init__.<locals>.<lambda> at 0xffff9f85fe20>
-            multi: True
-            sticky: False
-
-            name: version
-            default: 7.5
-            description: app version
-            values: ('latest', '7.5')
-            validator: <function Variant.__init__.<locals>.<lambda> at 0xffff9f85ff60>
-            multi: False
-            sticky: False
 
 Okay that was a lot to take in. Most of it is ``variants`` yet again. We'll discuss a
 couple in detail: ``affinity`` will run the `affinity
@@ -294,8 +129,9 @@ caveats:
 **Caveats and known issues**
 
 1. The OSU benchmarks are a work in progress, and we are still working out the details
-on scaling ranks at this stage, so we will stick with 2 ranks on 2 fake nodes. 2.
-Collectives *can* hang in this configuration as this multi-node trick we're playing on
+on scaling ranks at this stage, so we will stick with 2 ranks on 2 fake nodes. 
+
+2.  Collectives *can* hang in this configuration as this multi-node trick we're playing on
 the Flux broker is really more for testing broker throughput, scheduling algorithms,
 etc., not actual applications. We will demonstrate a more robust single-node
 configuration a bit later.
