@@ -30,6 +30,7 @@
     tutorial-101
     tutorial-llnl
     comparing-experiment-builds
+    containers
 
 .. toctree::
     :maxdepth: 1
