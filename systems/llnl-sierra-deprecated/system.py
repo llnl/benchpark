@@ -20,7 +20,7 @@ from benchpark.system import (
 )
 
 
-class LlnlSierra(System):
+class LlnlSierraDeprecated(System):
 
     maintainers("pearce8", "nhanford", "rfhaque")
 
