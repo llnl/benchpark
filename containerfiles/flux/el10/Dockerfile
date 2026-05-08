@@ -6,6 +6,7 @@ RUN dnf clean all \
 	&& rm -rf /var/cache/dnf \
 	&& git config --global checkout.workers 1024 \
 	&& git config --global feature.manyFiles true \
+    && git config --global core.sharedRepository false \
 	&& echo "* soft memlock unlimited" >> /etc/security/limits.conf \
     && echo "* hard memlock unlimited" >> /etc/security/limits.conf
 
