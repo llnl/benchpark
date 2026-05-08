@@ -107,7 +107,7 @@ class OsuMicroBenchmarks(
 
     def compute_applications_section(self):
 
-        num_nodes = {"n_nodes": 2, "n_ranks": 1}
+        num_nodes = {"n_nodes": 2, "n_ranks": 2}
 
         if self.spec.satisfies("exec_mode=test"):
             for pk, pv in num_nodes.items():
@@ -119,7 +119,7 @@ class OsuMicroBenchmarks(
             self.add_experiment_variable("additional_args", " -d cuda", False)
         if self.spec.satisfies("+rocm") or self.spec.satisfies("+cuda"):
             resource = "n_gpus"
-            self.add_experiment_variable("n_gpus", 1, True)
+            self.add_experiment_variable("n_gpus", 2, True)
         else:
             resource = "n_nodes"
 
