@@ -7,53 +7,105 @@
 
 import argparse
 import inspect
+import os
+import pathlib
 import shlex
 import subprocess
 import sys
+
 import yaml
 
+# Process --version/--help early and exit before doing any further imports
+# (which can result in expensive cloning operations).
 __version__ = "0.1.0"
 if "-V" in sys.argv or "--version" in sys.argv:
     print(__version__)
     exit()
-helpstr = """usage: main.py [-h] [-V] {tags,system,experiment,setup,unit-test,audit,info,list} ...
+helpstr = """usage: main.py [-h] [-V] {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze,aggregate,configure} ...
 
 Benchpark
-
 options:
   -h, --help            show this help message and exit
   -V, --version         show version number and exit
-
 Subcommands:
-  {tags,system,experiment,setup,unit-test,audit,info,list}
+  {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze,aggregate,configure}
     tags                Tags in Benchpark experiments
     system              Initialize a system config
     experiment          Interact with experiments
     setup               Set up an experiment and prepare it to build/run
     unit-test           Run benchpark unit tests
     audit               Look for problems in System/Experiment repos
+    mirror              Copy a benchpark workspace
     info                Get information about Systems and Experiments
+    show-build          Show how spack built a benchmark
     list                List experiments, systems, benchmarks, and modifiers
-    analyze             Perform canned analysis on the performance data (caliper files) after 'ramble on'"""
-if "-h" == sys.argv[1] or "--help" == sys.argv[1]:
+    bootstrap           Bootstrap benchpark or update an existing bootstrap
+    analyze             Perform pre-defined analysis on the performance data (caliper files) after 'ramble on'
+    redo                Re-instantiate system and all associated experiments
+    aggregate           Aggregate multiple experiments (even across workspaces) into the same submission script
+    configure           Configure options relating to the Benchpark environment
+    """
+if len(sys.argv) == 1 or "-h" == sys.argv[1] or "--help" == sys.argv[1]:
     print(helpstr)
     exit()
 
-import benchpark.paths  # noqa: E402
+from benchpark.base_paths import base_paths  # noqa: E402
+
+# Set paths here that are important for configuration: after this block
+# commands that use config can be imported and run
+_found_cfg = False
+for i, arg in enumerate(sys.argv):
+    if arg.startswith("-C") or arg.startswith("--config"):
+        _found_cfg = True
+        if "=" in arg:
+            val = arg.split("=")[1]
+        else:
+            val = sys.argv[i + 1]
+        base_paths.user_input_cfg = pathlib.Path(val)
+if not _found_cfg:
+    base_paths.user_input_cfg = None
+
+base_paths.invocation_working_dir = pathlib.Path(os.getcwd()).absolute().resolve()
+
+# Later imports initiate bootstrapping, and the configure command may want
+# to configure this behavior, so we handle it before doing remaining imports
+if "configure" in sys.argv:
+    import benchpark.cmd.configure  # noqa: E402
+
+    parser = argparse.ArgumentParser(description="Benchpark")
+    parser.add_argument(
+        "-C",
+        "--config",
+        help="Use config related to system/experiment/workspace generation."
+        " Default is <benchpark_root>/config/",
+    )
+    subparsers = parser.add_subparsers(title="Subcommands", dest="subcommand")
+    configure_parser = subparsers.add_parser(
+        "configure", help="Configure options relating to the Benchpark environment"
+    )
+    benchpark.cmd.configure.setup_parser(configure_parser)
+    args = parser.parse_args()
+    benchpark.cmd.configure.command(args)
+    sys.exit(0)
+
+from benchpark.paths import paths  # noqa: E402
 from benchpark.runtime import RuntimeResources  # noqa: E402
 
-bootstrapper = RuntimeResources(benchpark.paths.benchpark_home)  # noqa
+bootstrapper = RuntimeResources(paths.benchpark_home)  # noqa
 bootstrapper.bootstrap()  # noqa
 
+import benchpark.cmd.aggregate  # noqa: E402
 import benchpark.cmd.audit  # noqa: E402
-import benchpark.cmd.system  # noqa: E402
+import benchpark.cmd.bootstrap  # noqa: E402
 import benchpark.cmd.experiment  # noqa: E402
-import benchpark.cmd.setup  # noqa: E402
-import benchpark.cmd.show_build  # noqa: E402
-import benchpark.cmd.unit_test  # noqa: E402
-import benchpark.cmd.mirror  # noqa: E402
 import benchpark.cmd.info  # noqa: E402
 import benchpark.cmd.list  # noqa: E402
+import benchpark.cmd.mirror  # noqa: E402
+import benchpark.cmd.redo  # noqa: E402
+import benchpark.cmd.setup  # noqa: E402
+import benchpark.cmd.show_build  # noqa: E402
+import benchpark.cmd.system  # noqa: E402
+import benchpark.cmd.unit_test  # noqa: E402
 from benchpark.accounting import benchpark_benchmarks  # noqa: E402
 
 try:
@@ -71,6 +123,14 @@ def main():
     parser = argparse.ArgumentParser(description="Benchpark")
     parser.add_argument(
         "-V", "--version", action="store_true", help="show version number and exit"
+    )
+    # -C is actually processed above here, in the imports, but must
+    # be registered here because otherwise argparse will think there
+    # is an invalid option.
+    parser.add_argument(
+        "-C",
+        "--config",
+        help="use config related to system/experiment/workspace generation",
     )
 
     subparsers = parser.add_subparsers(title="Subcommands", dest="subcommand")
@@ -120,7 +180,7 @@ def supports_unknown_args(command):
 
 
 def benchpark_get_tags():
-    f = benchpark.paths.benchpark_root / "taxonomy.yaml"
+    f = paths.benchpark_root / "taxonomy.yaml"
     tags = []
 
     with open(f, "r") as stream:
@@ -210,10 +270,26 @@ def init_commands(subparsers, actions_dict):
     )
     benchpark.cmd.list.setup_parser(list_parser)
 
+    bootstrap_parser = subparsers.add_parser(
+        "bootstrap", help="Bootstrap benchpark or update an existing bootstrap"
+    )
+    benchpark.cmd.bootstrap.setup_parser(bootstrap_parser)
+
     analyze_parser = subparsers.add_parser(
         "analyze",
-        help="Perform canned analysis on the performance data (caliper files) after 'ramble on'",
+        help="Perform pre-defined analysis on the performance data (caliper files) after 'ramble on'",
     )
+
+    aggregate_parser = subparsers.add_parser(
+        "aggregate",
+        help="Aggregate multiple experiments (even across workspaces) into the same submission script",
+    )
+    benchpark.cmd.aggregate.setup_parser(aggregate_parser)
+
+    redo_parser = subparsers.add_parser(
+        "redo", help="Re-instantiate all experiments in a system"
+    )
+    benchpark.cmd.redo.setup_parser(redo_parser)
 
     actions_dict["system"] = benchpark.cmd.system.command
     actions_dict["experiment"] = benchpark.cmd.experiment.command
@@ -224,6 +300,9 @@ def init_commands(subparsers, actions_dict):
     actions_dict["info"] = benchpark.cmd.info.command
     actions_dict["show-build"] = benchpark.cmd.show_build.command
     actions_dict["list"] = benchpark.cmd.list.command
+    actions_dict["bootstrap"] = benchpark.cmd.bootstrap.command
+    actions_dict["aggregate"] = benchpark.cmd.aggregate.command
+    actions_dict["redo"] = benchpark.cmd.redo.command
     if analyze_installed:
         benchpark.cmd.analyze.setup_parser(analyze_parser)
         actions_dict["analyze"] = benchpark.cmd.analyze.command
@@ -273,7 +352,7 @@ def benchpark_tags(subparsers, actions_dict):
 
 def helper_experiments_tags(ramble_exe, benchmarks):
     # find all tags in Ramble applications (both in Ramble built-in and in Benchpark/repo)
-    (tags_stdout, tags_stderr) = run_command(f"{ramble_exe} attributes --tags --all")
+    tags_stdout, tags_stderr = run_command(f"{ramble_exe} attributes --tags --all")
     ramble_applications_tags = {}
     lines = tags_stdout.splitlines()
 
@@ -293,15 +372,23 @@ def benchpark_tags_handler(args):
     """
     Filter ramble tags by benchpark benchmarks
     """
-    source_dir = benchpark.paths.benchpark_root
-    ramble_exe = benchpark.paths.benchpark_home / "ramble/bin/ramble"
-    subprocess.run([ramble_exe, "repo", "add", "--scope=site", f"{source_dir}/repo"])
+    source_dir = paths.benchpark_root
+    ramble_exe = paths.benchpark_home / "ramble/bin/ramble"
+    subprocess.run(
+        [
+            ramble_exe,
+            "repo",
+            "add",
+            "--scope=site",
+            f"{source_dir}/repos/ramble_applications",
+        ]
+    )
     benchmarks = benchpark_benchmarks()
 
     if args.tag:
         if benchpark_check_tag(args.tag):
             # find all applications in Ramble that have a given tag (both in Ramble built-in and in Benchpark/repo)
-            (tag_stdout, tag_stderr) = run_command(f"{ramble_exe} list -t {args.tag}")
+            tag_stdout, tag_stderr = run_command(f"{ramble_exe} list -t {args.tag}")
             lines = tag_stdout.splitlines()
 
             for line in lines:

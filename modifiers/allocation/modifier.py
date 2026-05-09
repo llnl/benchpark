@@ -5,6 +5,7 @@
 
 import math
 from enum import Enum
+
 from ramble.modkit import *
 
 
@@ -22,13 +23,15 @@ class AllocOpt(Enum):
     # Descriptions of resources available on systems
     SYS_GPUS_PER_NODE = 100
     SYS_CORES_PER_NODE = 101
-    SYS_MEM_PER_NODE = 102
+    SYS_MEM_PER_NODE_GB = 102
 
     # Scheduler identification and other high-level instructions
     SCHEDULER = 200
     TIMEOUT = 201  # This is assumed to be in minutes
     MAX_REQUEST = 202
     QUEUE = 203
+    BANK = 204
+    MAX_NODES = 205
 
     # Exec customization for inserting arbitrary options and commands,
     # inserted verbatim
@@ -47,6 +50,7 @@ class AllocOpt(Enum):
             AllocOpt.EXTRA_CMD_OPTS,
             AllocOpt.POST_EXEC_CMDS,
             AllocOpt.PRE_EXEC_CMDS,
+            AllocOpt.BANK,
         ]:
             return str(input)
         else:
@@ -63,6 +67,7 @@ class AllocAlias:
 
 
 SENTINEL_UNDEFINED_VALUE_STR = "placeholder"
+SENTINEL_UNDEFINED_VALUE_INT = 2**64 - 1
 
 
 class AttrDict(dict):
@@ -101,11 +106,8 @@ class AttrDict(dict):
     def _nullify_placeholders(v):
         # If we see a string variable set to "placeholder" we assume the
         # user wants us to set it.
-        # For integers, values exceeding max_request are presumed to be
-        # placeholders.
-        max_request_int = v.max_request or 1000
         placeholder_checks = {
-            int: lambda x: x > max_request_int,
+            int: lambda x: x == SENTINEL_UNDEFINED_VALUE_INT,
             str: lambda x: x == SENTINEL_UNDEFINED_VALUE_STR,
         }
         for var, val in v.defined():
@@ -225,10 +227,11 @@ class Allocation(BasicModifier):
 
     tags("infrastructure")
 
-    # Currently there is only one mode. The only behavior supported right
-    # now is to attempt to request "enough" resources for a given
-    # request (e.g. to make sure we request enough nodes, assuming we
-    # know how many CPUs we want)"
+    mode(
+        name="torchrun-hpc",
+        description="Use torchrun-hpc as launcher instead of default scheduler launcher.",
+    )
+
     mode("standard", description="Standard execution mode for allocation")
     default_mode("standard")
 
@@ -290,12 +293,15 @@ class Allocation(BasicModifier):
                         "Experiment requests GPUs, but sys_gpus_per_node "
                         "is not specified for the system"
                     )
+
             v.n_nodes = max(cores_node_request or 0, gpus_node_request or 0)
+
+        if not v.n_ranks_per_node:
+            v.n_ranks_per_node = v.n_ranks // v.n_nodes
 
         if not v.n_threads_per_proc:
             v.n_threads_per_proc = 1
 
-        max_request = v.max_request or 1000
         # Final check, make sure the above arithmetic didn't result in an
         # unreasonable allocation request.
         for var, val in v.defined():
@@ -303,25 +309,46 @@ class Allocation(BasicModifier):
                 int(val)
             except (ValueError, TypeError):
                 continue
-            if val > max_request:
-                raise ValueError(f"Request exceeds maximum: {var}/{val}/{max_request}")
+
+        if v.max_nodes and v.n_nodes > v.max_nodes:
+            raise ValueError(
+                f"{v.n_nodes} nodes is unsatisfiable for queue '{v.queue}' (max {v.max_nodes})."
+            )
 
     def slurm_instructions(self, v):
         sbatch_opts, srun_opts = Allocation._init_batch_and_cmd_opts(v)
 
+        launch_cmd = "srun" if self._usage_mode == "standard" else self._usage_mode
+
         if v.n_ranks:
-            srun_opts.append(f"-n {v.n_ranks}")
+            if self._usage_mode == "torchrun-hpc":
+                srun_opts.append(f"-n {v.n_ranks_per_node}")
+            else:
+                srun_opts.append(f"-n {v.n_ranks}")
+            sbatch_opts.append(f"-n {v.n_ranks}")
         if v.n_gpus:
-            srun_opts.append(f"--gpus {v.n_gpus}")
+            if self._usage_mode == "torchrun-hpc":
+                srun_opts.append("--gpus-per-proc=1")
+            else:
+                srun_opts.append(f"--gpus {v.n_gpus}")
+            sbatch_opts.append(f"--gpus {v.n_gpus}")
         if v.n_nodes:
             srun_opts.append(f"-N {v.n_nodes}")
+
+        if v.queue:
+            sbatch_opts.append(f"-p {v.queue}")
 
         if v.timeout:
             sbatch_opts.append(f"--time {v.timeout}")
 
-        sbatch_directives = list(f"#SBATCH {x}" for x in (srun_opts + sbatch_opts))
+        if v.bank:
+            sbatch_opts.append(f"--account {v.bank}")
 
-        v.mpi_command = f"srun {' '.join(srun_opts)}"
+        sbatch_opts.append("--exclusive")
+
+        sbatch_directives = list(f"#SBATCH {x}" for x in (sbatch_opts))
+
+        v.mpi_command = f"{launch_cmd} {' '.join(srun_opts)}"
         v.single_rank_mpi_command = f"srun -n 1 -N 1 {'--gpus 1' if v.n_gpus else ''}"
         v.batch_submit = "sbatch {execute_experiment}"
         v.allocation_directives = "\n".join(sbatch_directives)
@@ -373,24 +400,42 @@ class Allocation(BasicModifier):
     def flux_instructions(self, v):
         batch_opts, cmd_opts = Allocation._init_batch_and_cmd_opts(v)
 
+        launch_cmd = "flux run" if self._usage_mode == "standard" else self._usage_mode
+
         # Always run exclusive for mpibind + flux.
         # Otherwise, binding may oversubscribe cores before all cores are allocated.
         cmd_opts.append("--exclusive")
+        batch_opts.append("--exclusive")
         # Required for '--exclusive'. Will be computed, if not defined, from initialization
         cmd_opts.append(f"-N {v.n_nodes}")
+        batch_opts.append(f"-N {v.n_nodes}")
 
+        cmd_ranks = ""
         if v.n_ranks:
-            cmd_ranks = f"-n {v.n_ranks}"
+            if self._usage_mode == "torchrun-hpc":
+                cmd_ranks = f"-n {v.n_ranks_per_node}"
+            else:
+                cmd_ranks = f"-n {v.n_ranks}"
         if v.n_gpus:
             gpus_per_rank = 1  # self.gpus_as_gpus_per_rank(v)
-            cmd_opts.append(f"-g={gpus_per_rank}")
+            if self._usage_mode == "torchrun-hpc":
+                cmd_opts.append(f"--gpus-per-proc={gpus_per_rank}")
+            else:
+                cmd_opts.append(f"-g={gpus_per_rank}")
+            batch_opts.append(f"-g={gpus_per_rank}")
+
+        if v.queue:
+            batch_opts.append(f"-q {v.queue}")
 
         if v.timeout:
             batch_opts.append(f"-t {v.timeout}m")
 
-        batch_directives = list(f"# flux: {x}" for x in (cmd_opts + batch_opts))
+        if v.bank:
+            batch_opts.append(f"-B {v.bank}")
 
-        v.mpi_command = f"flux run {' '.join([cmd_ranks] + cmd_opts)}"
+        batch_directives = list(f"# flux: {x}" for x in (batch_opts))
+
+        v.mpi_command = f"{launch_cmd} {' '.join([cmd_ranks] + cmd_opts)}"
         v.single_rank_mpi_command = f"flux run -n 1 -N 1 {'-g=1' if v.n_gpus else ''}"
         v.batch_submit = "flux batch {execute_experiment}"
         v.allocation_directives = "\n".join(batch_directives)
@@ -452,6 +497,48 @@ class Allocation(BasicModifier):
         v.batch_submit = "pjsub {execute_experiment}"
         v.allocation_directives = "\n".join(batch_directives)
 
+    def pbs_instructions(self, v):
+        batch_opts, cmd_opts = Allocation._init_batch_and_cmd_opts(v)
+
+        if not v.n_ranks_per_node:
+            v.n_ranks_per_node = math.ceil(v.n_ranks / v.n_nodes)
+
+        node_spec = [f"select={v.n_nodes}"]
+        node_spec.append(f"mpiprocs={v.n_ranks_per_node}")
+
+        if v.n_ranks:
+            cmd_opts.append(f"-np {v.n_ranks}")
+
+        if v.n_threads_per_proc and v.n_threads_per_proc != 1:
+            node_spec.append(f"ompthreads={v.n_threads_per_proc}")
+
+        n_cpus_per_node = v.n_ranks_per_node * v.n_threads_per_proc
+        node_spec.append(f"ncpus={n_cpus_per_node}")
+
+        if v.n_gpus:
+            gpus_per_rank = self.gpus_as_gpus_per_rank(v.n_gpus)
+            node_spec.append(f"gpus={gpus_per_rank}")
+
+        if node_spec:
+            batch_opts.append(f"-l {':'.join(node_spec)}")
+        else:
+            raise ValueError("Not enough information to select resources")
+
+        if v.queue:
+            batch_opts.append(f"-q {v.queue}")
+
+        if v.timeout:
+            batch_opts.append(f"-l walltime={TimeFormat.as_hhmmss(v.timeout)}")
+
+        if v.bank:
+            batch_opts.append(f"-A {v.bank}")
+
+        batch_directives = list(f"#PBS {x}" for x in batch_opts)
+
+        v.mpi_command = f"mpiexec {' '.join(cmd_opts)}"
+        v.batch_submit = "qsub {execute_experiment}"
+        v.allocation_directives = "\n".join(batch_directives)
+
     def determine_scheduler_instructions(self, v):
         handler = {
             "slurm": self.slurm_instructions,
@@ -459,14 +546,12 @@ class Allocation(BasicModifier):
             "mpi": self.mpi_instructions,
             "lsf": self.lsf_instructions,
             "pjm": self.pjm_instructions,
+            "pbs": self.pbs_instructions,
         }
         if v.scheduler not in handler:
             raise ValueError(
                 f"scheduler ({v.scheduler}) must be one of : "
                 + " ".join(handler.keys())
             )
-
-        if not v.timeout:
-            v.timeout = 120
 
         handler[v.scheduler](v)

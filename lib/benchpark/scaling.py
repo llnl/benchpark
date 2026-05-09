@@ -4,211 +4,216 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
+from enum import Enum
+
 from benchpark.directives import variant
+from benchpark.error import BenchparkError
 from benchpark.experiment import ExperimentHelper
 
 
-class Scaling:
-    variant(
-        "scaling-factor",
-        default="2",
-        values=int,
-        description="Factor by which to scale values of problem variables",
-    )
+class ScalingMode(Enum):
+    Strong = "strong"
+    Weak = "weak"
+    Throughput = "throughput"
 
-    variant(
-        "scaling-iterations",
-        default="4",
-        values=int,
-        description="Number of experiments to be generated",
-    )
 
-    # input parameters:
-    # 1. input_variables: dictionary with key value pairs of type str: int or tuple(str): list(int)
-    # For the value in input_variables corresponding to scaling_variable,
-    # if the value is a list, select the index of its smallest element, 0 otherwise
-    # Beginning with this index, generate a list of indexes of length equal to
-    # the number of dimensions in an (ascending) round-robin order
-    # 2. scaling_variable: variable of type str or tuple(str). The scaling order is determined by
-    # the value in input_variables corresponding to scaling_variable.
-    #
-    # output:
-    # scaling_order: list[int]. list of indices, with one value for each dimension,
-    # starting with the minimum value of the first element in input_variables arranged
-    # in an ascending round-robin order
-    def configure_scaling_policy(self, input_variables, scaling_variable):
-        # compute the number of dimensions
-        n_dims = 1
-        for param in input_variables.values():
-            if isinstance(param, list):
-                n_dims = len(param)
-                break
+def Scaling(*modes):
+    for mode in modes:
+        if not isinstance(mode, ScalingMode):
+            raise ValueError(f"Invalid scaling mode: {mode}")
 
-        # starting with the minimum value dim of the scaling_variable
-        # compute the remaining n_dims-1 values in a round-robin manner
-        val = input_variables[scaling_variable]
-        min_dim = val.index(min(val)) if isinstance(val, list) else 0
-
-        return [(min_dim + i) % n_dims for i in range(n_dims)]
-
-    # input parameters:
-    # 1. input_variables: dict[str, int | tuple(str), list[int]]. Dictionary of all variables
-    # that need to be scaled. All variables are ordered as per the ordering policy of
-    # the first element in input_variables. By default, this policy is to scale the
-    # values beginning with the smallest dimension and proceeding in a RR manner through
-    # the other dimensions
-    #
-    # 2. scaling_factor: int. Factor by which to scale the variables. All entries in
-    # input_variables are scaled by the same factor
-    #
-    # 3. num_exprs: int. Number of experiments to be generated
-    #
-    # 4. scaling_variable: variable of type str or tuple(str). The scaling order is determined by
-    # the value in input_variables corresponding to scaling_variable. If no scaling_variable is
-    # specified, the scaling order is defined using the first element in input_variables
-    #
-    # output:
-    # scaling_order: list[int]. list of indices, with one value for each dimension,
-    # output:
-    # output_variables: dict[str, int | list[int]]. num_exprs values for each
-    # dimension of the input variable scaled by the scaling_factor according to the
-    # scaling policy
-    def scale_experiment_variables(
-        self, input_variables, scaling_factor, num_exprs, scaling_variable=None
-    ):
-        # check if variable list is not empty
-        if not input_variables:
-            return {}
-
-        # if undefined, set scaling_variable to the first param in the input_params dict
-        if not scaling_variable:
-            scaling_variable = next(iter(input_variables))
-
-        # check if scaling_variable is a valid key into the input_variables dictionary
-        if scaling_variable not in input_variables:
-            raise RuntimeError("Invalid ordering variable")
-
-        # check if:
-        # 1. input_variables key value pairs are either of type str: int or tuple(str): list(int)
-        # 2. the length of key: tuple(str) is equal to length of value: list(int)
-        # 3. all values of type list(int) have the same length i.e. the same number of dimensions
-        n_dims = None
-        for k, v in input_variables.items():
-            if isinstance(k, str):
-                if not isinstance(v, int):
-                    raise RuntimeError("Invalid key-value pair. Expected type str->int")
-            elif isinstance(k, tuple) and all(isinstance(s, str) for s in k):
-                if isinstance(v, list) and all(isinstance(i, int) for i in v):
-                    if len(k) != len(v):
-                        raise RuntimeError(
-                            "Invalid value. Length of key {k} does not match the length of value {v}"
-                        )
-                    else:
-                        if not n_dims:
-                            n_dims = len(v)
-                        if len(v) != n_dims:
-                            raise RuntimeError(
-                                "Variables to be scaled have different dimensions"
-                            )
-                else:
-                    raise RuntimeError(
-                        "Invalid key-value pair. Expected type tuple(str)->list[int]"
-                    )
-            else:
-                raise RuntimeError("Invalid key. Expected type str or tuple(str)")
-
-        # compute the scaling order based on the scaling_variable
-        scaling_order_index = self.configure_scaling_policy(
-            input_variables, scaling_variable
+    # Base scaling class
+    class BaseScaling:
+        variant(
+            "scaling-factor",
+            default="2",
+            values=int,
+            description="Factor by which to scale values of problem variables",
         )
 
-        scaled_variables = {}
-        for key, val in input_variables.items():
-            scaled_variables[key] = (
-                [[v] for v in val] if isinstance(val, list) else [[val]]
+        variant(
+            "scaling-iterations",
+            default="4",
+            values=int,
+            description="Number of experiments to be generated",
+        )
+
+        variant(
+            "strong",
+            default=False,
+            description="Strong scaling",
+        )
+        variant(
+            "weak",
+            default=False,
+            description="Weak scaling",
+        )
+        variant(
+            "throughput",
+            default=False,
+            description="Throughput scaling",
+        )
+
+    scaling_calls = []
+
+    for mode in modes:
+        if mode == ScalingMode.Strong:
+            scaling_calls.append(
+                (
+                    lambda self: self.spec.satisfies("+" + ScalingMode.Strong.value),
+                    lambda self: self.scale_params(
+                        self.scaling_config[ScalingMode.Strong]
+                    ),
+                )
             )
 
-        # Take initial parameterized vector for experiment, for each experiment after the first, scale one
-        # dimension of that vector by the scaling factor; cycle through the dimensions in round-robin fashion.
-        for exp_num in range(num_exprs - 1):
-            for param in scaled_variables.values():
-                if len(param) == 1:
-                    param[0].append(param[0][-1] * scaling_factor)
-                else:
-                    for p_idx, p_val in enumerate(param):
-                        p_val.append(
-                            p_val[-1] * scaling_factor
-                            if p_idx
-                            == scaling_order_index[exp_num % len(scaling_order_index)]
-                            else p_val[-1]
-                        )
+        if mode == ScalingMode.Weak:
+            scaling_calls.append(
+                (
+                    lambda self: self.spec.satisfies("+" + ScalingMode.Weak.value),
+                    lambda self: self.scale_params(
+                        self.scaling_config[ScalingMode.Weak]
+                    ),
+                )
+            )
 
-        output_variables = {}
-        for k, v in scaled_variables.items():
-            if isinstance(k, tuple):
-                for i in range(len(k)):
-                    output_variables[k[i]] = v[i] if len(v[i]) > 1 else v[i][0]
-            else:
-                output_variables[k] = v[0] if len(v[0]) > 1 else v[0][0]
-        return output_variables
+        if mode == ScalingMode.Throughput:
+            scaling_calls.append(
+                (
+                    lambda self: self.spec.satisfies(
+                        "+" + ScalingMode.Throughput.value
+                    ),
+                    lambda self: self.scale_params(
+                        self.scaling_config[ScalingMode.Throughput]
+                    ),
+                )
+            )
 
+    def scale(self):
+        for check, action in scaling_calls:
+            if check(self):
+                return action(self)
+        raise RuntimeError("No valid scaling mode matched")
 
-class StrongScaling(Scaling):
-    variant(
-        "strong",
-        default=False,
-        description="Strong scaling",
-    )
+    BaseScaling.scale = scale
 
-    def generate_strong_scaling_params(
-        self, resource_variable, scaling_factor, num_exprs
-    ):
-        return self.scale_experiment_variables(
-            resource_variable, scaling_factor, num_exprs
-        )
+    def scale_params(self, scaling_config):
+        """
+        scaling_config is a dictionary of the form variable -> scaling_func
+        This method scales the problem by applying scaling_function to each variable in scaling_config
+        Starting with the smallest value dimension for the first variable in scaling_config,
+        the scaling proceeds in a round-robin manner for the specified number of iterations
+        """
 
+        scaling_vars = [getattr(self.expr_vars, v) for v in scaling_config.keys()]
+
+        dim_set = set()
+        for v in scaling_vars:
+            if v.ndims != 1:
+                dim_set.add(v.ndims)
+
+        if dim_set and len(dim_set) > 1:
+            raise BenchparkError(
+                "All scaling variables must either have the same number of dimensions, or only one dimension"
+            )
+
+        start_dim = scaling_vars[0].min_dim
+        ndims = dim_set.pop() if dim_set else 1
+
+        num_exprs = int(self.spec.variants["scaling-iterations"][0]) - 1
+        scaling_factor = int(self.spec.variants["scaling-factor"][0])
+
+        for itr in range(num_exprs):
+            dim = (start_dim + itr) % ndims
+            for var_name, scaling_func in scaling_config.items():
+                if scaling_func:
+                    getattr(self.expr_vars, var_name).scale_dim(
+                        itr, dim, scaling_func, scaling_factor
+                    )
+
+    BaseScaling.scale_params = scale_params
+
+    # The register_scaling_config method defines the scaled variables and their
+    # scaling function for each scaling mode supported in the experiment
+    # The input to register_scaling_config is a dictionary of the form
+    # ScalingMode -> { scaled_var: scaling_function }
+    # An entry is required for each ScalingMode supported in the experiment
+    # For a multi-dimensional variable of the form:
+    # num_procs -> { "px": 2, "py": 2, "pz": 1 }, the value of scaled_var is "num_procs"
+    # For a scalar variable, the value of scaled_var is the name of the variable
+    # Each scaled_var specified in register_scaling_config must be added to the
+    # list of experiment variables using add_experiment_variable
+    #
+    # The scaling function has the following form
+    # def scaling_function(var, itr, dim, scaling_factor):
+    #    return ...
+    # The arguments for the scaling_function are:
+    # var: benchpark.Variable instance of the scaled variable
+    # itr: The current iteration in the specified number of scaling iterations
+    # dim: The current dimension that is being scaled
+    # scaling_factor: The factor by which the variable dimension must be scaled
+    # The scaling_function must return the new scaled value for the variable dimension
+    #
+    # scaling starts from the dimension with the minimum value for the first variable
+    # in the list of variables and proceeds through the dimensions in a round-robin
+    # manner for the specified number of scaling iterations
+    # e.g. if the scaling config is defined as:
+    # ScalingMode.Strong: {
+    #     "np": lambda var, itr, dim, sf: var.val(dim) * sf,
+    #     "probs": lambda var, itr, dim, sf: var.val(dim) * sf,
+    # }, and the starting values of the variables are
+    # "np" : { "px": 2,
+    #          "py": 2,
+    #          "pz": 1 } and,
+    # "probs" : { "nx": 16,
+    #             "ny": 32,
+    #             "nz": 32 },
+    # then after 4 scaling iterations (3 scalings), the
+    # final values of the scaled variables will be
+    # "np" : { "px": [2,2,4,4]
+    #          "py": [2,2,2,4]
+    #          "pz": [1,2,2,2] } and,
+    # "probs" : { "nx": [16,16,32,32]
+    #             "ny": [32,32,32,64]
+    #             "nz": [32,64,64,64] },
+    # Note that scaling starts with the minimum value dimension (pz) of the
+    # first variable (np) and proceeds in a round-robin manner
+
+    def register_scaling_config(self, scaling_config):
+        unimplemented_modes = []
+        for mode in modes:
+            if mode not in scaling_config.keys():
+                unimplemented_modes.append(mode)
+        if unimplemented_modes:
+            raise ValueError(
+                f"Experiment supports scaling modes {', '.join(m.value for m in unimplemented_modes)}, but does not define a config for them"
+            )
+
+        for var in scaling_config.keys():
+            if var not in modes:
+                raise ValueError(
+                    f"Unsupported scaling config '{var}', this experiment only supports {', '.join(m.value for m in modes)}"
+                )
+        self.scaling_config = scaling_config
+
+    BaseScaling.register_scaling_config = register_scaling_config
+
+    # Helper class
     class Helper(ExperimentHelper):
         def get_helper_name_prefix(self):
-            return "strong_scaling" if self.spec.satisfies("+strong") else ""
+            for s in [
+                ScalingMode.Strong.value,
+                ScalingMode.Weak.value,
+                ScalingMode.Throughput.value,
+            ]:
+                if self.spec.satisfies("+" + s):
+                    return s + "_scaling"
+            return "no_scaling"
 
-
-class WeakScaling(Scaling):
-    variant(
-        "weak",
-        default=False,
-        description="Weak scaling",
+    return type(
+        "ExperimentScaling",
+        (BaseScaling,),
+        {
+            "Helper": Helper,
+        },
     )
-
-    def generate_weak_scaling_params(
-        self, resource_variable, problem_size_variables, scaling_factor, num_exprs
-    ):
-        scaling_variable = next(iter(resource_variable))
-        return self.scale_experiment_variables(
-            resource_variable | problem_size_variables,
-            scaling_factor,
-            num_exprs,
-            scaling_variable,
-        )
-
-    class Helper(ExperimentHelper):
-        def get_helper_name_prefix(self):
-            return "weak_scaling" if self.spec.satisfies("+weak") else ""
-
-
-class ThroughputScaling(Scaling):
-    variant(
-        "throughput",
-        default=False,
-        description="Throughput scaling",
-    )
-
-    def generate_throughput_scaling_params(
-        self, problem_size_variables, scaling_factor, num_exprs
-    ):
-        return self.scale_experiment_variables(
-            problem_size_variables, scaling_factor, num_exprs
-        )
-
-    class Helper(ExperimentHelper):
-        def get_helper_name_prefix(self):
-            return "throughput_scaling" if self.spec.satisfies("+throughput") else ""

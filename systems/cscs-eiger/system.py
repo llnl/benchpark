@@ -3,11 +3,13 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainers
-from benchpark.system import System
-from benchpark.openmpsystem import OpenMPSystem
+
 from packaging.version import Version
+
+from benchpark.directives import maintainers, variant
+from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.paths import hardware_descriptions
+from benchpark.system import System, compiler_def, compiler_section_for
 
 
 class CscsEiger(System):
@@ -16,6 +18,7 @@ class CscsEiger(System):
 
     id_to_resources = {
         "eiger": {
+            "cpu_arch": "zen2",
             "sys_cores_per_node": 128,
             "timeout": 30,
             "system_site": "cscs",
@@ -32,7 +35,7 @@ class CscsEiger(System):
 
     def __init__(self, spec):
         super().__init__(spec)
-        self.programming_models = [OpenMPSystem()]
+        self.programming_models = [OpenMPCPUOnlySystem()]
 
         self.gcc_version = Version("12.3.0")
 
@@ -42,22 +45,18 @@ class CscsEiger(System):
             setattr(self, k, v)
 
     def compute_compilers_section(self):
-        return {
-            "compilers": [
-                {
-                    "compiler": {
-                        "spec": "gcc@12.3.0",
-                        "paths": {"cc": "cc", "cxx": "CC", "f77": "ftn", "fc": "ftn"},
-                        "flags": {},
-                        "target": "any",
-                        "operating_system": "HPECray",
-                        "modules": ["PrgEnv-gnu", "gcc/12.3.0"],
-                        "environment": {},
-                        "extra_rpaths": [],
-                    }
-                }
-            ]
-        }
+        return compiler_section_for(
+            "gcc",
+            [
+                compiler_def(
+                    "gcc@12.3.0 languages:=c,c++,fortran",
+                    "/path/is/now/needed/",  # <-- TODO: this needs to be filled in
+                    {"c": "cc", "cxx": "CC", "fortran": "ftn"},
+                    modules=["PrgEnv-gnu", "gcc/12.3.0"],
+                    compilers_use_relative_paths=True,
+                )
+            ],
+        )
 
     def compute_packages_section(self):
 

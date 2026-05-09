@@ -12,10 +12,10 @@ import pathlib
 import re
 from typing import Iterable, Iterator, List, Match, Optional, Union
 
-from benchpark.error import BenchparkError
-import benchpark.repo
-
 import llnl.util.lang  # noqa
+
+import benchpark.repo
+from benchpark.error import BenchparkError
 
 repo_path = benchpark.repo.paths[benchpark.repo.ObjectTypes.experiments]
 sys_repo = benchpark.repo.paths[benchpark.repo.ObjectTypes.systems]
@@ -95,6 +95,10 @@ class VariantMap(llnl.util.lang.HashableMap):
         string.write(" ".join(self.stringify(key, self[key]) for key in kv_keys))
 
         return string.getvalue()
+
+    def _cmp_iter(self):
+        for k, v in sorted(self.items()):
+            yield (k, v)
 
 
 class ConcreteVariantMap(VariantMap):
@@ -319,14 +323,19 @@ class ConcreteSpec(Spec):
             name, values = variants_to_check.pop()
             checked.add((name, values))
 
-            conditions = [
-                w
-                for w, v_by_n in self.object_class.variants.items()
-                for n, v in v_by_n.items()
-                if n == name and v.validate_values_bool(values)
-            ]
+            conditions = []
+            possible_variants = set()
+            for when, v_by_n in self.object_class.variants.items():
+                possible_variants.update(v_by_n.keys())
+                for n, v in v_by_n.items():
+                    if n == name:
+                        if not v.validate_values_bool(values):
+                            raise Exception(
+                                f"'{values}' is not valid for variant '{name}' on {self.name}"
+                            )
+                        conditions.append(when)
 
-            if not conditions:
+            if name not in possible_variants:
                 raise Exception(f"{name} is not a valid variant of {self.name}")
 
             # This variant is already valid on self

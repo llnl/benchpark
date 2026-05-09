@@ -3,79 +3,84 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.error import BenchparkError
-from benchpark.directives import variant, maintainers
+from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
-from benchpark.scaling import StrongScaling
-from benchpark.scaling import WeakScaling
+from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
+from benchpark.scaling import Scaling, ScalingMode
 
 
 class Ior(
     Experiment,
-    StrongScaling,
-    WeakScaling,
+    ProgrammingModel(ProgrammingModelType.Mpionly),
+    Scaling(ScalingMode.Strong, ScalingMode.Weak),
 ):
     variant(
         "workload",
-        default="ior",
+        default="mpiio-write",
+        values=("mpiio-write", "mpiio-read", "posix-write", "posix-read"),
         description="base IOR  or other problem",
     )
 
     variant(
         "version",
-        default="3.3.0",
+        default="4.0.0",
+        values=("develop", "latest", "4.0.0"),
         description="app version",
+    )
+
+    variant(
+        "test_file_mode",
+        default="fpp",
+        values=("fpp", "ssf"),
+        description="File per-process (fpp) or single shared file (ssf)",
     )
 
     maintainers("hariharan-devarajan")
 
     def compute_applications_section(self):
-        # TODO: Replace with conflicts clause
-        scaling_modes = {
-            "strong": self.spec.satisfies("+strong"),
-            "weak": self.spec.satisfies("+weak"),
-            "single_node": self.spec.satisfies("+single_node"),
-        }
 
-        scaling_mode_enabled = [key for key, value in scaling_modes.items() if value]
-        if len(scaling_mode_enabled) != 1:
-            raise BenchparkError(
-                f"Only one type of scaling per experiment is allowed for application package {self.name}"
-            )
+        test_file_mode = ""
+        if self.spec.variants["test_file_mode"][0] == "fpp":
+            test_file_mode = "-F"
+        self.add_experiment_variable("test_file_mode", test_file_mode, False)
 
-        num_nodes = {"n_nodes": 1}
-        t = "{b}/256"
+        if self.spec.satisfies("exec_mode=test"):
+            nodes = 1
+            bt_factor = 8  # blocksize = transfersize * bt_factor
+            t = 524288
+        elif self.spec.satisfies("exec_mode=perf"):
+            nodes = 32
+            bt_factor = 128  # blocksize = transfersize * bt_factor
+            t = 67108864
+
+        self.add_experiment_variable("n_nodes", nodes, True)
+        self.add_experiment_variable("n_ranks", "4 * {n_nodes}", True)
         self.add_experiment_variable("t", t, True)
+        self.add_experiment_variable("b", t * bt_factor, True)
 
-        if self.spec.satisfies("+single_node"):
-            for pk, pv in num_nodes.items():
-                self.add_experiment_variable(pk, pv, True)
-            self.add_experiment_variable("b", "268435456", True)
-        elif self.spec.satisfies("+strong"):
-            scaled_variables = self.generate_strong_scaling_params(
-                {tuple(num_nodes.keys()): list(num_nodes.values())},
-                int(self.spec.variants["scaling-factor"][0]),
-                int(self.spec.variants["scaling-iterations"][0]),
+        full_path = self.system_spec.system.full_io_path
+        sys_name = self.system_spec._name
+        # Check mount point provided
+        if not full_path:
+            raise ValueError(
+                f'Must set "mount_point" variant (e.g. "benchpark system init {sys_name} mount_point=...") on the system used in this experiment. Run "benchpark info system {sys_name}" for valid values.'
             )
-            for k, v in scaled_variables.items():
-                self.add_experiment_variable(k, v, True)
-            # 256 mb
-            self.add_experiment_variable("b", "268435456 / {n_nodes}", True)
-        elif self.spec.satisfies("+weak"):
-            scaled_variables = self.generate_weak_scaling_params(
-                {tuple(num_nodes.keys()): list(num_nodes.values())},
-                {tuple(num_nodes.keys()): list(num_nodes.values())},
-                int(self.spec.variants["scaling-factor"][0]),
-                int(self.spec.variants["scaling-iterations"][0]),
-            )
-            for k, v in scaled_variables.items():
-                self.add_experiment_variable(k, v, True)
+        self.add_experiment_variable("o", full_path)
 
-            self.add_experiment_variable("b", "268435456", True)
-
-        self.add_experiment_variable("t", t, True)
-        self.add_experiment_variable(
-            "n_ranks", "{sys_cores_per_node} * {n_nodes}", True
+        self.register_scaling_config(
+            {
+                ScalingMode.Strong: {
+                    "n_nodes": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "b": lambda var, itr, dim, scaling_factor: var.val(dim),
+                },
+                ScalingMode.Weak: {
+                    "n_nodes": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "b": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                },
+            }
         )
 
         self.set_required_variables(
@@ -85,6 +90,4 @@ class Ior(
         )
 
     def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, [f"ior@{app_version}"])
+        self.add_package_spec(self.name, [f"ior{self.determine_version()}"])

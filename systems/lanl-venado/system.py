@@ -4,12 +4,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.directives import variant, maintainers
-from benchpark.cudasystem import CudaSystem
-from benchpark.openmpsystem import OpenMPSystem
-from benchpark.system import System
-from benchpark.paths import hardware_descriptions
 from packaging.version import Version
+
+from benchpark.cudasystem import CudaSystem
+from benchpark.directives import maintainers, variant
+from benchpark.paths import hardware_descriptions
+from benchpark.system import System, compiler_def, compiler_section_for, merge_dicts
 
 
 class LanlVenado(System):
@@ -18,6 +18,7 @@ class LanlVenado(System):
 
     id_to_resources = {
         "grace-hopper": {
+            "cpu_arch": "neoverse",
             "cuda_arch": 90,
             "sys_cores_per_node": 144,
             "sys_gpus_per_node": 4,
@@ -27,6 +28,7 @@ class LanlVenado(System):
             + "/HPECray-neoverse-H100-Slingshot/hardware_description.yaml",
         },
         "grace-grace": {
+            "cpu_arch": "neoverse",
             "sys_cores_per_node": 144,
             "system_site": "lanl",
             "hardware_key": str(hardware_descriptions)
@@ -77,8 +79,6 @@ class LanlVenado(System):
             self.programming_models = [CudaSystem()]
             self.cuda_version = Version(self.spec.variants["cuda"][0])
             self.gtl_flag = self.spec.variants["gtl"][0]
-        if self.spec.variants["cluster"][0] == "grace-grace":
-            self.programming_models = [OpenMPSystem()]
 
         self.scheduler = "slurm"
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
@@ -167,65 +167,46 @@ class LanlVenado(System):
         return selections
 
     def compute_compilers_section(self):
-        selections = {
-            "compilers": [
-                {
-                    "compiler": {
-                        "spec": "gcc@12.3.0",
-                        "paths": {
-                            "cc": "/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/bin/gcc",
-                            "cxx": "/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/bin/g++",
-                            "f77": "/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/bin/gfortran",
-                            "fc": "/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/bin/gfortran",
-                        },
-                        "flags": {},
-                        "operating_system": "sles15",
-                        "target": "aarch64",
-                        "modules": [],
-                        "environment": {},
-                        "extra_rpaths": [],
-                    }
-                }
-            ]
-        }
+        gcc_cfg = compiler_section_for(
+            "gcc",
+            [
+                compiler_def(
+                    "gcc@12.3.0 languages:=c,c++,fortran",
+                    "/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/",
+                    {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                )
+            ],
+        )
+
         # TODO: Construct/extract/customize compiler information from the working set
         if self.spec.satisfies("compiler=cce"):
-            selections["compilers"] += [
-                {
-                    "compiler": {
-                        "spec": "cce@18.0.0",
-                        "paths": {
-                            "cc": "/opt/cray/pe/cce/18.0.0/bin/craycc",
-                            "cxx": "/opt/cray/pe/cce/18.0.0/bin/crayCC",
-                            "f77": "/opt/cray/pe/cce/18.0.0/bin/crayftn",
-                            "fc": "/opt/cray/pe/cce/18.0.0/bin/crayftn",
-                        },
-                        "flags": {
-                            "cflags": "-g -O2 --gcc-toolchain=/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0",
-                            "cxxflags": "-g -O2 --gcc-toolchain=/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0",
-                            "fflags": "-g -O2 -hnopattern",
-                            "ldflags": "-ldl",
-                        },
-                        "operating_system": "sles15",
-                        "target": "aarch64",
-                        "modules": [],
-                        "environment": {
+            cce_cfg = compiler_section_for(
+                "cce",
+                [
+                    compiler_def(
+                        "cce@18.0.0",
+                        "/opt/cray/pe/cce/18.0.0/",
+                        {"c": "cracc", "cxx": "crayCC", "fortran": "crayftn"},
+                        env={
                             "prepend_path": {
                                 "LD_LIBRARY_PATH": "/opt/cray/pe/cce/18.0.0/cce/aarch64/lib:/opt/cray/libfabric/1.20.1/lib64:/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/lib:/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/lib64:/opt/cray/pe/gcc-libs"
                             }
                         },
-                        "extra_rpaths": [
+                        extra_rpaths=[
                             "/opt/cray/pe/gcc-libs",
                             "/opt/cray/pe/cce/18.0.0/cce/aarch64/lib",
                             "/opt/cray/libfabric/1.20.1/lib64",
                             "/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/lib",
                             "/usr/projects/hpcsoft/tce/24-07/cos3-aarch64-cc90/compilers/gcc/12.3.0/lib64",
                         ],
-                    }
-                }
-            ]
+                    )
+                ],
+            )
+            cfg = merge_dicts(gcc_cfg, cce_cfg)
+        else:
+            cfg = gcc_cfg
 
-        return selections
+        return cfg
 
     def mpi_config(self):
         mpi_version = "8.1.30"

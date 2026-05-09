@@ -5,12 +5,13 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import json
 import os
 import os.path
 import re
 import shutil
 
-import benchpark.paths
+from benchpark.paths import paths
 from benchpark.runtime import run_command
 
 
@@ -34,40 +35,86 @@ def extract_build_commands(log_file):
     return extracted
 
 
+def collect_experiments(workspace_dir):
+    experiments = list()
+    for dirpath, dirnames, filenames in os.walk(workspace_dir):
+        for fname in filenames:
+            if fname == "execute_experiment":
+                experiments.append(os.path.join(dirpath, fname))
+    return experiments
+
+
 def show_build_dump(args):
     env_root = _find_env_root(args.workspace)
 
     determine_exp = os.path.join(
-        benchpark.paths.benchpark_root, "lib", "scripts", "determine-exp.py"
+        paths.benchpark_root, "lib", "scripts", "experiment-build-info.py"
     )
     out, err = run_command(f"spack -e {env_root} python {determine_exp}")
-    experiment_name = out.strip()
+    exp_info = json.loads(out)
 
-    logs_out = os.path.join(args.destdir, f"build-{experiment_name}.log")
-    if not os.path.exists(logs_out):
-        with open(logs_out, "w") as f:
-            run_command(f"spack -e {env_root} logs {experiment_name}", stdout=f)
+    root_name = exp_info["root"]
 
-    build_cmds = extract_build_commands(logs_out)
-    cmds_out = os.path.join(args.destdir, "extracted-commands.txt")
-    if not os.path.exists(cmds_out):
-        with open(cmds_out, "w", encoding="utf-8") as f:
-            for cmd in build_cmds:
-                f.write(f"{cmd}\n")
+    urls = exp_info["urls"]
 
-    # Spack also stores env vars for the build in the install dir, copy them
-    out, err = run_command(f"spack -e {env_root} location -i {experiment_name}")
-    install_location = out.strip()
-    env_vars_path = os.path.join(install_location, ".spack", "spack-build-env.txt")
-    env_vars_out = os.path.join(args.destdir, os.path.basename(env_vars_path))
-    if not os.path.exists(env_vars_out):
-        shutil.copy(env_vars_path, env_vars_out)
+    if not os.path.exists(args.destdir):
+        os.mkdir(args.destdir)
+
+    url_info = os.path.join(args.destdir, "url-info.txt")
+    if not os.path.exists(url_info):
+        with open(url_info, "w") as f:
+            for pkg_name, info in urls.items():
+                url = info["url"]
+                details = info["details"]
+                f.write(f"{pkg_name} ({url}): {str(details)}\n")
+
+    tree = os.path.join(args.destdir, f"{root_name}-tree.txt")
+    if not os.path.exists(tree):
+        with open(tree, "w") as f:
+            f.write(exp_info["tree"])
+
+    root_run_vars_file = os.path.join(args.destdir, f"{root_name}-run-vars.txt")
+    with open(root_run_vars_file, "w") as f:
+        run_command(f"spack -e {env_root} load --sh {root_name}", stdout=f)
+
+    if args.download:
+        out_mirror = os.path.join(args.destdir, "source-downloads")
+        run_command(f"spack -e {env_root} mirror create -d {out_mirror} --all")
+
+    for pkg_name, build_env_file in exp_info["info"]:
+        logs_out = os.path.join(args.destdir, f"{pkg_name}-build.log")
+        if not os.path.exists(logs_out):
+            with open(logs_out, "w") as f:
+                run_command(f"spack -e {env_root} logs {pkg_name}", stdout=f)
+
+        build_cmds = extract_build_commands(logs_out)
+        cmds_out = os.path.join(args.destdir, f"{pkg_name}-extracted-commands.txt")
+        if not os.path.exists(cmds_out):
+            with open(cmds_out, "w", encoding="utf-8") as f:
+                for cmd in build_cmds:
+                    f.write(f"{cmd}\n")
+
+        env_vars_out = os.path.join(
+            args.destdir, os.path.basename(f"{pkg_name}-build-env.txt")
+        )
+        if not os.path.exists(env_vars_out):
+            shutil.copy(build_env_file, env_vars_out)
+
+    for i, exp in enumerate(collect_experiments(args.workspace)):
+        exp_out = os.path.join(args.destdir, f"exp-{i}")
+        if not os.path.exists(exp_out):
+            shutil.copy(exp, exp_out)
 
 
 def setup_parser(root_parser):
-    show_build_subparser = root_parser.add_subparsers(dest="show_build_subcommand")
+    show_build_subparser = root_parser.add_subparsers(
+        dest="show_build_subcommand", required=True
+    )
 
     dump_parser = show_build_subparser.add_parser("dump")
+    dump_parser.add_argument(
+        "--download", action="store_true", help="Download the associated sources"
+    )
     dump_parser.add_argument(
         "workspace",
         help="A Ramble workspace you want to want to generate build instructions for",
@@ -81,7 +128,3 @@ def command(args):
     }
     if args.show_build_subcommand in actions:
         actions[args.show_build_subcommand](args)
-    else:
-        raise ValueError(
-            f"Unknown subcommand for 'show-build': {args.show_build_subcommand}"
-        )

@@ -5,10 +5,11 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import os.path
+import os
 import pathlib
 import subprocess
 import sys
+import uuid
 
 
 def main():
@@ -16,7 +17,31 @@ def main():
         raise Exception("\n\nERR: Must be using Python 3.8 or later!\n")
     basedir = pathlib.Path(__file__).resolve().parents[1]
     main_py = basedir / "lib" / "main.py"
-    subprocess.run([sys.executable, main_py] + sys.argv[1:], check=True)
+
+    if os.environ.get("BENCHPARK_RUN_COVERAGE"):
+        # Create a unique coverage data file name
+        coverage_dir = (
+            basedir / f"coverage-data-{os.environ.get('BENCHPARK_RUN_COVERAGE')}"
+        )
+        coverage_dir.mkdir(exist_ok=True, parents=True)
+        unique_id = uuid.uuid4().hex
+        coverage_file = coverage_dir / f".coverage.{unique_id}"
+        # Run the code with coverage, writing to the unique file
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "coverage",
+                "run",
+                f"--data-file={coverage_file}",
+                "--source=lib",
+                main_py,
+            ]
+            + sys.argv[1:],
+            check=True,
+        )
+    else:
+        subprocess.run([sys.executable, main_py] + sys.argv[1:], check=True)
 
 
 if __name__ == "__main__":

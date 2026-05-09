@@ -3,16 +3,18 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainers
+from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
-from benchpark.rocm import ROCmExperiment
-from benchpark.cuda import CudaExperiment
+from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
 
 
 class OsuMicroBenchmarks(
     Experiment,
-    ROCmExperiment,
-    CudaExperiment,
+    ProgrammingModel(
+        ProgrammingModelType.Mpionly,
+        ProgrammingModelType.Cuda,
+        ProgrammingModelType.Rocm,
+    ),
 ):
 
     variant(
@@ -94,13 +96,20 @@ class OsuMicroBenchmarks(
         description="workloads available",
     )
 
+    variant(
+        "version",
+        default="7.5",
+        values=("latest", "7.5"),
+        description="app version",
+    )
+
     maintainers("nhanford")
 
     def compute_applications_section(self):
 
-        num_nodes = {"n_nodes": 2}
+        num_nodes = {"n_nodes": 2, "n_ranks": 2}
 
-        if self.spec.satisfies("+single_node"):
+        if self.spec.satisfies("exec_mode=test"):
             for pk, pv in num_nodes.items():
                 self.add_experiment_variable(pk, pv, True)
 
@@ -110,8 +119,7 @@ class OsuMicroBenchmarks(
             self.add_experiment_variable("additional_args", " -d cuda", False)
         if self.spec.satisfies("+rocm") or self.spec.satisfies("+cuda"):
             resource = "n_gpus"
-            for pk, pv in num_nodes.items():
-                self.add_experiment_variable("n_gpus", pv, True)
+            self.add_experiment_variable("n_gpus", 2, True)
         else:
             resource = "n_nodes"
 
@@ -121,4 +129,6 @@ class OsuMicroBenchmarks(
         )
 
     def compute_package_section(self):
-        self.add_package_spec(self.name, ["osu-micro-benchmarks"])
+        self.add_package_spec(
+            self.name, [f"osu-micro-benchmarks{self.determine_version()}"]
+        )

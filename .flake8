@@ -25,4 +25,4 @@ exclude =
   buck-out,
   build,
   dist,
-  repo
+  repos

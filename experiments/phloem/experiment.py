@@ -3,12 +3,15 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainers
+from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
-from benchpark.scaling import StrongScaling
+from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
 
 
-class Phloem(Experiment, StrongScaling):
+class Phloem(
+    Experiment,
+    ProgrammingModel(ProgrammingModelType.Mpionly),
+):
     variant(
         "workload",
         default="sqmr",
@@ -18,7 +21,8 @@ class Phloem(Experiment, StrongScaling):
 
     variant(
         "version",
-        default="master",
+        default="1.4.5",
+        values=("master", "latest", "1.4.5"),
         description="app version",
     )
 
@@ -41,6 +45,4 @@ class Phloem(Experiment, StrongScaling):
         )
 
     def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, [f"phloem@{app_version} +mpi"])
+        self.add_package_spec(self.name, [f"phloem{self.determine_version()}"])

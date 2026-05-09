@@ -3,18 +3,19 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainers
+from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
-from benchpark.openmp import OpenMPExperiment
-from benchpark.cuda import CudaExperiment
-from benchpark.rocm import ROCmExperiment
+from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
 
 
 class Gromacs(
     Experiment,
-    OpenMPExperiment,
-    CudaExperiment,
-    ROCmExperiment,
+    ProgrammingModel(
+        ProgrammingModelType.Mpionly,
+        ProgrammingModelType.Openmp,
+        ProgrammingModelType.Cuda,
+        ProgrammingModelType.Rocm,
+    ),
 ):
     variant(
         "workload",
@@ -45,11 +46,16 @@ class Gromacs(
         "sycl",
         default=True,
         values=(True, False),
-        when=("+rocm"),
         description="Enable GPU-aware MPI",
     )
 
     def compute_applications_section(self):
+        # MPI-only defaults
+        self.add_experiment_variable("n_ranks", 8, True)
+        target = "cpu"
+        bonded_target = "cpu"
+        npme = "0"
+
         if self.spec.satisfies("+openmp"):
             self.set_environment_variable("OMP_PROC_BIND", "close")
             self.set_environment_variable("OMP_PLACES", "cores")
@@ -102,9 +108,6 @@ class Gromacs(
         )
 
     def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
-
         spack_specs = "+mpi~hwloc"
         spack_specs += "+sycl" if self.spec.satisfies("+sycl") else "~sycl"
 
@@ -116,5 +119,5 @@ class Gromacs(
 
         self.add_package_spec(
             self.name,
-            [f"gromacs@{app_version} {spack_specs}"],
+            [f"gromacs{self.determine_version()} {spack_specs}"],
         )

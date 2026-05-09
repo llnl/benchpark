@@ -1,0 +1,35 @@
+.machine-check:
+  tags: [shell, oslic]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - |
+      if [[ $(jq '.[env.CI_MACHINE].total_nodes_up' /usr/global/tools/lorenz/data/loginnodeStatus) == 0 ]]
+      then
+        echo -e "\e[31mNo node available on ${CI_MACHINE}\e[0m"
+        curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+             --header 'Content-Type: application/json' \
+             --header "authorization: Bearer ${GITHUB_TOKEN}" \
+             --data "{ \"state\": \"failure\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${CI_MACHINE} down\", \"context\": \"ci/gitlab/${CI_MACHINE}\" }"
+        exit 1
+      fi
+tioga-up-check:
+  stage: machine-checks
+  variables:
+    CI_MACHINE: tioga
+  extends: [.machine-check]
+tuolumne-up-check:
+  stage: machine-checks
+  variables:
+    CI_MACHINE: tuolumne
+  extends: [.machine-check]
+dane-up-check:
+  stage: machine-checks
+  variables:
+    CI_MACHINE: dane
+  extends: [.machine-check]
+matrix-up-check:
+  stage: machine-checks
+  variables:
+    CI_MACHINE: matrix
+  extends: [.machine-check]

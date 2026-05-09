@@ -92,6 +92,11 @@ Network, Storage, and Analysis (SC-W 2023), November 12–17, 2023, Denver, CO, 
 ACM, New York, NY, USA, 9 pages.
 `doi.org/10.1145/3624062.3624135 <https://doi.org/10.1145/3624062.3624135>`_.
 
+Olga Pearce, Gregory Becker, Stephanie Brink, Nathan Hanford, Dewi Yokelson, August Knox, and Barry Rountree.
+2025. HPC Benchmarking: Repeat, Replicate, Reproduce.
+ACM Conference on Reproducibility and Replicability, July 29-31, Vancouver, Canada.
+`doi/10.1145/3736731.3746150 <https://dl.acm.org/doi/10.1145/3736731.3746150>`_.
+
 License
 -------
 Benchpark is released under the Apache 2.0 w/ LLVM Exception license. For more details see

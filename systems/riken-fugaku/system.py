@@ -4,10 +4,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from benchpark.directives import variant, maintainers
-from benchpark.system import System
-from benchpark.openmpsystem import OpenMPSystem
+from benchpark.directives import maintainers, variant
+from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.paths import hardware_descriptions
+from benchpark.system import System, compiler_def, compiler_section_for
 
 
 class RikenFugaku(System):
@@ -16,8 +16,9 @@ class RikenFugaku(System):
 
     id_to_resources = {
         "fugaku": {
+            "cpu_arch": "A64FX",
             "sys_cores_per_node": 48,
-            "sys_mem_per_node": 32,
+            "sys_mem_per_node_GB": 32,
             "system_site": "riken",
             "hardware_key": str(hardware_descriptions)
             + "/Fujitsu-A64FX-TofuD/hardware_description.yaml",
@@ -33,7 +34,7 @@ class RikenFugaku(System):
 
     def __init__(self, spec):
         super().__init__(spec)
-        self.programming_models = [OpenMPSystem()]
+        self.programming_models = [OpenMPCPUOnlySystem()]
 
         self.scheduler = "pjm"
         attrs = self.id_to_resources.get("fugaku")
@@ -42,10 +43,24 @@ class RikenFugaku(System):
 
     def compute_packages_section(self):
         # Doesn't look like we need to switch MPI based on compiler from old definition, verify this
+        # SBA: It is actually needed for fujitsu-mpi and fujitsu-ssl2. Edited to load the required version only.
+        default_comp = self.spec.variants["compiler"][0]
+        if default_comp == "clang":
+            comp_version = "clang@17.0.2"
+            mpi_prefix = "/opt/FJSVxtclanga/tcsds-mpi-1.2.38"
+            ssl2_prefix = "/vol0004/apps/oss/llvm-v17.0.2/compute_node"
+        if default_comp == "fj":
+            comp_version = "fj@4.10.0"
+            mpi_prefix = "/opt/FJSVxtclanga/tcsds-mpi-1.2.38"
+            ssl2_prefix = "/opt/FJSVxtclanga/tcsds-ssl2-1.2.38"
+        if default_comp == "gcc":
+            comp_version = "gcc@13.2.0"
+            mpi_prefix = "/vol0004/apps/oss/mpigcc/fjmpi-gcc12"
+            ssl2_prefix = "/opt/FJSVxtclanga/tcsds-ssl2-1.2.38"
         selections = {
             "packages": {
                 "all": {
-                    "compiler": ["clang", "fj", "gcc"],
+                    "compiler": ["llvm", "fj", "gcc"],
                     "providers": {
                         "mpi": ["fujitsu-mpi", "openmpi", "mpich"],
                         "blas": ["fujitsu-ssl2", "openblas"],
@@ -59,7 +74,7 @@ class RikenFugaku(System):
                 "python": {
                     "externals": [
                         {
-                            "spec": "python@3.11.6%fj@4.10.0 arch=linux-rhel8-a64fx",
+                            "spec": "python@3.11.6 arch=linux-rhel8-a64fx %fj@4.10.0",
                             "prefix": "/vol0004/apps/oss/spack-v0.21/opt/spack/linux-rhel8-a64fx/fj-4.10.0/python-3.11.6-qbmpmn2uxu4oe3qoawxbizp7awqlgkcq",
                         }
                     ]
@@ -69,16 +84,9 @@ class RikenFugaku(System):
                     "buildable": False,
                     "externals": [
                         {
-                            "spec": "fujitsu-mpi@4.10.0%clang@17.0.2 arch=linux-rhel8-a64fx",
-                            "prefix": "/opt/FJSVxtclanga/tcsds-mpi-1.2.38",
-                        },
-                        {
-                            "spec": "fujitsu-mpi@4.10.0%fj@4.10.0 arch=linux-rhel8-a64fx",
-                            "prefix": "/opt/FJSVxtclanga/tcsds-mpi-1.2.38",
-                        },
-                        {
-                            "spec": "fujitsu-mpi@4.10.0%gcc@13.2.0 arch=linux-rhel8-a64fx",
-                            "prefix": "/vol0004/apps/oss/mpigcc/fjmpi-gcc12",
+                            "spec": "fujitsu-mpi@4.10.0 arch=linux-rhel8-a64fx %"
+                            f"{comp_version}",
+                            "prefix": f"{mpi_prefix}",
                         },
                     ],
                 },
@@ -86,16 +94,9 @@ class RikenFugaku(System):
                     "buildable": False,
                     "externals": [
                         {
-                            "spec": "fujitsu-ssl2@4.10.0%clang@17.0.2 arch=linux-rhel8-a64fx",
-                            "prefix": "/vol0004/apps/oss/llvm-v17.0.2/compute_node",
-                        },
-                        {
-                            "spec": "fujitsu-ssl2@4.10.0%fj@4.10.0 arch=linux-rhel8-a64fx",
-                            "prefix": "/opt/FJSVxtclanga/tcsds-ssl2-1.2.38",
-                        },
-                        {
-                            "spec": "fujitsu-ssl2@4.10.0%gcc@13.2.0 arch=linux-rhel8-a64fx",
-                            "prefix": "/opt/FJSVxtclanga/tcsds-ssl2-1.2.38",
+                            "spec": "fujitsu-ssl2@4.10.0 arch=linux-rhel8-a64fx %"
+                            f"{comp_version}",
+                            "prefix": f"{ssl2_prefix}",
                         },
                     ],
                 },
@@ -141,7 +142,7 @@ class RikenFugaku(System):
                     "externals": [
                         {
                             "spec": "cmake@3.27.7 arch=linux-rhel8-a64fx",
-                            "prefix": "/vol0004/apps/oss/spack/opt/spack/linux-rhel8-a64fx/fj-4.10.0/cmake-3.27.7-ussgjuqkqbxi5dcv7kbp6bugdcjc5ph6",
+                            "prefix": "/vol0004/apps/oss/spack-v0.21/opt/spack/linux-rhel8-a64fx/fj-4.10.0/cmake-3.27.7-ussgjuqkqbxi5dcv7kbp6bugdcjc5ph6",
                         },
                         {
                             "spec": "cmake@3.20.2 arch=linux-rhel8-a64fx",
@@ -401,6 +402,7 @@ class RikenFugaku(System):
                         {"spec": "m4@1.4.18 arch=linux-rhel8-a64fx", "prefix": "/usr"}
                     ]
                 },
+                "mpi": {"buildable": False},
                 "nettle": {
                     "externals": [
                         {
@@ -548,58 +550,49 @@ class RikenFugaku(System):
                 },
             }
         }
+        if not self.spec.satisfies("compiler=gcc"):
+            selections["packages"] |= {
+                "blas": {"require": ["fujitsu-ssl2"]},
+                "lapack": {"require": ["fujitsu-ssl2"]},
+            }
 
         return selections
 
     def compute_compilers_section(self):
-
         compiler = self.spec.variants["compiler"][0]
 
-        selections = {"compilers": []}
-
         if compiler == "clang":
-            selections["compilers"] += [
-                {
-                    "compiler": {
-                        "spec": "clang@17.0.2",
-                        "paths": {
-                            "cc": "/vol0004/apps/oss/llvm-v17.0.2/compute_node/bin/clang",
-                            "cxx": "/vol0004/apps/oss/llvm-v17.0.2/compute_node/bin/clang++",
-                            "f77": "/vol0004/apps/oss/llvm-v17.0.2/compute_node/bin/flang",
-                            "fc": "/vol0004/apps/oss/llvm-v17.0.2/compute_node/bin/flang",
-                        },
-                        # Uncomment and populate these if needed
-                        # "flags": {
-                        #     "cflags": {"-msve-vector-bits=scalable"},
-                        #     "cxxflags": {"-msve-vector-bits=scalable"},
-                        #     "fflags": {"-msve-vector-bits=scalable"},
-                        #     "ldflags": {"-fuse-ld=lld"},
-                        # },
-                        "environment": {
+            # maybe_flags = {
+            #    "cflags": {"-msve-vector-bits=scalable"},
+            #    "cxxflags": {"-msve-vector-bits=scalable"},
+            #    "fflags": {"-msve-vector-bits=scalable"},
+            #    "ldflags": {"-fuse-ld=lld"},
+            # }
+            cfg = compiler_section_for(
+                "llvm",
+                [
+                    compiler_def(
+                        "llvm@17.0.2",
+                        "/vol0004/apps/oss/llvm-v17.0.2/compute_node/",
+                        {"c": "clang", "cxx": "clang++", "fortran": "flang"},
+                        env={
                             "append_path": {
                                 "LD_LIBRARY_PATH": "/opt/FJSVxtclanga/tcsds-1.2.38/lib64"
                             }
                         },
-                        "operating_system": "rhel8",
-                        "target": "aarch64",
-                        "modules": [],
-                        "extra_rpaths": [],
-                    }
-                }
-            ]
+                        # flags = maybe_flags
+                    )
+                ],
+            )
         elif compiler == "gcc":
-            selections["compilers"] += [
-                {
-                    "compiler": {
-                        "spec": "gcc@13.2.0",
-                        "paths": {
-                            "cc": "/vol0004/apps/oss/spack-v0.21/opt/spack/linux-rhel8-a64fx/gcc-8.5.0/gcc-13.2.0-abihbe7ykvpedq54j6blfvfppy7ojbmd/bin/gcc",
-                            "cxx": "/vol0004/apps/oss/spack-v0.21/opt/spack/linux-rhel8-a64fx/gcc-8.5.0/gcc-13.2.0-abihbe7ykvpedq54j6blfvfppy7ojbmd/bin/g++",
-                            "f77": "/vol0004/apps/oss/spack-v0.21/opt/spack/linux-rhel8-a64fx/gcc-8.5.0/gcc-13.2.0-abihbe7ykvpedq54j6blfvfppy7ojbmd/bin/gfortran",
-                            "fc": "/vol0004/apps/oss/spack-v0.21/opt/spack/linux-rhel8-a64fx/gcc-8.5.0/gcc-13.2.0-abihbe7ykvpedq54j6blfvfppy7ojbmd/bin/gfortran",
-                        },
-                        "flags": {"ldflags": {"-lelf -ldl"}},
-                        "environment": {
+            cfg = compiler_section_for(
+                "gcc",
+                [
+                    compiler_def(
+                        "gcc@13.2.0 languages:=c,c++,fortran",
+                        "/vol0004/apps/oss/spack-v0.21/opt/spack/linux-rhel8-a64fx/gcc-8.5.0/gcc-13.2.0-abihbe7ykvpedq54j6blfvfppy7ojbmd/",
+                        {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                        env={
                             "set": {
                                 "OPAL_PREFIX": "/vol0004/apps/oss/mpigcc/fjmpi-gcc12"
                             },
@@ -607,29 +600,19 @@ class RikenFugaku(System):
                                 "LD_LIBRARY_PATH": "/opt/FJSVxtclanga/tcsds-1.2.38/lib64"
                             },
                         },
-                        "operating_system": "rhel8",
-                        "target": "aarch64",
-                        "modules": [],
-                        "extra_rpaths": [],
-                    }
-                }
-            ]
+                        flags={"ldflags": "-lelf -ldl"},
+                    )
+                ],
+            )
         elif compiler == "fj":
-            selections["compilers"] += [
-                {
-                    "compiler": {
-                        "spec": "fj@4.10.0",
-                        "modules": [],
-                        "paths": {
-                            "cc": "/opt/FJSVxtclanga/tcsds-1.2.38/bin/fcc",
-                            "cxx": "/opt/FJSVxtclanga/tcsds-1.2.38/bin/FCC",
-                            "f77": "/opt/FJSVxtclanga/tcsds-1.2.38/bin/frt",
-                            "fc": "/opt/FJSVxtclanga/tcsds-1.2.38/bin/frt",
-                        },
-                        "flags": {},
-                        "operating_system": "rhel8",
-                        "target": "aarch64",
-                        "environment": {
+            cfg = compiler_section_for(
+                "fj",
+                [
+                    compiler_def(
+                        "fj@4.10.0",
+                        "/opt/FJSVxtclanga/tcsds-1.2.38/",
+                        {"c": "fcc", "cxx": "FCC", "fortran": "frt"},
+                        env={
                             "set": {
                                 "fcc_ENV": "-Nclang",
                                 "FCC_ENV": "-Nclang",
@@ -639,12 +622,11 @@ class RikenFugaku(System):
                                 "LD_LIBRARY_PATH": "/opt/FJSVxtclanga/tcsds-1.2.38/lib64",
                             },
                         },
-                        "extra_rpaths": [],
-                    }
-                }
-            ]
+                    )
+                ],
+            )
 
-        return selections
+        return cfg
 
     def system_specific_variables(self):
         return {
@@ -654,14 +636,15 @@ class RikenFugaku(System):
         }
 
     def compute_software_section(self):
+        default_comp = self.spec.variants["compiler"][0]
+        if default_comp == "clang":
+            default_comp = "llvm"
         return {
             "software": {
                 "packages": {
-                    "default-compiler": {
-                        "pkg_spec": f"{self.spec.variants['compiler'][0]}"
-                    },
+                    "default-compiler": {"pkg_spec": f"{default_comp}"},
                     "default-mpi": {"pkg_spec": "fujitsu-mpi"},
-                    "compiler-clang": {"pkg_spec": "clang"},
+                    "compiler-clang": {"pkg_spec": "llvm"},
                     "compiler-fj": {"pkg_spec": "fj"},
                     "compiler-gcc": {"pkg_spec": "gcc"},
                     "blas": {"pkg_spec": "fujitsu-ssl2"},

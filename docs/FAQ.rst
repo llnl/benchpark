@@ -1,84 +1,106 @@
-.. Copyright 2023 Lawrence Livermore National Security, LLC and other
-   Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+..
+    Copyright 2023 Lawrence Livermore National Security, LLC and other
+    Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 
-   SPDX-License-Identifier: Apache-2.0
+    SPDX-License-Identifier: Apache-2.0
 
+This page contains answers to frequently asked questions about Benchpark. If you have
+questions that are not answered here, feel free to ask on `#benchpark-support channel in
+Spack Slack <https://spackpm.slack.com/archives/C061R1M9HNJ>`_ or `GitHub Discussions
+<https://github.com/llnl/benchpark/discussions>`_. If you’ve learned the answer to a
+question that you think should be here, please consider contributing to this page.
 
-==========================
-Frequently Asked Questions
-==========================
+############################
+ Frequently Asked Questions
+############################
 
----------------------------------
-Benchmark not yet in Spack/Ramble
----------------------------------
+***********************************
+ Benchmark not yet in Spack/Ramble
+***********************************
 
-By default, Benchpark will use ${Benchmark1} specifications (``package.py`` and ``application.py``)
-provided in the Spack and Ramble repos.
-It is possible to overwrite the benchmark specifications provided in the Spack and Ramble repos.
-To do so, add ``package.py`` and/or ``application.py`` for ${Benchmark1} in
-``benchpark/repo/${Benchmark1}``::
+By default, Benchpark will use ${Benchmark1} specifications (``package.py`` and
+``application.py``) provided in the Spack and Ramble repos. It is possible to overwrite
+the benchmark specifications provided in the Spack and Ramble repos. To do so, add
+``package.py`` and/or ``application.py`` for ${Benchmark1} in
+``benchpark/repo/${Benchmark1}``:
 
-  benchpark
-  └── repo
-     ├── ${Benchmark1}
-     │  ├── application.py
-     │  └── package.py
-     └── repo.yaml
+::
+
+    benchpark
+    └── repo
+       ├── ${Benchmark1}
+       │  ├── application.py
+       │  └── package.py
+       └── repo.yaml
 
 ``benchpark/repo`` can be used as a staging area for the build and run specification for
-${Benchmark1} so that you can test them together with your experiment specification
-on a given system.  Once the experiment is working and merged into the develop branch of Benchpark,
-we would like to encourage the contributors to upstream the ``package.py`` to Spack,
-and the ``application.py`` to Ramble.  When those PRs are approved and merged,
+${Benchmark1} so that you can test them together with your experiment specification on a
+given system. Once the experiment is working and merged into the develop branch of
+Benchpark, we would like to encourage the contributors to upstream the ``package.py`` to
+Spack, and the ``application.py`` to Ramble. When those PRs are approved and merged,
 please submit a PR to remove the duplicated specification from ``benchpark/repo``.
 
-----------------------------------
-Spack/Ramble versions in Benchpark
-----------------------------------
+************************************
+ Spack/Ramble versions in Benchpark
+************************************
 
-Benchpark depends on the build functionality provided in
-`Spack <https://github.com/spack/spack>`_,
-and run functionality provided in
-`Ramble <https://github.com/GoogleCloudPlatform/ramble>`_.
-To allow for testing before pulling in updates in Spack and Ramble,
-Benchpark clones and uses the versions of Spack and Ramble
-specified in ``checkout-versions.yaml``.
+Benchpark depends on the build functionality provided in `Spack
+<https://github.com/spack/spack>`_, the Spack packages provided in `Spack-packages
+<https://github.com/spack/spack-packages>`_, and run functionality provided in `Ramble
+<https://github.com/GoogleCloudPlatform/ramble>`_. To allow for testing before pulling
+in updates in Spack and Ramble, Benchpark clones and uses the versions of Spack and
+Ramble specified in ``checkout-versions.yaml``.
 
-The user might notice this delay in Spack and Ramble versions
-in two ways:
+The user might notice this delay in Spack and Ramble versions in two ways:
 
-* The latest functionality of Spack and/or Ramble may not yet be
-  available in Benchpark.
-* The latest package.py specifications available in Spack
-  and application.py specifications available in Ramble
-  may not be available in Benchpark.
+- The latest functionality of Spack and/or Ramble may not yet be available in Benchpark.
+- The latest package.py specifications available in Spack and application.py
+  specifications available in Ramble may not be available in Benchpark.
 
-At your own risk, you may go into the cloned Spack and Ramble
-directories and perform a git pull to grab those updates.
-This may be useful for package updates, but perilous for
-functionality updates.
+At your own risk, you may go into the cloned Spack, Spack-packages, and Ramble
+directories and perform a git pull to grab those updates (these are located in your home
+directory (``~``) or an alternate location you indicated when bootstrapping Benchpark).
+This may be useful for package updates (i.e. Spack-packages), but perilous for
+functionality updates (i.e. Spack or Ramble).
 
-Alternatively, the user may temporarily copy the needed packages
-into ``benchpark/repo``, and remove them when Benchpark updates
-to the next version of Spack/Ramble.
+Alternatively, the user may temporarily copy the needed packages into
+``benchpark/repo``, and remove them when Benchpark updates to the next version of
+Spack/Ramble.
 
--------------------------
-What to rerun after edits
--------------------------
+***************************
+ What to rerun after edits
+***************************
 
 .. list-table:: I made changes.  What should I rerun?
-   :widths: 35 65
-   :header-rows: 1
+    :widths: 35 65
+    :header-rows: 1
 
-   * - What I changed
-     - Commands to rerun
-   * - configs
-     - ``ramble --disable-progress-bar --workspace-dir . workspace setup``
-   * - benchmark's package.py
-     - ``ramble --disable-progress-bar --workspace-dir . workspace setup``
-   * - dependency of package.py
-     - ``ramble --disable-progress-bar --workspace-dir . workspace setup``
-   * - experiment parameters
-     - delete ``workspace/experiments``
-   * - wish to rerun experiments
-     - delete ``workspace/experiments``
+    - - What I changed
+      - Commands to rerun
+    - - configs
+      - ``ramble --workspace-dir . workspace setup``
+    - - benchmark's package.py
+      - ``ramble --workspace-dir . workspace setup``
+    - - dependency of package.py
+      - ``ramble --workspace-dir . workspace setup``
+    - - experiment parameters
+      - delete ``workspace/experiments``
+    - - wish to rerun experiments
+      - delete ``workspace/experiments``
+
+**********************************************************************
+ How to move the Benchpark bootstrap location from the home directory
+**********************************************************************
+
+Remove your current bootstrap in home (``~``) and then use: ``benchpark configure`` to
+set your preferred location. Keep in mind that Spack, Spack-packages, and Ramble will be
+cloned to this location, so if you are using slow storage this may take awhile.
+
+::
+
+    rm -rf ~/.benchpark
+    benchpark configure --bootstrap-location /my/path
+    benchpark bootstrap
+
+benchpark will save this location, and you can optionally set a new bootstrap location
+for each clone of benchpark, or reuse the same location.

@@ -8,11 +8,14 @@ on:
 concurrency:
   group: ci-${{github.ref}}-${{github.event.pull_request.number || github.run_number}}
   cancel-in-progress: true
+permissions:
+  pull-requests: read
+  contents: read
+  pages: write
+  id-token: write
 jobs:
   changes:
     runs-on: ubuntu-24.04
-    permissions:
-      pull-requests: read
     outputs:
       docs: ${{ steps.filter.outputs.docs }}
       style: ${{ steps.filter.outputs.style }}
@@ -21,14 +24,15 @@ jobs:
       license: ${{ steps.filter.outputs.license }}
       diffpackages: ${{ steps.filter.outputs.diffpackages }}
       modified_repo_dirs: ${{ steps.get_modified_repo_dirs.outputs.modified_repo_dirs }}
+      containers: ${{ steps.filter.outputs.containers }}
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         if: ${{ github.event_name == 'push' || github.event_name == 'merge_group' || github.event_name == 'pull_request' }}
         with:
           fetch-depth: 0
 
         # For pull requests it's not necessary to checkout the code
-      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
+      - uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d
         id: filter
         with:
           # For merge group events, compare against the target branch (main)
@@ -57,13 +61,17 @@ jobs:
               - 'docs/conf.py'
               - 'experiments/**'
               - 'lib/**'
+              - 'modifiers/**'
               - 'repo/**'
               - 'systems/**'
               - 'var/**'
               - 'pyproject.toml'
               - '.flake8'
               - 'checkout-versions.yaml'
+              - '.gitlab-ci.yml'
+              - 'docs/**'
             run:
+              - '.github/**'
               - 'bin/**'
               - 'configs/**'
               - 'checkout-versions.yaml'
@@ -98,6 +106,9 @@ jobs:
               - 'var/**'
             diffpackages:
               - 'repo/**/package.py'
+            containers:
+              - 'containerfiles/**'
+              - 'systems/fluxtainer/**'
       - name: Get modified directories in repo/
         id: get_modified_repo_dirs
         run: |
@@ -124,6 +135,11 @@ jobs:
     if: ${{ needs.changes.outputs.run == 'true' }}
     needs: changes
     uses: ./.github/workflows/run.yml
+    # 'workflow_call' actions do not get access to secrets
+    # normally. So, we add this (plus the corresponding)
+    # settings in coverage.yml to pass the token on
+    secrets:
+      BENCHPARK_CODECOV_TOKEN: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
   coverage:
     if: ${{ needs.changes.outputs.coverage == 'true' }}
     needs: changes
@@ -143,6 +159,15 @@ jobs:
     uses: ./.github/workflows/diffpackages.yml
     with:
       modified_repo_dirs: ${{ needs.changes.outputs.modified_repo_dirs }}
+  containers:
+    if: ${{ needs.changes.outputs.containers == 'true' }}
+    needs: changes
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
+    uses: ./.github/workflows/containers.yml
   all:
     needs:
       - changes
@@ -152,6 +177,7 @@ jobs:
       - coverage
       - license
       - diffpackages
+      - containers
     if: always()
     runs-on: ubuntu-latest
     steps:

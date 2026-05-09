@@ -5,10 +5,13 @@
 
 from benchpark.directives import variant
 from benchpark.experiment import Experiment
-from benchpark.openmp import OpenMPExperiment
+from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
 
 
-class SalmonTddft(Experiment, OpenMPExperiment):
+class SalmonTddft(
+    Experiment,
+    ProgrammingModel(ProgrammingModelType.Mpionly, ProgrammingModelType.Openmp),
+):
     variant(
         "workload",
         default="gs",
@@ -48,7 +51,4 @@ class SalmonTddft(Experiment, OpenMPExperiment):
         )
 
     def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
-
-        self.add_package_spec(self.name, [f"salmon-tddft@{app_version}"])
+        self.add_package_spec(self.name, [f"salmon-tddft{self.determine_version()}"])

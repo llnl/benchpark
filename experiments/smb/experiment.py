@@ -3,12 +3,15 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainers
+from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
-from benchpark.scaling import StrongScaling
+from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
 
 
-class Smb(Experiment, StrongScaling):
+class Smb(
+    Experiment,
+    ProgrammingModel(ProgrammingModelType.Mpionly),
+):
     variant(
         "workload",
         default="mpi_overhead",
@@ -18,7 +21,8 @@ class Smb(Experiment, StrongScaling):
 
     variant(
         "version",
-        default="master",
+        default="1.1",
+        values=("master", "latest", "1.1"),
         description="app version",
     )
 
@@ -38,9 +42,7 @@ class Smb(Experiment, StrongScaling):
         )
 
     def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
-        spec_string = f"smb@{app_version} +mpi"
+        spec_string = f"smb{self.determine_version()}"
         if self.spec.satisfies("workload=rma_mt"):
             spec_string += "+rma"
         self.add_package_spec(self.name, [spec_string])

@@ -18,14 +18,14 @@ do
         do
             echo $i $scale
             # Setup specific experiment
-            benchpark experiment init --dest=quicksilver$i$scale$runNum quicksilver +$scale +openmp ~single_node caliper=mpi
+            benchpark experiment init --dest=quicksilver$i$scale$runNum quicksilver +$scale +openmp caliper=mpi
             if [ "$i" == "gcc12" ]; then
-                benchpark setup quicksilver$i$scale$runNum daneGCC workspace
+                benchpark setup daneGCC/quicksilver$i$scale$runNum workspace
                 . workspace/setup.sh
                 ramble --workspace-dir workspace/quicksilver$i$scale$runNum/daneGCC/workspace workspace setup
                 ramble --workspace-dir workspace/quicksilver$i$scale$runNum/daneGCC/workspace on
             else
-                benchpark setup quicksilver$i$scale$runNum daneIntel workspace
+                benchpark setup daneIntel/quicksilver$i$scale$runNum workspace
                 . workspace/setup.sh
                 ramble --workspace-dir workspace/quicksilver$i$scale$runNum/daneIntel/workspace workspace setup
                 ramble --workspace-dir workspace/quicksilver$i$scale$runNum/daneIntel/workspace on

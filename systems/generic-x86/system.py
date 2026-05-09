@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from benchpark.directives import maintainers
+from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.system import System
-from benchpark.openmpsystem import OpenMPSystem
 
 
 class GenericX86(System):
@@ -16,7 +16,7 @@ class GenericX86(System):
 
     def __init__(self, spec):
         super().__init__(spec)
-        self.programming_models = [OpenMPSystem()]
+        self.programming_models = [OpenMPCPUOnlySystem()]
 
         self.scheduler = "mpi"
         setattr(self, "sys_cores_per_node", 1)

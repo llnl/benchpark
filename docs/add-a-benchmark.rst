@@ -1,33 +1,41 @@
-.. Copyright 2023 Lawrence Livermore National Security, LLC and other
-   Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+..
+    Copyright 2023 Lawrence Livermore National Security, LLC and other
+    Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 
-   SPDX-License-Identifier: Apache-2.0
+    SPDX-License-Identifier: Apache-2.0
 
-==================
-Adding a Benchmark
-==================
+####################
+ Adding a Benchmark
+####################
 
-This guide is intended for application developers who want to add a benchmark so that it can be run with Benchpark.
+This guide is intended for application developers who want to add a benchmark so that it
+can be run with Benchpark.
 
-Create a New Benchmark
-------------------------
+************************
+ Create a New Benchmark
+************************
 
-The following system-independent specification is required for each ${Benchmark1} in ``benchpark/repo/${Benchmark1}``:
+The following system-independent specification is required for each ${Benchmark1}:
 
-- ``package.py`` is a Spack specification that defines how to build and install ${Benchmark1}.
-- ``application.py`` is a Ramble specification that defines the ${Benchmark1} input and parameters.
+- ``package.py`` is a Spack specification that defines how to build and install
+  ${Benchmark1}. See the `Spack Package Creation Tutorial
+  <https://spack-tutorial.readthedocs.io/en/latest/tutorial_packaging.html>`_ to learn
+  how to create and test a Spack ``package.py``. If your benchmark already exists in
+  Spack, benchpark will use that version of the ``package.py``, unless you define a
+  version in ``benchpark/repo/``.
+- ``application.py`` is a Ramble specification that defines the ${Benchmark1} input and
+  parameters. See the `Ramble Application Definition Developers Tutorial
+  <https://ramble.readthedocs.io/en/latest/dev_guides/1_basic_application_definition_tutorial.html>`_
+  to learn how to create a Ramble ``application.py``. We recommend testing your
+  ``application.py`` using the `Ramble Testing Application Definitions
+  <https://ramble.readthedocs.io/en/latest/dev_guides/1_basic_application_definition_tutorial.html#testing-application-definitions>`_
+  instructions. If your benchmark already exists in Ramble, benchpark will use that
+  version of the ``application.py``, unless you define a version in ``benchpark/repo/``.
 
-During ``benchpark setup`` the user selects ${Benchmark1} to run as the following::
+Again, by default Benchpark will use ${Benchmark1} specifications (``application.py``
+and ``package.py``) provided in the Spack and Ramble upstream repositories. Overwrite
+the upstream definitions by adding the ``application.py`` and/or ``package.py`` to
+``benchpark/repo/${Benchmark1}``, see :doc:`FAQ` for details.
 
-     benchpark setup </output/path/to/experiments_root> </output/path/to/system_root> </output/path/to/workspace> 
-
-By default, Benchpark will use ${Benchmark1} specifications (``application.py`` and ``package.py``)
-provided in the Spack and Ramble repos.
-It is possible to overwrite the benchmark specifications provided in the Spack and Ramble repos;
-see :doc:`FAQ` for details.
-
-
-Validate a Benchmark 
-------------------------
-
-Now that the benchmark has been created/updated you need to configure at least one experiment, and then validate it, see :doc:`add-an-experiment`.
+After satisfying the above prerequisites, in order to use your benchmark in Benchpark,
+you will need to create an experiment as described in :doc:`add-an-experiment`.

@@ -3,21 +3,22 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.error import BenchparkError
-from benchpark.directives import variant, maintainers
-from benchpark.experiment import Experiment
-from benchpark.scaling import StrongScaling
 from benchpark.caliper import Caliper
-from benchpark.cuda import CudaExperiment
-from benchpark.rocm import ROCmExperiment
+from benchpark.directives import maintainers, variant
+from benchpark.experiment import Experiment
+from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
+from benchpark.scaling import Scaling, ScalingMode
 
 
 class Remhos(
     Experiment,
-    StrongScaling,
+    ProgrammingModel(
+        ProgrammingModelType.Mpionly,
+        ProgrammingModelType.Cuda,
+        ProgrammingModelType.Rocm,
+    ),
+    Scaling(ScalingMode.Strong, ScalingMode.Weak, ScalingMode.Throughput),
     Caliper,
-    CudaExperiment,
-    ROCmExperiment,
 ):
 
     variant(
@@ -29,75 +30,122 @@ class Remhos(
 
     variant(
         "version",
-        default="gpu-opt",
-        values=("1.0", "develop", "gpu-fom", "gpu-opt"),
+        default="develop",
+        values=("develop", "latest", "1.0"),
         description="app version",
+    )
+
+    variant(
+        "gpu-aware-mpi",
+        default=False,
+        values=(True, False),
+        description="Use GPU-aware MPI",
+    )
+
+    variant(
+        "raja",
+        default=True,
+        values=(True, False),
+        description="Use RAJA backend for MFEM",
     )
 
     maintainers("rfhaque")
 
     def compute_applications_section(self):
-        # TODO: Replace with conflicts clause
-        scaling_modes = {
-            "strong": self.spec.satisfies("+strong"),
-            "single_node": self.spec.satisfies("+single_node"),
-        }
-
-        scaling_mode_enabled = [key for key, value in scaling_modes.items() if value]
-        if len(scaling_mode_enabled) != 1:
-            print(scaling_mode_enabled)
-            raise BenchparkError(
-                f"Only one type of scaling per experiment is allowed for application package {self.name}"
-            )
-
-        if self.spec.variants["workload"][0] == "2d":
-            problem_sizes = {"epm": 1024}
-        elif self.spec.variants["workload"][0] == "3d":
-            problem_sizes = {"epm": 512}
-        device = "n_ranks"
-
-        for nk, nv in problem_sizes.items():
-            self.add_experiment_variable(nk, nv, True)
-
-        scaling_factor = {"scaling_factor": 1}
-
-        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
-            device = "n_gpus"
-            n_devices_per_node = "{sys_gpus_per_node}"
+        if self.spec.satisfies("exec_mode=perf"):
+            if self.spec.satisfies("workload=2d"):
+                self.add_experiment_variable("epm", 1024, True)
+                self.add_experiment_variable("o", 3, False)
+                self.add_experiment_variable("p", 14, False)
+            elif self.spec.satisfies("workload=3d"):
+                self.add_experiment_variable("epm", 512, True)
+                self.add_experiment_variable("o", 2, False)
+                self.add_experiment_variable("p", 10, False)
         else:
-            device = "n_ranks"
-            n_devices_per_node = "{sys_cores_per_node}"
-            self.add_experiment_variable("n_threads_per_proc", 1)
+            if self.spec.satisfies("workload=2d"):
+                self.add_experiment_variable("epm", 1024, True)
+                self.add_experiment_variable("o", 3, False)
+                self.add_experiment_variable("p", 14, False)
+            elif self.spec.satisfies("workload=3d"):
+                self.add_experiment_variable("epm", 512, True)
+                self.add_experiment_variable("o", 2, False)
+                self.add_experiment_variable("p", 10, False)
+        self.add_experiment_variable("dt", -1.0, False)
+        self.add_experiment_variable("tf", 0.5, False)
+        self.add_experiment_variable("ho", 3, False)
+        self.add_experiment_variable("lo", 5, False)
+        self.add_experiment_variable("fct", 2, False)
+        self.add_experiment_variable("vs", 1, False)
+        self.add_experiment_variable("ms", 5, False)
 
-        if self.spec.satisfies("+strong"):
-            scaled_variables = self.generate_strong_scaling_params(
-                {tuple(scaling_factor.keys()): list(scaling_factor.values())},
-                int(self.spec.variants["scaling-factor"][0]),
-                int(self.spec.variants["scaling-iterations"][0]),
-            )
-            for pk, pv in scaled_variables.items():
-                self.add_experiment_variable(pk, pv, True)
-        else:
-            for pk, pv in scaling_factor.items():
-                self.add_experiment_variable(pk, pv, True)
+        # resource_count is the number of resources used for this experiment:
+        self.add_experiment_variable("resource_count", 4, False)
+        self.add_experiment_variable("pool", 120, False)
 
-        self.add_experiment_variable(
-            device, f"{n_devices_per_node}*" + "{scaling_factor}", True
+        # Set the variables required by the experiment
+        self.set_required_variables(
+            n_resources="{resource_count}",
+            process_problem_size="{epm}",
+            total_problem_size="{epm} * {n_resources}",
+        )
+
+        # Register the scaling variables and their respective scaling functions
+        # required to correctly scale the experiment for the given scaliing policy
+        # Strong scaling scales up resource_count by the specified scaling_factor
+        # and scales epm down by scaling_factor to keep the problem size constant
+        self.register_scaling_config(
+            {
+                ScalingMode.Strong: {
+                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "epm": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    // scaling_factor,
+                },
+                ScalingMode.Weak: {
+                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "epm": lambda var, itr, dim, scaling_factor: var.val(dim),
+                },
+                ScalingMode.Throughput: {
+                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    ),
+                    "epm": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                },
+            }
         )
 
         if self.spec.satisfies("+cuda"):
-            self.add_experiment_variable("arch", "CUDA")
+            if self.spec.satisfies("+raja"):
+                self.add_experiment_variable("device", "raja-gpu", True)
+            else:
+                self.add_experiment_variable("device", "cuda", True)
         elif self.spec.satisfies("+rocm"):
-            self.add_experiment_variable("arch", "HIP")
+            if self.spec.satisfies("+raja"):
+                self.add_experiment_variable("device", "raja-gpu", True)
+            else:
+                self.add_experiment_variable("device", "hip", True)
+        else:
+            self.add_experiment_variable("device", "cpu", True)
 
-        n_resources = "{" + device + "}"
-        self.set_required_variables(
-            n_resources=n_resources,
-            process_problem_size="{epm}",
-            total_problem_size="{epm}*" + n_resources,
-        )
+        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+            self.add_experiment_variable("n_gpus", "{n_resources}", True)
+            if self.spec.satisfies("+gpu-aware-mpi"):
+                self.add_experiment_variable("gam", "--gpu-aware-mpi")
+            else:
+                self.add_experiment_variable("gam", "--no-gpu-aware-mpi")
+        else:
+            self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
     def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, [f"remhos@{app_version} +metis"])
+        gam = "~gpu-aware-mpi"
+        raja = "~raja"
+        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+            if self.spec.satisfies("+gpu-aware-mpi"):
+                gam = "+gpu-aware-mpi"
+        if self.spec.satisfies("+raja"):
+            raja = "+raja"
+        self.add_package_spec(
+            self.name, [f"remhos{self.determine_version()} +metis {gam} {raja}"]
+        )

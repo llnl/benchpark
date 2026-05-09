@@ -3,22 +3,24 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.error import BenchparkError
-from benchpark.directives import variant, maintainers
-from benchpark.experiment import Experiment
-from benchpark.scaling import StrongScaling
-from benchpark.openmp import OpenMPExperiment
-from benchpark.cuda import CudaExperiment
-from benchpark.rocm import ROCmExperiment
+import math
+
 from benchpark.caliper import Caliper
+from benchpark.directives import maintainers, variant
+from benchpark.experiment import Experiment
+from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
+from benchpark.scaling import Scaling, ScalingMode
 
 
 class RajaPerf(
     Experiment,
-    StrongScaling,
-    CudaExperiment,
-    ROCmExperiment,
-    OpenMPExperiment,
+    ProgrammingModel(
+        ProgrammingModelType.Mpionly,
+        ProgrammingModelType.Openmp,
+        ProgrammingModelType.Cuda,
+        ProgrammingModelType.Rocm,
+    ),
+    Scaling(ScalingMode.Strong, ScalingMode.Weak, ScalingMode.Throughput),
     Caliper,
 ):
     variant(
@@ -29,83 +31,93 @@ class RajaPerf(
 
     variant(
         "version",
-        default="develop",
+        default="2025.12.1",
+        values=("develop", "latest", "2025.12.1", "2025.03.0", "2024.07.0"),
         description="app version",
+    )
+
+    variant(
+        "exec_mode",
+        default="test",
+        values=("test", "perf", "singlenode_cpu_bandwidth"),
+        description="Execution mode",
     )
 
     maintainers("michaelmckinsey1")
 
     def compute_applications_section(self):
-        # TODO: Replace with conflicts clause
-        scaling_modes = {
-            "strong": self.spec.satisfies("+strong"),
-            "weak": self.spec.satisfies("+weak"),
-            "throughput": self.spec.satisfies("+throughput"),
-            "single_node": self.spec.satisfies("+single_node"),
-        }
-
-        scaling_mode_enabled = [key for key, value in scaling_modes.items() if value]
-        if len(scaling_mode_enabled) != 1:
-            raise BenchparkError(
-                f"Only one type of scaling per experiment is allowed for application package {self.name}"
+        if self.spec.satisfies("exec_mode=test"):
+            self.add_experiment_variable("process_problem_size", 1048576, True)
+            self.add_experiment_variable("n_resources", 1, False)
+        elif self.spec.satisfies("exec_mode=singlenode_cpu_bandwidth"):
+            # Need large enough problem size to stress cache, so system dependent.
+            # Examples dane: 128*1024**2, lassen: 64*1024**2, tuolumne: 256*1024**2, rzgenie: 32*1024*1024, poodle: 128*1024*1024
+            sys = self.system_spec.system
+            sockets = sys.sys_sockets_per_node
+            L3size_bytes = sys.sys_cpu_L3_MB * 10**6
+            L2size_bytes = sys.sys_cpu_L2_KB * 10**3
+            num_cores = sys.sys_cores_per_node / sockets
+            div_constant = 16  # 2 doubles per problem size
+            cache_constant = 4  # Make sure data stays in cache
+            if hasattr(sys, "sys_ccd_per_node"):
+                L3size_bytes *= sys.sys_ccd_per_node / sockets
+            problem_size = (
+                (sockets * (L3size_bytes + L2size_bytes * num_cores))
+                * cache_constant
+                / div_constant
             )
-
-        n_resources = {"n_ranks": 1}
-        problem_sizes = {"size": 1048576}
-
-        if self.spec.satisfies("+single_node"):
-            for pk, pv in n_resources.items():
-                n_resources = pv
-            for nk, nv in problem_sizes.items():
-                self.add_experiment_variable(nk, nv, True)
-        elif self.spec.satisfies("+weak"):
-            # Use "strong scaling" to generate resource scaling since problem size is per-process
-            scaled_variables = self.generate_strong_scaling_params(
-                {tuple(n_resources.keys()): list(n_resources.values())},
-                int(self.spec.variants["scaling-factor"][0]),
-                int(self.spec.variants["scaling-iterations"][0]),
+            nearest_power_of_two = 2 ** round(math.log2(problem_size))
+            self.add_experiment_variable(
+                "process_problem_size", nearest_power_of_two, True
             )
-            n_resources = scaled_variables["n_ranks"]
-            for pk, pv in scaled_variables.items():
-                self.add_experiment_variable(pk, pv, True)
-            for nk, nv in problem_sizes.items():
-                self.add_experiment_variable(nk, nv, True)
-        elif self.spec.satisfies("+strong"):
-            scaled_variables = self.generate_strong_scaling_params(
-                {tuple(n_resources.keys()): list(n_resources.values())},
-                int(self.spec.variants["scaling-factor"][0]),
-                int(self.spec.variants["scaling-iterations"][0]),
-            )
-            n_resources = scaled_variables["n_ranks"]
-            for pk, pv in scaled_variables.items():
-                self.add_experiment_variable(pk, pv, True)
-            # Notice 1/scaling-factor to keep total problem size constant for per-process problem size experiments
-            scaled_problem_sizes = self.generate_strong_scaling_params(
-                {tuple(problem_sizes.keys()): list(problem_sizes.values())},
-                1 / int(self.spec.variants["scaling-factor"][0]),
-                int(self.spec.variants["scaling-iterations"][0]),
-            )
-            problem_sizes = scaled_problem_sizes["size"]
-            for nk, nv in scaled_problem_sizes.items():
-                self.add_experiment_variable(nk, nv, True)
-
-        if self.spec.satisfies("+cuda"):
-            self.add_experiment_variable("n_gpus", n_resources, True)
-        elif self.spec.satisfies("+rocm"):
-            self.add_experiment_variable("n_gpus", n_resources, True)
-        elif self.spec.satisfies("+openmp"):
-            self.add_experiment_variable("n_ranks", n_resources, True)
-            self.add_experiment_variable("n_threads_per_proc", 1, True)
-        else:
-            self.add_experiment_variable("n_ranks", n_resources, True)
+            # Number of processes
+            self.add_experiment_variable("n_resources", 1, False)
 
         self.set_required_variables(
-            n_resources="{n_ranks}",
-            process_problem_size="{size}",
-            total_problem_size="{n_ranks}*{size}",
+            total_problem_size="{n_resources}*{process_problem_size}",
         )
 
+        # In this application (RAJAPerf), since the input problem sizes (process_problem_size)
+        # are per process sizes, strong scaling the problem implies that
+        # as n_resources are scaled up, i.e. (x * scaling_factor),
+        # process_problem_size are commensurately scaled down i.e. (x // scaling_factor)
+
+        # For weak scaling, only the n_resources have to be scaled up,
+        # process_problem_size remain the same
+        self.register_scaling_config(
+            {
+                ScalingMode.Strong: {
+                    "n_resources": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "process_problem_size": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
+                    // scaling_factor,
+                },
+                ScalingMode.Weak: {
+                    "n_resources": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "process_problem_size": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    ),
+                },
+                ScalingMode.Throughput: {
+                    "n_resources": lambda var, itr, dim, scaling_factor: var.val(dim),
+                    "process_problem_size": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    )
+                    * scaling_factor,
+                },
+            }
+        )
+
+        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+            self.add_experiment_variable("n_gpus", "{n_resources}", True)
+        elif self.spec.satisfies("+openmp"):
+            self.add_experiment_variable("n_ranks", "{n_resources}", True)
+            self.add_experiment_variable("n_threads_per_proc", 1, True)
+        else:
+            self.add_experiment_variable("n_ranks", "{n_resources}", True)
+
     def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, [f"raja-perf@{app_version}"])
+        self.add_package_spec(self.name, [f"raja-perf{self.determine_version()} +mpi"])

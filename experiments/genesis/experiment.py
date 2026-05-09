@@ -3,12 +3,15 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainers
+from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
-from benchpark.openmp import OpenMPExperiment
+from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
 
 
-class Genesis(Experiment, OpenMPExperiment):
+class Genesis(
+    Experiment,
+    ProgrammingModel(ProgrammingModelType.Mpionly, ProgrammingModelType.Openmp),
+):
 
     variant(
         "workload",
@@ -19,13 +22,19 @@ class Genesis(Experiment, OpenMPExperiment):
 
     variant(
         "version",
-        default="main",
+        default="2.1.6",
+        values=("2.1.6", "main"),
         description="app version",
     )
 
     maintainers("jdomke", "SBA0486")
 
     def compute_applications_section(self):
+        if self.spec.satisfies("exec_mode=test"):
+            self.add_experiment_variable("n_nodes", ["1"], True)
+        # Must be exec_mode=perf
+        else:
+            self.add_experiment_variable("n_nodes", ["2"], True)
 
         self.add_experiment_variable("experiment_setup", "")
         self.add_experiment_variable("lx", "32")
@@ -42,8 +51,7 @@ class Genesis(Experiment, OpenMPExperiment):
         self.add_experiment_variable("maxiter_inner", "50")
 
         if self.spec.satisfies("+openmp"):
-            self.add_experiment_variable("n_nodes", ["2"], True)
-            self.add_experiment_variable("processes_per_node", ["4"])
+            self.add_experiment_variable("processes_per_node", ["8"])
             self.add_experiment_variable("n_ranks", "{processes_per_node} * {n_nodes}")
             self.add_experiment_variable("omp_num_threads", ["12"])
             self.add_experiment_variable("arch", "OpenMP")
@@ -55,6 +63,4 @@ class Genesis(Experiment, OpenMPExperiment):
         )
 
     def compute_package_section(self):
-        # get package version
-        app_version = self.spec.variants["version"][0]
-        self.add_package_spec(self.name, [f"genesis@{app_version} +mpi"])
+        self.add_package_spec(self.name, [f"genesis{self.determine_version()}"])

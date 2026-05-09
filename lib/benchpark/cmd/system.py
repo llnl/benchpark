@@ -6,22 +6,24 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+import pickle
 import shutil
 import subprocess
 import sys
-import yaml
 from pprint import pprint
 
+import llnl.util.tty.color as color
+import yaml
 from deepdiff import DeepDiff
 
-import benchpark.system
 import benchpark.spec
-import benchpark.paths
-import llnl.util.tty.color as color
+import benchpark.system
+from benchpark.paths import paths
 
 
 def system_init(args):
     system_spec = benchpark.spec.SystemSpec(" ".join(args.spec)).concretize()
+    system_spec.destdir = args.dest
     system = system_spec.system
 
     if args.basedir:
@@ -44,6 +46,10 @@ def system_init(args):
         shutil.rmtree(destdir)
         raise
 
+    system_pickle = os.path.join(destdir, "system.pkl")
+    with open(system_pickle, "wb") as f:
+        pickle.dump(system_spec, f)
+
 
 def system_id(args):
     temp_sys = benchpark.system.System(args.system_dir)
@@ -57,16 +63,14 @@ def system_external(args):
     if args.new_system:
         subprocess.run(
             [
-                benchpark.paths.benchpark_home / "spack/bin/spack",
+                paths.benchpark_home / "spack/bin/spack",
                 "external",
                 "find",
                 "--not-buildable",
             ]
         )
 
-        with open(
-            benchpark.paths.benchpark_home / "../.spack/packages.yaml", "r"
-        ) as file:
+        with open(paths.benchpark_home / "spack/etc/spack/packages.yaml", "r") as file:
             new_packages = yaml.safe_load(file)["packages"]
 
         color.cprint("@*rHere are all of the new packages:@.")
@@ -80,7 +84,7 @@ def system_external(args):
     pkg_list = list(packages.keys())
     subprocess.run(
         [
-            benchpark.paths.benchpark_home / "spack/bin/spack",
+            paths.benchpark_home / "spack/bin/spack",
             "external",
             "find",
             "--not-buildable",
@@ -88,7 +92,7 @@ def system_external(args):
         + [pkg for pkg in pkg_list]
     )
 
-    with open(benchpark.paths.benchpark_home / "../.spack/packages.yaml", "r") as file:
+    with open(paths.benchpark_home / "spack/etc/spack/packages.yaml", "r") as file:
         new_packages = yaml.safe_load(file)["packages"]
 
     # Use DeepDiff to find differences
@@ -110,7 +114,9 @@ def system_external(args):
 
 
 def setup_parser(root_parser):
-    system_subparser = root_parser.add_subparsers(dest="system_subcommand")
+    system_subparser = root_parser.add_subparsers(
+        dest="system_subcommand", required=True
+    )
 
     init_parser = system_subparser.add_parser("init")
     init_parser.add_argument("--dest", help="Place all system files here directly")
@@ -143,5 +149,3 @@ def command(args):
     }
     if args.system_subcommand in actions:
         actions[args.system_subcommand](args)
-    else:
-        raise ValueError(f"Unknown subcommand for 'system': {args.system_subcommand}")
