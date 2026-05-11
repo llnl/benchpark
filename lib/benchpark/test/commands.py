@@ -82,9 +82,7 @@ def test_info():
         check=True,
     )
     result = [
-        line.lstrip().split(" ")[0]
-        for line in text.stdout.splitlines()
-        if line.strip()
+        line.lstrip().split(" ")[0] for line in text.stdout.splitlines() if line.strip()
     ]
 
     for r in result:

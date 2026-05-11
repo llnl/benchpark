@@ -15,7 +15,7 @@ class GenericX86(System):
     maintainers("slabasan")
 
     id_to_resources = {
-        "default": { 
+        "default": {
             "sys_cores_per_node": 1,
             "scheduler": "mpi",
         }
