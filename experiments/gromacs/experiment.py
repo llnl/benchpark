@@ -112,7 +112,9 @@ class Gromacs(
         spack_specs += "+sycl" if self.spec.satisfies("+sycl") else "~sycl"
 
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
-            spack_specs += f" direct-gpu-comm={self.spec.variants['direct-gpu-comm'][0]} "
+            spack_specs += (
+                f" direct-gpu-comm={self.spec.variants['direct-gpu-comm'][0]} "
+            )
             spack_specs += " ~double "
         else:
             spack_specs += " direct-gpu-comm=off "
