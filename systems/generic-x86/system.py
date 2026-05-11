@@ -25,6 +25,10 @@ class GenericX86(System):
         super().__init__(spec)
         self.programming_models = [OpenMPCPUOnlySystem()]
 
+        attrs = self.id_to_resources.get("default")
+        for k, v in attrs.items():
+            setattr(self, k, v)
+
     def compute_software_section(self):
         """This is somewhat vestigial, and maybe deleted later. The experiments
         will fail if these variables are not defined though, so for now
