@@ -84,7 +84,7 @@ def test_info():
     result = [
         line.lstrip().split(" ")[0]
         for line in text.stdout.splitlines()
-        if line.strip() and not line.lstrip().startswith("generic-x86")
+        if line.strip()
     ]
 
     for r in result:

@@ -14,12 +14,16 @@ class GenericX86(System):
 
     maintainers("slabasan")
 
+    id_to_resources = {
+        "default": { 
+            "sys_cores_per_node": 1,
+            "scheduler": "mpi",
+        }
+    }
+
     def __init__(self, spec):
         super().__init__(spec)
         self.programming_models = [OpenMPCPUOnlySystem()]
-
-        self.scheduler = "mpi"
-        setattr(self, "sys_cores_per_node", 1)
 
     def compute_software_section(self):
         """This is somewhat vestigial, and maybe deleted later. The experiments
