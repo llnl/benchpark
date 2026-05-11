@@ -114,6 +114,12 @@ class Caliper(BasicModifier):
     )
 
     add_service(
+        service_name="roctx",
+        service_option="roctx",
+        description="Enable ROCm ROCtx service",
+    )
+
+    add_service(
         service_name="rocprofiler",
         service_option="rocprofiler",
         description="Enable ROCm rocprofiler service",

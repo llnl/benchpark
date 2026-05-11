@@ -14,22 +14,6 @@ class PyScaffold(ExecutableApplication):
 
     tags = ["python"]
 
-    register_phase(
-        "prepend_library_path", pipeline="setup", run_before=["make_experiments"]
-    )
-
-    def _prepend_library_path(self, workspace, app_inst=None):
-        """Function to prepend to LD_LIBRARY_PATH, can't do in spack because python_platlib points to wrong site-packages dir"""
-        paths = []
-
-        app_inst.variables["rocm_mods"] = ""
-        if "rocm_arch" in app_inst.variables.keys():
-            app_inst.variables["rocm_mods"] = (
-                "module load rocm/6.4.2 rccl/fast-env-slows-mpi libfabric\nexport SPINDLE_FLUXOPT=off\nexport LD_PRELOAD=/opt/rocm-6.4.2/llvm/lib/libomp.so\nexport MPICH_GPU_SUPPORT_ENABLED=0\nexport LD_LIBRARY_PATH=/collab/usr/global/tools/rccl/toss_4_x86_64_ib_cray/rocm-6.4.1/install/lib/:$LD_LIBRARY_PATH\nexport LD_LIBRARY_PATH=/opt/cray/pe/cce/20.0.0/cce/x86_64/lib:$LD_LIBRARY_PATH\nexport CALI_SERVICES_ENABLE=roctx\n"
-            )
-
-        app_inst.variables["ld_paths"] = ":".join(paths)
-
     with when("package_manager_family=pip"):
         software_spec("scaffold", pkg_spec="py-scaffold")
 
@@ -40,10 +24,9 @@ class PyScaffold(ExecutableApplication):
         description="",
     )
 
-    # TODO: Figure out MPICH_GPU_SUPPORT_ENABLED=0, disabling GTL otherwise linker error.
     executable(
         "modules",
-        "{rocm_mods}export LD_LIBRARY_PATH={ld_paths}:$LD_LIBRARY_PATH",
+        'export MPICH_GPU_SUPPORT_ENABLED=0\nexport LD_PRELOAD="/opt/rocm-7.1.1/llvm/lib/libomp.so /opt/cray/pe/mpich/9.1.0/ofi/gnu/11.2/lib/libmpi_gnu.so.12 /collab/usr/gapps/python/toss_4_x86_64_ib/anaconda3-2023.09/lib/libstdc++.so.6"',
     )
     executable(
         "generate",
@@ -52,7 +35,7 @@ class PyScaffold(ExecutableApplication):
     )
     executable(
         "run",
-        "$(which scaffold) benchmark -c {config_file} --problem-scale {problem_scale}",
+        "$(which scaffold) benchmark -c {config_file} --problem-scale {problem_scale} --epochs {num_epochs} --fract-base-dir ../fractals",
         use_mpi=True,
     )
 

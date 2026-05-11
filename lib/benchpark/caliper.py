@@ -34,6 +34,7 @@ class Caliper:
         values=(
             "none",
             "nvtx",
+            "roctx",
             "rocprofiler",
         ),
         multi=True,
