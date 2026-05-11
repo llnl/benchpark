@@ -5,14 +5,14 @@
 
 import subprocess
 
-import benchpark.paths
+from benchpark.paths import paths
 
 
 def test_list():
     for subcmd in ["experiments", "modifiers", "systems", "benchmarks"]:
         # Test with title (default behavior)
         result_with_title = subprocess.run(
-            [benchpark.paths.benchpark_root / "bin/benchpark", "list", subcmd],
+            [paths.benchpark_root / "bin/benchpark", "list", subcmd],
             check=True,
             capture_output=True,
             text=True,
@@ -24,7 +24,7 @@ def test_list():
         # Test without title (--no-title flag)
         result_no_title = subprocess.run(
             [
-                benchpark.paths.benchpark_root / "bin/benchpark",
+                paths.benchpark_root / "bin/benchpark",
                 "list",
                 subcmd,
                 "--no-title",
@@ -46,7 +46,7 @@ def test_list():
     # Check filtering
     check_cuda = subprocess.run(
         [
-            benchpark.paths.benchpark_root / "bin/benchpark",
+            paths.benchpark_root / "bin/benchpark",
             "list",
             "experiments",
             "--experiment",
@@ -64,6 +64,32 @@ def test_list():
 
 def test_tags():
     subprocess.run(
-        [benchpark.paths.benchpark_root / "bin/benchpark", "tags", "-a", "ad"],
+        [paths.benchpark_root / "bin/benchpark", "tags", "-a", "ad"],
         check=True,
     )
+
+
+def test_info():
+    text = subprocess.run(
+        [
+            paths.benchpark_root / "bin/benchpark",
+            "list",
+            "systems",
+            "--no-title",
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    result = [
+        line.lstrip().split(" ")[0]
+        for line in text.stdout.splitlines()
+        if line.strip() and not line.lstrip().startswith("generic-x86")
+    ]
+
+    for r in result:
+        subprocess.run(
+            [paths.benchpark_root / "bin/benchpark", "info", "system", r],
+            check=True,
+            capture_output=True,
+        )

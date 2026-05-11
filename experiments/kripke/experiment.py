@@ -3,22 +3,21 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainers
-from benchpark.experiment import Experiment
-from benchpark.mpi import MpiOnlyExperiment
-from benchpark.openmp import OpenMPExperiment
-from benchpark.cuda import CudaExperiment
-from benchpark.rocm import ROCmExperiment
-from benchpark.scaling import ScalingMode, Scaling
 from benchpark.caliper import Caliper
+from benchpark.directives import maintainers, variant
+from benchpark.experiment import Experiment
+from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
+from benchpark.scaling import Scaling, ScalingMode
 
 
 class Kripke(
     Experiment,
-    MpiOnlyExperiment,
-    OpenMPExperiment,
-    CudaExperiment,
-    ROCmExperiment,
+    ProgrammingModel(
+        ProgrammingModelType.Mpionly,
+        ProgrammingModelType.Openmp,
+        ProgrammingModelType.Cuda,
+        ProgrammingModelType.Rocm,
+    ),
     Scaling(ScalingMode.Strong, ScalingMode.Weak, ScalingMode.Throughput),
     Caliper,
 ):
@@ -31,8 +30,8 @@ class Kripke(
 
     variant(
         "version",
-        default="2025-07",
-        values=("develop", "latest", "2025-07", "1.2.7.0"),
+        default="2025.12.0",
+        values=("develop", "latest", "2025.12.0", "2025.07.0", "1.2.7.0"),
         description="app version",
     )
 
@@ -40,6 +39,13 @@ class Kripke(
         "single_memory",
         default=False,
         description="Enable single memory space model in rocm",
+    )
+
+    variant(
+        "other",
+        default=False,
+        values=(True, False),
+        description="Set other input/environment variables",
     )
 
     maintainers("pearce8")
@@ -61,28 +67,140 @@ class Kripke(
             self.add_experiment_variable("nquad", 128, True)
             self.add_experiment_variable("ds", 128, True)
             self.add_experiment_variable("lorder", 4, True)
+            self.add_experiment_variable("pool", 4, True)
+            problem_spec = {
+                "nzx": 32,
+                "nzy": 32,
+                "nzz": 16,
+                "pool": 4,
+                "npx": 2,
+                "npy": 2,
+                "npz": 1,
+                "ngroups": 64,
+                "gs": 1,
+                "nquad": 128,
+                "ds": 128,
+                "lorder": 4,
+                "layout": "GDZ",
+                "strong_n": lambda var, itr, dim, scaling_factor: var.val(dim),
+                "strong_p": lambda var, itr, dim, scaling_factor: var.val(dim)
+                * scaling_factor,
+                "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim)
+                * scaling_factor,
+                "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim)
+                * scaling_factor,
+                "throughput_n": lambda var, itr, dim, scaling_factor: var.val(dim)
+                * scaling_factor,
+                "throughput_p": lambda var, itr, dim, scaling_factor: var.val(dim),
+            }
         # Must be exec_mode=perf
         else:
-            # Number of processes in each dimension
-            self.add_experiment_variable(
-                "n_resources_dict",
-                {"npx": [2, 2, 2], "npy": [2, 2, 2], "npz": [1, 1, 1]},
-                True,
-            )
+            if self.spec.satisfies("+throughput"):
+                problem_spec = {
+                    "nzx": [
+                        80,
+                        100,
+                        120,
+                        140,
+                        160,
+                        180,
+                        200,
+                        220,
+                    ],
+                    "nzy": [
+                        80,
+                        100,
+                        120,
+                        140,
+                        160,
+                        180,
+                        200,
+                        220,
+                    ],
+                    "nzz": [
+                        40,
+                        50,
+                        60,
+                        70,
+                        80,
+                        90,
+                        100,
+                        110,
+                    ],
+                    "pool": 120,
+                    "npx": [2, 2, 2, 2, 2, 2, 2, 2],
+                    "npy": [2, 2, 2, 2, 2, 2, 2, 2],
+                    "npz": [1, 1, 1, 1, 1, 1, 1, 1],
+                    "ngroups": 48,
+                    "gs": 1,
+                    "nquad": 80,
+                    "ds": 80,
+                    "lorder": 4,
+                    "layout": "GDZ",
+                    "strong_n": None,
+                    "strong_p": None,
+                    "weak_n": None,
+                    "weak_p": None,
+                    "throughput_n": None,
+                    "throughput_p": None,
+                }
+            else:
+                problem_spec = {
+                    "nzx": 80,
+                    "nzy": 80,
+                    "nzz": 40,
+                    "pool": 120,
+                    "npx": 2,
+                    "npy": 2,
+                    "npz": 1,
+                    "ngroups": 48,
+                    "gs": 1,
+                    "nquad": 80,
+                    "ds": 80,
+                    "lorder": 4,
+                    "layout": "GDZ",
+                    "strong_n": lambda var, itr, dim, scaling_factor: var.val(dim),
+                    "strong_p": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "throughput_n": None,
+                    "throughput_p": None,
+                }
+        # Number of processes in each dimension
+        self.add_experiment_variable(
+            "n_resources_dict",
+            {
+                "npx": problem_spec["npx"],
+                "npy": problem_spec["npy"],
+                "npz": problem_spec["npz"],
+            },
+            True,
+        )
 
-            # Per-process size (in zones) in each dimension
-            self.add_experiment_variable(
-                "total_problem_size_dict",
-                {"nzx": [64, 64, 64], "nzy": [64, 64, 64], "nzz": [32, 32, 32]},
-                True,
-            )
+        # Per-process size (in zones) in each dimension
+        self.add_experiment_variable(
+            "total_problem_size_dict",
+            {
+                "nzx": problem_spec["nzx"],
+                "nzy": problem_spec["nzy"],
+                "nzz": problem_spec["nzz"],
+            },
+            True,
+        )
 
-            self.add_experiment_variable("ngroups", [220, 320, 360], True)
-            self.add_experiment_variable("gs", 1, True)
-            self.add_experiment_variable("nquad", 36, True)
-            self.add_experiment_variable("ds", 36, True)
-            self.add_experiment_variable("lorder", 4, True)
-            self.add_experiment_variable("layout", "GDZ", True)
+        self.add_experiment_variable("ngroups", problem_spec["ngroups"], True)
+        self.add_experiment_variable("gs", problem_spec["gs"], True)
+        self.add_experiment_variable("nquad", problem_spec["nquad"], True)
+        self.add_experiment_variable("ds", problem_spec["ds"], True)
+        self.add_experiment_variable("lorder", problem_spec["lorder"], True)
+        self.add_experiment_variable("layout", problem_spec["layout"], True)
+        self.add_experiment_variable("pool", problem_spec["pool"], True)
+
+        if self.spec.satisfies("+other"):
+            self.set_environment_variable("HSA_XNACK", 1)
 
         # Set the variables required by the experiment
         self.set_required_variables(
@@ -102,32 +220,16 @@ class Kripke(
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    )
-                    * scaling_factor,
-                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    ),
+                    "n_resources_dict": problem_spec["strong_p"],
+                    "total_problem_size_dict": problem_spec["strong_n"],
                 },
                 ScalingMode.Weak: {
-                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    )
-                    * scaling_factor,
-                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    )
-                    * scaling_factor,
+                    "n_resources_dict": problem_spec["weak_p"],
+                    "total_problem_size_dict": problem_spec["weak_n"],
                 },
                 ScalingMode.Throughput: {
-                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    ),
-                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    )
-                    * scaling_factor,
+                    "n_resources_dict": problem_spec["throughput_p"],
+                    "total_problem_size_dict": problem_spec["throughput_n"],
                 },
             }
         )
@@ -156,5 +258,5 @@ class Kripke(
             else "~single_memory"
         )
         self.add_package_spec(
-            self.name, [f"kripke{self.determine_version()} {single_memory} "]
+            self.name, [f"kripke{self.determine_version()} {single_memory} +mpi"]
         )

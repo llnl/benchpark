@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
+import subprocess
+import sys
+
 import pandas as pd
 import yaml
-import sys
-import subprocess
 
 sys.path.append("../lib/")
 import benchpark.accounting  # noqa: E402
-import benchpark.paths  # noqa: E402
 
 
 def construct_tag_groups(tag_groups, tag_dicts, dictionary):

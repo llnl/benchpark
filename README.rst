@@ -95,6 +95,7 @@ ACM, New York, NY, USA, 9 pages.
 Olga Pearce, Gregory Becker, Stephanie Brink, Nathan Hanford, Dewi Yokelson, August Knox, and Barry Rountree.
 2025. HPC Benchmarking: Repeat, Replicate, Reproduce.
 ACM Conference on Reproducibility and Replicability, July 29-31, Vancouver, Canada.
+`doi/10.1145/3736731.3746150 <https://dl.acm.org/doi/10.1145/3736731.3746150>`_.
 
 License
 -------

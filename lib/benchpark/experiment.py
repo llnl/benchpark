@@ -3,19 +3,18 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Dict
-import yaml  # TODO: some way to ensure yaml available
 import sys
-
-from benchpark.error import BenchparkError
-from benchpark.directives import ExperimentSystemBase
-from benchpark.directives import variant
-from benchpark.variables import VariableDict
-import benchpark.spec
-import benchpark.variant
+from typing import Dict
 
 import ramble.language.language_base  # noqa
 import ramble.language.language_helpers  # noqa
+import yaml  # TODO: some way to ensure yaml available
+
+import benchpark.spec
+import benchpark.variant
+from benchpark.directives import ExperimentSystemBase, variant
+from benchpark.error import BenchparkError
+from benchpark.variables import VariableDict
 
 
 class ExperimentHelper:
@@ -130,14 +129,14 @@ class Affinity:
 
             if not self.spec.satisfies("affinity=none"):
                 package_specs["affinity"] = {
-                    "pkg_spec": f"affinity@{affinity_version}+mpi",
+                    "spack_pkg_spec": f"affinity@{affinity_version}+mpi",
                     "compiler": system_specs["compiler"],
                 }
                 if self.spec.satisfies("+cuda"):
-                    package_specs["affinity"]["pkg_spec"] += "+cuda"
+                    package_specs["affinity"]["spack_pkg_spec"] += "+cuda"
                 elif self.spec.satisfies("+rocm"):
                     package_specs["affinity"][
-                        "pkg_spec"
+                        "spack_pkg_spec"
                     ] += "+rocm amdgpu_target={rocm_arch}"
 
             return {
@@ -202,7 +201,7 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
     variant(
         "package_manager",
         default="spack",
-        values=("spack", "environment-modules", "user-managed"),
+        values=("spack", "environment-modules", "user-managed", "pip", "spack-pip"),
         description="package manager to use",
     )
 
@@ -218,10 +217,21 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
         description="Prepend to environment PATH during experiment execution",
     )
 
+    variant(
+        "n_repeats",
+        default="0",
+        description="Number of experiment repetitions",
+    )
+
+    variant(
+        "allocation",
+        default="standard",
+        values=("standard", "torchrun-hpc"),
+        description="Allocation modifier mode",
+    )
+
     def __init__(self, spec):
         self.spec: "benchpark.spec.ConcreteExperimentSpec" = spec
-        # Device type must be set before super with absence of mpionly experiment type
-        self.device_type = "cpu"
         self.programming_models = []
         super().__init__()
         self.helpers = []
@@ -232,7 +242,6 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
             "n_resources",
             "process_problem_size",
             "total_problem_size",
-            "device_type",
         ]
 
         for cls in self.__class__.mro()[1:]:
@@ -241,7 +250,7 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
                     helper_instance = cls.Helper(self)
                     self.helpers.append(helper_instance)
 
-        self.name = self.spec.name
+        self.name = self.spec.name.replace("-", "_")
 
         if "workload" in self.spec.variants:
             self.workload = self.spec.variants["workload"]
@@ -250,31 +259,22 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
 
         self.package_specs = {}
 
+        # Get available programming models for checks
+        self.programming_models = list(self._available_programming_models)
+
         # Explicitly ordered list. "mpi" first
         models = ["mpi"] + ["openmp", "cuda", "rocm"]
-        invalid_models = []
-        for model in models:
-            # Experiment specifying model in add_package_spec that it doesn't implement
-            if (
-                self.spec.satisfies("+" + model)
-                and model not in self.programming_models
-            ):
-                invalid_models.append(model)
         # Case where there are no experiments specified in experiment.py
         if len(self.programming_models) == 0:
-            raise NotImplementedError(
-                f"Please specify a programming model in your {self.name}/experiment.py (e.g. MpiOnlyExperiment, OpenMPExperiment, CudaExperiment, ROCmExperiment). See other experiments for examples."
+            raise BenchparkError(
+                f"Please specify a programming model in your {self.name}/experiment.py (e.g. ProgrammingModelType.Mpionly, ProgrammingModelType.Openmp, ProgrammingModelType.Cuda, ProgrammingModelType.Rocm). See other experiments for examples."
             )
-        elif len(invalid_models) > 0:
-            raise NotImplementedError(
-                f'{invalid_models} are not valid programming models for "{self.name}". Choose from {self.programming_models}.'
-            )
-        # Check if experiment is trying to run in MpiOnly mode without being an MpiOnlyExperiment
+        # Check if experiment is trying to run in MpiOnly mode without being an ProgrammingModelType.Mpionly experiment
         elif "mpi" not in str(self.spec) and not any(
             self.spec.satisfies("+" + model) for model in models[1:]
         ):
-            raise NotImplementedError(
-                f'"{self.name}" cannot run with MPI only without inheriting from MpiOnlyExperiment. Choose from {self.programming_models}'
+            raise BenchparkError(
+                f'"{self.name}" cannot run with MPI only without inheriting from ProgrammingModelType.Mpionly. Choose from {self.programming_models}'
             )
 
         if (
@@ -314,7 +314,6 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
 
     def set_required_variables(self, **kwargs):
         """Helper function to set required variables."""
-        self.add_experiment_variable("device_type", self.device_type, False)
         for var in kwargs.keys():
             if var not in self.req_vars:
                 raise ValueError(f"Unexpected experiment variable provided '{var}'")
@@ -349,11 +348,13 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
             }
         # default configs for all experiments
         default_config = {
+            "n_repeats": self.spec.variants["n_repeats"][0],
             "deprecated": True,
             "benchpark_experiment_command": "benchpark " + " ".join(sys.argv[1:]),
             "system": system_dict,
+            "spec": str(self.spec),
         }
-        if self.spec.variants["package_manager"][0] == "spack":
+        if "spack" in self.spec.variants["package_manager"][0]:
             default_config["spack_flags"] = {
                 "install": "--add --keep-stage",
                 "concretize": "-U -f",
@@ -365,10 +366,26 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
 
     def compute_modifiers_section_wrapper(self):
         # by default we use the allocation modifier and no others
-        modifier_list = [{"name": "allocation"}, {"name": "exit-code"}]
+        modifier_list = [
+            {"name": "allocation", "mode": self.spec.variants["allocation"][0]},
+            {"name": "exit-code"},
+        ]
         modifier_list += self.compute_modifiers_section()
         for cls in self.helpers:
-            modifier_list += cls.compute_modifiers_section()
+            cls_list = cls.compute_modifiers_section()
+            modifier_list += cls_list
+
+            # topdown specific logic
+            uarch_whitelist = ["sapphirerapids", "emeraldrapids"]
+            if len(cls_list) > 0:
+                for mod_obj in cls_list:
+                    if mod_obj["name"] == "caliper" and "topdown" in mod_obj["mode"]:
+                        cpu_arch = self.system_spec.system.cpu_arch
+                        if cpu_arch.lower() not in uarch_whitelist:
+                            raise ValueError(
+                                f"Topdown analysis is not supported on the provided system with uarch='{cpu_arch}'. Must be one of:\n\t{uarch_whitelist}"
+                            )
+
         return modifier_list
 
     def add_experiment_variable(self, name, values, named=False, matrixed=False):
@@ -449,7 +466,10 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
         for cls in self.helpers:
             helper_prefix = cls.get_helper_name_prefix()
             if helper_prefix:
-                expr_helper_list.append(helper_prefix)
+                if isinstance(helper_prefix, list):
+                    expr_helper_list.extend(helper_prefix)
+                else:
+                    expr_helper_list.append(helper_prefix)
         expr_name_suffix = "_".join(expr_helper_list + self.expr_var_names)
 
         self.check_required_variables()
@@ -478,11 +498,26 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
             }
         }
 
-    def add_package_spec(self, package_name, spec=None):
+    def add_package_spec(self, package_name, spec=None, package_manager="spack"):
+
+        # "user-managed" and "environment-variables" package managers will not use spack.
+        self_pkg_manager = self.spec.variants["package_manager"][0]
+        if self_pkg_manager != package_manager and self_pkg_manager in [
+            "environment-modules",
+            "user-managed",
+        ]:
+            print(f"Using '{self_pkg_manager}' instead of '{package_manager}'")
+            package_manager = self_pkg_manager.replace("-", "_")
+
         if spec:
-            self.package_specs[package_name] = {
-                "pkg_spec": spec[0],
-            }
+            if package_name not in self.package_specs:
+                self.package_specs[package_name] = {
+                    f"{package_manager}_pkg_spec": spec[0],
+                }
+            else:
+                self.package_specs[package_name][f"{package_manager}_pkg_spec"] = spec[
+                    0
+                ]
         else:
             self.package_specs[package_name] = {}
 
@@ -510,14 +545,21 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
                 f"Package section must be defined for application package {self.name}"
             )
 
-        if pkg_manager == "spack":
-            spack_variants = list(
-                filter(
-                    lambda v: v is not None,
-                    (cls.get_spack_variants() for cls in self.helpers),
-                )
+        spack_variants = list(
+            filter(
+                lambda v: v is not None,
+                (cls.get_spack_variants() for cls in self.helpers),
             )
-            self.package_specs[self.name]["pkg_spec"] += " ".join(
+        )
+
+        # Specific to spack-pip, note: not the same as pkg_manager == "spack"
+        if "spack" in pkg_manager:
+            self.package_specs[self.name]["spack_pkg_spec"] += " ".join(
+                spack_variants
+            ).strip()
+        else:
+            pkg_spec_name = pkg_manager.replace("-", "_") + "_pkg_spec"
+            self.package_specs[self.name][pkg_spec_name] += " ".join(
                 spack_variants
             ).strip()
 

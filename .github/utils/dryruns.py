@@ -3,12 +3,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import subprocess
-import time
-import sys
 import argparse
 import os
 import re
+import subprocess
+import sys
+import time
 
 DEFAULT_SYSTEM = "llnl-cluster cluster=dane"
 # Skip experiments
@@ -24,8 +24,15 @@ SKIP_EXPR = [
     "stream aws-pcluster instance_type=c4.xlarge",
     "stream cscs-daint",
     "stream generic-x86",
+    "stream fluxtainer",
     # Broken URL's in application.py going to cause dryrun failure
     "genesis",
+    # Not ProgrammingModelType.Mpionly
+    "py-scaffold+strong",
+    "py-scaffold+weak",
+    # Needs package_manager=spack-pip
+    "py-scaffold+rocm",
+    "py-scaffold+cuda",
 ]
 
 
@@ -120,7 +127,6 @@ def main():
         ["./bin/benchpark", "list", "modifiers", "--no-title"], decode=True
     )
     nmods = [i for i in mods_str.replace(" " * 4, "").split("\n") if i != ""]
-    print(nmods)
     modifiers_expr = []
     exclude_mods = ["allocation"]
     i = 0
@@ -131,7 +137,6 @@ def main():
             continue
         if not nmods[i].startswith("\t"):
             curmod = nmods[i]
-            print(curmod)
             end = "=on" if curmod != "caliper" else "=time"
             if "(all benchmarks)" in nmods[i + 1]:
                 for b in mpi_only_expr:
@@ -174,8 +179,13 @@ def main():
     for _, expr_spec_list, sys_spec_list in exprs_to_sys:
         for espec in expr_spec_list:
             for sspec in sys_spec_list:
+                if "ior" in espec and "llnl-cluster" in sspec:
+                    sspec += " mount_point=/p/lustre1"
+                elif "ior" in espec:
+                    SKIP_EXPR.append(f"{espec} {sspec}")
                 expr = f"{espec} {sspec}"
-                if expr in SKIP_EXPR:
+                # If (1) entire spec in SKIP_EXPR or (2) just the experiment name is specified, e.g. skip all systems
+                if expr in SKIP_EXPR or any([expr.split(" ")[0] == se for se in SKIP_EXPR]):
                     skip_tests += 1
                     print(f'Skipping "{expr}"')
                     continue

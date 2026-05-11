@@ -3,12 +3,15 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant, maintainers
+from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
-from benchpark.mpi import MpiOnlyExperiment
+from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
 
 
-class Smb(Experiment, MpiOnlyExperiment):
+class Smb(
+    Experiment,
+    ProgrammingModel(ProgrammingModelType.Mpionly),
+):
     variant(
         "workload",
         default="mpi_overhead",

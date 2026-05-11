@@ -1,3 +1,31 @@
+workflow:
+  rules:
+    # Always allow scheduled pipelines
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: always
+
+    # Run pipelines only when these files/dirs change
+    - changes:
+        - .gitlab/**
+        - bin/**
+        - configs/**
+        - experiments/**
+        - lib/**
+        - modifiers/**
+        - repo/**
+        - var/**
+        - systems/llnl-elcapitan/system.py
+        - systems/llnl-cluster/system.py
+        - .gitlab-ci.yml
+        - checkout-versions.yaml
+        - CTestConfig.cmake
+        - CTestGitlab.cmake
+        - pyproject.toml
+        - remote-urls.yaml
+        - requirements.txt
+
+    # Otherwise, don't create a pipeline
+    - when: never
 variables:
   LLNL_SERVICE_USER: benchpark
   # Required information about GitHub repository
@@ -19,8 +47,10 @@ variables:
   FLUX_ARGS: -N 1 --exclusive
   # Dane
   DANE_SHARED_ALLOC: -N 1 -t 04:00:00 --exclusive --reservation=ci
+  # Matrix (NODES ARE SHARED WITHOUT --exclusive)
+  MATRIX_SHARED_ALLOC: -N 1 -t 04:00:00 --exclusive
   # Tuolumne (max 4hr policy)
-  TUOLUMNE_SHARED_ALLOC: -N 1 -t 2h --queue=pci --exclusive --setattr=gpumode=${GPUMODE}
+  TUOLUMNE_SHARED_ALLOC: -N 1 -t 3h --queue=pbatch --exclusive --setattr=gpumode=${GPUMODE}
     --conf=resource.rediscover=true
   # Tioga (max 2hr policy)
   TIOGA_SHARED_ALLOC: -N 1 -t 2h --queue=pci --exclusive
@@ -42,22 +72,24 @@ include:
   # Daily tests (from PRs)
   - local: .gitlab/tests/shared_flux_clusters.yml
   - local: .gitlab/tests/shared_slurm_clusters.yml
-  - local: .gitlab/tests/non_shared.yml
   # Nightly tests
   - local: .gitlab/tests/nightly.yml
 stages:
+  - bootstrap-benchpark
   - machine-checks
   - allocate-resources
   - test
   - release-resources
   - cleanup-dir
+bootstrap_benchpark:
+  tags: [shell, oslic]
+  stage: bootstrap-benchpark
+  script:
+    - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
+    - ./bin/benchpark configure --bootstrap-location $CUSTOM_CI_BUILDS_DIR
+    - ./bin/benchpark bootstrap
 cleanup_pipeline_dir:
   tags: [shell, oslic]
-  needs:
-    - release_resources_dane
-    - release_resources_flux_tioga
-    - release_resources_flux_tuolumne
-  extends: .on_host_template
   stage: cleanup-dir
   script:
     - echo "Removing $CUSTOM_CI_BUILDS_DIR"

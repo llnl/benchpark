@@ -10,15 +10,15 @@ import pickle
 import shutil
 import subprocess
 import sys
-import yaml
 from pprint import pprint
 
+import llnl.util.tty.color as color
+import yaml
 from deepdiff import DeepDiff
 
-import benchpark.system
 import benchpark.spec
-import benchpark.paths
-import llnl.util.tty.color as color
+import benchpark.system
+from benchpark.paths import paths
 
 
 def system_init(args):
@@ -63,16 +63,14 @@ def system_external(args):
     if args.new_system:
         subprocess.run(
             [
-                benchpark.paths.benchpark_home / "spack/bin/spack",
+                paths.benchpark_home / "spack/bin/spack",
                 "external",
                 "find",
                 "--not-buildable",
             ]
         )
 
-        with open(
-            benchpark.paths.benchpark_home / "../.spack/packages.yaml", "r"
-        ) as file:
+        with open(paths.benchpark_home / "spack/etc/spack/packages.yaml", "r") as file:
             new_packages = yaml.safe_load(file)["packages"]
 
         color.cprint("@*rHere are all of the new packages:@.")
@@ -86,7 +84,7 @@ def system_external(args):
     pkg_list = list(packages.keys())
     subprocess.run(
         [
-            benchpark.paths.benchpark_home / "spack/bin/spack",
+            paths.benchpark_home / "spack/bin/spack",
             "external",
             "find",
             "--not-buildable",
@@ -94,7 +92,7 @@ def system_external(args):
         + [pkg for pkg in pkg_list]
     )
 
-    with open(benchpark.paths.benchpark_home / "../.spack/packages.yaml", "r") as file:
+    with open(paths.benchpark_home / "spack/etc/spack/packages.yaml", "r") as file:
         new_packages = yaml.safe_load(file)["packages"]
 
     # Use DeepDiff to find differences

@@ -3,10 +3,10 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import yaml
 import sys
 
 import pytest
+import yaml
 
 import benchpark.spec
 
@@ -117,10 +117,16 @@ def test_default_config_section():
 
     config_section = experiment.compute_config_section()
 
+    the_spec = config_section["spec"]
+    del config_section["spec"]
+
+    assert benchpark.spec.ExperimentSpec(the_spec) == spec
+
     assert config_section == {
         "benchpark_experiment_command": "benchpark "
         + " ".join(sys.argv[1:]),  # Not applicable here
         "deprecated": True,
+        "n_repeats": "0",
         "spack_flags": {
             "install": "--add --keep-stage",
             "concretize": "-U -f",
@@ -135,7 +141,10 @@ def test_default_modifiers_section():
 
     modifiers_section = experiment.compute_modifiers_section_wrapper()
 
-    assert modifiers_section == [{"name": "allocation"}, {"name": "exit-code"}]
+    assert modifiers_section == [
+        {"name": "allocation", "mode": "standard"},
+        {"name": "exit-code"},
+    ]
 
 
 def test_multiple_models():
