@@ -505,8 +505,8 @@ class Amg2023(
         if self.spec.satisfies("exec_mode=perf"):
             self.generate_perf_specs()
         else:
-            process_problem_size_dict = {"nx": 80, "ny": 80, "nz": 80}
-            n_resources_dict = {"px": 2, "py": 2, "pz": 2}
+            process_problem_size_dict = {"nx": 80, "ny": 80, "nz": 40}
+            n_resources_dict = {"px": 2, "py": 2, "pz": 1}
 
             # Per-process size (in zones) in each dimension
             self.add_experiment_variable(
