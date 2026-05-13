@@ -270,6 +270,7 @@ class Laghos(
                 self.add_experiment_variable("device", "hip", True)
         else:
             self.add_experiment_variable("device", "cpu", True)
+            self.add_experiment_variable("pool", 0, True)
 
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_experiment_variable("n_gpus", "{n_resources}", True)

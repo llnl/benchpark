@@ -189,15 +189,14 @@ be incremented by 1.
  CDash
 *******
 
-The successes/failures of our GitLab tests are posted to our CDash dashboard `CDash
-dashboard <https://my.cdash.org/index.php?project=Benchpark>`_. There is a dashboard for
-the nightly tests on the develop branch, and several dashboards for each system for
-daily PRs.
+The successes/failures of our nightly GitLab tests are posted to our CDash dashboard
+`CDash dashboard <https://my.cdash.org/index.php?project=Benchpark>`_. Daily and PR jobs
+still run through CTest, but they do not submit results to CDash.
 
 The following files are related to CDash:
 
-1. ``CTestGitlab.cmake`` configures CTest variables, the dashboard names and runs the
-   tests and submits the results.
+1. ``CTestGitlab.cmake`` configures CTest variables, the dashboard names, runs the
+   tests, and submits the results for nightly jobs.
 2. ``CTestConfig.cmake`` sets the cdash token and configuration variables.
 3. ``CMakeLists.txt`` enables CTest and adds the gitlab test.
 4. ``.gitlab/utils/status.yml`` Contains the logic to run CTest after a test completes
