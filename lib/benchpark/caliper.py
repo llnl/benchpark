@@ -19,6 +19,8 @@ class Caliper:
             "mpi",
             "cuda",
             "rocm",
+            "rocm-gputime",
+            "cuda-gputime",
             "rccl",
             "topdown-counters-all",
             "topdown-counters-toplevel",
