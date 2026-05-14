@@ -19,6 +19,7 @@ class Caliper:
             "mpi",
             "cuda",
             "rocm",
+            "rccl",
             "topdown-counters-all",
             "topdown-counters-toplevel",
             "topdown-all",

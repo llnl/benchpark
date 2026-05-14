@@ -107,6 +107,12 @@ class Caliper(BasicModifier):
         description="Profile HIP API functions",
     )
 
+    add_mode(
+        mode_name="rccl",
+        mode_option="profile.rccl",
+        description="Profile RCCL API functions",
+    )
+
     add_service(
         service_name="nvtx",
         service_option="nvtx",

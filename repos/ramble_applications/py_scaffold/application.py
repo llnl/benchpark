@@ -24,7 +24,7 @@ class PyScaffold(ExecutableApplication):
         app_inst.variables["rocm_mods"] = ""
         if "rocm_arch" in app_inst.variables.keys():
             app_inst.variables["rocm_mods"] = (
-                'export MPICH_GPU_SUPPORT_ENABLED=0\nexport LD_PRELOAD="/opt/rocm-7.1.1/llvm/lib/libomp.so /opt/cray/pe/mpich/9.1.0/ofi/gnu/11.2/lib/libmpi_gnu.so.12 /collab/usr/gapps/python/toss_4_x86_64_ib/anaconda3-2023.09/lib/libstdc++.so.6"'
+                'export HIP_LAUNCH_BLOCKING=1\nexport MPICH_GPU_SUPPORT_ENABLED=0\nexport LD_PRELOAD="/opt/rocm-7.1.1/llvm/lib/libomp.so /opt/cray/pe/mpich/9.1.0/ofi/gnu/11.2/lib/libmpi_gnu.so.12 /collab/usr/gapps/python/toss_4_x86_64_ib/anaconda3-2023.09/lib/libstdc++.so.6"'
             )
 
     with when("package_manager_family=pip"):
