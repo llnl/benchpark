@@ -20,6 +20,23 @@ ctest_update()
 ctest_configure()
 ctest_test(INCLUDE "Gitlab")
 
+if(DEFINED TEST_RUNTIME_SECONDS AND NOT "${TEST_RUNTIME_SECONDS}" STREQUAL "")
+    file(READ "${CTEST_BINARY_DIRECTORY}/Testing/TAG" _tag_file)
+    string(REGEX MATCH "^[^\n]+" _tag "${_tag_file}")
+    set(_test_xml "${CTEST_BINARY_DIRECTORY}/Testing/${_tag}/Test.xml")
+
+    if(EXISTS "${_test_xml}")
+        file(READ "${_test_xml}" _xml)
+        string(REGEX REPLACE
+            "<NamedMeasurement type=\"numeric/double\" name=\"Execution Time\">[ \t\r\n]*<Value>[^<]+</Value>"
+            "<NamedMeasurement type=\"numeric/double\" name=\"Execution Time\">\n\t\t\t\t\t<Value>${TEST_RUNTIME_SECONDS}</Value>"
+            _xml
+            "${_xml}"
+        )
+        file(WRITE "${_test_xml}" "${_xml}")
+    endif()
+endif()
+
 # Submit results to CDash only for Nightly runs.
 if ("${TEST_TYPE}" STREQUAL "Nightly")
     ctest_submit(
