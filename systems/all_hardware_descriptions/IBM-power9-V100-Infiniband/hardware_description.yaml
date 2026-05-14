@@ -21,19 +21,19 @@ system_definition:
     vendor: Mellanox
     name: EDR-Infiniband
   systems-tested:
-    llnl-sierra:
+    llnl-sierra-deprecated:
       os: RHEL
       scheduler: lsf
       compiler: xl
       runtime: cuda
       mpi: spectrum-mpi
   top500-system-instances:
-    Summit:
+    Summit-deprecated:
       benchpark_system:
       top500: <https://www.top500.org/system/179397>
-    Sierra:
-      benchpark_system: llnl-sierra
+    Sierra-deprecated:
+      benchpark_system: llnl-sierra-deprecated
       top500: <https://www.top500.org/system/179398>
-    Lassen:
-      benchpark_system: llnl-sierra
+    Lassen-deprecated:
+      benchpark_system: llnl-sierra-deprecated
       top500: <https://www.top500.org/system/179567>
