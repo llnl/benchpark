@@ -108,165 +108,111 @@ class Laghos(
 
     def generate_perf_specs(self):
         problem_spec = {
-            "nx": 1,
-            "ny": 1,
-            "nz": 1,
+            "epm": 1024,
             "pool_size": 16,
             "resource_count": 4,
-            "strong": None,
-            "weak": None,
-            "throughput": None,
         }
         # Add problem specs as needed here
         if self.spec.satisfies("+throughput"):
             if self.spec.satisfies("order=linear"):
-                problem_spec["rs"] = [4, 4, 4]
-                problem_spec["rp"] = [2, 3, 4]
+                problem_spec["epm"] = [16384]
             elif self.spec.satisfies("order=quadratic"):
-                problem_spec["rs"] = [4, 4, 4]
-                problem_spec["rp"] = [1, 2, 3]
+                problem_spec["epm"] = [2048]
             elif self.spec.satisfies("order=cubic"):
-                problem_spec["rs"] = [4, 4, 4]
-                problem_spec["rp"] = [1, 2, 3]
+                problem_spec["epm"] = [576]
         elif self.spec.satisfies("+strong"):
-            problem_spec["strong"] = (
-                lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor
-            )
             if self.spec.satisfies("order=linear"):
-                problem_spec["rs"] = 0
-                problem_spec["rp"] = 3
+                problem_spec["epm"] = 524288
             elif self.spec.satisfies("order=quadratic"):
-                problem_spec["rs"] = 0
-                problem_spec["rp"] = 2
+                problem_spec["epm"] = 65536
             elif self.spec.satisfies("order=cubic"):
-                problem_spec["rs"] = 0
-                problem_spec["rp"] = 1
+                problem_spec["epm"] = 19652
         elif self.spec.satisfies("+weak"):
             if self.spec.satisfies("order=linear"):
-                problem_spec["nx"] = [16, 20, 25, 16, 20, 25, 16, 20, 25, 16, 20, 25, 16]
-                problem_spec["ny"] = [16, 20, 25, 16, 20, 25, 16, 20, 25, 16, 20, 25, 16]
-                problem_spec["nz"] = [16, 20, 25, 16, 20, 25, 16, 20, 25, 16, 20, 25, 16]
-                problem_spec["resource_count"] = [4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384]
-                problem_spec["rs"] = 0
-                problem_spec["rp"] = [3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7]
+                problem_spec["epm"] = 524288
             elif self.spec.satisfies("order=quadratic"):
-                problem_spec["nx"] = [16, 20, 25, 16, 20, 25, 16, 20, 25, 16, 20, 25, 16]
-                problem_spec["ny"] = [16, 20, 25, 16, 20, 25, 16, 20, 25, 16, 20, 25, 16]
-                problem_spec["nz"] = [16, 20, 25, 16, 20, 25, 16, 20, 25, 16, 20, 25, 16]
-                problem_spec["resource_count"] = [4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384]
-                problem_spec["rs"] = 0
-                problem_spec["rp"] = [2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6]
+                problem_spec["epm"] = 65536
             elif self.spec.satisfies("order=cubic"):
-                problem_spec["nx"] = [21, 27, 34, 21, 27, 34, 21, 27, 34, 21, 27, 34, 21]
-                problem_spec["ny"] = [21, 27, 34, 21, 27, 34, 21, 27, 34, 21, 27, 34, 21]
-                problem_spec["nz"] = [21, 27, 34, 21, 27, 34, 21, 27, 34, 21, 27, 34, 21]
-                problem_spec["resource_count"] = [4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384]
-                problem_spec["rs"] = 0
-                problem_spec["rp"] = [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5]
+                problem_spec["epm"] = 19652
         else:
             if self.spec.satisfies("order=linear"):
-                problem_spec["rs"] = 0
-                problem_spec["rp"] = 3
-                problem_spec["nx"] = 16
-                problem_spec["ny"] = 16
-                problem_spec["nz"] = 16
+                problem_spec["epm"] = 524288
             elif self.spec.satisfies("order=quadratic"):
-                problem_spec["rs"] = 0
-                problem_spec["rp"] = 2
-                problem_spec["nx"] = 16
-                problem_spec["ny"] = 16
-                problem_spec["nz"] = 16
+                problem_spec["epm"] = 65536
             elif self.spec.satisfies("order=cubic"):
-                problem_spec["rs"] = 0
-                problem_spec["rp"] = 1
-                problem_spec["nx"] = 21
-                problem_spec["ny"] = 21
-                problem_spec["nz"] = 21
-
-        self.add_experiment_variable("nx", problem_spec["nx"], True)
-        self.add_experiment_variable("ny", problem_spec["ny"], True)
-        self.add_experiment_variable("nz", problem_spec["nz"], True)
-        self.add_experiment_variable("rs", problem_spec["rs"], True)
-        self.add_experiment_variable("rp", problem_spec["rp"], True)
+                problem_spec["epm"] = 19652
 
         self.add_experiment_variable(
-            "resource_count", problem_spec["resource_count"], True
+            "epm", problem_spec["epm"], True
         )
-
-        # Per-process size (in zones) in each dimension
-        self.add_experiment_variable("zones", "{nx}*{ny}*{nz}*(8**({rs}+{rp}))", False)
-
+        # Total elements
+        self.add_experiment_variable(
+            "qpts", "{quad}*{epm}*{resource_count}", False
+        )
         # Umpire device pool size
-        self.add_experiment_variable("pool", problem_spec["pool_size"], False)
-
-        self.register_scaling_config(
-            {
-                ScalingMode.Strong: {
-                    "resource_count": problem_spec["strong"],
-                },
-                ScalingMode.Weak: {
-                    "resource_count": problem_spec["weak"],
-                },
-                ScalingMode.Throughput: {
-                    "resource_count": problem_spec["throughput"],
-                },
-            }
+        self.add_experiment_variable(
+            "pool", problem_spec["pool_size"], False
+        )
+        self.add_experiment_variable(
+            "resource_count", problem_spec["resource_count"], True
         )
 
     def compute_applications_section(self):
         if self.spec.satisfies("exec_mode=perf"):
             self.generate_perf_specs()
         else:
-            # "zones" defined from mesh file, we are hardcoding it here
-            self.add_experiment_variable("nx", 1, True)
-            self.add_experiment_variable("ny", 1, True)
-            self.add_experiment_variable("nz", 1, True)
-
-            self.add_experiment_variable("rs", 3, True)
-            self.add_experiment_variable("rp", 2, True)
+            self.add_experiment_variable("epm", 32768, True)
             self.add_experiment_variable(
-                "zones", "{nx}*{ny}*{nz}*(8**({rs}+{rp}))", False
+                "qpts", "{quad}*{epm}*{resource_count}", False
             )
-            self.add_experiment_variable("pool", 16, True)
+            self.add_experiment_variable("pool", 16, False)
             # resource_count is the number of resources used for this experiment:
-            self.add_experiment_variable("resource_count", 1, False)
+            self.add_experiment_variable("resource_count", 1, True)
 
-            # Register the scaling variables and their respective scaling functions
-            # required to correctly scale the experiment for the given scaliing policy
-            # Strong scaling scales up resource_count by the specified scaling_factor
-            self.register_scaling_config(
-                {
-                    ScalingMode.Strong: {
-                        "resource_count": lambda var, itr, dim, scaling_factor: var.val(
-                            dim
-                        )
-                        * scaling_factor,
-                    },
-                    ScalingMode.Weak: {
-                        "resource_count": None,
-                    },
-                    ScalingMode.Throughput: {
-                        "resource_count": None,
-                    },
-                }
-            )
+        # Register the scaling variables and their respective scaling functions
+        # required to correctly scale the experiment for the given scaliing policy
+        # Strong scaling scales up resource_count by the specified scaling_factor
+        self.register_scaling_config(
+            {
+                ScalingMode.Strong: {
+                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "epm": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    // scaling_factor,
+                },
+                ScalingMode.Weak: {
+                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "epm": lambda var, itr, dim, scaling_factor: var.val(dim),
+                },
+                ScalingMode.Throughput: {
+                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim),
+                    "epm": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                },
+            }
+        )
 
         if self.spec.satisfies("order=linear"):
             self.add_experiment_variable("order", "linear", True)
             self.add_experiment_variable("ok", 1, False)
             self.add_experiment_variable("ot", 0, False)
+            self.add_experiment_variable("quad", 8, True)
         elif self.spec.satisfies("order=quadratic"):
             self.add_experiment_variable("order", "quadratic", True)
             self.add_experiment_variable("ok", 2, False)
             self.add_experiment_variable("ot", 1, False)
+            self.add_experiment_variable("quad", 64, True)
         elif self.spec.satisfies("order=cubic"):
             self.add_experiment_variable("order", "cubic", True)
             self.add_experiment_variable("ok", 3, False)
             self.add_experiment_variable("ot", 2, False)
+            self.add_experiment_variable("quad", 216, True)
         else:
             self.add_experiment_variable("order", "linear", True)
             self.add_experiment_variable("ok", 1, False)
             self.add_experiment_variable("ot", 0, False)
+            self.add_experiment_variable("quad", 8, True)
 
         if self.spec.satisfies("+nc"):
             self.add_experiment_variable("nc_type", "nonconforming", True)
@@ -278,8 +224,8 @@ class Laghos(
         # Set the variables required by the experiment
         self.set_required_variables(
             n_resources="{resource_count}",
-            process_problem_size="{zones} / {n_resources}",
-            total_problem_size="{zones}",
+            process_problem_size="{qpts} / {n_resources}",
+            total_problem_size="{qpts}",
         )
 
         if self.spec.satisfies("+cuda"):
