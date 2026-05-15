@@ -142,17 +142,11 @@ class Laghos(
             elif self.spec.satisfies("order=cubic"):
                 problem_spec["epm"] = 19652
 
-        self.add_experiment_variable(
-            "epm", problem_spec["epm"], True
-        )
+        self.add_experiment_variable("epm", problem_spec["epm"], True)
         # Total elements
-        self.add_experiment_variable(
-            "qpts", "{quad}*{epm}*{resource_count}", False
-        )
+        self.add_experiment_variable("qpts", "{quad}*{epm}*{resource_count}", False)
         # Umpire device pool size
-        self.add_experiment_variable(
-            "pool", problem_spec["pool_size"], False
-        )
+        self.add_experiment_variable("pool", problem_spec["pool_size"], False)
         self.add_experiment_variable(
             "resource_count", problem_spec["resource_count"], True
         )
@@ -162,9 +156,7 @@ class Laghos(
             self.generate_perf_specs()
         else:
             self.add_experiment_variable("epm", 32768, True)
-            self.add_experiment_variable(
-                "qpts", "{quad}*{epm}*{resource_count}", False
-            )
+            self.add_experiment_variable("qpts", "{quad}*{epm}*{resource_count}", False)
             self.add_experiment_variable("pool", 16, False)
             # resource_count is the number of resources used for this experiment:
             self.add_experiment_variable("resource_count", 1, True)
@@ -186,7 +178,9 @@ class Laghos(
                     "epm": lambda var, itr, dim, scaling_factor: var.val(dim),
                 },
                 ScalingMode.Throughput: {
-                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim),
+                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    ),
                     "epm": lambda var, itr, dim, scaling_factor: var.val(dim)
                     * scaling_factor,
                 },
