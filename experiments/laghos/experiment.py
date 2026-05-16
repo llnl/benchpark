@@ -58,6 +58,13 @@ class Laghos(
     )
 
     variant(
+        "mesh-strategy",
+        default="refinement",
+        values=("epm", "refinement", "file"),
+        description="Type of mesh generation strategy to use",
+    )
+
+    variant(
         "nc",
         default=False,
         values=(True, False),
@@ -106,54 +113,52 @@ class Laghos(
 
     maintainers("wdhawkins")
 
-    def generate_perf_specs(self):
-        problem_spec = {
-            "epm": 1024,
-            "pool_size": 16,
-            "resource_count": 4,
-        }
-        # Add problem specs as needed here
-        if self.spec.satisfies("+throughput"):
-            if self.spec.satisfies("order=linear"):
-                problem_spec["epm"] = [16384]
-            elif self.spec.satisfies("order=quadratic"):
-                problem_spec["epm"] = [2048]
-            elif self.spec.satisfies("order=cubic"):
-                problem_spec["epm"] = [576]
-        elif self.spec.satisfies("+strong"):
-            if self.spec.satisfies("order=linear"):
-                problem_spec["epm"] = 524288
-            elif self.spec.satisfies("order=quadratic"):
-                problem_spec["epm"] = 65536
-            elif self.spec.satisfies("order=cubic"):
-                problem_spec["epm"] = 19652
-        elif self.spec.satisfies("+weak"):
-            if self.spec.satisfies("order=linear"):
-                problem_spec["epm"] = 524288
-            elif self.spec.satisfies("order=quadratic"):
-                problem_spec["epm"] = 65536
-            elif self.spec.satisfies("order=cubic"):
-                problem_spec["epm"] = 19652
-        else:
-            if self.spec.satisfies("order=linear"):
-                problem_spec["epm"] = 524288
-            elif self.spec.satisfies("order=quadratic"):
-                problem_spec["epm"] = 65536
-            elif self.spec.satisfies("order=cubic"):
-                problem_spec["epm"] = 19652
-
-        self.add_experiment_variable("epm", problem_spec["epm"], True)
-        # Total elements
-        self.add_experiment_variable("qpts", "{quad}*{epm}*{resource_count}", False)
-        # Umpire device pool size
-        self.add_experiment_variable("pool", problem_spec["pool_size"], False)
-        self.add_experiment_variable(
-            "resource_count", problem_spec["resource_count"], True
-        )
-
-    def compute_applications_section(self):
+    def compute_applications_section_epm(self):
         if self.spec.satisfies("exec_mode=perf"):
-            self.generate_perf_specs()
+            problem_spec = {
+                "epm": 1024,
+                "pool_size": 16,
+                "resource_count": 4,
+            }
+            # Add problem specs as needed here
+            if self.spec.satisfies("+throughput"):
+                if self.spec.satisfies("order=linear"):
+                    problem_spec["epm"] = [16384]
+                elif self.spec.satisfies("order=quadratic"):
+                    problem_spec["epm"] = [2048]
+                elif self.spec.satisfies("order=cubic"):
+                    problem_spec["epm"] = [576]
+            elif self.spec.satisfies("+strong"):
+                if self.spec.satisfies("order=linear"):
+                    problem_spec["epm"] = 524288
+                elif self.spec.satisfies("order=quadratic"):
+                    problem_spec["epm"] = 65536
+                elif self.spec.satisfies("order=cubic"):
+                    problem_spec["epm"] = 19652
+            elif self.spec.satisfies("+weak"):
+                if self.spec.satisfies("order=linear"):
+                    problem_spec["epm"] = 524288
+                elif self.spec.satisfies("order=quadratic"):
+                    problem_spec["epm"] = 65536
+                elif self.spec.satisfies("order=cubic"):
+                    problem_spec["epm"] = 19652
+            else:
+                if self.spec.satisfies("order=linear"):
+                    problem_spec["epm"] = 524288
+                elif self.spec.satisfies("order=quadratic"):
+                    problem_spec["epm"] = 65536
+                elif self.spec.satisfies("order=cubic"):
+                    problem_spec["epm"] = 19652
+
+            self.add_experiment_variable("epm", problem_spec["epm"], True)
+            # Total elements
+            self.add_experiment_variable("qpts", "{quad}*{epm}*{resource_count}", False)
+            # Umpire device pool size
+            self.add_experiment_variable("pool", problem_spec["pool_size"], False)
+            self.add_experiment_variable(
+                "resource_count", problem_spec["resource_count"], True
+            )
+
         else:
             self.add_experiment_variable("epm", 32768, True)
             self.add_experiment_variable("qpts", "{quad}*{epm}*{resource_count}", False)
@@ -186,6 +191,137 @@ class Laghos(
                 },
             }
         )
+
+    def generate_perf_specs(self):
+        problem_spec = {
+            "nx": 1,
+            "ny": 1,
+            "nz": 1,
+            "pool_size": 16,
+            "resource_count": 4,
+            "strong": None,
+            "weak": None,
+            "throughput": None,
+        }
+        # Add problem specs as needed here
+        if self.spec.satisfies("+throughput"):
+            if self.spec.satisfies("order=linear"):
+                problem_spec["rs"] = [4, 4, 4]
+                problem_spec["rp"] = [2, 3, 4]
+            elif self.spec.satisfies("order=quadratic"):
+                problem_spec["rs"] = [4, 4, 4]
+                problem_spec["rp"] = [1, 2, 3]
+            elif self.spec.satisfies("order=cubic"):
+                problem_spec["rs"] = [4, 4, 4]
+                problem_spec["rp"] = [1, 2, 3]
+        elif self.spec.satisfies("+strong"):
+            problem_spec["strong"] = (
+                lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor
+            )
+            if self.spec.satisfies("order=linear"):
+                problem_spec["rs"] = 4
+                problem_spec["rp"] = 3
+            elif self.spec.satisfies("order=quadratic"):
+                problem_spec["rs"] = 4
+                problem_spec["rp"] = 2
+            elif self.spec.satisfies("order=cubic"):
+                problem_spec["rs"] = 4
+                problem_spec["rp"] = 1
+        elif self.spec.satisfies("+weak"):
+            problem_spec["nx"] = [1, 2, 3, 4, 5, 6]
+            problem_spec["ny"] = [1, 2, 3, 4, 5, 6]
+            problem_spec["nz"] = [1, 2, 3, 4, 5, 6]
+            problem_spec["resource_count"] = [4, 32, 108, 256, 500, 864]
+            if self.spec.satisfies("order=linear"):
+                problem_spec["rs"] = 4
+                problem_spec["rp"] = 3
+            elif self.spec.satisfies("order=quadratic"):
+                problem_spec["rs"] = 4
+                problem_spec["rp"] = 2
+            elif self.spec.satisfies("order=cubic"):
+                problem_spec["rs"] = 4
+                problem_spec["rp"] = 1
+        else:
+            problem_spec["rs"] = 4
+            problem_spec["rp"] = 1
+
+        self.add_experiment_variable("nx", problem_spec["nx"], True)
+        self.add_experiment_variable("ny", problem_spec["ny"], True)
+        self.add_experiment_variable("nz", problem_spec["nz"], True)
+        self.add_experiment_variable("rs", problem_spec["rs"], True)
+        self.add_experiment_variable("rp", problem_spec["rp"], True)
+
+        self.add_experiment_variable(
+            "resource_count", problem_spec["resource_count"], True
+        )
+
+        # Per-process size (in zones) in each dimension
+        self.add_experiment_variable("qpts", "{quad}*{nx}*{ny}*{nz}*(8**({rs}+{rp}))", False)
+
+        # Umpire device pool size
+        self.add_experiment_variable("pool", problem_spec["pool_size"], False)
+
+        self.register_scaling_config(
+            {
+                ScalingMode.Strong: {
+                    "resource_count": problem_spec["strong"],
+                },
+                ScalingMode.Weak: {
+                    "resource_count": problem_spec["weak"],
+                },
+                ScalingMode.Throughput: {
+                    "resource_count": problem_spec["throughput"],
+                },
+            }
+        )
+
+    def compute_applications_section_refinement(self):
+        if self.spec.satisfies("exec_mode=perf"):
+            self.generate_perf_specs()
+        else:
+            # "zones" defined from mesh file, we are hardcoding it here
+            self.add_experiment_variable("nx", 1, True)
+            self.add_experiment_variable("ny", 1, True)
+            self.add_experiment_variable("nz", 1, True)
+
+            self.add_experiment_variable("rs", 3, True)
+            self.add_experiment_variable("rp", 2, True)
+            self.add_experiment_variable(
+                "qpts", "{quad}*{nx}*{ny}*{nz}*(8**({rs}+{rp}))", False
+            )
+            self.add_experiment_variable("pool", 16, True)
+            # resource_count is the number of resources used for this experiment:
+            self.add_experiment_variable("resource_count", 1, False)
+
+            # Register the scaling variables and their respective scaling functions
+            # required to correctly scale the experiment for the given scaliing policy
+            # Strong scaling scales up resource_count by the specified scaling_factor
+            self.register_scaling_config(
+                {
+                    ScalingMode.Strong: {
+                        "resource_count": lambda var, itr, dim, scaling_factor: var.val(
+                            dim
+                        )
+                        * scaling_factor,
+                    },
+                    ScalingMode.Weak: {
+                        "resource_count": None,
+                    },
+                    ScalingMode.Throughput: {
+                        "resource_count": None,
+                    },
+                }
+            )
+
+    def compute_applications_section(self):
+        if self.spec.satisfies("mesh-strategy=epm"):
+            self.compute_applications_section_epm()
+        elif self.spec.satisfies("mesh-strategy=refinement"):
+            self.compute_applications_section_refinement()
+        else:
+            raise ValueError(
+                "Unsupported mesh generation strategy"
+            )
 
         if self.spec.satisfies("order=linear"):
             self.add_experiment_variable("order", "linear", True)
