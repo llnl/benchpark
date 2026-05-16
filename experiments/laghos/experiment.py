@@ -60,7 +60,7 @@ class Laghos(
     variant(
         "mesh-strategy",
         default="refinement",
-        values=("epm", "refinement", "file"),
+        values=("epm", "refinement", "meshfile"),
         description="Type of mesh generation strategy to use",
     )
 
