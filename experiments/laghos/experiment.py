@@ -256,7 +256,9 @@ class Laghos(
         )
 
         # Per-process size (in zones) in each dimension
-        self.add_experiment_variable("qpts", "{quad}*{nx}*{ny}*{nz}*(8**({rs}+{rp}))", False)
+        self.add_experiment_variable(
+            "qpts", "{quad}*{nx}*{ny}*{nz}*(8**({rs}+{rp}))", False
+        )
 
         # Umpire device pool size
         self.add_experiment_variable("pool", problem_spec["pool_size"], False)
@@ -319,9 +321,7 @@ class Laghos(
         elif self.spec.satisfies("mesh-strategy=refinement"):
             self.compute_applications_section_refinement()
         else:
-            raise ValueError(
-                "Unsupported mesh generation strategy"
-            )
+            raise ValueError("Unsupported mesh generation strategy")
 
         if self.spec.satisfies("order=linear"):
             self.add_experiment_variable("order", "linear", True)
