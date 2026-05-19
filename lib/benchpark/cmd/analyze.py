@@ -91,6 +91,7 @@ class RAJAPerf:
             * self.tk.dataframe["Reps"]
             * self.tk.metadata["mpi.world.size"]
         )
+        self.tk.exc_metrics.append("Memory Bandwidth (GB/s)")
 
         self.tk.dataframe["FLOP Rate (GFLOPS)"] = (
             self.tk.dataframe["Flops/Rep"]
@@ -99,9 +100,27 @@ class RAJAPerf:
             * self.tk.dataframe["Reps"]
             * self.tk.metadata["mpi.world.size"]
         )
+        self.tk.exc_metrics.append("FLOP Rate (GFLOPS)")
 
         return ["Memory Bandwidth (GB/s)", "FLOP Rate (GFLOPS)"]
 
+
+class ScaFFold:
+    def __init__(self, tk):
+        self.tk = tk
+        # Matches application_name column in metadata
+        self.name = "scaffold"
+
+    def set_metrics(self):
+        self.tk.dataframe["TFLOPs (BF16)"] = (
+            # https://github.com/ROCm/rocm-systems/blob/8bb3b73c117e5630106540447268ccad771906a4/projects/rocprofiler-compute/src/rocprof_compute_soc/analysis_configs/gfx90a/0400_roofline.yaml#L51
+            self.tk.dataframe["Total SQ_INSTS_VALU_MFMA_MOPS_BF16 (exc)"] * 512
+            / self.tk.dataframe["Avg GPU time (E)"]
+            / 10**12
+        )
+        self.tk.exc_metrics.append("TFLOPs (BF16)")
+
+        return ["TFLOPs (BF16)"]
 
 # -----------------------------
 # Helper Functions
@@ -391,7 +410,7 @@ def prepare_data(**kwargs):
 
     metric = kwargs["yaxis_metric"]
 
-    known_applications = {"raja-perf": RAJAPerf}
+    known_applications = {"raja-perf": RAJAPerf, "scaffold": ScaFFold}
     for ta in tk.metadata["application_name"].unique():
         if ta in known_applications.keys():
             added_mets = known_applications[ta](tk).set_metrics()
@@ -593,7 +612,14 @@ def prepare_data(**kwargs):
     norm_col = kwargs.get("normalize_by", "")
     if norm_col != "":
         logger.info(f"Normalizing '{kwargs['yaxis_metric']}' by '{norm_col}'")
-        tk.dataframe[kwargs["yaxis_metric"]] /= tk.dataframe[norm_col]
+        tk.dataframe[kwargs["yaxis_metric"]] /= tk.dataframe[norm_col] * 1e12
+
+    print(tk.profile_mapping)
+    print(tk.tree(kwargs["yaxis_metric"],indices=14162220873700))
+    print(tk.tree(kwargs["yaxis_metric"],indices=6334389100413))
+    print(tk.tree(kwargs["yaxis_metric"],indices=3650960442712))
+    print(tk.tree(kwargs["yaxis_metric"],indices=13284072939493))
+    print(tk.tree(kwargs["yaxis_metric"],indices=15700773896140))
 
     make_chart(df=tk.dataframe, x_axis=x_axis_metadata, **kwargs)
 
