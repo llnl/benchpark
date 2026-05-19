@@ -180,7 +180,11 @@ class RuntimeResources:
 
     def _spack(self):
         if not self.pkgs_location.exists():
-            self._install_packages()
+            if self.spack_location.exists() and self.spack_location.is_symlink():
+                # Don't create a spack-packages repo if custom spack is in use
+                pass
+            else:
+                self._install_packages()
 
         env = {"SPACK_DISABLE_LOCAL_CONFIG": "1"}
         spack = Command(self.spack_location / "bin" / "spack", env)
