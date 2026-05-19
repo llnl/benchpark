@@ -612,7 +612,7 @@ def prepare_data(**kwargs):
     norm_col = kwargs.get("normalize_by", "")
     if norm_col != "":
         logger.info(f"Normalizing '{kwargs['yaxis_metric']}' by '{norm_col}'")
-        tk.dataframe[kwargs["yaxis_metric"]] /= tk.dataframe[norm_col] * 1e12
+        tk.dataframe[kwargs["yaxis_metric"]] /= tk.dataframe[norm_col]
 
     print(tk.profile_mapping)
     print(tk.tree(kwargs["yaxis_metric"],indices=14162220873700))
