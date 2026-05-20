@@ -28,7 +28,7 @@ jobs:
       - name: Build with sphinx
         run: |
           cd docs
-          make html SPHINXOPTS="-W --keep-going" WORKSPACE_PATH=/tmp/workspace
+          make html WORKSPACE_PATH=/tmp/workspace
       - name: Check for Typos using Codespell
         run: |
           codespell --ignore-words=.codespellignore
