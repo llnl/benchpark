@@ -225,7 +225,7 @@ class LlnlElcapitan(System):
             )
         else:
             if self.rocm_version >= Version("7.0.0"):
-                self.cce_version = Version("21.0.0")
+                self.cce_version = Version("21.0.1")
                 self.mpi_version = Version("9.1.0")
                 # Modules for cce/21.0 named as cce/20.0, so do not change this
                 self.override_cce_shortpath = Version("20.0")
