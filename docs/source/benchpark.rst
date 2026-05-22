@@ -1,173 +1,196 @@
-benchpark package
-=================
+###################
+ benchpark package
+###################
 
-Submodules
-----------
+************
+ Submodules
+************
 
-benchpark.accounting module
----------------------------
+*****************************
+ benchpark.accounting module
+*****************************
 
 .. automodule:: benchpark.accounting
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-benchpark.base\_paths module
-----------------------------
+******************************
+ benchpark.base\_paths module
+******************************
 
 .. automodule:: benchpark.base_paths
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-benchpark.caliper module
-------------------------
+**************************
+ benchpark.caliper module
+**************************
 
 .. automodule:: benchpark.caliper
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-benchpark.config module
------------------------
+*************************
+ benchpark.config module
+*************************
 
 .. automodule:: benchpark.config
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-benchpark.cudasystem module
----------------------------
+*****************************
+ benchpark.cudasystem module
+*****************************
 
 .. automodule:: benchpark.cudasystem
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-benchpark.debug module
-----------------------
+************************
+ benchpark.debug module
+************************
 
 .. automodule:: benchpark.debug
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-benchpark.directives module
----------------------------
+*****************************
+ benchpark.directives module
+*****************************
 
 .. automodule:: benchpark.directives
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-benchpark.error module
-----------------------
+************************
+ benchpark.error module
+************************
 
 .. automodule:: benchpark.error
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-benchpark.experiment module
----------------------------
+*****************************
+ benchpark.experiment module
+*****************************
 
 .. automodule:: benchpark.experiment
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-benchpark.openmpsystem module
------------------------------
+*******************************
+ benchpark.openmpsystem module
+*******************************
 
 .. automodule:: benchpark.openmpsystem
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-benchpark.paths module
-----------------------
+************************
+ benchpark.paths module
+************************
 
 .. automodule:: benchpark.paths
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-benchpark.programming\_model module
------------------------------------
+*************************************
+ benchpark.programming\_model module
+*************************************
 
 .. automodule:: benchpark.programming_model
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-benchpark.repo module
----------------------
+***********************
+ benchpark.repo module
+***********************
 
 .. automodule:: benchpark.repo
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-benchpark.rocmsystem module
----------------------------
+*****************************
+ benchpark.rocmsystem module
+*****************************
 
 .. automodule:: benchpark.rocmsystem
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-benchpark.runtime module
-------------------------
+**************************
+ benchpark.runtime module
+**************************
 
 .. automodule:: benchpark.runtime
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-benchpark.scaling module
-------------------------
+**************************
+ benchpark.scaling module
+**************************
 
 .. automodule:: benchpark.scaling
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-benchpark.spec module
----------------------
+***********************
+ benchpark.spec module
+***********************
 
 .. automodule:: benchpark.spec
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-benchpark.system module
------------------------
+*************************
+ benchpark.system module
+*************************
 
 .. automodule:: benchpark.system
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-benchpark.variables module
---------------------------
+****************************
+ benchpark.variables module
+****************************
 
 .. automodule:: benchpark.variables
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-benchpark.variant module
-------------------------
+**************************
+ benchpark.variant module
+**************************
 
 .. automodule:: benchpark.variant
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-Module contents
----------------
+*****************
+ Module contents
+*****************
 
 .. automodule:: benchpark
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
