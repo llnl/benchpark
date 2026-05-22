@@ -48,7 +48,7 @@ class PyScaffold(ExecutableApplication):
     )
     executable(
         "run",
-        "$(which scaffold) benchmark -c {config_file} --problem-scale {problem_scale} --epochs {num_epochs} --fract-base-dir ../fractals",
+        "$(which scaffold) benchmark -c {config_file} --problem-scale {problem_scale} --epochs {num_epochs}",
         use_mpi=True,
     )
 
