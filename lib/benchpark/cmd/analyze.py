@@ -115,7 +115,7 @@ class ScaFFold:
         self.tk.dataframe["TFLOPS (BF16)"] = (
             # https://github.com/ROCm/rocm-systems/blob/8bb3b73c117e5630106540447268ccad771906a4/projects/rocprofiler-compute/src/rocprof_compute_soc/analysis_configs/gfx90a/0400_roofline.yaml#L51
             self.tk.dataframe["Total SQ_INSTS_VALU_MFMA_MOPS_BF16 (exc)"] * 512
-            / self.tk.dataframe["Avg GPU time (E)"]
+            / self.tk.dataframe["Max GPU time (E)"]
             / 10**12
         )
         self.tk.exc_metrics.append("TFLOPS (BF16)")
