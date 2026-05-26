@@ -21,13 +21,15 @@ class PyScaffold(ExecutableApplication):
     def _prepend_library_path(self, workspace, app_inst=None):
         """Function to prepend to LD_LIBRARY_PATH, can't do in spack because python_platlib points to wrong site-packages dir"""
 
-        app_inst.variables["rocm_mods"] = ""
+        app_inst.variables["mods"] = ""
         if "rocm_arch" in app_inst.variables.keys():
-            app_inst.variables["rocm_mods"] = (
+            app_inst.variables["mods"] = (
                 'export HIP_LAUNCH_BLOCKING=1\nexport MPICH_GPU_SUPPORT_ENABLED=0\nexport LD_PRELOAD="/opt/rocm-7.1.1/llvm/lib/libomp.so /opt/cray/pe/mpich/9.1.0/ofi/gnu/11.2/lib/libmpi_gnu.so.12 /collab/usr/gapps/python/toss_4_x86_64_ib/anaconda3-2023.09/lib/libstdc++.so.6"'
             )
+        elif "cuda_arch" in app_inst.variables.keys():
+            app_inst.variables["mods"] = 'export LD_LIBRARY_PATH=/collab/usr/gapps/python/toss_4_x86_64_ib/anaconda3-2023.09/lib:$LD_LIBRARY_PATH'
         else:
-            app_inst.variables["rocm_mods"] = ":"
+            app_inst.variables["mods"] = ":"
 
     with when("package_manager_family=pip"):
         software_spec("scaffold", pkg_spec="py-scaffold")
@@ -41,7 +43,7 @@ class PyScaffold(ExecutableApplication):
 
     executable(
         "modules",
-        "{rocm_mods}",
+        "{mods}",
     )
     executable(
         "generate",
