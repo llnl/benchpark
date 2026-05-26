@@ -107,6 +107,17 @@ Workshop Deadlines
 - Author Notification: April 22, 2026
 - Camera-Ready Upload: May 6, 2026
 
+
+full paper
+On Similarity of Computational Kernels in our Codes and Proxies M McKinsey et al.
+
+short paper
+Phoeni6: A Container-Based Framework for Reproducible and Fair Energy Comparison of AI Workloads
+
+extended abstract
+A First Step Towards Unifying Benchmark Descriptions
+Continuous Benchmarking for Production HPC Centers
+
 ********************
  Agenda (Tentative)
 ********************
@@ -115,13 +126,16 @@ Workshop Deadlines
 | Time                | Title                         | Materials |
 +=====================+===============================+===========+
 | 09:00 AM - 09:00 AM | Welcome and Introduction      |           |
-| 09:10 AM - 10:30 AM | Accepted talks                |           |
+| 09:10 AM - 09:40 AM | Accepted talk McKinsey        |           |
+| 09:40 AM - 10:05 AM | Accepted talk Phoeni6         |           |
+| 10:05 AM - 10:30 AM | Accepted talk First Step      |           |
 | 10:30 AM - 11:00 AM | Coffee Break                  |           |
-| 11:00 AM - 12:30 PM | Accepted talks                |           |
+| 11:00 AM - 11:25 PM | Accepted talks Continuous     |           |
+| 11:25 AM - 12:30 PM | Benchpark tutorial            |           |
 | 12:30 PM - 01:30 PM | Lunch                         |           |
 | 01:30 PM - 03:00 PM | Benchpark and Ramble tutorial |           |
 | 03:00 PM - 03:30 PM | Coffee Break                  |           |
-| 03:30 PM - 04:45 PM | Benchpark and Ramble Tutorial |           |
+| 03:30 PM - 04:45 PM | Open discussions              |           |
 | 04:45 PM - 05:00 PM | Closing Remarks               |           |
 +---------------------+-------------------------------+-----------+
 
