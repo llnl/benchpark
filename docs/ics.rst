@@ -111,28 +111,55 @@ Workshop Deadlines
  Agenda (Tentative)
 ********************
 
-+---------------------+--------------------------------------------------------------------------------------------------+-----------+
-| Time                | Title                                                                                            | Materials |
-+=====================+==================================================================================================+===========+
-| 09:00 AM - 09:10 AM | Welcome and Introduction                                                                         |           |
-| 09:10 AM - 09:30 AM | On Similarity of Computational Kernels in our Codes and Proxies                                  |           |
-|                     | McKinsey, Brink, Pearce                                                                          |           |
-| 09:30 AM - 09:50 AM | Phoeni6: A Container-Based Framework for Reproducible and Fair Energy Comparison of AI Workloads |           |
-|                     | Oliveira-Filho, Silva-de-Souza, Sakuyama, Xavier-de-Souza                                        |           |
-| 09:50 AM - 10:10 AM | A First Step Towards Unifying Benchmark Descriptions                                             |           |
-|                     | Badwaik, Herten                                                                                  |           |
-| 10:10 AM - 10:30 PM | Continuous Benchmarking for Production HPC Centers                                               |           |
-|                     | Ardhapurkar, Shaikh, Das, Dinde, Wandhekar                                                       |           |
-| 10:30 AM - 11:00 AM | Coffee Break                                                                                     |           |
-| 11:00 AM - 11:20 PM | TBD                                                                                              |           |
-|                     | Tuomas Koskela                                                                                   |           |
-| 11:20 PM - 12:30 PM | Benchpark tutorial                                                                               |           |
-| 12:30 PM - 01:30 PM | Lunch                                                                                            |           |
-| 01:30 PM - 03:00 PM | Benchpark and Ramble tutorial w/hands-on                                                         |           |
-| 03:00 PM - 03:30 PM | Coffee Break                                                                                     |           |
-| 03:30 PM - 04:45 PM | Speaker Panel and Open Discussion                                                                |           |
-| 04:45 PM - 05:00 PM | Closing Remarks                                                                                  |           |
-+---------------------+--------------------------------------------------------------------------------------------------+-----------+
+.. list-table::
+
+ * - **Time**
+   - **Title**
+   - **Materials**
+ * - 09:00 AM - 09:10 AM
+   - Welcome and Introduction
+   -
+ * - 09:10 AM - 09:30 AM
+   - | On Similarity of Computational Kernels in our Codes and Proxies
+     | McKinsey, Brink, Pearce
+   -
+ * - 09:30 AM - 09:50 AM
+   - | Phoeni6: A Container-Based Framework for Reproducible and Fair Energy Comparison of AI Workloads
+     | Oliveira-Filho, Silva-de-Souza, Sakuyama, Xavier-de-Souza
+   -
+ * - 09:50 AM - 10:10 AM
+   - | A First Step Towards Unifying Benchmark Descriptions
+     | Badwaik, Herten
+   -
+ * - 10:10 AM - 10:30 AM
+   - | Continuous Benchmarking for Production HPC Centers
+     | Ardhapurkar, Shaikh, Das, Dinde, Wandhekar
+   -
+ * - 10:30 AM - 11:00 AM
+   - Coffee Break
+   -
+ * - 11:00 AM - 11:20 AM
+   - | TBD
+     | Tuomas Koskela
+   -
+ * - 11:20 AM - 12:30 PM
+   - Benchpark Tutorial
+   -
+ * - 12:30 PM - 01:30 PM
+   - Lunch
+   -
+ * - 01:30 PM - 03:00 PM
+   - Benchpark and Ramble Tutorial w/Hands-On
+   -
+ * - 03:00 PM - 03:30 PM
+   - Coffee Break
+   -
+ * - 03:30 PM - 04:45 PM
+   - Speaker Panel and Open Discussion
+   -
+ * - 04:45 PM - 05:00 PM
+   - Closing Remarks
+   -
 
 **********************
  Organizing Committee
