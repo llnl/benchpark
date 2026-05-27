@@ -2,7 +2,7 @@ Repo:
   dest_org: benchpark
   dest_name: benchpark
   # Optional: Name of the CI check as reported back to GitHub (default: gitlab-ci)
-  check_name: "ci / gitlab"
+  check_name: ci / gitlab
   # Optional: granularity of CI statuses reported to GitHub (default: [pipeline])
   # Set to [pipeline] for overall pipeline status only
   # Set to [jobs] for individual job statuses only
