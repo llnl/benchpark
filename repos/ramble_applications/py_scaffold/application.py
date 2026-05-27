@@ -24,7 +24,7 @@ class PyScaffold(ExecutableApplication):
         app_inst.variables["mods"] = ""
         if "rocm_arch" in app_inst.variables.keys():
             app_inst.variables["mods"] = (
-                'export HIP_LAUNCH_BLOCKING=1\nexport MPICH_GPU_SUPPORT_ENABLED=0\nexport LD_PRELOAD="/opt/rocm-7.1.1/llvm/lib/libomp.so /opt/cray/pe/mpich/9.1.0/ofi/gnu/11.2/lib/libmpi_gnu.so.12 /collab/usr/gapps/python/toss_4_x86_64_ib/anaconda3-2023.09/lib/libstdc++.so.6"'
+                'export MIOPEN_DEBUG_CONV_DIRECT=0\nexport HIP_LAUNCH_BLOCKING=0\nexport MPICH_GPU_SUPPORT_ENABLED=0\nexport LD_PRELOAD="/opt/rocm-7.1.1/llvm/lib/libomp.so /opt/cray/pe/mpich/9.1.0/ofi/gnu/11.2/lib/libmpi_gnu.so.12 /collab/usr/gapps/python/toss_4_x86_64_ib/anaconda3-2023.09/lib/libstdc++.so.6"'
             )
         elif "cuda_arch" in app_inst.variables.keys():
             app_inst.variables["mods"] = 'export LD_LIBRARY_PATH=/collab/usr/gapps/python/toss_4_x86_64_ib/anaconda3-2023.09/lib:{pip_purelib_path}/nvidia/cudnn/lib:{pip_purelib_path}/torch/lib:$LD_LIBRARY_PATH'
