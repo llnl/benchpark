@@ -23,7 +23,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
 
     license("BSD-3-Clause")
 
-    version("develop", branch="task/chen59/initmemgpu", submodules=False)
+    version("develop", branch="develop", submodules=False)
     version("2025.12.0", submodules=False, commit="01f6f85c02ceffcd2bc06e42cee997867dd142c5")
     version("2025.07.0", submodules=False, commit="8cf38433a6a11e0dcd17864e649b2d045159ee9c")
     version(
