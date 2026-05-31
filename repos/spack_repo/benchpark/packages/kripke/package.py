@@ -23,7 +23,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
 
     license("BSD-3-Clause")
 
-    version("develop", branch="develop", submodules=False)
+    version("develop", branch="task/chen59/initmemgpu", submodules=False)
     version("2025.12.0", submodules=False, commit="01f6f85c02ceffcd2bc06e42cee997867dd142c5")
     version("2025.07.0", submodules=False, commit="8cf38433a6a11e0dcd17864e649b2d045159ee9c")
     version(
@@ -66,7 +66,11 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("cxx", type="build")
     depends_on("fortran", type="build")
 
-    depends_on("chai@2025.12.0+raja", when="@develop")
+    depends_on("camp@main", when="@develop")
+    depends_on("chai@develop+raja cxxstd=20", when="@develop")
+    depends_on("raja@develop cxxstd=20", when="@develop")
+    depends_on("umpire@develop", when="@develop")
+
     depends_on("chai@2025.12.0+raja", when="@2025.12.0")
     depends_on("fmt@9.1", when=f"^chai@2024.07.0")
     depends_on("chai@2024.07.0+raja", when="@:2025.07.0")
@@ -124,6 +128,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     def cmake_args(self):
         spec = self.spec
         args = []
+        blt_cxx_std = "20" if spec.satisfies("@develop") else "17"
 
         if "+rocm" in spec or "+cuda" in spec:
             enable_chai = "ON"
@@ -141,6 +146,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
                 "-Dchai_DIR=%s" % self.spec["chai"].prefix,
                 "-DENABLE_CHAI=%s" % enable_chai,
                 "-DENABLE_CHAI_SINGLE_MEMORY=%s" % enable_chai_single_memory,
+                "-DBLT_CXX_STD=%s" % f"c++{blt_cxx_std}",
                 "-DMPI_CXX_LINK_FLAGS='%s'" % self.spec['mpi'].libs.ld_flags,
             ]
         )
