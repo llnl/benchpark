@@ -52,7 +52,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     # Recommended mfem version for laghos v1.x is: ^mfem@3.3.1-laghos-v1.0
     depends_on("mfem@3.3.1-laghos-v1.0", when="@1.0,1.1")
     depends_on("mfem+caliper", when="+caliper")
-    depends_on("mfem cxxstd=17")
+    depends_on("mfem cxxstd=20", when="@develop")
 
     requires("^[virtuals=zlib-api] zlib")
 

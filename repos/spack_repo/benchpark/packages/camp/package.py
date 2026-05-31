@@ -16,6 +16,8 @@ class Camp(BuiltinCamp):
         submodules=False,
     )
 
+    variant("default_stream", default=False, description="Use default stream")
+
     def setup_build_environment(self, env):
         super().setup_build_environment(env)
         if "+cuda" in self.spec:
@@ -25,3 +27,9 @@ class Camp(BuiltinCamp):
         super().setup_run_environment(env)
         if "+cuda" in self.spec:
             env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
+
+    def cmake_args(self):
+        options = super().cmake_args()
+        options.append(self.define_from_variant("CAMP_USE_PLATFORM_DEFAULT_STREAM", "default_stream"))
+
+        return options
