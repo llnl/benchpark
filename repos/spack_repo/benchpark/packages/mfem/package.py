@@ -15,8 +15,6 @@ class Mfem(BuiltinMfem):
 
     variant("caliper", default=False, description="Build Caliper support")
 
-    version("develop", branch="raja-launchbounds")
-
     depends_on("camp+default_stream", when="+umpire")
     depends_on("camp@main", when="@develop +umpire")
     depends_on("umpire@develop", when="@develop +umpire")
