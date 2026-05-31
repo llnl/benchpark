@@ -69,7 +69,24 @@ class Hypre(BuiltinHypre):
             env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
 
 class CMakeBuilder(HypreCMakeBuilder):
-    pass
+    root_cmakelists_dir = "src"
+
+    def cmake_args(self):
+        args = super().cmake_args()
+
+        if "+umpire" in self.spec:
+            umpire = self.spec["umpire"]
+            umpire_opts = umpire.prefix.include
+            umpire_libs = umpire.libs
+            if "^camp" in umpire:
+                umpire_libs += umpire["camp"].libs
+            if "^fmt" in umpire:
+                umpire_libs += umpire["fmt"].libs
+
+            args.append(self.define("TPL_UMPIRE_INCLUDE_DIRS", umpire_opts))
+            args.append(self.define("TPL_UMPIRE_LIBRARIES", umpire_libs))
+
+        return args
 
 class AutotoolsBuilder(HypreAutotoolsBuilder):
     pass
