@@ -1,5 +1,6 @@
 from pathlib import Path
 import json
+import subprocess
 from shlex import quote
 
 import yaml
@@ -27,10 +28,21 @@ class Metadata(BasicModifier):
     versions_file = "checkout-versions.yaml"
 
     def extract_version_metadata(self):
-        with open(Path(self._file_path).resolve().parents[2] / self.versions_file, "r", encoding="utf-8") as f:
+        repo_root = Path(self._file_path).resolve().parents[2]
+
+        with open(repo_root / self.versions_file, "r", encoding="utf-8") as f:
             version_data = yaml.safe_load(f) or {}
 
-        return json.dumps(version_data)
+        versions = dict(version_data.get("versions", {}))
+
+        benchpark_hash = subprocess.check_output(
+            ["git", "-C", str(repo_root), "rev-parse", "--short", "HEAD"],
+            text=True,
+        ).strip()
+
+        versions["benchpark"] = benchpark_hash
+
+        return json.dumps({"versions": versions})
 
     def write_metadata_command(self):
         escaped_json = self.extract_version_metadata().replace("'", "'\"'\"'")
