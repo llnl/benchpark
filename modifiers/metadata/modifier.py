@@ -1,7 +1,7 @@
 from pathlib import Path
 import json
+import re
 import subprocess
-from shlex import quote
 
 import yaml
 
@@ -26,28 +26,53 @@ class Metadata(BasicModifier):
 
     metadata_file = "{experiment_run_dir}/build_info.json"
     versions_file = "checkout-versions.yaml"
-
-    def extract_version_metadata(self):
+    
+    def extract_benchpark_version(self):
         repo_root = Path(self._file_path).resolve().parents[2]
-
-        with open(repo_root / self.versions_file, "r", encoding="utf-8") as f:
-            version_data = yaml.safe_load(f) or {}
-
-        versions = dict(version_data.get("versions", {}))
-
         benchpark_hash = subprocess.check_output(
             ["git", "-C", str(repo_root), "rev-parse", "--short", "HEAD"],
             text=True,
         ).strip()
+        return benchpark_hash
+        
+    def extract_dependencies_version(self):
+        repo_root = Path(self._file_path).resolve().parents[2]
 
-        versions["benchpark"] = benchpark_hash
+        with open(repo_root / self.versions_file, "r", encoding="utf-8") as f:
+            version_data = yaml.safe_load(f)
 
-        return json.dumps({"versions": versions})
+        dependencies_ver_json = version_data.get("versions")
 
-    def write_metadata_command(self):
-        escaped_json = self.extract_version_metadata().replace("'", "'\"'\"'")
+        return {
+            "ramble": dependencies_ver_json.get("ramble"),
+            "spack": dependencies_ver_json.get("spack"),
+            "spack-packages": dependencies_ver_json.get("spack-packages"),
+        }
+
+    def extract_package_version(self, app_inst):
+        package_name = app_inst.name
+
+        package_ver_raw = subprocess.check_output(
+            ["spack", "find", "--json", package_name],
+            text=True,
+        )
+
+        package_ver_json = json.loads(package_ver_raw)[0]
+
+        return {
+            "name": package_ver_json.get("name"),
+            "version": package_ver_json.get("version"),
+            "commit": package_ver_json.get("parameters").get("commit"),
+        }
+
+    def write_metadata_command(self, app_inst):
+        metadata = {
+            "benchpark": self.extract_benchpark_version(),
+            "dependencies": self.extract_dependencies_version(),
+            "package": self.extract_package_version(app_inst),
+        }
+        escaped_json = json.dumps(metadata, indent=2).replace("'", "'\"'\"'")
         return "(printf '%s' '{}' > {})".format(escaped_json, self.metadata_file)
-
 
     def metadata(self, executable_name, executable, app_inst=None):
         from ramble.util.executable import CommandExecutable
@@ -63,7 +88,7 @@ class Metadata(BasicModifier):
             pre_exec.append(
                 CommandExecutable(
                     f"write-build-info-{executable_name}",
-                    template=[self.write_metadata_command()],
+                    template=[self.write_metadata_command(app_inst)],
                 )
             )
 
