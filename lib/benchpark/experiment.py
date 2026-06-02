@@ -169,8 +169,32 @@ class Hwloc:
 
             return hwloc_modifier_list
 
+class Metadata:
+    variant(
+        "metadata",
+        default="none",
+        values=(
+            "none",
+            "on",
+        ),
+        multi=False,
+        description="Collect build metadata and attach it to Caliper output"
+    )
 
-class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc):
+    class Helper(ExperimentHelper):
+        def compute_modifiers_section(self):
+            metadata_modifier_list = []
+
+            if not self.spec.satisfies("metadata=none"):
+                metadata_modifier_modes = {}
+                metadata_modifier_modes["name"] = "metadata"
+                metadata_modifier_modes["mode"] = self.spec.variants["metadata"][0]
+                metadata_modifier_list.append(metadata_modifier_modes)
+
+            return metadata_modifier_list
+
+
+class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc, Metadata):
     """This is the superclass for all benchpark experiments.
 
     ***The Experiment class***
