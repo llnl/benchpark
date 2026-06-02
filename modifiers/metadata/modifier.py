@@ -24,7 +24,7 @@ class Metadata(BasicModifier):
 
     executable_modifier("metadata")
 
-    metadata_file = "{experiment_run_dir}/build_info.json"
+    metadata_file = "{experiment_run_dir}/version_metadata.json"
     versions_file = "checkout-versions.yaml"
     
     def extract_benchpark_version(self):
@@ -84,14 +84,14 @@ class Metadata(BasicModifier):
             [modifier["name"] == "caliper" for modifier in app_inst.modifiers]
         )
 
-        if caliper_modifier:
-            pre_exec.append(
-                CommandExecutable(
-                    f"write-build-info-{executable_name}",
-                    template=[self.write_metadata_command(app_inst)],
-                )
+        pre_exec.append(
+            CommandExecutable(
+                f"write-build-info-{executable_name}",
+                template=[self.write_metadata_command(app_inst)],
             )
+        )
 
+        if caliper_modifier:
             pre_exec.append(
                 CommandExecutable(
                     f"modify-caliper-config-{executable_name}",
