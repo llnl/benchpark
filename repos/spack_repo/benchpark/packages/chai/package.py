@@ -29,13 +29,3 @@ class Chai(BuiltinChai):
             entries.append(cmake_cache_option("CHAI_DISABLE_RM", True))
 
         return entries
-
-    def setup_build_environment(self, env):
-        super().setup_build_environment(env)
-        if "+cuda" in self.spec:
-            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
-
-    def setup_run_environment(self, env):
-        super().setup_run_environment(env)
-        if "+cuda" in self.spec:
-            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")

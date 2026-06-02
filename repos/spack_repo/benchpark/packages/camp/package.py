@@ -15,13 +15,3 @@ class Camp(BuiltinCamp):
         commit="a8caefa9f4c811b1a114b4ed2c9b681d40f12325",
         submodules=False,
     )
-
-    def setup_build_environment(self, env):
-        super().setup_build_environment(env)
-        if "+cuda" in self.spec:
-            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
-
-    def setup_run_environment(self, env):
-        super().setup_run_environment(env)
-        if "+cuda" in self.spec:
-            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
