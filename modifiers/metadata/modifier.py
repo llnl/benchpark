@@ -17,7 +17,7 @@ class Metadata(BasicModifier):
     
     mode(
         name="on",
-        description="Collect build metadata and attach it to Caliper output",
+        description="Collect metadata and attach it to Caliper output if Caliper is present",
     )
     
     default_mode("on")
@@ -25,7 +25,7 @@ class Metadata(BasicModifier):
     executable_modifier("metadata")
 
     metadata_file = "{experiment_run_dir}/version_metadata.json"
-    versions_file = "checkout-versions.yaml"
+    dependencies_file = "checkout-versions.yaml"
     
     def extract_benchpark_version(self):
         repo_root = Path(self._file_path).resolve().parents[2]
@@ -38,7 +38,7 @@ class Metadata(BasicModifier):
     def extract_dependencies_version(self):
         repo_root = Path(self._file_path).resolve().parents[2]
 
-        with open(repo_root / self.versions_file, "r", encoding="utf-8") as f:
+        with open(repo_root / self.dependencies_file, "r", encoding="utf-8") as f:
             version_data = yaml.safe_load(f)
 
         dependencies_ver_json = version_data.get("versions")
@@ -71,8 +71,8 @@ class Metadata(BasicModifier):
             "dependencies": self.extract_dependencies_version(),
             "package": self.extract_package_version(app_inst),
         }
-        escaped_json = json.dumps(metadata, indent=2).replace("'", "'\"'\"'")
-        return "(printf '%s' '{}' > {})".format(escaped_json, self.metadata_file)
+        metadata_json = json.dumps(metadata, indent=2)
+        return "(printf '%s' '{}' > {})".format(metadata_json, self.metadata_file)
 
     def metadata(self, executable_name, executable, app_inst=None):
         from ramble.util.executable import CommandExecutable
