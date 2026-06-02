@@ -43,6 +43,7 @@ class Laghos(ExecutableApplication):
 
     common_args = (
         " -m {mesh}"
+        + " -epm {epm}"
         + " -nx {nx} -ny {ny} -nz {nz}"
         + " -rs {rs} -rp {rp}"
         + " -ms {ms}"
@@ -86,6 +87,10 @@ class Laghos(ExecutableApplication):
 
     workload_variable(
         "mesh", default="default", description="mesh file", workloads=["*"]
+    )
+
+    workload_variable(
+        "epm", default="0", description="Elements per MPI rank", workloads=["*"]
     )
 
     workload_variable(

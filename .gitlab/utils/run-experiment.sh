@@ -47,6 +47,8 @@ fi
 # Runs experiments where n_nodes == 1, and Print Log
 ramble --disable-logger --workspace-dir . on --executor '{execute_experiment}' --where '{n_nodes} == 1'
 find experiments/ -type f -name "*.out" -exec cat {} +
+# Fail if log files are empty or don't exist
+find experiments/ -type f -name "*.out" | grep -q . || { echo "No .out files found"; exit 1; }; find experiments/ -type f -name "*.out" -empty -print -quit | grep -q . && { echo "Empty .out file found"; exit 1; }
 
 # Analyze Experiments
 ramble --disable-logger --workspace-dir . workspace analyze --format json yaml text

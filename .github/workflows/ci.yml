@@ -24,6 +24,7 @@ jobs:
       license: ${{ steps.filter.outputs.license }}
       diffpackages: ${{ steps.filter.outputs.diffpackages }}
       modified_repo_dirs: ${{ steps.get_modified_repo_dirs.outputs.modified_repo_dirs }}
+      containers: ${{ steps.filter.outputs.containers }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         if: ${{ github.event_name == 'push' || github.event_name == 'merge_group' || github.event_name == 'pull_request' }}
@@ -105,6 +106,9 @@ jobs:
               - 'var/**'
             diffpackages:
               - 'repo/**/package.py'
+            containers:
+              - 'containerfiles/**'
+              - 'systems/fluxtainer/**'
       - name: Get modified directories in repo/
         id: get_modified_repo_dirs
         run: |
@@ -155,6 +159,15 @@ jobs:
     uses: ./.github/workflows/diffpackages.yml
     with:
       modified_repo_dirs: ${{ needs.changes.outputs.modified_repo_dirs }}
+  containers:
+    if: ${{ needs.changes.outputs.containers == 'true' }}
+    needs: changes
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
+    uses: ./.github/workflows/containers.yml
   all:
     needs:
       - changes
@@ -164,6 +177,7 @@ jobs:
       - coverage
       - license
       - diffpackages
+      - containers
     if: always()
     runs-on: ubuntu-latest
     steps:
