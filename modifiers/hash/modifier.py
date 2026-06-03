@@ -21,7 +21,7 @@ class Hash(BasicModifier):
         from ramble.util.executable import CommandExecutable
 
         script_dir = Path(self._file_path).resolve().parent
-        hash_metadata_file_path = "{experiment_run_dir}/version_metadata.json"
+        hash_metadata_file_path = "{experiment_run_dir}/hash_metadata.json"
         repo_root = Path(self._file_path).resolve().parents[2]
 
         application_name = app_inst.name
