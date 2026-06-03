@@ -92,8 +92,6 @@ class SpartaSnl(CMakePackage, CudaPackage, ROCmPackage):
                 env.prepend_path("LD_LIBRARY_PATH", rpath)
 
     def setup_build_environment(self, env):
-        if "+cuda" in self.spec:
-            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
         if self.spec.satisfies("+kokkos+rocm fft_kokkos=hipfft"):
             env.prepend_path("LD_LIBRARY_PATH", self.spec["hipfft"].prefix.lib)
         if "+mpi" in self.spec:

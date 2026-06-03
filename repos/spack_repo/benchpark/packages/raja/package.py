@@ -27,13 +27,3 @@ class Raja(BuiltinRaja):
         commit="e827035c630e71a9358e2f21c2f3cf6fd5fb6605",
         submodules=False,
     )
-    
-    def setup_build_environment(self, env):
-        super().setup_build_environment(env)
-        if "+cuda" in self.spec:
-            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
-
-    def setup_run_environment(self, env):
-        super().setup_run_environment(env)
-        if "+cuda" in self.spec:
-            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")

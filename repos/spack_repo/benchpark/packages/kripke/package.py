@@ -112,7 +112,6 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
         spec = self.spec
         if "+cuda" in spec:
             env.set("CUDAHOSTCXX", self.spec["mpi"].mpicxx)
-            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
 
     def setup_run_environment(self, env):
       super().setup_run_environment(env)
