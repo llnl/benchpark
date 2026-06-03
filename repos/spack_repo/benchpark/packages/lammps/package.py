@@ -36,12 +36,6 @@ class Lammps(BuiltinLammps):
       for rpath in self.compiler.extra_rpaths:
         env.prepend_path("LD_LIBRARY_PATH", rpath)
 
-  def setup_build_environment(self, env):
-    super().setup_build_environment(env)
-
-    if "+cuda" in self.spec:
-      env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
-
   def cmake_args(self):
     args = super().cmake_args()
 
