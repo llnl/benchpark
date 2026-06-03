@@ -107,14 +107,14 @@ Workshop Deadlines
 - Author Notification: April 22, 2026
 - Camera-Ready Upload: May 6, 2026
 
-********************
- Agenda (Tentative)
-********************
+********
+ Agenda
+********
 
 .. list-table::
 
  * - **Time**
-   - **Title**
+   - **Title and Speaker**
  * - 09:00 AM - 09:10 AM
    - | Welcome and Introduction
      | *Pearce, Bird, Koskela*
