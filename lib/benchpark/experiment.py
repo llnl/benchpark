@@ -169,32 +169,32 @@ class Hwloc:
 
             return hwloc_modifier_list
 
-class Metadata:
+class Hash:
     variant(
-        "metadata",
+        "hash",
         default="none",
         values=(
             "none",
             "on",
         ),
         multi=False,
-        description="Collect build metadata and attach it to Caliper output"
+        description="Collect experiment hash metadata and attach it to Caliper output if Caliper is present"
     )
 
     class Helper(ExperimentHelper):
         def compute_modifiers_section(self):
-            metadata_modifier_list = []
+            hash_modifier_list = []
 
-            if not self.spec.satisfies("metadata=none"):
-                metadata_modifier_modes = {}
-                metadata_modifier_modes["name"] = "metadata"
-                metadata_modifier_modes["mode"] = self.spec.variants["metadata"][0]
-                metadata_modifier_list.append(metadata_modifier_modes)
+            if not self.spec.satisfies("hash=none"):
+                hash_modifier_modes = {}
+                hash_modifier_modes["name"] = "hash"
+                hash_modifier_modes["mode"] = self.spec.variants["hash"][0]
+                hash_modifier_list.append(hash_modifier_modes)
 
-            return metadata_modifier_list
+            return hash_modifier_list
 
 
-class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc, Metadata):
+class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc, Hash):
     """This is the superclass for all benchpark experiments.
 
     ***The Experiment class***
