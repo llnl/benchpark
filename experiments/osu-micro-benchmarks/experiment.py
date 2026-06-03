@@ -121,7 +121,7 @@ class OsuMicroBenchmarks(
 
     def compute_applications_section(self):
 
-        if any(self.spec.satisfies(f"workload={wl}") for wl in two_rank_workloads):
+        if any(self.spec.satisfies(f"workload={wl}") for wl in self.two_rank_workloads):
             n_ranks = 2
             if self.spec.satisfies("+rocm") or self.spec.satisfies("+cuda"):
                 resource = "n_gpus"
@@ -149,11 +149,11 @@ class OsuMicroBenchmarks(
 
         use_gpus = self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm")
         resource_var = "n_gpus" if use_gpus else "n_ranks"
-        resources_per_node = self.max_gpus_per_node if use_gpus else self.max_cpus_per_node
+        resources_per_node = "{sys_gpus_per_node}" if use_gpus else "{sys_cores_per_node}"
 
         self.register_scaling_config(
             {
-                ScalingMode.Weak: {
+                ScalingMode.Strong: {
                     "n_nodes": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
                     resource_var: lambda var, itr, dim, scaling_factor: resources_per_node
                         * var.val("n_nodes") * scaling_factor,
