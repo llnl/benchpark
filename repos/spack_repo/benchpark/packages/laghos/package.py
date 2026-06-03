@@ -94,10 +94,6 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         if "+gpu-aware-mpi" in self.spec:
             env.set("MFEM_GPU_AWARE_MPI", "1")
 
-    def setup_build_environment(self, env):
-        if "+cuda" in self.spec:
-            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
-
     @property
     def build_targets(self):
         targets = []
