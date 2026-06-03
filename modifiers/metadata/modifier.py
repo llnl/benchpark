@@ -24,7 +24,7 @@ class Metadata(BasicModifier):
         metadata_file_path = "{experiment_run_dir}/version_metadata.json"
         repo_root = Path(self._file_path).resolve().parents[2]
 
-        package_name = app_inst.name
+        application_name = app_inst.name
 
         pre_exec = []
         post_exec = []
@@ -33,7 +33,7 @@ class Metadata(BasicModifier):
             CommandExecutable(
                 f"write-json-{executable_name}",
                 template=[
-                    f"python {script_dir}/metadata_collector.py {metadata_file_path} {repo_root} {package_name}"
+                    f"python {script_dir}/metadata_collector.py {metadata_file_path} {repo_root} {application_name}"
                 ],
             )
         )

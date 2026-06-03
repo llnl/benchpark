@@ -2,6 +2,7 @@ import argparse
 import json
 import subprocess
 import yaml
+import traceback
 from pathlib import Path
 
 def write(metadata, metadata_file_path):
@@ -16,7 +17,7 @@ def extract_benchpark_version(repo_root):
 
     return benchpark_hash
     
-def extract_dependencies_version(repo_root):
+def extract_benchpark_dependencies_version(repo_root):
     dependencies_file = "checkout-versions.yaml"
 
     with open(Path(repo_root) / dependencies_file, "r", encoding="utf-8") as f:
@@ -30,18 +31,30 @@ def extract_dependencies_version(repo_root):
         "spack-packages": dependencies_ver_json.get("spack-packages"),
     }
 
-def extract_package_version(package_name):
-    package_ver_raw = subprocess.check_output(
-        ["spack", "find", "--json", package_name],
+def spack_find_json(name):
+    raw = subprocess.check_output(
+        ["spack", "find", "--json", name],
         text=True,
     )
+    return json.loads(raw)[0]
 
-    package_ver_json = json.loads(package_ver_raw)[0]
+def extract_name_version_commit(pkg_json):
+    params = pkg_json.get("parameters", {})
+    return {
+        "name": pkg_json.get("name"),
+        "version": pkg_json.get("version"),
+        "commit": params.get("commit"),
+    }
+
+def collect_package_info(application_name):
+    pkg_json = spack_find_json(application_name)
 
     return {
-        "name": package_ver_json.get("name"),
-        "version": package_ver_json.get("version"),
-        "commit": package_ver_json.get("parameters").get("commit"),
+        "application": extract_name_version_commit(pkg_json),
+        "dependencies": {
+            dep["name"]: extract_name_version_commit(spack_find_json(dep["name"]))
+            for dep in pkg_json.get("dependencies", [])
+        },
     }
 
 if __name__ == "__main__":
@@ -54,15 +67,22 @@ if __name__ == "__main__":
         "repo_root", type=str
     )
     parser.add_argument(
-        "package_name", type=str
+        "application_name", type=str
     )
 
     args = parser.parse_args()
 
-    metadata = {
-        "benchpark": extract_benchpark_version(args.repo_root),
-        "dependencies": extract_dependencies_version(args.repo_root),
-        "package": extract_package_version(args.package_name),
-    }
+    try:
+        metadata = {
+            "benchpark": extract_benchpark_version(args.repo_root),
+            "benchpark_dependencies": extract_benchpark_dependencies_version(args.repo_root),
+            "packages": collect_package_info(args.application_name),
+        }
+
+    except Exception as e:
+        with open("error_log", "w", encoding="utf-8") as f:
+            f.write(f"{type(e).__name__}: {e}\n")
+            f.write(traceback.format_exc())
+        raise
 
     write(metadata, args.metadata_file_path)
