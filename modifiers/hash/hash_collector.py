@@ -80,7 +80,7 @@ if __name__ == "__main__":
         }
 
     except Exception as e:
-        with open("error_log", "w", encoding="utf-8") as f:
+        with open("hash_error_log", "w", encoding="utf-8") as f:
             f.write(f"{type(e).__name__}: {e}\n")
             f.write(traceback.format_exc())
         raise
