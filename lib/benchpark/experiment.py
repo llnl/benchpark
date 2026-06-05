@@ -169,6 +169,7 @@ class Hwloc:
 
             return hwloc_modifier_list
 
+
 class Hash:
     variant(
         "hash",

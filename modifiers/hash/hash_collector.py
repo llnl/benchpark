@@ -56,7 +56,7 @@ def collect_package_info(application_name):
     pkg_json = spack_find_json(application_name)
 
     application =  extract_package_hash(pkg_json)
-    dependencies= {}
+    dependencies = {}
     for dep in pkg_json.get("dependencies"):
         dep_info = extract_package_hash(spack_find_json(dep["name"]))
         if dep_info["commit"] is not None:
