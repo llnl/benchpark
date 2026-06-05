@@ -48,7 +48,7 @@ variables:
   # Dane
   DANE_SHARED_ALLOC: -N 1 -t 04:00:00 --exclusive --reservation=ci
   # Matrix (NODES ARE SHARED WITHOUT --exclusive)
-  MATRIX_SHARED_ALLOC: -N 1 -t 04:00:00 --exclusive -p pci
+  MATRIX_SHARED_ALLOC: -N 1 -t 04:00:00 --exclusive
   # Tuolumne (max 4hr policy)
   TUOLUMNE_SHARED_ALLOC: -N 1 -t 4h --queue=pci --exclusive --setattr=gpumode=${GPUMODE}
     --conf=resource.rediscover=true
