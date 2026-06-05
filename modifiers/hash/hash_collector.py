@@ -5,9 +5,11 @@ import yaml
 import traceback
 from pathlib import Path
 
+
 def write(metadata, metadata_file_path):
     with open(metadata_file_path, "w") as f:
         json.dump(metadata, f, indent=2)
+
 
 def extract_benchpark_hash(repo_root):
     benchpark_hash = subprocess.check_output(
@@ -16,7 +18,8 @@ def extract_benchpark_hash(repo_root):
     ).strip()
 
     return benchpark_hash
-    
+
+
 def extract_benchpark_dependencies_hash(repo_root):
     dependencies_file = "checkout-versions.yaml"
 
@@ -31,12 +34,14 @@ def extract_benchpark_dependencies_hash(repo_root):
         "spack-packages": dependencies_hash_json.get("spack-packages"),
     }
 
+
 def spack_find_json(name):
     raw = subprocess.check_output(
         ["spack", "find", "--json", name],
         text=True,
     )
     return json.loads(raw)[0]
+
 
 def extract_package_hash(pkg_json):
     params = pkg_json.get("parameters", {})
@@ -46,36 +51,37 @@ def extract_package_hash(pkg_json):
         "commit": params.get("commit"),
     }
 
+
 def collect_package_info(application_name):
     pkg_json = spack_find_json(application_name)
 
+    application =  extract_package_hash(pkg_json),
+    dependencies= {}
+    for dep in pkg_json.get("dependencies"):
+        dep_info = extract_package_hash(spack_find_json(dep["name"]))
+        if dep_info["commit"] is not None:
+            dependencies[dep["name"]] = dep_info
+    print(dependencies)
     return {
-        "application": extract_package_hash(pkg_json),
-        "dependencies": {
-            dep["name"]: extract_package_hash(spack_find_json(dep["name"]))
-            for dep in pkg_json.get("dependencies", [])
-        },
+        "application": application,
+        "dependencies": dependencies,
     }
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="write hash metadata to JSON")
 
-    parser.add_argument(
-        "hash_metadata_file_path", type=str
-    )
-    parser.add_argument(
-        "repo_root", type=str
-    )
-    parser.add_argument(
-        "application_name", type=str
-    )
+    parser.add_argument("hash_metadata_file_path", type=str)
+    parser.add_argument("repo_root", type=str)
+    parser.add_argument("application_name", type=str)
 
     args = parser.parse_args()
 
     try:
         metadata = {
             "benchpark": extract_benchpark_hash(args.repo_root),
-            "benchpark_dependencies": extract_benchpark_dependencies_hash(args.repo_root),
+            "benchpark_dependencies": extract_benchpark_dependencies_hash(
+                args.repo_root
+            ),
             "packages": collect_package_info(args.application_name),
         }
 

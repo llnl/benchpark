@@ -1,22 +1,23 @@
 from pathlib import Path
 from ramble.modkit import *
 
+
 class Hash(BasicModifier):
     """Define a modifier for collecting experiment hash metadata"""
 
     name = "hash"
 
     maintainers("vining1")
-    
+
     mode(
         name="on",
         description="Collect experiment hash metadata and attach it to Caliper output if Caliper is present",
     )
-    
+
     default_mode("on")
 
     executable_modifier("hash")
-    
+
     def hash(self, executable_name, executable, app_inst=None):
         from ramble.util.executable import CommandExecutable
 
@@ -55,5 +56,3 @@ class Hash(BasicModifier):
             )
 
         return pre_exec, post_exec
-
-    
