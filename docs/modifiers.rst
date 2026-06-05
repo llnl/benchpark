@@ -251,8 +251,8 @@ The ``hash`` modifier records version metadata for the Benchpark repository, the
 Benchpark dependencies, and the application package plus any dependencies whose Spack
 metadata includes a commit value.
 
-The ``hash`` modifier is disabled by default (``hash=none``). You can specify
-``hash=on`` to enable usage.
+The ``hash`` modifier is enabled by default (``hash=on``). You can specify
+``hash=none`` to disable usage.
 
 ::
 

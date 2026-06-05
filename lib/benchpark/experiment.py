@@ -173,7 +173,7 @@ class Hwloc:
 class Hash:
     variant(
         "hash",
-        default="none",
+        default="on",
         values=(
             "none",
             "on",
