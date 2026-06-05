@@ -178,7 +178,7 @@ class Hash:
             "on",
         ),
         multi=False,
-        description="Collect experiment hash metadata and attach it to Caliper output if Caliper is present"
+        description="Collect experiment hash metadata and attach it to Caliper output if Caliper is present",
     )
 
     class Helper(ExperimentHelper):
