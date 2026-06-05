@@ -243,15 +243,16 @@ experiment directory.
 If also running with the ``caliper`` modifier, ``hwloc`` information will be included in
 the Caliper metadata.
 
-**************************
+************************
  Hash: Version Metadata
-**************************
+************************
 
 The ``hash`` modifier records version metadata for the Benchpark repository, the pinned
 Benchpark dependencies, and the application package plus any dependencies whose Spack
 metadata includes a commit value.
 
-The ``hash`` modifier is disabled by default (``hash=none``). You can specify ``hash=on`` to enable usage.
+The ``hash`` modifier is disabled by default (``hash=none``). You can specify
+``hash=on`` to enable usage.
 
 ::
 
