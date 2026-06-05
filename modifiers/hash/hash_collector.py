@@ -1,9 +1,10 @@
 import argparse
 import json
 import subprocess
-import yaml
 import traceback
 from pathlib import Path
+
+import yaml
 
 
 def write(metadata, metadata_file_path):
