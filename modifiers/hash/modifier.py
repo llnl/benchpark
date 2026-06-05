@@ -44,6 +44,7 @@ class Hash(BasicModifier):
             [modifier["name"] == "caliper" for modifier in app_inst.modifiers]
         )
 
+        # Modify Caliper config to track this json as part of its metadata
         if caliper_modifier:
             pre_exec.append(
                 CommandExecutable(
