@@ -101,11 +101,11 @@ run_tests_slurm_dane:
         BENCHMARK: [kripke, amg2023]
         VARIANT: ['+strong caliper=mpi,time', '+weak caliper=mpi,time']
         TEST_ANALYZE: ['true']
-      # Test hash, affinity, and hwloc with caliper on
+      # Test githash, affinity, and hwloc with caliper on
       - HOST: dane
         ARCHCONFIG: llnl-cluster
         BENCHMARK: [kripke]
-        VARIANT: ['caliper=mpi,time hwloc=on affinity=on hash=on']
+        VARIANT: ['caliper=mpi,time hwloc=on affinity=on githash=on']
       # Topdown
       - HOST: dane
         ARCHCONFIG: llnl-cluster

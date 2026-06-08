@@ -3,27 +3,27 @@ from pathlib import Path
 from ramble.modkit import *
 
 
-class Hash(BasicModifier):
-    """Define a modifier for collecting experiment hash metadata"""
+class GitHash(BasicModifier):
+    """Define a modifier for collecting experiment git hash metadata"""
 
-    name = "hash"
+    name = "githash"
 
     maintainers("vining1")
 
     mode(
         name="on",
-        description="Collect experiment hash metadata and attach it to Caliper output if Caliper is present",
+        description="Collect experiment git hash metadata and attach it to Caliper output if Caliper is present",
     )
 
     default_mode("on")
 
-    executable_modifier("hash")
+    executable_modifier("githash")
 
-    def hash(self, executable_name, executable, app_inst=None):
+    def githash(self, executable_name, executable, app_inst=None):
         from ramble.util.executable import CommandExecutable
 
         script_dir = Path(self._file_path).resolve().parent
-        hash_metadata_file_path = "{experiment_run_dir}/hash_metadata.json"
+        githash_metadata_file_path = "{experiment_run_dir}/githash_metadata.json"
         repo_root = Path(self._file_path).resolve().parents[2]
 
         application_name = app_inst.name
@@ -35,7 +35,7 @@ class Hash(BasicModifier):
             CommandExecutable(
                 f"write-json-{executable_name}",
                 template=[
-                    f"python {script_dir}/hash_collector.py {hash_metadata_file_path} {repo_root} {application_name}"
+                    f"python {script_dir}/githash.py {githash_metadata_file_path} {repo_root} {application_name}"
                 ],
             )
         )
@@ -51,7 +51,7 @@ class Hash(BasicModifier):
                     f"modify-caliper-config-{executable_name}",
                     template=[
                         'export CALI_CONFIG="$CALI_CONFIG,metadata(file={})"'.format(
-                            hash_metadata_file_path
+                            githash_metadata_file_path
                         )
                     ],
                 )

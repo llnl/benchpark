@@ -70,9 +70,9 @@ def collect_package_info(application_name):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="write hash metadata to JSON")
+    parser = argparse.ArgumentParser(description="write git hash metadata to JSON")
 
-    parser.add_argument("hash_metadata_file_path", type=str)
+    parser.add_argument("githash_metadata_file_path", type=str)
     parser.add_argument("repo_root", type=str)
     parser.add_argument("application_name", type=str)
 
@@ -88,9 +88,9 @@ if __name__ == "__main__":
         }
 
     except Exception as e:
-        with open("hash_error_log", "w", encoding="utf-8") as f:
+        with open("githash_error_log", "w", encoding="utf-8") as f:
             f.write(f"{type(e).__name__}: {e}\n")
             f.write(traceback.format_exc())
         raise
 
-    write(metadata, args.hash_metadata_file_path)
+    write(metadata, args.githash_metadata_file_path)

@@ -170,32 +170,32 @@ class Hwloc:
             return hwloc_modifier_list
 
 
-class Hash:
+class GitHash:
     variant(
-        "hash",
+        "githash",
         default="on",
         values=(
             "none",
             "on",
         ),
         multi=False,
-        description="Collect experiment hash metadata and attach it to Caliper output if Caliper is present",
+        description="Collect experiment git hash metadata and attach it to Caliper output if Caliper is present",
     )
 
     class Helper(ExperimentHelper):
         def compute_modifiers_section(self):
-            hash_modifier_list = []
+            githash_modifier_list = []
 
-            if not self.spec.satisfies("hash=none"):
-                hash_modifier_modes = {}
-                hash_modifier_modes["name"] = "hash"
-                hash_modifier_modes["mode"] = self.spec.variants["hash"][0]
-                hash_modifier_list.append(hash_modifier_modes)
+            if not self.spec.satisfies("githash=none"):
+                githash_modifier_modes = {}
+                githash_modifier_modes["name"] = "githash"
+                githash_modifier_modes["mode"] = self.spec.variants["githash"][0]
+                githash_modifier_list.append(githash_modifier_modes)
 
-            return hash_modifier_list
+            return githash_modifier_list
 
 
-class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc, Hash):
+class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc, GitHash):
     """This is the superclass for all benchpark experiments.
 
     ***The Experiment class***
