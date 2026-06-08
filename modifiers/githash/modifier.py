@@ -3,7 +3,7 @@ from pathlib import Path
 from ramble.modkit import *
 
 
-class GitHash(BasicModifier):
+class Githash(BasicModifier):
     """Define a modifier for collecting experiment git hash metadata"""
 
     name = "githash"

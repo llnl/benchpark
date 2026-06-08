@@ -170,7 +170,7 @@ class Hwloc:
             return hwloc_modifier_list
 
 
-class GitHash:
+class Githash:
     variant(
         "githash",
         default="on",
