@@ -195,7 +195,7 @@ class Githash:
             return githash_modifier_list
 
 
-class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc, GitHash):
+class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc, Githash):
     """This is the superclass for all benchpark experiments.
 
     ***The Experiment class***
