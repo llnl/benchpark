@@ -54,11 +54,21 @@ class Remhos(
     def compute_applications_section(self):
         if self.spec.satisfies("exec_mode=perf"):
             if self.spec.satisfies("workload=2d"):
-                self.add_experiment_variable("epm", 1024, True)
+                if self.spec.satisfies("+throughput"):
+                    self.add_experiment_variable("epm", 1024, True)
+                elif self.spec.satisfies("+weak"):
+                    self.add_experiment_variable("epm", 131072, True)
+                else:
+                    self.add_experiment_variable("epm", 1024, True)
                 self.add_experiment_variable("o", 3, False)
                 self.add_experiment_variable("p", 14, False)
             elif self.spec.satisfies("workload=3d"):
-                self.add_experiment_variable("epm", 512, True)
+                if self.spec.satisfies("+throughput"):
+                    self.add_experiment_variable("epm", 512, True)
+                elif self.spec.satisfies("+weak"):
+                    self.add_experiment_variable("epm", 131072, True)
+                else:
+                    self.add_experiment_variable("epm", 512, True)
                 self.add_experiment_variable("o", 2, False)
                 self.add_experiment_variable("p", 10, False)
         else:
@@ -80,7 +90,12 @@ class Remhos(
 
         # resource_count is the number of resources used for this experiment:
         self.add_experiment_variable("resource_count", 4, False)
-        self.add_experiment_variable("pool", 120, False)
+        if self.spec.satisfies("+throughput"):
+            self.add_experiment_variable("pool", 80, False)
+        elif self.spec.satisfies("+weak"):
+            self.add_experiment_variable("pool", 16, False)
+        else:
+            self.add_experiment_variable("pool", 16, False)
 
         # Set the variables required by the experiment
         self.set_required_variables(
