@@ -144,6 +144,7 @@ def test_default_modifiers_section():
     assert modifiers_section == [
         {"name": "allocation", "mode": "standard"},
         {"name": "exit-code"},
+        {"name": "githash", "mode": "on"},
     ]
 
 
