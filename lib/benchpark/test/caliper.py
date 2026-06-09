@@ -39,6 +39,7 @@ def test_experiment_compute_variables_section_caliper(monkeypatch):
         "caliper_metadata": {
             "affinity": "none",
             "allocation": "standard",
+            "githash": "on",
             "hwloc": "none",
             "application_name": "{application_name}",
             "experiment_name": "{experiment_name}",
@@ -135,6 +136,7 @@ def test_caliper_modifier(monkeypatch):
         "caliper": "time",
         "caliper_services": "none",
         "exec_mode": "test",
+        "githash": "on",
         "hwloc": "none",
         "package_manager": "spack",
         "prepend_path": "'",
