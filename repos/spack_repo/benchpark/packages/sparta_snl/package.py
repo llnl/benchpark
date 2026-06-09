@@ -54,7 +54,7 @@ class SpartaSnl(CMakePackage, CudaPackage, ROCmPackage):
 
     depends_on("mpi", when="+mpi")
 
-    depends_on("kokkos@5.0.0: +deprecated_code_4", when="@20260102: +kokkos")
+    depends_on("kokkos@5.0.0:", when="@20260102: +kokkos")
     depends_on("kokkos", when="+kokkos")
     depends_on("kokkos+openmp", when="+openmp")
     depends_on("kokkos+rocm", when="+rocm")
