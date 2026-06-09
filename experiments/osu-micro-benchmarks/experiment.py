@@ -16,7 +16,7 @@ class OsuMicroBenchmarks(
         ProgrammingModelType.Cuda,
         ProgrammingModelType.Rocm,
     ),
-    Scaling(ScalingMode.Strong, ScalingMode.Throughput)
+    Scaling(ScalingMode.Strong, ScalingMode.Throughput),
 ):
 
     two_rank_workloads = [
@@ -28,7 +28,7 @@ class OsuMicroBenchmarks(
         "osu_get_latency",
         "osu_put_bibw",
         "osu_put_bw",
-        "osu_put_latency"
+        "osu_put_latency",
     ]
 
     variant(
@@ -149,14 +149,18 @@ class OsuMicroBenchmarks(
 
         use_gpus = self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm")
         resource_var = "n_gpus" if use_gpus else "n_ranks"
-        resources_per_node = "{sys_gpus_per_node}" if use_gpus else "{sys_cores_per_node}"
+        resources_per_node = (
+            "{sys_gpus_per_node}" if use_gpus else "{sys_cores_per_node}"
+        )
 
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "n_nodes": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+                    "n_nodes": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
                     resource_var: lambda var, itr, dim, scaling_factor: resources_per_node
-                        * var.val("n_nodes") * scaling_factor,
+                    * var.val("n_nodes")
+                    * scaling_factor,
                     "process_problem_size": "",
                     "total_problem_size": "",
                 },
@@ -165,10 +169,9 @@ class OsuMicroBenchmarks(
                     resource_var: 2,
                     "process_problem_size": "",
                     "total_problem_size": "",
-                }
+                },
             }
         )
-
 
         n_resources = "{" + resource + "}"
         self.set_required_variables(
