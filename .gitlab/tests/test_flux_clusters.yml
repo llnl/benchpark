@@ -1,0 +1,97 @@
+include:
+  - local: .gitlab/utils/status.yml
+  - local: .gitlab/utils/machine_checks.yml
+  - local: .gitlab/utils/rules.yml
+workflow:
+  auto_cancel:
+    on_new_commit: conservative
+#############################
+# Resource Allocation Section
+#############################
+.allocate_resources_flux:
+  extends: .on_host_template
+  stage: allocate-resources
+  script:
+    - set -x
+    - flux --parent alloc ${SHARED_ALLOC} --job-name=${ALLOC_NAME}${GPUMODE} --bg
+  after_script:
+    - |
+      if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
+        . .gitlab/utils/cancel-flux.sh
+      fi
+allocate_resources_tioga:
+  extends: .allocate_resources_flux
+  variables:
+    HOST: tioga
+    SHARED_ALLOC: $TIOGA_SHARED_ALLOC
+  tags: [shell, tioga]
+  needs: [tioga-up-check]
+##########################
+# Resource Release Section
+##########################
+.release_resources_flux:
+  extends: .on_host_template
+  stage: release-resources
+  # Do not cleanup dir yet
+  script: [. .gitlab/utils/cancel-flux.sh --no-clean]
+release_resources_flux_tioga:
+  extends: .release_resources_flux
+  needs: [allocate_resources_tioga, run_tests_flux_tioga]
+  variables:
+    HOST: tioga
+  tags: [shell, tioga]
+##################
+# Test Run Section
+##################
+.run_tests_flux:
+  stage: test
+  extends: .on_host_template
+  before_script:
+    - !reference [.report_status, before_script]
+  script:
+    - |
+      ALLOC_ID=$(flux jobs --name="${ALLOC_NAME}${GPUMODE}" -n -o "{id}")
+      echo -e "[Information]: Shared allocation ID = ${ALLOC_ID}"
+      PROXY="$( [[ -n "${ALLOC_ID}" ]] && echo "flux proxy ${ALLOC_ID}" || echo "" )"
+      pr_rc=0
+      develop_rc=0
+
+      ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${FLUX_ARGS} .gitlab/utils/run-experiment.sh ) || pr_rc=$?
+
+      git fetch origin develop
+      git worktree add "$CI_PROJECT_DIR/develop" origin/develop
+      cd "$CI_PROJECT_DIR/develop"
+
+      ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${FLUX_ARGS} .gitlab/utils/run-experiment.sh ) || develop_rc=$?
+
+      echo "[PR Status]: PR checkout exit code = ${pr_rc}"
+      echo "[Develop Status]: develop checkout exit code = ${develop_rc}"
+      printf '%s\n' "${pr_rc}" > "$CI_PROJECT_DIR/pr_flux.status"
+      printf '%s\n' "${develop_rc}" > "$CI_PROJECT_DIR/develop_flux.status"
+
+      exit "${pr_rc}"
+  after_script:
+    - !reference [.report_status, after_script]
+    - |
+      pr_status="Failed"
+      develop_status="Failed"
+
+      [[ "$(cat "$CI_PROJECT_DIR/pr_flux.status")" == "0" ]] && pr_status="Passed"
+      [[ "$(cat "$CI_PROJECT_DIR/develop_flux.status")" == "0" ]] && develop_status="Passed"
+
+      echo "Summary:"
+      echo "Develop: ${develop_status}"
+      echo "PR: ${pr_status}"
+    - |
+      if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
+        . .gitlab/utils/cancel-flux.sh
+      fi
+run_tests_flux_tioga:
+  extends: .run_tests_flux
+  tags: [shell, tioga]
+  needs: [allocate_resources_tioga]
+  parallel:
+    matrix:
+      - HOST: tioga
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [stream]
