@@ -73,11 +73,17 @@ release_resources_flux_tioga:
   after_script:
     - !reference [.report_status, after_script]
     - |
-      pr_status="Failed"
-      develop_status="Failed"
+      if [[ "$(cat "$CI_PROJECT_DIR/pr_flux.status")" == "0" ]]; then
+        pr_status="Passed"
+      else
+        pr_status="Failed"
+      fi
 
-      [[ "$(cat "$CI_PROJECT_DIR/pr_flux.status")" == "0" ]] && pr_status="Passed"
-      [[ "$(cat "$CI_PROJECT_DIR/develop_flux.status")" == "0" ]] && develop_status="Passed"
+      if [[ "$(cat "$CI_PROJECT_DIR/develop_flux.status")" == "0" ]]; then
+        develop_status="Passed"
+      else
+        develop_status="Failed"
+      fi
 
       echo "Summary:"
       echo "Develop: ${develop_status}"
