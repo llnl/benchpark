@@ -59,8 +59,8 @@ release_resources_flux_tioga:
       ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${FLUX_ARGS} .gitlab/utils/run-experiment.sh ) || pr_rc=$?
 
       git fetch origin develop
-      git worktree add "$CI_PROJECT_DIR/develop" origin/develop
-      cd "$CI_PROJECT_DIR/develop"
+      git worktree add "$CI_PROJECT_DIR/d" origin/develop
+      cd "$CI_PROJECT_DIR/d"
 
       ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${FLUX_ARGS} .gitlab/utils/run-experiment.sh ) || develop_rc=$?
 
