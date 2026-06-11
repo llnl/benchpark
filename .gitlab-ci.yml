@@ -73,6 +73,7 @@ include:
   # - local: .gitlab/tests/shared_flux_clusters.yml
   # - local: .gitlab/tests/shared_slurm_clusters.yml
   - local: .gitlab/tests/test_flux_clusters.yml 
+  - local: .gitlab/tests/test_slurm_clusters.yml
   # Nightly tests
   - local: .gitlab/tests/nightly.yml
 stages:

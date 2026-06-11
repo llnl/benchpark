@@ -1,3 +1,4 @@
+# Clusters listed here are native slurm clusters that we test using flux. See "non_shared.yaml"
 include:
   - local: .gitlab/utils/status.yml
   - local: .gitlab/utils/machine_checks.yml
@@ -8,51 +9,60 @@ workflow:
 #############################
 # Resource Allocation Section
 #############################
-.allocate_resources_flux:
+.allocate_resources_slurm:
   extends: .on_host_template
   stage: allocate-resources
   script:
-    - set -x
-    - flux --parent alloc ${SHARED_ALLOC} --job-name=${ALLOC_NAME}${GPUMODE} --bg
+    - set -e
+    # submit and grab JobID
+    - JOBID=$(sbatch --parsable ${SHARED_ALLOC} --wait-all-nodes=1 --job-name="${ALLOC_NAME}"
+      --wrap='srun -N 1 -n 1 flux start sleep inf')
+    - echo "Slurm job = ${JOBID}"
+    # wait until SLURM job running
+    # 1..2160 is up to 6 hours
+    - for i in {1..2160}; do state=$(sacct -j ${JOBID} -n -o State 2>/dev/null | head
+      -1 | awk '{print $1}'); [[ "$state" == "RUNNING" ]] && break; echo "waiting...
+      total duration has been $(( (i-1)*10 ))s" && sleep 10; done
+    #- for i in {1..1080}; do flux proxy slurm:${JOBID} flux ping -c1 >/dev/null 2>&1 && break; echo "waiting..." sleep 10; done
+    #- flux proxy slurm:${JOBID} flux ping -c1  # final check (fails the job if still not ready)
   after_script:
     - |
       if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
-        . .gitlab/utils/cancel-flux.sh
+        . .gitlab/utils/cancel-slurm.sh
       fi
-allocate_resources_tioga:
-  extends: .allocate_resources_flux
+allocate_resources_matrix:
+  extends: .allocate_resources_slurm
   variables:
-    HOST: tioga
-    SHARED_ALLOC: $TIOGA_SHARED_ALLOC
-  tags: [shell, tioga]
-  needs: [tioga-up-check]
+    HOST: matrix
+    SHARED_ALLOC: $MATRIX_SHARED_ALLOC
+  tags: [shell, matrix]
+  needs: [matrix-up-check]
 ##########################
 # Resource Release Section
 ##########################
-.release_resources_flux:
+.release_resources_slurm:
   extends: .on_host_template
   stage: release-resources
   # Do not cleanup dir yet
-  script: [. .gitlab/utils/cancel-flux.sh --no-clean]
-release_resources_flux_tioga:
-  extends: .release_resources_flux
-  needs: [allocate_resources_tioga, run_tests_flux_tioga]
-  variables:
-    HOST: tioga
-  tags: [shell, tioga]
+  script: [. .gitlab/utils/cancel-slurm.sh --no-clean]
+release_resources_matrix:
+  extends: .release_resources_slurm
+  tags: [shell, matrix]
+  needs: [allocate_resources_matrix, run_tests_slurm_matrix]
 ##################
 # Test Run Section
 ##################
-.run_tests_flux:
-  stage: test
+.run_tests_slurm:
   extends: .on_host_template
+  stage: test
   before_script:
     - !reference [.report_status, before_script]
   script:
     - |
-      ALLOC_ID=$(flux jobs --name="${ALLOC_NAME}${GPUMODE}" -n -o "{id}")
-      echo -e "[Information]: Shared allocation ID = ${ALLOC_ID}"
-      PROXY="$( [[ -n "${ALLOC_ID}" ]] && echo "flux proxy ${ALLOC_ID}" || echo "" )"
+      echo -e "### Allocation name is ${ALLOC_NAME}"
+      export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
+      echo -e "### Job ID is ${JOBID}"
+      PROXY="$( [[ -n "${JOBID}" ]] && echo "flux proxy slurm:${JOBID}" || echo "" )"
     - |
       pr_rc=0
       develop_rc=0
@@ -99,14 +109,15 @@ release_resources_flux_tioga:
       bash .gitlab/utils/compare-githash-metadata.sh "$pr_json" "$develop_json"
     - |
       if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
-        . .gitlab/utils/cancel-flux.sh
+        . .gitlab/utils/cancel-slurm.sh
       fi
-run_tests_flux_tioga:
-  extends: .run_tests_flux
-  tags: [shell, tioga]
-  needs: [allocate_resources_tioga]
+run_tests_slurm_matrix:
+  extends: .run_tests_slurm
+  tags: [shell, matrix]
+  needs: [allocate_resources_matrix]
   parallel:
     matrix:
-      - HOST: tioga
-        ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [stream]
+      - HOST: matrix
+        ARCHCONFIG: llnl-matrix
+        BENCHMARK: [babelstream]
+        VARIANT: [+cuda]
