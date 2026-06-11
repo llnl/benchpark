@@ -66,7 +66,7 @@ release_resources_flux_tioga:
 
       echo "[PR Status]: PR checkout exit code = ${pr_rc}"
       echo "[Develop Status]: develop checkout exit code = ${develop_rc}"
-      printf '%s\n' "${pr_rc}" > "$CI_PROJECT_DIR/pr_flux.status"
+      printf '%s\n' "1" > "$CI_PROJECT_DIR/pr_flux.status"
       printf '%s\n' "${develop_rc}" > "$CI_PROJECT_DIR/develop_flux.status"
 
       exit "${pr_rc}"
