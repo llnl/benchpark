@@ -35,7 +35,7 @@ extract_packages() {
     ' "$json_file"
 }
 
-echo -e "\n\n======[PACKAGE GITHASH SUMMARY]======="
+echo -e "======[PACKAGE GITHASH SUMMARY]======"
 while IFS=$'\t' read -r package_name old_commit; do
     new_commit=$(
         extract_packages "$new_json" | awk -F'\t' -v name="$package_name" '$1 == name { print $2; exit }'
@@ -47,4 +47,4 @@ while IFS=$'\t' read -r package_name old_commit; do
         echo "[${package_name}]: has no commit changes."
     fi
 done < <(extract_packages "$old_json")
-echo -e "======================================\n\n"
+echo -e "====================================="
