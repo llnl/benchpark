@@ -85,10 +85,10 @@ release_resources_flux_tioga:
         develop_status="FAILED"
       fi
 
-      echo -e "======[CHECKOUT SUMMARY]======"
+      echo -e "===============[TESTS]==============="
       echo "[Develop]: ${develop_status}"
       echo "[PR]: ${pr_status}"
-      echo -e "=============================="
+      echo -e "====================================="
     - |
       pr_workspace="$CI_PROJECT_DIR/wkp/${HOST}/${BENCHMARK}/workspace"
       develop_workspace="$CI_PROJECT_DIR/d/wkp/${HOST}/${BENCHMARK}/workspace"
