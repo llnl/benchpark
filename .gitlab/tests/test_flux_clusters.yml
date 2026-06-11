@@ -92,12 +92,10 @@ release_resources_flux_tioga:
     - |
       pr_workspace="$CI_PROJECT_DIR/wkp/${HOST}/${BENCHMARK}/workspace"
       develop_workspace="$CI_PROJECT_DIR/d/wkp/${HOST}/${BENCHMARK}/workspace"
-
-      while IFS= read -r pr_json; do
-        relative_json="${pr_json#${pr_workspace}/}"
-        develop_json="${develop_workspace}/${relative_json}"
-        bash .gitlab/utils/compare-githash-metadata.sh "$pr_json" "$develop_json"
-      done < <(find "${pr_workspace}/experiments/${BENCHMARK}" -type f -name 'githash_metadata.json' | sort)
+      pr_json=$(find "${pr_workspace}/experiments/${BENCHMARK}" -type f -name 'githash_metadata.json' | sort | head -n 1)
+      relative_json="${pr_json#${pr_workspace}/}"
+      develop_json="${develop_workspace}/${relative_json}"
+      bash .gitlab/utils/compare-githash-metadata.sh "$pr_json" "$develop_json"
     - |
       if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
         . .gitlab/utils/cancel-flux.sh
