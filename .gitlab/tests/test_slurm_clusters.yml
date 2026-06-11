@@ -119,4 +119,4 @@ run_tests_slurm_dane:
     matrix:
       - HOST: dane
         ARCHCONFIG: llnl-cluster
-        BENCHMARK: [babelstream]
+        BENCHMARK: [stream]
