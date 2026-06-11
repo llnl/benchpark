@@ -74,20 +74,30 @@ release_resources_flux_tioga:
     - !reference [.report_status, after_script]
     - |
       if [[ "$(cat "$CI_PROJECT_DIR/pr_flux.status")" == "0" ]]; then
-        pr_status="Passed"
+        pr_status="PASSED"
       else
-        pr_status="Failed"
+        pr_status="FAILED"
       fi
 
       if [[ "$(cat "$CI_PROJECT_DIR/develop_flux.status")" == "0" ]]; then
-        develop_status="Passed"
+        develop_status="PASSED"
       else
-        develop_status="Failed"
+        develop_status="FAILED"
       fi
 
-      echo "Summary:"
-      echo "Develop: ${develop_status}"
-      echo "PR: ${pr_status}"
+      echo -e "\n\n======[CHECKOUT SUMMARY]======="
+      echo "[Develop]: ${develop_status}"
+      echo "[PR]: ${pr_status}"
+      echo -e "======================================\n\n"
+    - |
+      pr_workspace="$CI_PROJECT_DIR/wkp/${HOST}/${BENCHMARK}/workspace"
+      develop_workspace="$CI_PROJECT_DIR/d/wkp/${HOST}/${BENCHMARK}/workspace"
+
+      while IFS= read -r pr_json; do
+        relative_json="${pr_json#${pr_workspace}/}"
+        develop_json="${develop_workspace}/${relative_json}"
+        bash .gitlab/utils/compare-githash-metadata.sh "$pr_json" "$develop_json"
+      done < <(find "${pr_workspace}/experiments/${BENCHMARK}" -type f -name 'githash_metadata.json' | sort)
     - |
       if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
         . .gitlab/utils/cancel-flux.sh
@@ -100,5 +110,4 @@ run_tests_flux_tioga:
     matrix:
       - HOST: tioga
         ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [remhos]
-        VARIANT: [+rocm]
+        BENCHMARK: [stream]
