@@ -109,4 +109,5 @@ run_tests_flux_tioga:
     matrix:
       - HOST: tioga
         ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [stream]
+        BENCHMARK: [laghos]
+        VARIANT: [+rocm]
