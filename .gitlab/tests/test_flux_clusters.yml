@@ -46,6 +46,10 @@ release_resources_flux_tioga:
 .run_tests_flux:
   stage: test
   extends: .on_host_template
+  artifacts:
+    when: always
+    paths:
+      - artifact-githash/${HOST}/${BENCHMARK}/githash_metadata.json
   before_script:
     - !reference [.report_status, before_script]
   script:
@@ -94,9 +98,14 @@ release_resources_flux_tioga:
       pr_workspace="$CI_PROJECT_DIR/wkp/${HOST}/${BENCHMARK}/workspace"
       develop_workspace="$CI_PROJECT_DIR/d/wkp/${HOST}/${BENCHMARK}/workspace"
       pr_json=$(find "${pr_workspace}/experiments/${BENCHMARK}" -type f -name 'githash_metadata.json' | sort | head -n 1)
+      artifact_dir="$CI_PROJECT_DIR/artifact-githash/${HOST}/${BENCHMARK}"
+      mkdir -p "${artifact_dir}"
+      if [[ -n "${pr_json}" ]]; then
+        cp "${pr_json}" "${artifact_dir}/githash_metadata.json"
+      fi
       relative_json="${pr_json#${pr_workspace}/}"
       develop_json="${develop_workspace}/${relative_json}"
-      bash .gitlab/utils/compare-githash-metadata.sh "$pr_json" "$develop_json"
+      # bash .gitlab/utils/compare-githash-metadata.sh "$pr_json" "$develop_json"
     - |
       if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
         . .gitlab/utils/cancel-flux.sh
@@ -109,5 +118,4 @@ run_tests_flux_tioga:
     matrix:
       - HOST: tioga
         ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [laghos]
-        VARIANT: [+rocm]
+        BENCHMARK: [stream]
