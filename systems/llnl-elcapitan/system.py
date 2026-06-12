@@ -140,6 +140,7 @@ class LlnlElcapitan(System):
             "6.4.1",
             "6.4.2",
             "6.4.3",
+            "7.1.1",
             "7.2.0",
             "7.2.1",
         ),
@@ -173,7 +174,7 @@ class LlnlElcapitan(System):
     variant(
         "bank",
         default="none",
-        values=("none", "guests", "asccasc", "lc", "fractale", "wbronze"),
+        values=("none", "guests", "asccasc", "lc", "fractale", "wbronze", "flask"),
         multi=False,
         description="Submit a job to a specific named bank",
     )
