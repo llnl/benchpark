@@ -99,7 +99,7 @@ jobs:
             --where '{n_nodes} == 1'
       - name: Upload binary coverage to Codecov
         if: ${{ !contains(github.head_ref, 'dependabot/') }}
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
           directory: ./coverage-data-binary
@@ -119,7 +119,7 @@ jobs:
           BENCHPARK_RUN_COVERAGE=aggregate ./bin/benchpark aggregate --dest agg workspace2  # Aggregate multi-trial workspace
       - name: Upload aggregate coverage to Codecov
         if: ${{ !contains(github.head_ref, 'dependabot/') }}
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
           directory: ./coverage-data-aggregate
@@ -157,7 +157,7 @@ jobs:
           BENCHPARK_RUN_COVERAGE=${{ matrix.testtype }} ./bin/benchpark-python .github/utils/dryruns.py --test ${{ matrix.testtype }}
       - name: Upload coverage to Codecov
         if: ${{ !contains(github.head_ref, 'dependabot/') }}
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
           directory: ./coverage-data-${{ matrix.testtype }}
