@@ -98,7 +98,7 @@ jobs:
             --executor '{execute_experiment}' \
             --where '{n_nodes} == 1'
       - name: Upload binary coverage to Codecov
-        if: ${{ !contains(github.head_ref, 'dependabot/') }}
+        if: ${{ !contains(github.head_ref, 'dependabot/') && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork) }}
         uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
@@ -118,7 +118,7 @@ jobs:
           ./workspace2/ramble/bin/ramble --workspace-dir /home/runner/work/benchpark/benchpark/workspace2/dane/saxpy-agg/workspace workspace setup --dry-run
           BENCHPARK_RUN_COVERAGE=aggregate ./bin/benchpark aggregate --dest agg workspace2  # Aggregate multi-trial workspace
       - name: Upload aggregate coverage to Codecov
-        if: ${{ !contains(github.head_ref, 'dependabot/') }}
+        if: ${{ !contains(github.head_ref, 'dependabot/') && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork) }}
         uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
@@ -156,7 +156,7 @@ jobs:
           ./bin/benchpark bootstrap
           BENCHPARK_RUN_COVERAGE=${{ matrix.testtype }} ./bin/benchpark-python .github/utils/dryruns.py --test ${{ matrix.testtype }}
       - name: Upload coverage to Codecov
-        if: ${{ !contains(github.head_ref, 'dependabot/') }}
+        if: ${{ !contains(github.head_ref, 'dependabot/') && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork) }}
         uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
