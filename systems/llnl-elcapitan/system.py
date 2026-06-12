@@ -208,6 +208,13 @@ class LlnlElcapitan(System):
         description="Which mount point to use for IO benchmarks",
     )
 
+    variant(
+        "spindle",
+        default=False,
+        values=(True, False),
+        description="Use Spindle for improving the library-loading performance of dynamically linked HPC applications.",
+    )
+
     def __init__(self, spec):
         super().__init__(spec)
         self.programming_models = [ROCmSystem(), OpenMPCPUOnlySystem()]
@@ -862,7 +869,11 @@ class LlnlElcapitan(System):
     def system_specific_variables(self):
         opts = super().system_specific_variables()
 
-        extra_batch_opts = ""
+        extra_batch_opts = []
+
+        if not self.spec.variants["spindle"][0]:
+            extra_batch_opts.append("-o spindle.level=off")
+
         if self.rocm_arch == "gfx942":
             # MI300A modes
             if self.spec.satisfies("gpumode=SPX"):
@@ -871,19 +882,26 @@ class LlnlElcapitan(System):
                 gpu_factor = 3
             elif self.spec.satisfies("gpumode=CPX"):
                 gpu_factor = 6
-            extra_batch_opts += f"--setattr=gpumode={self.spec.variants['gpumode'][0]}\n--conf=resource.rediscover=true"
+            extra_batch_opts.append(
+                f"--setattr=gpumode={self.spec.variants['gpumode'][0]}"
+            )
+            extra_batch_opts.append("--conf=resource.rediscover=true")
 
             # Rabbits
             mt_point = self.spec.variants["mount_point"][0]
             if mt_point != "none" and "rabbits" in mt_point:
-                extra_batch_opts += f"\n-S dw={mt_point.lstrip('rabbits_')}"
+                extra_batch_opts.append(f"-S dw={mt_point.lstrip('rabbits_')}")
 
             opts.update(
                 {
                     "gpu_factor": gpu_factor,
-                    "extra_batch_opts": extra_batch_opts,
                 }
             )
+        opts.update(
+            {
+                "extra_batch_opts": "\n".join(extra_batch_opts),
+            }
+        )
         return opts
 
     def compute_software_section(self):
