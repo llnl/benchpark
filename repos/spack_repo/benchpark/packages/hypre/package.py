@@ -65,8 +65,6 @@ class Hypre(BuiltinHypre):
             if spec.satisfies("+openmp"):
                 libsci_name += "_mp"
             env.append_flags("LDFLAGS", f"-L{spec['lapack'].prefix}/lib -l{libsci_name}")
-        if "+cuda" in self.spec:
-            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
 
 class CMakeBuilder(HypreCMakeBuilder):
     root_cmakelists_dir = "src"
