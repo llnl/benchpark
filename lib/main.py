@@ -21,14 +21,14 @@ __version__ = "0.1.0"
 if "-V" in sys.argv or "--version" in sys.argv:
     print(__version__)
     exit()
-helpstr = """usage: main.py [-h] [-V] {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze,aggregate,configure} ...
+helpstr = """usage: main.py [-h] [-V] {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze,redo,aggregate,configure} ...
 
 Benchpark
 options:
   -h, --help            show this help message and exit
   -V, --version         show version number and exit
 Subcommands:
-  {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze,aggregate,configure}
+  {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze,redo,aggregate,configure}
     tags                Tags in Benchpark experiments
     system              Initialize a system config
     experiment          Interact with experiments

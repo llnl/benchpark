@@ -140,6 +140,7 @@ class LlnlElcapitan(System):
             "6.4.1",
             "6.4.2",
             "6.4.3",
+            "7.1.1",
             "7.2.0",
             "7.2.1",
         ),
@@ -173,7 +174,7 @@ class LlnlElcapitan(System):
     variant(
         "bank",
         default="none",
-        values=("none", "guests", "asccasc", "lc", "fractale", "wbronze"),
+        values=("none", "guests", "asccasc", "lc", "fractale", "wbronze", "flask"),
         multi=False,
         description="Submit a job to a specific named bank",
     )
@@ -225,7 +226,7 @@ class LlnlElcapitan(System):
             )
         else:
             if self.rocm_version >= Version("7.0.0"):
-                self.cce_version = Version("21.0.0")
+                self.cce_version = Version("21.0.1")
                 self.mpi_version = Version("9.1.0")
                 # Modules for cce/21.0 named as cce/20.0, so do not change this
                 self.override_cce_shortpath = Version("20.0")

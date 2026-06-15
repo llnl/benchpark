@@ -242,3 +242,24 @@ experiment directory.
 
 If also running with the ``caliper`` modifier, ``hwloc`` information will be included in
 the Caliper metadata.
+
+***************************
+ GitHash: Version Metadata
+***************************
+
+The ``githash`` modifier records version metadata for the Benchpark repository, the
+pinned Benchpark dependencies, and the application package plus any dependencies whose
+Spack metadata includes a commit value.
+
+The ``githash`` modifier is enabled by default (``githash=on``). You can specify
+``githash=none`` to disable usage.
+
+::
+
+    benchpark experiment init --dest=</path/to/experiment_root> </path/to/system> <benchmark> caliper=<caliper_variant> githash=on
+
+The ``githash`` modifier writes this information to ``githash_metadata.json`` in the
+experiment directory.
+
+If also running with the ``caliper`` modifier, Benchpark adds ``githash_metadata.json``
+to the Caliper metadata.
