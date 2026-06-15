@@ -1,8 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-if [[ $# -lt 5 || $# -gt 6 ]]; then
-    echo "Usage: $0 <ref> <job_name> <host> <benchmark> <output_path> [exclude_pipeline_id]" >&2
+if [[ $# -lt 5 || $# -gt 7 ]]; then
+    echo "Usage: $0 <ref> <job_name> <host> <benchmark> <output_path> [exclude_pipeline_id] [status_output_path]" >&2
     exit 1
 fi
 
@@ -12,6 +12,7 @@ host=$3
 benchmark=$4
 output_path=$5
 exclude_pipeline_id=${6:-}
+status_output_path=${7:-}
 
 api_url=${GITLAB_API_V4_URL:-${CI_API_V4_URL:-}}
 project_id=${GITLAB_PROJECT_ID:-${CI_PROJECT_ID:-}}
@@ -106,16 +107,36 @@ baseline_job_id=$(
     '
 )
 
+baseline_job_status=$(
+    printf '%s' "${jobs_json}" \
+    | jq -r --arg job_name "${job_name}" '
+        [.[] | select(.name == $job_name and (.artifacts_file.filename // "") != "")]
+        | sort_by(.id)
+        | last
+        | .status // empty
+    '
+)
+
 if [[ -z "${baseline_job_id}" ]]; then
     echo "Unable to locate job '${job_name}' with artifacts in pipeline ${baseline_pipeline_id}." >&2
     exit 1
 fi
 
+if [[ -z "${baseline_job_status}" ]]; then
+    echo "Unable to determine status for job '${job_name}' in pipeline ${baseline_pipeline_id}." >&2
+    exit 1
+fi
+
 mkdir -p "$(dirname "${output_path}")"
+
+if [[ -n "${status_output_path}" ]]; then
+    mkdir -p "$(dirname "${status_output_path}")"
+    printf '%s\n' "${baseline_job_status}" > "${status_output_path}"
+fi
 
 curl --location --silent --show-error --fail \
     --header "${auth_header}" \
     "${api_url}/projects/${project_id}/jobs/${baseline_job_id}/artifacts/${artifact_relpath}" \
     --output "${output_path}"
 
-echo "Downloaded artifact from pipeline ${baseline_pipeline_id}, job ${baseline_job_id} to ${output_path}"
+echo "Downloaded artifact from pipeline ${baseline_pipeline_id}, job ${baseline_job_id} (status=${baseline_job_status}) to ${output_path}"
