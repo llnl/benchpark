@@ -8,15 +8,27 @@ from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
 from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
 
+BabelstreamProgrammingModel = ProgrammingModel(
+  ProgrammingModelType.Openmp,
+  ProgrammingModelType.Cuda,
+  ProgrammingModelType.Rocm,
+)
+
+class BabelstreamProgrammingModelHelper(BabelstreamProgrammingModel.Helper):
+  def get_spack_variants(self):
+      variants = super().get_spack_variants()
+      variants = variants.replace("+openmp", "+omp")
+      variants = variants.replace("~openmp", "~omp")
+      variants = variants.replace("+rocm", "+rocm +hip")
+      variants = variants.replace("~rocm", "~rocm ~hip")
+      return variants
+
+BabelstreamProgrammingModel.Helper = BabelstreamProgrammingModelHelper
 
 class Babelstream(
     Experiment,
     Caliper,
-    ProgrammingModel(
-        ProgrammingModelType.Openmp,
-        ProgrammingModelType.Cuda,
-        ProgrammingModelType.Rocm,
-    ),
+    BabelstreamProgrammingModel,
 ):
     variant(
         "workload",
@@ -26,8 +38,8 @@ class Babelstream(
 
     variant(
         "version",
-        default="caliper",
-        values=("develop", "latest", "5.0", "caliper"),
+        default="main",
+        values=("main", "develop", "latest", "5.0"),
         description="app version",
     )
 
@@ -65,8 +77,6 @@ class Babelstream(
 
     def compute_package_section(self):
         # get package version
-        omp_spec = "+omp" if self.spec.satisfies("+openmp") else ""
-        hip_spec = "+hip" if self.spec.satisfies("+rocm") else ""
         self.add_package_spec(
-            self.name, [f"babelstream{self.determine_version()} {omp_spec} {hip_spec}"]
+            self.name, [f"babelstream{self.determine_version()}"]
         )
