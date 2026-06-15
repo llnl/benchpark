@@ -9,19 +9,20 @@ from benchpark.experiment import Experiment
 from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
 
 BabelstreamProgrammingModel = ProgrammingModel(
-  ProgrammingModelType.Openmp,
-  ProgrammingModelType.Cuda,
-  ProgrammingModelType.Rocm,
+    ProgrammingModelType.Openmp,
+    ProgrammingModelType.Cuda,
+    ProgrammingModelType.Rocm,
 )
 
 class BabelstreamProgrammingModelHelper(BabelstreamProgrammingModel.Helper):
-  def get_spack_variants(self):
-      variants = super().get_spack_variants()
-      variants = variants.replace("+openmp", "+omp")
-      variants = variants.replace("~openmp", "~omp")
-      variants = variants.replace("+rocm", "+rocm +hip")
-      variants = variants.replace("~rocm", "~rocm ~hip")
-      return variants
+    def get_spack_variants(self):
+        variants = super().get_spack_variants()
+        variants = variants.replace("+openmp", "+omp")
+        variants = variants.replace("~openmp", "~omp")
+        variants = variants.replace("+rocm", "+rocm +hip")
+        variants = variants.replace("~rocm", "~rocm ~hip")
+        return variants
+
 
 BabelstreamProgrammingModel.Helper = BabelstreamProgrammingModelHelper
 
@@ -77,6 +78,4 @@ class Babelstream(
 
     def compute_package_section(self):
         # get package version
-        self.add_package_spec(
-            self.name, [f"babelstream{self.determine_version()}"]
-        )
+        self.add_package_spec(self.name, [f"babelstream{self.determine_version()}"])
