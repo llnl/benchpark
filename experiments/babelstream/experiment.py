@@ -26,6 +26,7 @@ class BabelstreamProgrammingModelHelper(BabelstreamProgrammingModel.Helper):
 
 BabelstreamProgrammingModel.Helper = BabelstreamProgrammingModelHelper
 
+
 class Babelstream(
     Experiment,
     Caliper,
