@@ -13,7 +13,7 @@ from spack_repo.builtin.packages.babelstream.package import (
 
 
 class Babelstream(BuiltinBabelstream):
-    git = "https://github.com/rfhaque/BabelStream.git"
+    git = "https://github.com/UoB-HPC/BabelStream.git"
 
     version("main", branch="fix_adiak_variable")
 
