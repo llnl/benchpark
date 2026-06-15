@@ -14,6 +14,7 @@ BabelstreamProgrammingModel = ProgrammingModel(
     ProgrammingModelType.Rocm,
 )
 
+
 class BabelstreamProgrammingModelHelper(BabelstreamProgrammingModel.Helper):
     def get_spack_variants(self):
         variants = super().get_spack_variants()
