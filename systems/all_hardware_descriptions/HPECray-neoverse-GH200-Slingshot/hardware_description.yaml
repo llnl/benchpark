@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 system_definition:
-  name: HPECray-neoverse-H100-Slingshot
+  name: HPECray-neoverse-GH200-Slingshot
   integrator:
     vendor: HPECray
     name: EX254n
@@ -14,7 +14,7 @@ system_definition:
     uArch: neoverse
   accelerator:
     vendor: NVIDIA
-    name: H100
+    name: GH200
     ISA: PTX
     uArch: sm_90
   interconnect:

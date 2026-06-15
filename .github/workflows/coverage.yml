@@ -17,8 +17,8 @@ jobs:
         run: |
           ./bin/benchpark unit-test --cov=./ --cov-branch --cov-report=xml --durations=20 -ra
       - name: Upload coverage to Codecov
-        if: ${{ !contains(github.head_ref, 'dependabot/') }}
-        uses: codecov/codecov-action@v6
+        if: ${{ !contains(github.head_ref, 'dependabot/') && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork) }}
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
           directory: ./coverage/reports
