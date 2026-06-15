@@ -47,7 +47,7 @@ release_resources_flux_tioga:
   stage: test
   extends: .on_host_template
   variables:
-    BASELINE_REF: ci-with-githash
+    BASELINE_REF: feature/ci-with-githash
   artifacts:
     when: always
     paths:
@@ -101,7 +101,6 @@ release_resources_flux_tioga:
       # develop_workspace="$CI_PROJECT_DIR/d/wkp/${HOST}/${BENCHMARK}/workspace"
       pr_json=$(find "${pr_workspace}/experiments/${BENCHMARK}" -type f -name 'githash_metadata.json' | sort | head -n 1)
       artifact_dir="$CI_PROJECT_DIR/artifact-githash/${HOST}/${BENCHMARK}"
-      artifact_relpath="artifact-githash/${HOST}/${BENCHMARK}/githash_metadata.json"
       baseline_json="${artifact_dir}/baseline_githash_metadata.json"
       mkdir -p "${artifact_dir}"
       if [[ -n "${pr_json}" ]]; then
@@ -110,29 +109,13 @@ release_resources_flux_tioga:
         echo "Unable to locate PR githash metadata in ${pr_workspace}" >&2
         exit 1
       fi
-      baseline_pipeline_id=$(
-        curl --silent --show-error --fail --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
-          "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/pipelines?ref=${BASELINE_REF}&order_by=id&sort=desc&per_page=20" \
-        | jq -r --arg current_pipeline_id "${CI_PIPELINE_ID}" '.[] | select((.id | tostring) != $current_pipeline_id) | .id' \
-        | head -n 1
-      )
-      if [[ -z "${baseline_pipeline_id}" ]]; then
-        echo "Unable to locate a prior pipeline for ref ${BASELINE_REF}" >&2
-        exit 1
-      fi
-      baseline_job_id=$(
-        curl --silent --show-error --fail --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
-          "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/pipelines/${baseline_pipeline_id}/jobs?per_page=100" \
-        | jq -r --arg job_name "${CI_JOB_NAME}" '.[] | select(.name == $job_name and (.artifacts_file.filename // "") != "") | .id' \
-        | head -n 1
-      )
-      if [[ -z "${baseline_job_id}" ]]; then
-        echo "Unable to locate job ${CI_JOB_NAME} with artifacts in pipeline ${baseline_pipeline_id}" >&2
-        exit 1
-      fi
-      curl --location --silent --show-error --fail --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
-        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/jobs/${baseline_job_id}/artifacts/${artifact_relpath}" \
-        --output "${baseline_json}"
+      bash .gitlab/utils/fetch-githash-artifact.sh \
+        "${BASELINE_REF}" \
+        "${CI_JOB_NAME}" \
+        "${HOST}" \
+        "${BENCHMARK}" \
+        "${baseline_json}" \
+        "${CI_PIPELINE_ID}"
       bash .gitlab/utils/compare-githash-metadata.sh "${baseline_json}" "${pr_json}"
       # relative_json="${pr_json#${pr_workspace}/}"
       # develop_json="${develop_workspace}/${relative_json}"
