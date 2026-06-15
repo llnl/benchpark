@@ -4,9 +4,13 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from spack.package import *
+from spack_repo.builtin.packages.babelstream.package import (
+    Babelstream as BuiltinBabelstream,
+)
+from spack_repo.builtin.packages.babelstream.package import (
+    CMakeBuilder as BabelstreamCMakeBuilder,
+)
 
-from spack_repo.builtin.packages.babelstream.package import CMakeBuilder as BabelstreamCMakeBuilder
-from spack_repo.builtin.packages.babelstream.package import Babelstream as BuiltinBabelstream
 
 class Babelstream(BuiltinBabelstream):
     git = "https://github.com/rfhaque/BabelStream.git"
