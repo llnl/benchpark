@@ -1,8 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-if [[ $# -lt 5 || $# -gt 7 ]]; then
-    echo "Usage: $0 <ref> <job_name> <host> <benchmark> <output_path> [exclude_pipeline_id] [status_output_path]" >&2
+if [[ $# -lt 5 || $# -gt 8 ]]; then
+    echo "Usage: $0 <ref> <job_name> <host> <benchmark> <output_path> [exclude_pipeline_id] [status_output_path] [exclude_pipeline_name]" >&2
     exit 1
 fi
 
@@ -13,6 +13,7 @@ benchmark=$4
 output_path=$5
 exclude_pipeline_id=${6:-}
 status_output_path=${7:-}
+exclude_pipeline_name=${8:-}
 
 api_url=${GITLAB_API_V4_URL:-${CI_API_V4_URL:-}}
 project_id=${GITLAB_PROJECT_ID:-${CI_PROJECT_ID:-}}
@@ -43,6 +44,9 @@ echo "Searching ref '${ref}' for artifact '${artifact_relpath}'"
 if [[ -n "${exclude_pipeline_id}" ]]; then
     echo "Excluding pipeline ID ${exclude_pipeline_id}"
 fi
+if [[ -n "${exclude_pipeline_name}" ]]; then
+    echo "Excluding pipeline name '${exclude_pipeline_name}'"
+fi
 
 pipelines_json=$(
     curl --silent --show-error --fail --get \
@@ -59,14 +63,14 @@ printf '%s' "${pipelines_json}" | jq -r '
     if length == 0 then
         "  (none)"
     else
-        .[] | "  id=\(.id) status=\(.status) ref=\(.ref) sha=\(.sha)"
+        .[] | "  id=\(.id) status=\(.status) ref=\(.ref) name=\((.name // "<unnamed>")) sha=\(.sha)"
     end
 '
 
 baseline_pipeline_id=$(
     printf '%s' "${pipelines_json}" \
-    | jq -r --arg exclude_pipeline_id "${exclude_pipeline_id}" '
-        [.[] | select($exclude_pipeline_id == "" or (.id | tostring) != $exclude_pipeline_id)]
+    | jq -r --arg exclude_pipeline_id "${exclude_pipeline_id}" --arg exclude_pipeline_name "${exclude_pipeline_name}" '
+        [.[] | select(($exclude_pipeline_id == "" or (.id | tostring) != $exclude_pipeline_id) and ($exclude_pipeline_name == "" or (.name // "") != $exclude_pipeline_name))]
         | sort_by(.id)
         | last
         | .id // empty
