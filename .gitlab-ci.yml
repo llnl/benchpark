@@ -4,10 +4,6 @@ workflow:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: always
 
-    # Always allow develop pipelines 
-    - if: $CI_COMMIT_BRANCH == "develop" && $CI_PIPELINE_SOURCE == "push"
-      when: always
-
     # Run pipelines only when these files/dirs change
     - changes:
         - .gitlab/**/*
