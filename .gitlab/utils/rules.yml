@@ -6,17 +6,18 @@
     - if: $CI_JOB_NAME =~ /release_resources|cleanup_pipeline_dir/ && $CI_PIPELINE_SOURCE
         != "schedule"
       when: always
-    - when: on_success
     - changes:
         - .gitlab-ci.yml
-        - .gitlab/**
-        - bin/**
-        - experiments/$BENCHMARK/**
-        - systems/$ARCHCONFIG/**
-        - repo/$BENCHMARK/**
-        - modifiers/**
-        - var/**
-        - lib/**
+        - .gitlab/**/*
+        - bin/**/*
+        - experiments/$BENCHMARK/**/*
+        - systems/$ARCHCONFIG/**/*
+        - repo/$BENCHMARK/**/*
+        - modifiers/**/*
+        - var/**/*
+        - lib/**/*
+      when: on_success
+    - when: never
 .nightly_rules:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
