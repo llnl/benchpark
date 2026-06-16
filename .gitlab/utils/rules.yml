@@ -8,7 +8,6 @@
       when: always
     - changes:
         - .gitlab-ci.yml
-        - .gitlab/utils/rules.yml
         - .gitlab/**
         - bin/**
         - experiments/$BENCHMARK/**
