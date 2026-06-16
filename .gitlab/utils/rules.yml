@@ -8,14 +8,14 @@
       when: always
     - changes:
         - .gitlab-ci.yml
-        - .gitlab/**
-        - bin/**
-        - experiments/$BENCHMARK/**
-        - systems/$ARCHCONFIG/**
-        - repo/$BENCHMARK/**
-        - modifiers/**
-        - var/**
-        - lib/**
+        - .gitlab/**/*
+        - bin/**/*
+        - experiments/$BENCHMARK/**/*
+        - systems/$ARCHCONFIG/**/*
+        - repo/$BENCHMARK/**/*
+        - modifiers/**/*
+        - var/**/*
+        - lib/**/*
       when: on_success
     - when: never
 .nightly_rules:
