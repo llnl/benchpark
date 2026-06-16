@@ -50,6 +50,7 @@ allocate_resources_matrix:
 .release_resources_slurm:
   extends: .on_host_template
   stage: release-resources
+  when: always
   # Do not cleanup dir yet
   script: [. .gitlab/utils/cancel-slurm.sh --no-clean]
 release_resources_dane:
