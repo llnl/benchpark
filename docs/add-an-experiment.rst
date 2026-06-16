@@ -13,8 +13,8 @@ benchmark.
 
 **Video**
 
-- For the last recorded video of this tutorial, see the `Benchpark Tutorial
-  starting at 1:47:00 <https://www.youtube.com/watch?v=AeaUfpybJfg>`_.
+- For the last recorded video of this tutorial, see the `Benchpark Tutorial starting at
+  1:47:00 <https://www.youtube.com/watch?v=AeaUfpybJfg>`_.
 
 Similar to the systems API, Benchpark provides an API for representing experiments as
 objects and customizing their options with command line arguments. Experiment
