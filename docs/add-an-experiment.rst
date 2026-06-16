@@ -35,8 +35,9 @@ concrete Ramble experiments for the target system and programming model.
 In this example, we will show how to create an experiment for the `High Performance
 Computing Linpack Benchmark <https://www.netlib.org/benchmark/hpl/>`__. This benchmark
 has a `Spack package
-<https://github.com/LLNL/benchpark/blob/develop/repo/hpl/package.py>`__ and `Ramble
-application <https://github.com/LLNL/benchpark/blob/develop/repo/hpl/application.py>`__
+<https://github.com/LLNL/benchpark/blob/develop/repos/spack_repo/benchpark/packages/hpl/package.py>`__
+and `Ramble application
+<https://github.com/LLNL/benchpark/blob/develop/repos/ramble_applications/hpl/application.py>`__
 defined in Benchpark, so Benchpark will use these over the upstream `Spack package
 <https://github.com/spack/spack-packages/blob/develop/repos/spack_repo/builtin/packages/hpl/package.py>`__
 and `Ramble application
@@ -72,16 +73,17 @@ executed with MPI.
     ):
 
 Looking at the `HPL package
-<https://github.com/LLNL/benchpark/blob/develop/repo/hpl/package.py>`__, we see that
-there are ``OpenMP`` and ``Caliper`` variants defined in the build specification. The
-HPL package.py defines the ``OpenMP`` variant because the source of the HPL benchmark
-supports the ``OpenMP`` programming model. The HPL package.py defines the ``Caliper``
-variant because the HPL source code is instrumented with the ``Caliper`` performance
-profiling library (via a `fork <https://github.com/daboehme/HPL-caliper.git>`__ of the
-source code) and the build links to Caliper. Enabling these variants in our Benchpark
-experiment only requires inheritance from the pre-defined
-``ProgrammingModelType.Openmp`` and ``Caliper`` classes. For more details on the
-configurability of experiment variants, see :ref:`experiment-variants`.
+<https://github.com/LLNL/benchpark/blob/develop/repos/spack_repo/benchpark/packages/hpl/package.py>`__,
+we see that there are ``OpenMP`` and ``Caliper`` variants defined in the build
+specification. The HPL package.py defines the ``OpenMP`` variant because the source of
+the HPL benchmark supports the ``OpenMP`` programming model. The HPL package.py defines
+the ``Caliper`` variant because the HPL source code is instrumented with the ``Caliper``
+performance profiling library (via a `fork
+<https://github.com/daboehme/HPL-caliper.git>`__ of the source code) and the build links
+to Caliper. Enabling these variants in our Benchpark experiment only requires
+inheritance from the pre-defined ``ProgrammingModelType.Openmp`` and ``Caliper``
+classes. For more details on the configurability of experiment variants, see
+:ref:`experiment-variants`.
 
 ::
 

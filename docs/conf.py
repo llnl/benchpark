@@ -32,6 +32,7 @@ author = "Olga Pearce, Alec Scott, Peter Scheibel, Greg Becker, Riyaz Haque, and
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
+    "sphinx_copybutton",
     "sphinx_rtd_theme",
     "sphinxcontrib.programoutput",
     "sphinx.ext.autodoc",
