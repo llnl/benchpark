@@ -12,7 +12,7 @@
         - bin/**/*
         - experiments/$BENCHMARK/**/*
         - systems/$ARCHCONFIG/**/*
-        - repo/$BENCHMARK/**/*
+        - repos/$BENCHMARK/**/*
         - modifiers/**/*
         - var/**/*
         - lib/**/*
