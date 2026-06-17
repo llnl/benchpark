@@ -3,7 +3,7 @@ workflow:
     # Always allow scheduled pipelines
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: always
-      
+
     # Run pipelines only when these files/dirs change
     - changes:
         - .gitlab/**/*
@@ -12,7 +12,7 @@ workflow:
         - experiments/**/*
         - lib/**/*
         - modifiers/**/*
-        - repo/**/*
+        - repos/**/*
         - var/**/*
         - systems/llnl-elcapitan/system.py
         - systems/llnl-cluster/system.py
