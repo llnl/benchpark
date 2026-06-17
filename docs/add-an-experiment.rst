@@ -42,11 +42,10 @@ defined in Benchpark, so Benchpark will use these over the upstream `Spack packa
 <https://github.com/spack/spack-packages/blob/develop/repos/spack_repo/builtin/packages/hpl/package.py>`__
 and `Ramble application
 <https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/applications/hpl/application.py>`__.
-For clarity, if ``benchpark/repo/hpl`` did not exist, Benchpark would use the upstream
-versions. Additionally, the Benchpark HPL ``application.py`` inherits from the Ramble
-upstream, so they are equivalent aside from an extra Benchpark tag definition. Notice
-the HPL application in Ramble also inherits from a `base HPL application
-<https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/base_applications/hpl/base_application.py>`__,
+For clarity, if ``benchpark/repos/spack_repo/benchpark/packages/hpl`` and ``benchpark/repos/ramble_applications/hpl`` did
+not exist, Benchpark would use the upstream versions. Additionally, the Benchpark HPL ``application.py`` inherits from the
+Ramble upstream, so they are equivalent aside from an extra Benchpark tag definition. Notice the HPL application in Ramble
+also inherits from a `base HPL application <https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/base_applications/hpl/base_application.py>`__,
 which is relevant because it contains the workload variables that we will need to define
 in our Benchpark experiment.
 
