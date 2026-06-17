@@ -43,9 +43,7 @@ class Laghos(ExecutableApplication):
 
     common_args = (
         " -m {mesh}"
-        + " -epm {epm}"
-        + " -nx {nx} -ny {ny} -nz {nz}"
-        + " -rs {rs} -rp {rp}"
+        + " {mesh_options}"
         + " -ms {ms}"
         + " -ok {ok} -ot {ot} -oq {oq}"
         + " {nc} --mem --fom {gam}"
@@ -188,3 +186,28 @@ class Laghos(ExecutableApplication):
         match=r"Major kernels total time",
         file="{experiment_run_dir}/{experiment_name}.out",
     )
+
+    def _make_experiments(self, workspace, app_inst=None):
+        """
+        When setting up its mesh, Laghos strictly accepts as input either the 
+        elements per mpi (epm) or the mesh dimensions and refinement factors 
+        (nx/ny/nz/rs/rp), but not both
+
+        Here we select one of the two strategies based on the value of epm
+        if epm > 0: use -epm {epm}
+        else: use -nx {nx} -ny {ny} -nz {nz} -rs {rs} -rp {rp}
+
+        """
+        epm = int(self.expander.expand_var_name("epm"))
+
+        if epm:
+            self.variables["mesh_options"] = f"-epm {epm}"
+        else:
+            nx = int(self.expander.expand_var_name("nx"))
+            ny = int(self.expander.expand_var_name("ny"))
+            nz = int(self.expander.expand_var_name("nz"))
+            rs = int(self.expander.expand_var_name("rs"))
+            rp = int(self.expander.expand_var_name("rp"))
+            self.variables["mesh_options"] = f"-nx {nx} -ny {ny} -nz {nz} -rs {rs} -rp {rp}"
+
+        super()._make_experiments(workspace)

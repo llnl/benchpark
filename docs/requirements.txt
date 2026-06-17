@@ -1,3 +1,4 @@
 Sphinx
 sphinx-rtd-theme
 sphinxcontrib-programoutput
+sphinx-copybutton

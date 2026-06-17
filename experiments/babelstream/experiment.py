@@ -8,15 +8,30 @@ from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
 from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
 
+BabelstreamProgrammingModel = ProgrammingModel(
+    ProgrammingModelType.Openmp,
+    ProgrammingModelType.Cuda,
+    ProgrammingModelType.Rocm,
+)
+
+
+class BabelstreamProgrammingModelHelper(BabelstreamProgrammingModel.Helper):
+    def get_spack_variants(self):
+        variants = super().get_spack_variants()
+        variants = variants.replace("+openmp", "+omp")
+        variants = variants.replace("~openmp", "~omp")
+        variants = variants.replace("+rocm", "+rocm +hip")
+        variants = variants.replace("~rocm", "~rocm ~hip")
+        return variants
+
+
+BabelstreamProgrammingModel.Helper = BabelstreamProgrammingModelHelper
+
 
 class Babelstream(
     Experiment,
     Caliper,
-    ProgrammingModel(
-        ProgrammingModelType.Openmp,
-        ProgrammingModelType.Cuda,
-        ProgrammingModelType.Rocm,
-    ),
+    BabelstreamProgrammingModel,
 ):
     variant(
         "workload",
@@ -26,14 +41,16 @@ class Babelstream(
 
     variant(
         "version",
-        default="caliper",
-        values=("develop", "latest", "5.0", "caliper"),
+        default="main",
+        values=("main", "develop", "latest", "5.0"),
         description="app version",
     )
 
     maintainers("daboehme")
 
     def compute_applications_section(self):
+        self.add_experiment_variable("n", "50", True)
+        self.add_experiment_variable("s", "10240000", True)
 
         self.add_experiment_variable("n", "35", False)
         self.add_experiment_variable("o", "0", False)
@@ -46,6 +63,8 @@ class Babelstream(
         else:
             self.add_experiment_variable("execute", "omp-stream", False)
 
+        if self.spec.satisfies("+openmp"):
+            self.add_experiment_variable("n_threads_per_proc", 16, True)
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_experiment_variable("n_gpus", "{n_nodes}*{sys_gpus_per_node}")
             n_resources = "{n_gpus}"
@@ -55,9 +74,10 @@ class Babelstream(
 
         self.set_required_variables(
             n_resources=f"{n_resources}",
-            process_problem_size="{n}/" + str(n_resources),
-            total_problem_size="{n}",
+            process_problem_size="{s}",
+            total_problem_size="{s} * {n_resources}",
         )
 
     def compute_package_section(self):
+        # get package version
         self.add_package_spec(self.name, [f"babelstream{self.determine_version()}"])
