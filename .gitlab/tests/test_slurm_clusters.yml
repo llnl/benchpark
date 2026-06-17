@@ -1,0 +1,117 @@
+# Clusters listed here are native slurm clusters that we test using flux. See "non_shared.yaml"
+include:
+  - local: .gitlab/utils/status.yml
+  - local: .gitlab/utils/machine_checks.yml
+  - local: .gitlab/utils/rules.yml
+workflow:
+  auto_cancel:
+    on_new_commit: conservative
+#############################
+# Resource Allocation Section
+#############################
+.allocate_resources_slurm:
+  extends: .on_host_template
+  stage: allocate-resources
+  script:
+    - set -e
+    # submit and grab JobID
+    - JOBID=$(sbatch --parsable ${SHARED_ALLOC} --wait-all-nodes=1 --job-name="${ALLOC_NAME}"
+      --wrap='srun -N 1 -n 1 flux start sleep inf')
+    - echo "Slurm job = ${JOBID}"
+    # wait until SLURM job running
+    # 1..2160 is up to 6 hours
+    - for i in {1..2160}; do state=$(sacct -j ${JOBID} -n -o State 2>/dev/null | head
+      -1 | awk '{print $1}'); [[ "$state" == "RUNNING" ]] && break; echo "waiting...
+      total duration has been $(( (i-1)*10 ))s" && sleep 10; done
+    #- for i in {1..1080}; do flux proxy slurm:${JOBID} flux ping -c1 >/dev/null 2>&1 && break; echo "waiting..." sleep 10; done
+    #- flux proxy slurm:${JOBID} flux ping -c1  # final check (fails the job if still not ready)
+  after_script:
+    - |
+      if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
+        . .gitlab/utils/cancel-slurm.sh
+      fi
+allocate_resources_dane:
+  extends: .allocate_resources_slurm
+  variables:
+    HOST: dane
+    SHARED_ALLOC: $DANE_SHARED_ALLOC
+  tags: [shell, dane]
+  needs: [dane-up-check]
+##########################
+# Resource Release Section
+##########################
+.release_resources_slurm:
+  extends: .on_host_template
+  stage: release-resources
+  # Do not cleanup dir yet
+  script: [. .gitlab/utils/cancel-slurm.sh --no-clean]
+release_resources_dane:
+  extends: .release_resources_slurm
+  tags: [shell, dane]
+  needs: [allocate_resources_dane, run_tests_slurm_dane]
+##################
+# Test Run Section
+##################
+.run_tests_slurm:
+  extends: .on_host_template
+  stage: test
+  before_script:
+    - !reference [.report_status, before_script]
+  script:
+    - |
+      echo -e "### Allocation name is ${ALLOC_NAME}"
+      export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
+      echo -e "### Job ID is ${JOBID}"
+      PROXY="$( [[ -n "${JOBID}" ]] && echo "flux proxy slurm:${JOBID}" || echo "" )"
+    - |
+      pr_rc=0
+      develop_rc=0
+      ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${FLUX_ARGS} .gitlab/utils/run-experiment.sh ) || pr_rc=$?
+
+      # git fetch origin develop
+      # git worktree add "$CI_PROJECT_DIR/d" origin/develop
+      # cd "$CI_PROJECT_DIR/d"
+
+      # ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${FLUX_ARGS} .gitlab/utils/run-experiment.sh ) || develop_rc=$?
+      echo "[PR Status]: PR checkout exit code = ${pr_rc}"
+      echo "[Develop Status]: develop checkout exit code = ${develop_rc}"
+      printf '%s\n' "${pr_rc}" > "$CI_PROJECT_DIR/pr_flux.status"
+      printf '%s\n' "${develop_rc}" > "$CI_PROJECT_DIR/develop_flux.status"
+      exit "${pr_rc}"
+  after_script:
+    - !reference [.report_status, after_script]
+    - |
+      if [[ "$(cat "$CI_PROJECT_DIR/pr_flux.status")" == "0" ]]; then
+        pr_status="PASSED"
+      else
+        pr_status="FAILED"
+      fi
+      if [[ "$(cat "$CI_PROJECT_DIR/develop_flux.status")" == "0" ]]; then
+        develop_status="PASSED"
+      else
+        develop_status="FAILED"
+      fi
+      echo -e "===============[TESTS]==============="
+      echo "[Develop]: ${develop_status}"
+      echo "[PR]: ${pr_status}"
+      echo -e "====================================="
+    - |
+      pr_workspace="$CI_PROJECT_DIR/wkp/${HOST}/${BENCHMARK}/workspace"
+      develop_workspace="$CI_PROJECT_DIR/d/wkp/${HOST}/${BENCHMARK}/workspace"
+      pr_json=$(find "${pr_workspace}/experiments/${BENCHMARK}" -type f -name 'githash_metadata.json' | sort | head -n 1)
+      relative_json="${pr_json#${pr_workspace}/}"
+      develop_json="${develop_workspace}/${relative_json}"
+      bash .gitlab/utils/compare-githash-metadata.sh "$pr_json" "$develop_json"
+    - |
+      if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
+        . .gitlab/utils/cancel-slurm.sh
+      fi
+run_tests_slurm_dane:
+  extends: .run_tests_slurm
+  tags: [shell, dane]
+  needs: [allocate_resources_dane]
+  parallel:
+    matrix:
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        BENCHMARK: [laghos]
