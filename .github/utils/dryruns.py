@@ -25,7 +25,7 @@ SKIP_EXPR = [
     "stream cscs-daint",
     "stream generic-x86",
     "stream fluxtainer",
-    "stream riken-cloud cluster=dgx",
+    "stream riken-dgx",
     # Broken URL's in application.py going to cause dryrun failure
     "genesis",
     # Not ProgrammingModelType.Mpionly
