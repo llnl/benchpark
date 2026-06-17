@@ -446,7 +446,9 @@ class RikenDgx(System):
         if self.spec.satisfies("compiler=cuda"):
             if str(self.cuda_version) != "13.0" and str(self.cuda_version) != "13.2":
                 print("--- Change Notice ---")
-                print(" The CUDA version has been changed to 13.2 (Restrictions in DGX)")
+                print(
+                    " The CUDA version has been changed to 13.2 (Restrictions in DGX)"
+                )
                 self.cuda_version = 13.2
             cuda_cfg = compiler_section_for(
                 "cuda",
