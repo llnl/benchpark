@@ -30,21 +30,21 @@ for this example, it will add the following artifacts to `build-test/`
    easier to understand what commands to run to do the build)
 3. `spack-build-env.txt`: the environment variables set at build time
 
-##########################
-Build outside of Benchpark
-##########################
+############################
+ Build outside of Benchpark
+############################
 
 2 steps to build packages the way Benchpark builds packages without running Benchpark:
 
-1.  Use the spack-packages commit that Benchpark uses:
+1. Use the spack-packages commit that Benchpark uses:
 
-``` git clone https://github.com/llnl/benchpark.git
-export packages_commit=python -c "import yaml; print(yaml.safe_load(open('benchpark/checkout-versions.yaml'))['versions']['spack-packages'])"
-git clone https://github.com/spack/spack-packages.git
-pushd spack-packages && git checkout $packages_commit $$
-$ popd ```
+``` git clone https://github.com/llnl/benchpark.git export packages_commit=python -c
+"import yaml;
+print(yaml.safe_load(open('benchpark/checkout-versions.yaml'))['versions']['spack-packages'])"
+git clone https://github.com/spack/spack-packages.git pushd spack-packages && git
+checkout $packages_commit $$ $ popd ```
 
 2. Layer Benchpark's dedicated package repo on top:
 
-``` spack repo add spack-packages/repos/spack_repo/builtin/
-spack repo add benchpark/repos/spack_repo/benchpark/ ```
+``` spack repo add spack-packages/repos/spack_repo/builtin/ spack repo add
+benchpark/repos/spack_repo/benchpark/ ```
