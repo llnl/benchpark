@@ -15,7 +15,7 @@ from spack_repo.builtin.packages.babelstream.package import (
 class Babelstream(BuiltinBabelstream):
     git = "https://github.com/UoB-HPC/BabelStream.git"
 
-    version("main", branch="fix_adiak_variable")
+    version("main", branch="main")
 
     variant("caliper", default=False, description="Enable/disable Caliper support")
 
