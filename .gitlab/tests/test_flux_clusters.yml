@@ -47,7 +47,7 @@ release_resources_flux_tioga:
   stage: test
   extends: .on_host_template
   variables:
-    BASELINE_REF: feature/ci-with-githash
+    BASELINE_REF: develop
     BASELINE_EXCLUDED_PIPELINE_NAME: Nightly
   artifacts:
     when: always
