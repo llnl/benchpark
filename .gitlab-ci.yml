@@ -53,7 +53,7 @@ variables:
   TUOLUMNE_SHARED_ALLOC: -N 1 -t 4h --queue=pci --exclusive --setattr=gpumode=${GPUMODE}
     --conf=resource.rediscover=true
   # Tioga (max 2hr policy)
-  TIOGA_SHARED_ALLOC: -N 1 -t 2h --queue=pdebug --exclusive
+  TIOGA_SHARED_ALLOC: -N 1 -t 2h --queue=pci --exclusive
   CUSTOM_CI_BUILDS_DIR: $$HOME/.jacamar-ci/$CI_PIPELINE_ID
   # Dir cleanup can take awhile
   RUNNER_AFTER_SCRIPT_TIMEOUT: 20m
