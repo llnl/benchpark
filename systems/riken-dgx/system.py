@@ -413,7 +413,7 @@ class RikenDgx(System):
                     "openmpi": {
                         "buildable": True,
                         "version": ["4.1.7"],
-                        "variants": "+cuda+cxx cuda_arch=90 fabrics=ucx schedulers=slurm",
+                        "variants": "+cuda+cxx cuda_arch=100 fabrics=ucx schedulers=slurm",
                     },
                 }
             }
