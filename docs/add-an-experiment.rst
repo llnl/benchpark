@@ -284,15 +284,15 @@ runtime parameters during experiment initialization, e.g., ``benchpark experimen
 
     from benchpark.experiment import Experiment
     from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
-    from benchpark.scaling import ScalingMode, Scaling
     from benchpark.caliper import Caliper
     from benchpark.directives import variant, maintainers
+    from benchpark.scaling import Scaling, ScalingMode
 
     class Hpl(
       Experiment,
       ProgrammingModel(ProgrammingModelType.Mpionly, ProgrammingModelType.Openmp),
-      Scaling(ScalingMode.Strong, ScalingMode.Weak),
       Caliper,
+      Scaling(ScalingMode.Strong, ScalingMode.Weak),
     ):
 
       variant(
@@ -349,15 +349,15 @@ not list required packages for the benchmark here, since they are already define
 
     from benchpark.experiment import Experiment
     from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
-    from benchpark.scaling import ScalingMode, Scaling
     from benchpark.caliper import Caliper
     from benchpark.directives import variant, maintainers
+    from benchpark.scaling import Scaling, ScalingMode
 
     class Hpl(
       Experiment,
       ProgrammingModel(ProgrammingModelType.Mpionly, ProgrammingModelType.Openmp),
-      Scaling(ScalingMode.Strong, ScalingMode.Weak),
       Caliper,
+      Scaling(ScalingMode.Strong, ScalingMode.Weak),
     ):
 
       variant(
