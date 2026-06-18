@@ -10,7 +10,7 @@ from ramble.appkit import *
 class PyScaffold(ExecutableApplication):
     """Scale-Free Fractal benchmark - A scalable deep learning benchmark: UNet trained on procedurally-generated, 3D fractal data"""
 
-    name = "scaffold"
+    name = "py-scaffold"
 
     tags = ["python"]
 
