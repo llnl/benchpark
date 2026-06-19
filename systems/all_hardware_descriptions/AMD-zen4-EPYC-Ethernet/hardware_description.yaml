@@ -1,0 +1,29 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+system_definition:
+  name: AMD-zen4-EPYC-Ethernet
+  integrator:
+    vendor: AMD
+    name: genoa
+  processor:
+    vendor: AMD
+    name: EPYC-Zen4
+    ISA: x86_64
+    uArch: zen4
+  accelerator:
+    vendor:
+    name:
+    ISA:
+    uArch:
+  interconnect:
+    vendor:
+    name: Ethernet
+  systems-tested:
+    genoa:
+      os: Rocky
+      scheduler: slurm
+      compiler: gcc
+      runtime:
+      mpi: openmpi
