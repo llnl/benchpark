@@ -5,6 +5,7 @@ codespell==2.4.2
 pyyaml==6.0.3
 pandas==3.0.1
 sphinxcontrib-programoutput==0.19
+sphinx-copybutton==0.5.2
 # benchpark analyze -h command
 llnl-thicket
 matplotlib

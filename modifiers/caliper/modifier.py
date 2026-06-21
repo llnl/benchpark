@@ -107,10 +107,22 @@ class Caliper(BasicModifier):
         description="Profile HIP API functions",
     )
 
+    add_mode(
+        mode_name="rccl",
+        mode_option="profile.rccl",
+        description="Profile RCCL API functions",
+    )
+
     add_service(
         service_name="nvtx",
         service_option="nvtx",
         description="Enable CUDA NVTX service",
+    )
+
+    add_service(
+        service_name="roctx",
+        service_option="roctx",
+        description="Enable ROCm ROCtx service",
     )
 
     add_service(
