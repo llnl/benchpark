@@ -42,6 +42,13 @@ class Kripke(
     )
 
     variant(
+        "problem_size",
+        default="large",
+        values=("large", "medium", "small"),
+        description="Problem size",
+    )
+
+    variant(
         "other",
         default=False,
         values=(True, False),
@@ -159,6 +166,45 @@ class Kripke(
                     "throughput_n": None,
                     "throughput_p": None,
                 }
+            elif self.spec.satisfies("+weak"):
+                problem_spec = {
+                    "nzx": 80,
+                    "nzy": 80,
+                    "nzz": 40,
+                    "pool": 120,
+                    "npx": 2,
+                    "npy": 2,
+                    "npz": 1,
+                    "ngroups": 48,
+                    "gs": 1,
+                    "nquad": 80,
+                    "ds": 80,
+                    "lorder": 4,
+                    "layout": "GDZ",
+                    "strong_n": None,
+                    "strong_p": None,
+                    "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "throughput_n": None,
+                    "throughput_p": None,
+                }
+                if self.spec.satisfies("problem_size=large"):
+                    problem_spec["nzx"] = 220
+                    problem_spec["nzy"] = 220
+                    problem_spec["nzz"] = 110
+                    problem_spec["pool"] = 105
+                if self.spec.satisfies("problem_size=medium"):
+                    problem_spec["nzx"] = 200
+                    problem_spec["nzy"] = 200
+                    problem_spec["nzz"] = 100
+                    problem_spec["pool"] = 77
+                if self.spec.satisfies("problem_size=small"):
+                    problem_spec["nzx"] = 188
+                    problem_spec["nzy"] = 188
+                    problem_spec["nzz"] = 94
+                    problem_spec["pool"] = 70
             else:
                 problem_spec = {
                     "nzx": 80,
