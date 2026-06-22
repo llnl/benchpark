@@ -40,7 +40,7 @@ class OsuMicroBenchmarks(OsuMicroBenchmarksBase):
 
     register_validator(
         name="two_rank_workloads",
-        predicate="{n_ranks} != 2",
+        predicate="{n_ranks} == 2",
         workload_group="two_rank_workloads",
         message="This test requires exactly two processes."
         )
