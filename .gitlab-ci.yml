@@ -94,5 +94,3 @@ cleanup_pipeline_dir:
   script:
     - echo "Removing $CUSTOM_CI_BUILDS_DIR"
     - rm -rf $CUSTOM_CI_BUILDS_DIR
-  rules:
-    - when: always
