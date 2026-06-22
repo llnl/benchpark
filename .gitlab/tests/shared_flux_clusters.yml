@@ -19,15 +19,15 @@ workflow:
       if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
         . .gitlab/utils/cancel-flux.sh
       fi
-allocate_resources_tuolumne:
-  extends: .allocate_resources_flux
-  parallel:
-    matrix:
-      - HOST: tuolumne
-        SHARED_ALLOC: $TUOLUMNE_SHARED_ALLOC
-        GPUMODE: SPX
-  tags: [shell, tuolumne]
-  needs: [tuolumne-up-check]
+# allocate_resources_tuolumne:
+#   extends: .allocate_resources_flux
+#   parallel:
+#     matrix:
+#       - HOST: tuolumne
+#         SHARED_ALLOC: $TUOLUMNE_SHARED_ALLOC
+#         GPUMODE: SPX
+#   tags: [shell, tuolumne]
+#   needs: [tuolumne-up-check]
 allocate_resources_tioga:
   extends: .allocate_resources_flux
   variables:
@@ -43,14 +43,14 @@ allocate_resources_tioga:
   stage: release-resources
   # Do not cleanup dir yet
   script: [. .gitlab/utils/cancel-flux.sh --no-clean]
-release_resources_flux_tuolumne:
-  extends: .release_resources_flux
-  needs: [allocate_resources_tuolumne, run_tests_flux_tuolumne]
-  parallel:
-    matrix:
-      - HOST: tuolumne
-        GPUMODE: SPX
-  tags: [shell, tuolumne]
+# release_resources_flux_tuolumne:
+#   extends: .release_resources_flux
+#   needs: [allocate_resources_tuolumne, run_tests_flux_tuolumne]
+#   parallel:
+#     matrix:
+#       - HOST: tuolumne
+#         GPUMODE: SPX
+#   tags: [shell, tuolumne]
 release_resources_flux_tioga:
   extends: .release_resources_flux
   needs: [allocate_resources_tioga, run_tests_flux_tioga]
@@ -86,6 +86,7 @@ release_resources_flux_tioga:
     - !reference [.report_status, after_script]
     - |
       pr_workspace="$CI_PROJECT_DIR/wkp/${HOST}/${BENCHMARK}/workspace"
+      echo "PR Workspace is: ${pr_workspace}"
       pr_json=$(find "${pr_workspace}/experiments/${BENCHMARK}" -type f -name 'githash_metadata.json' | sort | head -n 1)
       artifact_dir="$CI_PROJECT_DIR/artifact-githash/${HOST}/${BENCHMARK}"
       baseline_json="${artifact_dir}/baseline_githash_metadata.json"
@@ -158,67 +159,67 @@ release_resources_flux_tioga:
       if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
         . .gitlab/utils/cancel-flux.sh
       fi
-run_tests_flux_tuolumne:
-  extends: .run_tests_flux
-  tags: [shell, tuolumne]
-  needs: [allocate_resources_tuolumne]
-  parallel:
-    matrix:
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        BENCHMARK:
-          - amg2023
-          - branson
-          - kripke
-          - laghos
-          - lammps
-          - raja-perf
-          - remhos
-          - sparta-snl
-        VARIANT: [+rocm]
-        GPUMODE: SPX
-      # Test openmp on tuolumne
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [kripke]
-        VARIANT: [+openmp]
-        GPUMODE: SPX
-      # Test kripke+rocm+single_memory on tuolumne
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [kripke]
-        VARIANT: [+rocm+single_memory]
-        GPUMODE: SPX
-      # Caliper profile.hip
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [kripke]
-        VARIANT: ['+rocm caliper=mpi,time,rocm']
-        GPUMODE: SPX
-      # spack-pip
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [py-scaffold]
-        VARIANT:
-          - +rocm package_manager=spack-pip caliper=mpi,time allocation=torchrun-hpc
-      # rocm7
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [raja-perf]
-        VARIANT: ['+rocm caliper=time,rocm version=develop']
-        SYSTEM_ARGS: [rocm=7.2.1]
-        GPUMODE: SPX
-      # Caliper services
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [kripke]
-        VARIANT: [+rocm caliper_services=rocprofiler]
-        GPUMODE: SPX
-      # gcc
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [stream]
-        SYSTEM_ARGS: [compiler=gcc]
+# run_tests_flux_tuolumne:
+#   extends: .run_tests_flux
+#   tags: [shell, tuolumne]
+#   needs: [allocate_resources_tuolumne]
+#   parallel:
+#     matrix:
+#       - HOST: tuolumne
+#         ARCHCONFIG: llnl-elcapitan
+#         BENCHMARK:
+#           - amg2023
+#           - branson
+#           - kripke
+#           - laghos
+#           - lammps
+#           - raja-perf
+#           - remhos
+#           - sparta-snl
+#         VARIANT: [+rocm]
+#         GPUMODE: SPX
+#       # Test openmp on tuolumne
+#       - HOST: tuolumne
+#         ARCHCONFIG: llnl-elcapitan
+#         BENCHMARK: [kripke]
+#         VARIANT: [+openmp]
+#         GPUMODE: SPX
+#       # Test kripke+rocm+single_memory on tuolumne
+#       - HOST: tuolumne
+#         ARCHCONFIG: llnl-elcapitan
+#         BENCHMARK: [kripke]
+#         VARIANT: [+rocm+single_memory]
+#         GPUMODE: SPX
+#       # Caliper profile.hip
+#       - HOST: tuolumne
+#         ARCHCONFIG: llnl-elcapitan
+#         BENCHMARK: [kripke]
+#         VARIANT: ['+rocm caliper=mpi,time,rocm']
+#         GPUMODE: SPX
+#       # spack-pip
+#       - HOST: tuolumne
+#         ARCHCONFIG: llnl-elcapitan
+#         BENCHMARK: [py-scaffold]
+#         VARIANT:
+#           - +rocm package_manager=spack-pip caliper=mpi,time allocation=torchrun-hpc
+#       # rocm7
+#       - HOST: tuolumne
+#         ARCHCONFIG: llnl-elcapitan
+#         BENCHMARK: [raja-perf]
+#         VARIANT: ['+rocm caliper=time,rocm version=develop']
+#         SYSTEM_ARGS: [rocm=7.2.1]
+#         GPUMODE: SPX
+#       # Caliper services
+#       - HOST: tuolumne
+#         ARCHCONFIG: llnl-elcapitan
+#         BENCHMARK: [kripke]
+#         VARIANT: [+rocm caliper_services=rocprofiler]
+#         GPUMODE: SPX
+#       # gcc
+#       - HOST: tuolumne
+#         ARCHCONFIG: llnl-elcapitan
+#         BENCHMARK: [stream]
+#         SYSTEM_ARGS: [compiler=gcc]
 run_tests_flux_tioga:
   extends: .run_tests_flux
   tags: [shell, tioga]
@@ -227,11 +228,11 @@ run_tests_flux_tioga:
     matrix:
       - HOST: tioga
         ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [amg2023, kripke, laghos, raja-perf, remhos]
+        BENCHMARK: [kripke, raja-perf] # BENCHMARK: [amg2023, kripke, laghos, raja-perf, remhos]
         VARIANT: [+rocm]
       # spack-pip
-      - HOST: tioga
-        ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [py-scaffold]
-        VARIANT:
-          - +rocm package_manager=spack-pip caliper=mpi,time allocation=torchrun-hpc
+      # - HOST: tioga
+      #   ARCHCONFIG: llnl-elcapitan
+      #   BENCHMARK: [py-scaffold]
+      #   VARIANT:
+      #     - +rocm package_manager=spack-pip caliper=mpi,time allocation=torchrun-hpc
