@@ -1,0 +1,29 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+system_definition:
+  name: NVIDIA-cortex-GB10-Ethernet
+  integrator:
+    vendor: NVIDIA
+    name: DGX_Spark
+  processor:
+    vendor: NVIDIA
+    name: Grace
+    ISA: Armv9
+    uArch: cortex
+  accelerator:
+    vendor: NVIDIA
+    name: GB10
+    ISA: PTX
+    uArch: sm_100
+  interconnect:
+    vendor: NVIDIA
+    name: 10GbEthernet
+  systems-tested:
+    ng-dgx:
+      os: Ubuntu
+      scheduler: slurm
+      compiler: nvhpc
+      runtime: cuda
+      mpi: openmpi
