@@ -140,16 +140,18 @@ class OsuMicroBenchmarks(
             self.add_experiment_variable("n_nodes", [1, 2], True)
             self.add_experiment_variable("scaling-iterations", 1, True)
         else:
+            sys = self.system_spec.system
             # "Fill" the nodes with ranks, and scale according to user parameters.
             resources_per_node = (
-                "{sys_gpus_per_node}" if use_gpus else "{sys_cores_per_node}"
+                sys.sys_gpus_per_node if use_gpus else sys.sys_cores_per_node
             )
             self.add_experiment_variable(resource_var, resources_per_node, True)
+            self.add_experiment_variable("n_nodes", 1, True)
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "n_nodes": lambda var, itr, dim, scaling_factor: var.val(dim),
-                    resource_var: lambda var, itr, dim, scaling_factor: var.val(dim),
+                    "n_nodes": lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
+                    resource_var: lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor,
                     "process_problem_size": "",
                     "total_problem_size": "",
                 },
