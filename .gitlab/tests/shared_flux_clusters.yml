@@ -176,13 +176,12 @@ run_tests_flux_tuolumne:
       #     - sparta-snl
       #   VARIANT: [+rocm]
       #   GPUMODE: SPX
-      # GTL experiments
+      # needs caliper for mpi
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK: [branson]
-        VARIANT: [+rocm]
+        VARIANT: [+rocm caliper=mpi]
         GPUMODE: SPX
-        SYSTEM_ARGS: [+gtl]
       # # Test openmp on tuolumne
       # - HOST: tuolumne
       #   ARCHCONFIG: llnl-elcapitan

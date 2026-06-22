@@ -57,13 +57,12 @@ include:
           - remhos
           - sparta-snl
         VARIANT: [+rocm]
-      # GTL experiments
+      # Needs caliper for mpi
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
         SCHEDULER_PARAMETERS: $ELCAP_PARAMS
         BENCHMARK: [branson]
-        VARIANT: [+rocm]
-        SYSTEM_ARGS: [+gtl]
+        VARIANT: [+rocm caliper=mpi]
       # +openmp tests
       - HOST: dane
         ARCHCONFIG: llnl-cluster
