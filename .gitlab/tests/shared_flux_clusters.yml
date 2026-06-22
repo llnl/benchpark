@@ -164,61 +164,67 @@ run_tests_flux_tuolumne:
   needs: [allocate_resources_tuolumne]
   parallel:
     matrix:
+      # - HOST: tuolumne
+      #   ARCHCONFIG: llnl-elcapitan
+      #   BENCHMARK:
+      #     - amg2023
+      #     - kripke
+      #     - laghos
+      #     - lammps
+      #     - raja-perf
+      #     - remhos
+      #     - sparta-snl
+      #   VARIANT: [+rocm]
+      #   GPUMODE: SPX
+      # GTL experiments
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
-        BENCHMARK:
-          - amg2023
-          - branson
-          - kripke
-          - laghos
-          - lammps
-          - raja-perf
-          - remhos
-          - sparta-snl
+        BENCHMARK: [branson]
         VARIANT: [+rocm]
         GPUMODE: SPX
-      # Test openmp on tuolumne
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [kripke]
-        VARIANT: [+openmp]
-        GPUMODE: SPX
-      # Test kripke+rocm+single_memory on tuolumne
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [kripke]
-        VARIANT: [+rocm+single_memory]
-        GPUMODE: SPX
-      # Caliper profile.hip
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [kripke]
-        VARIANT: ['+rocm caliper=mpi,time,rocm']
-        GPUMODE: SPX
-      # spack-pip
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [py-scaffold]
-        VARIANT:
-          - +rocm package_manager=spack-pip caliper=mpi,time allocation=torchrun-hpc
-      # rocm7
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [raja-perf]
-        VARIANT: ['+rocm caliper=time,rocm version=develop']
-        SYSTEM_ARGS: [rocm=7.2.1]
-        GPUMODE: SPX
-      # Caliper services
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [kripke]
-        VARIANT: [+rocm caliper_services=rocprofiler]
-        GPUMODE: SPX
-      # gcc
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [stream]
-        SYSTEM_ARGS: [compiler=gcc]
+        SYSTEM_ARGS: [+gtl]
+      # # Test openmp on tuolumne
+      # - HOST: tuolumne
+      #   ARCHCONFIG: llnl-elcapitan
+      #   BENCHMARK: [kripke]
+      #   VARIANT: [+openmp]
+      #   GPUMODE: SPX
+      # # Test kripke+rocm+single_memory on tuolumne
+      # - HOST: tuolumne
+      #   ARCHCONFIG: llnl-elcapitan
+      #   BENCHMARK: [kripke]
+      #   VARIANT: [+rocm+single_memory]
+      #   GPUMODE: SPX
+      # # Caliper profile.hip
+      # - HOST: tuolumne
+      #   ARCHCONFIG: llnl-elcapitan
+      #   BENCHMARK: [kripke]
+      #   VARIANT: ['+rocm caliper=mpi,time,rocm']
+      #   GPUMODE: SPX
+      # # spack-pip
+      # - HOST: tuolumne
+      #   ARCHCONFIG: llnl-elcapitan
+      #   BENCHMARK: [py-scaffold]
+      #   VARIANT:
+      #     - +rocm package_manager=spack-pip caliper=mpi,time allocation=torchrun-hpc
+      # # rocm7
+      # - HOST: tuolumne
+      #   ARCHCONFIG: llnl-elcapitan
+      #   BENCHMARK: [raja-perf]
+      #   VARIANT: ['+rocm caliper=time,rocm version=develop']
+      #   SYSTEM_ARGS: [rocm=7.2.1]
+      #   GPUMODE: SPX
+      # # Caliper services
+      # - HOST: tuolumne
+      #   ARCHCONFIG: llnl-elcapitan
+      #   BENCHMARK: [kripke]
+      #   VARIANT: [+rocm caliper_services=rocprofiler]
+      #   GPUMODE: SPX
+      # # gcc
+      # - HOST: tuolumne
+      #   ARCHCONFIG: llnl-elcapitan
+      #   BENCHMARK: [stream]
+      #   SYSTEM_ARGS: [compiler=gcc]
 run_tests_flux_tioga:
   extends: .run_tests_flux
   tags: [shell, tioga]

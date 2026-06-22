@@ -49,7 +49,6 @@ include:
         BENCHMARK:
           - amg2023
           - babelstream
-          - branson
           - kripke
           - laghos
           - lammps
@@ -58,6 +57,13 @@ include:
           - remhos
           - sparta-snl
         VARIANT: [+rocm]
+      # GTL experiments
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        SCHEDULER_PARAMETERS: $ELCAP_PARAMS
+        BENCHMARK: [branson]
+        VARIANT: [+rocm]
+        SYSTEM_ARGS: [+gtl]
       # +openmp tests
       - HOST: dane
         ARCHCONFIG: llnl-cluster
