@@ -43,6 +43,10 @@ sys.path.insert(0, os.path.abspath("../lib"))
 
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", ".spack-env"]
 
+# sphinx-copybutton configurations to avoid copying shell prompts
+copybutton_prompt_text = r"(?:\[[^\]]*\])?\$ "
+copybutton_prompt_is_regexp = True
+
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
