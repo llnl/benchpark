@@ -22,3 +22,25 @@ class OsuMicroBenchmarks(OsuMicroBenchmarksBase):
             'network-multi-threaded','network-nonblocking-collectives',
             'network-onesided','network-point-to-point',
             'c','java','python','openacc']
+
+    workload_group(
+        "two_rank_workloads",
+        workloads=[
+            "osu_bibw",
+            "osu_bw",
+            "osu_latency",
+            "osu_get_acc_latency",
+            "osu_get_bw",
+            "osu_get_latency",
+            "osu_put_bibw",
+            "osu_put_bw",
+            "osu_put_latency",
+            ]
+        )
+
+    register_validator(
+        name="two_rank_workloads",
+        predicate="{n_ranks} == 2",
+        workload_group="target_workloads",
+        message="This test requires exactly two processes."
+        )
