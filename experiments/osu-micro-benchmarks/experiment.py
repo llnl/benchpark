@@ -138,7 +138,7 @@ class OsuMicroBenchmarks(
             # Test the intra-node case and the inter-node case. Ignore user-set scaling params.
             self.add_experiment_variable(resource_var, [2, 2], True)
             self.add_experiment_variable("n_nodes", [1, 2], True)
-            self.add_experiment_variable("scaling_iterations", 1, True)
+            self.add_experiment_variable("scaling-iterations", 1, True)
         else:
             # "Fill" the nodes with ranks, and scale according to user paramters.
             resources_per_node = (
@@ -154,10 +154,7 @@ class OsuMicroBenchmarks(
                     "total_problem_size": "",
                 },
                 ScalingMode.Throughput: {
-                    "n_nodes": lambda var, itr, dim, scaling_factor: var.val(dim),
-                    resource_var: lambda var, itr, dim, scaling_factor: var.val(dim),
-                    "process_problem_size": "",
-                    "total_problem_size": "",
+                    "n_nodes": None,
                 },
             }
         )
