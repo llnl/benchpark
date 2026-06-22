@@ -140,7 +140,7 @@ class OsuMicroBenchmarks(
             self.add_experiment_variable("n_nodes", [1, 2], True)
             self.add_experiment_variable("scaling-iterations", 1, True)
         else:
-            # "Fill" the nodes with ranks, and scale according to user paramters.
+            # "Fill" the nodes with ranks, and scale according to user parameters.
             resources_per_node = (
                 "{sys_gpus_per_node}" if use_gpus else "{sys_cores_per_node}"
             )
