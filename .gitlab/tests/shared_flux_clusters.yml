@@ -41,6 +41,7 @@ allocate_resources_tioga:
 .release_resources_flux:
   extends: .on_host_template
   stage: release-resources
+  when: always
   # Do not cleanup dir yet
   script: [. .gitlab/utils/cancel-flux.sh --no-clean]
 release_resources_flux_tuolumne:
