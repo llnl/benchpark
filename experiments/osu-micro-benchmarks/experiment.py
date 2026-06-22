@@ -121,59 +121,48 @@ class OsuMicroBenchmarks(
 
     def compute_applications_section(self):
 
-        if any(self.spec.satisfies(f"workload={wl}") for wl in self.two_rank_workloads):
-            n_ranks = 2
-            if self.spec.satisfies("+rocm") or self.spec.satisfies("+cuda"):
-                resource = "n_gpus"
-                self.add_experiment_variable("n_gpus", 2, True)
-
-        num_nodes = {"n_nodes": 2, "n_ranks": n_ranks}
-
         if self.spec.satisfies("exec_mode=test"):
             num_nodes = {"n_nodes": 1, "n_ranks": 2}
-        else:
-            num_nodes = {"n_nodes": 2, "n_ranks": 2}
-
-        for pk, pv in num_nodes.items():
-            self.add_experiment_variable(pk, pv, True)
+            for pk, pv in num_nodes.items():
+                self.add_experiment_variable(pk, pv, True)
 
         if self.spec.satisfies("+rocm"):
             self.add_experiment_variable("additional_args", " -d rocm", False)
         if self.spec.satisfies("+cuda"):
             self.add_experiment_variable("additional_args", " -d cuda", False)
-        if self.spec.satisfies("+rocm") or self.spec.satisfies("+cuda"):
-            resource = "n_gpus"
-            self.add_experiment_variable("n_gpus", 2, True)
-        else:
-            resource = "n_nodes"
 
         use_gpus = self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm")
         resource_var = "n_gpus" if use_gpus else "n_ranks"
-        resources_per_node = (
-            "{sys_gpus_per_node}" if use_gpus else "{sys_cores_per_node}"
-        )
-
+        # self.add_experiment_variable("n_nodes", 2 , True)
+        if any(self.spec.satisfies(f"workload={wl}") for wl in self.two_rank_workloads):
+            # Test the intra-node case and the inter-node case. Ignore user-set scaling params.
+            self.add_experiment_variable(resource_var, [2, 2], True)
+            self.add_experiment_variable("n_nodes", [1, 2], True)
+            self.add_experiment_variable("scaling_iterations", 1, True)
+        else:
+            # "Fill" the nodes with ranks, and scale according to user paramters.
+            resources_per_node = (
+                "{sys_gpus_per_node}" if use_gpus else "{sys_cores_per_node}"
+            )
+            self.add_experiment_variable(resource_var, resources_per_node, True)
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "n_nodes": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
-                    resource_var: lambda var, itr, dim, scaling_factor: resources_per_node
-                    * var.val("n_nodes")
-                    * scaling_factor,
+                    "n_nodes": lambda var, itr, dim, scaling_factor: var.val(dim),
+                    resource_var: lambda var, itr, dim, scaling_factor: var.val(dim),
                     "process_problem_size": "",
                     "total_problem_size": "",
                 },
                 ScalingMode.Throughput: {
-                    "n_nodes": 2,
-                    resource_var: 2,
+                    "n_nodes": lambda var, itr, dim, scaling_factor: var.val(dim),
+                    resource_var: lambda var, itr, dim, scaling_factor: var.val(dim),
                     "process_problem_size": "",
                     "total_problem_size": "",
                 },
             }
         )
 
-        n_resources = "{" + resource + "}"
+        n_resources = "{" + resource_var + "}"
         self.set_required_variables(
             n_resources=n_resources, process_problem_size="", total_problem_size=""
         )
