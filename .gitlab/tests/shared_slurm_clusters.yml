@@ -56,10 +56,10 @@ release_resources_dane:
   extends: .release_resources_slurm
   rules: !reference [.resource_rules_dane, rules]
   tags: [shell, dane]
-   needs:
-    - job: allocate_resources_dane
-    - job: run_tests_slurm_dane
-      optional: true
+  needs:
+  - job: allocate_resources_dane
+  - job: run_tests_slurm_dane
+    optional: true
 # release_resources_matrix:
 #   extends: .release_resources_slurm
 #   tags: [shell, matrix]
