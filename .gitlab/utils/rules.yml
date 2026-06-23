@@ -1,4 +1,4 @@
-.on_host_template:
+.run_test_rules:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
         != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
@@ -14,6 +14,48 @@
         - var/**/*
         - lib/**/*
       when: on_success
+.resource_rules_dane:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
+        != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
+      when: never
+    - changes:
+        - .gitlab-ci.yml
+        - .gitlab/**/*
+        - bin/**/*
+        - experiments/amg2023/**/*
+        - experiments/branson/**/*
+        - experiments/hpcg/**/*
+        - experiments/hpl/**/*
+        - experiments/ior/**/*
+        - experiments/kripke/**/*
+        - experiments/laghos/**/*
+        - experiments/lammps/**/*
+        - experiments/osu-micro-benchmarks/**/*
+        - experiments/phloem/**/*
+        - experiments/raja-perf/**/*
+        - experiments/remhos/**/*
+        - experiments/sparta-snl/**/*
+        - systems/llnl-cluster/**/*
+        - repos/**/amg2023/**/*
+        - repos/**/branson/**/*
+        - repos/**/hpcg/**/*
+        - repos/**/hpl/**/*
+        - repos/**/ior/**/*
+        - repos/**/kripke/**/*
+        - repos/**/laghos/**/*
+        - repos/**/lammps/**/*
+        - repos/**/osu-micro-benchmarks/**/*
+        - repos/**/phloem/**/*
+        - repos/**/raja-perf/**/*
+        - repos/**/remhos/**/*
+        - repos/**/sparta-snl/**/*
+        - modifiers/**/*
+        - var/**/*
+        - lib/**/*
+      when: on_success
+# .resource_rules_tioga:
+# .resource_rules_tuolumne:
 .nightly_rules:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"

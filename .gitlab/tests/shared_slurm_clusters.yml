@@ -10,7 +10,7 @@ workflow:
 # Resource Allocation Section
 #############################
 .allocate_resources_slurm:
-  extends: .on_host_template
+  extends: .run_test_rules
   stage: allocate-resources
   script:
     - set -e
@@ -32,6 +32,7 @@ workflow:
       fi
 allocate_resources_dane:
   extends: .allocate_resources_slurm
+  rules: !reference [.resource_rules_dane, rules]
   variables:
     HOST: dane
     SHARED_ALLOC: $DANE_SHARED_ALLOC
@@ -48,13 +49,14 @@ allocate_resources_dane:
 # Resource Release Section
 ##########################
 .release_resources_slurm:
-  extends: .on_host_template
+  extends: .run_test_rules
   stage: release-resources
   when: always
   # Do not cleanup dir yet
   script: [. .gitlab/utils/cancel-slurm.sh --no-clean]
 release_resources_dane:
   extends: .release_resources_slurm
+  rules: !reference [.resource_rules_dane, rules]
   tags: [shell, dane]
   needs: [allocate_resources_dane, run_tests_slurm_dane]
 # release_resources_matrix:
@@ -65,7 +67,7 @@ release_resources_dane:
 # Test Run Section
 ##################
 .run_tests_slurm:
-  extends: .on_host_template
+  extends: .run_test_rules
   stage: test
   variables:
     BASELINE_REF: develop
