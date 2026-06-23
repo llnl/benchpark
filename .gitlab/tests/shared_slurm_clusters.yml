@@ -37,13 +37,13 @@ allocate_resources_dane:
     SHARED_ALLOC: $DANE_SHARED_ALLOC
   tags: [shell, dane]
   needs: [dane-up-check]
-allocate_resources_matrix:
-  extends: .allocate_resources_slurm
-  variables:
-    HOST: matrix
-    SHARED_ALLOC: $MATRIX_SHARED_ALLOC
-  tags: [shell, matrix]
-  needs: [matrix-up-check]
+# allocate_resources_matrix:
+#   extends: .allocate_resources_slurm
+#   variables:
+#     HOST: matrix
+#     SHARED_ALLOC: $MATRIX_SHARED_ALLOC
+#   tags: [shell, matrix]
+#   needs: [matrix-up-check]
 ##########################
 # Resource Release Section
 ##########################
@@ -57,10 +57,10 @@ release_resources_dane:
   extends: .release_resources_slurm
   tags: [shell, dane]
   needs: [allocate_resources_dane, run_tests_slurm_dane]
-release_resources_matrix:
-  extends: .release_resources_slurm
-  tags: [shell, matrix]
-  needs: [allocate_resources_matrix, run_tests_slurm_matrix]
+# release_resources_matrix:
+#   extends: .release_resources_slurm
+#   tags: [shell, matrix]
+#   needs: [allocate_resources_matrix, run_tests_slurm_matrix]
 ##################
 # Test Run Section
 ##################
@@ -207,31 +207,31 @@ run_tests_slurm_dane:
         ARCHCONFIG: llnl-cluster
         SYSTEM_ARGS: [compiler=gcc, compiler=llvm]
         BENCHMARK: osu-micro-benchmarks
-run_tests_slurm_matrix:
-  extends: .run_tests_slurm
-  tags: [shell, matrix]
-  needs: [allocate_resources_matrix]
-  parallel:
-    matrix:
-      - HOST: matrix
-        ARCHCONFIG: llnl-matrix
-        BENCHMARK:
-          - amg2023
-          - babelstream
-          - kripke
-          - laghos
-          - lammps
-          - raja-perf
-          - remhos
-          - saxpy
-        VARIANT: [+cuda]
-      - HOST: matrix
-        ARCHCONFIG: llnl-matrix
-        BENCHMARK: [sparta-snl]
-        VARIANT: [+cuda~gpu-aware-mpi]
-      # spack-pip
-      - HOST: matrix
-        ARCHCONFIG: llnl-matrix
-        BENCHMARK: [py-scaffold]
-        VARIANT:
-          - +cuda package_manager=spack-pip caliper=mpi,time allocation=torchrun-hpc
+# run_tests_slurm_matrix:
+#   extends: .run_tests_slurm
+#   tags: [shell, matrix]
+#   needs: [allocate_resources_matrix]
+#   parallel:
+#     matrix:
+#       - HOST: matrix
+#         ARCHCONFIG: llnl-matrix
+#         BENCHMARK:
+#           - amg2023
+#           - babelstream
+#           - kripke
+#           - laghos
+#           - lammps
+#           - raja-perf
+#           - remhos
+#           - saxpy
+#         VARIANT: [+cuda]
+#       - HOST: matrix
+#         ARCHCONFIG: llnl-matrix
+#         BENCHMARK: [sparta-snl]
+#         VARIANT: [+cuda~gpu-aware-mpi]
+#       # spack-pip
+#       - HOST: matrix
+#         ARCHCONFIG: llnl-matrix
+#         BENCHMARK: [py-scaffold]
+#         VARIANT:
+#           - +cuda package_manager=spack-pip caliper=mpi,time allocation=torchrun-hpc
