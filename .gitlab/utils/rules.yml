@@ -23,33 +23,20 @@
         - .gitlab-ci.yml
         - .gitlab/**/*
         - bin/**/*
-        - experiments/amg2023/**/*
-        - experiments/branson/**/*
-        - experiments/hpcg/**/*
-        - experiments/hpl/**/*
-        - experiments/ior/**/*
-        - experiments/kripke/**/*
-        - experiments/laghos/**/*
-        - experiments/lammps/**/*
-        - experiments/osu-micro-benchmarks/**/*
-        - experiments/phloem/**/*
-        - experiments/raja-perf/**/*
-        - experiments/remhos/**/*
-        - experiments/sparta-snl/**/*
+        - "**/amg2023/**/*"
+        - "**/branson/**/*"
+        - "**/hpcg/**/*"
+        - "**/hpl/**/*"
+        - "**/ior/**/*"
+        - "**/kripke/**/*"
+        - "**/laghos/**/*"
+        - "**/lammps/**/*"
+        - "**/osu-micro-benchmarks/**/*"
+        - "**/phloem/**/*"
+        - "**/raja-perf/**/*"
+        - "**/remhos/**/*"
+        - "**/sparta-snl/**/*"
         - systems/llnl-cluster/**/*
-        - repos/**/amg2023/**/*
-        - repos/**/branson/**/*
-        - repos/**/hpcg/**/*
-        - repos/**/hpl/**/*
-        - repos/**/ior/**/*
-        - repos/**/kripke/**/*
-        - repos/**/laghos/**/*
-        - repos/**/lammps/**/*
-        - repos/**/osu-micro-benchmarks/**/*
-        - repos/**/phloem/**/*
-        - repos/**/raja-perf/**/*
-        - repos/**/remhos/**/*
-        - repos/**/sparta-snl/**/*
         - modifiers/**/*
         - var/**/*
         - lib/**/*
@@ -63,27 +50,17 @@
         - .gitlab-ci.yml
         - .gitlab/**/*
         - bin/**/*
-        - experiments/amg2023/**/*
-        - experiments/babelstream/**/*
-        - experiments/kripke/**/*
-        - experiments/laghos/**/*
-        - experiments/lammps/**/*
-        - experiments/py-scaffold/**/*
-        - experiments/raja-perf/**/*
-        - experiments/remhos/**/*
-        - experiments/saxpy/**/*
-        - experiments/sparta-snl/**/*
+        - "**/amg2023/**/*"
+        - "**/babelstream/**/*"
+        - "**/kripke/**/*"
+        - "**/laghos/**/*"
+        - "**/lammps/**/*"
+        - "**/py-scaffold/**/*"
+        - "**/raja-perf/**/*"
+        - "**/remhos/**/*"
+        - "**/saxpy/**/*"
+        - "**/sparta-snl/**/*"
         - systems/llnl-matrix/**/*
-        - repos/**/amg2023/**/*
-        - repos/**/babelstream/**/*
-        - repos/**/kripke/**/*
-        - repos/**/laghos/**/*
-        - repos/**/lammps/**/*
-        - repos/**/py-scaffold/**/*
-        - repos/**/raja-perf/**/*
-        - repos/**/remhos/**/*
-        - repos/**/saxpy/**/*
-        - repos/**/sparta-snl/**/*
         - modifiers/**/*
         - var/**/*
         - lib/**/*
@@ -97,19 +74,13 @@
         - .gitlab-ci.yml
         - .gitlab/**/*
         - bin/**/*
-        - experiments/amg2023/**/*
-        - experiments/kripke/**/*
-        - experiments/laghos/**/*
-        - experiments/py-scaffold/**/*
-        - experiments/raja-perf/**/*
-        - experiments/remhos/**/*
+        - "**/amg2023/**/*"
+        - "**/kripke/**/*"
+        - "**/laghos/**/*"
+        - "**/py-scaffold/**/*"
+        - "**/raja-perf/**/*"
+        - "**/remhos/**/*"
         - systems/llnl-elcapitan/**/*
-        - repos/**/amg2023/**/*
-        - repos/**/kripke/**/*
-        - repos/**/laghos/**/*
-        - repos/**/py-scaffold/**/*
-        - repos/**/raja-perf/**/*
-        - repos/**/remhos/**/*
         - modifiers/**/*
         - var/**/*
         - lib/**/*
@@ -123,27 +94,17 @@
         - .gitlab-ci.yml
         - .gitlab/**/*
         - bin/**/*
-        - experiments/amg2023/**/*
-        - experiments/branson/**/*
-        - experiments/kripke/**/*
-        - experiments/laghos/**/*
-        - experiments/lammps/**/*
-        - experiments/py-scaffold/**/*
-        - experiments/raja-perf/**/*
-        - experiments/remhos/**/*
-        - experiments/sparta-snl/**/*
-        - experiments/stream/**/*
+        - "**/amg2023/**/*"
+        - "**/branson/**/*"
+        - "**/kripke/**/*"
+        - "**/laghos/**/*"
+        - "**/lammps/**/*"
+        - "**/py-scaffold/**/*"
+        - "**/raja-perf/**/*"
+        - "**/remhos/**/*"
+        - "**/sparta-snl/**/*"
+        - "**/stream/**/*"
         - systems/llnl-elcapitan/**/*
-        - repos/**/amg2023/**/*
-        - repos/**/branson/**/*
-        - repos/**/kripke/**/*
-        - repos/**/laghos/**/*
-        - repos/**/lammps/**/*
-        - repos/**/py-scaffold/**/*
-        - repos/**/raja-perf/**/*
-        - repos/**/remhos/**/*
-        - repos/**/sparta-snl/**/*
-        - repos/**/stream/**/*
         - modifiers/**/*
         - var/**/*
         - lib/**/*
