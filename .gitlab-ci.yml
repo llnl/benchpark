@@ -70,7 +70,7 @@ include:
       - utilities/preliminary-ignore-draft-pr.yml
       - utilities/skip-branch-not-a-pr.yml
   # Daily tests (from PRs)
-  # - local: .gitlab/tests/shared_flux_clusters.yml
+  - local: .gitlab/tests/shared_flux_clusters.yml
   - local: .gitlab/tests/shared_slurm_clusters.yml
   # Nightly tests
   - local: .gitlab/tests/nightly.yml
