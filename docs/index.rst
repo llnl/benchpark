@@ -30,6 +30,7 @@
     tutorial-101
     tutorial-llnl
     comparing-experiment-builds
+    containers
 
 .. toctree::
     :maxdepth: 1
@@ -55,7 +56,6 @@
     add-a-benchmark
     add-an-experiment
     testing-your-contribution
-    update-a-system-config
 
 .. toctree::
     :maxdepth: 1

@@ -44,11 +44,6 @@ class Saxpy(CMakePackage, CudaPackage, ROCmPackage):
         for f in ["CMakeLists.txt", "saxpy.cc", "config.hh.in"]:
             shutil.copy2(os.path.join(repo_path, f), self.stage.source_path)
 
-    def setup_build_environment(self, env):
-        if "+cuda" in self.spec:
-            env.set("CUDAHOSTCXX", self.spec["mpi"].mpicxx)
-            env.set("NVCC_APPEND_FLAGS", "-std=c++14 -allow-unsupported-compiler")
-
     def cmake_args(self):
         spec = self.spec
         args = []
@@ -59,6 +54,7 @@ class Saxpy(CMakePackage, CudaPackage, ROCmPackage):
         if '+cuda' in spec:
             args.append('-DCMAKE_CUDA_HOST_COMPILER={0}'.format(spec["mpi"].mpicxx))
             args.append('-DCMAKE_CUDA_COMPILER={0}'.format(spec["cuda"].prefix + "/bin/nvcc"))
+            args.append(self.define("CMAKE_CUDA_FLAGS", "-I={0}".format(spec["mpi"].prefix.include)))
             args.append('-DUSE_CUDA=ON')
             cuda_arch_vals = spec.variants["cuda_arch"].value
             if cuda_arch_vals:

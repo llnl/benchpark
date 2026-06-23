@@ -3,10 +3,10 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 system_definition:
-  name: HPECray-neoverse-H100-Slingshot
+  name: NVIDIA-neoverse-GH200-Infiniband
   integrator:
-    vendor: HPECray
-    name: EX254n
+    vendor: NVIDIA
+    name: GH200
   processor:
     vendor: NVIDIA
     name: Grace
@@ -14,20 +14,16 @@ system_definition:
     uArch: neoverse
   accelerator:
     vendor: NVIDIA
-    name: H100
+    name: GH200
     ISA: PTX
     uArch: sm_90
   interconnect:
-    vendor: HPECray
-    name: Slingshot11
+    vendor: NVIDIA
+    name: HDR200InfiniBand
   systems-tested:
-    lanl-venado:
-      os: HPECrayOS
+    qc-gh200:
+      os: Rocky
       scheduler: slurm
-      compiler: cce
+      compiler: nvhpc
       runtime: cuda
-      mpi: cray-mpich
-  top500-system-instances:
-    Venado:
-      benchpark_system: lanl-venado
-      top500: <https://www.top500.org/system/180246>
+      mpi: openmpi

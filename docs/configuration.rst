@@ -64,7 +64,10 @@ Benchpark can pull configurations from one location, with the following priority
 - As an argument to ``benchpark``: ``benchpark -C <dir>...``
 - If the CWD where you invoke the benchpark executable has ``benchpark-config``
   directory
-- If ``<benchpark_root>/config`` is a directory; this must exist if the first two don't
+- If ``<benchpark_root>/user-config`` is a directory; this will be created on the first
+  run of benchpark.
+- If ``<benchpark_root>/config`` is a directory; this must exist if the first three
+  don't
 
 There is no mixing and matching between these tiers. If you are using ``-C``, then the
 specified directory must contain a ``bootstrap.yaml`` and a ``repos.yaml`` (you can copy

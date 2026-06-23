@@ -135,7 +135,7 @@ Notice that each dependency tree differs in the compilers used (gcc\@12.1.1 vs.
 intel\@2021.6.0)
 
 This can also be done in a single command by the ``diffBuildSpecs.py`` script (see
-:doc:`scripts`).
+:doc:`diffBuildSpecs`).
 
 ``spack-python lib/scripts/diffBuildSpecs.py quicksilver/{hash1} quicksilver/{hash2}``
 

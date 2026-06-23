@@ -9,14 +9,14 @@
     - when: on_success
     - changes:
         - .gitlab-ci.yml
-        - .gitlab/**
-        - bin/**
-        - experiments/$BENCHMARK/**
-        - systems/$ARCHCONFIG/**
-        - repo/$BENCHMARK/**
-        - modifiers/**
-        - var/**
-        - lib/**
+        - .gitlab/**/*
+        - bin/**/*
+        - experiments/$BENCHMARK/**/*
+        - systems/$ARCHCONFIG/**/*
+        - repos/$BENCHMARK/**/*
+        - modifiers/**/*
+        - var/**/*
+        - lib/**/*
 .nightly_rules:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"

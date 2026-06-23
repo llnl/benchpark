@@ -6,14 +6,14 @@ workflow:
 
     # Run pipelines only when these files/dirs change
     - changes:
-        - .gitlab/**
-        - bin/**
-        - configs/**
-        - experiments/**
-        - lib/**
-        - modifiers/**
-        - repo/**
-        - var/**
+        - .gitlab/**/*
+        - bin/**/*
+        - configs/**/*
+        - experiments/**/*
+        - lib/**/*
+        - modifiers/**/*
+        - repos/**/*
+        - var/**/*
         - systems/llnl-elcapitan/system.py
         - systems/llnl-cluster/system.py
         - .gitlab-ci.yml
@@ -50,7 +50,7 @@ variables:
   # Matrix (NODES ARE SHARED WITHOUT --exclusive)
   MATRIX_SHARED_ALLOC: -N 1 -t 04:00:00 --exclusive
   # Tuolumne (max 4hr policy)
-  TUOLUMNE_SHARED_ALLOC: -N 1 -t 3h --queue=pbatch --exclusive --setattr=gpumode=${GPUMODE}
+  TUOLUMNE_SHARED_ALLOC: -N 1 -t 4h --queue=pci --exclusive --setattr=gpumode=${GPUMODE}
     --conf=resource.rediscover=true
   # Tioga (max 2hr policy)
   TIOGA_SHARED_ALLOC: -N 1 -t 2h --queue=pci --exclusive
@@ -94,3 +94,5 @@ cleanup_pipeline_dir:
   script:
     - echo "Removing $CUSTOM_CI_BUILDS_DIR"
     - rm -rf $CUSTOM_CI_BUILDS_DIR
+  rules:
+    - when: always
