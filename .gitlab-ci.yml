@@ -6,14 +6,14 @@ workflow:
 
     # Run pipelines only when these files/dirs change
     - changes:
-        - .gitlab/**
-        - bin/**
-        - configs/**
-        - experiments/**
-        - lib/**
-        - modifiers/**
-        - repo/**
-        - var/**
+        - .gitlab/**/*
+        - bin/**/*
+        - configs/**/*
+        - experiments/**/*
+        - lib/**/*
+        - modifiers/**/*
+        - repos/**/*
+        - var/**/*
         - systems/llnl-elcapitan/system.py
         - systems/llnl-cluster/system.py
         - .gitlab-ci.yml
@@ -94,3 +94,5 @@ cleanup_pipeline_dir:
   script:
     - echo "Removing $CUSTOM_CI_BUILDS_DIR"
     - rm -rf $CUSTOM_CI_BUILDS_DIR
+  rules:
+    - when: always
