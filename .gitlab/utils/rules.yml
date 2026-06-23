@@ -54,8 +54,100 @@
         - var/**/*
         - lib/**/*
       when: on_success
-# .resource_rules_tioga:
-# .resource_rules_tuolumne:
+.resource_rules_matrix:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
+        != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
+      when: never
+    - changes:
+        - .gitlab-ci.yml
+        - .gitlab/**/*
+        - bin/**/*
+        - experiments/amg2023/**/*
+        - experiments/babelstream/**/*
+        - experiments/kripke/**/*
+        - experiments/laghos/**/*
+        - experiments/lammps/**/*
+        - experiments/py-scaffold/**/*
+        - experiments/raja-perf/**/*
+        - experiments/remhos/**/*
+        - experiments/saxpy/**/*
+        - experiments/sparta-snl/**/*
+        - systems/llnl-matrix/**/*
+        - repos/**/amg2023/**/*
+        - repos/**/babelstream/**/*
+        - repos/**/kripke/**/*
+        - repos/**/laghos/**/*
+        - repos/**/lammps/**/*
+        - repos/**/py-scaffold/**/*
+        - repos/**/raja-perf/**/*
+        - repos/**/remhos/**/*
+        - repos/**/saxpy/**/*
+        - repos/**/sparta-snl/**/*
+        - modifiers/**/*
+        - var/**/*
+        - lib/**/*
+      when: on_success
+.resource_rules_tioga:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
+        != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
+      when: never
+    - changes:
+        - .gitlab-ci.yml
+        - .gitlab/**/*
+        - bin/**/*
+        - experiments/amg2023/**/*
+        - experiments/kripke/**/*
+        - experiments/laghos/**/*
+        - experiments/py-scaffold/**/*
+        - experiments/raja-perf/**/*
+        - experiments/remhos/**/*
+        - systems/llnl-elcapitan/**/*
+        - repos/**/amg2023/**/*
+        - repos/**/kripke/**/*
+        - repos/**/laghos/**/*
+        - repos/**/py-scaffold/**/*
+        - repos/**/raja-perf/**/*
+        - repos/**/remhos/**/*
+        - modifiers/**/*
+        - var/**/*
+        - lib/**/*
+      when: on_success
+.resource_rules_tuolumne:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
+        != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
+      when: never
+    - changes:
+        - .gitlab-ci.yml
+        - .gitlab/**/*
+        - bin/**/*
+        - experiments/amg2023/**/*
+        - experiments/branson/**/*
+        - experiments/kripke/**/*
+        - experiments/laghos/**/*
+        - experiments/lammps/**/*
+        - experiments/py-scaffold/**/*
+        - experiments/raja-perf/**/*
+        - experiments/remhos/**/*
+        - experiments/sparta-snl/**/*
+        - experiments/stream/**/*
+        - systems/llnl-elcapitan/**/*
+        - repos/**/amg2023/**/*
+        - repos/**/branson/**/*
+        - repos/**/kripke/**/*
+        - repos/**/laghos/**/*
+        - repos/**/lammps/**/*
+        - repos/**/py-scaffold/**/*
+        - repos/**/raja-perf/**/*
+        - repos/**/remhos/**/*
+        - repos/**/sparta-snl/**/*
+        - repos/**/stream/**/*
+        - modifiers/**/*
+        - var/**/*
+        - lib/**/*
+      when: on_success
 .nightly_rules:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
