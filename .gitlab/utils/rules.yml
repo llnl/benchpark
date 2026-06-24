@@ -30,11 +30,11 @@
         - '**/kripke/**/*'
         - '**/laghos/**/*'
         - '**/lammps/**/*'
-        - '**/osu-micro-benchmarks/**/*'
+        - '**/osu[-_]micro[-_]benchmarks/**/*'
         - '**/phloem/**/*'
-        - '**/raja-perf/**/*'
+        - '**/raja[-_]perf/**/*'
         - '**/remhos/**/*'
-        - '**/sparta-snl/**/*'
+        - '**/sparta[-_]snl/**/*'
         - systems/llnl-cluster/**/*
         - modifiers/**/*
         - var/**/*
@@ -53,11 +53,11 @@
         - '**/kripke/**/*'
         - '**/laghos/**/*'
         - '**/lammps/**/*'
-        - '**/py-scaffold/**/*'
-        - '**/raja-perf/**/*'
+        - '**/py[-_]scaffold/**/*'
+        - '**/raja[-_]perf/**/*'
         - '**/remhos/**/*'
         - '**/saxpy/**/*'
-        - '**/sparta-snl/**/*'
+        - '**/sparta[-_]snl/**/*'
         - systems/llnl-matrix/**/*
         - modifiers/**/*
         - var/**/*
@@ -74,8 +74,8 @@
         - '**/amg2023/**/*'
         - '**/kripke/**/*'
         - '**/laghos/**/*'
-        - '**/py-scaffold/**/*'
-        - '**/raja-perf/**/*'
+        - '**/py[-_]scaffold/**/*'
+        - '**/raja[-_]perf/**/*'
         - '**/remhos/**/*'
         - systems/llnl-elcapitan/**/*
         - modifiers/**/*
@@ -95,10 +95,10 @@
         - '**/kripke/**/*'
         - '**/laghos/**/*'
         - '**/lammps/**/*'
-        - '**/py-scaffold/**/*'
-        - '**/raja-perf/**/*'
+        - '**/py[-_]scaffold/**/*'
+        - '**/raja[-_]perf/**/*'
         - '**/remhos/**/*'
-        - '**/sparta-snl/**/*'
+        - '**/sparta[-_]snl/**/*'
         - '**/stream/**/*'
         - systems/llnl-elcapitan/**/*
         - modifiers/**/*
