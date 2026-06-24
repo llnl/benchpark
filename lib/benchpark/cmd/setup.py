@@ -57,6 +57,11 @@ def setup_parser(root_parser):
     root_parser.add_argument(
         "--spack", type=str, help="Use the designated, pre-existing Spack instance"
     )
+    root_parser.add_argument(
+        "--environment",
+        type=str,
+        help="Use an existing Spack environment (name or path) instead of creating one from package specs. Enables reuse of pre-installed packages.",
+    )
 
 
 def determine_experiment_id(exp_src_dir):
@@ -185,6 +190,36 @@ def command(args):
         ramble_spack_experiment_configs_dir,
         include_fn,
     )
+
+    # If using --environment, configure ramble to use the external spack environment
+    # This enables reuse of pre-installed packages
+    if "spack" in pkg_manager and args.environment:
+        ramble_yaml_path = ramble_configs_dir / "ramble.yaml"
+        if ramble_yaml_path.exists():
+            # Read the symlinked file
+            with open(ramble_yaml_path, "r") as f:
+                ramble_config = yaml.safe_load(f)
+
+            # Replace symlink with actual file
+            ramble_yaml_path.unlink()
+
+            # Find and update the software environments section
+            if "ramble" in ramble_config and "software" in ramble_config["ramble"]:
+                software_section = ramble_config["ramble"]["software"]
+
+                if "environments" in software_section:
+                    # Update each environment to use the external environment
+                    for env_name in software_section["environments"]:
+                        env_config = software_section["environments"][env_name]
+                        # Replace packages list with external_env
+                        if "packages" in env_config:
+                            del env_config["packages"]
+                        env_config["external_env"] = args.environment
+                        print(f"  Configured environment '{env_name}' to use external spack environment: {args.environment}")
+
+            # Write updated config
+            with open(ramble_yaml_path, "w") as f:
+                yaml.dump(ramble_config, f, default_flow_style=False)
 
     template_name = "execute_experiment.tpl"
     experiment_template_options = [
