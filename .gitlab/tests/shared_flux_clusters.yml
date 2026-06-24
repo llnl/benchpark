@@ -10,6 +10,7 @@ workflow:
 #############################
 .allocate_resources_flux:
   stage: allocate-resources
+  when: on_success
   script:
     - set -x
     - flux --parent alloc ${SHARED_ALLOC} --job-name=${ALLOC_NAME}${GPUMODE} --bg

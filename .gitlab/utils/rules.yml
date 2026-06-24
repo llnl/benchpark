@@ -39,7 +39,6 @@
         - modifiers/**/*
         - var/**/*
         - lib/**/*
-      when: on_success
 .resource_rules_matrix:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
@@ -63,7 +62,6 @@
         - modifiers/**/*
         - var/**/*
         - lib/**/*
-      when: on_success
 .resource_rules_tioga:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
@@ -83,7 +81,6 @@
         - modifiers/**/*
         - var/**/*
         - lib/**/*
-      when: on_success
 .resource_rules_tuolumne:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
@@ -107,7 +104,6 @@
         - modifiers/**/*
         - var/**/*
         - lib/**/*
-      when: on_success
 .nightly_rules:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"

@@ -11,6 +11,7 @@ workflow:
 #############################
 .allocate_resources_slurm:
   stage: allocate-resources
+  when: on_success
   script:
     - set -e
     # submit and grab JobID
