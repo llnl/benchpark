@@ -7,7 +7,7 @@
         - .gitlab-ci.yml
         - .gitlab/**/*
         - bin/**/*
-        - "**/$BENCHMARK/**/*"
+        - '**/$BENCHMARK/**/*'
         - systems/$ARCHCONFIG/**/*
         - modifiers/**/*
         - var/**/*
