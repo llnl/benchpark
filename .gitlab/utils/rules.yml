@@ -7,9 +7,8 @@
         - .gitlab-ci.yml
         - .gitlab/**/*
         - bin/**/*
-        - experiments/$BENCHMARK/**/*
+        - "**/$BENCHMARK/**/*"
         - systems/$ARCHCONFIG/**/*
-        - repos/$BENCHMARK/**/*
         - modifiers/**/*
         - var/**/*
         - lib/**/*
