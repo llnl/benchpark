@@ -186,42 +186,6 @@ def command(args):
         include_fn,
     )
 
-    # If using --spack (or a prior setup used --spack, detected by symlink),
-    # automatically switch to spack-reuse package manager to enable reuse
-    # of pre-installed packages
-    spack_location = experiments_root / "spack"
-    using_custom_spack = args.spack or (spack_location.exists() and spack_location.is_symlink())
-
-    if "spack" in pkg_manager and using_custom_spack:
-        ramble_yaml_path = ramble_configs_dir / "ramble.yaml"
-        if ramble_yaml_path.exists():
-            # Read the symlinked file
-            with open(ramble_yaml_path, "r") as f:
-                ramble_config = yaml.safe_load(f)
-
-            # Replace symlink with actual file and update package_manager
-            ramble_yaml_path.unlink()
-
-            # Recursively find and update package_manager variants
-            def update_package_manager(d):
-                if isinstance(d, dict):
-                    for key, value in d.items():
-                        if key == "package_manager" and value == "spack":
-                            d[key] = "spack-reuse"
-                            print(f"  Switched package_manager from 'spack' to 'spack-reuse' for pre-installed package reuse")
-                        elif isinstance(value, (dict, list)):
-                            update_package_manager(value)
-                elif isinstance(d, list):
-                    for item in d:
-                        update_package_manager(item)
-
-            update_package_manager(ramble_config)
-
-            # Write updated config
-            with open(ramble_yaml_path, "w") as f:
-                yaml.dump(ramble_config, f, default_flow_style=False)
-            print(f"  Updated {ramble_yaml_path} to use spack-reuse package manager")
-
     template_name = "execute_experiment.tpl"
     experiment_template_options = [
         configs_src_dir / template_name,
@@ -299,8 +263,6 @@ export SPACK_DISABLE_LOCAL_CONFIG=1
             ramble(f"repo add --scope=site {repo_dir}")
         ramble('config --scope=site add "config:disable_progress_bar:true"')
         ramble(f"repo add -t modifiers --scope=site {source_dir}/modifiers")
-        # Add custom package managers repository
-        ramble(f"repo add -t package_managers --scope=site {source_dir}/repos/package_managers")
         ramble("config --scope=site add \"config:spack:global:args:'-d'\"")
 
     if not initializer_script.exists():
