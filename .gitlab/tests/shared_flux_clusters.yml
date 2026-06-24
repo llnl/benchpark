@@ -48,9 +48,9 @@ release_resources_flux_tuolumne:
   extends: .release_resources_flux
   rules: !reference [.resource_rules_tuolumne, rules]
   needs:
-  - job: allocate_resources_tuolumne
-  - job: run_tests_flux_tuolumne
-    optional: true
+    - job: allocate_resources_tuolumne
+    - job: run_tests_flux_tuolumne
+      optional: true
   parallel:
     matrix:
       - HOST: tuolumne
@@ -60,9 +60,9 @@ release_resources_flux_tioga:
   extends: .release_resources_flux
   rules: !reference [.resource_rules_tioga, rules]
   needs:
-  - job: allocate_resources_tioga
-  - job: run_tests_flux_tioga
-    optional: true
+    - job: allocate_resources_tioga
+    - job: run_tests_flux_tioga
+      optional: true
   variables:
     HOST: tioga
   tags: [shell, tioga]

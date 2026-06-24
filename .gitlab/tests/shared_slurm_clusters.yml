@@ -58,17 +58,17 @@ release_resources_dane:
   rules: !reference [.resource_rules_dane, rules]
   tags: [shell, dane]
   needs:
-  - job: allocate_resources_dane
-  - job: run_tests_slurm_dane
-    optional: true
+    - job: allocate_resources_dane
+    - job: run_tests_slurm_dane
+      optional: true
 release_resources_matrix:
   extends: .release_resources_slurm
   rules: !reference [.resource_rules_matrix, rules]
   tags: [shell, matrix]
   needs:
-  - job: allocate_resources_matrix
-  - job: run_tests_slurm_matrix
-    optional: true
+    - job: allocate_resources_matrix
+    - job: run_tests_slurm_matrix
+      optional: true
 ##################
 # Test Run Section
 ##################

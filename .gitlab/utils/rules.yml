@@ -23,19 +23,19 @@
         - .gitlab-ci.yml
         - .gitlab/**/*
         - bin/**/*
-        - "**/amg2023/**/*"
-        - "**/branson/**/*"
-        - "**/hpcg/**/*"
-        - "**/hpl/**/*"
-        - "**/ior/**/*"
-        - "**/kripke/**/*"
-        - "**/laghos/**/*"
-        - "**/lammps/**/*"
-        - "**/osu-micro-benchmarks/**/*"
-        - "**/phloem/**/*"
-        - "**/raja-perf/**/*"
-        - "**/remhos/**/*"
-        - "**/sparta-snl/**/*"
+        - '**/amg2023/**/*'
+        - '**/branson/**/*'
+        - '**/hpcg/**/*'
+        - '**/hpl/**/*'
+        - '**/ior/**/*'
+        - '**/kripke/**/*'
+        - '**/laghos/**/*'
+        - '**/lammps/**/*'
+        - '**/osu-micro-benchmarks/**/*'
+        - '**/phloem/**/*'
+        - '**/raja-perf/**/*'
+        - '**/remhos/**/*'
+        - '**/sparta-snl/**/*'
         - systems/llnl-cluster/**/*
         - modifiers/**/*
         - var/**/*
@@ -50,16 +50,16 @@
         - .gitlab-ci.yml
         - .gitlab/**/*
         - bin/**/*
-        - "**/amg2023/**/*"
-        - "**/babelstream/**/*"
-        - "**/kripke/**/*"
-        - "**/laghos/**/*"
-        - "**/lammps/**/*"
-        - "**/py-scaffold/**/*"
-        - "**/raja-perf/**/*"
-        - "**/remhos/**/*"
-        - "**/saxpy/**/*"
-        - "**/sparta-snl/**/*"
+        - '**/amg2023/**/*'
+        - '**/babelstream/**/*'
+        - '**/kripke/**/*'
+        - '**/laghos/**/*'
+        - '**/lammps/**/*'
+        - '**/py-scaffold/**/*'
+        - '**/raja-perf/**/*'
+        - '**/remhos/**/*'
+        - '**/saxpy/**/*'
+        - '**/sparta-snl/**/*'
         - systems/llnl-matrix/**/*
         - modifiers/**/*
         - var/**/*
@@ -74,12 +74,12 @@
         - .gitlab-ci.yml
         - .gitlab/**/*
         - bin/**/*
-        - "**/amg2023/**/*"
-        - "**/kripke/**/*"
-        - "**/laghos/**/*"
-        - "**/py-scaffold/**/*"
-        - "**/raja-perf/**/*"
-        - "**/remhos/**/*"
+        - '**/amg2023/**/*'
+        - '**/kripke/**/*'
+        - '**/laghos/**/*'
+        - '**/py-scaffold/**/*'
+        - '**/raja-perf/**/*'
+        - '**/remhos/**/*'
         - systems/llnl-elcapitan/**/*
         - modifiers/**/*
         - var/**/*
@@ -94,16 +94,16 @@
         - .gitlab-ci.yml
         - .gitlab/**/*
         - bin/**/*
-        - "**/amg2023/**/*"
-        - "**/branson/**/*"
-        - "**/kripke/**/*"
-        - "**/laghos/**/*"
-        - "**/lammps/**/*"
-        - "**/py-scaffold/**/*"
-        - "**/raja-perf/**/*"
-        - "**/remhos/**/*"
-        - "**/sparta-snl/**/*"
-        - "**/stream/**/*"
+        - '**/amg2023/**/*'
+        - '**/branson/**/*'
+        - '**/kripke/**/*'
+        - '**/laghos/**/*'
+        - '**/lammps/**/*'
+        - '**/py-scaffold/**/*'
+        - '**/raja-perf/**/*'
+        - '**/remhos/**/*'
+        - '**/sparta-snl/**/*'
+        - '**/stream/**/*'
         - systems/llnl-elcapitan/**/*
         - modifiers/**/*
         - var/**/*
