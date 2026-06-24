@@ -215,7 +215,9 @@ def command(args):
                         if "packages" in env_config:
                             del env_config["packages"]
                         env_config["external_env"] = args.environment
-                        print(f"  Configured environment '{env_name}' to use external spack environment: {args.environment}")
+                        print(
+                            f"  Configured environment '{env_name}' to use external spack environment: {args.environment}"
+                        )
 
             # Write updated config
             with open(ramble_yaml_path, "w") as f:
@@ -261,7 +263,9 @@ def command(args):
             if spack_location.is_symlink():
                 existing_target = os.readlink(spack_location)
                 if os.path.abspath(existing_target) != os.path.abspath(args.spack):
-                    print(f"Error: {spack_location} already points to {existing_target}")
+                    print(
+                        f"Error: {spack_location} already points to {existing_target}"
+                    )
                     print(f"       but --spack specifies {args.spack}")
                     sys.exit(1)
                 # else: symlink already points to correct location, continue
