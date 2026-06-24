@@ -57,7 +57,8 @@ Now you are ready to compile your experiments as described in :doc:`build-experi
  Using pre-built Spack packages
 ********************************
 
-You can specify a pre-existing spack, along with an environment within that Spack instance with pre-built specs:
+You can specify a pre-existing spack, along with an environment within that Spack
+instance with pre-built specs:
 
 ::
 
@@ -65,7 +66,8 @@ You can specify a pre-existing spack, along with an environment within that Spac
     benchpark experiment init x y
     benchpark setup x/y </output/path/to/workspace> --spack=custom-spack --environment=e1
 
-If e1 has an install of the benchmark you need, then ``ramble workspace setup`` will not need to install any packages.
+If e1 has an install of the benchmark you need, then ``ramble workspace setup`` will not
+need to install any packages.
 
 *************************************
  Built-in System/Experiment Variants
