@@ -86,7 +86,6 @@ release_resources_flux_tioga:
     - !reference [.report_status, after_script]
     - |
       pr_workspace="$CI_PROJECT_DIR/wkp/${HOST}/${BENCHMARK}/workspace"
-      echo "PR Workspace is: ${pr_workspace}"
       pr_json=$(find "${pr_workspace}/experiments/${BENCHMARK}" -type f -name 'githash_metadata.json' | sort | head -n 1)
       artifact_dir="$CI_PROJECT_DIR/artifact-githash/${HOST}/${BENCHMARK}"
       baseline_json="${artifact_dir}/baseline_githash_metadata.json"
