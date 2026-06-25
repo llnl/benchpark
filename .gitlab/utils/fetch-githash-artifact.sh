@@ -67,69 +67,88 @@ printf '%s' "${pipelines_json}" | jq -r '
     end
 '
 
-baseline_pipeline_id=$(
+candidate_pipelines=$(
     printf '%s' "${pipelines_json}" \
     | jq -r --arg exclude_pipeline_id "${exclude_pipeline_id}" --arg exclude_pipeline_name "${exclude_pipeline_name}" '
         [.[] | select(($exclude_pipeline_id == "" or (.id | tostring) != $exclude_pipeline_id) and ($exclude_pipeline_name == "" or (.name // "") != $exclude_pipeline_name))]
         | sort_by(.id)
-        | last
-        | .id // empty
+        | reverse[]
+        | [.id, .status, (.name // "<unnamed>")]
+        | @tsv
     '
 )
 
-if [[ -z "${baseline_pipeline_id}" ]]; then
+if [[ -z "${candidate_pipelines}" ]]; then
     echo "Unable to locate a candidate pipeline for ref ${ref} after exclusions." >&2
     exit 1
 fi
 
+baseline_pipeline_id=""
+baseline_job_id=""
+baseline_job_status=""
+
+while IFS=$'\t' read -r candidate_pipeline_id candidate_pipeline_status candidate_pipeline_name; do
+    [[ -z "${candidate_pipeline_id}" ]] && continue
+
+    echo "Checking pipeline ${candidate_pipeline_id} (status=${candidate_pipeline_status}, name=${candidate_pipeline_name})"
+
+    jobs_json=$(
+        curl --silent --show-error --fail \
+            --header "${auth_header}" \
+            "${api_url}/projects/${project_id}/pipelines/${candidate_pipeline_id}/jobs?per_page=100"
+    )
+
+    echo "Matching jobs in pipeline ${candidate_pipeline_id}:"
+    printf '%s' "${jobs_json}" | jq -r --arg job_name "${job_name}" '
+        [ .[] | select(.name == $job_name) ] as $matches
+        | if ($matches | length) == 0 then
+            "  (none)"
+          else
+            $matches[]
+            | "  id=\(.id) status=\(.status) artifacts=\((.artifacts_file.filename // "<none>"))"
+          end
+    '
+
+    baseline_job_id=$(
+        printf '%s' "${jobs_json}" \
+        | jq -r --arg job_name "${job_name}" '
+            [.[] | select(.name == $job_name and (.artifacts_file.filename // "") != "")]
+            | sort_by(.id)
+            | last
+            | .id // empty
+        '
+    )
+
+    baseline_job_status=$(
+        printf '%s' "${jobs_json}" \
+        | jq -r --arg job_name "${job_name}" '
+            [.[] | select(.name == $job_name and (.artifacts_file.filename // "") != "")]
+            | sort_by(.id)
+            | last
+            | .status // empty
+        '
+    )
+
+    if [[ -z "${baseline_job_id}" ]]; then
+        echo "No matching job with artifacts found in pipeline ${candidate_pipeline_id}, trying next candidate."
+        continue
+    fi
+
+    if [[ -z "${baseline_job_status}" ]]; then
+        echo "Matching job in pipeline ${candidate_pipeline_id} had no status, trying next candidate."
+        continue
+    fi
+
+    baseline_pipeline_id="${candidate_pipeline_id}"
+    break
+done <<< "${candidate_pipelines}"
+
+if [[ -z "${baseline_pipeline_id}" ]]; then
+    echo "Unable to locate job '${job_name}' with artifacts in any candidate pipeline for ref ${ref}." >&2
+    exit 1
+fi
+
 echo "Selected pipeline ID ${baseline_pipeline_id}"
-
-jobs_json=$(
-    curl --silent --show-error --fail \
-        --header "${auth_header}" \
-        "${api_url}/projects/${project_id}/pipelines/${baseline_pipeline_id}/jobs?per_page=100"
-)
-
-echo "Matching jobs in pipeline ${baseline_pipeline_id}:"
-printf '%s' "${jobs_json}" | jq -r --arg job_name "${job_name}" '
-    [ .[] | select(.name == $job_name) ] as $matches
-    | if ($matches | length) == 0 then
-        "  (none)"
-      else
-        $matches[]
-        | "  id=\(.id) status=\(.status) artifacts=\((.artifacts_file.filename // "<none>"))"
-      end
-'
-
-baseline_job_id=$(
-    printf '%s' "${jobs_json}" \
-    | jq -r --arg job_name "${job_name}" '
-        [.[] | select(.name == $job_name and (.artifacts_file.filename // "") != "")]
-        | sort_by(.id)
-        | last
-        | .id // empty
-    '
-)
-
-baseline_job_status=$(
-    printf '%s' "${jobs_json}" \
-    | jq -r --arg job_name "${job_name}" '
-        [.[] | select(.name == $job_name and (.artifacts_file.filename // "") != "")]
-        | sort_by(.id)
-        | last
-        | .status // empty
-    '
-)
-
-if [[ -z "${baseline_job_id}" ]]; then
-    echo "Unable to locate job '${job_name}' with artifacts in pipeline ${baseline_pipeline_id}." >&2
-    exit 1
-fi
-
-if [[ -z "${baseline_job_status}" ]]; then
-    echo "Unable to determine status for job '${job_name}' in pipeline ${baseline_pipeline_id}." >&2
-    exit 1
-fi
 
 mkdir -p "$(dirname "${output_path}")"
 
