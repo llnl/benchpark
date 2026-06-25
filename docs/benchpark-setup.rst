@@ -64,10 +64,10 @@ instance with pre-built specs:
 
     benchpark system init --dest=x <SystemName> compiler=<Compiler>
     benchpark experiment init x y
-    benchpark setup x/y </output/path/to/workspace> --spack=custom-spack --environment=e1
+    benchpark setup x/y </output/path/to/workspace> --spack=custom-spack --environment=/abspath/to/spack/env
 
-If e1 has an install of the benchmark you need, then ``ramble workspace setup`` will not
-need to install any packages.
+If the provided environment has an install of the benchmark you need, then ``ramble
+workspace setup`` will not need to install any packages.
 
 *************************************
  Built-in System/Experiment Variants
