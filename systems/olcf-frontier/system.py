@@ -181,12 +181,10 @@ class OlcfFrontier(System):
 
         mount_point = self.spec.variants["mount_point"][0]
         if mount_point not in self.mount_points + ["none"]:
-            raise KeyError(
-                f'"{mount_point}" is not a valid mount point.'
-            )
+            raise KeyError(f'"{mount_point}" is not a valid mount point.')
         if mount_point == "none":
             self.full_io_path = None
-        elif mount_point == '/lustre/orion':
+        elif mount_point == "/lustre/orion":
             self.full_io_path = f'{mount_point}/{self.spec.variants["bank"][0]}/scratch/{os.environ["USER"]}'
 
     def compute_packages_section(self):
