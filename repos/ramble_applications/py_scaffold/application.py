@@ -12,7 +12,10 @@ class PyScaffold(ExecutableApplication):
 
     name = "py-scaffold"
 
-    tags = ["python"]
+    tags = ["python",'ai','ai-training','unet','pytorch','low-precision',
+            'mpi','nccl','rccl','network-collectives',
+            'large-scale','weak-scaling','strong-scaling',
+            'llnl-nightly','llnl-monthly','llnl-pr','llnl-weekly']
 
     register_phase(
         "prepend_library_path", pipeline="setup", run_before=["make_experiments"]

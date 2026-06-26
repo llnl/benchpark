@@ -39,6 +39,7 @@ class Laghos(ExecutableApplication):
         "network-latency-bound",
         "network-collectives",
         "unstructured-grid",
+        'llnl-nightly','llnl-monthly','llnl-pr','llnl-weekly'
     ]
 
     common_args = (
