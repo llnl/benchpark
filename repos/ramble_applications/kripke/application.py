@@ -16,7 +16,8 @@ class Kripke(ExecutableApplication):
             'large-scale','multi-node','single-node','c++','raja',
             'simd','vectorization','register-pressure','high-fp','atomics','high-branching',
             'high-memory-bandwidth','large-memory-footprint','regular-memory-access',
-            'mpi','network-latency-bound','network-collectives']
+            'mpi','network-latency-bound','network-collectives','llnl-nightly','llnl-monthly',
+            'llnl-pr','llnl-weekly']
 
     executable('kripke', 'kripke.exe' +
                      ' --groups {ngroups}' +
