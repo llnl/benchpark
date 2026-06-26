@@ -107,11 +107,13 @@ class OsuMicroBenchmarks(
 
     def compute_applications_section(self):
 
-        num_nodes = {"n_nodes": 2, "n_ranks": 2}
-
         if self.spec.satisfies("exec_mode=test"):
-            for pk, pv in num_nodes.items():
-                self.add_experiment_variable(pk, pv, True)
+            num_nodes = {"n_nodes": 1, "n_ranks": 2}
+        else:
+            num_nodes = {"n_nodes": 2, "n_ranks": 2}
+
+        for pk, pv in num_nodes.items():
+            self.add_experiment_variable(pk, pv, True)
 
         if self.spec.satisfies("+rocm"):
             self.add_experiment_variable("additional_args", " -d rocm", False)

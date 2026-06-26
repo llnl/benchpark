@@ -77,9 +77,31 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s: %(message)s")
 
 
-class RAJAPerf:
+class Application:
     def __init__(self, tk):
         self.tk = tk
+
+    def set_metrics(self):
+        mets = []
+        if all(
+            x in self.tk.dataframe.columns
+            for x in ["Total SQ_INSTS_VALU_MFMA_MOPS_BF16 (exc)", "Max GPU time (E)"]
+        ):
+            self.tk.dataframe["TFLOPS (BF16)"] = (
+                # https://github.com/ROCm/rocm-systems/blob/8bb3b73c117e5630106540447268ccad771906a4/projects/rocprofiler-compute/src/rocprof_compute_soc/analysis_configs/gfx90a/0400_roofline.yaml#L51
+                self.tk.dataframe["Total SQ_INSTS_VALU_MFMA_MOPS_BF16 (exc)"]
+                * 512
+                / self.tk.dataframe["Max GPU time (E)"]
+                / 10**12
+            )
+            self.tk.exc_metrics.append("TFLOPS (BF16)")
+            mets.append("TFLOPS (BF16)")
+        return mets
+
+
+class RAJAPerf(Application):
+    def __init__(self, tk):
+        super().__init__(tk)
         # Matches application_name column in metadata
         self.name = "raja-perf"
 
@@ -91,6 +113,7 @@ class RAJAPerf:
             * self.tk.dataframe["Reps"]
             * self.tk.metadata["mpi.world.size"]
         )
+        self.tk.exc_metrics.append("Memory Bandwidth (GB/s)")
 
         self.tk.dataframe["FLOP Rate (GFLOPS)"] = (
             self.tk.dataframe["Flops/Rep"]
@@ -99,6 +122,7 @@ class RAJAPerf:
             * self.tk.dataframe["Reps"]
             * self.tk.metadata["mpi.world.size"]
         )
+        self.tk.exc_metrics.append("FLOP Rate (GFLOPS)")
 
         return ["Memory Bandwidth (GB/s)", "FLOP Rate (GFLOPS)"]
 
@@ -390,6 +414,13 @@ def prepare_data(**kwargs):
         tk = tk.query(query)
 
     metric = kwargs["yaxis_metric"]
+
+    added_mets = Application(tk).set_metrics()
+    if added_mets:
+        logger.info(
+            "Added the following generic derived metrics:\n\t%s\n\tUse them via the '--yaxis-metric' parameter.",
+            added_mets,
+        )
 
     known_applications = {"raja-perf": RAJAPerf}
     for ta in tk.metadata["application_name"].unique():
