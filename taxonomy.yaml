@@ -149,6 +149,7 @@ benchpark-tags:
     - time-dependent
     - transformer
     - transport
+    - unet
     - workflow
   programming-language:
     - c
