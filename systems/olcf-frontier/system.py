@@ -28,6 +28,7 @@ class OlcfFrontier(System):
         "frontier": {
             "cpu_arch": "zen3",
             "rocm_arch": "gfx90a",
+            # https://docs.olcf.ornl.gov/systems/frontier_user_guide.html
             "sys_cores_per_node": 56,
             "sys_cores_os_reserved_per_node": 8,
             "sys_cores_os_reserved_per_node_list": [0, 8, 16, 24, 32, 40, 48, 56],
@@ -95,6 +96,13 @@ class OlcfFrontier(System):
         default="cray-libsci",
         values=("cray-libsci",),
         description="Which blas to use",
+    )
+    variant(
+        "bank",
+        default="none",
+        values=("none",),
+        multi=False,
+        description="Submit a job to a specific named bank",
     )
     variant(
         "queue",
@@ -712,29 +720,6 @@ class OlcfFrontier(System):
         opts = super().system_specific_variables()
 
         extra_batch_opts = "--account=csc683"
-
-        if self.rocm_arch == "gfx942":
-            # MI300A modes
-            if self.spec.satisfies("gpumode=SPX"):
-                gpu_factor = 1
-            elif self.spec.satisfies("gpumode=TPX"):
-                gpu_factor = 3
-            elif self.spec.satisfies("gpumode=CPX"):
-                gpu_factor = 6
-            extra_batch_opts += f"--setattr=gpumode={self.spec.variants['gpumode'][0]}\n--conf=resource.rediscover=true"
-
-            # Rabbits
-            mt_point = self.spec.variants["mount_point"][0]
-            if mt_point != "none" and "rabbits" in mt_point:
-                extra_batch_opts += f"\n-S dw={mt_point.lstrip('rabbits_')}"
-
-            # opts.update(
-            #     {
-            #         "gpu_factor": gpu_factor,
-            #         "extra_batch_opts": extra_batch_opts,
-            #     }
-            # )
-            opts["gpu_factor"] = gpu_factor
 
         opts["extra_batch_opts"] = extra_batch_opts
         return opts
