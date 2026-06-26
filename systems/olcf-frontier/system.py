@@ -51,6 +51,14 @@ class OlcfFrontier(System):
     }
 
     variant(
+        "cluster",
+        default="frontier",
+        values=("frontier",),
+        multi=False,
+        description="Target OLCF system",
+    )
+
+    variant(
         "rocm",
         default="6.4.2",
         values=(
@@ -79,7 +87,7 @@ class OlcfFrontier(System):
     variant(
         "lapack",
         default="cray-libsci",
-        values=("cray-libsci"),
+        values=("cray-libsci",),
         description="Which lapack to use",
     )
     variant(
@@ -91,7 +99,7 @@ class OlcfFrontier(System):
     variant(
         "queue",
         default="batch",
-        values=("batch"),
+        values=("batch",),
         multi=False,
         description="Submit to queue other than the default queue (e.g. pdebug)",
     )
@@ -198,9 +206,7 @@ class OlcfFrontier(System):
                 "groff": {"externals": [{"spec": "groff@1.22.3", "prefix": "/usr"}]},
                 "cmake": {
                     "externals": [
-                        {"spec": "cmake@3.20.2", "prefix": "/usr"},
-                        {"spec": "cmake@3.23.1", "prefix": "/usr/tce"},
-                        {"spec": "cmake@3.24.2", "prefix": "/usr/tce"},
+                        {"spec": "cmake@3.28.3", "prefix": "/usr"},
                     ],
                     "buildable": False,
                 },
@@ -262,16 +268,9 @@ class OlcfFrontier(System):
                     "buildable": False,
                     "externals": [
                         {
-                            "spec": "python@3.9.12",
-                            "prefix": "/usr/tce/packages/python/python-3.9.12",
-                        },
-                        {
-                            "spec": "python@3.11.5",
-                            "prefix": "/usr/tce/packages/python/python-3.11.5",
-                        },
-                        {
-                            "spec": "python@3.12.2",
-                            "prefix": "/usr/tce/packages/python/python-3.12.2",
+                            "spec": "python@3.13.0",
+                            "prefix": "/sw/frontier/spack-envs/core-25.03/opt/gcc-13.2/python-3.13.0-z6cvwh43maa5kvglquodiadny7ohzirp",
+                            "modules": ["python/3.13.0"],
                         },
                     ],
                 },
@@ -714,7 +713,8 @@ class OlcfFrontier(System):
     def system_specific_variables(self):
         opts = super().system_specific_variables()
 
-        extra_batch_opts = ""
+        extra_batch_opts = "--account=csc683"
+
         if self.rocm_arch == "gfx942":
             # MI300A modes
             if self.spec.satisfies("gpumode=SPX"):
@@ -730,12 +730,15 @@ class OlcfFrontier(System):
             if mt_point != "none" and "rabbits" in mt_point:
                 extra_batch_opts += f"\n-S dw={mt_point.lstrip('rabbits_')}"
 
-            opts.update(
-                {
-                    "gpu_factor": gpu_factor,
-                    "extra_batch_opts": extra_batch_opts,
-                }
-            )
+            # opts.update(
+            #     {
+            #         "gpu_factor": gpu_factor,
+            #         "extra_batch_opts": extra_batch_opts,
+            #     }
+            # )
+            opts["gpu_factor"] = gpu_factor
+
+        opts["extra_batch_opts"] = extra_batch_opts
         return opts
 
     def compute_software_section(self):
