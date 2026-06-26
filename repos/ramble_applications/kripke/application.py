@@ -10,7 +10,7 @@ from ramble.appkit import *
 
 class Kripke(ExecutableApplication):
     """Kripke benchmark uses RAJA Portability Layer"""
-    name = "Kripke"
+    name = "kripke"
 
     tags = ['asc','transport','deterministic','structured-grid',
             'large-scale','multi-node','single-node','c++','raja',
