@@ -314,7 +314,10 @@ class OlcfFrontier(System):
                     "externals": [
                         {
                             "spec": "cray-libsci@25.09.0%cce",
-                            "prefix": "/opt/cray/pe/libsci/25.09.0/cray/20.0/x86_64/",
+                            "prefix": (
+                                f"/opt/cray/pe/libsci/25.09.0/"
+                                f"CRAYCLANG/{self.short_cce_version}/x86_64"
+                            ),
                         }
                     ]
                 }
@@ -671,7 +674,6 @@ class OlcfFrontier(System):
     def rocm_cce_compiler_cfg(self):
         rpaths = [
             f"/opt/rocm-{self.rocm_version}/lib",
-            "/opt/cray/pe/gcc-libs",
             f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib",
         ]
 
@@ -680,13 +682,12 @@ class OlcfFrontier(System):
         # and sometimes just for ROCm support
         rocmcc_entry = compiler_def(
             f"llvm-amdgpu@{self.rocm_version}",
-            f"/opt/rocm-{self.rocm_version}/",
+            f"/opt/rocm-{self.rocm_version}/llvm",
             {"c": "amdclang", "cxx": "amdclang++", "fortran": "amdflang"},
             modules=[f"rocm/{self.rocm_version}"],
             extra_rpaths=list(rpaths),
             env={
                 "set": {"RFE_811452_DISABLE": "1"},
-                "append_path": {"LD_LIBRARY_PATH": "/opt/cray/pe/gcc-libs"},
                 "prepend_path": {
                     "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib",
                     "LIBRARY_PATH": f"/opt/rocm-{self.rocm_version}/lib",
