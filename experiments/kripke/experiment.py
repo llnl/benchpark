@@ -36,9 +36,10 @@ class Kripke(
     )
 
     variant(
-        "single_memory",
+        "gpu-aware-mpi",
         default=False,
-        description="Enable single memory space model in rocm",
+        values=(True, False),
+        description="Enable GPU-aware MPI",
     )
 
     variant(
@@ -49,10 +50,10 @@ class Kripke(
     )
 
     variant(
-        "other",
-        default=False,
+        "chai",
+        default=True,
         values=(True, False),
-        description="Set other input/environment variables",
+        description="Enable CHAI",
     )
 
     maintainers("pearce8")
@@ -260,9 +261,6 @@ class Kripke(
         self.add_experiment_variable("layout", problem_spec["layout"], True)
         self.add_experiment_variable("pool", problem_spec["pool"], True)
 
-        if self.spec.satisfies("+other"):
-            self.set_environment_variable("HSA_XNACK", 1)
-
         # Set the variables required by the experiment
         self.set_required_variables(
             n_resources="{npx}*{npy}*{npz}",
@@ -312,12 +310,16 @@ class Kripke(
             self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
     def compute_package_section(self):
-        # get package version
-        single_memory = (
-            "+single_memory"
-            if self.spec.variants["single_memory"][0]
-            else "~single_memory"
+        gam = (
+            "+gpu-aware-mpi"
+            if self.spec.variants["gpu-aware-mpi"][0]
+            else "~gpu-aware-mpi"
+        )
+        chai = (
+            "+chai"
+            if self.spec.variants["chai"][0]
+            else "~chai"
         )
         self.add_package_spec(
-            self.name, [f"kripke{self.determine_version()} {single_memory} +mpi"]
+            self.name, [f"kripke{self.determine_version()} {gam} {chai} +mpi"]
         )

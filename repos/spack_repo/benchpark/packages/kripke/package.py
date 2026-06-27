@@ -15,7 +15,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     """
 
     homepage = "https://computing.llnl.gov/projects/co-design/kripke"
-    git = "https://github.com/LLNL/Kripke.git"
+    git = "https://github.com/rfhaque/Kripke.git"
 
     tags = ["proxy-app"]
 
@@ -23,7 +23,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
 
     license("BSD-3-Clause")
 
-    version("develop", branch="develop", submodules=False)
+    version("develop", branch="kripke_chai_umpire", submodules=False)
     version("2025.12.0", submodules=False, commit="01f6f85c02ceffcd2bc06e42cee997867dd142c5")
     version("2025.07.0", submodules=False, commit="8cf38433a6a11e0dcd17864e649b2d045159ee9c")
     version(
@@ -55,62 +55,86 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     )
 
     variant("mpi", default=True, description="Build with MPI.")
+    variant("chai", default=True, description="Build with CHAI/Umpire.")
     variant("openmp", default=False, description="Build with OpenMP enabled.")
     variant("caliper", default=False, description="Build with Caliper support enabled.")
-    variant("single_memory", default=False, description="Enable single memory space model in rocm")
-
-    conflicts("+single_memory", when="~rocm")
-    depends_on("chai+single_memory", when="+single_memory")
+    variant("gpu-aware-mpi", default=False, description="Enable GPU-aware MPI")
 
     depends_on("c", type="build")
     depends_on("cxx", type="build")
     depends_on("fortran", type="build")
 
     depends_on("camp@main", when="@develop")
-    depends_on("chai@develop+raja cxxstd=20", when="@develop")
     depends_on("raja@develop cxxstd=20", when="@develop")
-    depends_on("umpire@develop", when="@develop")
-
-    depends_on("chai@2025.12.0+raja", when="@2025.12.0")
-    depends_on("fmt@9.1", when=f"^chai@2024.07.0")
-    depends_on("chai@2024.07.0+raja", when="@:2025.07.0")
-    depends_on("chai@2024.07.0+raja", when="@1.2.7.0:2025.07.0")
-    depends_on("fmt@9.1", when=f"^chai@2024.07.0")
 
     depends_on("mpi", when="+mpi")
-    depends_on("chai+mpi", when="+mpi")
+
+    with when("+chai"):
+      depends_on("chai+mpi", when="+mpi")
+      depends_on("chai@develop+raja cxxstd=20", when="@develop")
+      depends_on("chai@2025.12.0+raja", when="@2025.12.0")
+      depends_on("chai@2024.07.0+raja", when="@1.2.7.0:2025.07.0")
+      depends_on("fmt@9.1", when=f"^chai@2024.07.0")
+
+      depends_on("chai+openmp", when="+openmp")
+      depends_on("chai~openmp", when="~openmp")
+
+      depends_on("chai+cuda", when="+cuda")
+      depends_on("chai~cuda", when="~cuda")
+      for sm_ in CudaPackage.cuda_arch_values:
+          depends_on("chai cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
+
+      depends_on("chai+rocm", when="+rocm")
+      depends_on("chai~rocm", when="~rocm")
+      for arch in ROCmPackage.amdgpu_targets:
+          depends_on("chai amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
+
+      depends_on("umpire@develop", when="@develop")
+      depends_on("umpire+openmp", when="+openmp")
+      depends_on("umpire~openmp", when="~openmp")
+
+      depends_on("umpire+cuda", when="+cuda")
+      depends_on("umpire~cuda", when="~cuda")
+      for sm_ in CudaPackage.cuda_arch_values:
+          depends_on("umpire cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
+
+      depends_on("umpire+rocm", when="+rocm")
+      depends_on("umpire~rocm", when="~rocm")
+      for arch in ROCmPackage.amdgpu_targets:
+          depends_on("umpire amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
+
+      conflicts("^blt@0.7:", when="^chai@:2024.07.0")
+
     depends_on("caliper", when="+caliper")
     depends_on("adiak@0.4:", when="+caliper")
     conflicts("^blt@:0.3.6", when="+rocm")
-    conflicts("^blt@0.7:", when="^chai@:2024.07.0")
 
     depends_on("blt@0.6.2:", type="build", when=f"@1.2.7:")
 
-    depends_on("chai+openmp", when="+openmp")
-    depends_on("chai~openmp", when="~openmp")
+    with when("+cuda~chai"):
+        depends_on("umpire@develop", when="@develop")
+        depends_on("umpire+cuda")
+        for sm_ in CudaPackage.cuda_arch_values:
+            depends_on("umpire cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
 
-    depends_on("chai+cuda", when="+cuda")
-    depends_on("chai~cuda", when="~cuda")
+    with when("+rocm~chai"):
+        depends_on("umpire@develop", when="@develop")
+        depends_on("umpire+rocm")
+        for arch in ROCmPackage.amdgpu_targets:
+            depends_on("umpire amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
+
+    depends_on("raja+openmp", when="+openmp")
+    depends_on("raja~openmp", when="~openmp")
+
+    depends_on("raja+cuda", when="+cuda")
+    depends_on("raja~cuda", when="~cuda")
     for sm_ in CudaPackage.cuda_arch_values:
-        depends_on("chai cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
+        depends_on("raja cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
 
-    depends_on("chai+rocm", when="+rocm")
-    depends_on("chai~rocm", when="~rocm")
+    depends_on("raja+rocm", when="+rocm")
+    depends_on("raja~rocm", when="~rocm")
     for arch in ROCmPackage.amdgpu_targets:
-        depends_on("chai amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
-
-    depends_on("umpire+openmp", when="+openmp")
-    depends_on("umpire~openmp", when="~openmp")
-    
-    depends_on("umpire+cuda", when="+cuda")
-    depends_on("umpire~cuda", when="~cuda")
-    for sm_ in CudaPackage.cuda_arch_values:
-        depends_on("umpire cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
-
-    depends_on("umpire+rocm", when="+rocm")
-    depends_on("umpire~rocm", when="~rocm")
-    for arch in ROCmPackage.amdgpu_targets:
-        depends_on("umpire amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
+        depends_on("raja amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
 
     def setup_build_environment(self, env):
         spec = self.spec
@@ -129,52 +153,47 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
         args = []
         blt_cxx_std = "20" if spec.satisfies("@develop") else "17"
 
-        if "+rocm" in spec or "+cuda" in spec:
-            enable_chai = "ON"
-            enable_chai_single_memory = "ON" if "+single_memory" in spec else "OFF"
-        else:
-            enable_chai = "OFF"
-            enable_chai_single_memory = "OFF"
-
         args.extend(
             [
-                "-DCAMP_DIR=%s" % self.spec["camp"].prefix,
+                "-Dcamp_DIR=%s" % self.spec["camp"].prefix,
                 "-DBLT_SOURCE_DIR=%s" % self.spec["blt"].prefix,
-                "-Dumpire_DIR=%s" % self.spec["umpire"].prefix,
                 "-DRAJA_DIR=%s" % self.spec["raja"].prefix,
-                "-Dchai_DIR=%s" % self.spec["chai"].prefix,
-                "-DENABLE_CHAI=%s" % enable_chai,
-                "-DENABLE_CHAI_SINGLE_MEMORY=%s" % enable_chai_single_memory,
                 "-DBLT_CXX_STD=%s" % f"c++{blt_cxx_std}",
                 "-DMPI_CXX_LINK_FLAGS='%s'" % self.spec['mpi'].libs.ld_flags,
             ]
         )
 
-        if "+openmp" in spec:
-            args.append("-DENABLE_OPENMP=ON")
+        args.append(self.define_from_variant("ENABLE_CHAI", "chai"))
+        if "+chai" in spec:
+            args.extend(
+                [
+                    "-Dchai_DIR=%s" % self.spec["chai"].prefix,
+                    "-Dumpire_DIR=%s" % self.spec["umpire"].prefix,
+                ]
+            )
 
-        if "+caliper" in spec:
-            args.append("-DENABLE_CALIPER=ON")
+        args.append(self.define_from_variant("ENABLE_GPU_AWARE_MPI", "gpu-aware-mpi"))
+        args.append(self.define_from_variant("ENABLE_OPENMP", "openmp"))
+        args.append(self.define_from_variant("ENABLE_CALIPER", "caliper"))
 
+        args.append(self.define_from_variant("ENABLE_MPI", "mpi"))
         if "+mpi" in spec:
-            args.append("-DENABLE_MPI=ON")
             args.append(self.define("CMAKE_CXX_COMPILER", self.spec["mpi"].mpicxx))
 
+        args.append(self.define_from_variant("ENABLE_HIP", "rocm"))
         if "+rocm" in spec:
             # Set up the hip macros needed by the build
-            args.append("-DENABLE_HIP=ON")
+            args.append("-Dumpire_DIR=%s" % self.spec["umpire"].prefix)
             args.append("-DHIP_ROOT_DIR={0}".format(spec["hip"].prefix))
             rocm_archs = spec.variants["amdgpu_target"].value
             if "none" not in rocm_archs:
                 arch_str = ",".join(rocm_archs)
                 args.append("-DHIP_HIPCC_FLAGS=--amdgpu-target={0}".format(arch_str))
                 args.append("-DCMAKE_HIP_ARCHITECTURES={0}".format(arch_str))
-        else:
-            # Ensure build with hip is disabled
-            args.append("-DENABLE_HIP=OFF")
 
+        args.append(self.define_from_variant("ENABLE_CUDA", "cuda"))
         if "+cuda" in spec:
-            args.append("-DENABLE_CUDA=ON")
+            args.append("-Dumpire_DIR=%s" % self.spec["umpire"].prefix)
             args.append(self.define("CMAKE_CUDA_HOST_COMPILER", self.spec["mpi"].mpicxx))
             if not spec.satisfies("cuda_arch=none"):
                 cuda_arch = spec.variants["cuda_arch"].value
@@ -184,8 +203,6 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
                 "-DCMAKE_CUDA_FLAGS=--extended-lambda -I=%s"
                 % (self.spec["mpi"].prefix.include)
             )
-        else:
-            args.append("-DENABLE_CUDA=OFF")
 
         return args
 
