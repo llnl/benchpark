@@ -18,11 +18,13 @@ class SpartaSnl(CMakePackage, CudaPackage, ROCmPackage):
 
     version("master", branch="master")
     version("20Jan2025", tag="20Jan2025")
+    version("20260102", commit="478143bcc766083a100480a0a6e8a0c42c85e7e4")
 
     variant("mpi", default=True, description="Build with mpi")
     variant("openmp", default=False, description="Enable OpenMP support")
     variant("jpeg", default=False, description="Build with jpeg support")
     variant("png", default=False, description="Build with png support")
+    variant("apu", default=False, description="Enable APU support", when="@4.5: +rocm")
 
     variant(
         "kokkos",
@@ -52,12 +54,12 @@ class SpartaSnl(CMakePackage, CudaPackage, ROCmPackage):
 
     depends_on("mpi", when="+mpi")
 
+    depends_on("kokkos@5.0.0:", when="@20260102: +kokkos")
     depends_on("kokkos", when="+kokkos")
-    depends_on("kokkos+openmp cxxstd=17", when="+openmp")
+    depends_on("kokkos+openmp", when="+openmp")
     depends_on("kokkos+rocm", when="+rocm")
-    depends_on("kokkos+wrapper+cuda cxxstd=17", when="+cuda")
-    # Kokkos 5 not building
-    depends_on("kokkos@:4", when="+kokkos")
+    depends_on("kokkos+wrapper", when="+cuda")
+    depends_on("kokkos+apu", when="+apu")
 
     depends_on("jpeg", when="+jpeg")
     depends_on("libpng", when="+png")
@@ -85,6 +87,10 @@ class SpartaSnl(CMakePackage, CudaPackage, ROCmPackage):
         if self.spec.satisfies("+kokkos+rocm fft_kokkos=hipfft"):
             env.prepend_path("LD_LIBRARY_PATH", self.spec["hipfft"].prefix.lib)
 
+        if self.compiler.extra_rpaths:
+            for rpath in self.compiler.extra_rpaths:
+                env.prepend_path("LD_LIBRARY_PATH", rpath)
+
     def setup_build_environment(self, env):
         if self.spec.satisfies("+kokkos+rocm fft_kokkos=hipfft"):
             env.prepend_path("LD_LIBRARY_PATH", self.spec["hipfft"].prefix.lib)
@@ -107,6 +113,11 @@ class SpartaSnl(CMakePackage, CudaPackage, ROCmPackage):
             build_system_flags.extend(flags)
         else:
             wrapper_flags.extend(flags)
+
+        if self.spec.satisfies("+apu"):
+            if name == "cxxflags":
+                build_system_flags.append("-fdenormal-fp-math=ieee")
+                build_system_flags.append("-fgpu-flush-denormals-to-zero")
 
         return (wrapper_flags, [], build_system_flags)
 
@@ -145,6 +156,16 @@ class SpartaSnl(CMakePackage, CudaPackage, ROCmPackage):
             args.append(f"-DFFT_KOKKOS={spec.variants['fft_kokkos'].value.upper()}")
         else:
             args.append(self.define("PKG_KOKKOS", False))
+
+        if spec.satisfies("+apu"):
+            existing_ldflags = self.spec.compiler_flags.get("ldflags", [])
+            existing = " ".join(existing_ldflags)
+            extra = " -lxpmem -lhugetlbfs"
+            if existing:
+                combined = f"{existing} {extra}"
+            else:
+                combined = extra
+            args.append(f"-DCMAKE_EXE_LINKER_FLAGS={combined}")
 
         return args
 
