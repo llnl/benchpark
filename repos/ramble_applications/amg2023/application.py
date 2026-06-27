@@ -17,7 +17,7 @@ class Amg2023(ExecutableApplication):
             'high-branching','high-memory-bandwidth','large-memory-footprint',
             'regular-memory-access','irregular-memory-access','mixed-precision',
             'mpi','network-latency-bound','network-collectives','block-structured-grid',
-            'c']
+            'c','llnl-nightly','llnl-monthly','llnl-pr','llnl-weekly']
 
     executable('p1', 'amg' +
                      ' -P {px} {py} {pz}' +
