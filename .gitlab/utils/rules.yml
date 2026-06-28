@@ -1,19 +1,106 @@
-.on_host_template:
+.run_test_rules:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
         != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
       when: never
-    - if: $CI_JOB_NAME =~ /release_resources|cleanup_pipeline_dir/ && $CI_PIPELINE_SOURCE
-        != "schedule"
-      when: always
-    - when: on_success
     - changes:
         - .gitlab-ci.yml
         - .gitlab/**/*
         - bin/**/*
-        - experiments/$BENCHMARK/**/*
+        - '**/$BENCHMARK/**/*'
         - systems/$ARCHCONFIG/**/*
-        - repos/$BENCHMARK/**/*
+        - modifiers/**/*
+        - var/**/*
+        - lib/**/*
+      when: on_success
+.resource_rules_dane:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
+        != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
+      when: never
+    - changes:
+        - .gitlab-ci.yml
+        - .gitlab/**/*
+        - bin/**/*
+        - '**/amg2023/**/*'
+        - '**/branson/**/*'
+        - '**/hpcg/**/*'
+        - '**/hpl/**/*'
+        - '**/ior/**/*'
+        - '**/kripke/**/*'
+        - '**/laghos/**/*'
+        - '**/lammps/**/*'
+        - '**/osu[-_]micro[-_]benchmarks/**/*'
+        - '**/phloem/**/*'
+        - '**/raja[-_]perf/**/*'
+        - '**/remhos/**/*'
+        - '**/sparta[-_]snl/**/*'
+        - systems/llnl-cluster/**/*
+        - modifiers/**/*
+        - var/**/*
+        - lib/**/*
+.resource_rules_matrix:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
+        != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
+      when: never
+    - changes:
+        - .gitlab-ci.yml
+        - .gitlab/**/*
+        - bin/**/*
+        - '**/amg2023/**/*'
+        - '**/babelstream/**/*'
+        - '**/kripke/**/*'
+        - '**/laghos/**/*'
+        - '**/lammps/**/*'
+        - '**/py[-_]scaffold/**/*'
+        - '**/raja[-_]perf/**/*'
+        - '**/remhos/**/*'
+        - '**/saxpy/**/*'
+        - '**/sparta[-_]snl/**/*'
+        - systems/llnl-matrix/**/*
+        - modifiers/**/*
+        - var/**/*
+        - lib/**/*
+.resource_rules_tioga:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
+        != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
+      when: never
+    - changes:
+        - .gitlab-ci.yml
+        - .gitlab/**/*
+        - bin/**/*
+        - '**/amg2023/**/*'
+        - '**/kripke/**/*'
+        - '**/laghos/**/*'
+        - '**/py[-_]scaffold/**/*'
+        - '**/raja[-_]perf/**/*'
+        - '**/remhos/**/*'
+        - systems/llnl-elcapitan/**/*
+        - modifiers/**/*
+        - var/**/*
+        - lib/**/*
+.resource_rules_tuolumne:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
+        != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
+      when: never
+    - changes:
+        - .gitlab-ci.yml
+        - .gitlab/**/*
+        - bin/**/*
+        - '**/amg2023/**/*'
+        - '**/branson/**/*'
+        - '**/kripke/**/*'
+        - '**/laghos/**/*'
+        - '**/lammps/**/*'
+        - '**/py[-_]scaffold/**/*'
+        - '**/raja[-_]perf/**/*'
+        - '**/remhos/**/*'
+        - '**/sparta[-_]snl/**/*'
+        - '**/stream/**/*'
+        - systems/llnl-elcapitan/**/*
         - modifiers/**/*
         - var/**/*
         - lib/**/*

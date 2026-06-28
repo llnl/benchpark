@@ -9,8 +9,8 @@ workflow:
 # Resource Allocation Section
 #############################
 .allocate_resources_flux:
-  extends: .on_host_template
   stage: allocate-resources
+  when: on_success
   script:
     - set -x
     - flux --parent alloc ${SHARED_ALLOC} --job-name=${ALLOC_NAME}${GPUMODE} --bg
@@ -21,6 +21,7 @@ workflow:
       fi
 allocate_resources_tuolumne:
   extends: .allocate_resources_flux
+  rules: !reference [.resource_rules_tuolumne, rules]
   parallel:
     matrix:
       - HOST: tuolumne
@@ -30,6 +31,7 @@ allocate_resources_tuolumne:
   needs: [tuolumne-up-check]
 allocate_resources_tioga:
   extends: .allocate_resources_flux
+  rules: !reference [.resource_rules_tioga, rules]
   variables:
     HOST: tioga
     SHARED_ALLOC: $TIOGA_SHARED_ALLOC
@@ -39,13 +41,17 @@ allocate_resources_tioga:
 # Resource Release Section
 ##########################
 .release_resources_flux:
-  extends: .on_host_template
   stage: release-resources
+  when: always
   # Do not cleanup dir yet
   script: [. .gitlab/utils/cancel-flux.sh --no-clean]
 release_resources_flux_tuolumne:
   extends: .release_resources_flux
-  needs: [allocate_resources_tuolumne, run_tests_flux_tuolumne]
+  rules: !reference [.resource_rules_tuolumne, rules]
+  needs:
+    - job: allocate_resources_tuolumne
+    - job: run_tests_flux_tuolumne
+      optional: true
   parallel:
     matrix:
       - HOST: tuolumne
@@ -53,7 +59,11 @@ release_resources_flux_tuolumne:
   tags: [shell, tuolumne]
 release_resources_flux_tioga:
   extends: .release_resources_flux
-  needs: [allocate_resources_tioga, run_tests_flux_tioga]
+  rules: !reference [.resource_rules_tioga, rules]
+  needs:
+    - job: allocate_resources_tioga
+    - job: run_tests_flux_tioga
+      optional: true
   variables:
     HOST: tioga
   tags: [shell, tioga]
@@ -62,7 +72,7 @@ release_resources_flux_tioga:
 ##################
 .run_tests_flux:
   stage: test
-  extends: .on_host_template
+  extends: .run_test_rules
   variables:
     BASELINE_REF: develop
     BASELINE_EXCLUDED_PIPELINE_NAME: Nightly
