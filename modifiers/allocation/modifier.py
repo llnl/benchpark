@@ -325,6 +325,7 @@ class Allocation(BasicModifier):
                 srun_opts.append(f"-n {v.n_ranks_per_node}")
             else:
                 srun_opts.append(f"-n {v.n_ranks}")
+
             sbatch_opts.append(f"-n {v.n_ranks}")
         if v.n_gpus:
             if self._usage_mode == "torchrun-hpc":
@@ -334,6 +335,7 @@ class Allocation(BasicModifier):
             sbatch_opts.append(f"--gpus {v.n_gpus}")
         if v.n_nodes:
             srun_opts.append(f"-N {v.n_nodes}")
+            sbatch_opts.append(f"-N {v.n_nodes}")
 
         if v.queue:
             sbatch_opts.append(f"-p {v.queue}")

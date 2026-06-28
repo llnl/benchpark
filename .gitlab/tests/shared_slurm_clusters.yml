@@ -10,8 +10,8 @@ workflow:
 # Resource Allocation Section
 #############################
 .allocate_resources_slurm:
-  extends: .on_host_template
   stage: allocate-resources
+  when: on_success
   script:
     - set -e
     # submit and grab JobID
@@ -32,6 +32,7 @@ workflow:
       fi
 allocate_resources_dane:
   extends: .allocate_resources_slurm
+  rules: !reference [.resource_rules_dane, rules]
   variables:
     HOST: dane
     SHARED_ALLOC: $DANE_SHARED_ALLOC
@@ -39,6 +40,7 @@ allocate_resources_dane:
   needs: [dane-up-check]
 allocate_resources_matrix:
   extends: .allocate_resources_slurm
+  rules: !reference [.resource_rules_matrix, rules]
   variables:
     HOST: matrix
     SHARED_ALLOC: $MATRIX_SHARED_ALLOC
@@ -48,23 +50,31 @@ allocate_resources_matrix:
 # Resource Release Section
 ##########################
 .release_resources_slurm:
-  extends: .on_host_template
   stage: release-resources
+  when: always
   # Do not cleanup dir yet
   script: [. .gitlab/utils/cancel-slurm.sh --no-clean]
 release_resources_dane:
   extends: .release_resources_slurm
+  rules: !reference [.resource_rules_dane, rules]
   tags: [shell, dane]
-  needs: [allocate_resources_dane, run_tests_slurm_dane]
+  needs:
+    - job: allocate_resources_dane
+    - job: run_tests_slurm_dane
+      optional: true
 release_resources_matrix:
   extends: .release_resources_slurm
+  rules: !reference [.resource_rules_matrix, rules]
   tags: [shell, matrix]
-  needs: [allocate_resources_matrix, run_tests_slurm_matrix]
+  needs:
+    - job: allocate_resources_matrix
+    - job: run_tests_slurm_matrix
+      optional: true
 ##################
 # Test Run Section
 ##################
 .run_tests_slurm:
-  extends: .on_host_template
+  extends: .run_test_rules
   stage: test
   variables:
     BASELINE_REF: develop
@@ -90,7 +100,7 @@ release_resources_matrix:
     - !reference [.report_status, after_script]
     - |
       pr_workspace="$CI_PROJECT_DIR/wkp/${HOST}/${BENCHMARK}/workspace"
-      pr_json=$(find "${pr_workspace}/experiments/${BENCHMARK}" -type f -name 'githash_metadata.json' | sort | head -n 1)
+      pr_json=$(find "${pr_workspace}/experiments" -type f -name 'githash_metadata.json' | sort | head -n 1)
       artifact_dir="$CI_PROJECT_DIR/artifact-githash/${HOST}/${BENCHMARK}"
       baseline_json="${artifact_dir}/baseline_githash_metadata.json"
       baseline_status_file="${artifact_dir}/baseline_job.status"
