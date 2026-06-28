@@ -6,6 +6,7 @@
 import os
 import pathlib
 import shlex
+import shutil
 import subprocess
 import sys
 from contextlib import contextmanager
@@ -27,6 +28,21 @@ def working_dir(location):
 
 
 def git_clone_commit(url, commit, destination):
+    try:
+        os.makedirs(destination, exist_ok=True)
+        with working_dir(destination):
+            # Newer git (>=2.49) supports `git clone --depth 1 --revision <sha>`,
+            # but uses the fetch here to cover older git versions.
+            run_command("git init")
+            run_command(f"git remote add origin {url}")
+            run_command(f"git fetch --depth 1 origin {commit}")
+            run_command("git checkout FETCH_HEAD")
+        return
+    except Exception as e:
+        if os.path.exists(destination):
+            shutil.rmtree(destination)
+        debug_print(f"Shallow fetch failed: {e}. Falling back to full clone.")
+
     run_command(f"git clone -c feature.manyFiles=true {url} {destination}")
 
     with working_dir(destination):
@@ -109,9 +125,19 @@ class RuntimeResources:
 
     def _check_and_update_bootstrap(self, desired_commit, location):
         with working_dir(location):
-            # length of hash is 7 in checkout-versions.yaml
-            current_commit = run_command("git rev-parse HEAD")[0].strip()[:7]
+            current_commit = run_command("git rev-parse HEAD")[0].strip()
             if current_commit != desired_commit:
+                try:
+                    run_command(f"git fetch --depth 1 origin {desired_commit}")
+                    run_command("git checkout FETCH_HEAD")
+                    print(
+                        f"Updating '{location}' from {current_commit} to {desired_commit}"
+                    )
+                    return
+                except Exception as e:
+                    debug_print(
+                        f"Shallow fetch failed during update: {e}. Falling back to fetch all."
+                    )
                 run_command("git fetch --all")
                 run_command(f"git checkout {desired_commit}")
                 print(
