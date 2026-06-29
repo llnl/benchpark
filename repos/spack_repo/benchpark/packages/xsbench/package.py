@@ -5,11 +5,12 @@
 
 from spack_repo.builtin.build_systems.cuda import CudaPackage
 from spack_repo.builtin.build_systems.makefile import MakefilePackage
+from spack_repo.builtin.build_systems.rocm import ROCmPackage
 
 from spack.package import *
 
 
-class Xsbench(MakefilePackage, CudaPackage):
+class Xsbench(MakefilePackage, CudaPackage, ROCmPackage):
     """XSBench is a mini-app representing a key computational
     kernel of the Monte Carlo neutronics application OpenMC.
     A full explanation of the theory and purpose of XSBench
@@ -29,14 +30,17 @@ class Xsbench(MakefilePackage, CudaPackage):
     variant("mpi", default=True, description="Build with MPI support")
     variant("openmp", default=True, description="Build with OpenMP support")
     variant("cuda", default=False, when="@19:", description="Build with CUDA support")
+    variant("rocm", default=False, when="@20:", description="Build worth ROCm/HIP support")
 
     depends_on("c", type="build")  # generated
     depends_on("cxx", type="build")  # generated
 
     depends_on("mpi", when="+mpi")
 
+    conflicts("+cuda", when="+rocm", msg="CUDA and ROCm are mutually exclusive")
     conflicts("cuda_arch=none", when="+cuda", msg="Must select a CUDA architecture")
     conflicts("+cuda", when="+openmp", msg="OpenMP must be disabled to support CUDA")
+    conflicts("+rocm", when="+openmp", msg="OpenMP must be disabled to support ROCm")
 
     @property
     def build_directory(self):
@@ -48,6 +52,9 @@ class Xsbench(MakefilePackage, CudaPackage):
 
         if "+cuda" in self.spec:
             return "cuda"
+        
+        if "+rocm" in self.spec:
+            return "hip"
 
     @property
     def build_targets(self):
@@ -56,6 +63,11 @@ class Xsbench(MakefilePackage, CudaPackage):
 
         if "+cuda" in self.spec:
             return ["SM_VERSION={0}".format(self.spec.variants["cuda_arch"].value[0])]
+
+        if "+rocm" in self.spec:
+            amdgpu_targets = self.spec.variants["amdgpu_target"].value
+            hip_flags = self.hip_flags(amdgpu_targets)
+            return ["CFLAGS={0} -std=c++14 -O3".format(hip_flags)]
 
         if not self.spec.satisfies("%nvhpc@:20.11"):
             cflags = "-std=gnu99"
