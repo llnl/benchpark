@@ -159,6 +159,7 @@ include:
         SYSTEM_ARGS: [mount_point=rabbits_lustre_small]
 nightly_test_run:
   extends: .nightly_rules
+  interruptible: false
   resource_group: $HOST
   stage: test
   tags: [$HOST, batch]
