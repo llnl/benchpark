@@ -233,6 +233,7 @@ run_tests_flux_tioga:
   extends: .run_tests_flux
   tags: [shell, tioga]
   needs: [allocate_resources_tioga]
+  interruptible: false
   parallel:
     matrix:
       - HOST: tioga
