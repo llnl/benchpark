@@ -93,7 +93,8 @@ generate_test_summary:
   tags: [shell, oslic]
   stage: summarize
   script:
-    - python3 .gitlab/utils/generate_test_summary_csv.py --output test-summary.csv
+    - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
+    - python .gitlab/utils/generate_test_summary_csv.py --output test-summary.csv
   artifacts:
     when: always
     paths:

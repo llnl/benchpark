@@ -6,6 +6,7 @@ import json
 import os
 import re
 import sys
+import subprocess
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -15,39 +16,19 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 EXPERIMENTS_DIR = REPO_ROOT / "experiments"
 
-# Fixed baseline columns requested for the nightly-style summary layout.
-COLUMN_SPECS = [
-    ("dane", "oneapi", "mvapich2"),
-    ("dane", "gcc", "mvapich2"),
-    ("dane", "intel", "mvapich2"),
-    ("dane", "llvm", "mvapich2"),
-    ("dane", "oneapi", "openmpi"),
-    ("dane", "gcc", "openmpi"),
-    ("dane", "intel", "openmpi"),
-    ("dane", "llvm", "openmpi"),
-    ("matrix", "oneapi", "mvapich2"),
-    ("matrix", "gcc", "mvapich2"),
-    ("matrix", "intel", "mvapich2"),
-    ("matrix", "oneapi", "openmpi"),
-    ("matrix", "gcc", "openmpi"),
-    ("matrix", "intel", "openmpi"),
-    ("tuolumne", "cce", "cray-mpich"),
-    ("tuolumne", "gcc", "cray-mpich"),
-    ("tuolumne", "rocmcc", "cray-mpich"),
-    ("tioga", "cce", "cray-mpich"),
-    ("tioga", "gcc", "cray-mpich"),
-    ("tioga", "rocmcc", "cray-mpich"),
-]
-
+# Fixed system columns. Compatibility is intentionally limited to programming models.
 COLUMN_LABELS = {
-    spec: f"{spec[0]} ({spec[1]} | {spec[2]})" for spec in COLUMN_SPECS
+    "dane": "dane (mpi/openmp)",
+    "matrix": "matrix (cuda)",
+    "tioga": "tioga (rocm)",
+    "tuolumne": "tuolumne (rocm)",
 }
 
-DEFAULT_CONFIGS = {
-    "dane": ("oneapi", "mvapich2"),
-    "matrix": ("gcc", "mvapich2"),
-    "tuolumne": ("cce", "cray-mpich"),
-    "tioga": ("cce", "cray-mpich"),
+SYSTEM_MODELS = {
+    "dane": {"mpi", "openmp"},
+    "matrix": {"mpi", "openmp", "cuda"},
+    "tioga": {"mpi", "openmp", "rocm"},
+    "tuolumne": {"mpi", "openmp", "rocm"},
 }
 
 
@@ -145,6 +126,39 @@ def benchmark_names():
     )
 
 
+def load_experiment_models():
+    command = [str(REPO_ROOT / "bin" / "benchpark"), "list", "experiments", "--no-title"]
+    try:
+        result = subprocess.run(
+            command,
+            cwd=REPO_ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except subprocess.CalledProcessError as exc:
+        raise RuntimeError(
+            "Unable to query experiment metadata with benchpark list experiments."
+        ) from exc
+
+    models_by_benchmark = {}
+    for line in result.stdout.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+
+        match = re.match(r"^([A-Za-z0-9_.-]+)(?:\+\[([^\]]+)\])?", line)
+        if not match:
+            continue
+
+        benchmark, model_group = match.groups()
+        models_by_benchmark[benchmark] = (
+            set(model_group.split("|")) if model_group else set()
+        )
+
+    return models_by_benchmark
+
+
 def extract_matrix_payload(job_name):
     match = re.search(r"\[(.*)\]", job_name)
     return match.group(1) if match else None
@@ -162,25 +176,48 @@ def find_benchmark(payload, benchmarks):
     return None
 
 
+def split_payload(payload):
+    return [token.strip() for token in re.split(r",\s+", payload) if token.strip()]
+
+
+def row_model(tokens):
+    token_text = " ".join(tokens)
+    for model in ("cuda", "rocm", "openmp"):
+        if re.search(rf"(^|[\s+])\+{model}($|[\s~+])", token_text):
+            return model
+    return "mpi"
+
+
+def row_spec(tokens, benchmark):
+    ignored_tokens = set(COLUMN_LABELS) | {
+        "llnl-cluster",
+        "llnl-matrix",
+        "llnl-elcapitan",
+    }
+    extras = []
+    for token in tokens:
+        if token == benchmark or token in ignored_tokens or token.startswith("$"):
+            continue
+        extras.append(token)
+    return " ".join([benchmark] + extras)
+
+
 def parse_job(job, benchmarks):
     payload = extract_matrix_payload(job["name"])
     if not payload:
         return None
 
+    tokens = split_payload(payload)
     host = find_value(payload, r"(?:^|,\s)(dane|matrix|tuolumne|tioga)(?:,|$)")
     benchmark = find_benchmark(payload, benchmarks)
     if not host or not benchmark:
         return None
 
-    compiler = find_value(payload, r"(?:^|,\s)compiler=([A-Za-z0-9_-]+)(?:,|$)")
-    mpi = find_value(payload, r"(?:^|,\s)mpi=([A-Za-z0-9_-]+)(?:,|$)")
-
-    default_compiler, default_mpi = DEFAULT_CONFIGS[host]
     return {
         "host": host,
         "benchmark": benchmark,
-        "compiler": compiler or default_compiler,
-        "mpi": mpi or default_mpi,
+        "model": row_model(tokens),
+        "row_spec": row_spec(tokens, benchmark),
         "status": job["status"],
         "name": job["name"],
     }
@@ -195,9 +232,9 @@ def cell_status(existing, job_status):
 
 def build_summary_rows(jobs, stage):
     benchmarks = benchmark_names()
+    experiment_models = load_experiment_models()
     rows = {}
     unparsed_jobs = []
-    unmapped_jobs = []
 
     for job in jobs:
         if job.get("stage") != stage:
@@ -210,47 +247,46 @@ def build_summary_rows(jobs, stage):
             unparsed_jobs.append(job["name"])
             continue
 
-        if parsed["benchmark"] not in rows:
-            rows[parsed["benchmark"]] = {
-                label: "N/A" for label in COLUMN_LABELS.values()
-            }
+        if parsed["row_spec"] not in rows:
+            supported_models = experiment_models.get(parsed["benchmark"], set())
+            rows[parsed["row_spec"]] = {}
+            for host, label in COLUMN_LABELS.items():
+                if (
+                    parsed["model"] in supported_models
+                    and parsed["model"] in SYSTEM_MODELS[host]
+                ):
+                    rows[parsed["row_spec"]][label] = "Not Tested"
+                else:
+                    rows[parsed["row_spec"]][label] = "N/A"
 
-        column_key = (parsed["host"], parsed["compiler"], parsed["mpi"])
-        if column_key not in COLUMN_LABELS:
-            unmapped_jobs.append(parsed["name"])
-            continue
-
-        label = COLUMN_LABELS[column_key]
-        rows[parsed["benchmark"]][label] = cell_status(
-            rows[parsed["benchmark"]][label], parsed["status"]
+        label = COLUMN_LABELS[parsed["host"]]
+        rows[parsed["row_spec"]][label] = cell_status(
+            rows[parsed["row_spec"]][label], parsed["status"]
         )
 
-    return rows, unparsed_jobs, unmapped_jobs
+    return rows, unparsed_jobs
 
 
 def write_csv(output_path, rows):
-    fieldnames = ["benchmark"] + [COLUMN_LABELS[spec] for spec in COLUMN_SPECS]
+    fieldnames = ["experiment_spec"] + list(COLUMN_LABELS.values())
     with open(output_path, "w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
         writer.writeheader()
-        for benchmark in sorted(rows):
-            writer.writerow({"benchmark": benchmark} | rows[benchmark])
+        for experiment_spec in sorted(rows):
+            writer.writerow(
+                {"experiment_spec": experiment_spec} | rows[experiment_spec]
+            )
 
 
 def main():
     args = parse_args()
     jobs = load_jobs(args.jobs_json)
-    rows, unparsed_jobs, unmapped_jobs = build_summary_rows(jobs, args.stage)
+    rows, unparsed_jobs = build_summary_rows(jobs, args.stage)
     write_csv(args.output, rows)
 
     if unparsed_jobs:
         print(
             f"Skipped {len(unparsed_jobs)} test jobs that could not be parsed.",
-            file=sys.stderr,
-        )
-    if unmapped_jobs:
-        print(
-            f"Skipped {len(unmapped_jobs)} parsed test jobs with no fixed summary column.",
             file=sys.stderr,
         )
 
