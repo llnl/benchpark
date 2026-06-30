@@ -34,6 +34,9 @@ COLUMN_SPECS = [
     ("tuolumne", "cce", "cray-mpich"),
     ("tuolumne", "gcc", "cray-mpich"),
     ("tuolumne", "rocmcc", "cray-mpich"),
+    ("tioga", "cce", "cray-mpich"),
+    ("tioga", "gcc", "cray-mpich"),
+    ("tioga", "rocmcc", "cray-mpich"),
 ]
 
 COLUMN_LABELS = {
@@ -193,7 +196,8 @@ def cell_status(existing, job_status):
 def build_summary_rows(jobs, stage):
     benchmarks = benchmark_names()
     rows = {}
-    skipped_jobs = []
+    unparsed_jobs = []
+    unmapped_jobs = []
 
     for job in jobs:
         if job.get("stage") != stage:
@@ -203,12 +207,7 @@ def build_summary_rows(jobs, stage):
 
         parsed = parse_job(job, benchmarks)
         if not parsed:
-            skipped_jobs.append(job["name"])
-            continue
-
-        column_key = (parsed["host"], parsed["compiler"], parsed["mpi"])
-        if column_key not in COLUMN_LABELS:
-            skipped_jobs.append(parsed["name"])
+            unparsed_jobs.append(job["name"])
             continue
 
         if parsed["benchmark"] not in rows:
@@ -216,12 +215,17 @@ def build_summary_rows(jobs, stage):
                 label: "N/A" for label in COLUMN_LABELS.values()
             }
 
+        column_key = (parsed["host"], parsed["compiler"], parsed["mpi"])
+        if column_key not in COLUMN_LABELS:
+            unmapped_jobs.append(parsed["name"])
+            continue
+
         label = COLUMN_LABELS[column_key]
         rows[parsed["benchmark"]][label] = cell_status(
             rows[parsed["benchmark"]][label], parsed["status"]
         )
 
-    return rows, skipped_jobs
+    return rows, unparsed_jobs, unmapped_jobs
 
 
 def write_csv(output_path, rows):
@@ -236,12 +240,17 @@ def write_csv(output_path, rows):
 def main():
     args = parse_args()
     jobs = load_jobs(args.jobs_json)
-    rows, skipped_jobs = build_summary_rows(jobs, args.stage)
+    rows, unparsed_jobs, unmapped_jobs = build_summary_rows(jobs, args.stage)
     write_csv(args.output, rows)
 
-    if skipped_jobs:
+    if unparsed_jobs:
         print(
-            f"Skipped {len(skipped_jobs)} test jobs that did not map to the fixed summary columns.",
+            f"Skipped {len(unparsed_jobs)} test jobs that could not be parsed.",
+            file=sys.stderr,
+        )
+    if unmapped_jobs:
+        print(
+            f"Skipped {len(unmapped_jobs)} parsed test jobs with no fixed summary column.",
             file=sys.stderr,
         )
 
