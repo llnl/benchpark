@@ -133,7 +133,7 @@ Workshop Deadlines
  * - 10:30 AM - 11:00 AM
    - Coffee Break
  * - 11:00 AM - 11:20 AM
-   - | TBD
+   - | Reflections on Building Portable Benchmark Frameworks
      | *Koskela*
  * - 11:20 AM - 12:30 PM
    - | Benchpark Tutorial
