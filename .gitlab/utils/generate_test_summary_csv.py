@@ -31,6 +31,13 @@ SYSTEM_MODELS = {
     "tuolumne": {"mpi", "openmp", "rocm"},
 }
 
+EXPERIMENT_MODEL_MARKERS = {
+    "ProgrammingModelType.Openmp": "openmp",
+    "ProgrammingModelType.Cuda": "cuda",
+    "ProgrammingModelType.Rocm": "rocm",
+    "ProgrammingModelType.Mpionly": "mpi",
+}
+
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -137,9 +144,16 @@ def load_experiment_models():
             text=True,
         )
     except subprocess.CalledProcessError as exc:
-        raise RuntimeError(
-            "Unable to query experiment metadata with benchpark list experiments."
-        ) from exc
+        print(
+            "Unable to query experiment metadata with benchpark list experiments; "
+            "falling back to experiment.py source scan.",
+            file=sys.stderr,
+        )
+        if exc.stdout:
+            print(exc.stdout, file=sys.stderr)
+        if exc.stderr:
+            print(exc.stderr, file=sys.stderr)
+        return load_experiment_models_from_source()
 
     models_by_benchmark = {}
     for line in result.stdout.splitlines():
@@ -155,6 +169,23 @@ def load_experiment_models():
         models_by_benchmark[benchmark] = (
             set(model_group.split("|")) if model_group else set()
         )
+
+    return models_by_benchmark
+
+
+def load_experiment_models_from_source():
+    models_by_benchmark = {}
+    for experiment_dir in EXPERIMENTS_DIR.iterdir():
+        experiment_file = experiment_dir / "experiment.py"
+        if not experiment_file.is_file():
+            continue
+
+        file_text = experiment_file.read_text(encoding="utf-8")
+        models_by_benchmark[experiment_dir.name] = {
+            model
+            for marker, model in EXPERIMENT_MODEL_MARKERS.items()
+            if marker in file_text
+        }
 
     return models_by_benchmark
 
