@@ -14,7 +14,6 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-EXPERIMENTS_DIR = REPO_ROOT / "experiments"
 
 # Fixed system columns. Compatibility is intentionally limited to programming models.
 COLUMN_LABELS = {
@@ -203,38 +202,11 @@ def find_benchmark(payload, benchmarks):
     return None
 
 
-def split_payload(payload):
-    return [token.strip() for token in re.split(r",\s+", payload) if token.strip()]
-
-
-def row_model(tokens):
-    token_text = " ".join(tokens)
-    for model in ("cuda", "rocm", "openmp"):
-        if re.search(rf"(^|[\s+])\+{model}($|[\s~+])", token_text):
-            return model
-    return "mpi"
-
-
-def row_spec(tokens, benchmark):
-    ignored_tokens = set(COLUMN_LABELS) | {
-        "llnl-cluster",
-        "llnl-matrix",
-        "llnl-elcapitan",
-    }
-    extras = []
-    for token in tokens:
-        if token == benchmark or token in ignored_tokens or token.startswith("$"):
-            continue
-        extras.append(token)
-    return " ".join([benchmark] + extras)
-
-
 def parse_job(job, benchmarks):
     payload = extract_matrix_payload(job["name"])
     if not payload:
         return None
 
-    tokens = split_payload(payload)
     host = find_value(payload, r"(?:^|,\s)(dane|matrix|tuolumne|tioga)(?:,|$)")
     benchmark = find_benchmark(payload, benchmarks)
     if not host or not benchmark:
@@ -243,18 +215,19 @@ def parse_job(job, benchmarks):
     return {
         "host": host,
         "benchmark": benchmark,
-        "model": row_model(tokens),
-        "row_spec": row_spec(tokens, benchmark),
         "status": job["status"],
         "name": job["name"],
     }
 
 
-def cell_status(existing, job_status):
-    current = "Pass" if job_status == "success" else "Fail"
-    if existing == "Fail" or current == "Fail":
-        return "Fail"
-    return "Pass"
+def format_cell(counts):
+    total = counts["total"]
+    passed = counts["passed"]
+    if total == 0:
+        raise ValueError("Cannot format an empty aggregated cell.")
+    if passed == total:
+        return f"Pass ({passed}/{total})"
+    return f"Fail ({passed}/{total})"
 
 
 def build_summary_rows(jobs, stage):
@@ -274,35 +247,41 @@ def build_summary_rows(jobs, stage):
             unparsed_jobs.append(job["name"])
             continue
 
-        if parsed["row_spec"] not in rows:
+        if parsed["benchmark"] not in rows:
             supported_models = experiment_models.get(parsed["benchmark"], set())
-            rows[parsed["row_spec"]] = {}
+            rows[parsed["benchmark"]] = {}
             for host, label in COLUMN_LABELS.items():
-                if (
-                    parsed["model"] in supported_models
-                    and parsed["model"] in SYSTEM_MODELS[host]
-                ):
-                    rows[parsed["row_spec"]][label] = "Not Tested"
+                if supported_models & SYSTEM_MODELS[host]:
+                    rows[parsed["benchmark"]][label] = "Not Tested"
                 else:
-                    rows[parsed["row_spec"]][label] = "N/A"
+                    rows[parsed["benchmark"]][label] = "N/A"
 
         label = COLUMN_LABELS[parsed["host"]]
-        rows[parsed["row_spec"]][label] = cell_status(
-            rows[parsed["row_spec"]][label], parsed["status"]
-        )
+        existing = rows[parsed["benchmark"]][label]
+        if isinstance(existing, str):
+            counts = {"passed": 0, "total": 0}
+        else:
+            counts = existing
+        counts["total"] += 1
+        if parsed["status"] == "success":
+            counts["passed"] += 1
+        rows[parsed["benchmark"]][label] = counts
+
+    for benchmark, row in rows.items():
+        for label, value in row.items():
+            if isinstance(value, dict):
+                row[label] = format_cell(value)
 
     return rows, unparsed_jobs
 
 
 def write_csv(output_path, rows):
-    fieldnames = ["experiment_spec"] + list(COLUMN_LABELS.values())
+    fieldnames = ["benchmark"] + list(COLUMN_LABELS.values())
     with open(output_path, "w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
         writer.writeheader()
-        for experiment_spec in sorted(rows):
-            writer.writerow(
-                {"experiment_spec": experiment_spec} | rows[experiment_spec]
-            )
+        for benchmark in sorted(rows):
+            writer.writerow({"benchmark": benchmark} | rows[benchmark])
 
 
 def main():
