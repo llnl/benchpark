@@ -17,10 +17,10 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 # Fixed system columns. Compatibility is intentionally limited to programming models.
 COLUMN_LABELS = {
-    "dane": "dane (mpi/openmp)",
-    "matrix": "matrix (cuda)",
-    "tioga": "tioga (rocm)",
-    "tuolumne": "tuolumne (rocm)",
+    "dane": "dane",
+    "matrix": "matrix",
+    "tioga": "tioga",
+    "tuolumne": "tuolumne",
 }
 
 SYSTEM_MODELS = {
