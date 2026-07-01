@@ -94,6 +94,7 @@ generate_test_summary:
   stage: summarize
   script:
     - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
+    - ./bin/benchpark configure --bootstrap-location $CUSTOM_CI_BUILDS_DIR
     - python .gitlab/utils/generate_test_summary_csv.py --output test-summary.csv
   artifacts:
     when: always
