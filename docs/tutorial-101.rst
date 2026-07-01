@@ -20,9 +20,9 @@ presentations of this tutorial (oldest to most recent):
 - September 16, 2025. Half-day tutorial at `International Conference on eScience
   (eScience) <https://www.escience-conference.org/2025/>`_ on Benchpark and Ramble.
 - January 22, 2026. Half-day tutorial at RIKEN on Benchpark and Ramble.
-- (Upcoming) June 2026. Half-day tutorial at `ISC <https://isc-hpc.com/>`_ on Benchpark
+- June 22, 2026. Half-day tutorial at `ISC <https://isc-hpc.com/>`_ on Benchpark
   on Ramble.
-- (Upcoming) July 2026. Full-day workshop at `International Conference on Supercomputing
+- July 6, 2026. Full-day workshop at `International Conference on Supercomputing
   (ICS) <https://dipsa-qub.github.io/ICS2026-webpage/>`_ on reproducible benchmarking.
 - (Upcoming) Sept 2026. Half-day tutorial at `2026 Livermore's HPC Tutorials
   <https://hpcic.llnl.gov/tutorials>`_ on Benchpark and Ramble.
@@ -31,13 +31,13 @@ presentations of this tutorial (oldest to most recent):
   <https://pact2026.github.io/workshops/reproducible-benchmarking-tutorial/>`_ on
   Benchpark and Ramble.
 
-.. image:: tutorial/ISC26-Tutorial-Slide-Preview.jpg
-    :target: _static/slides/ISC26-Tutorial-Slides.pdf
+.. image:: tutorial/ICS26-Tutorial-Slide-Preview.jpg
+    :target: _static/slides/ICS26-Tutorial-Slides.pdf
     :height: 72px
     :align: left
     :alt: Slide Preview
 
-:download:`Download Slides <_static/slides/ISC26-Tutorial-Slides.pdf>`.
+:download:`Download Slides <_static/slides/ICS26-Tutorial-Slides.pdf>`.
 
 `Watch HPCIC 2025 Tutorial Video <https://www.youtube.com/watch?v=AeaUfpybJfg>`_.
 
