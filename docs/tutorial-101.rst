@@ -20,10 +20,10 @@ presentations of this tutorial (oldest to most recent):
 - September 16, 2025. Half-day tutorial at `International Conference on eScience
   (eScience) <https://www.escience-conference.org/2025/>`_ on Benchpark and Ramble.
 - January 22, 2026. Half-day tutorial at RIKEN on Benchpark and Ramble.
-- June 22, 2026. Half-day tutorial at `ISC <https://isc-hpc.com/>`_ on Benchpark
-  on Ramble.
-- July 6, 2026. Full-day workshop at `International Conference on Supercomputing
-  (ICS) <https://dipsa-qub.github.io/ICS2026-webpage/>`_ on reproducible benchmarking.
+- June 22, 2026. Half-day tutorial at `ISC <https://isc-hpc.com/>`_ on Benchpark on
+  Ramble.
+- July 6, 2026. Full-day workshop at `International Conference on Supercomputing (ICS)
+  <https://dipsa-qub.github.io/ICS2026-webpage/>`_ on reproducible benchmarking.
 - (Upcoming) Sept 2026. Half-day tutorial at `2026 Livermore's HPC Tutorials
   <https://hpcic.llnl.gov/tutorials>`_ on Benchpark and Ramble.
 - (Upcoming) Oct 2026. Half-day tutorial at `International Conference on Parallel
