@@ -98,8 +98,7 @@ generate_test_summary:
     - python .gitlab/utils/generate_test_summary_csv.py --output test-summary.csv
   artifacts:
     when: always
-    paths:
-      - test-summary.csv
+    paths: [test-summary.csv]
   rules:
     - when: always
 cleanup_pipeline_dir:
