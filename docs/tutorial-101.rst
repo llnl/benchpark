@@ -242,7 +242,7 @@ scaling experiment by running:
 This command does two things. First, it builds all necessary software using Spack.
 Building the software may take a while to complete, depending on how many external
 packages are contained in the system definition from :ref:`Step 3 <step3_label>`. For
-this tutorial, it should take roughly 2 minutes. Second, this command generates batch
+this tutorial, it should take roughly 5 minutes. Second, this command generates batch
 scripts (e.g., submission scripts) for executing the experiment. For each run in the
 experiment, a directory containing the files necessary for the run will be created under
 ``/home/jovyan/benchpark/wkp/kripke-benchmark/hpc-tutorial/workspace/experiments/kripke/kripke``.
