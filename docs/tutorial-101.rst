@@ -24,9 +24,9 @@ presentations of this tutorial (oldest to most recent):
   Ramble.
 - July 6, 2026. Full-day workshop at `International Conference on Supercomputing (ICS)
   <https://dipsa-qub.github.io/ICS2026-webpage/>`_ on reproducible benchmarking.
-- (Upcoming) Sept 2026. Half-day tutorial at `2026 Livermore's HPC Tutorials
+- (Upcoming) Sept 1, 2026. Half-day tutorial at `2026 Livermore's HPC Tutorials
   <https://hpcic.llnl.gov/tutorials>`_ on Benchpark and Ramble.
-- (Upcoming) Oct 2026. Half-day tutorial at `International Conference on Parallel
+- (Upcoming) Oct 19, 2026. Half-day tutorial at `International Conference on Parallel
   Architectures and Compilation Techniques (PACT)
   <https://pact2026.github.io/workshops/reproducible-benchmarking-tutorial/>`_ on
   Benchpark and Ramble.
