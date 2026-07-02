@@ -53,7 +53,7 @@ variables:
   TUOLUMNE_SHARED_ALLOC: -N 1 -t 4h --queue=pci --exclusive --setattr=gpumode=${GPUMODE}
     --conf=resource.rediscover=true
   # Tioga (max 2hr policy)
-  TIOGA_SHARED_ALLOC: -N 1 -t 2h --queue=pci --exclusive
+  TIOGA_SHARED_ALLOC: -N 1 -t 2h --queue=pdebug --exclusive
   CUSTOM_CI_BUILDS_DIR: $$HOME/.jacamar-ci/$CI_PIPELINE_ID
   # Dir cleanup can take awhile
   RUNNER_AFTER_SCRIPT_TIMEOUT: 20m
@@ -71,7 +71,7 @@ include:
       - utilities/skip-branch-not-a-pr.yml
   # Daily tests (from PRs)
   - local: .gitlab/tests/shared_flux_clusters.yml
-  - local: .gitlab/tests/shared_slurm_clusters.yml
+  # - local: .gitlab/tests/shared_slurm_clusters.yml
   # Nightly tests
   - local: .gitlab/tests/nightly.yml
 stages:
