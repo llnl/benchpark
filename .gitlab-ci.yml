@@ -80,6 +80,7 @@ stages:
   - allocate-resources
   - test
   - release-resources
+  - summarize
   - cleanup-dir
 bootstrap_benchpark:
   tags: [shell, oslic]
@@ -88,6 +89,18 @@ bootstrap_benchpark:
     - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
     - ./bin/benchpark configure --bootstrap-location $CUSTOM_CI_BUILDS_DIR
     - ./bin/benchpark bootstrap
+generate_test_summary:
+  tags: [shell, oslic]
+  stage: summarize
+  script:
+    - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
+    - ./bin/benchpark configure --bootstrap-location $CUSTOM_CI_BUILDS_DIR
+    - python .gitlab/utils/generate_test_summary_csv.py --output test-summary.csv
+  artifacts:
+    when: always
+    paths: [test-summary.csv]
+  rules:
+    - when: always
 cleanup_pipeline_dir:
   tags: [shell, oslic]
   stage: cleanup-dir
