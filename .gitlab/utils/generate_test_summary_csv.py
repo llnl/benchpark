@@ -12,7 +12,6 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
-
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 # Fixed system columns. Compatibility is intentionally limited to programming models.
@@ -29,6 +28,7 @@ SYSTEM_MODELS = {
     "tioga": {"mpi", "openmp", "rocm"},
     "tuolumne": {"mpi", "openmp", "rocm"},
 }
+
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -113,7 +113,12 @@ def load_jobs(jobs_json_path=None):
 
 
 def load_experiment_models():
-    command = [str(REPO_ROOT / "bin" / "benchpark"), "list", "experiments", "--no-title"]
+    command = [
+        str(REPO_ROOT / "bin" / "benchpark"),
+        "list",
+        "experiments",
+        "--no-title",
+    ]
     try:
         result = subprocess.run(
             command,
