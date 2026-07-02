@@ -112,41 +112,8 @@ def load_jobs(jobs_json_path=None):
     return load_jobs_from_api()
 
 
-def log_debug(message):
-    print(f"[summary] {message}", file=sys.stderr)
-
-
-def read_file_if_exists(path):
-    try:
-        return path.read_text(encoding="utf-8")
-    except FileNotFoundError:
-        return None
-
-
-def log_benchpark_context():
-    user_bootstrap = REPO_ROOT / "user-config" / "bootstrap.yaml"
-    default_bootstrap = REPO_ROOT / "config" / "bootstrap.yaml"
-    log_debug(f"repo_root={REPO_ROOT}")
-    log_debug(f"cwd={Path.cwd()}")
-    log_debug(f"HOME={os.environ.get('HOME')}")
-    log_debug(f"SYS_TYPE={os.environ.get('SYS_TYPE')}")
-    log_debug(f"CI_PROJECT_DIR={os.environ.get('CI_PROJECT_DIR')}")
-    log_debug(f"CUSTOM_CI_BUILDS_DIR={os.environ.get('CUSTOM_CI_BUILDS_DIR')}")
-    log_debug(f"user_bootstrap_yaml={user_bootstrap}")
-    user_bootstrap_text = read_file_if_exists(user_bootstrap)
-    if user_bootstrap_text is None:
-        log_debug("user_bootstrap_yaml_contents=<missing>")
-    else:
-        log_debug(f"user_bootstrap_yaml_contents={user_bootstrap_text.strip()}")
-    default_bootstrap_text = read_file_if_exists(default_bootstrap)
-    if default_bootstrap_text is not None:
-        log_debug(f"default_bootstrap_yaml_contents={default_bootstrap_text.strip()}")
-
-
 def load_experiment_models():
     command = [str(REPO_ROOT / "bin" / "benchpark"), "list", "experiments", "--no-title"]
-    log_benchpark_context()
-    log_debug(f"running_command={' '.join(command)}")
     try:
         result = subprocess.run(
             command,
@@ -156,15 +123,16 @@ def load_experiment_models():
             text=True,
         )
     except subprocess.CalledProcessError as exc:
-        log_debug("benchpark list experiments failed")
-        log_debug(f"returncode={exc.returncode}")
-        if exc.stdout:
-            log_debug(f"stdout:\n{exc.stdout.rstrip()}")
+        details = [
+            "Unable to query experiment metadata with benchpark list experiments.",
+            f"Command: {' '.join(command)}",
+            f"Return code: {exc.returncode}",
+        ]
         if exc.stderr:
-            log_debug(f"stderr:\n{exc.stderr.rstrip()}")
-        raise RuntimeError(
-            "Unable to query experiment metadata with benchpark list experiments."
-        ) from exc
+            details.append(f"stderr:\n{exc.stderr.rstrip()}")
+        if exc.stdout:
+            details.append(f"stdout:\n{exc.stdout.rstrip()}")
+        raise RuntimeError("\n".join(details)) from exc
 
     models_by_benchmark = {}
     for line in result.stdout.splitlines():
@@ -181,7 +149,6 @@ def load_experiment_models():
             set(model_group.split("|")) if model_group else set()
         )
 
-    log_debug(f"parsed_experiment_count={len(models_by_benchmark)}")
     return models_by_benchmark
 
 
