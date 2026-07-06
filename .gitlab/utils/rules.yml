@@ -3,7 +3,8 @@
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
         != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
       when: never
-    - changes:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" || ($CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "develop"))
+      changes:
         - .gitlab-ci.yml
         - .gitlab/**/*
         - bin/**/*
@@ -18,7 +19,8 @@
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
         != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
       when: never
-    - changes:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" || ($CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "develop"))
+      changes:
         - .gitlab-ci.yml
         - .gitlab/**/*
         - bin/**/*
@@ -44,7 +46,8 @@
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
         != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
       when: never
-    - changes:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" || ($CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "develop"))
+      changes:
         - .gitlab-ci.yml
         - .gitlab/**/*
         - bin/**/*
@@ -67,7 +70,8 @@
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
         != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
       when: never
-    - changes:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" || ($CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "develop"))
+      changes:
         - .gitlab-ci.yml
         - .gitlab/**/*
         - bin/**/*
@@ -86,7 +90,8 @@
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
         != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
       when: never
-    - changes:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" || ($CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "develop"))
+      changes:
         - .gitlab-ci.yml
         - .gitlab/**/*
         - bin/**/*

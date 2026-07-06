@@ -4,8 +4,9 @@ workflow:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: always
 
-    # Run pipelines only when these files/dirs change
-    - changes:
+    # Run MR pipelines, plus push pipelines on develop branch, only when these files/dirs change
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" || ($CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "develop"))
+      changes:
         - .gitlab/**/*
         - bin/**/*
         - configs/**/*
