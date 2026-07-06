@@ -21,7 +21,7 @@ system_definition:
     vendor: NVIDIA
     name: 10GbEthernet
   systems-tested:
-    ng-dgx:
+    riken-dgx:
       os: Ubuntu
       scheduler: slurm
       compiler: nvhpc
