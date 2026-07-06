@@ -146,16 +146,16 @@ def main():
                 if not no_cluster:
                     sys_list.append(f"{var}={cluster}")
                 subprocess.run(sys_list)
-                if os.path.isdir(f"{name}/{exper}"):
-                    shutil.rmtree(f"{name}/{exper}")
+                if os.path.isdir(f"{name}/{cluster}/{exper}"):
+                    shutil.rmtree(f"{name}/{cluster}/{exper}")
                 subprocess.run(
                     [
                         "python",
                         f"{name}/lib/main.py",
                         "experiment",
                         "init",
-                        f"--dest={name}/{exper}",
-                        f"--system={name}/{cluster}",
+                        f"--dest={exper}",
+                        f"{name}/{cluster}",
                         f"{exper}{spec}" + args.extra_spec,
                     ]
                 )
@@ -164,18 +164,18 @@ def main():
                         "python",
                         f"{name}/lib/main.py",
                         "setup",
-                        f"{name}/{exper}",
+                        f"{name}/{cluster}/{exper}",
                         f"{name}/wkp",
                     ]
                 )
                 # Path to the Spack setup script
                 spack_setup_script = f"{name}/wkp/setup.sh"
                 # Define the ramble command
-                ramble_command = f"{name}/wkp/ramble/bin/ramble --workspace-dir {name}/wkp/{exper}/{cluster}/workspace workspace setup"
+                ramble_command = f"{name}/wkp/ramble/bin/ramble --workspace-dir {name}/wkp/{cluster}/{exper}/workspace workspace setup"
                 # Combine sourcing the script and running the command
                 run_str = f"bash -c 'source {spack_setup_script} && {ramble_command}"
                 if args.run_experiment:
-                    run_str += f" && {name}/wkp/ramble/bin/ramble --workspace-dir {name}/wkp/{exper}/{cluster}/workspace on"
+                    run_str += f" && {name}/wkp/ramble/bin/ramble --workspace-dir {name}/wkp/{cluster}/{exper}/workspace on"
                 run_str += "'"
                 subprocess.run(
                     run_str,
