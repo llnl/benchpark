@@ -160,7 +160,7 @@ include:
 nightly_test_run:
   extends: .nightly_rules
   interruptible: false
-  resource_group: "${HOST}-${CI_PIPELINE_ID}"
+  resource_group: "${HOST}-${CI_PIPELINE_IID}"
   stage: test
   tags: [$HOST, batch]
   <<: *test_clusters_nightly
