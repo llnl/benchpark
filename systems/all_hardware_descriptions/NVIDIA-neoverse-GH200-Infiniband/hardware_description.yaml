@@ -21,7 +21,7 @@ system_definition:
     vendor: NVIDIA
     name: HDR200InfiniBand
   systems-tested:
-    qc-gh200:
+    riken-gh200:
       os: Rocky
       scheduler: slurm
       compiler: nvhpc
