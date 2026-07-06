@@ -10,8 +10,8 @@ workflow:
 # Resource Allocation Section
 #############################
 .allocate_resources_slurm:
-  extends: .on_host_template
   stage: allocate-resources
+  when: on_success
   script:
     - set -e
     # submit and grab JobID
@@ -32,6 +32,7 @@ workflow:
       fi
 allocate_resources_dane:
   extends: .allocate_resources_slurm
+  rules: !reference [.resource_rules_dane, rules]
   variables:
     HOST: dane
     SHARED_ALLOC: $DANE_SHARED_ALLOC
@@ -39,6 +40,7 @@ allocate_resources_dane:
   needs: [dane-up-check]
 allocate_resources_matrix:
   extends: .allocate_resources_slurm
+  rules: !reference [.resource_rules_matrix, rules]
   variables:
     HOST: matrix
     SHARED_ALLOC: $MATRIX_SHARED_ALLOC
@@ -48,24 +50,38 @@ allocate_resources_matrix:
 # Resource Release Section
 ##########################
 .release_resources_slurm:
-  extends: .on_host_template
   stage: release-resources
+  when: always
   # Do not cleanup dir yet
   script: [. .gitlab/utils/cancel-slurm.sh --no-clean]
 release_resources_dane:
   extends: .release_resources_slurm
+  rules: !reference [.resource_rules_dane, rules]
   tags: [shell, dane]
-  needs: [allocate_resources_dane, run_tests_slurm_dane]
+  needs:
+    - job: allocate_resources_dane
+    - job: run_tests_slurm_dane
+      optional: true
 release_resources_matrix:
   extends: .release_resources_slurm
+  rules: !reference [.resource_rules_matrix, rules]
   tags: [shell, matrix]
-  needs: [allocate_resources_matrix, run_tests_slurm_matrix]
+  needs:
+    - job: allocate_resources_matrix
+    - job: run_tests_slurm_matrix
+      optional: true
 ##################
 # Test Run Section
 ##################
 .run_tests_slurm:
-  extends: .on_host_template
+  extends: .run_test_rules
   stage: test
+  variables:
+    BASELINE_REF: develop
+    BASELINE_EXCLUDED_PIPELINE_NAME: Nightly
+  artifacts:
+    when: always
+    paths: ['artifact-githash/${HOST}/${BENCHMARK}/githash_metadata.json']
   before_script:
     - !reference [.report_status, before_script]
   script:
@@ -75,9 +91,83 @@ release_resources_matrix:
       echo -e "### Job ID is ${JOBID}"
     - |
       PROXY="$( [[ -n "${JOBID}" ]] && echo "flux proxy slurm:${JOBID}" || echo "" )"
-      ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${FLUX_ARGS} .gitlab/utils/run-experiment.sh )
+      pr_rc=0
+      ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${FLUX_ARGS} .gitlab/utils/run-experiment.sh ) || pr_rc=$?
+      echo "[PR Status]: PR checkout exit code = ${pr_rc}"
+      printf '%s\n' "${pr_rc}" > "$CI_PROJECT_DIR/pr_flux.status"
+      exit "${pr_rc}"
   after_script:
     - !reference [.report_status, after_script]
+    - |
+      pr_workspace="$CI_PROJECT_DIR/wkp/${HOST}/${BENCHMARK}/workspace"
+      pr_json=$(find "${pr_workspace}/experiments" -type f -name 'githash_metadata.json' | sort | head -n 1)
+      artifact_dir="$CI_PROJECT_DIR/artifact-githash/${HOST}/${BENCHMARK}"
+      baseline_json="${artifact_dir}/baseline_githash_metadata.json"
+      baseline_status_file="${artifact_dir}/baseline_job.status"
+      mkdir -p "${artifact_dir}"
+      if [[ -n "${pr_json}" ]]; then
+        cp "${pr_json}" "${artifact_dir}/githash_metadata.json"
+      else
+        echo "Unable to locate PR githash metadata in ${pr_workspace}" >&2
+        exit 1
+      fi
+      bash .gitlab/utils/fetch-githash-artifact.sh \
+        "${BASELINE_REF}" \
+        "${CI_JOB_NAME}" \
+        "${HOST}" \
+        "${BENCHMARK}" \
+        "${baseline_json}" \
+        "${CI_PIPELINE_ID}" \
+        "${baseline_status_file}" \
+        "${BASELINE_EXCLUDED_PIPELINE_NAME}"
+      if [[ "$(cat "$CI_PROJECT_DIR/pr_flux.status")" == "0" ]]; then
+        pr_status="PASSED"
+      else
+        pr_status="FAILED"
+      fi
+      case "$(cat "${baseline_status_file}")" in
+        success)
+          baseline_status="PASSED"
+          ;;
+        failed)
+          baseline_status="FAILED"
+          ;;
+        canceled)
+          baseline_status="CANCELED"
+          ;;
+        running)
+          baseline_status="RUNNING"
+          ;;
+        pending)
+          baseline_status="PENDING"
+          ;;
+        manual)
+          baseline_status="MANUAL"
+          ;;
+        skipped)
+          baseline_status="SKIPPED"
+          ;;
+        created)
+          baseline_status="CREATED"
+          ;;
+        waiting_for_resource)
+          baseline_status="WAITING_FOR_RESOURCE"
+          ;;
+        preparing)
+          baseline_status="PREPARING"
+          ;;
+        scheduled)
+          baseline_status="SCHEDULED"
+          ;;
+        *)
+          baseline_status="$(cat "${baseline_status_file}" | tr '[:lower:]' '[:upper:]')"
+          ;;
+      esac
+      echo -e "===============[TESTS]==============="
+      echo "[Baseline]: ${baseline_status}"
+      echo "[PR]: ${pr_status}"
+      echo -e "====================================="
+      bash .gitlab/utils/compare-githash-metadata.sh "${baseline_json}" "${pr_json}"
     - |
       if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
         . .gitlab/utils/cancel-slurm.sh
@@ -101,11 +191,11 @@ run_tests_slurm_dane:
         BENCHMARK: [kripke, amg2023]
         VARIANT: ['+strong caliper=mpi,time', '+weak caliper=mpi,time']
         TEST_ANALYZE: ['true']
-      # Test affinity and hwloc with caliper on
+      # Test githash, affinity, and hwloc with caliper on
       - HOST: dane
         ARCHCONFIG: llnl-cluster
         BENCHMARK: [kripke]
-        VARIANT: ['caliper=mpi,time hwloc=on affinity=on']
+        VARIANT: ['caliper=mpi,time hwloc=on affinity=on githash=on']
       # Topdown
       - HOST: dane
         ARCHCONFIG: llnl-cluster

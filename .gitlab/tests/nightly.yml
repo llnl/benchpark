@@ -14,7 +14,6 @@ include:
         ARCHCONFIG: llnl-cluster
         SCHEDULER_PARAMETERS: $DANE_PARAMS
         BENCHMARK:
-          - ad
           - amg2023
           - gpcnet
           - hpcg
@@ -160,6 +159,7 @@ include:
         SYSTEM_ARGS: [mount_point=rabbits_lustre_small]
 nightly_test_run:
   extends: .nightly_rules
+  interruptible: false
   resource_group: $HOST
   stage: test
   tags: [$HOST, batch]

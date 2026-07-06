@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 versions:
-  ramble: 100f97d  # develop on 04/25/2026 (newer than 0.6.0 release)
-  spack: a85ec51  # Dec. 1 2025 v1.1.0
-  spack-packages: 0a42215  # Jan. 20 2026
+  # Shallow fetch requires the full commit sha
+  ramble: 100f97d9dfbc588058e37f0dfd94abd8ba742a57  # develop on 04/25/2026 (newer than 0.6.0 release)
+  spack: a85ec51644917c14d996977e876de5be20b70a0b  # Dec. 1 2025 v1.1.0
+  spack-packages: 661ecf6476a80db9d028519cef55a14109763d9d  # Jun 1 2026

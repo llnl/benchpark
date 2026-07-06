@@ -16,7 +16,8 @@ class RajaPerf(ExecutableApplication):
             'atomics','simd','vectorization','register-pressure',
             'high-memory-bandwidth','regular-memory-access',
             'mpi','network-point-to-point','network-latency-bound',
-            'c++','raja','sycl','builtin-caliper']
+            'c++','raja','sycl','builtin-caliper',
+            'llnl-nightly','llnl-monthly','llnl-pr','llnl-weekly']
 
     register_phase(
         "compute_cali_args", pipeline="setup", run_before=["make_experiments"]

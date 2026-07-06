@@ -73,6 +73,16 @@ specified by the ``.gitlab-ci.yml`` configuration file:
            involves starting flux on the allocated node, which is necessary since
            testing the benchpark workflow involves submitting a job within a job step in
            this case, which is not possible using slurm.
+      iv. Shared test jobs and shared resource jobs use different rules from
+          ``rules.yml``. The test jobs use ``run_test_rules``, which watch benchmark and
+          system paths through the ``BENCHMARK`` and ``ARCHCONFIG`` variables. The
+          resource allocation and release jobs use host-specific ``resource_rules_*``
+          entries, each with an explicit watch list for the benchmarks that run on that
+          host. When adding a benchmark to a shared Flux or shared Slurm host, update
+          the matching ``resource_rules_*`` list so changes to that benchmark create the
+          allocate, test, and release jobs for that host. For example, if a shared host
+          runs kripke, its ``resource_rules_*`` entry should include
+          ``'**/kripke/**/*'``.
 
 4. ``.gitlab/utils/`` contains various utility functions for:
 

@@ -64,10 +64,6 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
 
     depends_on("hypre+gpu-aware-mpi", when="+mpi+gpu-aware-mpi")
 
-    def setup_build_environment(self, env):
-        if self.spec.satisfies("+cuda"):
-            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
-
     def cmake_args(self):
         cmake_options = []
         cmake_options.append(self.define_from_variant("AMG_WITH_CALIPER", "caliper"))

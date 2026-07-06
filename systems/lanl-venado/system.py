@@ -25,14 +25,14 @@ class LanlVenado(System):
             "system_site": "lanl",
             "extra_batch_opts": "-A llnl_ai_g -pgpu",
             "hardware_key": str(hardware_descriptions)
-            + "/HPECray-neoverse-H100-Slingshot/hardware_description.yaml",
+            + "/HPECray-neoverse-GH200-Slingshot/hardware_description.yaml",
         },
         "grace-grace": {
             "cpu_arch": "neoverse",
             "sys_cores_per_node": 144,
             "system_site": "lanl",
             "hardware_key": str(hardware_descriptions)
-            + "/HPECray-neoverse-H100-Slingshot/hardware_description.yaml",
+            + "/HPECray-neoverse-GH200-Slingshot/hardware_description.yaml",
         },
     }
 

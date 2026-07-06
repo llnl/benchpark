@@ -107,6 +107,52 @@ Workshop Deadlines
 - Author Notification: April 22, 2026
 - Camera-Ready Upload: May 6, 2026
 
+********
+ Agenda
+********
+
+.. list-table::
+
+ * - **Time**
+   - **Title and Speaker**
+ * - 09:00 AM - 09:30 AM
+   - | Welcome and Introduction
+     | *Pearce, Bird, Koskela*
+ * - 09:50 AM - 10:10 AM
+   - | A First Step Towards Unifying Benchmark Descriptions
+     | *Badwaik, Herten*
+ * - 10:10 AM - 10:30 AM
+   - | Phoeni6: A Container-Based Framework for Reproducible and Fair Energy Comparison of AI Workloads
+     | *Oliveira-Filho, Silva-de-Souza, Sakuyama, Xavier-de-Souza*
+ * - 10:30 AM - 11:00 AM
+   - Coffee Break
+ * - 11:00 AM - 11:20 AM
+   - | Continuous Benchmarking for Production HPC Centers
+     | *Ardhapurkar, Shaikh, Das, Dinde, Wandhekar*
+ * - 11:20 AM - 11:40 PM
+   - | Reflections on Building Portable Benchmark Frameworks
+     | *Koskela*
+ * - 11:40 AM - 12:00 PM
+   - | On Similarity of Computational Kernels in our Codes and Proxies
+     | *McKinsey, Brink, Pearce*
+ * - 12:00 AM - 12:30 PM
+   - | Speaker Panel and Open Discussion
+     | *Moderator: Pearce*
+     | *Panelists: Oliveira-Filho, Badwaik, Ardhapurkar, Koskela*
+ * - 12:30 PM - 01:30 PM
+   - Lunch
+ * - 01:30 PM - 03:00 PM
+   - | Benchpark Tutorial
+     | *Pearce*
+ * - 03:00 PM - 03:30 PM
+   - Coffee Break
+ * - 03:30 PM - 04:45 PM
+   - | Benchpark and Ramble Tutorial w/Hands-On
+     | *Pearce, Bird*
+ * - 04:45 PM - 05:00 PM
+   - | Closing Remarks
+     | *Pearce, Bird, Koskela*
+
 **********************
  Organizing Committee
 **********************
