@@ -7,7 +7,7 @@ workflow:
     # Feature branch pipelines should diff against the integration target.
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != "develop"
       changes:
-        compare_to: refs/heads/develop
+        compare_to: refs/heads/ci-diff-source-update
         paths: &workflow_change_paths
           - .gitlab/**/*
           - bin/**/*
