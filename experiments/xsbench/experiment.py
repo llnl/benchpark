@@ -7,7 +7,6 @@ from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
 from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
 
-
 XsbenchProgrammingModel = ProgrammingModel(
     ProgrammingModelType.Cuda,
     ProgrammingModelType.Rocm,
@@ -57,8 +56,5 @@ class Xsbench(
         # variants directly to this string.
         self.add_package_spec(
             self.name,
-            [
-                f"benchpark.xsbench{self.determine_version()} "
-                "~mpi ~openmp "
-            ],
+            [f"benchpark.xsbench{self.determine_version()} " "~mpi ~openmp "],
         )
