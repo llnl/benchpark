@@ -3,6 +3,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+from packaging.version import Version
+
 from benchpark.cudasystem import CudaSystem
 from benchpark.directives import maintainers, variant
 from benchpark.openmpsystem import OpenMPCPUOnlySystem
@@ -14,7 +16,6 @@ from benchpark.system import (
     compiler_section_for,
     merge_dicts,
 )
-from packaging.version import Version
 
 
 class JcahpcMiyabiG(System):
