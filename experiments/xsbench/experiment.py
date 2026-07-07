@@ -32,7 +32,7 @@ class Xsbench(
         description="Which XSBench version to use.",
     )
 
-    maintainers("matthewc20032019")
+    maintainers("matthewc2003")
 
     def compute_applications_section(self):
         # Minimal validated configuration: one process on one GPU.
