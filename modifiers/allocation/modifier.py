@@ -529,7 +529,7 @@ class Allocation(BasicModifier):
         # configuration and can fail when invoked.
         #
         #
-        #if v.n_gpus:
+        # if v.n_gpus:
         #    gpus_per_rank = self.gpus_as_gpus_per_rank(v.n_gpus)
         #    node_spec.append(f"gpus={gpus_per_rank}")
 
