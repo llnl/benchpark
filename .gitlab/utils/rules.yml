@@ -3,7 +3,7 @@
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
         != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
       when: never
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" || ($CI_PIPELINE_SOURCE ==
+    - if: $CI_PIPELINE_SOURCE == "external_pull_request_event" || ($CI_PIPELINE_SOURCE ==
         "push" && ($CI_COMMIT_BRANCH == "develop"))
       changes:
         - .gitlab-ci.yml
@@ -20,7 +20,7 @@
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
         != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
       when: never
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" || ($CI_PIPELINE_SOURCE ==
+    - if: $CI_PIPELINE_SOURCE == "external_pull_request_event" || ($CI_PIPELINE_SOURCE ==
         "push" && ($CI_COMMIT_BRANCH == "develop"))
       changes:
         - .gitlab-ci.yml
@@ -48,7 +48,7 @@
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
         != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
       when: never
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" || ($CI_PIPELINE_SOURCE ==
+    - if: $CI_PIPELINE_SOURCE == "external_pull_request_event" || ($CI_PIPELINE_SOURCE ==
         "push" && ($CI_COMMIT_BRANCH == "develop"))
       changes:
         - .gitlab-ci.yml
@@ -73,7 +73,7 @@
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
         != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
       when: never
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" || ($CI_PIPELINE_SOURCE ==
+    - if: $CI_PIPELINE_SOURCE == "external_pull_request_event" || ($CI_PIPELINE_SOURCE ==
         "push" && ($CI_COMMIT_BRANCH == "develop"))
       changes:
         - .gitlab-ci.yml
@@ -94,7 +94,7 @@
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
         != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
       when: never
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" || ($CI_PIPELINE_SOURCE ==
+    - if: $CI_PIPELINE_SOURCE == "external_pull_request_event" || ($CI_PIPELINE_SOURCE ==
         "push" && ($CI_COMMIT_BRANCH == "develop"))
       changes:
         - .gitlab-ci.yml
