@@ -10,11 +10,11 @@ class Xsbench(ExecutableApplication):
     workload("history", executables=["history"])
     workload("event", executables=["event"])
 
-    workload_variable("benchmark_size", default="large", values=["small", "large", "XL", "XXL"], description="XSBench H-M benchmark size", workload="standard")
-    workload_variable("grid_type", default="unionized", values=["unionized", "nuclide", "hash"], description="Energy-grid search method", workload="standard")
-    workload_variable("particles", default="500000", description="Number of particle histories", workload="standard")
-    workload_variable("lookups", default="34", description="Cross-section lookups per particle in history mode", workload="standard")
-    workload_variable("kernel", default="0", description="XSBench kernel implementation ID", workload="standard")
+    workload_variable("benchmark_size", default="large", values=["small", "large", "XL", "XXL"], description="XSBench H-M benchmark size", workload=["history", "event"])
+    workload_variable("grid_type", default="unionized", values=["unionized", "nuclide", "hash"], description="Energy-grid search method", workload=["history", "event"])
+    workload_variable("particles", default="500000", description="Number of particle histories", workload="history")
+    workload_variable("lookups", default="34", description="Cross-section lookups per particle in history mode", workload=["history", "event"])
+    workload_variable("kernel", default="0", description="XSBench kernel implementation ID", workload=["history", "event"])
 
     figure_of_merit(
         "Runtime",
