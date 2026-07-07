@@ -1,6 +1,7 @@
 workflow:
   rules:
     # Always allow scheduled pipelines
+    # test
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: always
 
