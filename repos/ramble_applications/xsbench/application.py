@@ -4,17 +4,52 @@ from ramble.appkit import *
 class Xsbench(ExecutableApplication):
     name = "xsbench"
 
-    executable('history', 'XSBench -m history -s {benchmark_size} -G {grid_type} -p {particles} -l {lookups} -k {kernel}', use_mpi=False)
-    executable('event', 'XSBench -m event -s {benchmark_size} -G {grid_type} -l {lookups} -k {kernel}', use_mpi=False)
+    executable(
+        "history",
+        "XSBench -m history -s {benchmark_size} -G {grid_type} -p {particles} -l {lookups} -k {kernel}",
+        use_mpi=False,
+    )
+    executable(
+        "event",
+        "XSBench -m event -s {benchmark_size} -G {grid_type} -l {lookups} -k {kernel}",
+        use_mpi=False,
+    )
 
     workload("history", executables=["history"])
     workload("event", executables=["event"])
 
-    workload_variable("benchmark_size", default="large", values=["small", "large", "XL", "XXL"], description="XSBench H-M benchmark size", workload=["history", "event"])
-    workload_variable("grid_type", default="unionized", values=["unionized", "nuclide", "hash"], description="Energy-grid search method", workload=["history", "event"])
-    workload_variable("particles", default="500000", description="Number of particle histories", workload="history")
-    workload_variable("lookups", default="34", description="Cross-section lookups per particle in history mode", workload=["history", "event"])
-    workload_variable("kernel", default="0", description="XSBench kernel implementation ID", workload=["history", "event"])
+    workload_variable(
+        "benchmark_size",
+        default="large",
+        values=["small", "large", "XL", "XXL"],
+        description="XSBench H-M benchmark size",
+        workload=["history", "event"],
+    )
+    workload_variable(
+        "grid_type",
+        default="unionized",
+        values=["unionized", "nuclide", "hash"],
+        description="Energy-grid search method",
+        workload=["history", "event"],
+    )
+    workload_variable(
+        "particles",
+        default="500000",
+        description="Number of particle histories",
+        workload="history",
+    )
+    workload_variable(
+        "lookups",
+        default="34",
+        description="Cross-section lookups per particle in history mode",
+        workload=["history", "event"],
+    )
+    workload_variable(
+        "kernel",
+        default="0",
+        description="XSBench kernel implementation ID",
+        workload=["history", "event"],
+    )
 
     figure_of_merit(
         "Runtime",
