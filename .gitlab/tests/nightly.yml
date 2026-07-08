@@ -3,6 +3,7 @@ include:
   - local: .gitlab/utils/rules.yml
 .test_clusters_nightly: &test_clusters_nightly
   variables:
+    BASELINE_REF: develop
     DASHBOARD_NAME: Nightly [benchpark-develop]
     DANE_PARAMS: -N 1 -t 01:00:00 --exclusive --reservation=ci
     MATRIX_PARAMS: -N 1 -t 01:00:00 --exclusive
@@ -164,8 +165,86 @@ nightly_test_run:
   stage: test
   tags: [$HOST, batch]
   <<: *test_clusters_nightly
+  artifacts:
+    when: always
+    paths: ['artifact-githash/${HOST}/${BENCHMARK}/githash_metadata.json']
   before_script:
     - !reference [.report_status, before_script]
-  script: [./.gitlab/utils/run-experiment.sh]
+  script:
+    - |
+      nightly_rc=0
+      ./.gitlab/utils/run-experiment.sh || nightly_rc=$?
+      echo "[Nightly Status]: Nightly checkout exit code = ${nightly_rc}"
+      printf '%s\n' "${nightly_rc}" > "$CI_PROJECT_DIR/nightly_run.status"
+      exit "${nightly_rc}"
   after_script:
     - !reference [.report_status, after_script]
+    - |-
+      run_workspace="$CI_PROJECT_DIR/wkp/${HOST}/${BENCHMARK}/workspace"
+      githash_json=$(find "${run_workspace}/experiments" -type f -name 'githash_metadata.json' | sort | head -n 1)
+      artifact_dir="$CI_PROJECT_DIR/artifact-githash/${HOST}/${BENCHMARK}"
+      baseline_json="${artifact_dir}/baseline_githash_metadata.json"
+      baseline_status_file="${artifact_dir}/baseline_job.status"
+      mkdir -p "${artifact_dir}"
+      if [[ -n "${githash_json}" ]]; then
+        cp "${githash_json}" "${artifact_dir}/githash_metadata.json"
+      else
+        echo "Unable to locate githash metadata in ${run_workspace}" >&2
+        exit 1
+      fi
+      bash .gitlab/utils/fetch-githash-artifact.sh \
+        "${BASELINE_REF}" \
+        "${CI_JOB_NAME}" \
+        "${HOST}" \
+        "${BENCHMARK}" \
+        "${baseline_json}" \
+        "${CI_PIPELINE_ID}" \
+        "${baseline_status_file}"
+      if [[ "$(cat "$CI_PROJECT_DIR/nightly_run.status")" == "0" ]]; then
+        nightly_status="PASSED"
+      else
+        nightly_status="FAILED"
+      fi
+      case "$(cat "${baseline_status_file}")" in
+        success)
+          baseline_status="PASSED"
+          ;;
+        failed)
+          baseline_status="FAILED"
+          ;;
+        canceled)
+          baseline_status="CANCELED"
+          ;;
+        running)
+          baseline_status="RUNNING"
+          ;;
+        pending)
+          baseline_status="PENDING"
+          ;;
+        manual)
+          baseline_status="MANUAL"
+          ;;
+        skipped)
+          baseline_status="SKIPPED"
+          ;;
+        created)
+          baseline_status="CREATED"
+          ;;
+        waiting_for_resource)
+          baseline_status="WAITING_FOR_RESOURCE"
+          ;;
+        preparing)
+          baseline_status="PREPARING"
+          ;;
+        scheduled)
+          baseline_status="SCHEDULED"
+          ;;
+        *)
+          baseline_status="$(cat "${baseline_status_file}" | tr '[:lower:]' '[:upper:]')"
+          ;;
+      esac
+      echo -e "===============[TESTS]==============="
+      echo "[Baseline]: ${baseline_status}"
+      echo "[Nightly]: ${nightly_status}"
+      echo -e "====================================="
+      bash .gitlab/utils/compare-githash-metadata.sh "${baseline_json}" "${githash_json}"
