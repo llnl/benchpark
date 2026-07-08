@@ -99,6 +99,12 @@ release_resources_matrix:
   after_script:
     - !reference [.report_status, after_script]
     - |
+      if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
+        bash .gitlab/utils/cancel-slurm.sh || true
+        echo "Removing $CUSTOM_CI_BUILDS_DIR"
+        rm -rf $CUSTOM_CI_BUILDS_DIR
+      fi
+    - |
       pr_workspace="$CI_PROJECT_DIR/wkp/${HOST}/${BENCHMARK}/workspace"
       pr_json=$(find "${pr_workspace}/experiments" -type f -name 'githash_metadata.json' | sort | head -n 1)
       artifact_dir="$CI_PROJECT_DIR/artifact-githash/${HOST}/${BENCHMARK}"
@@ -168,10 +174,6 @@ release_resources_matrix:
       echo "[PR]: ${pr_status}"
       echo -e "====================================="
       bash .gitlab/utils/compare-githash-metadata.sh "${baseline_json}" "${pr_json}"
-    - |
-      if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
-        . .gitlab/utils/cancel-slurm.sh
-      fi
 run_tests_slurm_dane:
   extends: .run_tests_slurm
   tags: [shell, dane]

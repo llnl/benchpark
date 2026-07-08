@@ -169,3 +169,8 @@ nightly_test_run:
   script: [./.gitlab/utils/run-experiment.sh]
   after_script:
     - !reference [.report_status, after_script]
+    - |
+      if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
+        echo "Removing $CUSTOM_CI_BUILDS_DIR"
+        rm -rf $CUSTOM_CI_BUILDS_DIR
+      fi
