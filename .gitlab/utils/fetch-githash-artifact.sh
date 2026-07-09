@@ -20,6 +20,20 @@ project_id=${GITLAB_PROJECT_ID:-${CI_PROJECT_ID:-}}
 job_token=${GITLAB_JOB_TOKEN:-${CI_JOB_TOKEN:-}}
 private_token=${GITLAB_PRIVATE_TOKEN:-${PRIVATE_TOKEN:-${GITLAB_TOKEN:-}}}
 artifact_relpath="artifact-githash/${host}/${benchmark}/githash_metadata.json"
+jq_job_name_args=(
+    --arg job_name "${job_name}"
+    --arg dane_params "${DANE_PARAMS:-}"
+    --arg matrix_params "${MATRIX_PARAMS:-}"
+    --arg elcap_params "${ELCAP_PARAMS:-}"
+    --arg gpumode "${GPUMODE:-}"
+)
+jq_normalize_job_name='
+    def normalize_job_name:
+        gsub("\\$\\{DANE_PARAMS\\}|\\$DANE_PARAMS"; $dane_params)
+        | gsub("\\$\\{MATRIX_PARAMS\\}|\\$MATRIX_PARAMS"; $matrix_params)
+        | gsub("\\$\\{ELCAP_PARAMS\\}|\\$ELCAP_PARAMS"; $elcap_params)
+        | gsub("\\$\\{GPUMODE\\}|\\$GPUMODE"; $gpumode);
+'
 
 if [[ -z "${api_url}" ]]; then
     echo "Missing GitLab API URL. Set GITLAB_API_V4_URL or CI_API_V4_URL." >&2
@@ -98,21 +112,21 @@ while IFS=$'\t' read -r candidate_pipeline_id candidate_pipeline_status candidat
             "${api_url}/projects/${project_id}/pipelines/${candidate_pipeline_id}/jobs?per_page=100"
     )
 
-    echo "Matching jobs in pipeline ${candidate_pipeline_id}:"
-    printf '%s' "${jobs_json}" | jq -r --arg job_name "${job_name}" '
-        [ .[] | select(.name == $job_name) ] as $matches
+    echo "Matching jobs in pipeline ${candidate_pipeline_id} after expanding job-name variables:"
+    printf '%s' "${jobs_json}" | jq -r "${jq_job_name_args[@]}" "${jq_normalize_job_name}"'
+        [ .[] | select((.name | normalize_job_name) == ($job_name | normalize_job_name)) ] as $matches
         | if ($matches | length) == 0 then
             "  (none)"
           else
             $matches[]
-            | "  id=\(.id) status=\(.status) artifacts=\((.artifacts_file.filename // "<none>"))"
+            | "  id=\(.id) status=\(.status) artifacts=\((.artifacts_file.filename // "<none>")) name=\(.name)"
           end
     '
 
     baseline_job_id=$(
         printf '%s' "${jobs_json}" \
-        | jq -r --arg job_name "${job_name}" '
-            [.[] | select(.name == $job_name and (.artifacts_file.filename // "") != "")]
+        | jq -r "${jq_job_name_args[@]}" "${jq_normalize_job_name}"'
+            [.[] | select((.name | normalize_job_name) == ($job_name | normalize_job_name) and (.artifacts_file.filename // "") != "")]
             | sort_by(.id)
             | last
             | .id // empty
@@ -121,8 +135,8 @@ while IFS=$'\t' read -r candidate_pipeline_id candidate_pipeline_status candidat
 
     baseline_job_status=$(
         printf '%s' "${jobs_json}" \
-        | jq -r --arg job_name "${job_name}" '
-            [.[] | select(.name == $job_name and (.artifacts_file.filename // "") != "")]
+        | jq -r "${jq_job_name_args[@]}" "${jq_normalize_job_name}"'
+            [.[] | select((.name | normalize_job_name) == ($job_name | normalize_job_name) and (.artifacts_file.filename // "") != "")]
             | sort_by(.id)
             | last
             | .status // empty
