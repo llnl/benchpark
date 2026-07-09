@@ -10,5 +10,6 @@ export URI=$(flux jobs -o "{id} {name}" | grep ${ALLOC_NAME}${GPUMODE} | awk '{p
 ([[ -n "${URI}" ]] && flux cancel ${URI} || exit 0)
 
 if ! $NO_CLEAN; then
+    echo "Removing $CUSTOM_CI_BUILDS_DIR"
     rm -rf $CUSTOM_CI_BUILDS_DIR
 fi
