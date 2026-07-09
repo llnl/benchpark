@@ -1,8 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-if [[ $# -lt 5 || $# -gt 8 ]]; then
-    echo "Usage: $0 <ref> <job_name> <host> <benchmark> <output_path> [exclude_pipeline_id] [status_output_path] [exclude_pipeline_name]" >&2
+if [[ $# -lt 5 || $# -gt 7 ]]; then
+    echo "Usage: $0 <ref> <job_name> <host> <benchmark> <output_path> [exclude_pipeline_id] [status_output_path]" >&2
     exit 1
 fi
 
@@ -13,7 +13,6 @@ benchmark=$4
 output_path=$5
 exclude_pipeline_id=${6:-}
 status_output_path=${7:-}
-exclude_pipeline_name=${8:-}
 
 api_url=${GITLAB_API_V4_URL:-${CI_API_V4_URL:-}}
 project_id=${GITLAB_PROJECT_ID:-${CI_PROJECT_ID:-}}
@@ -27,6 +26,7 @@ jq_job_name_args=(
     --arg elcap_params "${ELCAP_PARAMS:-}"
     --arg gpumode "${GPUMODE:-}"
 )
+# shellcheck disable=SC2016
 jq_normalize_job_name='
     def normalize_job_name:
         gsub("\\$\\{DANE_PARAMS\\}|\\$DANE_PARAMS"; $dane_params)
@@ -58,10 +58,6 @@ echo "Searching ref '${ref}' for artifact '${artifact_relpath}'"
 if [[ -n "${exclude_pipeline_id}" ]]; then
     echo "Excluding pipeline ID ${exclude_pipeline_id}"
 fi
-if [[ -n "${exclude_pipeline_name}" ]]; then
-    echo "Excluding pipeline name '${exclude_pipeline_name}'"
-fi
-
 pipelines_json=$(
     curl --silent --show-error --fail --get \
         --header "${auth_header}" \
@@ -83,8 +79,8 @@ printf '%s' "${pipelines_json}" | jq -r '
 
 candidate_pipelines=$(
     printf '%s' "${pipelines_json}" \
-    | jq -r --arg exclude_pipeline_id "${exclude_pipeline_id}" --arg exclude_pipeline_name "${exclude_pipeline_name}" '
-        [.[] | select(($exclude_pipeline_id == "" or (.id | tostring) != $exclude_pipeline_id) and ($exclude_pipeline_name == "" or (.name // "") != $exclude_pipeline_name))]
+    | jq -r --arg exclude_pipeline_id "${exclude_pipeline_id}" '
+        [.[] | select($exclude_pipeline_id == "" or (.id | tostring) != $exclude_pipeline_id)]
         | sort_by(.id)
         | reverse[]
         | [.id, .status, (.name // "<unnamed>")]
