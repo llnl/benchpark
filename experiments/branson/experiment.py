@@ -65,6 +65,7 @@ class Branson(
     def compute_applications_section(self):
         if self.spec.satisfies("exec_mode=test"):
             self.add_experiment_variable("num_particles", 1000000, True)
+            pool_size = 4
         else:
             if self.spec.satisfies("+throughput"):
                 photons = [
