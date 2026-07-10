@@ -7,7 +7,7 @@ if [[ "$1" == "--no-clean" ]]; then
 fi
 
 export URI=$(flux jobs -o "{id} {name}" | grep ${ALLOC_NAME}${GPUMODE} | awk '{print $1}')
-([[ -n "${URI}" ]] && flux cancel ${URI} || exit 0)
+([[ -n "${URI}" ]] && flux cancel ${URI} || true)
 
 echo "CLEANING CHECK"
 if ! $NO_CLEAN; then

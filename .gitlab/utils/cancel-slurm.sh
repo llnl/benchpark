@@ -7,8 +7,9 @@ if [[ "$1" == "--no-clean" ]]; then
 fi
 
 export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
-([[ -n "${JOBID}" ]] && scancel ${JOBID} || exit 0)
+([[ -n "${JOBID}" ]] && scancel ${JOBID} || true)
 
+echo "CLEANING CHECK"
 if ! $NO_CLEAN; then
     CLEANUP_CI_BUILDS_DIR="${CUSTOM_CI_BUILDS_DIR/#\$HOME/$HOME}"
     CLEANUP_LOCK_DIR="${CLEANUP_CI_BUILDS_DIR}.cleanup.lock"
