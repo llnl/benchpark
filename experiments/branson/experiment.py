@@ -100,7 +100,7 @@ class Branson(
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_experiment_variable("pool", pool_size, False)
         self.add_experiment_variable("input_file", "3D_lb_hohlraum.xml", False)
-        self.add_experiment_variable("particle_message_size", "400000", False)
+        self.add_experiment_variable("particle_message_size", "10000", False)
 
         self.register_scaling_config(
             {
