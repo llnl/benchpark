@@ -21,7 +21,7 @@ system_definition:
     vendor:
     name: Ethernet
   systems-tested:
-    genoa:
+    riken-genoa:
       os: Rocky
       scheduler: slurm
       compiler: gcc
