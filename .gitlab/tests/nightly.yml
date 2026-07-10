@@ -159,7 +159,8 @@ include:
         SYSTEM_ARGS: [mount_point=rabbits_lustre_small]
 nightly_test_run:
   extends: .nightly_rules
-  resource_group: $HOST
+  interruptible: false
+  resource_group: ${HOST}-${CI_PIPELINE_IID}
   stage: test
   tags: [$HOST, batch]
   <<: *test_clusters_nightly
