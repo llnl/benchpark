@@ -420,9 +420,6 @@ class Amg2023(
                     problem_spec["nx"] = 350
                     problem_spec["ny"] = 350
                     problem_spec["nz"] = 350
-                    #problem_spec["nx"] = 360
-                    #problem_spec["ny"] = 360
-                    #problem_spec["nz"] = 360
                     problem_spec["px"] = 2
                     problem_spec["py"] = 2
                     problem_spec["pz"] = 1
