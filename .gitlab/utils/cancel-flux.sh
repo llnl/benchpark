@@ -9,6 +9,7 @@ fi
 export URI=$(flux jobs -o "{id} {name}" | grep ${ALLOC_NAME}${GPUMODE} | awk '{print $1}')
 ([[ -n "${URI}" ]] && flux cancel ${URI} || exit 0)
 
+echo "CLEANING CHECK"
 if ! $NO_CLEAN; then
     CLEANUP_CI_BUILDS_DIR="${CUSTOM_CI_BUILDS_DIR/#\$HOME/$HOME}"
     CLEANUP_LOCK_DIR="${CLEANUP_CI_BUILDS_DIR}.cleanup.lock"
