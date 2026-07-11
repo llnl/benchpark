@@ -23,14 +23,14 @@ class Xsbench(ExecutableApplication):
         default="large",
         values=["small", "large", "XL", "XXL"],
         description="XSBench H-M benchmark size",
-        workload=["history", "event"],
+        workloads=["history", "event"],
     )
     workload_variable(
         "grid_type",
         default="unionized",
         values=["unionized", "nuclide", "hash"],
         description="Energy-grid search method",
-        workload=["history", "event"],
+        workloads=["history", "event"],
     )
     workload_variable(
         "particles",
@@ -42,13 +42,13 @@ class Xsbench(ExecutableApplication):
         "lookups",
         default="34",
         description="Cross-section lookups per particle in history mode",
-        workload=["history", "event"],
+        workloads=["history", "event"],
     )
     workload_variable(
         "kernel",
         default="0",
         description="XSBench kernel implementation ID",
-        workload=["history", "event"],
+        workloads=["history", "event"],
     )
 
     figure_of_merit(
