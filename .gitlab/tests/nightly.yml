@@ -89,16 +89,18 @@ include:
           - gromacs
           - kripke
           - laghos
-          - lammps
           - osu-micro-benchmarks
           - raja-perf
           - remhos
           - saxpy
         VARIANT: [+cuda]
+      # Matrix no gpu-aware mpi
       - HOST: matrix
         ARCHCONFIG: llnl-matrix
         SCHEDULER_PARAMETERS: $MATRIX_PARAMS
-        BENCHMARK: [sparta-snl]
+        BENCHMARK:
+          - lammps
+          - sparta-snl
         VARIANT: [+cuda~gpu-aware-mpi]
       #############
       # Other tests
