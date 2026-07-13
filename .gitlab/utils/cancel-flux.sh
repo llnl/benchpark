@@ -29,6 +29,14 @@ if ! $NO_CLEAN; then
     if mkdir "$CLEANUP_LOCK_DIR"; then
         echo "Removing $CLEANUP_CI_BUILDS_DIR"
         rm -rf "$CLEANUP_CI_BUILDS_DIR"
+        rm_rc=$?
+        echo "rm exit code: $rm_rc"
+        if [[ -e "$CLEANUP_CI_BUILDS_DIR" ]]; then
+            echo "Cleanup target still exists immediately after rm"
+            find "$CLEANUP_CI_BUILDS_DIR" -maxdepth 4 -mindepth 1 | head -100 || true
+        else
+            echo "Cleanup target removed immediately after rm"
+        fi
         rmdir "$CLEANUP_LOCK_DIR" || true
     else
         echo "Cleanup already running for $CLEANUP_CI_BUILDS_DIR"
