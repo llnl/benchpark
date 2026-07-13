@@ -97,6 +97,7 @@ release_resources_flux_tioga:
     - |
       if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
         . .gitlab/utils/cancel-flux.sh
+        exit 0
       fi
     - |
       pr_workspace="$CI_PROJECT_DIR/wkp/${HOST}/${BENCHMARK}/workspace"
