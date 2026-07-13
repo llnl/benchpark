@@ -417,10 +417,13 @@ class Amg2023(
                     or self.spec.satisfies("target=MI250")
                     or self.spec.satisfies("target=H100")
                 ):
-                    problem_spec["nx"] = 292
-                    problem_spec["ny"] = 292
-                    problem_spec["nz"] = 292
-                    problem_spec["pool_size"] = 13
+                    problem_spec["nx"] = 350
+                    problem_spec["ny"] = 350
+                    problem_spec["nz"] = 350
+                    problem_spec["px"] = 2
+                    problem_spec["py"] = 2
+                    problem_spec["pz"] = 1
+                    problem_spec["pool_size"] = 32
                 elif self.spec.satisfies("target=MI300-CPX"):
                     problem_spec["nx"] = 160
                     problem_spec["ny"] = 160
