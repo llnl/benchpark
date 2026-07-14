@@ -60,9 +60,7 @@ def collect_package_info(application_name):
     dependencies = {}
     for dep in pkg_json.get("dependencies"):
         dep_info = extract_package_hash(spack_find_json(dep["name"]))
-        # Ignore packages without commit information, as they are not useful for comparing versions
-        if dep_info["commit"] is not None:
-            dependencies[dep["name"]] = dep_info
+        dependencies[dep["name"]] = dep_info
     return {
         "application": application,
         "dependencies": dependencies,
