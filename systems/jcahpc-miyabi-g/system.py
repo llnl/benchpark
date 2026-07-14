@@ -37,21 +37,11 @@ class JcahpcMiyabiG(System):
     #   NVHPC root : /work/opt/local/aarch64/cores/nvidia/<ver>/Linux_aarch64/<ver>
     #   HPC-X MPI  : <nvhpc-root>/comm_libs/<cuda>/hpcx/latest/ompi
     #   Std. CUDA  : /work/opt/local/aarch64/cores/cuda/<ver>
-    # nvhpc release -> (bundled default CUDA, HPC-X OpenMPI version)
-    nvhpc_to_cuda_mpi = {
-        "24.5": ("12.4", "4.1.7"),
-        "24.9": ("12.6", "4.1.7"),
-        "24.11": ("12.6", "4.1.7"),
-        "25.1": ("12.6", "4.1.7"),
-        "25.3": ("12.8", "4.1.7"),
-        "25.5": ("12.9", "4.1.9"),
-        "25.9": ("13.0", "4.1.9"),
-        "25.11": ("13.0", "4.1.9"),
-        "26.3": ("13.1", "4.1.9"),
-    }
-
     id_to_resources = {
         "miyabi-g": {
+            "cuda_arch": "90",
+            "pbs_emit_gpus": 0,
+            "pbs_ncpus_per_node": 72,
             "sys_cores_per_node": 72,
             "sys_gpus_per_node": 1,
             "sys_mem_per_node_GB": 120,
@@ -135,8 +125,35 @@ class JcahpcMiyabiG(System):
         self.scheduler = "pbs"
 
         self.nvhpc_version = Version(self.spec.variants["nvhpc"][0])
-        bundled_cuda, hpcx_ompi = self.nvhpc_to_cuda_mpi[str(self.nvhpc_version)]
-        self.hpcx_ompi_version = hpcx_ompi
+        self.cuda_version = Version(self.spec.variants["cuda"][0])
+
+        if str(self.nvhpc_version) == "24.5":
+            self.nvhpc_cuda_version = "12.4"
+            self.hpcx_ompi_version = "4.1.7"
+        if str(self.nvhpc_version) == "24.9":
+            self.nvhpc_cuda_version = "12.6"
+            self.hpcx_ompi_version = "4.1.7"
+        if str(self.nvhpc_version) == "24.11":
+            self.nvhpc_cuda_version = "12.6"
+            self.hpcx_ompi_version = "4.1.7"
+        if str(self.nvhpc_version) == "25.1":
+            self.nvhpc_cuda_version = "12.6"
+            self.hpcx_ompi_version = "4.1.7"
+        if str(self.nvhpc_version) == "25.3":
+            self.nvhpc_cuda_version = "12.8"
+            self.hpcx_ompi_version = "4.1.7"
+        if str(self.nvhpc_version) == "25.5":
+            self.nvhpc_cuda_version = "12.9"
+            self.hpcx_ompi_version = "4.1.9"
+        if str(self.nvhpc_version) == "25.9":
+            self.nvhpc_cuda_version = "13.0"
+            self.hpcx_ompi_version = "4.1.9"
+        if str(self.nvhpc_version) == "25.11":
+            self.nvhpc_cuda_version = "13.0"
+            self.hpcx_ompi_version = "4.1.9"
+        if str(self.nvhpc_version) == "26.3":
+            self.nvhpc_cuda_version = "13.1"
+            self.hpcx_ompi_version = "4.1.9"
 
         # HPC-X (OpenMPI) is the vendor MPI on Miyabi-G. It is always sourced
         # from the NVIDIA HPC SDK bundle, even when building with gcc.
@@ -145,15 +162,13 @@ class JcahpcMiyabiG(System):
             f"/Linux_aarch64/{self.nvhpc_version}"
         )
         self.hpcx_prefix = (
-            f"{self.nvhpc_base}/comm_libs/{bundled_cuda}/hpcx/latest/ompi"
+            f"{self.nvhpc_base}/comm_libs/{self.nvhpc_cuda_version}/hpcx/latest/ompi"
         )
 
         # Effective CUDA: the HPC SDK bundle when building with nvhpc,
         # otherwise the standalone cuda module chosen by the `cuda` variant.
         if self.spec.satisfies("compiler=nvhpc"):
-            self.cuda_version = Version(bundled_cuda)
-        else:
-            self.cuda_version = Version(self.spec.variants["cuda"][0])
+            self.cuda_version = self.nvhpc_cuda_version
 
         attrs = self.id_to_resources.get("miyabi-g")
         for k, v in attrs.items():
@@ -349,13 +364,11 @@ class JcahpcMiyabiG(System):
 
     def system_specific_variables(self):
         variables = {
-            "cuda_arch": "90",
-            # Miyabi-G nodes are allocated whole (one GH200 per node, no MIG
-            # sharing), so request the node's full core count. Otherwise the
-            # generated `ncpus` collapses to the rank/thread count (e.g. 1 for a
-            # single-rank job); PBS then pins the job to that narrow cpuset and
-            # HPC-X/Open MPI's hwloc segfaults building the topology on GH200.
-            "n_cores_per_node": self.sys_cores_per_node,
+            "cuda_arch": self.cuda_arch,
+            # Avoid too-small PBS cpusets that make HPC-X/Open MPI hwloc fail
+            # during startup on Miyabi-G.
+            "pbs_emit_gpus": self.pbs_emit_gpus,
+            "pbs_ncpus_per_node": self.pbs_ncpus_per_node,
         }
         # JCAHPC PBS requires the project group via `-W group_list=<group>`
         # (not `-A`). Inject it as an extra batch directive when provided.

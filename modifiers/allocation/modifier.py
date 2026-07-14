@@ -19,6 +19,8 @@ class AllocOpt(Enum):
     N_GPUS = 6
     N_CORES_PER_NODE = 7
     OMP_NUM_THREADS = 8
+    PBS_NCPUS_PER_NODE = 9
+    PBS_EMIT_GPUS = 10
 
     # Descriptions of resources available on systems
     SYS_GPUS_PER_NODE = 100
@@ -509,29 +511,20 @@ class Allocation(BasicModifier):
         if v.n_threads_per_proc and v.n_threads_per_proc != 1:
             node_spec.append(f"ompthreads={v.n_threads_per_proc}")
 
-        # A system may request a specific per-node core count via the
-        # `n_cores_per_node` variable (e.g. sites that allocate whole nodes and
-        # need the full cpuset). When it is not set we fall back to the cores
-        # implied by the rank/thread layout. This keeps site policy out of the
-        # shared modifier: a system that wants a different value (MIG slices,
-        # partial-node sharing, ...) simply sets `n_cores_per_node` accordingly.
-        n_cpus_per_node = v.n_cores_per_node or (
-            v.n_ranks_per_node * v.n_threads_per_proc
+        # Some PBS sites need a scheduler-specific ncpus floor that is larger
+        # than the rank/thread layout, for example to avoid a too-small cpuset.
+        layout_ncpus = v.n_ranks_per_node * v.n_threads_per_proc
+        n_cpus_per_node = max(
+            v.pbs_ncpus_per_node or 0,
+            v.n_cores_per_node or 0,
+            layout_ncpus,
         )
 
         node_spec.append(f"ncpus={n_cpus_per_node}")
 
-        # No GPU chunk sub-resource is emitted here.
-        # On Miyabi-G, GPU allocation is already reflected in n_nodes/select, so
-        # adding a separate GPU chunk resource is unnecessary.
-        #
-        # Avoid the PBS GPU chunk path here, as it is not needed for this site
-        # configuration and can fail when invoked.
-        #
-        #
-        # if v.n_gpus:
-        #    gpus_per_rank = self.gpus_as_gpus_per_rank(v.n_gpus)
-        #    node_spec.append(f"gpus={gpus_per_rank}")
+        if v.n_gpus and v.pbs_emit_gpus != 0:
+            gpus_per_rank = self.gpus_as_gpus_per_rank(v)
+            node_spec.append(f"gpus={gpus_per_rank}")
 
         if node_spec:
             batch_opts.append(f"-l {':'.join(node_spec)}")
