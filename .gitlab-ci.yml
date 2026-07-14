@@ -4,25 +4,36 @@ workflow:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: always
 
-    # Run pipelines only when these files/dirs change
-    - changes:
-        - .gitlab/**/*
-        - bin/**/*
-        - configs/**/*
-        - experiments/**/*
-        - lib/**/*
-        - modifiers/**/*
-        - repos/**/*
-        - var/**/*
-        - systems/llnl-elcapitan/system.py
-        - systems/llnl-cluster/system.py
-        - .gitlab-ci.yml
-        - checkout-versions.yaml
-        - CTestConfig.cmake
-        - CTestGitlab.cmake
-        - pyproject.toml
-        - remote-urls.yaml
-        - requirements.txt
+    # Always allow manually started pipelines
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: always
+
+    # Feature branch pipelines should diff against the integration target.
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != "develop"
+      changes:
+        compare_to: refs/heads/develop
+        paths: &workflow_change_paths
+          - .gitlab/**/*
+          - bin/**/*
+          - configs/**/*
+          - experiments/**/*
+          - lib/**/*
+          - modifiers/**/*
+          - repos/**/*
+          - var/**/*
+          - systems/llnl-elcapitan/system.py
+          - systems/llnl-cluster/system.py
+          - .gitlab-ci.yml
+          - checkout-versions.yaml
+          - CTestConfig.cmake
+          - CTestGitlab.cmake
+          - pyproject.toml
+          - remote-urls.yaml
+          - requirements.txt
+
+    # Develop pipelines should diff against the previous develop commit.
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "develop"
+      changes: *workflow_change_paths
 
     # Otherwise, don't create a pipeline
     - when: never
