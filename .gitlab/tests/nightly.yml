@@ -99,9 +99,7 @@ include:
       - HOST: matrix
         ARCHCONFIG: llnl-matrix
         SCHEDULER_PARAMETERS: $MATRIX_PARAMS
-        BENCHMARK:
-          - lammps
-          - sparta-snl
+        BENCHMARK: [lammps, sparta-snl]
         VARIANT: [+cuda~gpu-aware-mpi]
       #############
       # Other tests
