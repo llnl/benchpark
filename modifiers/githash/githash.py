@@ -46,10 +46,12 @@ def spack_find_json(name):
 
 def extract_package_hash(pkg_json):
     params = pkg_json.get("parameters", {})
+    external = pkg_json.get("external") or params.get("external", {})
     return {
         "name": pkg_json.get("name"),
         "version": pkg_json.get("version"),
         "commit": params.get("commit"),
+        "external_path": external.get("path"),
     }
 
 
