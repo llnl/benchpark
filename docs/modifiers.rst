@@ -248,8 +248,7 @@ the Caliper metadata.
 ***************************
 
 The ``githash`` modifier records version metadata for the Benchpark repository, the
-pinned Benchpark dependencies, and the application package plus any dependencies whose
-Spack metadata includes a commit value.
+pinned Benchpark dependencies, and the application package plus any dependencies.
 
 The ``githash`` modifier is enabled by default (``githash=on``). You can specify
 ``githash=none`` to disable usage.

@@ -168,9 +168,7 @@ run_tests_slurm_matrix:
         VARIANT: [+cuda]
       - HOST: matrix
         ARCHCONFIG: llnl-matrix
-        BENCHMARK:
-          - lammps
-          - sparta-snl
+        BENCHMARK: [lammps, sparta-snl]
         VARIANT: [+cuda~gpu-aware-mpi]
       # spack-pip
       - HOST: matrix
