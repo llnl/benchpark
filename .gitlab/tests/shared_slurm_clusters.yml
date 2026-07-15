@@ -229,14 +229,13 @@ run_tests_slurm_matrix:
           - babelstream
           - kripke
           - laghos
-          - lammps
           - raja-perf
           - remhos
           - saxpy
         VARIANT: [+cuda]
       - HOST: matrix
         ARCHCONFIG: llnl-matrix
-        BENCHMARK: [sparta-snl]
+        BENCHMARK: [lammps, sparta-snl]
         VARIANT: [+cuda~gpu-aware-mpi]
       # spack-pip
       - HOST: matrix

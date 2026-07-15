@@ -13,11 +13,13 @@ from spack_repo.builtin.packages.osu_micro_benchmarks.package import (
 class OsuMicroBenchmarks(BuiltinOsu, ROCmPackage):
 
     depends_on("cray-mpich+gtl", when="+rocm")
-    
+
     def configure_args(self):
         args = super().configure_args()
         if self.spec.satisfies("+rocm"):
-            args.extend([f"LDFLAGS={self.spec['mpi'].libs.ld_flags}"]) 
+            if "--enable-rocm" not in args:
+                args.append("--enable-rocm")
+            args.extend([f"LDFLAGS={self.spec['mpi'].libs.ld_flags}"])
             print(self.spec['mpi'])
         new_args = list()
         for x in args:
