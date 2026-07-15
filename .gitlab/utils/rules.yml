@@ -3,6 +3,8 @@
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
         != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
       when: never
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: on_success
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != "develop"
       changes:
         compare_to: refs/heads/develop
@@ -24,6 +26,8 @@
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
         != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
       when: never
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: on_success
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != "develop"
       changes:
         compare_to: refs/heads/develop
@@ -55,6 +59,8 @@
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
         != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
       when: never
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: on_success
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != "develop"
       changes:
         compare_to: refs/heads/develop
@@ -83,6 +89,8 @@
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
         != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
       when: never
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: on_success
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != "develop"
       changes:
         compare_to: refs/heads/develop
@@ -107,6 +115,8 @@
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
         != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
       when: never
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: on_success
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != "develop"
       changes:
         compare_to: refs/heads/develop

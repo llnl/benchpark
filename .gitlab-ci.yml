@@ -4,6 +4,10 @@ workflow:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: always
 
+    # Always allow manually started pipelines
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: always
+
     # Feature branch pipelines should diff against the integration target.
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != "develop"
       changes:
