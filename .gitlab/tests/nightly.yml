@@ -3,7 +3,7 @@ include:
   - local: .gitlab/utils/rules.yml
 .test_clusters_nightly: &test_clusters_nightly
   variables:
-    BASELINE_REF: nightly-githash
+    BASELINE_REF: develop
     DASHBOARD_NAME: Nightly [benchpark-develop]
     DANE_PARAMS: -N 1 -t 01:00:00 --exclusive --reservation=ci
     MATRIX_PARAMS: -N 1 -t 01:00:00 --exclusive
