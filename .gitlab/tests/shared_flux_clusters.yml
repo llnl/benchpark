@@ -239,7 +239,7 @@ run_tests_flux_tioga:
       - HOST: tioga
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK: [amg2023, kripke, laghos, raja-perf, remhos]
-        VARIANT: [+rocm]
+        VARIANT: ['+rocm caliper=time,mpi']
       # spack-pip
       - HOST: tioga
         ARCHCONFIG: llnl-elcapitan
