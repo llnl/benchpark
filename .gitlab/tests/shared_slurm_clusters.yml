@@ -100,14 +100,9 @@ release_resources_matrix:
   after_script:
     - !reference [.report_status, after_script]
     - |
-      pr_workspace="$CI_PROJECT_DIR/wkp/${HOST}/${BENCHMARK}/workspace"
-      cali_artifact_dir="$CI_PROJECT_DIR/artifact-cali/${HOST}/${BENCHMARK}"
-      mkdir -p "${cali_artifact_dir}"
-      find "${pr_workspace}/experiments" -type f -name '*.cali' -exec cp {} "${cali_artifact_dir}/" \; || true
+      bash .gitlab/utils/collect-cali-artifact.sh
     - |
-      bash .gitlab/utils/collect-githash-artifact.sh \
-        PR \
-        "$CI_PROJECT_DIR/pr_flux.status"
+      bash .gitlab/utils/collect-githash-artifact.sh PR "$CI_PROJECT_DIR/pr_flux.status"
     - |
       if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
         . .gitlab/utils/cancel-slurm.sh
