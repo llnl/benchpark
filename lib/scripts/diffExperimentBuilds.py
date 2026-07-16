@@ -147,55 +147,16 @@ def main():
                 spec = "+" + spec
                 var = "cluster"
                 if os.path.isdir(f"{name}/{cluster}"):
-<<<<<<< Updated upstream
-                    shutil.rmtree(f"{name}/{cluster}")
-                sys_list = [
-                    "python",
-                    f"{name}/lib/main.py",
-                    "system",
-                    "init",
-                    f"--dest={name}/{cluster}",
-                    system,
-                ]
-                if not no_cluster:
-                    sys_list.append(f"{var}={cluster}")
-                subprocess.run(sys_list)
-                if os.path.isdir(f"{name}/{cluster}/{exper}"):
-                    shutil.rmtree(f"{name}/{cluster}/{exper}")
-                subprocess.run(
-                    [
-=======
                     if args.rebuild:
                         shutil.rmtree(f"{name}/{cluster}")
                 if not os.path.isdir(f"{name}/{cluster}"):
                     sys_list = [
->>>>>>> Stashed changes
                         "python",
                         f"{name}/lib/main.py",
                         "system",
                         "init",
-<<<<<<< Updated upstream
-                        f"--dest={exper}",
-                        f"{name}/{cluster}",
-=======
-<<<<<<< Updated upstream
-                        f"--dest={name}/{exper}",
-                        f"--system={name}/{cluster}",
->>>>>>> Stashed changes
-                        f"{exper}{spec}" + args.extra_spec,
-                    ]
-                )
-                subprocess.run(
-                    [
-                        "python",
-                        f"{name}/lib/main.py",
-                        "setup",
-                        f"{name}/{cluster}/{exper}",
-                        f"{name}/wkp",
-=======
                         f"--dest={name}/{cluster}",
                         system,
->>>>>>> Stashed changes
                     ]
                     if not no_cluster:
                         sys_list.append(f"{var}={cluster}")
@@ -274,29 +235,13 @@ def main():
                         check=True,
                     )
                 # Define the ramble command
-<<<<<<< Updated upstream
-                ramble_command = f"{name}/wkp/ramble/bin/ramble --workspace-dir {name}/wkp/{cluster}/{exper}/workspace workspace setup"
-=======
-<<<<<<< Updated upstream
-                ramble_command = f"{name}/wkp/ramble/bin/ramble --workspace-dir {name}/wkp/{exper}/{cluster}/workspace workspace setup"
-=======
                 ramble_command = f"{name}/wkp/ramble/bin/ramble --workspace-dir {workspace_dir}"
->>>>>>> Stashed changes
->>>>>>> Stashed changes
                 # Combine sourcing the script and running the command
                 run_str = f"bash -c 'source {spack_setup_script}"
                 if setup_needed:
                     run_str += f" && {ramble_command} workspace setup"
                 if args.run_experiment:
-<<<<<<< Updated upstream
-                    run_str += f" && {name}/wkp/ramble/bin/ramble --workspace-dir {name}/wkp/{cluster}/{exper}/workspace on"
-=======
-<<<<<<< Updated upstream
-                    run_str += f" && {name}/wkp/ramble/bin/ramble --workspace-dir {name}/wkp/{exper}/{cluster}/workspace on"
-=======
                     run_str += f" && {ramble_command} on"
->>>>>>> Stashed changes
->>>>>>> Stashed changes
                 run_str += "'"
                 if setup_needed or args.run_experiment:
                     subprocess.run(
