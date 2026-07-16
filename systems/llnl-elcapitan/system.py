@@ -838,7 +838,7 @@ class LlnlElcapitan(System):
         rocmcc_entry = compiler_def(
             f"llvm-amdgpu@{self.rocm_version}",
             f"/opt/rocm-{self.rocm_version}/llvm",
-            {"c": "amdclang", "cxx": "amdclang++", "fortran": "amdflang"},
+            {"c": "amdclang", "cxx": "amdclang++", "fortran": "amdflang", "hip": "amdclang++"},
             modules=[f"rocm/{self.rocm_version}"],
             extra_rpaths=list(rpaths),
             env={
