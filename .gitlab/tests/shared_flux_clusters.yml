@@ -74,7 +74,7 @@ release_resources_flux_tioga:
   stage: test
   extends: .run_test_rules
   variables:
-    BASELINE_REF: develop
+    BASELINE_REF: ci-caliper
   artifacts:
     when: always
     paths:
