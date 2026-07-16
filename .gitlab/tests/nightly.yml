@@ -89,16 +89,16 @@ include:
           - gromacs
           - kripke
           - laghos
-          - lammps
           - osu-micro-benchmarks
           - raja-perf
           - remhos
           - saxpy
         VARIANT: [+cuda]
+      # Matrix no gpu-aware mpi
       - HOST: matrix
         ARCHCONFIG: llnl-matrix
         SCHEDULER_PARAMETERS: $MATRIX_PARAMS
-        BENCHMARK: [sparta-snl]
+        BENCHMARK: [lammps, sparta-snl]
         VARIANT: [+cuda~gpu-aware-mpi]
       #############
       # Other tests
@@ -160,7 +160,7 @@ include:
 nightly_test_run:
   extends: .nightly_rules
   interruptible: false
-  resource_group: $HOST
+  resource_group: ${HOST}-${CI_PIPELINE_IID}
   stage: test
   tags: [$HOST, batch]
   <<: *test_clusters_nightly
