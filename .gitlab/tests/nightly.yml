@@ -3,6 +3,7 @@ include:
   - local: .gitlab/utils/rules.yml
 .test_clusters_nightly: &test_clusters_nightly
   variables:
+    BASELINE_REF: develop
     DASHBOARD_NAME: Nightly [benchpark-develop]
     DANE_PARAMS: -N 1 -t 01:00:00 --exclusive --reservation=ci
     MATRIX_PARAMS: -N 1 -t 01:00:00 --exclusive
@@ -164,8 +165,21 @@ nightly_test_run:
   stage: test
   tags: [$HOST, batch]
   <<: *test_clusters_nightly
+  artifacts:
+    when: always
+    paths: ['artifact-githash/${HOST}/${BENCHMARK}/githash_metadata.json']
   before_script:
     - !reference [.report_status, before_script]
-  script: [./.gitlab/utils/run-experiment.sh]
+  script:
+    - |
+      nightly_rc=0
+      ./.gitlab/utils/run-experiment.sh || nightly_rc=$?
+      echo "[Nightly Status]: Nightly checkout exit code = ${nightly_rc}"
+      printf '%s\n' "${nightly_rc}" > "$CI_PROJECT_DIR/nightly_run.status"
+      exit "${nightly_rc}"
   after_script:
     - !reference [.report_status, after_script]
+    - |-
+      bash .gitlab/utils/collect-githash-artifact.sh \
+        Nightly \
+        "$CI_PROJECT_DIR/nightly_run.status"
