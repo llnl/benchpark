@@ -10,7 +10,7 @@ checkout_label=$1
 run_status_file=$2
 
 run_workspace="${CI_PROJECT_DIR}/wkp/${HOST}/${BENCHMARK}/workspace"
-artifact_dir="${CI_PROJECT_DIR}/artifact-githash/${HOST}/${BENCHMARK}"
+artifact_dir="${CI_PROJECT_DIR}/artifact-githash"
 githash_json=""
 baseline_json="${artifact_dir}/baseline_githash_metadata.json"
 baseline_status_file="${artifact_dir}/baseline_job.status"
@@ -30,7 +30,7 @@ fi
 fetch_args=(
     --ref "${BASELINE_REF}"
     --job-name "${CI_JOB_NAME}"
-    --artifact-path "artifact-githash/${HOST}/${BENCHMARK}/githash_metadata.json"
+    --artifact-path "artifact-githash/githash_metadata.json"
     --output-path "${baseline_json}"
     --exclude-pipeline-id "${CI_PIPELINE_ID}"
     --status-output-path "${baseline_status_file}"

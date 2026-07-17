@@ -81,8 +81,8 @@ release_resources_matrix:
   artifacts:
     when: always
     paths:
-      - 'artifact-githash/${HOST}/${BENCHMARK}/githash_metadata.json'
-      - 'artifact-cali/${HOST}/${BENCHMARK}/'
+      - 'artifact-githash/githash_metadata.json'
+      - 'artifact-cali/'
   before_script:
     - !reference [.report_status, before_script]
   script:

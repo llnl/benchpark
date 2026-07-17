@@ -2,8 +2,8 @@
 set -euo pipefail
 
 run_workspace="${CI_PROJECT_DIR}/wkp/${HOST}/${BENCHMARK}/workspace"
-artifact_dir="${CI_PROJECT_DIR}/artifact-cali/${HOST}/${BENCHMARK}"
-baseline_artifact_dir="${CI_PROJECT_DIR}/baseline-cali/${HOST}/${BENCHMARK}"
+artifact_dir="${CI_PROJECT_DIR}/artifact-cali"
+baseline_artifact_dir="${CI_PROJECT_DIR}/baseline-cali"
 
 mkdir -p "${artifact_dir}"
 if [[ -d "${run_workspace}/experiments" ]]; then
@@ -15,7 +15,7 @@ fi
 bash .gitlab/utils/fetch-job-artifact.sh \
     --ref "${BASELINE_REF}" \
     --job-name "${CI_JOB_NAME}" \
-    --artifact-path "artifact-cali/${HOST}/${BENCHMARK}/" \
+    --artifact-path "artifact-cali/" \
     --output-path "${baseline_artifact_dir}" \
     --exclude-pipeline-id "${CI_PIPELINE_ID}" \
     --directory \

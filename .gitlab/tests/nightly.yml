@@ -167,7 +167,7 @@ nightly_test_run:
   <<: *test_clusters_nightly
   artifacts:
     when: always
-    paths: ['artifact-githash/${HOST}/${BENCHMARK}/githash_metadata.json']
+    paths: ['artifact-githash/githash_metadata.json']
   before_script:
     - !reference [.report_status, before_script]
   script:
