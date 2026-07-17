@@ -77,9 +77,7 @@ release_resources_flux_tioga:
     BASELINE_REF: ci-caliper
   artifacts:
     when: always
-    paths:
-      - 'artifact-githash/githash_metadata.json'
-      - 'artifact-cali/'
+    paths: [artifact-githash/githash_metadata.json, artifact-cali/]
   before_script:
     - !reference [.report_status, before_script]
   script:
@@ -163,7 +161,7 @@ run_tests_flux_tuolumne:
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK: [stream]
-        VARIANT: [caliper=time,mpi]
+        VARIANT: [caliper=time, mpi]
         SYSTEM_ARGS: [compiler=gcc]
 run_tests_flux_tioga:
   extends: .run_tests_flux

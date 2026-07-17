@@ -80,9 +80,7 @@ release_resources_matrix:
     BASELINE_REF: develop
   artifacts:
     when: always
-    paths:
-      - 'artifact-githash/githash_metadata.json'
-      - 'artifact-cali/'
+    paths: [artifact-githash/githash_metadata.json, artifact-cali/]
   before_script:
     - !reference [.report_status, before_script]
   script:
