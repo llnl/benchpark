@@ -74,7 +74,7 @@ release_resources_flux_tioga:
   stage: test
   extends: .run_test_rules
   variables:
-    BASELINE_REF: ci-caliper
+    BASELINE_REF: develop
   artifacts:
     when: always
     paths: [artifact-githash/githash_metadata.json, artifact-cali/]
