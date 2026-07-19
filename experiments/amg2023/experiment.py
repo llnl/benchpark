@@ -374,8 +374,8 @@ class Amg2023(
                 "ny": 171,
                 "nz": 171,
                 "pool_size": 16,
-                "px": 1,
-                "py": 1,
+                "px": 2,
+                "py": 2,
                 "pz": 1,
                 "strong_n": None,
                 "strong_p": None,
@@ -398,7 +398,7 @@ class Amg2023(
                     # problem_spec["nx"] = 86
                     # problem_spec["ny"] = 86
                     # problem_spec["nz"] = 86
-                    # problem_spec["pool_size"] = 2
+                    # problem_spec["pool_size"] = 4
                 elif self.spec.satisfies("target=MI300-CPX"):
                     problem_spec["nx"] = 94
                     problem_spec["ny"] = 94
@@ -417,6 +417,9 @@ class Amg2023(
                     or self.spec.satisfies("target=MI250")
                     or self.spec.satisfies("target=H100")
                 ):
+                    # problem_spec["nx"] = 360
+                    # problem_spec["ny"] = 360
+                    # problem_spec["nz"] = 360
                     problem_spec["nx"] = 350
                     problem_spec["ny"] = 350
                     problem_spec["nz"] = 350

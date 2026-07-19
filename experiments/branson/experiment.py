@@ -87,6 +87,7 @@ class Branson(
                     40000000,
                     53200000,
                     80000000,
+                    100000000,
                     200000000,
                     400000000,
                     800000000,
@@ -94,13 +95,13 @@ class Branson(
                 pool_size = 64
             else:
                 photons = 100000000
-                pool_size = 32
+                pool_size = 20
             self.add_experiment_variable("num_particles", photons, True)
         self.add_experiment_variable("resource_count", 4, False)
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_experiment_variable("pool", pool_size, False)
         self.add_experiment_variable("input_file", "3D_lb_hohlraum.xml", False)
-        self.add_experiment_variable("particle_message_size", "10000", False)
+        self.add_experiment_variable("particle_message_size", "400000", False)
 
         self.register_scaling_config(
             {
