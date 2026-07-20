@@ -142,8 +142,10 @@ run_tests_flux_tuolumne:
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK: [py-scaffold]
+        GPUMODE: [SPX]
+        SYSTEM_ARGS: [rocm=7.1.1]
         VARIANT:
-          - +rocm package_manager=spack-pip caliper=mpi,time allocation=torchrun-hpc
+          - +rocm package_manager=spack-pip caliper=time,rocm,rocm-gputime,rccl allocation=torchrun-hpc
       # rocm7
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
