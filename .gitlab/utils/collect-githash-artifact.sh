@@ -10,7 +10,7 @@ checkout_label=$1
 run_status_file=$2
 
 run_workspace="${CI_PROJECT_DIR}/wkp/${HOST}/${BENCHMARK}/workspace"
-artifact_dir="${CI_PROJECT_DIR}/artifact-githash/${HOST}/${BENCHMARK}"
+artifact_dir="${CI_PROJECT_DIR}/artifact-githash"
 githash_json=""
 baseline_json="${artifact_dir}/baseline_githash_metadata.json"
 baseline_status_file="${artifact_dir}/baseline_job.status"
@@ -28,16 +28,15 @@ else
 fi
 
 fetch_args=(
-    "${BASELINE_REF}"
-    "${CI_JOB_NAME}"
-    "${HOST}"
-    "${BENCHMARK}"
-    "${baseline_json}"
-    "${CI_PIPELINE_ID}"
-    "${baseline_status_file}"
+    --ref "${BASELINE_REF}"
+    --job-name "${CI_JOB_NAME}"
+    --artifact-path "artifact-githash/githash_metadata.json"
+    --output-path "${baseline_json}"
+    --exclude-pipeline-id "${CI_PIPELINE_ID}"
+    --status-output-path "${baseline_status_file}"
 )
 
-bash .gitlab/utils/fetch-githash-artifact.sh "${fetch_args[@]}"
+bash .gitlab/utils/fetch-job-artifact.sh "${fetch_args[@]}"
 
 if [[ "$(cat "${run_status_file}")" == "0" ]]; then
     run_status="PASSED"
