@@ -1,0 +1,56 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index d60cb45..a03c8db 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -24,6 +24,7 @@ endif()
+ find_package(HYPRE REQUIRED)
+ find_package(MFEM REQUIRED)
+ find_package(MPI REQUIRED)
++find_package(RAJA REQUIRED)
+ 
+ option(LAGHOS_USE_CALIPER "Use Caliper" OFF)
+ if (LAGHOS_USE_CALIPER)
+@@ -61,6 +62,13 @@ if (MFEM_USE_HIP)
+   if(NOT DEFINED CMAKE_HIP_ARCHITECTURES)
+     set(CMAKE_HIP_ARCHITECTURES gfx942)
+   endif()
++  enable_language(HIP)
++  set(CMAKE_HIP_STANDARD ${CMAKE_CXX_STANDARD} CACHE STRING
++    "HIP standard to use.")
++  set(CMAKE_HIP_STANDARD_REQUIRED ON CACHE BOOL
++    "Force the use of the chosen HIP standard.")
++  set(CMAKE_HIP_EXTENSIONS OFF CACHE BOOL "Enable HIP standard extensions.")
++  message(STATUS "Using HIP architecture: ${CMAKE_HIP_ARCHITECTURES}")
+ endif()
+ 
+ 
+@@ -72,6 +80,10 @@ if (MFEM_USE_CUDA)
+   set_source_files_properties(${SOURCES} PROPERTIES LANGUAGE CUDA)
+ endif()
+ 
++if (MFEM_USE_HIP)
++  set_source_files_properties(${SOURCES} PROPERTIES LANGUAGE HIP)
++endif()
++
+ add_executable(laghos ${SOURCES})
+ 
+ target_include_directories(laghos PUBLIC "${MFEM_DIR}/../../../include/mfem")
+@@ -80,6 +92,7 @@ target_link_libraries(laghos
+   PUBLIC mfem
+   PUBLIC MPI::MPI_CXX
+   PUBLIC HYPRE::HYPRE
++  PUBLIC RAJA
+ )
+ if(LAGHOS_USE_CALIPER)
+   target_link_libraries(laghos
+@@ -93,6 +106,10 @@ if (MFEM_USE_CUDA)
+   set_source_files_properties(sedov/sedov_sol.cpp sedov/sedov.cpp PROPERTIES LANGUAGE CUDA)
+ endif()
+ 
++if (MFEM_USE_HIP)
++  set_source_files_properties(sedov/sedov_sol.cpp sedov/sedov.cpp PROPERTIES LANGUAGE HIP)
++endif()
++
+ add_executable(sedov sedov/sedov_sol.cpp sedov/sedov.cpp)
+ 
+ target_include_directories(sedov PUBLIC "${MFEM_DIR}/../../../include/mfem")

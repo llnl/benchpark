@@ -5,11 +5,11 @@
 
 from spack.package import *
 from spack_repo.builtin.build_systems.cuda import CudaPackage
-from spack_repo.builtin.build_systems.makefile import MakefilePackage
+from spack_repo.builtin.build_systems.cmake import CMakePackage
 from spack_repo.builtin.build_systems.rocm import ROCmPackage
 
 
-class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
+class Laghos(CMakePackage, CudaPackage, ROCmPackage):
     """Laghos (LAGrangian High-Order Solver) is a CEED miniapp that solves the
     time-dependent Euler equations of compressible gas dynamics in a moving
     Lagrangian frame using unstructured high-order finite element spatial
@@ -66,6 +66,8 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     depends_on("mfem+cuda+mpi+umpire", when="+cuda")
     depends_on("mfem~cuda", when="~cuda")
 
+    patch("laghos-cmake.patch")
+
     for sm_ in CudaPackage.cuda_arch_values:
         depends_on("hypre cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
         depends_on("mfem cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
@@ -94,32 +96,27 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         if "+gpu-aware-mpi" in self.spec:
             env.set("MFEM_GPU_AWARE_MPI", "1")
 
-    @property
-    def build_targets(self):
-        targets = []
-        spec = self.spec
-
-        targets.append("MFEM_DIR=%s" % spec["mfem"].prefix)
-        targets.append("CONFIG_MK=%s" % spec["mfem"].package.config_mk)
-        targets.append("TEST_MK=%s" % spec["mfem"].package.test_mk)
-        if "+caliper" in self.spec:
-            targets.append("LAGHOS_USE_CALIPER=ON")
-            targets.append("CALIPER_DIR=%s" % spec["caliper"].prefix)
-            targets.append("ADIAK_DIR=%s" % spec["adiak"].prefix)
-        if spec.satisfies("@:2.0"):
-            targets.append("CXX=%s" % spec["mpi"].mpicxx)
-        if self.spec.satisfies("+ofast %gcc"):
-            targets.append("CXXFLAGS = -Ofast -finline-functions")
-        return targets
-
-    # See lib/spack/spack/build_systems/makefile.py
-    def check(self):
-        with working_dir(self.build_directory):
-            make("test", *self.build_targets)
+    install_time_test_callbacks = []  # type: List[str]
 
     def install(self, spec, prefix):
         mkdirp(prefix.bin)
-        install("laghos", prefix.bin)
-        install_tree("data", prefix.data)
+        build_dir = self.build_directory
+        install(join_path(build_dir, "laghos"), prefix.bin)
+        install(join_path(build_dir, "sedov"), prefix.bin)
 
-    install_time_test_callbacks = []  # type: List[str]
+    def cmake_args(self):
+        spec = self.spec
+        args = []
+        args.append(f"-DMFEM_DIR={spec['mfem'].prefix}")
+        if self.spec.satisfies("+rocm"):
+            args.append("-DMFEM_USE_HIP=ON")
+            args.append(f"-DCMAKE_HIP_COMPILER={env['HIPCXX']}")
+            args.append(f"-DCMAKE_CXX_COMPILER={env['HIPCXX']}")
+            amdgpu_target = ";".join(spec.variants["amdgpu_target"].value)
+            args.append(self.define("CMAKE_HIP_ARCHITECTURES", amdgpu_target))
+            #flags = [
+            #    "-x hip",
+            #    f"--offload-arch={amdgpu_target}",
+            #]
+            #args.append(self.define("CMAKE_CXX_FLAGS", " ".join(flags)))
+        return args
