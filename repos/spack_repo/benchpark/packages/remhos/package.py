@@ -99,3 +99,7 @@ class Remhos(CMakePackage, CudaPackage, ROCmPackage):
         if self.spec.satisfies("+caliper"):
             args.append("-DREMHOS_USE_CALIPER=ON")
         return args
+
+    def install(self, spec, prefix):
+        super().install(spec, prefix)
+        install(self.prefix.bin.remhos_main, self.prefix.bin.remhos)
