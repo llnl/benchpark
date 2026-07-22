@@ -199,7 +199,7 @@ class Kripke(
         self.add_experiment_variable("layout", problem_spec["layout"], True)
         self.add_experiment_variable("pool", problem_spec["pool"], True)
 
-        if self.spec.satisfies("+other"):
+        if self.spec.satisfies("+rocm+single_memory") or self.spec.satisfies("+other"):
             self.set_environment_variable("HSA_XNACK", 1)
 
         # Set the variables required by the experiment

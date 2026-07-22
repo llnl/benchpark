@@ -67,7 +67,7 @@ else
     addlibs=""
 fi
 
-{dep.prefix.bin}/{target} "$addlibs" "$@"
+{dep.prefix.bin}/{target} ${{addlibs:+$addlibs}} "$@"
 """
                     )
                 st = os.stat(fpath)
