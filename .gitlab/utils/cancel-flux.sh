@@ -32,7 +32,7 @@ schedule_delayed_cleanup() {
     fi
 }
 
-export URI=$(flux jobs -o "{id} {name}" | grep ${ALLOC_NAME}${GPUMODE} | awk '{print $1}')
+URI=$(flux jobs -o "{id} {name}" | grep "${ALLOC_NAME}${GPUMODE}" | awk '{print $1}')
 ([[ -n "${URI}" ]] && flux cancel ${URI} || true)
 if [[ -n "${URI}" ]]; then
     for i in {1..60}; do

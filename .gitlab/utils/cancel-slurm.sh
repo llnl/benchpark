@@ -32,7 +32,7 @@ schedule_delayed_cleanup() {
     fi
 }
 
-export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
+JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
 ([[ -n "${JOBID}" ]] && scancel ${JOBID} || true)
 if [[ -n "${JOBID}" ]]; then
     JOBIDS_CSV="${JOBID//$'\n'/,}"
