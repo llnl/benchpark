@@ -57,7 +57,7 @@ class Xsbench(MakefilePackage, CudaPackage, ROCmPackage):
 
     depends_on("mpi", when="+mpi")
     depends_on("caliper", when="@mpi-fix")
-    depends_on("caliper+rocm amdgpu_target=gfx942", when="@caliper-support:+rocm")
+    depends_on("caliper+rocm amdgpu_target=gfx942", when="@mpi-fix:+rocm")
     depends_on("adiak", when="@mpi-fix")
 
     conflicts("+cuda", when="+rocm", msg="CUDA and ROCm are mutually exclusive")
@@ -87,7 +87,7 @@ class Xsbench(MakefilePackage, CudaPackage, ROCmPackage):
         targets = []
         cflags = ""
 
-        if "@caliper-support" in self.spec:
+        if "@caliper-support" or "@mpi-fix" in self.spec:
             targets.append("CALI_DIR={0}".format(self.spec["caliper"].prefix))
             targets.append("ADIAK_DIR={0}".format(self.spec["adiak"].prefix))
 
