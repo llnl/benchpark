@@ -235,7 +235,9 @@ def main():
                         check=True,
                     )
                 # Define the ramble command
-                ramble_command = f"{name}/wkp/ramble/bin/ramble --workspace-dir {workspace_dir}"
+                ramble_command = (
+                    f"{name}/wkp/ramble/bin/ramble --workspace-dir {workspace_dir}"
+                )
                 # Combine sourcing the script and running the command
                 run_str = f"bash -c 'source {spack_setup_script}"
                 if setup_needed:
