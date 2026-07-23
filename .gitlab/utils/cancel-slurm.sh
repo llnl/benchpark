@@ -9,29 +9,6 @@ for arg in "$@"; do
     esac
 done
 
-schedule_delayed_cleanup() {
-    cleanup_script=$(printf '%s\n' \
-        "lock=$(printf "%q" "$CLEANUP_LOCK_DIR")" \
-        "target=$(printf "%q" "$CLEANUP_CI_BUILDS_DIR")" \
-        '    rm -rf "$target"' \
-        '    rmdir "$lock" 2>/dev/null || true')
-
-    echo "Scheduling delayed cleanup for $CLEANUP_CI_BUILDS_DIR"
-    if command -v at >/dev/null 2>&1 &&
-        printf '%s\n' "$cleanup_script" | at now + 2 minutes >/dev/null 2>&1; then
-        echo "Delayed cleanup queued with at"
-        return 0
-    elif command -v setsid >/dev/null 2>&1; then
-        echo "Unable to queue cleanup with at; falling back to detached cleanup"
-        nohup setsid bash -c "$(printf '%s\n%s' "sleep 120" "$cleanup_script")" >/dev/null 2>&1 &
-        return 0
-    else
-        echo "Unable to queue cleanup with at; falling back to background cleanup"
-        bash -c "$(printf '%s\n%s' "sleep 120" "$cleanup_script")" >/dev/null 2>&1 &
-        return 0
-    fi
-}
-
 JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
 ([[ -n "${JOBID}" ]] && scancel ${JOBID} || true)
 if [[ -n "${JOBID}" ]]; then
@@ -45,11 +22,5 @@ if [[ -n "${JOBID}" ]]; then
 fi
 
 if ! $NO_CLEAN; then
-    CLEANUP_CI_BUILDS_DIR="${CUSTOM_CI_BUILDS_DIR/#\$HOME/$HOME}"
-    CLEANUP_LOCK_DIR="${CLEANUP_CI_BUILDS_DIR}.cleanup.lock"
-    if mkdir "$CLEANUP_LOCK_DIR" 2>/dev/null; then
-        schedule_delayed_cleanup || rmdir "$CLEANUP_LOCK_DIR" 2>/dev/null || true
-    else
-        echo "Delayed cleanup already scheduled for $CLEANUP_CI_BUILDS_DIR"
-    fi
+    bash .gitlab/utils/cancel-cleanup.sh "$CUSTOM_CI_BUILDS_DIR"
 fi
