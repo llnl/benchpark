@@ -7,12 +7,12 @@ class Xsbench(ExecutableApplication):
     executable(
         "history",
         "XSBench -m history -s {benchmark_size} -G {grid_type} -p {particles} -l {lookups} -k {kernel}",
-        use_mpi=False,
+        use_mpi=True,
     )
     executable(
         "event",
         "XSBench -m event -s {benchmark_size} -G {grid_type} -l {lookups} -k {kernel}",
-        use_mpi=False,
+        use_mpi=True,
     )
 
     workload("history", executables=["history"])

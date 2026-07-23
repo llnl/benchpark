@@ -10,6 +10,7 @@ from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
 XsbenchProgrammingModel = ProgrammingModel(
     ProgrammingModelType.Cuda,
     ProgrammingModelType.Rocm,
+    ProgrammingModelType.Mpionly,
 )
 
 
@@ -27,16 +28,23 @@ class Xsbench(
     variant(
         "version",
         default="20",
-        values=("20", "latest"),
+        values=("20", "latest", "caliper-support", "mpi-fix"),
         description="Which XSBench version to use.",
     )
+
+    # variant(
+    #     "amdgpu_target",
+    #     default="",
+    #     values=('gfx942'),
+    # )
 
     maintainers("matthewc2003")
 
     def compute_applications_section(self):
         # Minimal validated configuration: one process on one GPU.
         self.add_experiment_variable("n_nodes", 1, True)
-        self.add_experiment_variable("n_gpus", 1, False)
+        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+            self.add_experiment_variable("n_gpus", 1, False)
 
         # Override the event workload defaults from application.py.
         self.add_experiment_variable("benchmark_size", "large", True)
@@ -56,5 +64,5 @@ class Xsbench(
         # variants directly to this string.
         self.add_package_spec(
             self.name,
-            [f"benchpark.xsbench{self.determine_version()} " "~mpi ~openmp "],
+            [f"benchpark.xsbench{self.determine_version()} " "+mpi ~openmp "],
         )
