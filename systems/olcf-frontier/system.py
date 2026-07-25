@@ -70,6 +70,7 @@ class OlcfFrontier(System):
             "7.0.2",
             "7.1.1",
             "7.2.0",
+            "7.13.0"
         ),
         description="ROCm version",
     )
@@ -143,6 +144,7 @@ class OlcfFrontier(System):
                 self.cce_version = Version("21.0.0")
                 self.mpi_version = Version("9.1.0")
                 self.rccl_version = self.rocm_version
+                self.override_cce_shortpath = "20.0"
             elif self.rocm_version >= Version("6.4.0"):
                 self.cce_version = Version("20.0.0")
                 self.mpi_version = Version("9.0.1")
@@ -325,6 +327,24 @@ class OlcfFrontier(System):
                             ),
                         }
                     ]
+                }
+            }
+        elif self.spec.satisfies("compiler=rocmcc"):
+            selections["packages"] |= {
+                "cray-libsci": {
+                    "externals": [
+                        {
+                            "spec": (
+                                f"cray-libsci@26.03.0"
+                                f"%rocmcc@{self.rocm_version}"
+                            ),
+                            "prefix": (
+                                "/opt/cray/pe/libsci/26.03.0/"
+                                f"AMD/{self.short_rocm_version}/x86_64"
+                            ),
+                        }
+                    ],
+                    "buildable": False,
                 }
             }
         elif self.spec.satisfies("compiler=gcc"):
