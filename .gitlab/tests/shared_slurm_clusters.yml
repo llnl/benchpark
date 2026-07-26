@@ -80,7 +80,7 @@ release_resources_matrix:
     BASELINE_REF: develop
   artifacts:
     when: always
-    paths: ['artifact-githash/${HOST}/${BENCHMARK}/githash_metadata.json']
+    paths: [artifact-githash/githash_metadata.json, artifact-cali/]
   before_script:
     - !reference [.report_status, before_script]
   script:
@@ -98,9 +98,9 @@ release_resources_matrix:
   after_script:
     - !reference [.report_status, after_script]
     - |
-      bash .gitlab/utils/collect-githash-artifact.sh \
-        PR \
-        "$CI_PROJECT_DIR/pr_flux.status"
+      bash .gitlab/utils/collect-cali-artifact.sh
+    - |
+      bash .gitlab/utils/collect-githash-artifact.sh PR "$CI_PROJECT_DIR/pr_flux.status"
     - |
       if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
         . .gitlab/utils/cancel-slurm.sh
