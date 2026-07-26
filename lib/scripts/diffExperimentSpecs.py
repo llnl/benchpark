@@ -1,8 +1,9 @@
 import argparse
 import os
+import shutil
 import subprocess
 
-from diffSystems import compare_yaml
+from diffSystemSpecs import compare_yaml
 
 import benchpark.util.color as color
 
@@ -42,6 +43,20 @@ Example usage:
         default=[],
         help="List of experiments to include for comparison (default: all experiments).",
     )
+    parser.add_argument(
+        "-s",
+        "--system",
+        type=str,
+        default="generic-x86",
+        help="Name of system.py to use for experiment init (default: generic-x86).",
+    )
+    parser.add_argument(
+        "-c",
+        "--cluster",
+        type=str,
+        default=None,
+        help="System variant if applicable.",
+    )
 
     args = parser.parse_args()
 
@@ -50,6 +65,8 @@ Example usage:
         "benchpark-old": args.old,
         "benchpark-new": args.new,
     }
+    system = args.system
+    cluster = args.cluster if args.cluster else system
 
     if args.experiments == []:
         experiments_out = subprocess.run(
@@ -71,6 +88,21 @@ Example usage:
             )
         subprocess.run(["git", "checkout", tag], cwd=name)
 
+        if os.path.isdir(f"{name}/{cluster}"):
+            shutil.rmtree(f"{name}/{cluster}")
+        sys_list = [
+            "python",
+            f"{name}/lib/main.py",
+            "system",
+            "init",
+            f"--dest={name}/{cluster}",
+            system,
+        ]
+        if args.cluster:
+            var = "instance_type" if system == "aws-pcluster" else "cluster"
+            sys_list.append(f"{var}={cluster}")
+        subprocess.run(sys_list)
+
         for experiment in experiments:
             subprocess.run(
                 [
@@ -78,7 +110,8 @@ Example usage:
                     f"{name}/lib/main.py",
                     "experiment",
                     "init",
-                    f"--dest={name}/{'/'.join(experiment.split('+'))}",
+                    f"--dest={'/'.join(experiment.split('+'))}",
+                    f"{name}/{cluster}",
                     experiment,
                 ]
             )
@@ -86,7 +119,7 @@ Example usage:
     # Compare the YAML files
     for experiment in experiments:
         color.cprint("@*y" + experiment + "@.")
-        loc = "/".join(experiment.split("+"))
+        loc = f"{cluster}/" + "/".join(experiment.split("+"))
         file = "ramble.yaml"
         color.cprint("\t@*b" + loc + "/" + file + "@.")
         compare_yaml(
