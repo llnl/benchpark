@@ -41,7 +41,7 @@ class JcahpcMiyabiG(System):
         "miyabi-g": {
             "cuda_arch": "90",
             "pbs_emit_gpus": 0,
-            "pbs_ncpus_per_node": 72,
+            "pbs_min_ncpus_per_node": 2,
             "sys_cores_per_node": 72,
             "sys_gpus_per_node": 1,
             "sys_mem_per_node_GB": 120,
@@ -368,7 +368,7 @@ class JcahpcMiyabiG(System):
             # Avoid too-small PBS cpusets that make HPC-X/Open MPI hwloc fail
             # during startup on Miyabi-G.
             "pbs_emit_gpus": self.pbs_emit_gpus,
-            "pbs_ncpus_per_node": self.pbs_ncpus_per_node,
+            "pbs_min_ncpus_per_node": self.pbs_min_ncpus_per_node,
         }
         # JCAHPC PBS requires the project group via `-W group_list=<group>`
         # (not `-A`). Inject it as an extra batch directive when provided.
