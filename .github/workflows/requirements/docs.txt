@@ -1,7 +1,7 @@
 # docs
 sphinx==9.1.0
 sphinx-rtd-theme==3.1.0
-codespell==2.4.2
+codespell==2.4.3
 pyyaml==6.0.3
 pandas==3.0.1
 sphinxcontrib-programoutput==0.19
