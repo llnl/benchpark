@@ -3,8 +3,9 @@
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
-from spack.package import *
 import spack_repo.builtin.packages.llvm_amdgpu.package
+from spack.package import *
+
 
 class LlvmAmdgpu(spack_repo.builtin.packages.llvm_amdgpu.package.LlvmAmdgpu):
     provides("fortran") 
