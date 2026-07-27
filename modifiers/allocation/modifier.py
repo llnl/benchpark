@@ -19,6 +19,8 @@ class AllocOpt(Enum):
     N_GPUS = 6
     N_CORES_PER_NODE = 7
     OMP_NUM_THREADS = 8
+    PBS_MIN_NCPUS_PER_NODE = 9
+    PBS_EMIT_GPUS = 10
 
     # Descriptions of resources available on systems
     SYS_GPUS_PER_NODE = 100
@@ -509,11 +511,19 @@ class Allocation(BasicModifier):
         if v.n_threads_per_proc and v.n_threads_per_proc != 1:
             node_spec.append(f"ompthreads={v.n_threads_per_proc}")
 
-        n_cpus_per_node = v.n_ranks_per_node * v.n_threads_per_proc
+        # Some PBS sites need a scheduler-specific ncpus floor, for example to
+        # avoid a too-small cpuset.
+        layout_ncpus = v.n_ranks_per_node * v.n_threads_per_proc
+        n_cpus_per_node = max(
+            v.pbs_min_ncpus_per_node or 0,
+            v.n_cores_per_node or 0,
+            layout_ncpus,
+        )
+
         node_spec.append(f"ncpus={n_cpus_per_node}")
 
-        if v.n_gpus:
-            gpus_per_rank = self.gpus_as_gpus_per_rank(v.n_gpus)
+        if v.n_gpus and v.pbs_emit_gpus != 0:
+            gpus_per_rank = self.gpus_as_gpus_per_rank(v)
             node_spec.append(f"gpus={gpus_per_rank}")
 
         if node_spec:
