@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout Benchpark
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
@@ -98,8 +98,8 @@ jobs:
             --executor '{execute_experiment}' \
             --where '{n_nodes} == 1'
       - name: Upload binary coverage to Codecov
-        if: ${{ !contains(github.head_ref, 'dependabot/') }}
-        uses: codecov/codecov-action@v6
+        if: ${{ !contains(github.head_ref, 'dependabot/') && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork) }}
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
           directory: ./coverage-data-binary
@@ -118,8 +118,8 @@ jobs:
           ./workspace2/ramble/bin/ramble --workspace-dir /home/runner/work/benchpark/benchpark/workspace2/dane/saxpy-agg/workspace workspace setup --dry-run
           BENCHPARK_RUN_COVERAGE=aggregate ./bin/benchpark aggregate --dest agg workspace2  # Aggregate multi-trial workspace
       - name: Upload aggregate coverage to Codecov
-        if: ${{ !contains(github.head_ref, 'dependabot/') }}
-        uses: codecov/codecov-action@v6
+        if: ${{ !contains(github.head_ref, 'dependabot/') && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork) }}
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
           directory: ./coverage-data-aggregate
@@ -147,7 +147,7 @@ jobs:
           - modifiers
     steps:
       - name: Checkout Benchpark
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
@@ -156,8 +156,8 @@ jobs:
           ./bin/benchpark bootstrap
           BENCHPARK_RUN_COVERAGE=${{ matrix.testtype }} ./bin/benchpark-python .github/utils/dryruns.py --test ${{ matrix.testtype }}
       - name: Upload coverage to Codecov
-        if: ${{ !contains(github.head_ref, 'dependabot/') }}
-        uses: codecov/codecov-action@v6
+        if: ${{ !contains(github.head_ref, 'dependabot/') && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork) }}
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
           directory: ./coverage-data-${{ matrix.testtype }}
@@ -168,7 +168,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout Benchpark
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
@@ -179,7 +179,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout Benchpark
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
@@ -201,9 +201,9 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
       - name: Setup Python
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: '3.12'
           cache: pip

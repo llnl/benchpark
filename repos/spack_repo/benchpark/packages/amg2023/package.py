@@ -42,7 +42,7 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("adiak", when="+caliper")
     depends_on("hypre~caliper")
     depends_on("hypre@:2.29.0", when="@20240511")
-    depends_on("hypre@2.30.0:", when="@develop")
+    depends_on("hypre@develop", when="@develop")
     depends_on("hypre~fortran")
     depends_on("hypre+mixedint", when="+mixedint")
     depends_on("blas")
@@ -63,10 +63,6 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
         depends_on("umpire amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
 
     depends_on("hypre+gpu-aware-mpi", when="+mpi+gpu-aware-mpi")
-
-    def setup_build_environment(self, env):
-        if self.spec.satisfies("+cuda"):
-            env.set("NVCC_APPEND_FLAGS", "-allow-unsupported-compiler")
 
     def cmake_args(self):
         cmake_options = []

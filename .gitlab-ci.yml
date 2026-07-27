@@ -4,25 +4,36 @@ workflow:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: always
 
-    # Run pipelines only when these files/dirs change
-    - changes:
-        - .gitlab/**
-        - bin/**
-        - configs/**
-        - experiments/**
-        - lib/**
-        - modifiers/**
-        - repo/**
-        - var/**
-        - systems/llnl-elcapitan/system.py
-        - systems/llnl-cluster/system.py
-        - .gitlab-ci.yml
-        - checkout-versions.yaml
-        - CTestConfig.cmake
-        - CTestGitlab.cmake
-        - pyproject.toml
-        - remote-urls.yaml
-        - requirements.txt
+    # Always allow manually started pipelines
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: always
+
+    # Feature branch pipelines should diff against the integration target.
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != "develop"
+      changes:
+        compare_to: refs/heads/develop
+        paths: &workflow_change_paths
+          - .gitlab/**/*
+          - bin/**/*
+          - configs/**/*
+          - experiments/**/*
+          - lib/**/*
+          - modifiers/**/*
+          - repos/**/*
+          - var/**/*
+          - systems/llnl-elcapitan/system.py
+          - systems/llnl-cluster/system.py
+          - .gitlab-ci.yml
+          - checkout-versions.yaml
+          - CTestConfig.cmake
+          - CTestGitlab.cmake
+          - pyproject.toml
+          - remote-urls.yaml
+          - requirements.txt
+
+    # Develop pipelines should diff against the previous develop commit.
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "develop"
+      changes: *workflow_change_paths
 
     # Otherwise, don't create a pipeline
     - when: never
@@ -50,7 +61,7 @@ variables:
   # Matrix (NODES ARE SHARED WITHOUT --exclusive)
   MATRIX_SHARED_ALLOC: -N 1 -t 04:00:00 --exclusive
   # Tuolumne (max 4hr policy)
-  TUOLUMNE_SHARED_ALLOC: -N 1 -t 3h --queue=pbatch --exclusive --setattr=gpumode=${GPUMODE}
+  TUOLUMNE_SHARED_ALLOC: -N 1 -t 4h --queue=pci --exclusive --setattr=gpumode=${GPUMODE}
     --conf=resource.rediscover=true
   # Tioga (max 2hr policy)
   TIOGA_SHARED_ALLOC: -N 1 -t 2h --queue=pci --exclusive
@@ -80,6 +91,7 @@ stages:
   - allocate-resources
   - test
   - release-resources
+  - summarize
   - cleanup-dir
 bootstrap_benchpark:
   tags: [shell, oslic]
@@ -88,9 +100,23 @@ bootstrap_benchpark:
     - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
     - ./bin/benchpark configure --bootstrap-location $CUSTOM_CI_BUILDS_DIR
     - ./bin/benchpark bootstrap
+generate_test_summary:
+  tags: [shell, oslic]
+  stage: summarize
+  script:
+    - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
+    - ./bin/benchpark configure --bootstrap-location $CUSTOM_CI_BUILDS_DIR
+    - python .gitlab/utils/generate_test_summary_csv.py --output test-summary.csv
+  artifacts:
+    when: always
+    paths: [test-summary.csv]
+  rules:
+    - when: always
 cleanup_pipeline_dir:
   tags: [shell, oslic]
   stage: cleanup-dir
   script:
     - echo "Removing $CUSTOM_CI_BUILDS_DIR"
     - rm -rf $CUSTOM_CI_BUILDS_DIR
+  rules:
+    - when: always

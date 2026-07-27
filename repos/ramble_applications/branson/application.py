@@ -14,31 +14,34 @@ class Branson(ExecutableApplication):
 
     tags = ['asc','montecarlo','particles',
             'high-branching','irregular-memory-access',
-            'mpi','c++']
+            'mpi','c++','llnl-nightly','llnl-monthly','llnl-pr','llnl-weekly']
 
     executable('setup_experiment',
            template=[
                'cp {branson}/inputs/* {experiment_run_dir}/.',
-               'sed -i "s|<photons>[0-9]*</photons>|<photons>{num_particles}</photons>|g" {experiment_run_dir}/{input_file}',
-               'grep -q "<photons>" {experiment_run_dir}/{input_file} || sed -i "/<\/common>/ i \  <photons>{num_particles}<\/photons>" {experiment_run_dir}/{input_file}',
-               'sed -i "s|<use_gpu_transporter>.*</use_gpu_transporter>|<use_gpu_transporter>{use_gpu}</use_gpu_transporter>|g" {experiment_run_dir}/{input_file}',
-               'grep -q "<use_gpu_transporter>" {experiment_run_dir}/{input_file} || sed -i "/<\/common>/ i \  <use_gpu_transporter>{use_gpu}<\/use_gpu_transporter>" {experiment_run_dir}/{input_file}',
-               'sed -i "s|<dd_transport_type>.*</dd_transport_type>|<dd_transport_type>{decomposition}</dd_transport_type>|g" {experiment_run_dir}/{input_file}',
-               'grep -q "<dd_transport_type>" {experiment_run_dir}/{input_file} || sed -i "/<\/common>/ i \  <dd_transport_type>{decomposition}<\/dd_transport_type>" {experiment_run_dir}/{input_file}',
-               'sed -i "s|<particle_storage>.*</particle_storage>|<particle_storage>{layout}</particle_storage>|g" {experiment_run_dir}/{input_file}',
-               'grep -q "<particle_storage>" {experiment_run_dir}/{input_file} || sed -i "/<\/common>/ i \  <particle_storage>{layout}<\/particle_storage>" {experiment_run_dir}/{input_file}',
-               'sed -i "s|<particle_algorithm>.*</particle_algorithm>|<particle_algorithm>{algorithm}</particle_algorithm>|g" {experiment_run_dir}/{input_file}',
-               'grep -q "<particle_algorithm>" {experiment_run_dir}/{input_file} || sed -i "/<\/common>/ i \  <particle_algorithm>{algorithm}<\/particle_algorithm>" {experiment_run_dir}/{input_file}',
-               'sed -i "s|<umpire_device_pool_size>.*</umpire_device_pool_size>|<umpire_device_pool_size>{pool}</umpire_device_pool_size>|g" {experiment_run_dir}/{input_file}',
-               'grep -q "<umpire_device_pool_size>" {experiment_run_dir}/{input_file} || sed -i "/<\/common>/ i \  <umpire_device_pool_size>{pool}<\/umpire_device_pool_size>" {experiment_run_dir}/{input_file}',
            ])
 
-    executable('p', '{branson}/bin/BRANSON {experiment_run_dir}/{input_file}', use_mpi=True)
+    common_args = (
+           " --photons {num_particles}"
+           + " --use-gpu-transporter {use_gpu}"
+           + " --dd-transport-type {decomposition}"
+           + " --particle-storage {layout}"
+           + " --particle-algorithm {algorithm}"
+           + " --particle-message-size {particle_message_size}"
+           + " --umpire-device-pool-size {pool}"
+    )
+
+    executable('p', '{branson}/bin/BRANSON' + ' {experiment_run_dir}/{input_file}'
+                + common_args, use_mpi=True)
 
     workload('branson', executables=['setup_experiment','p'])
     
     workload_variable('input_file', default='3D_hohlraum_multi_node.xml',
     	description='input file name',
+      	workloads=['branson'])
+
+    workload_variable('particle_message_size', default='10000',
+    	description='Message size',
       	workloads=['branson'])
 
     workload_variable('num_particles', default='250000000',

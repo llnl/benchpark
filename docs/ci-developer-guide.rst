@@ -73,6 +73,16 @@ specified by the ``.gitlab-ci.yml`` configuration file:
            involves starting flux on the allocated node, which is necessary since
            testing the benchpark workflow involves submitting a job within a job step in
            this case, which is not possible using slurm.
+      iv. Shared test jobs and shared resource jobs use different rules from
+          ``rules.yml``. The test jobs use ``run_test_rules``, which watch benchmark and
+          system paths through the ``BENCHMARK`` and ``ARCHCONFIG`` variables. The
+          resource allocation and release jobs use host-specific ``resource_rules_*``
+          entries, each with an explicit watch list for the benchmarks that run on that
+          host. When adding a benchmark to a shared Flux or shared Slurm host, update
+          the matching ``resource_rules_*`` list so changes to that benchmark create the
+          allocate, test, and release jobs for that host. For example, if a shared host
+          runs kripke, its ``resource_rules_*`` entry should include
+          ``'**/kripke/**/*'``.
 
 4. ``.gitlab/utils/`` contains various utility functions for:
 
@@ -189,15 +199,14 @@ be incremented by 1.
  CDash
 *******
 
-The successes/failures of our GitLab tests are posted to our CDash dashboard `CDash
-dashboard <https://my.cdash.org/index.php?project=Benchpark>`_. There is a dashboard for
-the nightly tests on the develop branch, and several dashboards for each system for
-daily PRs.
+The successes/failures of our nightly GitLab tests are posted to our CDash dashboard
+`CDash dashboard <https://my.cdash.org/index.php?project=Benchpark>`_. Daily and PR jobs
+still run through CTest, but they do not submit results to CDash.
 
 The following files are related to CDash:
 
-1. ``CTestGitlab.cmake`` configures CTest variables, the dashboard names and runs the
-   tests and submits the results.
+1. ``CTestGitlab.cmake`` configures CTest variables, the dashboard names, runs the
+   tests, and submits the results for nightly jobs.
 2. ``CTestConfig.cmake`` sets the cdash token and configuration variables.
 3. ``CMakeLists.txt`` enables CTest and adds the gitlab test.
 4. ``.gitlab/utils/status.yml`` Contains the logic to run CTest after a test completes

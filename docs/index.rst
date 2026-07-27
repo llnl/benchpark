@@ -56,7 +56,6 @@
     add-a-benchmark
     add-an-experiment
     testing-your-contribution
-    update-a-system-config
 
 .. toctree::
     :maxdepth: 1

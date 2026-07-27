@@ -58,6 +58,13 @@ class Laghos(
     )
 
     variant(
+        "mesh-strategy",
+        default="refinement",
+        values=("epm", "refinement", "meshfile"),
+        description="Type of mesh generation strategy to use",
+    )
+
+    variant(
         "nc",
         default=False,
         values=(True, False),
@@ -105,6 +112,85 @@ class Laghos(
     )
 
     maintainers("wdhawkins")
+
+    def compute_applications_section_epm(self):
+        if self.spec.satisfies("exec_mode=perf"):
+            problem_spec = {
+                "epm": 1024,
+                "pool_size": 16,
+                "resource_count": 4,
+            }
+            # Add problem specs as needed here
+            if self.spec.satisfies("+throughput"):
+                if self.spec.satisfies("order=linear"):
+                    problem_spec["epm"] = [16384]
+                elif self.spec.satisfies("order=quadratic"):
+                    problem_spec["epm"] = [2048]
+                elif self.spec.satisfies("order=cubic"):
+                    problem_spec["epm"] = [576]
+            elif self.spec.satisfies("+strong"):
+                if self.spec.satisfies("order=linear"):
+                    problem_spec["epm"] = 524288
+                elif self.spec.satisfies("order=quadratic"):
+                    problem_spec["epm"] = 65536
+                elif self.spec.satisfies("order=cubic"):
+                    problem_spec["epm"] = 19652
+            elif self.spec.satisfies("+weak"):
+                if self.spec.satisfies("order=linear"):
+                    problem_spec["epm"] = 524288
+                elif self.spec.satisfies("order=quadratic"):
+                    problem_spec["epm"] = 65536
+                elif self.spec.satisfies("order=cubic"):
+                    problem_spec["epm"] = 19652
+            else:
+                if self.spec.satisfies("order=linear"):
+                    problem_spec["epm"] = 524288
+                elif self.spec.satisfies("order=quadratic"):
+                    problem_spec["epm"] = 65536
+                elif self.spec.satisfies("order=cubic"):
+                    problem_spec["epm"] = 19652
+
+            self.add_experiment_variable("epm", problem_spec["epm"], True)
+            # Total elements
+            self.add_experiment_variable("qpts", "{quad}*{epm}*{resource_count}", False)
+            # Umpire device pool size
+            self.add_experiment_variable("pool", problem_spec["pool_size"], False)
+            self.add_experiment_variable(
+                "resource_count", problem_spec["resource_count"], True
+            )
+
+        else:
+            self.add_experiment_variable("epm", 32768, True)
+            self.add_experiment_variable("qpts", "{quad}*{epm}*{resource_count}", False)
+            self.add_experiment_variable("pool", 16, False)
+            # resource_count is the number of resources used for this experiment:
+            self.add_experiment_variable("resource_count", 4, True)
+
+        # Register the scaling variables and their respective scaling functions
+        # required to correctly scale the experiment for the given scaliing policy
+        # Strong scaling scales up resource_count by the specified scaling_factor
+        self.register_scaling_config(
+            {
+                ScalingMode.Strong: {
+                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "epm": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    // scaling_factor,
+                },
+                ScalingMode.Weak: {
+                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "epm": lambda var, itr, dim, scaling_factor: var.val(dim),
+                },
+                ScalingMode.Throughput: {
+                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(
+                        dim
+                    ),
+                    "epm": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                },
+            }
+        )
 
     def generate_perf_specs(self):
         problem_spec = {
@@ -170,7 +256,9 @@ class Laghos(
         )
 
         # Per-process size (in zones) in each dimension
-        self.add_experiment_variable("zones", "{nx}*{ny}*{nz}*(8**({rs}+{rp}))", False)
+        self.add_experiment_variable(
+            "qpts", "{quad}*{nx}*{ny}*{nz}*(8**({rs}+{rp}))", False
+        )
 
         # Umpire device pool size
         self.add_experiment_variable("pool", problem_spec["pool_size"], False)
@@ -189,7 +277,7 @@ class Laghos(
             }
         )
 
-    def compute_applications_section(self):
+    def compute_applications_section_refinement(self):
         if self.spec.satisfies("exec_mode=perf"):
             self.generate_perf_specs()
         else:
@@ -201,11 +289,11 @@ class Laghos(
             self.add_experiment_variable("rs", 3, True)
             self.add_experiment_variable("rp", 2, True)
             self.add_experiment_variable(
-                "zones", "{nx}*{ny}*{nz}*(8**({rs}+{rp}))", False
+                "qpts", "{quad}*{nx}*{ny}*{nz}*(8**({rs}+{rp}))", False
             )
             self.add_experiment_variable("pool", 16, True)
             # resource_count is the number of resources used for this experiment:
-            self.add_experiment_variable("resource_count", 1, False)
+            self.add_experiment_variable("resource_count", 4, False)
 
             # Register the scaling variables and their respective scaling functions
             # required to correctly scale the experiment for the given scaliing policy
@@ -227,22 +315,34 @@ class Laghos(
                 }
             )
 
+    def compute_applications_section(self):
+        if self.spec.satisfies("mesh-strategy=epm"):
+            self.compute_applications_section_epm()
+        elif self.spec.satisfies("mesh-strategy=refinement"):
+            self.compute_applications_section_refinement()
+        else:
+            raise ValueError("Unsupported mesh generation strategy")
+
         if self.spec.satisfies("order=linear"):
             self.add_experiment_variable("order", "linear", True)
             self.add_experiment_variable("ok", 1, False)
             self.add_experiment_variable("ot", 0, False)
+            self.add_experiment_variable("quad", 8, True)
         elif self.spec.satisfies("order=quadratic"):
             self.add_experiment_variable("order", "quadratic", True)
             self.add_experiment_variable("ok", 2, False)
             self.add_experiment_variable("ot", 1, False)
+            self.add_experiment_variable("quad", 64, True)
         elif self.spec.satisfies("order=cubic"):
             self.add_experiment_variable("order", "cubic", True)
             self.add_experiment_variable("ok", 3, False)
             self.add_experiment_variable("ot", 2, False)
+            self.add_experiment_variable("quad", 216, True)
         else:
             self.add_experiment_variable("order", "linear", True)
             self.add_experiment_variable("ok", 1, False)
             self.add_experiment_variable("ot", 0, False)
+            self.add_experiment_variable("quad", 8, True)
 
         if self.spec.satisfies("+nc"):
             self.add_experiment_variable("nc_type", "nonconforming", True)
@@ -254,8 +354,8 @@ class Laghos(
         # Set the variables required by the experiment
         self.set_required_variables(
             n_resources="{resource_count}",
-            process_problem_size="{zones} / {n_resources}",
-            total_problem_size="{zones}",
+            process_problem_size="{qpts} / {n_resources}",
+            total_problem_size="{qpts}",
         )
 
         if self.spec.satisfies("+cuda"):
@@ -270,6 +370,7 @@ class Laghos(
                 self.add_experiment_variable("device", "hip", True)
         else:
             self.add_experiment_variable("device", "cpu", True)
+            self.add_experiment_variable("pool", 0, True)
 
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_experiment_variable("n_gpus", "{n_resources}", True)
@@ -307,4 +408,3 @@ class Laghos(
         self.add_package_spec(
             self.name, [f"laghos{self.determine_version()} +metis {gam} {raja}"]
         )
-        self.add_package_spec("hypre", ["hypre@2.32.0: +lapack"])
