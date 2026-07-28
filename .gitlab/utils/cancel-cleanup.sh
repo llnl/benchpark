@@ -21,7 +21,7 @@ schedule_delayed_cleanup() {
 
     echo "Scheduling delayed cleanup for $CLEANUP_CI_BUILDS_DIR"
     if command -v at >/dev/null 2>&1 &&
-        printf '%s\n' "$cleanup_script" | at now + 2 minutes >/dev/null 2>&1; then
+        printf '%s\n' "$cleanup_script" | at now + 5 minutes >/dev/null 2>&1; then
         echo "Delayed cleanup queued with at"
         return 0
     fi
