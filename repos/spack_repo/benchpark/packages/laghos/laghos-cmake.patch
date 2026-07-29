@@ -1,16 +1,20 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index d60cb45..a03c8db 100644
+index d60cb45..1bb20e1 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -24,6 +24,7 @@ endif()
- find_package(HYPRE REQUIRED)
+@@ -25,6 +25,11 @@ find_package(HYPRE REQUIRED)
  find_package(MFEM REQUIRED)
  find_package(MPI REQUIRED)
-+find_package(RAJA REQUIRED)
  
++option(LAGHOS_USE_RAJA "Use RAJA" OFF)
++if (LAGHOS_USE_RAJA)
++  find_package(RAJA REQUIRED)
++endif()
++
  option(LAGHOS_USE_CALIPER "Use Caliper" OFF)
  if (LAGHOS_USE_CALIPER)
-@@ -61,6 +62,13 @@ if (MFEM_USE_HIP)
+   find_package(caliper REQUIRED)
+@@ -61,6 +66,13 @@ if (MFEM_USE_HIP)
    if(NOT DEFINED CMAKE_HIP_ARCHITECTURES)
      set(CMAKE_HIP_ARCHITECTURES gfx942)
    endif()
@@ -24,7 +28,7 @@ index d60cb45..a03c8db 100644
  endif()
  
  
-@@ -72,6 +80,10 @@ if (MFEM_USE_CUDA)
+@@ -72,6 +84,10 @@ if (MFEM_USE_CUDA)
    set_source_files_properties(${SOURCES} PROPERTIES LANGUAGE CUDA)
  endif()
  
@@ -35,15 +39,17 @@ index d60cb45..a03c8db 100644
  add_executable(laghos ${SOURCES})
  
  target_include_directories(laghos PUBLIC "${MFEM_DIR}/../../../include/mfem")
-@@ -80,6 +92,7 @@ target_link_libraries(laghos
-   PUBLIC mfem
+@@ -81,6 +97,9 @@ target_link_libraries(laghos
    PUBLIC MPI::MPI_CXX
    PUBLIC HYPRE::HYPRE
-+  PUBLIC RAJA
  )
++if(LAGHOS_USE_RAJA)
++  target_link_libraries(laghos PUBLIC RAJA)
++endif()
  if(LAGHOS_USE_CALIPER)
    target_link_libraries(laghos
-@@ -93,6 +106,10 @@ if (MFEM_USE_CUDA)
+     PUBLIC caliper
+@@ -93,6 +112,10 @@ if (MFEM_USE_CUDA)
    set_source_files_properties(sedov/sedov_sol.cpp sedov/sedov.cpp PROPERTIES LANGUAGE CUDA)
  endif()
  
