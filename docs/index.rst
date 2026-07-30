@@ -41,6 +41,7 @@
     run-experiment
     analyze-experiment
     benchpark-analyze
+    benchpark-compare
     configuration
     modifiers
     set-of-experiments
