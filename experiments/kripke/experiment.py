@@ -311,5 +311,5 @@ class Kripke(
         )
         cxxstd = self.spec.variants["cxxstd"][0]
         self.add_package_spec(
-            self.name, [f"kripke{self.determine_version()} {gam} {chai} {cxxstd} +mpi"]
+            self.name, [f"kripke{self.determine_version()} {gam} {chai} cxxstd={cxxstd} +mpi"]
         )
