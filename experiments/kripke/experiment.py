@@ -43,13 +43,6 @@ class Kripke(
     )
 
     variant(
-        "problem_size",
-        default="large",
-        values=("large", "medium", "small"),
-        description="Problem size",
-    )
-
-    variant(
         "chai",
         default=True,
         values=(True, False),
@@ -191,21 +184,10 @@ class Kripke(
                     "throughput_n": None,
                     "throughput_p": None,
                 }
-                if self.spec.satisfies("problem_size=large"):
-                    problem_spec["nzx"] = 220
-                    problem_spec["nzy"] = 220
-                    problem_spec["nzz"] = 110
-                    problem_spec["pool"] = 105
-                if self.spec.satisfies("problem_size=medium"):
-                    problem_spec["nzx"] = 200
-                    problem_spec["nzy"] = 200
-                    problem_spec["nzz"] = 100
-                    problem_spec["pool"] = 77
-                if self.spec.satisfies("problem_size=small"):
-                    problem_spec["nzx"] = 188
-                    problem_spec["nzy"] = 188
-                    problem_spec["nzz"] = 94
-                    problem_spec["pool"] = 70
+                problem_spec["nzx"] = 220
+                problem_spec["nzy"] = 220
+                problem_spec["nzz"] = 110
+                problem_spec["pool"] = 105
             else:
                 problem_spec = {
                     "nzx": 80,

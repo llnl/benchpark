@@ -15,7 +15,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     """
 
     homepage = "https://computing.llnl.gov/projects/co-design/kripke"
-    git = "https://github.com/rfhaque/Kripke.git"
+    git = "https://github.com/LLNL/Kripke.git"
 
     tags = ["proxy-app"]
 
@@ -23,7 +23,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
 
     license("BSD-3-Clause")
 
-    version("develop", branch="kripke_chai_umpire", submodules=False)
+    version("develop", branch="llnl/bugfix/chen59/devicedirectsegfault", submodules=False)
     version("2025.12.0", submodules=False, commit="01f6f85c02ceffcd2bc06e42cee997867dd142c5")
     version("2025.07.0", submodules=False, commit="8cf38433a6a11e0dcd17864e649b2d045159ee9c")
     version(
@@ -60,18 +60,43 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     variant("caliper", default=False, description="Build with Caliper support enabled.")
     variant("gpu-aware-mpi", default=False, description="Enable GPU-aware MPI")
 
+    variant(
+        "cxxstd",
+        default="17",
+        values=("11", "14", "17", "20"),
+        description="C++ standard to build with",
+    )
+
     depends_on("c", type="build")
     depends_on("cxx", type="build")
     depends_on("fortran", type="build")
 
-    depends_on("camp@main", when="@develop")
-    depends_on("raja@develop cxxstd=20", when="@develop")
+    # camp_version = "main"
+    camp_version = "2025.12.0"
+    # chai_version = "develop"
+    chai_version = "2025.12.0"
+    # raja_version = "develop"
+    raja_version = "2025.12.0"
+    # umpire_version = "develop"
+    umpire_version = "2025.12.0"
+
+    with when("cxxstd=11"):
+      cxxstd = "11"
+    with when("cxxstd=14"):
+      cxxstd = "14"
+    with when("cxxstd=17"):
+      cxxstd = "17"
+    with when("cxxstd=20"):
+      cxxstd = "20"
+ 
+   depends_on(f"camp@{camp_version}", when="@develop")
+    depends_on(f"raja@{raja_version}~examples~exercises cxxstd={cxxstd}", when="@develop")
 
     depends_on("mpi", when="+mpi")
 
     with when("+chai"):
       depends_on("chai+mpi", when="+mpi")
-      depends_on("chai@develop+raja cxxstd=20", when="@develop")
+      depends_on(f"chai@{chai_version}+raja cxxstd={cxxstd}", when="@develop")
       depends_on("chai@2025.12.0+raja", when="@2025.12.0")
       depends_on("chai@2024.07.0+raja", when="@1.2.7.0:2025.07.0")
       depends_on("fmt@9.1", when=f"^chai@2024.07.0")
@@ -89,7 +114,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
       for arch in ROCmPackage.amdgpu_targets:
           depends_on("chai amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
 
-      depends_on("umpire@develop", when="@develop")
+      depends_on(f"umpire@{umpire_version}", when="@develop")
       depends_on("umpire+openmp", when="+openmp")
       depends_on("umpire~openmp", when="~openmp")
 
@@ -112,13 +137,13 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("blt@0.6.2:", type="build", when=f"@1.2.7:")
 
     with when("+cuda~chai"):
-        depends_on("umpire@develop", when="@develop")
+        depends_on(f"umpire@{umpire_version}", when="@develop")
         depends_on("umpire+cuda")
         for sm_ in CudaPackage.cuda_arch_values:
             depends_on("umpire cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
 
     with when("+rocm~chai"):
-        depends_on("umpire@develop", when="@develop")
+        depends_on(f"umpire@{umpire_version}", when="@develop")
         depends_on("umpire+rocm")
         for arch in ROCmPackage.amdgpu_targets:
             depends_on("umpire amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
@@ -136,6 +161,10 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     for arch in ROCmPackage.amdgpu_targets:
         depends_on("raja amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
 
+    @property
+    def cxx_std(self):
+        return self.spec.variants.get("cxxstd").value
+
     def setup_build_environment(self, env):
         spec = self.spec
         if "+cuda" in spec:
@@ -151,14 +180,13 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     def cmake_args(self):
         spec = self.spec
         args = []
-        blt_cxx_std = "20" if spec.satisfies("@develop") else "17"
 
         args.extend(
             [
                 "-Dcamp_DIR=%s" % self.spec["camp"].prefix,
                 "-DBLT_SOURCE_DIR=%s" % self.spec["blt"].prefix,
                 "-DRAJA_DIR=%s" % self.spec["raja"].prefix,
-                "-DBLT_CXX_STD=%s" % f"c++{blt_cxx_std}",
+                "-DBLT_CXX_STD=%s" % f"c++{self.cxx_std}",
                 "-DMPI_CXX_LINK_FLAGS='%s'" % self.spec['mpi'].libs.ld_flags,
             ]
         )
