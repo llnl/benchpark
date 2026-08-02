@@ -89,7 +89,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     with when("cxxstd=20"):
       cxxstd = "20"
  
-   depends_on(f"camp@{camp_version}", when="@develop")
+    depends_on(f"camp@{camp_version}", when="@develop")
     depends_on(f"raja@{raja_version}~examples~exercises cxxstd={cxxstd}", when="@develop")
 
     depends_on("mpi", when="+mpi")
