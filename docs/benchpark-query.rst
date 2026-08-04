@@ -4,9 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-######################
- Query Caliper Results
-######################
+#######################
+ Query Performance Data
+#######################
 
 The ``benchpark query`` command searches one or more directories for Caliper ``.cali``
 files and writes selected metadata or performance data to a CSV file. It is useful when
