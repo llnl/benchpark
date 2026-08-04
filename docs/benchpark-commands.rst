@@ -89,8 +89,6 @@ Search for available system and experiment specifications in Benchpark.
       - Looks for problems in system and experiment repositories.
     - - benchpark analyze
       - Performs pre-defined analysis on Caliper performance data after ``ramble on``.
-    - - benchpark compare
-      - Compares a performance metric between two Caliper files.
     - - benchpark query
       - Queries Caliper files under a directory into a CSV.
 

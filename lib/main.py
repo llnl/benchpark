@@ -21,14 +21,14 @@ __version__ = "0.1.0"
 if "-V" in sys.argv or "--version" in sys.argv:
     print(__version__)
     exit()
-helpstr = """usage: main.py [-h] [-V] {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze,compare,query,redo,aggregate,configure} ...
+helpstr = """usage: main.py [-h] [-V] {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze,query,redo,aggregate,configure} ...
 
 Benchpark
 options:
   -h, --help            show this help message and exit
   -V, --version         show version number and exit
 Subcommands:
-  {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze,compare,query,redo,aggregate,configure}
+  {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze,query,redo,aggregate,configure}
     tags                Tags in Benchpark experiments
     system              Initialize a system config
     experiment          Interact with experiments
@@ -41,7 +41,6 @@ Subcommands:
     list                List experiments, systems, benchmarks, and modifiers
     bootstrap           Bootstrap benchpark or update an existing bootstrap
     analyze             Perform pre-defined analysis on the performance data (caliper files) after 'ramble on'
-    compare             Compare a performance metric between two Caliper files
     query               Query Caliper files into a CSV
     redo                Re-instantiate system and all associated experiments
     aggregate           Aggregate multiple experiments (even across workspaces) into the same submission script
@@ -116,13 +115,6 @@ try:
     analyze_installed = True
 except ModuleNotFoundError:
     analyze_installed = False
-
-try:
-    import benchpark.cmd.compare  # noqa: E402
-
-    compare_installed = True
-except ModuleNotFoundError:
-    compare_installed = False
 
 try:
     import benchpark.cmd.query  # noqa: E402
@@ -296,11 +288,6 @@ def init_commands(subparsers, actions_dict):
         help="Perform pre-defined analysis on the performance data (caliper files) after 'ramble on'",
     )
 
-    compare_parser = subparsers.add_parser(
-        "compare",
-        help="Compare a performance metric between two Caliper files",
-    )
-
     query_parser = subparsers.add_parser(
         "query",
         help="Query Caliper files into a CSV",
@@ -340,17 +327,6 @@ def init_commands(subparsers, actions_dict):
             )
 
         actions_dict["analyze"] = analyze_command_placeholder
-    if compare_installed:
-        benchpark.cmd.compare.setup_parser(compare_parser)
-        actions_dict["compare"] = benchpark.cmd.compare.command
-    else:
-
-        def compare_command_placeholder(args, unknown_args):
-            raise RuntimeError(
-                "Packages required for 'benchpark compare' not found. run 'pip install .[analyze]' from the 'benchpark' directory."
-            )
-
-        actions_dict["compare"] = compare_command_placeholder
     if query_installed:
         benchpark.cmd.query.setup_parser(query_parser)
         actions_dict["query"] = benchpark.cmd.query.command
