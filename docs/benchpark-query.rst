@@ -64,12 +64,12 @@ directory and prints the filename.
 When ``--metric`` names a performance data column instead of a metadata column, provide
 at least one region selector:
 
-- ``--query-regions-byname`` selects regions and their children whose name contains one of the provided
-  strings.
+- ``--query-regions-byname`` selects regions and their children whose name contains
+  one of the provided strings.
 - ``--filter-regions-byname`` keeps regions whose name matches one of the provided
   prefixes.
-- ``--exclude-regions`` removes regions and their children whose name contains one of the provided
-  strings before the query is evaluated.
+- ``--exclude-regions`` removes regions and their children whose name contains one of
+  the provided strings before the query is evaluated.
 
 For example, to query computation regions while excluding MPI regions:
 
@@ -114,3 +114,142 @@ The command accepts these arguments:
       - Additional metadata columns to include in the CSV.
     - - ``--exclude-regions PATTERN [PATTERN ...]``
       - Region name substrings to exclude before evaluating the query.
+
+
+*************************
+ Stacked Bar Chart Example
+*************************
+
+The following workflow uses ``benchpark query`` to split Caliper timing into
+computation and communication CSV files, then plots the results as stacked bar charts.
+This example compares ROCm versions using the
+``packages.dependencies.hip.version`` metadata column.
+
+First, query the computation regions. The notebook version loops over the available
+``wkp/<rocm-version>-<system>/<application>/`` directories and appends each generated
+query CSV into ``computation-time.csv``.
+
+.. code-block:: console
+
+    $ benchpark query \
+        wkp/rocm720-tioga/amg2023/ wkp/rocm642-tioga/amg2023/ \
+        wkp/rocm720-tuo/amg2023/ wkp/rocm642-tuo/amg2023/ \
+        --query-regions-byname Problem \
+        --metric "Avg time/rank (exc)" \
+        --metadata-columns packages.dependencies.hip.version \
+        --exclude-regions MPI_
+
+    $ benchpark query \
+        wkp/rocm720-tioga/kripke/ wkp/rocm642-tioga/kripke/ \
+        wkp/rocm720-tuo/kripke/ wkp/rocm642-tuo/kripke/ \
+        --query-regions-byname Solve \
+        --metric "Avg time/rank (exc)" \
+        --metadata-columns packages.dependencies.hip.version \
+        --exclude-regions MPI_
+
+    $ benchpark query \
+        wkp/rocm720-tioga/laghos/ wkp/rocm642-tioga/laghos/ \
+        wkp/rocm720-tuo/laghos/ wkp/rocm642-tuo/laghos/ \
+        --query-regions-byname SolveVelocity-ForcePA SolveEnergy-ForcePA \
+            SolveVelocity-CGVMass QUpdate-UpdateQuadratureData \
+        --metric "Avg time/rank (exc)" \
+        --metadata-columns packages.dependencies.hip.version \
+        --exclude-regions MPI_ SolveEnergy-CGEMass
+
+Then query communication regions by selecting the same parent regions and filtering to
+``MPI_`` children. These generated CSV files are appended into
+``communication-time.csv``.
+
+.. code-block:: console
+
+    $ benchpark query \
+        wkp/rocm720-tioga/amg2023/ wkp/rocm642-tioga/amg2023/ \
+        wkp/rocm720-tuo/amg2023/ wkp/rocm642-tuo/amg2023/ \
+        --query-regions-byname Problem \
+        --filter-regions-byname MPI_ \
+        --metric "Avg time/rank (exc)" \
+        --metadata-columns packages.dependencies.hip.version
+
+    $ benchpark query \
+        wkp/rocm720-tioga/kripke/ wkp/rocm642-tioga/kripke/ \
+        wkp/rocm720-tuo/kripke/ wkp/rocm642-tuo/kripke/ \
+        --query-regions-byname Solve \
+        --filter-regions-byname MPI_ \
+        --metric "Avg time/rank (exc)" \
+        --metadata-columns packages.dependencies.hip.version
+
+    $ benchpark query \
+        wkp/rocm720-tioga/laghos/ wkp/rocm642-tioga/laghos/ \
+        wkp/rocm720-tuo/laghos/ wkp/rocm642-tuo/laghos/ \
+        --query-regions-byname SolveVelocity-ForcePA SolveEnergy-ForcePA \
+            SolveVelocity-CGVMass QUpdate-UpdateQuadratureData \
+        --filter-regions-byname MPI_ \
+        --metric "Avg time/rank (exc)" \
+        --metadata-columns packages.dependencies.hip.version
+
+For applications that do not provide comparable Caliper regions, the same CSV shape can
+be produced from application output. The notebook parses LAMMPS timing rows into the
+same ``cluster``, ``application_name``, ``packages.dependencies.hip.version``, and
+``Avg time/rank (exc)`` columns before appending them to the two CSV files.
+
+The plotting notebook reads both query outputs and groups by system, benchmark, ROCm
+version, and region type:
+
+.. code-block:: python
+
+    import pandas as pd
+
+    df_comp = pd.read_csv("computation-time.csv")
+    df_comm = pd.read_csv("communication-time.csv")
+
+    value_col = "Avg time/rank (exc)"
+    version_col = "packages.dependencies.hip.version"
+    group_cols = ["cluster", "application_name", version_col]
+
+    bar_df = (
+        pd.concat(
+            [
+                df_comp.assign(region="Computation"),
+                df_comm.assign(region="Communication"),
+            ],
+            ignore_index=True,
+        )
+        .groupby(group_cols + ["region"])[value_col]
+        .mean()
+        .unstack(fill_value=0)
+        .reset_index()
+    )
+    bar_df["total"] = bar_df["Computation"] + bar_df["Communication"]
+
+The generated figures show computation and communication time stacked together for each
+benchmark/system pair, with hatching used to distinguish ROCm versions.
+
+.. figure:: _static/images/query-stacked-barchart-legend.png
+    :width: 550
+    :align: center
+
+    Legend for the stacked bar charts.
+
+.. figure:: _static/images/query-stacked-barchart-amg2023.png
+    :width: 700
+    :align: center
+
+    AMG2023 computation and communication time by system and ROCm version.
+
+.. figure:: _static/images/query-stacked-barchart-kripke.png
+    :width: 700
+    :align: center
+
+    Kripke computation and communication time by system and ROCm version.
+
+.. figure:: _static/images/query-stacked-barchart-laghos.png
+    :width: 700
+    :align: center
+
+    Laghos computation and communication time by system and ROCm version.
+
+.. figure:: _static/images/query-stacked-barchart-lammps.png
+    :width: 700
+    :align: center
+
+    LAMMPS computation and communication time by system and ROCm version.
