@@ -9,3 +9,4 @@ configure.yaml
 .env
 .DS_Store
 user-config/*
+wkp

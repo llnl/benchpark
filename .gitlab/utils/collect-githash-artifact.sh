@@ -14,6 +14,7 @@ artifact_dir="${CI_PROJECT_DIR}/artifact-githash"
 githash_json=""
 baseline_json="${artifact_dir}/baseline_githash_metadata.json"
 baseline_status_file="${artifact_dir}/baseline_job.status"
+changes_json="${artifact_dir}/githash_changes.json"
 
 if [[ -d "${run_workspace}/experiments" ]]; then
     githash_json=$(find "${run_workspace}/experiments" -type f -name 'githash_metadata.json' | sort | sed -n '1p')
@@ -87,4 +88,4 @@ echo -e "===============[TESTS]==============="
 echo "[Baseline]: ${baseline_status}"
 echo "[${checkout_label}]: ${run_status}"
 echo -e "====================================="
-bash .gitlab/utils/compare-githash-metadata.sh "${baseline_json}" "${githash_json}"
+bash .gitlab/utils/compare-githash-metadata.sh "${baseline_json}" "${githash_json}" "${changes_json}"
