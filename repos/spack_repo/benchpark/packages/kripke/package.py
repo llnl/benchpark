@@ -23,7 +23,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
 
     license("BSD-3-Clause")
 
-    version("develop", branch="llnl/bugfix/chen59/devicedirectsegfault", submodules=False)
+    version("develop", branch="develop", submodules=False)
     version("2025.12.0", submodules=False, commit="01f6f85c02ceffcd2bc06e42cee997867dd142c5")
     version("2025.07.0", submodules=False, commit="8cf38433a6a11e0dcd17864e649b2d045159ee9c")
     version(
@@ -80,25 +80,30 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     # umpire_version = "develop"
     umpire_version = "2025.12.0"
 
-    with when("cxxstd=11"):
-      cxxstd = "11"
-    with when("cxxstd=14"):
-      cxxstd = "14"
-    with when("cxxstd=17"):
-      cxxstd = "17"
-    with when("cxxstd=20"):
-      cxxstd = "20"
- 
     depends_on(f"camp@{camp_version}", when="@develop")
-    depends_on(f"raja@{raja_version}~examples~exercises cxxstd={cxxstd}", when="@develop")
+    for cxxstd in ("11", "14", "17", "20"):
+        depends_on(
+            f"raja@{raja_version}~examples~exercises cxxstd={cxxstd}",
+            when=f"@develop cxxstd={cxxstd}",
+        )
 
     depends_on("mpi", when="+mpi")
 
     with when("+chai"):
       depends_on("chai+mpi", when="+mpi")
-      depends_on(f"chai@{chai_version}+raja cxxstd={cxxstd}", when="@develop")
-      depends_on("chai@2025.12.0+raja", when="@2025.12.0")
-      depends_on("chai@2024.07.0+raja", when="@1.2.7.0:2025.07.0")
+      for cxxstd in ("11", "14", "17", "20"):
+          depends_on(
+              f"chai@{chai_version}+raja cxxstd={cxxstd}",
+              when=f"@develop cxxstd={cxxstd}",
+          )
+          depends_on(
+              f"chai@2025.12.0+raja cxxstd={cxxstd}",
+              when=f"@2025.12.0 cxxstd={cxxstd}",
+          )
+          depends_on(
+              f"chai@2024.07.0+raja cxxstd={cxxstd}",
+              when=f"@1.2.7.0:2025.07.0 cxxstd={cxxstd}",
+          )
       depends_on("fmt@9.1", when=f"^chai@2024.07.0")
 
       depends_on("chai+openmp", when="+openmp")
