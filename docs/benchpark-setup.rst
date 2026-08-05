@@ -76,15 +76,14 @@ workspace setup`` will not need to install any packages.
 There are benchpark system and experiment variants that you can change, without needing
 to define them in your ``system.py`` and ``experiment.py``.
 
-#############
+*************
  For Systems
-#############
+*************
 
     - ``timeout`` - Job timeout limit in minutes.
-
-#################
+*****************
  For Experiments
-#################
+*****************
 
     - ``package_manager`` - Specify this variant to use a ramble package manager other
       than ``spack``. See :doc:`run-binary` to see an example.
