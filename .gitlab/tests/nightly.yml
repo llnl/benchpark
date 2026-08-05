@@ -167,7 +167,7 @@ nightly_test_run:
   <<: *test_clusters_nightly
   artifacts:
     when: always
-    paths: [artifact-githash/githash_metadata.json, artifact-test-status/test_status.json]
+    paths: [artifact-githash/githash_metadata.json, artifact-test-metadata/test_metadata.json]
   before_script:
     - !reference [.report_status, before_script]
   script:
@@ -180,7 +180,7 @@ nightly_test_run:
   after_script:
     - !reference [.report_status, after_script]
     - |-
-      bash .gitlab/utils/collect-test-status-artifact.sh \
+      bash .gitlab/utils/write-test-metadata.sh \
         Nightly \
         "$CI_PROJECT_DIR/nightly_run.status"
     - |-
@@ -188,6 +188,6 @@ nightly_test_run:
         Nightly \
         "$CI_PROJECT_DIR/nightly_run.status"
     - |-
-      bash .gitlab/utils/collect-test-status-artifact.sh \
+      bash .gitlab/utils/write-test-metadata.sh \
         Nightly \
         "$CI_PROJECT_DIR/nightly_run.status"

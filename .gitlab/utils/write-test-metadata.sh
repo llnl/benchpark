@@ -9,7 +9,7 @@ fi
 checkout_label=$1
 run_status_file=$2
 
-artifact_dir="${CI_PROJECT_DIR}/artifact-test-status"
+artifact_dir="${CI_PROJECT_DIR}/artifact-test-metadata"
 test_status_file="${CI_PROJECT_DIR}/test_status.txt"
 githash_artifact_dir="${CI_PROJECT_DIR}/artifact-githash"
 githash_changes_json="${githash_artifact_dir}/githash_changes.json"
@@ -66,6 +66,6 @@ jq -n \
         url: $job_url,
         pipeline_id: $pipeline_id
       }
-    }' > "${artifact_dir}/test_status.json"
+    }' > "${artifact_dir}/test_metadata.json"
 
 rm -f "${changes_json}"
