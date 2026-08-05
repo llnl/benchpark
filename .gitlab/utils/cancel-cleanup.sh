@@ -31,7 +31,10 @@ schedule_delayed_cleanup() {
 }
 
 if mkdir "$CLEANUP_LOCK_DIR" 2>/dev/null; then
-    schedule_delayed_cleanup || rmdir "$CLEANUP_LOCK_DIR" 2>/dev/null || true
+    if ! schedule_delayed_cleanup; then
+        rm -rf "$CLEANUP_CI_BUILDS_DIR"
+        rmdir "$CLEANUP_LOCK_DIR" 2>/dev/null || true
+    fi
 else
     echo "Delayed cleanup already scheduled for $CLEANUP_CI_BUILDS_DIR"
 fi
