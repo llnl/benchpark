@@ -179,5 +179,6 @@ run_tests_flux_tioga:
       - HOST: tioga
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK: [py-scaffold]
+        SYSTEM_ARGS: [rocm=7.1.1]
         VARIANT:
           - +rocm package_manager=spack-pip caliper=mpi,time allocation=torchrun-hpc
