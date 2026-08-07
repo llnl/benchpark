@@ -298,18 +298,19 @@ class Kripke(
         else:
             self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
+        if self.spec.satisfies("+gpu-aware-mpi"):
+            # self.set_environment_variable("MPICH_GPU_IPC_CACHE_MAX_SIZE", 1000)
+            self.set_environment_variable("MPICH_NOLOCAL", 1)
+
     def compute_package_section(self):
         gam = (
             "+gpu-aware-mpi"
             if self.spec.variants["gpu-aware-mpi"][0]
             else "~gpu-aware-mpi"
         )
-        chai = (
-            "+chai"
-            if self.spec.variants["chai"][0]
-            else "~chai"
-        )
+        chai = "+chai" if self.spec.variants["chai"][0] else "~chai"
         cxxstd = self.spec.variants["cxxstd"][0]
         self.add_package_spec(
-            self.name, [f"kripke{self.determine_version()} {gam} {chai} cxxstd={cxxstd} +mpi"]
+            self.name,
+            [f"kripke{self.determine_version()} {gam} {chai} cxxstd={cxxstd} +mpi"],
         )
