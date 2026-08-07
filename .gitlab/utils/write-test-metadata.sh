@@ -47,7 +47,7 @@ if [[ -n "${BASELINE_REF:-}" && -n "${CI_JOB_NAME:-}" ]]; then
         --exclude-pipeline-id "${CI_PIPELINE_ID:-}" \
         --optional
 
-    if [[ -f "${baseline_metadata_json}" ]]; then
+    if [[ -s "${baseline_metadata_json}" ]]; then
         baseline_status="$(jq -r '.status // ""' "${baseline_metadata_json}")"
         if [[ -n "${baseline_status}" && "${baseline_status}" != "${test_status}" ]]; then
             status_changed=true
