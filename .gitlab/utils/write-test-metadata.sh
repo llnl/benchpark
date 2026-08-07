@@ -36,6 +36,25 @@ else
         > "${changes_json}"
 fi
 
+status_changed=false
+baseline_metadata_json=$(mktemp)
+if [[ -n "${BASELINE_REF:-}" && -n "${CI_JOB_NAME:-}" ]]; then
+    bash .gitlab/utils/fetch-job-artifact.sh \
+        --ref "${BASELINE_REF}" \
+        --job-name "${CI_JOB_NAME}" \
+        --artifact-path "artifact-test-metadata/test_metadata.json" \
+        --output-path "${baseline_metadata_json}" \
+        --exclude-pipeline-id "${CI_PIPELINE_ID:-}" \
+        --optional
+
+    if [[ -f "${baseline_metadata_json}" ]]; then
+        baseline_status="$(jq -r '.status // ""' "${baseline_metadata_json}")"
+        if [[ -n "${baseline_status}" && "${baseline_status}" != "${test_status}" ]]; then
+            status_changed=true
+        fi
+    fi
+fi
+
 jq -n \
     --arg checkout "${checkout_label}" \
     --arg host "${HOST:-}" \
@@ -44,6 +63,7 @@ jq -n \
     --arg system_args "${SYSTEM_ARGS:-}" \
     --arg benchmark_version "${BENCHMARK_VERSION:-}" \
     --arg status "${test_status}" \
+    --argjson status_changed "${status_changed}" \
     --arg run_exit_code "${run_exit_code}" \
     --arg job_name "${CI_JOB_NAME:-}" \
     --arg job_id "${CI_JOB_ID:-}" \
@@ -58,6 +78,7 @@ jq -n \
       system_args: $system_args,
       benchmark_version: $benchmark_version,
       status: $status,
+      status_changed: $status_changed,
       run_exit_code: (if $run_exit_code == "" then null else ($run_exit_code | tonumber?) end),
       changes: $changes[0],
       job: {
@@ -68,4 +89,4 @@ jq -n \
       }
     }' > "${artifact_dir}/test_metadata.json"
 
-rm -f "${changes_json}"
+rm -f "${changes_json}" "${baseline_metadata_json}"
