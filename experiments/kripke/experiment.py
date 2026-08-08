@@ -299,8 +299,8 @@ class Kripke(
             self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
         if self.spec.satisfies("+gpu-aware-mpi"):
-            # self.set_environment_variable("MPICH_GPU_IPC_CACHE_MAX_SIZE", 1000)
-            self.set_environment_variable("MPICH_NOLOCAL", 1)
+            self.set_environment_variable("MPICH_GPU_IPC_CACHE_MAX_SIZE", 1000)
+            # self.set_environment_variable("MPICH_NOLOCAL", 1)
 
     def compute_package_section(self):
         gam = (
