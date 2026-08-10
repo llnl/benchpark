@@ -6,4 +6,4 @@ versions:
   # Shallow fetch requires the full commit sha
   ramble: 100f97d9dfbc588058e37f0dfd94abd8ba742a57  # develop on 04/25/2026 (newer than 0.6.0 release)
   spack: 7972f0370da13ad67708b6f3e8d8f9f9b664b297  # 1.2.1 + module loading fix: https://github.com/scheibelp/spack/tree/fix-module-load
-  spack-packages: cd799833357715700386adc8dad0f0ea40bacced  # Tip of https://github.com/spack/spack-packages/pull/4411
+  spack-packages: 7c22b542e49de17f7849987e4f35aa5cd71913ee  # Tip of https://github.com/spack/spack-packages/pull/4411
