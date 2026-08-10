@@ -226,6 +226,7 @@ def divide_into(dividend, divisor):
 class Allocation(BasicModifier):
 
     name = "allocation"
+    _whitelist_file_name = "benchpark_whitelist"
 
     tags("infrastructure")
 
@@ -236,6 +237,17 @@ class Allocation(BasicModifier):
 
     mode("standard", description="Standard execution mode for allocation")
     default_mode("standard")
+
+    register_phase(
+        "create_cleanup_whitelist", pipeline="setup", run_after=["make_experiments"]
+    )
+
+    def _create_cleanup_whitelist(self, workspace, app_inst):
+        whitelist_file = self.expander.expand_var(
+            f"{{experiment_run_dir}}/{self._whitelist_file_name}"
+        )
+        with open(whitelist_file, "w"):
+            pass
 
     def inherit_from_application(self, app):
         super().inherit_from_application(app)
@@ -383,23 +395,18 @@ class Allocation(BasicModifier):
     def _cleanup_experiment_dir_cmd():
         """Removes artifacts from previous runs, if the experiment is executed more than once.
 
-        Ramble creates a small set of files during setup that must remain in the
-        experiment directory. Everything else at the top level is treated as
-        runtime output from an earlier execution.
+        Setup creates an empty whitelist file. The first execution populates it
+        with setup-created files, and later executions remove anything else.
         """
-        whitelist_files = [
-            # Ramble book keeping
-            ".ramble-experiment",
-            "ramble_inventory.json",
-            "ramble_status.json",
-            # Experiment file
-            "execute_experiment",
-            # Generated when Caliper modifier is on
-            "{experiment_name}_metadata.json",
-        ]
-        keep_predicates = " ".join(f"! -name '{file}'" for file in whitelist_files)
-        return (
-            f"find . -mindepth 1 -maxdepth 1 {keep_predicates} -exec rm -rf -- {{}} +"
+        whitelist_file = Allocation._whitelist_file_name
+        return "\n".join(
+            [
+                f"[ -s {whitelist_file} ] || "
+                'find . -mindepth 1 -maxdepth 1 -printf "%f\\n" | '
+                f"sort > {whitelist_file}",
+                'find . -mindepth 1 -maxdepth 1 -printf "%f\\n" | '
+                f'grep -Fxvf {whitelist_file} | xargs -r -d "\\n" rm -rf --',
+            ]
         )
 
     @staticmethod
