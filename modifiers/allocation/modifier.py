@@ -380,6 +380,27 @@ class Allocation(BasicModifier):
             raise ValueError(err_msg)
 
     @staticmethod
+    def _cleanup_experiment_dir_cmd():
+        """Removes artifacts from previous runs, if the experiment is executed more than once.
+
+        Ramble creates a small set of files during setup that must remain in the
+        experiment directory. Everything else at the top level is treated as
+        runtime output from an earlier execution.
+        """
+        whitelist_files = [
+            # Ramble book keeping
+            ".ramble-experiment",
+            "ramble_inventory.json",
+            "ramble_status.json",
+            # Experiment file
+            "execute_experiment",
+            # Generated when Caliper modifier is on
+            "{experiment_name}_metadata.json",
+        ]
+        keep_predicates = " ".join(f"! -name '{file}'" for file in whitelist_files)
+        return f"find . -mindepth 1 -maxdepth 1 {keep_predicates} -exec rm -rf -- {{}} +"
+
+    @staticmethod
     def _init_batch_and_cmd_opts(v):
         """System/experiment may have universal options they want to apply
         for all batch allocations or exec calls.
@@ -390,10 +411,11 @@ class Allocation(BasicModifier):
         if v.extra_cmd_opts:
             cmd_opts.extend(v.extra_cmd_opts.strip().split("\n"))
 
+        pre_exec_cmds = [Allocation._cleanup_experiment_dir_cmd()]
         if v.pre_exec_cmds:
-            v.pre_exec = v.pre_exec_cmds
-        else:
-            v.pre_exec = ""
+            pre_exec_cmds.append(v.pre_exec_cmds)
+        v.pre_exec = "\n".join(pre_exec_cmds)
+
         if v.post_exec_cmds:
             v.post_exec = v.post_exec_cmds
         else:
