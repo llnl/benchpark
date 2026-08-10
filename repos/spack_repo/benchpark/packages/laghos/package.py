@@ -66,8 +66,6 @@ class Laghos(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("mfem+cuda+mpi+umpire", when="+cuda")
     depends_on("mfem~cuda", when="~cuda")
 
-    patch("laghos-cmake.patch")
-
     for sm_ in CudaPackage.cuda_arch_values:
         depends_on("hypre cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
         depends_on("mfem cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
