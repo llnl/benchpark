@@ -79,6 +79,15 @@ def merge_cell(existing, result):
     if changed_packages(result):
         marker_set.add("dep")
 
+    if changes.get("system_spec_changed"):
+        marker_set.add("sys")
+
+    if changes.get("experiment_spec_changed"):
+        marker_set.add("exp")
+
+    if changes.get("application_spec_changed"):
+        marker_set.add("app")
+
     if result.get("status_changed") or changes.get("status_changed"):
         marker_set.add("!")
 
@@ -145,7 +154,11 @@ def build_matrix(results):
 
 
 def marker_text(markers):
-    ordered = [marker for marker in ("dep", "!") if marker in markers]
+    ordered = [
+        marker
+        for marker in ("dep", "sys", "exp", "app", "!")
+        if marker in markers
+    ]
     return " ".join(ordered)
 
 
@@ -395,7 +408,13 @@ def draw_legend(ax, left, top, table_width):
         )
 
     change_x = left + table_width * 0.62
-    change_items = [("!", "Status changed"), ("dep", "Package changed")]
+    change_items = [
+        ("!", "Status changed"),
+        ("dep", "Package changed"),
+        ("sys", "System spec changed"),
+        ("exp", "Experiment spec changed"),
+        ("app", "Application spec changed"),
+    ]
     for idx, (marker, label) in enumerate(change_items):
         y = start_y - idx * row_height
         ax.text(

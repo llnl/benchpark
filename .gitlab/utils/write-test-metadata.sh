@@ -27,6 +27,7 @@ if [[ -f "${run_status_file}" ]]; then
 fi
 
 changes_json=$(mktemp)
+changed_files_json=$(mktemp)
 if [[ -f "${githash_changes_json}" ]]; then
     cp "${githash_changes_json}" "${changes_json}"
 else
@@ -34,6 +35,44 @@ else
         --arg reason "Missing githash change summary" \
         '{available: false, reason: $reason, application_changed: false, dependencies_changed: false, packages: []}' \
         > "${changes_json}"
+fi
+
+printf '[]\n' > "${changed_files_json}"
+diff_base="origin/${BASELINE_REF:-develop}"
+if git rev-parse --verify --quiet "${diff_base}^{commit}" >/dev/null; then
+    git diff --name-only "${diff_base}" HEAD 2>/dev/null \
+        | jq -R -s 'split("\n") | map(select(length > 0))' \
+        > "${changed_files_json}" \
+        || printf '[]\n' > "${changed_files_json}"
+fi
+
+benchmark="${BENCHMARK:-}"
+benchmark_application="${benchmark//-/_}"
+application_spec_changed=false
+experiment_spec_changed=false
+system_spec_changed=false
+if [[ -n "${benchmark}" ]]; then
+    application_spec_changed="$(
+        jq -r \
+            --arg application_path "repos/ramble_applications/${benchmark_application}/" \
+            --arg legacy_application_path "repos/applications/${benchmark}/" \
+            'any(.[]; startswith($application_path) or startswith($legacy_application_path))' \
+            "${changed_files_json}"
+    )"
+    experiment_spec_changed="$(
+        jq -r \
+            --arg experiment_path "experiments/${benchmark}/" \
+            'any(.[]; startswith($experiment_path))' \
+            "${changed_files_json}"
+    )"
+fi
+if [[ -n "${ARCHCONFIG:-}" ]]; then
+    system_spec_changed="$(
+        jq -r \
+            --arg system_path "systems/${ARCHCONFIG}/" \
+            'any(.[]; startswith($system_path))' \
+            "${changed_files_json}"
+    )"
 fi
 
 status_changed=false
@@ -64,6 +103,9 @@ jq -n \
     --arg benchmark_version "${BENCHMARK_VERSION:-}" \
     --arg status "${test_status}" \
     --argjson status_changed "${status_changed}" \
+    --argjson application_spec_changed "${application_spec_changed}" \
+    --argjson experiment_spec_changed "${experiment_spec_changed}" \
+    --argjson system_spec_changed "${system_spec_changed}" \
     --arg run_exit_code "${run_exit_code}" \
     --arg job_name "${CI_JOB_NAME:-}" \
     --arg job_id "${CI_JOB_ID:-}" \
@@ -80,7 +122,11 @@ jq -n \
       status: $status,
       status_changed: $status_changed,
       run_exit_code: (if $run_exit_code == "" then null else ($run_exit_code | tonumber?) end),
-      changes: $changes[0],
+      changes: ($changes[0] + {
+        application_spec_changed: $application_spec_changed,
+        experiment_spec_changed: $experiment_spec_changed,
+        system_spec_changed: $system_spec_changed
+      }),
       job: {
         name: $job_name,
         id: $job_id,
@@ -89,4 +135,4 @@ jq -n \
       }
     }' > "${artifact_dir}/test_metadata.json"
 
-rm -f "${changes_json}" "${baseline_metadata_json}"
+rm -f "${changes_json}" "${changed_files_json}" "${baseline_metadata_json}"
