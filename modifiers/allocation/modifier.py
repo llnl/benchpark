@@ -398,7 +398,9 @@ class Allocation(BasicModifier):
             "{experiment_name}_metadata.json",
         ]
         keep_predicates = " ".join(f"! -name '{file}'" for file in whitelist_files)
-        return f"find . -mindepth 1 -maxdepth 1 {keep_predicates} -exec rm -rf -- {{}} +"
+        return (
+            f"find . -mindepth 1 -maxdepth 1 {keep_predicates} -exec rm -rf -- {{}} +"
+        )
 
     @staticmethod
     def _init_batch_and_cmd_opts(v):
