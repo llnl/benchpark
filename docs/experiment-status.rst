@@ -8,14 +8,13 @@
  Experiment Status
 ###################
 
-These steps reproduce CI metadata collection for the ``py-scaffold`` experiment on
-Tuolumne.
+These steps reproduce CI metadata collection for the ``amg2023`` experiment on Tioga.
 
 *************************
  Prepare the Environment
 *************************
 
-1. Log in to Tuolumne.
+1. Log in to Tioga.
 2. Clone Benchpark and enter the repository:
 
    ::
@@ -39,11 +38,11 @@ Run the following commands to collect metadata with ROCm 6.4.2:
 
 ::
 
-    ./bin/benchpark system init --dest=tuolumne_642 llnl-elcapitan cluster=tuolumne rocm=6.4.2
-    ./bin/benchpark experiment init --dest=py-scaffold tuolumne_642 py-scaffold +rocm package_manager=spack-pip caliper=time,rocm,rocm-gputime,rccl allocation=torchrun-hpc
-    ./bin/benchpark setup tuolumne_642/py-scaffold wkp/
+    ./bin/benchpark system init --dest=tioga_rocm_6.4.2 llnl-elcapitan cluster=tioga rocm=6.4.2
+    ./bin/benchpark experiment init --dest=amg2023 tioga_rocm_6.4.2 amg2023 +rocm caliper=time,mpi
+    ./bin/benchpark setup tioga_rocm_6.4.2/amg2023 wkp/
     . wkp/setup.sh
-    cd ./wkp/tuolumne_642/py-scaffold/workspace/
+    cd ./wkp/tioga_rocm_6.4.2/amg2023/workspace/
     ramble --workspace-dir . workspace setup
     ramble --workspace-dir . on
 
@@ -52,41 +51,28 @@ Return to the Benchpark repository root, then repeat the workflow with ROCm 7.2.
 ::
 
     cd ../../../..
-    ./bin/benchpark system init --dest=tuolumne_720 llnl-elcapitan cluster=tuolumne rocm=7.2.0
-    ./bin/benchpark experiment init --dest=py-scaffold tuolumne_720 py-scaffold +rocm package_manager=spack-pip caliper=time,rocm,rocm-gputime,rccl allocation=torchrun-hpc
-    ./bin/benchpark setup tuolumne_720/py-scaffold wkp/
+    ./bin/benchpark system init --dest=tioga_rocm_7.2.0 llnl-elcapitan cluster=tioga rocm=7.2.0
+    ./bin/benchpark experiment init --dest=amg2023 tioga_rocm_7.2.0 amg2023 +rocm caliper=time,mpi
+    ./bin/benchpark setup tioga_rocm_7.2.0/amg2023 wkp/
     . wkp/setup.sh
-    cd ./wkp/tuolumne_720/py-scaffold/workspace/
+    cd ./wkp/tioga_rocm_7.2.0/amg2023/workspace/
     ramble --workspace-dir . workspace setup
     ramble --workspace-dir . on
 
 ******************
- Compare Metadata
+ Inspect Metadata
 ******************
 
-After both runs complete, return to the Benchpark repository root and define the
-experiment directories:
+After both runs complete, return to the Benchpark repository root:
 
 ::
 
     cd ../../../..
-    rocm_642_experiment=wkp/tuolumne_642/py-scaffold/workspace/experiments/py_scaffold/sweep/py_scaffold_sweep_test_rocm_no_scaling_caliper_time_rocm_rocm_gputime_rccl_4_6_10_1
-    rocm_720_experiment=wkp/tuolumne_720/py-scaffold/workspace/experiments/py_scaffold/sweep/py_scaffold_sweep_test_rocm_no_scaling_caliper_time_rocm_rocm_gputime_rccl_4_6_10_1
 
-Verify that each experiment directory contains a ``githash_metadata.json`` file:
+Compare the two locally generated metadata files:
 
 ::
 
-    test -f "${rocm_642_experiment}/githash_metadata.json"
-    test -f "${rocm_720_experiment}/githash_metadata.json"
-
-Compare the two metadata files:
-
-::
-
-    .gitlab/utils/compare-githash-metadata.sh \
-        "${rocm_642_experiment}" \
-        "${rocm_720_experiment}"
-
-The comparison script generates a JSON file describing the differences between the two
-metadata files.
+    . .gitlab/utils/compare-githash-metadata.sh \
+        wkp/tioga_rocm_6.4.2/amg2023/workspace/experiments/amg2023/problem1/amg2023_problem1_test_mpi_rocm_no_scaling_caliper_time_mpi_80_80_40_2_2_1_4/githash_metadata.json \
+        wkp/tioga_rocm_7.2.0/amg2023/workspace/experiments/amg2023/problem1/amg2023_problem1_test_mpi_rocm_no_scaling_caliper_time_mpi_80_80_40_2_2_1_4/githash_metadata.json
