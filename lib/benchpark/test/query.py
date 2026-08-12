@@ -31,6 +31,17 @@ def import_query(monkeypatch):
     return query
 
 
+def read_query_csv(csv_path):
+    with csv_path.open(newline="") as csv_file:
+        assert csv_file.readline().rstrip() == (
+            "# benchpark query "
+            f"{AMG2023_ROCM642_TUO_PROBLEM1} "
+            "--query-regions-byname main "
+            "--metric 'Avg time/rank'"
+        )
+        return list(csv.DictReader(csv_file))
+
+
 def test_query_parser_requires_directories_and_metric(monkeypatch):
     query = import_query(monkeypatch)
     parser = argparse.ArgumentParser()
@@ -64,6 +75,12 @@ def test_query_command_reads_real_caliper_data(monkeypatch, tmp_path, capsys):
         metric="Avg time/rank",
         metadata_columns=[],
         exclude_regions=None,
+        command_line=(
+            "benchpark query "
+            f"{AMG2023_ROCM642_TUO_PROBLEM1} "
+            "--query-regions-byname main "
+            "--metric 'Avg time/rank'"
+        ),
     )
 
     assert query.command(args) == 0
@@ -73,8 +90,7 @@ def test_query_command_reads_real_caliper_data(monkeypatch, tmp_path, capsys):
     assert out == f"{csv_path.name}\n"
     assert csv_path.exists()
 
-    with csv_path.open(newline="") as csv_file:
-        rows = list(csv.DictReader(csv_file))
+    rows = read_query_csv(csv_path)
 
     assert len(rows) == 2
     assert {row["cluster"] for row in rows} == {"tuolumne"}
@@ -99,6 +115,12 @@ def test_query_command_includes_final_fom_metadata_column(
         metric="Avg time/rank",
         metadata_columns=["Final-FOM"],
         exclude_regions=None,
+        command_line=(
+            "benchpark query "
+            f"{AMG2023_ROCM642_TUO_PROBLEM1} "
+            "--query-regions-byname main "
+            "--metric 'Avg time/rank'"
+        ),
     )
 
     assert query.command(args) == 0
@@ -107,8 +129,7 @@ def test_query_command_includes_final_fom_metadata_column(
     csv_path = tmp_path / "query-01234567-012345.csv"
     assert out == f"{csv_path.name}\n"
 
-    with csv_path.open(newline="") as csv_file:
-        rows = list(csv.DictReader(csv_file))
+    rows = read_query_csv(csv_path)
 
     assert list(rows[0].keys()) == [
         "cluster",

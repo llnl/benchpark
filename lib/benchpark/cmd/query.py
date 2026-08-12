@@ -4,6 +4,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+import shlex
+import sys
 from datetime import datetime
 from glob import glob
 
@@ -59,6 +61,18 @@ def setup_parser(root_parser):
     )
 
 
+def _command_line(args):
+    if hasattr(args, "command_line"):
+        return args.command_line
+    return "benchpark " + shlex.join(sys.argv[1:])
+
+
+def _write_csv(df, filename, args):
+    with open(filename, "w", newline="") as csv_file:
+        csv_file.write(f"# {_command_line(args)}\n")
+        df.to_csv(csv_file, index=False)
+
+
 def command(args):
     cali_files = []
     for directory in args.directories:
@@ -72,7 +86,7 @@ def command(args):
     if args.metric in tk.metadata.columns:
         df = tk.metadata[columns + [args.metric]]
         filename = f"query-{datetime.now().strftime('%Y%m%d-%H%M%S')}.csv"
-        df.to_csv(filename, index=False)
+        _write_csv(df, filename, args)
         print(filename)
         return 0
 
@@ -134,7 +148,7 @@ def command(args):
 
     filename = f"query-{datetime.now().strftime('%Y%m%d-%H%M%S')}.csv"
 
-    df.to_csv(filename, index=False)
+    _write_csv(df, filename, args)
     print(filename)
 
     return 0
