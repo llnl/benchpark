@@ -105,7 +105,9 @@ def _write_csv(df, filename, args, tree=None):
 def command(args):
     cali_files = []
     for directory in args.directories:
-        cali_files.extend(glob(os.path.join(directory, "**/*.cali"), recursive=True))
+        cali_files.extend(
+            sorted(glob(os.path.join(directory, "**/*.cali"), recursive=True))
+        )
     if not cali_files:
         raise ValueError(f"No Caliper files found under {args.directories}")
 
