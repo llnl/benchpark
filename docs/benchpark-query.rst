@@ -36,23 +36,57 @@ To query a performance metric for matching regions:
         --metric "Avg time/rank" \
         --query-regions-byname main
 
-For example, this command queries the ``main`` region from a Tuolumne ROCm workspace:
+For example, this command queries the ``Problem`` region from a Frontier ROCm workspace
+and excludes MPI regions:
 
 .. code-block:: console
 
-    $ benchpark query wkp/rocm720-tuocpx/ --metric "Avg time/rank" --query-regions-byname "main"
-    query-20260804-155727.csv
+    $ benchpark query wkp/rocm642-frontier/amg2023/ --query-regions-byname Problem --metric "Avg time/rank" --exclude-regions MPI_
+    query-20260811-181919.csv
 
-The generated CSV contains one row per matching Caliper profile:
+The generated CSV contains one row per matching Caliper profile. Duplicate values in
+the metadata columns can occur when the workspace contains multiple trials for the same
+experiment configuration. Lines beginning with ``#`` are comments. The first comment
+records the command line. The trailing comments record the queried call tree structure
+after region selection and exclusion:
 
 .. code-block:: text
 
+    # benchpark query wkp/rocm642-frontier/amg2023/ --query-regions-byname Problem --metric 'Avg time/rank' --exclude-regions MPI_
     cluster,application_name,Avg time/rank
-    tuolumne,amg2023,37.868644941549995
-    tuolumne,amg2023,48.05078048824099
-    tuolumne,amg2023,65.32041833236799
-    tuolumne,amg2023,48.565981153342
-    tuolumne,amg2023,47.587217976849
+    frontier,amg2023,7.8742357827500005
+    frontier,amg2023,7.9076165642800005
+    frontier,amg2023,7.98603465824
+    frontier,amg2023,8.17716916271
+    frontier,amg2023,7.905229214139999
+
+    # Problem
+    # ├─ Setup
+    # │  ├─ hipDeviceSynchronize
+    # │  ├─ hipGetDevice
+    # │  ├─ hipGetDevicePropertiesR0600
+    # │  ├─ hipGetLastError
+    # │  ├─ hipHostMalloc
+    # │  ├─ hipLaunchKernel
+    # │  ├─ hipMalloc
+    # │  ├─ hipMemcpy
+    # │  ├─ hipMemcpyAsync
+    # │  ├─ hipMemcpyWithStream
+    # │  ├─ hipMemset
+    # │  ├─ hipMemsetAsync
+    # │  ├─ hipPeekAtLastError
+    # │  └─ hipStreamSynchronize
+    # └─ Solve
+    #    ├─ hipDeviceSynchronize
+    #    ├─ hipGetDevice
+    #    ├─ hipGetDevicePropertiesR0600
+    #    ├─ hipGetLastError
+    #    ├─ hipLaunchKernel
+    #    ├─ hipMemcpy
+    #    ├─ hipMemcpyWithStream
+    #    ├─ hipMemsetAsync
+    #    ├─ hipPeekAtLastError
+    #    └─ hipStreamSynchronize
 
 The command writes a file named ``query-YYYYMMDD-HHMMSS.csv`` in the current working
 directory and prints the filename.
