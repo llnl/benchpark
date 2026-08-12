@@ -11,7 +11,6 @@ import sys
 
 import pytest
 
-
 QUERY_DATA = pathlib.Path(__file__).parent / "data" / "query"
 AMG2023_ROCM642_TUO_PROBLEM1 = (QUERY_DATA / "rocm642-tuo-amg2023-problem1").resolve()
 

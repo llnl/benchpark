@@ -105,7 +105,8 @@ def command(args):
                     and any(r in n for r in args.query_regions_byname)
                 )
                 .all(),
-            ).rel("*")
+            )
+            .rel("*")
         )
         if args.filter_regions_byname:
             query = query.rel("*")
