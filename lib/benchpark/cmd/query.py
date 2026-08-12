@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+import re
 import shlex
 import sys
 from datetime import datetime
@@ -11,6 +12,13 @@ from glob import glob
 
 import pandas as pd
 import thicket as th
+
+_ANSI_ESCAPE = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]")
+_TREE_VALUE = re.compile(
+    r"^(\s*(?:(?:[\u2502|]\s{2})|\s{3})*\s*"
+    r"(?:[\u251c\u2514\u2500+`|\-]+[ \t]*)?)"
+    r"[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?\s+(.*)$"
+)
 
 
 def setup_parser(root_parser):
@@ -67,10 +75,31 @@ def _command_line(args):
     return "benchpark " + shlex.join(sys.argv[1:])
 
 
-def _write_csv(df, filename, args):
+def _tree_structure_lines(tree):
+    lines = []
+    for line in _ANSI_ESCAPE.sub("", tree).splitlines():
+        if line.startswith("Legend"):
+            break
+        match = _TREE_VALUE.match(line)
+        if not match:
+            continue
+        lines.append(match.group(1) + match.group(2))
+    return lines
+
+
+def _clean_tree(tk, metric):
+    clean_tree = tk.tree(metric, render_header=True)
+    return _ANSI_ESCAPE.sub("", clean_tree)
+
+
+def _write_csv(df, filename, args, tree=None):
     with open(filename, "w", newline="") as csv_file:
         csv_file.write(f"# {_command_line(args)}\n")
         df.to_csv(csv_file, index=False)
+        if tree:
+            csv_file.write("\n")
+            for line in _tree_structure_lines(tree):
+                csv_file.write(f"# {line}\n")
 
 
 def command(args):
@@ -148,7 +177,8 @@ def command(args):
 
     filename = f"query-{datetime.now().strftime('%Y%m%d-%H%M%S')}.csv"
 
-    _write_csv(df, filename, args)
+    _write_csv(df, filename, args, tree=_clean_tree(tk, args.metric))
+
     print(filename)
 
     return 0

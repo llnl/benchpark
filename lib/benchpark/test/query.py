@@ -39,7 +39,8 @@ def read_query_csv(csv_path):
             "--query-regions-byname main "
             "--metric 'Avg time/rank'"
         )
-        return list(csv.DictReader(csv_file))
+        rows = [line for line in csv_file if not line.startswith("#")]
+        return list(csv.DictReader(rows))
 
 
 def test_query_parser_requires_directories_and_metric(monkeypatch):
