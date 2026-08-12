@@ -81,7 +81,8 @@ jq_normalize_job_name='
         gsub("\\$\\{DANE_PARAMS\\}|\\$DANE_PARAMS"; $dane_params)
         | gsub("\\$\\{MATRIX_PARAMS\\}|\\$MATRIX_PARAMS"; $matrix_params)
         | gsub("\\$\\{ELCAP_PARAMS\\}|\\$ELCAP_PARAMS"; $elcap_params)
-        | gsub("\\$\\{GPUMODE\\}|\\$GPUMODE"; $gpumode);
+        | gsub("\\$\\{GPUMODE\\}|\\$GPUMODE"; $gpumode)
+        | gsub("rocm=[^,\\]]+"; "rocm=<version>");
 '
 
 fetch_job_artifact() {
