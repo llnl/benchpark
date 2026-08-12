@@ -21,14 +21,14 @@ __version__ = "0.1.0"
 if "-V" in sys.argv or "--version" in sys.argv:
     print(__version__)
     exit()
-helpstr = """usage: main.py [-h] [-V] {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze,redo,aggregate,configure} ...
+helpstr = """usage: main.py [-h] [-V] {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze,query,redo,aggregate,configure} ...
 
 Benchpark
 options:
   -h, --help            show this help message and exit
   -V, --version         show version number and exit
 Subcommands:
-  {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze,redo,aggregate,configure}
+  {tags,system,experiment,setup,unit-test,audit,mirror,info,show-build,list,bootstrap,analyze,query,redo,aggregate,configure}
     tags                Tags in Benchpark experiments
     system              Initialize a system config
     experiment          Interact with experiments
@@ -41,6 +41,7 @@ Subcommands:
     list                List experiments, systems, benchmarks, and modifiers
     bootstrap           Bootstrap benchpark or update an existing bootstrap
     analyze             Perform pre-defined analysis on the performance data (caliper files) after 'ramble on'
+    query               Query Caliper files into a CSV
     redo                Re-instantiate system and all associated experiments
     aggregate           Aggregate multiple experiments (even across workspaces) into the same submission script
     configure           Configure options relating to the Benchpark environment
@@ -115,6 +116,13 @@ try:
 except ModuleNotFoundError:
     analyze_installed = False
 
+try:
+    import benchpark.cmd.query  # noqa: E402
+
+    query_installed = True
+except ModuleNotFoundError:
+    query_installed = False
+
 
 def main():
     if sys.version_info[:2] < (3, 8):
@@ -140,6 +148,7 @@ def main():
     init_commands(subparsers, actions)
 
     args, unknown_args = parser.parse_known_args()
+    args.command_line = "benchpark " + shlex.join(sys.argv[1:])
     no_args = True if len(sys.argv) == 1 else False
 
     if no_args:
@@ -280,6 +289,11 @@ def init_commands(subparsers, actions_dict):
         help="Perform pre-defined analysis on the performance data (caliper files) after 'ramble on'",
     )
 
+    query_parser = subparsers.add_parser(
+        "query",
+        help="Query Caliper files into a CSV",
+    )
+
     aggregate_parser = subparsers.add_parser(
         "aggregate",
         help="Aggregate multiple experiments (even across workspaces) into the same submission script",
@@ -314,6 +328,17 @@ def init_commands(subparsers, actions_dict):
             )
 
         actions_dict["analyze"] = analyze_command_placeholder
+    if query_installed:
+        benchpark.cmd.query.setup_parser(query_parser)
+        actions_dict["query"] = benchpark.cmd.query.command
+    else:
+
+        def query_command_placeholder(args, unknown_args):
+            raise RuntimeError(
+                "Packages required for 'benchpark query' not found. run 'pip install .[analyze]' from the 'benchpark' directory."
+            )
+
+        actions_dict["query"] = query_command_placeholder
 
 
 def run_command(command_str, env=None):
