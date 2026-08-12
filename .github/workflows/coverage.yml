@@ -13,6 +13,7 @@ jobs:
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
+          pip install ".[analyze]"
       - name: Run unit tests with coverage
         run: |
           ./bin/benchpark unit-test --cov=./ --cov-branch --cov-report=xml --durations=20 -ra

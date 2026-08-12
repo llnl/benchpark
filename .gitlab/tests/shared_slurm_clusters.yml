@@ -98,6 +98,7 @@ release_resources_matrix:
   after_script:
     - !reference [.report_status, after_script]
     - |
+<<<<<<< HEAD
       bash .gitlab/utils/collect-cali-artifact.sh
     - |
       bash .gitlab/utils/write-test-metadata.sh PR "$CI_PROJECT_DIR/pr_flux.status"
@@ -106,9 +107,15 @@ release_resources_matrix:
     - |
       bash .gitlab/utils/write-test-metadata.sh PR "$CI_PROJECT_DIR/pr_flux.status"
     - |
+=======
+>>>>>>> develop
       if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
         . .gitlab/utils/cancel-slurm.sh
       fi
+    - |
+      bash .gitlab/utils/collect-cali-artifact.sh
+    - |
+      bash .gitlab/utils/collect-githash-artifact.sh PR "$CI_PROJECT_DIR/pr_flux.status"
 run_tests_slurm_dane:
   extends: .run_tests_slurm
   tags: [shell, dane]

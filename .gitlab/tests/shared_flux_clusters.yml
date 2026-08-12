@@ -105,6 +105,10 @@ release_resources_flux_tioga:
       if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
         . .gitlab/utils/cancel-flux.sh
       fi
+    - |
+      bash .gitlab/utils/collect-cali-artifact.sh
+    - |
+      bash .gitlab/utils/collect-githash-artifact.sh PR "$CI_PROJECT_DIR/pr_flux.status"
 run_tests_flux_tuolumne:
   extends: .run_tests_flux
   tags: [shell, tuolumne]

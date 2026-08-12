@@ -117,7 +117,8 @@ cleanup_pipeline_dir:
   tags: [shell, oslic]
   stage: cleanup-dir
   script:
-    - echo "Removing $CUSTOM_CI_BUILDS_DIR"
-    - rm -rf $CUSTOM_CI_BUILDS_DIR
+    - CLEANUP_CI_BUILDS_DIR="${CUSTOM_CI_BUILDS_DIR/#\$HOME/$HOME}"
+    - echo "Removing $CLEANUP_CI_BUILDS_DIR"
+    - rm -rf "$CLEANUP_CI_BUILDS_DIR"
   rules:
     - when: always
