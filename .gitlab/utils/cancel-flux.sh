@@ -1,14 +1,30 @@
 #!/bin/bash
-set -x
 
 NO_CLEAN=false
-if [[ "$1" == "--no-clean" ]]; then
-    NO_CLEAN=true
+for arg in "$@"; do
+    case "$arg" in
+    --no-clean)
+        NO_CLEAN=true
+        ;;
+    esac
+done
+
+URI=$(flux jobs -o "{id} {name}" | grep "${ALLOC_NAME}${GPUMODE}" | awk '{print $1}')
+([[ -n "${URI}" ]] && flux cancel ${URI} || true)
+if [[ -n "${URI}" ]]; then
+    for i in {1..60}; do
+        WAITING=false
+        for id in ${URI}; do
+            if flux jobs -o "{id}" | grep -Fxq "${id}"; then
+                WAITING=true
+            fi
+        done
+        $WAITING || break
+        echo "Waiting for Flux job ${URI} to stop before cleanup"
+        sleep 5
+    done
 fi
 
-export URI=$(flux jobs -o "{id} {name}" | grep ${ALLOC_NAME}${GPUMODE} | awk '{print $1}')
-([[ -n "${URI}" ]] && flux cancel ${URI} || exit 0)
-
 if ! $NO_CLEAN; then
-    rm -rf $CUSTOM_CI_BUILDS_DIR
+    bash .gitlab/utils/cancel-cleanup.sh "$CUSTOM_CI_BUILDS_DIR"
 fi
