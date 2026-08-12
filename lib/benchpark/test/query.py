@@ -43,6 +43,10 @@ def read_query_csv(csv_path):
         return list(csv.DictReader(rows))
 
 
+def rows_by_avg_time(rows):
+    return sorted(rows, key=lambda row: float(row["Avg time/rank"]))
+
+
 def test_query_parser_requires_directories_and_metric(monkeypatch):
     query = import_query(monkeypatch)
     parser = argparse.ArgumentParser()
@@ -96,7 +100,8 @@ def test_query_command_reads_real_caliper_data(monkeypatch, tmp_path, capsys):
     assert len(rows) == 2
     assert {row["cluster"] for row in rows} == {"tuolumne"}
     assert {row["application_name"] for row in rows} == {"amg2023"}
-    assert [float(row["Avg time/rank"]) for row in rows] == pytest.approx(
+    sorted_rows = rows_by_avg_time(rows)
+    assert [float(row["Avg time/rank"]) for row in sorted_rows] == pytest.approx(
         [
             62.07430117410001,
             63.49193220765,
@@ -138,7 +143,8 @@ def test_query_command_includes_final_fom_metadata_column(
         "Final-FOM",
         "Avg time/rank",
     ]
-    assert [float(row["Final-FOM"]) for row in rows] == pytest.approx(
+    sorted_rows = rows_by_avg_time(rows)
+    assert [float(row["Final-FOM"]) for row in sorted_rows] == pytest.approx(
         [
             1263870000.0,
             1140180000.0,
