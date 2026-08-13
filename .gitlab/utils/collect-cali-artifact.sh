@@ -12,6 +12,8 @@ performance_region="main"
 mkdir -p "${artifact_dir}"
 mkdir -p "${baseline_artifact_dir}"
 
+. /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
+
 write_unavailable_performance() {
     local reason=$1
     jq -n \
