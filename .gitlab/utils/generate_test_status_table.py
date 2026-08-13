@@ -19,6 +19,7 @@ from matplotlib.patches import Rectangle
 
 
 STATUS_ORDER = {
+    "Unknown": 0,
     "Run": 0,
     "Build": 1,
     "Perf": 2,
@@ -43,6 +44,12 @@ STATUS_STYLES = {
         "facecolor": "#ffd6e5",
         "edgecolor": "#f0a7c5",
         "hatch": "////",
+    },
+    "Unknown": {
+        "label": "Unknown failure",
+        "facecolor": "#ece3ff",
+        "edgecolor": "#b9a2e8",
+        "hatch": "xx",
     },
     "Perf": {
         "label": "Perf regression",
@@ -222,7 +229,7 @@ def render_table(summary, output_path):
     cell_width = 1.45
     header_height = 0.82
     title_height = 0.62
-    legend_height = 2.05
+    legend_height = 2.4
     margin = 0.25
 
     table_width = benchmark_width + cell_width * len(hosts)
@@ -399,7 +406,7 @@ def draw_legend(ax, left, top, table_width):
         fontfamily="serif",
     )
 
-    status_items = ["Not Tested", "Build", "Run", "Perf", "Pass"]
+    status_items = ["Not Tested", "Build", "Run", "Unknown", "Perf", "Pass"]
     row_height = 0.36
     swatch_width = 1.1
     swatch_height = 0.26

@@ -17,7 +17,7 @@ performance_json="${CI_PROJECT_DIR}/artifact-cali/performance_metadata.json"
 
 mkdir -p "${artifact_dir}"
 
-test_status="Unknown"
+test_status="Not Tested"
 if [[ -f "${test_status_file}" ]]; then
     test_status="$(cat "${test_status_file}")"
 fi
@@ -25,6 +25,10 @@ fi
 run_exit_code=""
 if [[ -f "${run_status_file}" ]]; then
     run_exit_code="$(cat "${run_status_file}")"
+fi
+
+if [[ ! -f "${test_status_file}" && -n "${run_exit_code}" && "${run_exit_code}" != "0" ]]; then
+    test_status="Unknown"
 fi
 
 changes_json=$(mktemp)
