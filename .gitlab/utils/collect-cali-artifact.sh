@@ -8,6 +8,7 @@ performance_json="${artifact_dir}/performance_metadata.json"
 baseline_performance_json="${baseline_artifact_dir}/performance_metadata.json"
 performance_metric="Avg time/rank"
 performance_region="main"
+performance_threshold="0.05"
 
 mkdir -p "${artifact_dir}"
 mkdir -p "${baseline_artifact_dir}"
@@ -87,4 +88,21 @@ if [[ "$(jq -r '.available // false' "${performance_json}")" == "true" && -n "${
         --output-path "${baseline_performance_json}" \
         --exclude-pipeline-id "${CI_PIPELINE_ID:-}" \
         --optional
+
+    if [[ -s "${baseline_performance_json}" ]]; then
+        if current_performance_value="$(jq -er '.value | numbers' "${performance_json}" 2>/dev/null)" \
+            && baseline_performance_value="$(jq -er 'select(.available == true) | .value | numbers' "${baseline_performance_json}" 2>/dev/null)"; then
+            tmp_performance_json=$(mktemp)
+            jq \
+                --argjson baseline_value "${baseline_performance_value}" \
+                --argjson threshold "${performance_threshold}" \
+                '. + {
+                  baseline_value: $baseline_value,
+                  threshold: $threshold,
+                  percent_deviation: (if $baseline_value > 0 then ((.value - $baseline_value) / $baseline_value * 100) else null end),
+                  regressed: (if $baseline_value > 0 then (.value > ($baseline_value * (1 + $threshold))) else false end)
+                }' "${performance_json}" > "${tmp_performance_json}"
+            mv "${tmp_performance_json}" "${performance_json}"
+        fi
+    fi
 fi

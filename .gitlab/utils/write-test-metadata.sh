@@ -14,8 +14,6 @@ test_status_file="${CI_PROJECT_DIR}/test_status.txt"
 githash_artifact_dir="${CI_PROJECT_DIR}/artifact-githash"
 githash_changes_json="${githash_artifact_dir}/githash_changes.json"
 performance_json="${CI_PROJECT_DIR}/artifact-cali/performance_metadata.json"
-baseline_performance_json="${CI_PROJECT_DIR}/baseline-cali/performance_metadata.json"
-performance_threshold="0.05"
 
 mkdir -p "${artifact_dir}"
 
@@ -51,30 +49,6 @@ else
           reason: $reason,
           regressed: false
         }' > "${merged_performance_json}"
-fi
-
-if [[ -s "${baseline_performance_json}" ]]; then
-    if current_performance_value="$(jq -er 'select(.available == true) | .value | numbers' "${merged_performance_json}" 2>/dev/null)" \
-        && baseline_performance_value="$(jq -er 'select(.available == true) | .value | numbers' "${baseline_performance_json}" 2>/dev/null)"; then
-        performance_regressed="$(
-            jq -n \
-                --argjson current "${current_performance_value}" \
-                --argjson baseline "${baseline_performance_value}" \
-                --argjson threshold "${performance_threshold}" \
-                '($baseline > 0) and ($current > ($baseline * (1 + $threshold)))'
-        )"
-        tmp_performance_json=$(mktemp)
-        jq \
-            --argjson baseline_value "${baseline_performance_value}" \
-            --argjson threshold "${performance_threshold}" \
-            --argjson regressed "${performance_regressed}" \
-            '. + {
-              baseline_value: $baseline_value,
-              threshold: $threshold,
-              regressed: $regressed
-            }' "${merged_performance_json}" > "${tmp_performance_json}"
-        mv "${tmp_performance_json}" "${merged_performance_json}"
-    fi
 fi
 
 printf '[]\n' > "${changed_files_json}"
