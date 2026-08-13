@@ -13,6 +13,9 @@ artifact_dir="${CI_PROJECT_DIR}/artifact-test-metadata"
 test_status_file="${CI_PROJECT_DIR}/test_status.txt"
 githash_artifact_dir="${CI_PROJECT_DIR}/artifact-githash"
 githash_changes_json="${githash_artifact_dir}/githash_changes.json"
+performance_json="${CI_PROJECT_DIR}/artifact-cali/performance_metadata.json"
+baseline_performance_json="${CI_PROJECT_DIR}/baseline-cali/performance_metadata.json"
+performance_threshold="0.05"
 
 mkdir -p "${artifact_dir}"
 
@@ -28,6 +31,7 @@ fi
 
 changes_json=$(mktemp)
 changed_files_json=$(mktemp)
+merged_performance_json=$(mktemp)
 if [[ -f "${githash_changes_json}" ]]; then
     cp "${githash_changes_json}" "${changes_json}"
 else
@@ -35,6 +39,42 @@ else
         --arg reason "Missing githash change summary" \
         '{available: false, reason: $reason, application_changed: false, dependencies_changed: false, packages: []}' \
         > "${changes_json}"
+fi
+
+if [[ -s "${performance_json}" ]]; then
+    cp "${performance_json}" "${merged_performance_json}"
+else
+    jq -n \
+        --arg reason "Missing performance metadata" \
+        '{
+          available: false,
+          reason: $reason,
+          regressed: false
+        }' > "${merged_performance_json}"
+fi
+
+if [[ -s "${baseline_performance_json}" ]]; then
+    if current_performance_value="$(jq -er 'select(.available == true) | .value | numbers' "${merged_performance_json}" 2>/dev/null)" \
+        && baseline_performance_value="$(jq -er 'select(.available == true) | .value | numbers' "${baseline_performance_json}" 2>/dev/null)"; then
+        performance_regressed="$(
+            jq -n \
+                --argjson current "${current_performance_value}" \
+                --argjson baseline "${baseline_performance_value}" \
+                --argjson threshold "${performance_threshold}" \
+                '($baseline > 0) and ($current > ($baseline * (1 + $threshold)))'
+        )"
+        tmp_performance_json=$(mktemp)
+        jq \
+            --argjson baseline_value "${baseline_performance_value}" \
+            --argjson threshold "${performance_threshold}" \
+            --argjson regressed "${performance_regressed}" \
+            '. + {
+              baseline_value: $baseline_value,
+              threshold: $threshold,
+              regressed: $regressed
+            }' "${merged_performance_json}" > "${tmp_performance_json}"
+        mv "${tmp_performance_json}" "${merged_performance_json}"
+    fi
 fi
 
 printf '[]\n' > "${changed_files_json}"
@@ -112,6 +152,7 @@ jq -n \
     --arg job_url "${CI_JOB_URL:-}" \
     --arg pipeline_id "${CI_PIPELINE_ID:-}" \
     --slurpfile changes "${changes_json}" \
+    --slurpfile performance "${merged_performance_json}" \
     '{
       checkout: $checkout,
       host: $host,
@@ -127,6 +168,7 @@ jq -n \
         experiment_spec_changed: $experiment_spec_changed,
         system_spec_changed: $system_spec_changed
       }),
+      performance: $performance[0],
       job: {
         name: $job_name,
         id: $job_id,
@@ -135,4 +177,4 @@ jq -n \
       }
     }' > "${artifact_dir}/test_metadata.json"
 
-rm -f "${changes_json}" "${changed_files_json}" "${baseline_metadata_json}"
+rm -f "${changes_json}" "${changed_files_json}" "${merged_performance_json}" "${baseline_metadata_json}"

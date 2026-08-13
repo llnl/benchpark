@@ -21,7 +21,8 @@ from matplotlib.patches import Rectangle
 STATUS_ORDER = {
     "Run": 0,
     "Build": 1,
-    "Pass": 2,
+    "Perf": 2,
+    "Pass": 3,
 }
 
 STATUS_STYLES = {
@@ -42,6 +43,12 @@ STATUS_STYLES = {
         "facecolor": "#ffd6e5",
         "edgecolor": "#f0a7c5",
         "hatch": "////",
+    },
+    "Perf": {
+        "label": "Perf regression",
+        "facecolor": "#cfeeff",
+        "edgecolor": "#8ecae6",
+        "hatch": "---",
     },
     "Not Tested": {
         "label": "Not Tested",
@@ -74,7 +81,11 @@ def normalize_status(status):
 def merge_cell(existing, result):
     status = normalize_status(result.get("status"))
     changes = result.get("changes") or {}
+    performance = result.get("performance") or {}
     marker_set = set(existing.get("markers", [])) if existing else set()
+
+    if status == "Pass" and performance.get("regressed"):
+        status = "Perf"
 
     if changed_packages(result):
         marker_set.add("dep")
@@ -388,7 +399,7 @@ def draw_legend(ax, left, top, table_width):
         fontfamily="serif",
     )
 
-    status_items = ["Not Tested", "Build", "Run", "Pass"]
+    status_items = ["Not Tested", "Build", "Run", "Perf", "Pass"]
     row_height = 0.36
     swatch_width = 1.1
     swatch_height = 0.26
