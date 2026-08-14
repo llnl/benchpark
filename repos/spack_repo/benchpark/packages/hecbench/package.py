@@ -28,7 +28,7 @@ class Hecbench(CMakePackage, CudaPackage, ROCmPackage):
     variant(
         "benchmark",
         default="babelstream",
-        values=("babelstream",),
+        values=("babelstream", "softmax"),
         multi=False,
         description="HeCBench benchmark to build",
     )
@@ -56,6 +56,11 @@ class Hecbench(CMakePackage, CudaPackage, ROCmPackage):
         "+rocm",
         policy="one_of",
         msg="Select exactly one programming model: +cuda or +rocm",
+    )
+    conflicts(
+        "benchmark=softmax",
+        when="+cuda",
+        msg="The Softmax benchmark is currently supported only with +rocm",
     )
     conflicts(
         "cuda_arch=none",
@@ -137,12 +142,35 @@ class Hecbench(CMakePackage, CudaPackage, ROCmPackage):
         mkdirp(prefix.bin)
         install(built_binary, join_path(prefix.bin, self.selected_target()))
 
-    def test_babelstream(self):
-        """Run BabelStream and verify its float and double results."""
+    def test_selected_benchmark(self):
+        """Run the selected benchmark and verify its validation output."""
         executable = Executable(join_path(self.prefix.bin, self.selected_target()))
-        output = executable("--arraysize", "1048576", "--numtimes", "2", output=str, error=str)
-        results = re.findall(r"^(PASS|FAIL)$", output, re.MULTILINE)
-        if results != ["PASS", "PASS"]:
-            raise RuntimeError(
-                "Expected BabelStream validation results ['PASS', 'PASS'], got {0}".format(results)
+        benchmark = self.selected_benchmark()
+
+        if benchmark == "babelstream":
+            output = executable(
+                "--arraysize", "1048576", "--numtimes", "2", output=str, error=str
             )
+            results = re.findall(r"^(PASS|FAIL)$", output, re.MULTILINE)
+            if results != ["PASS", "PASS"]:
+                raise RuntimeError(
+                    "Expected BabelStream validation results ['PASS', 'PASS'], got {0}".format(
+                        results
+                    )
+                )
+            return
+
+        if benchmark == "softmax":
+            output = executable("8", "128", "1", "2", output=str, error=str)
+            results = re.findall(r"^(PASS|FAIL)$", output, re.MULTILINE)
+            if results != ["PASS"]:
+                raise RuntimeError(
+                    "Expected Softmax validation results ['PASS'], got {0}".format(
+                        results
+                    )
+                )
+            return
+
+        raise RuntimeError(
+            "No standalone test defined for benchmark '{0}'".format(benchmark)
+        )
