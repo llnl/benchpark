@@ -12,6 +12,14 @@ from spack_repo.builtin.packages.chai.package import Chai as BuiltinChai
 
 
 class Chai(BuiltinChai):
+
+    version(
+        "2026.07.0",
+        tag="v2026.07.0",
+        commit="7ed19adb246d6df796434750d2994b84cd8558e7",
+        submodules=False,
+    )
+
     variant(
         "cxxstd",
         default="17",

@@ -49,13 +49,6 @@ class Kripke(
         description="Enable CHAI",
     )
 
-    variant(
-        "cxxstd",
-        default="17",
-        values=("11", "14", "17", "20"),
-        description="C++ standard to build with",
-    )
-
     maintainers("pearce8")
 
     def compute_applications_section(self):
@@ -309,8 +302,7 @@ class Kripke(
             else "~gpu-aware-mpi"
         )
         chai = "+chai" if self.spec.variants["chai"][0] else "~chai"
-        cxxstd = self.spec.variants["cxxstd"][0]
         self.add_package_spec(
             self.name,
-            [f"kripke{self.determine_version()} {gam} {chai} cxxstd={cxxstd} +mpi"],
+            [f"kripke{self.determine_version()} {gam} {chai} +mpi"],
         )
