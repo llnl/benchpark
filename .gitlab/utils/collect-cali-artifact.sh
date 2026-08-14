@@ -96,11 +96,14 @@ if [[ "$(jq -r '.available // false' "${performance_json}")" == "true" && -n "${
             jq \
                 --argjson baseline_value "${baseline_performance_value}" \
                 --argjson threshold "${performance_threshold}" \
+                --slurpfile baseline_performance "${baseline_performance_json}" \
                 '. + {
                   baseline_value: $baseline_value,
                   threshold: $threshold,
                   percent_deviation: (if $baseline_value > 0 then ((.value - $baseline_value) / $baseline_value * 100) else null end),
                   regressed: (if $baseline_value > 0 then (.value > ($baseline_value * (1 + $threshold))) else false end)
+                } | . + {
+                  regression_changed: (.regressed != ($baseline_performance[0].regressed // false))
                 }' "${performance_json}" > "${tmp_performance_json}"
             mv "${tmp_performance_json}" "${performance_json}"
         fi

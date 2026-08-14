@@ -106,7 +106,11 @@ def merge_cell(existing, result):
     if changes.get("application_spec_changed"):
         marker_set.add("app")
 
-    if result.get("status_changed") or changes.get("status_changed"):
+    if (
+        result.get("status_changed")
+        or changes.get("status_changed")
+        or performance.get("regression_changed")
+    ):
         marker_set.add("!")
 
     if not existing:
