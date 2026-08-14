@@ -46,7 +46,7 @@ STATUS_STYLES = {
         "hatch": "////",
     },
     "Unknown": {
-        "label": "Unknown failure",
+        "label": "Missing metadata",
         "facecolor": "#ece3ff",
         "edgecolor": "#b9a2e8",
         "hatch": "xx",
