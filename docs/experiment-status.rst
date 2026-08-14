@@ -8,7 +8,15 @@
  Experiment Status
 ###################
 
-These steps reproduce CI metadata collection for the ``amg2023`` experiment on Tioga.
+This page demonstrates the reproducible part of Benchpark CI locally:
+
+* run the same ``amg2023`` experiment setup twice with different ROCm versions,
+* collect the metadata emitted by each generated workspace, and
+* compare that metadata to identify what changed between the two runs.
+
+In the GitLab CI pipeline, the same collected metadata is combined with job
+status to produce an experiment status table. The table at the end of this page
+shows the kind of summary produced by that pipeline.
 
 *************************
  Prepare the Environment
@@ -34,7 +42,7 @@ These steps reproduce CI metadata collection for the ``amg2023`` experiment on T
  Collect Metadata
 ******************
 
-Run the following commands to collect metadata with ROCm 6.4.2:
+First collect metadata for ``amg2023`` on Tioga with ROCm 6.4.2:
 
 ::
 
@@ -46,7 +54,8 @@ Run the following commands to collect metadata with ROCm 6.4.2:
     ramble --workspace-dir . workspace setup
     ramble --workspace-dir . on
 
-Return to the Benchpark repository root, then repeat the workflow with ROCm 7.2.0:
+Return to the Benchpark repository root, then repeat the workflow with ROCm
+7.2.0.
 
 ::
 
@@ -69,10 +78,34 @@ After both runs complete, return to the Benchpark repository root:
 
     cd ../../../..
 
-Compare the two locally generated metadata files:
+Each workspace records a ``githash_metadata.json`` file for the concrete
+experiment instance that was generated and run. Compare the two locally
+generated metadata files:
 
 ::
 
     . .gitlab/utils/compare-githash-metadata.sh \
         wkp/tioga_rocm_6.4.2/amg2023/workspace/experiments/amg2023/problem1/amg2023_problem1_test_mpi_rocm_no_scaling_caliper_time_mpi_80_80_40_2_2_1_4/githash_metadata.json \
         wkp/tioga_rocm_7.2.0/amg2023/workspace/experiments/amg2023/problem1/amg2023_problem1_test_mpi_rocm_no_scaling_caliper_time_mpi_80_80_40_2_2_1_4/githash_metadata.json
+
+The comparison identifies which part of the experiment definition changed. In
+this example, the benchmark and experiment are the same, but the ROCm package
+version differs, so the change is reported as package metadata.
+
+*****************
+ CI Status Table
+*****************
+
+In a full GitLab CI run, we combine the same metadata comparison with
+pipeline job status. The resulting table lets developers see both the final
+state of each experiment and a possible reason a result differs from a previous or
+related run.
+
+.. figure:: status-table.png
+   :alt: CI experiment status table for amg2023 across Dane, Tioga, and Tuolumne
+   :width: 95%
+
+   Example CI experiment status table. The filled cells show experiment status,
+   while labels such as ``dep`` identify the type of metadata change. In this
+   example, the Tioga and Tuolumne ``amg2023 +rocm`` entries show a performance
+   regression associated with a package change.
