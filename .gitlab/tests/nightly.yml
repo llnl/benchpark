@@ -3,6 +3,7 @@ include:
   - local: .gitlab/utils/rules.yml
 .test_clusters_nightly: &test_clusters_nightly
   variables:
+    BASELINE_REF: develop
     DASHBOARD_NAME: Nightly [benchpark-develop]
     DANE_PARAMS: -N 1 -t 01:00:00 --exclusive --reservation=ci
     MATRIX_PARAMS: -N 1 -t 01:00:00 --exclusive
@@ -89,16 +90,16 @@ include:
           - gromacs
           - kripke
           - laghos
-          - lammps
           - osu-micro-benchmarks
           - raja-perf
           - remhos
           - saxpy
         VARIANT: [+cuda]
+      # Matrix no gpu-aware mpi
       - HOST: matrix
         ARCHCONFIG: llnl-matrix
         SCHEDULER_PARAMETERS: $MATRIX_PARAMS
-        BENCHMARK: [sparta-snl]
+        BENCHMARK: [lammps, sparta-snl]
         VARIANT: [+cuda~gpu-aware-mpi]
       #############
       # Other tests
@@ -160,12 +161,25 @@ include:
 nightly_test_run:
   extends: .nightly_rules
   interruptible: false
-  resource_group: $HOST
+  resource_group: ${HOST}-${CI_PIPELINE_IID}
   stage: test
   tags: [$HOST, batch]
   <<: *test_clusters_nightly
+  artifacts:
+    when: always
+    paths: [artifact-githash/githash_metadata.json]
   before_script:
     - !reference [.report_status, before_script]
-  script: [./.gitlab/utils/run-experiment.sh]
+  script:
+    - |
+      nightly_rc=0
+      ./.gitlab/utils/run-experiment.sh || nightly_rc=$?
+      echo "[Nightly Status]: Nightly checkout exit code = ${nightly_rc}"
+      printf '%s\n' "${nightly_rc}" > "$CI_PROJECT_DIR/nightly_run.status"
+      exit "${nightly_rc}"
   after_script:
     - !reference [.report_status, after_script]
+    - |-
+      bash .gitlab/utils/collect-githash-artifact.sh \
+        Nightly \
+        "$CI_PROJECT_DIR/nightly_run.status"

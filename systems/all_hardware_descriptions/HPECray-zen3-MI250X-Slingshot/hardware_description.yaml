@@ -34,6 +34,12 @@ system_definition:
       compiler: cce
       runtime: rocm
       mpi: cray-mpich
+    olcf-frontier:
+      os: HPECrayOS
+      scheduler: slurm
+      compiler: cce
+      runtime: rocm
+      mpi: cray-mpich
   top500-system-instances:
     Frontier:
       benchpark_system:

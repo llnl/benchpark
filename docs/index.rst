@@ -41,9 +41,11 @@
     run-experiment
     analyze-experiment
     benchpark-analyze
+    benchpark-query
     configuration
     modifiers
     set-of-experiments
+    experiment-status
     run-binary
     create-mirror
     io-benchmarking
@@ -53,6 +55,7 @@
     :caption: Contributing
 
     add-a-system-config
+    update-system-config
     add-a-benchmark
     add-an-experiment
     testing-your-contribution

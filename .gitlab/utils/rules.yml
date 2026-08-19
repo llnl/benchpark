@@ -3,107 +3,143 @@
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
         != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
       when: never
-    - changes:
-        - .gitlab-ci.yml
-        - .gitlab/**/*
-        - bin/**/*
-        - '**/$BENCHMARK/**/*'
-        - systems/$ARCHCONFIG/**/*
-        - modifiers/**/*
-        - var/**/*
-        - lib/**/*
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: on_success
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != "develop"
+      changes:
+        compare_to: refs/heads/develop
+        paths: &run_test_change_paths
+          - .gitlab-ci.yml
+          - .gitlab/**/*
+          - bin/**/*
+          - '**/$BENCHMARK/**/*'
+          - systems/$ARCHCONFIG/**/*
+          - modifiers/**/*
+          - var/**/*
+          - lib/**/*
+      when: on_success
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "develop"
+      changes: *run_test_change_paths
       when: on_success
 .resource_rules_dane:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
         != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
       when: never
-    - changes:
-        - .gitlab-ci.yml
-        - .gitlab/**/*
-        - bin/**/*
-        - '**/amg2023/**/*'
-        - '**/branson/**/*'
-        - '**/hpcg/**/*'
-        - '**/hpl/**/*'
-        - '**/ior/**/*'
-        - '**/kripke/**/*'
-        - '**/laghos/**/*'
-        - '**/lammps/**/*'
-        - '**/osu[-_]micro[-_]benchmarks/**/*'
-        - '**/phloem/**/*'
-        - '**/raja[-_]perf/**/*'
-        - '**/remhos/**/*'
-        - '**/sparta[-_]snl/**/*'
-        - systems/llnl-cluster/**/*
-        - modifiers/**/*
-        - var/**/*
-        - lib/**/*
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: on_success
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != "develop"
+      changes:
+        compare_to: refs/heads/develop
+        paths: &resource_dane_change_paths
+          - .gitlab-ci.yml
+          - .gitlab/**/*
+          - bin/**/*
+          - '**/amg2023/**/*'
+          - '**/branson/**/*'
+          - '**/hpcg/**/*'
+          - '**/hpl/**/*'
+          - '**/ior/**/*'
+          - '**/kripke/**/*'
+          - '**/laghos/**/*'
+          - '**/lammps/**/*'
+          - '**/osu[-_]micro[-_]benchmarks/**/*'
+          - '**/phloem/**/*'
+          - '**/raja[-_]perf/**/*'
+          - '**/remhos/**/*'
+          - '**/sparta[-_]snl/**/*'
+          - systems/llnl-cluster/**/*
+          - modifiers/**/*
+          - var/**/*
+          - lib/**/*
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "develop"
+      changes: *resource_dane_change_paths
 .resource_rules_matrix:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
         != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
       when: never
-    - changes:
-        - .gitlab-ci.yml
-        - .gitlab/**/*
-        - bin/**/*
-        - '**/amg2023/**/*'
-        - '**/babelstream/**/*'
-        - '**/kripke/**/*'
-        - '**/laghos/**/*'
-        - '**/lammps/**/*'
-        - '**/py[-_]scaffold/**/*'
-        - '**/raja[-_]perf/**/*'
-        - '**/remhos/**/*'
-        - '**/saxpy/**/*'
-        - '**/sparta[-_]snl/**/*'
-        - systems/llnl-matrix/**/*
-        - modifiers/**/*
-        - var/**/*
-        - lib/**/*
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: on_success
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != "develop"
+      changes:
+        compare_to: refs/heads/develop
+        paths: &resource_matrix_change_paths
+          - .gitlab-ci.yml
+          - .gitlab/**/*
+          - bin/**/*
+          - '**/amg2023/**/*'
+          - '**/babelstream/**/*'
+          - '**/kripke/**/*'
+          - '**/laghos/**/*'
+          - '**/lammps/**/*'
+          - '**/py[-_]scaffold/**/*'
+          - '**/raja[-_]perf/**/*'
+          - '**/remhos/**/*'
+          - '**/saxpy/**/*'
+          - '**/sparta[-_]snl/**/*'
+          - systems/llnl-matrix/**/*
+          - modifiers/**/*
+          - var/**/*
+          - lib/**/*
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "develop"
+      changes: *resource_matrix_change_paths
 .resource_rules_tioga:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
         != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
       when: never
-    - changes:
-        - .gitlab-ci.yml
-        - .gitlab/**/*
-        - bin/**/*
-        - '**/amg2023/**/*'
-        - '**/kripke/**/*'
-        - '**/laghos/**/*'
-        - '**/py[-_]scaffold/**/*'
-        - '**/raja[-_]perf/**/*'
-        - '**/remhos/**/*'
-        - systems/llnl-elcapitan/**/*
-        - modifiers/**/*
-        - var/**/*
-        - lib/**/*
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: on_success
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != "develop"
+      changes:
+        compare_to: refs/heads/develop
+        paths: &resource_tioga_change_paths
+          - .gitlab-ci.yml
+          - .gitlab/**/*
+          - bin/**/*
+          - '**/amg2023/**/*'
+          - '**/kripke/**/*'
+          - '**/laghos/**/*'
+          - '**/py[-_]scaffold/**/*'
+          - '**/raja[-_]perf/**/*'
+          - '**/remhos/**/*'
+          - systems/llnl-elcapitan/**/*
+          - modifiers/**/*
+          - var/**/*
+          - lib/**/*
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "develop"
+      changes: *resource_tioga_change_paths
 .resource_rules_tuolumne:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" || $ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH
         != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"
       when: never
-    - changes:
-        - .gitlab-ci.yml
-        - .gitlab/**/*
-        - bin/**/*
-        - '**/amg2023/**/*'
-        - '**/branson/**/*'
-        - '**/kripke/**/*'
-        - '**/laghos/**/*'
-        - '**/lammps/**/*'
-        - '**/py[-_]scaffold/**/*'
-        - '**/raja[-_]perf/**/*'
-        - '**/remhos/**/*'
-        - '**/sparta[-_]snl/**/*'
-        - '**/stream/**/*'
-        - systems/llnl-elcapitan/**/*
-        - modifiers/**/*
-        - var/**/*
-        - lib/**/*
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: on_success
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != "develop"
+      changes:
+        compare_to: refs/heads/develop
+        paths: &resource_tuolumne_change_paths
+          - .gitlab-ci.yml
+          - .gitlab/**/*
+          - bin/**/*
+          - '**/amg2023/**/*'
+          - '**/branson/**/*'
+          - '**/kripke/**/*'
+          - '**/laghos/**/*'
+          - '**/lammps/**/*'
+          - '**/py[-_]scaffold/**/*'
+          - '**/raja[-_]perf/**/*'
+          - '**/remhos/**/*'
+          - '**/sparta[-_]snl/**/*'
+          - '**/stream/**/*'
+          - systems/llnl-elcapitan/**/*
+          - modifiers/**/*
+          - var/**/*
+          - lib/**/*
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "develop"
+      changes: *resource_tuolumne_change_paths
 .nightly_rules:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"

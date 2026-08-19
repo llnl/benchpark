@@ -19,14 +19,14 @@ class Gromacs(
 ):
     variant(
         "workload",
-        default="water_gmx50_adac",
+        default="water_gmx50",
         description="workload name",
     )
 
     variant(
         "version",
-        default="2024",
-        values=("2024", "2023.3"),
+        default="2025.2",
+        values=("2025.2", "2024", "2023.3"),
         description="app version",
     )
 
@@ -36,10 +36,17 @@ class Gromacs(
     # on: turn on, but allow groamcs to disable it if GPU-aware MPI is not supported
     # force: turn on and force gromacs to use GPU-aware MPI. May result in error if unsupported
     variant(
-        "gpu-aware-mpi",
+        "direct-gpu-comm",
         default="on",
         values=("on", "off", "force"),
         description="Use GPU-aware MPI",
+    )
+
+    variant(
+        "sycl",
+        default=True,
+        values=(True, False),
+        description="Enable GPU-aware MPI",
     )
 
     def compute_applications_section(self):
@@ -86,6 +93,7 @@ class Gromacs(
             "pme": "auto",
             "bonded": f"{bonded_target}",
             "update": f"{target}",
+            "additional_args": " -pin {pin} -nb {nb} -pme {pme} -bonded {bonded} -update {update} -maxh {maxh} -nstlist {nstlist} -npme {npme} ",
         }
 
         for k, v in input_variables.items():
@@ -100,14 +108,16 @@ class Gromacs(
         )
 
     def compute_package_section(self):
-        spack_specs = "~hwloc"
-        spack_specs += "+sycl" if self.spec.satisfies("+rocm") else "~sycl"
+        spack_specs = "+mpi~hwloc"
+        spack_specs += "+sycl" if self.spec.satisfies("+sycl") else "~sycl"
 
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
-            spack_specs += f" gpu-aware-mpi={self.spec.variants['gpu-aware-mpi'][0]} "
+            spack_specs += (
+                f" direct-gpu-comm={self.spec.variants['direct-gpu-comm'][0]} "
+            )
             spack_specs += " ~double "
         else:
-            spack_specs += " gpu-aware-mpi=off "
+            spack_specs += " direct-gpu-comm=off "
 
         self.add_package_spec(
             self.name,
