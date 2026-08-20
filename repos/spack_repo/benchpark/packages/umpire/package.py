@@ -10,6 +10,13 @@ from spack_repo.builtin.packages.umpire.package import Umpire as BuiltinUmpire
 class Umpire(BuiltinUmpire):
 
     version(
+        "2026.07.1",
+        tag="v2026.07.1",
+        commit="5639f6c1fd4ca1fed7f0f1f48dcbbfbd00899484",
+        submodules=False,
+    )
+
+    version(
         "2025.12.0",
         tag="v2025.12.0",
         commit="0372fbd6e1f17d7e6dd72693f8b857f3ec7559e9",

@@ -54,6 +54,10 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     depends_on("mfem+caliper", when="+caliper")
     depends_on("mfem cxxstd=20", when="@develop")
 
+    depends_on("camp@2026.07.1", when="@develop")
+    depends_on("umpire@2026.07.1", when="@develop")
+    depends_on("raja@2026.07.0 ~examples~exercises cxxstd=20", when="@develop")
+
     requires("^[virtuals=zlib-api] zlib")
 
     depends_on("mpi")

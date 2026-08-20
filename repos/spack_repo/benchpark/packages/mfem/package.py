@@ -15,13 +15,13 @@ class Mfem(BuiltinMfem):
 
     variant("caliper", default=False, description="Build Caliper support")
 
-    depends_on("camp+default_stream", when="+umpire")
-    depends_on("camp@main", when="@develop +umpire")
-    depends_on("umpire@develop", when="@develop +umpire")
+    depends_on("camp", when="+umpire")
+    depends_on("camp@2026.07.1", when="@develop +umpire")
+    depends_on("umpire@2026.07.1", when="@develop +umpire")
 
-    depends_on("camp+default_stream", when="+raja")
-    depends_on("camp@main", when="@develop +raja")
-    depends_on("raja@develop cxxstd=20", when="@develop +raja")
+    depends_on("camp", when="+raja")
+    depends_on("camp@2026.07.1", when="@develop +raja")
+    depends_on("raja@2026.07.0 ~examples~exercises cxxstd=20", when="@develop +raja")
 
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
