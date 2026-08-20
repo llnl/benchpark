@@ -88,9 +88,9 @@ generated metadata files:
         wkp/tioga_rocm_6.4.2/amg2023/workspace/experiments/amg2023/problem1/amg2023_problem1_test_mpi_rocm_no_scaling_caliper_time_mpi_80_80_40_2_2_1_4/githash_metadata.json \
         wkp/tioga_rocm_7.2.0/amg2023/workspace/experiments/amg2023/problem1/amg2023_problem1_test_mpi_rocm_no_scaling_caliper_time_mpi_80_80_40_2_2_1_4/githash_metadata.json
 
-The comparison identifies which part of the experiment definition changed. In
-this example, the benchmark and experiment are the same, but the ROCm package
-version differs, so the change is reported as package metadata.
+The comparison identifies what packages have changed. In
+this example, the benchmark and experiment are the same, but the ROCm
+version differs, so the changed packages are reported in the metadata.
 
 *****************
  CI Status Table
