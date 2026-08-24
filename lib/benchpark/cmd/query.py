@@ -4,11 +4,21 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+import re
+import shlex
+import sys
 from datetime import datetime
 from glob import glob
 
 import pandas as pd
 import thicket as th
+
+_ANSI_ESCAPE = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]")
+_TREE_VALUE = re.compile(
+    r"^(\s*(?:(?:[\u2502|]\s{2})|\s{3})*\s*"
+    r"(?:[\u251c\u2514\u2500+`|\-]+[ \t]*)?)"
+    r"[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?\s+(.*)$"
+)
 
 
 def setup_parser(root_parser):
@@ -59,10 +69,45 @@ def setup_parser(root_parser):
     )
 
 
+def _command_line(args):
+    if hasattr(args, "command_line"):
+        return args.command_line
+    return "benchpark " + shlex.join(sys.argv[1:])
+
+
+def _tree_structure_lines(tree):
+    lines = []
+    for line in _ANSI_ESCAPE.sub("", tree).splitlines():
+        if line.startswith("Legend"):
+            break
+        match = _TREE_VALUE.match(line)
+        if not match:
+            continue
+        lines.append(match.group(1) + match.group(2))
+    return lines
+
+
+def _clean_tree(tk, metric):
+    clean_tree = tk.tree(metric, render_header=True)
+    return _ANSI_ESCAPE.sub("", clean_tree)
+
+
+def _write_csv(df, filename, args, tree=None):
+    with open(filename, "w", newline="") as csv_file:
+        csv_file.write(f"# {_command_line(args)}\n")
+        df.to_csv(csv_file, index=False)
+        if tree:
+            csv_file.write("\n")
+            for line in _tree_structure_lines(tree):
+                csv_file.write(f"# {line}\n")
+
+
 def command(args):
     cali_files = []
     for directory in args.directories:
-        cali_files.extend(glob(os.path.join(directory, "**/*.cali"), recursive=True))
+        cali_files.extend(
+            sorted(glob(os.path.join(directory, "**/*.cali"), recursive=True))
+        )
     if not cali_files:
         raise ValueError(f"No Caliper files found under {args.directories}")
 
@@ -72,7 +117,7 @@ def command(args):
     if args.metric in tk.metadata.columns:
         df = tk.metadata[columns + [args.metric]]
         filename = f"query-{datetime.now().strftime('%Y%m%d-%H%M%S')}.csv"
-        df.to_csv(filename, index=False)
+        _write_csv(df, filename, args)
         print(filename)
         return 0
 
@@ -105,7 +150,8 @@ def command(args):
                     and any(r in n for r in args.query_regions_byname)
                 )
                 .all(),
-            ).rel("*")
+            )
+            .rel("*")
         )
         if args.filter_regions_byname:
             query = query.rel("*")
@@ -133,7 +179,8 @@ def command(args):
 
     filename = f"query-{datetime.now().strftime('%Y%m%d-%H%M%S')}.csv"
 
-    df.to_csv(filename, index=False)
+    _write_csv(df, filename, args, tree=_clean_tree(tk, args.metric))
+
     print(filename)
 
     return 0

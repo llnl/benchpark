@@ -11,7 +11,6 @@ import sys
 
 import pytest
 
-
 QUERY_DATA = pathlib.Path(__file__).parent / "data" / "query"
 AMG2023_ROCM642_TUO_PROBLEM1 = (QUERY_DATA / "rocm642-tuo-amg2023-problem1").resolve()
 
@@ -30,6 +29,22 @@ def import_query(monkeypatch):
     query = importlib.import_module("benchpark.cmd.query")
     monkeypatch.setattr(query, "datetime", FakeDatetime)
     return query
+
+
+def read_query_csv(csv_path):
+    with csv_path.open(newline="") as csv_file:
+        assert csv_file.readline().rstrip() == (
+            "# benchpark query "
+            f"{AMG2023_ROCM642_TUO_PROBLEM1} "
+            "--query-regions-byname main "
+            "--metric 'Avg time/rank'"
+        )
+        rows = [line for line in csv_file if not line.startswith("#")]
+        return list(csv.DictReader(rows))
+
+
+def rows_by_avg_time(rows):
+    return sorted(rows, key=lambda row: float(row["Avg time/rank"]))
 
 
 def test_query_parser_requires_directories_and_metric(monkeypatch):
@@ -65,6 +80,12 @@ def test_query_command_reads_real_caliper_data(monkeypatch, tmp_path, capsys):
         metric="Avg time/rank",
         metadata_columns=[],
         exclude_regions=None,
+        command_line=(
+            "benchpark query "
+            f"{AMG2023_ROCM642_TUO_PROBLEM1} "
+            "--query-regions-byname main "
+            "--metric 'Avg time/rank'"
+        ),
     )
 
     assert query.command(args) == 0
@@ -74,13 +95,13 @@ def test_query_command_reads_real_caliper_data(monkeypatch, tmp_path, capsys):
     assert out == f"{csv_path.name}\n"
     assert csv_path.exists()
 
-    with csv_path.open(newline="") as csv_file:
-        rows = list(csv.DictReader(csv_file))
+    rows = read_query_csv(csv_path)
 
     assert len(rows) == 2
     assert {row["cluster"] for row in rows} == {"tuolumne"}
     assert {row["application_name"] for row in rows} == {"amg2023"}
-    assert [float(row["Avg time/rank"]) for row in rows] == pytest.approx(
+    sorted_rows = rows_by_avg_time(rows)
+    assert [float(row["Avg time/rank"]) for row in sorted_rows] == pytest.approx(
         [
             62.07430117410001,
             63.49193220765,
@@ -100,6 +121,12 @@ def test_query_command_includes_final_fom_metadata_column(
         metric="Avg time/rank",
         metadata_columns=["Final-FOM"],
         exclude_regions=None,
+        command_line=(
+            "benchpark query "
+            f"{AMG2023_ROCM642_TUO_PROBLEM1} "
+            "--query-regions-byname main "
+            "--metric 'Avg time/rank'"
+        ),
     )
 
     assert query.command(args) == 0
@@ -108,8 +135,7 @@ def test_query_command_includes_final_fom_metadata_column(
     csv_path = tmp_path / "query-01234567-012345.csv"
     assert out == f"{csv_path.name}\n"
 
-    with csv_path.open(newline="") as csv_file:
-        rows = list(csv.DictReader(csv_file))
+    rows = read_query_csv(csv_path)
 
     assert list(rows[0].keys()) == [
         "cluster",
@@ -117,7 +143,8 @@ def test_query_command_includes_final_fom_metadata_column(
         "Final-FOM",
         "Avg time/rank",
     ]
-    assert [float(row["Final-FOM"]) for row in rows] == pytest.approx(
+    sorted_rows = rows_by_avg_time(rows)
+    assert [float(row["Final-FOM"]) for row in sorted_rows] == pytest.approx(
         [
             1263870000.0,
             1140180000.0,

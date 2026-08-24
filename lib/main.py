@@ -148,6 +148,7 @@ def main():
     init_commands(subparsers, actions)
 
     args, unknown_args = parser.parse_known_args()
+    args.command_line = "benchpark " + shlex.join(sys.argv[1:])
     no_args = True if len(sys.argv) == 1 else False
 
     if no_args:
