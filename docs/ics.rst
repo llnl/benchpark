@@ -115,43 +115,58 @@ Workshop Deadlines
 
  * - **Time**
    - **Title and Speaker**
- * - 09:00 AM - 09:10 AM
+   - **Materials**
+ * - 09:00 AM - 09:30 AM
    - | Welcome and Introduction
      | *Pearce, Bird, Koskela*
- * - 09:10 AM - 09:30 AM
-   - | On Similarity of Computational Kernels in our Codes and Proxies
-     | *McKinsey, Brink, Pearce*
- * - 09:30 AM - 09:50 AM
-   - | Phoeni6: A Container-Based Framework for Reproducible and Fair Energy Comparison of AI Workloads
-     | *Oliveira-Filho, Silva-de-Souza, Sakuyama, Xavier-de-Souza*
+   -
  * - 09:50 AM - 10:10 AM
    - | A First Step Towards Unifying Benchmark Descriptions
      | *Badwaik, Herten*
+   - :download:`Slides <_static/slides/ICS26-JBadwaik.pdf>`
  * - 10:10 AM - 10:30 AM
-   - | Continuous Benchmarking for Production HPC Centers
-     | *Ardhapurkar, Shaikh, Das, Dinde, Wandhekar*
+   - | Phoeni6: A Container-Based Framework for Reproducible and Fair Energy Comparison of AI Workloads
+     | *Oliveira-Filho, Silva-de-Souza, Sakuyama, Xavier-de-Souza*
+   - :download:`Slides <_static/slides/ICS26-SXavierDeSouza.pdf>`
  * - 10:30 AM - 11:00 AM
    - Coffee Break
+   -
  * - 11:00 AM - 11:20 AM
-   - | TBD
+   - | Continuous Benchmarking for Production HPC Centers
+     | *Ardhapurkar, Shaikh, Das, Dinde, Wandhekar*
+   - :download:`Slides <_static/slides/ICS26-PArdhapurkar.pdf>`
+ * - 11:20 AM - 11:40 PM
+   - | Reflections on Building Portable Benchmark Frameworks
      | *Koskela*
- * - 11:20 AM - 12:30 PM
-   - | Benchpark Tutorial
-     | *Pearce*
- * - 12:30 PM - 01:30 PM
-   - Lunch
- * - 01:30 PM - 03:00 PM
-   - | Benchpark and Ramble Tutorial w/Hands-On
-     | *Pearce, Bird*
- * - 03:00 PM - 03:30 PM
-   - Coffee Break
- * - 03:30 PM - 04:45 PM
+   - | :download:`Slides <_static/slides/ICS26-TKoskela.pdf>`
+     | `Link to slides <https://tkoskela.github.io/talks/2026-ics-benchmarking-workshop/>`_
+ * - 11:40 AM - 12:00 PM
+   - | On Similarity of Computational Kernels in our Codes and Proxies
+     | *McKinsey, Brink, Pearce*
+   - :download:`Slides <_static/slides/ICS26-McKinsey.pdf>`
+ * - 12:00 PM - 12:30 PM
    - | Speaker Panel and Open Discussion
      | *Moderator: Pearce*
      | *Panelists: Oliveira-Filho, Badwaik, Ardhapurkar, Koskela*
+   -
+ * - 12:30 PM - 01:30 PM
+   - Lunch
+   -
+ * - 01:30 PM - 03:00 PM
+   - | Benchpark Tutorial
+     | *Pearce*
+   -
+ * - 03:00 PM - 03:30 PM
+   - Coffee Break
+   -
+ * - 03:30 PM - 04:45 PM
+   - | Benchpark and Ramble Tutorial w/Hands-On
+     | *Pearce, Bird*
+   -
  * - 04:45 PM - 05:00 PM
    - | Closing Remarks
      | *Pearce, Bird, Koskela*
+   -
 
 **********************
  Organizing Committee
