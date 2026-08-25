@@ -31,8 +31,11 @@ class RajaPerf(
 
     variant(
         "version",
-        default="2025.12.1",
-        values=("develop", "latest", "2025.12.1", "2025.03.0", "2024.07.0"),
+        # default="amr-raja-perf-fork",
+        # default="loop-unroll-nvidia-femsweep",
+        default="paper_modifications",
+        # values=("amr-raja-perf-fork", "develop", "latest", "2025.12.1", "2025.03.0", "2024.07.0"),
+        values=("paper_modifications", "develop", "latest", "2025.12.1", "2025.03.0", "2024.07.0"),
         description="app version",
     )
 

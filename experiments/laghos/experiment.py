@@ -206,14 +206,35 @@ class Laghos(
         # Add problem specs as needed here
         if self.spec.satisfies("+throughput"):
             if self.spec.satisfies("order=linear"):
-                problem_spec["rs"] = [4, 4, 4]
-                problem_spec["rp"] = [2, 3, 4]
+                problem_spec["nx"] = 16
+                problem_spec["ny"] = 16
+                problem_spec["nz"] = 16
+                problem_spec["rp"] = 4
+                # problem_spec["nx"] = [16, 20, 25, 16, 20, 25, 15, 16]
+                # problem_spec["ny"] = [16, 20, 25, 16, 20, 25, 15, 16]
+                # problem_spec["nz"] = [16, 20, 25, 16, 20, 25, 15, 16]
+                # problem_spec["rp"] = [2, 2, 2, 3, 3, 3, 4, 4]
+                problem_spec["rs"] = 0
             elif self.spec.satisfies("order=quadratic"):
-                problem_spec["rs"] = [4, 4, 4]
-                problem_spec["rp"] = [1, 2, 3]
+                problem_spec["nx"] = 16
+                problem_spec["ny"] = 16
+                problem_spec["nz"] = 16
+                problem_spec["rp"] = 1
+                # problem_spec["nx"] = [16, 20, 25, 16, 20, 25, 15, 16]
+                # problem_spec["ny"] = [16, 20, 25, 16, 20, 25, 15, 16]
+                # problem_spec["nz"] = [16, 20, 25, 16, 20, 25, 15, 16]
+                # problem_spec["rp"] = [1, 1, 1, 2, 2, 2, 3, 3]
+                problem_spec["rs"] = 0
             elif self.spec.satisfies("order=cubic"):
-                problem_spec["rs"] = [4, 4, 4]
-                problem_spec["rp"] = [1, 2, 3]
+                problem_spec["nx"] = 11
+                problem_spec["ny"] = 11
+                problem_spec["nz"] = 11
+                problem_spec["rp"] = 1
+                # problem_spec["nx"] = [11, 14, 17, 21, 27, 34, 20, 21]
+                # problem_spec["ny"] = [11, 14, 17, 21, 27, 34, 20, 21]
+                # problem_spec["nz"] = [11, 14, 17, 21, 27, 34, 20, 21]
+                # problem_spec["rp"] = [1, 1, 1, 1, 1, 1, 2, 2]
+                problem_spec["rs"] = 0
         elif self.spec.satisfies("+strong"):
             problem_spec["strong"] = (
                 lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor

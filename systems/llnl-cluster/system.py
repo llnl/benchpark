@@ -114,8 +114,8 @@ class LlnlCluster(System):
 
     variant(
         "mpi",
-        default="mvapich2",
-        values=("mvapich2", "openmpi"),
+        default="openmpi-dev",
+        values=("mvapich2", "openmpi", "openmpi-dev"),
         description="Which MPI implementation to use",
     )
 
@@ -282,11 +282,17 @@ class LlnlCluster(System):
         }
 
         mpi_type = self.spec.variants["mpi"][0]
-        mpi_dict = {
-            "mpi": {
-                "buildable": False,
-            },
-        }
+        if mpi_type == "openmpi-dev":
+            mpi_dict = {}
+            print("OPENMPI_DEV USED\n")
+            
+        else:
+            mpi_dict = {
+                "mpi": {
+                    "buildable": False,
+                },
+            }
+
         if self.spec.satisfies("compiler=gcc"):
             if mpi_type == "mvapich2":
                 mpi_dict["mvapich2"] = {
