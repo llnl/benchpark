@@ -112,7 +112,7 @@ _emit "valid" "" "" "$loaded_modules" "$spack_status"
 
 # This is deliberately compatible with the Python used by `spack python`.
 # It only parses, canonicalizes, and invokes Spack's existing raw finders.
-_SPACK_HELPER = r'''
+_SPACK_HELPER = r"""
 import json
 import sys
 
@@ -347,7 +347,7 @@ def main():
 
 if __name__ == "__main__":
     main()
-'''
+"""
 
 
 class _SpackHelperError(RuntimeError):
@@ -542,9 +542,11 @@ def _extract_declared_externals(packages):
                     package=package,
                     raw_spec=raw_spec,
                     raw_prefix=raw_prefix,
-                    prefix=_normalize_prefix(raw_prefix)
-                    if isinstance(raw_prefix, str)
-                    else None,
+                    prefix=(
+                        _normalize_prefix(raw_prefix)
+                        if isinstance(raw_prefix, str)
+                        else None
+                    ),
                     modules=tuple(raw_modules) if raw_modules is not None else (),
                     extra_attributes="extra_attributes" in entry,
                 )
@@ -643,9 +645,7 @@ def _run_spack_helper(request, *, timeout=_SPACK_TIMEOUT_SECONDS, site_purged=Fa
     if completed.returncode != 0:
         raise _SpackHelperError(_spack_error_detail(completed))
 
-    response = _framed_response(
-        completed.stdout, _SPACK_RESULT_PREFIX, "Spack helper"
-    )
+    response = _framed_response(completed.stdout, _SPACK_RESULT_PREFIX, "Spack helper")
     if not isinstance(response, dict) or response.get("status") != "ok":
         detail = response.get("detail") if isinstance(response, dict) else None
         raise _SpackHelperError(detail or "Spack helper failed")
@@ -720,8 +720,7 @@ def _run_spack_batch(requests):
         )
     except subprocess.TimeoutExpired as error:
         raise _SpackHelperError(
-            "Spack batch timed out after "
-            f"{_SPACK_BATCH_TIMEOUT_SECONDS} seconds"
+            "Spack batch timed out after " f"{_SPACK_BATCH_TIMEOUT_SECONDS} seconds"
         ) from error
     except OSError as error:
         raise _SpackHelperError(f"Spack batch could not start: {error}") from error
@@ -759,10 +758,7 @@ def _run_bounded_jobs(jobs, worker, failure):
     with ThreadPoolExecutor(
         max_workers=min(_VALIDATOR_CONCURRENCY, len(jobs))
     ) as executor:
-        futures = {
-            executor.submit(worker, *arguments): key
-            for key, arguments in jobs
-        }
+        futures = {executor.submit(worker, *arguments): key for key, arguments in jobs}
         for future in as_completed(futures):
             key = futures[future]
             try:
@@ -1091,9 +1087,9 @@ def _merge_validation_provenance(candidates, validations):
     for validation in validations:
         for evidence in validation.evidence:
             if evidence.invalid_detail is None:
-                validation_observations.setdefault(
-                    _identity_key(evidence), []
-                ).append(evidence)
+                validation_observations.setdefault(_identity_key(evidence), []).append(
+                    evidence
+                )
 
     merged = []
     for candidate in candidates:
@@ -1183,9 +1179,7 @@ def _validate_spack_prefix(
             detail=detection.get("detail"),
         )
 
-    observations = _spack_observations(
-        declaration.package, detection, observed_by
-    )
+    observations = _spack_observations(declaration.package, detection, observed_by)
     if any(item.invalid_detail is not None for item in observations):
         return declaration_result(
             "REVIEW_REQUIRED",
@@ -1346,8 +1340,7 @@ def _canonicalize_declared_externals(declarations):
         {
             "action": "canonicalize",
             "specs": [
-                {"id": index, "spec": external.raw_spec}
-                for index, external in eligible
+                {"id": index, "spec": external.raw_spec} for index, external in eligible
             ],
         }
     )
@@ -1506,8 +1499,7 @@ def _reconcile_package(package, declarations, candidates, validation_results=Non
             work.detail = None
             work.failed_module = None
         work.evidence = _coalesce_observations(
-            work.evidence
-            + (candidates[matching_candidate],)
+            work.evidence + (candidates[matching_candidate],)
         )
         if work.validation_basis is None:
             work.validation_basis = "broad_spack_detection"
@@ -1527,7 +1519,9 @@ def _reconcile_package(package, declarations, candidates, validation_results=Non
         declaration_index = unmatched_declarations[0]
         candidate_index = unmatched_candidates[0]
         declaration_work[declaration_index].state = "REPLACEMENT"
-        declaration_work[declaration_index].matched_candidate = candidates[candidate_index]
+        declaration_work[declaration_index].matched_candidate = candidates[
+            candidate_index
+        ]
         matched_candidates.add(candidate_index)
     elif unmatched_declaration_count == 1 and unmatched_candidate_count > 1:
         declaration_work[unmatched_declarations[0]].state = "REVIEW_REQUIRED"
@@ -1677,9 +1671,7 @@ def _reconcile_system_externals(system):
     broad_results = _run_spack_batch(broad_requests)
 
     broad_observations = {
-        package: _spack_observations(
-            package, detection, "broad_spack_detection"
-        )
+        package: _spack_observations(package, detection, "broad_spack_detection")
         for package, detection in broad_results.items()
     }
 
@@ -1692,18 +1684,14 @@ def _reconcile_system_externals(system):
             if declaration.invalid_detail is not None or not _prefix_only(declaration):
                 continue
             broad_validation = (
-                _validate_broad_prefix_external(
-                    declaration, detection, observations
-                )
+                _validate_broad_prefix_external(declaration, detection, observations)
                 if detection is not None
                 else None
             )
             if broad_validation is not None:
                 broad_validations[(package, index)] = broad_validation
                 continue
-            unresolved_by_package.setdefault(package, []).append(
-                (index, declaration)
-            )
+            unresolved_by_package.setdefault(package, []).append((index, declaration))
 
     targeted_requests = []
     for package in sorted(unresolved_by_package):
@@ -1900,13 +1888,13 @@ def _replace_literal_external(source, declaration, candidate):
 def _supported_externals_lists(source, literal):
     lines = source.splitlines(keepends=True)
     open_re = re.compile(r'^(?P<indent>[ \t]*)"externals": \[\r?\n?$')
-    close_re = re.compile(r'^(?P<indent>[ \t]*)\],?\r?\n?$')
+    close_re = re.compile(r"^(?P<indent>[ \t]*)\],?\r?\n?$")
     entry_re = re.compile(
         r'^(?P<indent>[ \t]*)\{"spec": "[^"\\\r\n]+", '
         r'"prefix": "[^"\\\r\n]+"\},\r?\n?$'
     )
     marker_re = re.compile(
-        r'^(?P<indent>[ \t]*)# benchpark: external-status=not-found\r?\n?$'
+        r"^(?P<indent>[ \t]*)# benchpark: external-status=not-found\r?\n?$"
     )
 
     matches = []
@@ -2147,9 +2135,7 @@ def _source_mutability_for_addition(
         if declaration_result.state != "VALID":
             continue
         declaration = declaration_result.external
-        reason = _proposal_direct_source_reason(
-            system_spec, declaration, scope_cache
-        )
+        reason = _proposal_direct_source_reason(system_spec, declaration, scope_cache)
         if reason is not None:
             reasons.append(reason)
             continue
@@ -2170,9 +2156,9 @@ def _source_mutability_for_addition(
         )
     return replace(
         proposal,
-        source_reason=reasons[0]
-        if reasons
-        else "no supported existing externals list was found",
+        source_reason=(
+            reasons[0] if reasons else "no supported existing externals list was found"
+        ),
     )
 
 
@@ -2277,9 +2263,7 @@ def _proposal_source_edit(source, proposal):
 
 
 def _strip_not_found_markers(source):
-    marker = re.compile(
-        r"^[ \t]*# benchpark: external-status=not-found(?:\r?\n|$)"
-    )
+    marker = re.compile(r"^[ \t]*# benchpark: external-status=not-found(?:\r?\n|$)")
     return "".join(
         line for line in source.splitlines(keepends=True) if not marker.match(line)
     )
@@ -2643,8 +2627,7 @@ def _reconciliation_exit_status(package_results):
         }:
             return 1
         if any(
-            declaration.state
-            in {"NOT_FOUND", "REPLACEMENT", "REVIEW_REQUIRED"}
+            declaration.state in {"NOT_FOUND", "REPLACEMENT", "REVIEW_REQUIRED"}
             for declaration in package_result.declarations
         ):
             return 1
