@@ -6,6 +6,8 @@ output_path="artifact-test-summary/test_metadata_summary.json"
 ref="${CI_COMMIT_REF_NAME:-}"
 artifact_path="artifact-test-metadata/test_metadata.json"
 pipeline_id="${CI_PIPELINE_ID:-}"
+summary_date="${CI_COMMIT_TIMESTAMP:-$(date -u +"%Y-%m-%dT%H:%M:%SZ")}"
+git_sha="${CI_COMMIT_SHA:-$(git rev-parse HEAD 2>/dev/null || true)}"
 
 mkdir -p "$(dirname "${output_path}")"
 
@@ -31,9 +33,13 @@ if [[ ${#metadata_files[@]} -eq 0 ]]; then
     jq -n \
         --arg pipeline_id "${CI_PIPELINE_ID:-}" \
         --arg ref "${CI_COMMIT_REF_NAME:-}" \
+        --arg date "${summary_date}" \
+        --arg gitSHA "${git_sha}" \
         '{
           pipeline_id: $pipeline_id,
           ref: $ref,
+          date: $date,
+          gitSHA: $gitSHA,
           results: []
         }' > "${output_path}"
     exit 0
@@ -42,9 +48,13 @@ fi
 jq -s \
     --arg pipeline_id "${CI_PIPELINE_ID:-}" \
     --arg ref "${CI_COMMIT_REF_NAME:-}" \
+    --arg date "${summary_date}" \
+    --arg gitSHA "${git_sha}" \
     'sort_by([.host // "", .benchmark // "", .variant // "", .job.name // ""]) as $results
      | {
          pipeline_id: $pipeline_id,
          ref: $ref,
+         date: $date,
+         gitSHA: $gitSHA,
          results: $results
        }' "${metadata_files[@]}" > "${output_path}"
