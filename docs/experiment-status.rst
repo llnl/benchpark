@@ -10,7 +10,8 @@
 
 This page demonstrates the reproducible part of Benchpark CI locally:
 
-- First, we run the same amg2023 experiment setup twice on the same system with different ROCm versions
+- First, we run the same amg2023 experiment setup twice on the same system with
+  different ROCm versions
 - Second, we collect the metadata emitted by each generated workspace, and
 - Third, we compare that metadata to identify what changed between the two runs.
 
@@ -131,9 +132,9 @@ reported in the metadata. The output is shown below.
 
 In a full GitLab CI run, we combine the same metadata comparison with pipeline job
 status. The resulting table lets developers see both the final state of each experiment
-and a possible reason a result differs from a previous or related run. The purpose of 
-the table is to used a diagnostic tool to narrow the investigation for new failures
-or performance regressions. It alone does not prove causality. 
+and a possible reason a result differs from a previous or related run. The purpose of
+the table is to used a diagnostic tool to narrow the investigation for new failures or
+performance regressions. It alone does not prove causality.
 
 .. figure:: status-table.png
     :alt: CI experiment status table for amg2023 across Dane, Tioga, and Tuolumne
