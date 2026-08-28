@@ -8,12 +8,11 @@
  Experiment Status
 ###################
 
-This page demonstrates the reproducible part of Benchpark CI locally:
-
-- First, we run the same amg2023 experiment setup twice on the same system with
-  different ROCm versions
-- Second, we collect the metadata emitted by each generated workspace, and
-- Third, we compare that metadata to identify what changed between the two runs.
+This page demonstrates how to reproduce a portion of Benchpark's CI to generate
+the experiment status table. In this example, we run the same amg2023
+experiment setup two times on the same system with different versions of ROCm.
+Then, we collect the metadata output by each generated workspace. Finally, we
+compare the metadata to identify what changed between the two runs.
 
 In the GitLab CI pipeline, the same collected metadata is combined with job status to
 produce an experiment status table. The table at the end of this page shows the kind of
@@ -55,7 +54,8 @@ First collect metadata for ``amg2023`` on Tioga with ROCm 6.4.2:
     ramble --workspace-dir . workspace setup
     ramble --workspace-dir . on
 
-Return to the Benchpark repository root, then repeat the workflow with ROCm 7.2.0.
+Return to the Benchpark repository root, then repeat the workflow with ROCm
+7.2.0 (still on Tioga).
 
 ::
 
@@ -78,8 +78,9 @@ After both runs complete, return to the Benchpark repository root:
 
     cd ~/benchpark
 
-Each workspace records a ``githash_metadata.json`` file for the concrete experiment
-instance that was generated and run. Compare the two locally generated metadata files:
+Each workspace outputs a ``githash_metadata.json`` file for the concrete experiment
+instance that was generated and run. Compare the two locally generated metadata
+files using the ``compare-githash-metadata.sh`` script:
 
 ::
 
@@ -87,9 +88,13 @@ instance that was generated and run. Compare the two locally generated metadata 
         wkp/tioga_rocm_6.4.2/amg2023/workspace/experiments/amg2023/problem1/amg2023_problem1_test_mpi_rocm_no_scaling_caliper_time_mpi_80_80_40_2_2_1_4/githash_metadata.json \
         wkp/tioga_rocm_7.2.0/amg2023/workspace/experiments/amg2023/problem1/amg2023_problem1_test_mpi_rocm_no_scaling_caliper_time_mpi_80_80_40_2_2_1_4/githash_metadata.json
 
-The comparison identifies what packages have changed. In this example, the benchmark and
-experiment are the same, but the ROCm version differs, so the changed packages are
-reported in the metadata. The output is shown below.
+The script compares the software stacks of the two runs, so you can more easily identify
+what software packages have changed between the runs. In this example, the benchmark and
+experiment (amg2023 on Tioga) are the same, but the ROCm version differs. The changed
+packages impacted by the difference in the ROCm version are reported in the metadata.
+Some software packages indicate code changes by releasing (or tagging) new versions,
+while others use git commits, so we report both in the script. The output of the script
+is shown below.
 
 ::
 
@@ -131,17 +136,21 @@ reported in the metadata. The output is shown below.
 *****************
 
 In a full GitLab CI run, we combine the same metadata comparison with pipeline job
-status. The resulting table lets developers see both the final state of each experiment
-and a possible reason a result differs from a previous or related run. The purpose of
-the table is to used a diagnostic tool to narrow the investigation for new failures or
-performance regressions. It alone does not prove causality.
+status. The resulting table is generated as a file at the end of the CI pipeline. It
+lets developers see both the final state of each experiment and a possible reason for a
+result differing from a previous related run. The table is meant to be a diagnostic
+tool to narrow the investigation of new failures or performance regressions, so a
+developer can know where to explore further. The table alone does not prove causality.
 
-.. figure:: status-table.png
-    :alt: CI experiment status table for amg2023 across Dane, Tioga, and Tuolumne
-    :width: 95%
+.. figure:: _static/images/status-table.png
+    :width: 75%
+    :align: center
 
-    Example CI experiment status table. The filled cells show experiment status, while
-    labels such as ``dep`` identify the type of metadata change. In this example, the
-    Tioga and Tuolumne ``amg2023 +rocm`` entries show a performance regression
-    associated with a package change. When investigating this regression, a developer
-    can more easily associate the rocm change with the new regression.
+    Example experiment status table generated at the end of a GitLab CI pipeline. The
+    filled cells show experiment status (e.g., build failure, runtime failure), while
+    labels such as ``dep`` or ``!`` identify the type of metadata change. In this
+    example, benchmark ``amg2023 +rocm`` on the Tioga and Tuolumne systems show a
+    performance regression associated with a package change. This performance regression
+    is different from the last time this benchmark ran on these systems, so it is marked
+    with a ``!``. When investigating this regression, a developer can more easily
+    associate the ROCm change with the performance regression.
