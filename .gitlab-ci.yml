@@ -110,7 +110,7 @@ generate_test_summary:
     - python .gitlab/utils/generate_test_status_table.py artifact-test-summary/test_metadata_summary.json
   artifacts:
     when: always
-    paths: [artifact-test-summary/test_metadata_summary.json, artifact-test-summary/test_status_table.png]
+    paths: [artifact-test-summary/]
   rules:
     - when: always
 cleanup_pipeline_dir:

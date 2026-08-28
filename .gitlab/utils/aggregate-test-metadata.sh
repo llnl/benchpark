@@ -3,13 +3,14 @@ set -euo pipefail
 
 input_dir="collected-test-metadata"
 output_path="artifact-test-summary/test_metadata_summary.json"
+output_dir="$(dirname "${output_path}")"
 ref="${CI_COMMIT_REF_NAME:-}"
 artifact_path="artifact-test-metadata/test_metadata.json"
 pipeline_id="${CI_PIPELINE_ID:-}"
 summary_date="${CI_COMMIT_TIMESTAMP:-$(date -u +"%Y-%m-%dT%H:%M:%SZ")}"
 git_sha="${CI_COMMIT_SHA:-$(git rev-parse HEAD 2>/dev/null || true)}"
 
-mkdir -p "$(dirname "${output_path}")"
+mkdir -p "${output_dir}"
 
 if [[ -z "${pipeline_id}" || -z "${ref}" ]]; then
     echo "Missing pipeline ID or ref." >&2
@@ -44,6 +45,18 @@ if [[ ${#metadata_files[@]} -eq 0 ]]; then
         }' > "${output_path}"
     exit 0
 fi
+
+for metadata_file in "${metadata_files[@]}"; do
+    host="$(jq -r '.host // empty' "${metadata_file}" | tr '[:upper:]' '[:lower:]')"
+    if [[ -n "${host}" ]]; then
+        mkdir -p "${output_dir}/${host}"
+        jq \
+            --arg date "${summary_date}" \
+            --arg gitSHA "${git_sha}" \
+            '. + {date: $date, gitSHA: $gitSHA}' \
+            "${metadata_file}" > "${output_dir}/${host}/$(basename "${metadata_file}")"
+    fi
+done
 
 jq -s \
     --arg pipeline_id "${CI_PIPELINE_ID:-}" \
