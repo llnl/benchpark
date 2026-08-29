@@ -27,6 +27,9 @@ class Gromacs(ExecutableApplication):
                '-c {input_path}/conf.gro ' +
                '-p {input_path}/topol.top ' +
                '-o exp_input.tpr', use_mpi=False)
+    executable('execute-gen', 'gmx_mpi mdrun -notunepme ' +
+               '-v -resethway -noconfout -nsteps {nsteps} ' +
+               '-s exp_input.tpr', use_mpi=True)
     executable('execute-nsteps-gen', 'gmx_mpi mdrun -notunepme ' +
                '-v -resethway -noconfout -nsteps 4000 ' +
                '-s exp_input.tpr', use_mpi=True)
