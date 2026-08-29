@@ -20,6 +20,12 @@ from spack_repo.builtin.packages.raja_perf.package import RajaPerf as BuiltinRaj
 class RajaPerf(BuiltinRajaPerf):
     """RAJA Performance Suite."""
 
+    variant(
+        "subkernels",
+        default=True,
+        description="Enable Caliper subkernel regions when Caliper support is enabled",
+    )
+
     version(
         "2025.12.1",
         tag="v2025.12.1",
@@ -39,3 +45,12 @@ class RajaPerf(BuiltinRajaPerf):
         if self.compiler.extra_rpaths:
             for rpath in self.compiler.extra_rpaths:
                 env.prepend_path("LD_LIBRARY_PATH", rpath)
+
+    def initconfig_package_entries(self):
+        entries = super().initconfig_package_entries()
+        entries.append(
+            cmake_cache_option(
+                "RAJA_PERFSUITE_USE_CALIPER_SUBKERNEL", "+subkernels" in self.spec
+            )
+        )
+        return entries
