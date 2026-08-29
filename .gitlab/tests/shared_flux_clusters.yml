@@ -94,13 +94,13 @@ release_resources_flux_tioga:
   after_script:
     - !reference [.report_status, after_script]
     - |
-      bash .gitlab/utils/collect-cali-artifact.sh
-    - |
-      bash .gitlab/utils/collect-githash-artifact.sh PR "$CI_PROJECT_DIR/pr_flux.status"
-    - |
       if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
         . .gitlab/utils/cancel-flux.sh
       fi
+    - |
+      bash .gitlab/utils/collect-cali-artifact.sh
+    - |
+      bash .gitlab/utils/collect-githash-artifact.sh PR "$CI_PROJECT_DIR/pr_flux.status"
 run_tests_flux_tuolumne:
   extends: .run_tests_flux
   tags: [shell, tuolumne]
@@ -179,5 +179,6 @@ run_tests_flux_tioga:
       - HOST: tioga
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK: [py-scaffold]
+        SYSTEM_ARGS: [rocm=7.1.1]
         VARIANT:
           - +rocm package_manager=spack-pip caliper=mpi,time allocation=torchrun-hpc

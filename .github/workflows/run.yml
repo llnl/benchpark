@@ -172,6 +172,7 @@ jobs:
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
+          pip install ".[analyze]"
       - name: Run
         run: |-
           ./bin/benchpark unit-test
