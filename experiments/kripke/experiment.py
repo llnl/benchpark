@@ -36,16 +36,17 @@ class Kripke(
     )
 
     variant(
-        "single_memory",
+        "gpu-aware-mpi",
         default=False,
-        description="Enable single memory space model in rocm",
+        values=(True, False),
+        description="Enable GPU-aware MPI",
     )
 
     variant(
-        "other",
-        default=False,
+        "chai",
+        default=True,
         values=(True, False),
-        description="Set other input/environment variables",
+        description="Enable CHAI",
     )
 
     maintainers("pearce8")
@@ -98,6 +99,7 @@ class Kripke(
             if self.spec.satisfies("+throughput"):
                 problem_spec = {
                     "nzx": [
+                        64,
                         80,
                         100,
                         120,
@@ -106,8 +108,13 @@ class Kripke(
                         180,
                         200,
                         220,
+                        240,
+                        260,
+                        280,
+                        300,
                     ],
                     "nzy": [
+                        64,
                         80,
                         100,
                         120,
@@ -116,8 +123,13 @@ class Kripke(
                         180,
                         200,
                         220,
+                        240,
+                        260,
+                        280,
+                        300,
                     ],
                     "nzz": [
+                        32,
                         40,
                         50,
                         60,
@@ -126,11 +138,15 @@ class Kripke(
                         90,
                         100,
                         110,
+                        120,
+                        130,
+                        140,
+                        150,
                     ],
                     "pool": 120,
-                    "npx": [2, 2, 2, 2, 2, 2, 2, 2],
-                    "npy": [2, 2, 2, 2, 2, 2, 2, 2],
-                    "npz": [1, 1, 1, 1, 1, 1, 1, 1],
+                    "npx": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+                    "npy": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+                    "npz": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                     "ngroups": 48,
                     "gs": 1,
                     "nquad": 80,
@@ -144,6 +160,34 @@ class Kripke(
                     "throughput_n": None,
                     "throughput_p": None,
                 }
+            elif self.spec.satisfies("+weak"):
+                problem_spec = {
+                    "nzx": 80,
+                    "nzy": 80,
+                    "nzz": 40,
+                    "pool": 120,
+                    "npx": 2,
+                    "npy": 2,
+                    "npz": 1,
+                    "ngroups": 48,
+                    "gs": 1,
+                    "nquad": 80,
+                    "ds": 80,
+                    "lorder": 4,
+                    "layout": "GDZ",
+                    "strong_n": None,
+                    "strong_p": None,
+                    "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "throughput_n": None,
+                    "throughput_p": None,
+                }
+                problem_spec["nzx"] = 220
+                problem_spec["nzy"] = 220
+                problem_spec["nzz"] = 110
+                problem_spec["pool"] = 105
             else:
                 problem_spec = {
                     "nzx": 80,
@@ -199,9 +243,6 @@ class Kripke(
         self.add_experiment_variable("layout", problem_spec["layout"], True)
         self.add_experiment_variable("pool", problem_spec["pool"], True)
 
-        if self.spec.satisfies("+other"):
-            self.set_environment_variable("HSA_XNACK", 1)
-
         # Set the variables required by the experiment
         self.set_required_variables(
             n_resources="{npx}*{npy}*{npz}",
@@ -250,13 +291,18 @@ class Kripke(
         else:
             self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
+        if self.spec.satisfies("+gpu-aware-mpi"):
+            self.set_environment_variable("MPICH_GPU_IPC_CACHE_MAX_SIZE", 1000)
+            # self.set_environment_variable("MPICH_NOLOCAL", 1)
+
     def compute_package_section(self):
-        # get package version
-        single_memory = (
-            "+single_memory"
-            if self.spec.variants["single_memory"][0]
-            else "~single_memory"
+        gam = (
+            "+gpu-aware-mpi"
+            if self.spec.variants["gpu-aware-mpi"][0]
+            else "~gpu-aware-mpi"
         )
+        chai = "+chai" if self.spec.variants["chai"][0] else "~chai"
         self.add_package_spec(
-            self.name, [f"kripke{self.determine_version()} {single_memory} +mpi"]
+            self.name,
+            [f"kripke{self.determine_version()} {gam} {chai} +mpi"],
         )
