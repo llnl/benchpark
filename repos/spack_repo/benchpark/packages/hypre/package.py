@@ -17,6 +17,8 @@ from spack_repo.builtin.packages.hypre.package import Hypre as BuiltinHypre
 
 
 class Hypre(BuiltinHypre):
+    version("3.2.0", submodules=False, tag="v3.2.0", commit="6bbcd4c3e230026451e05a42b8db689d70f23c62")
+
     requires("+rocm", when="^rocblas")
     requires("+rocm", when="^rocsolver")
 
