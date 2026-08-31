@@ -17,9 +17,9 @@ machine. For adding a new system, please see :doc:`add-a-system-config`.
     You must run the following commands on the target system. Software is detected for
     the current environment.
 
-***************************************************************************
- 1. Compare the Existing Software Specification to the Current Environment
-***************************************************************************
+************************************************************************
+ Compare the Existing Software Specification to the Current Environment
+************************************************************************
 
 Benchpark can collect the current system software specification and detects external
 packages available on the current system. The detected packages are then compared
@@ -49,9 +49,9 @@ updating the ROCm version to 7.2.0 as follows:
 The proposed changes are written to standard output. Changes that cannot be updated
 cleanly are reported for manual review.
 
-**************************************
- 2. Apply Local Changes to the System
-**************************************
+***********************************
+ Apply Local Changes to the System
+***********************************
 
 After reviewing the proposed updates, use ``--apply`` to apply eligible changes directly
 to the system's ``system.py``:
