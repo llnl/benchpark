@@ -8,11 +8,11 @@
  Experiment Status
 ###################
 
-This page demonstrates how to reproduce a portion of Benchpark's CI to generate
-the experiment status table. In this example, we run the same amg2023
-experiment setup two times on the same system with different versions of ROCm.
-Then, we collect the metadata output by each generated workspace. Finally, we
-compare the metadata to identify what changed between the two runs.
+This page demonstrates how to reproduce a portion of Benchpark's CI to generate the
+experiment status table. In this example, we run the same amg2023 experiment setup two
+times on the same system with different versions of ROCm. Then, we collect the metadata
+output by each generated workspace. Finally, we compare the metadata to identify what
+changed between the two runs.
 
 In the GitLab CI pipeline, the same collected metadata is combined with job status to
 produce an experiment status table. The table at the end of this page shows the kind of
@@ -54,8 +54,8 @@ First collect metadata for ``amg2023`` on Tioga with ROCm 6.4.2:
     ramble --workspace-dir . workspace setup
     ramble --workspace-dir . on
 
-Return to the Benchpark repository root, then repeat the workflow with ROCm
-7.2.0 (still on Tioga).
+Return to the Benchpark repository root, then repeat the workflow with ROCm 7.2.0 (still
+on Tioga).
 
 ::
 
@@ -79,8 +79,8 @@ After both runs complete, return to the Benchpark repository root:
     cd ~/benchpark
 
 Each workspace outputs a ``githash_metadata.json`` file for the concrete experiment
-instance that was generated and run. Compare the two locally generated metadata
-files using the ``compare-githash-metadata.sh`` script:
+instance that was generated and run. Compare the two locally generated metadata files
+using the ``compare-githash-metadata.sh`` script:
 
 ::
 
@@ -138,9 +138,9 @@ is shown below.
 In a full GitLab CI run, we combine the same metadata comparison with pipeline job
 status. The resulting table is generated as a file at the end of the CI pipeline. It
 lets developers see both the final state of each experiment and a possible reason for a
-result differing from a previous related run. The table is meant to be a diagnostic
-tool to narrow the investigation of new failures or performance regressions, so a
-developer can know where to explore further. The table alone does not prove causality.
+result differing from a previous related run. The table is meant to be a diagnostic tool
+to narrow the investigation of new failures or performance regressions, so a developer
+can know where to explore further. The table alone does not prove causality.
 
 .. figure:: _static/images/status-table.png
     :width: 75%
