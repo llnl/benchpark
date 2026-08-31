@@ -4,9 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-###################
- Experiment Status
-###################
+##################################
+ Generate Experiment Status Table
+##################################
 
 This page demonstrates how to reproduce a portion of Benchpark's CI to generate the
 experiment status table. In this example, we run the same amg2023 experiment setup two

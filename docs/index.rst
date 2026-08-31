@@ -45,10 +45,10 @@
     configuration
     modifiers
     set-of-experiments
-    experiment-status
     run-binary
     create-mirror
     io-benchmarking
+    experiment-status
 
 .. toctree::
     :maxdepth: 1
