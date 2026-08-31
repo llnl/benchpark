@@ -55,10 +55,10 @@
     :caption: Contributing
 
     add-a-system-config
-    update-system-config
     add-a-benchmark
     add-an-experiment
     testing-your-contribution
+    update-system-config
 
 .. toctree::
     :maxdepth: 1
