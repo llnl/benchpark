@@ -154,8 +154,15 @@ def wrap_config(config):
     return textwrap.wrap(config, width=34, break_long_words=False)
 
 
+def wrap_packages(packages):
+    if not packages:
+        return []
+    return textwrap.wrap(", ".join(sorted(packages)), width=30, break_long_words=False)
+
+
 def build_matrix(results):
     matrix = {}
+    row_packages = {}
     rows = set()
     hosts = set()
 
@@ -170,9 +177,10 @@ def build_matrix(results):
         hosts.add(host)
         matrix.setdefault(key, {})
         matrix[key][host] = merge_cell(matrix[key].get(host), result)
+        row_packages.setdefault(key, set()).update(changed_packages(result))
 
     sorted_rows = sorted(rows, key=lambda item: (item[0], config_sort_key(item[1])))
-    return sorted_rows, sorted(hosts), matrix
+    return sorted_rows, sorted(hosts), matrix, row_packages
 
 
 def marker_text(markers):
@@ -222,7 +230,7 @@ def add_cell(ax, x, y, width, height, status, markers=None):
 
 def render_table(summary, output_path):
     results = summary.get("results", [])
-    rows, hosts, matrix = build_matrix(results)
+    rows, hosts, matrix, row_packages = build_matrix(results)
 
     if not rows:
         rows = [("No Results", "")]
@@ -231,23 +239,28 @@ def render_table(summary, output_path):
 
     benchmark_width = 3.45
     cell_width = 1.45
+    packages_width = 2.35
     header_height = 0.82
     title_height = 0.62
     legend_height = 2.4
     margin = 0.25
 
-    table_width = benchmark_width + cell_width * len(hosts)
+    table_width = benchmark_width + cell_width * len(hosts) + packages_width
     content_width = max(table_width, 5.8)
     row_infos = [
         {
             "benchmark": benchmark,
             "config": config,
             "config_lines": wrap_config(config),
+            "package_lines": wrap_packages(row_packages.get((benchmark, config), set())),
         }
         for benchmark, config in rows
     ]
     row_heights = [
-        0.42 if not row["config_lines"] else 0.35 + 0.17 * len(row["config_lines"])
+        max(
+            0.42 if not row["config_lines"] else 0.35 + 0.17 * len(row["config_lines"]),
+            0.42 if not row["package_lines"] else 0.35 + 0.17 * len(row["package_lines"]),
+        )
         for row in row_infos
     ]
 
@@ -334,12 +347,24 @@ def render_table(summary, output_path):
             fontfamily="serif",
         )
 
+    packages_left = table_left + benchmark_width + cell_width * len(hosts)
+    ax.text(
+        packages_left + packages_width / 2,
+        header_bottom + header_height * 0.32,
+        "changed packages",
+        ha="center",
+        va="center",
+        fontsize=10,
+        fontfamily="serif",
+    )
+
     previous_benchmark = None
     row_top = header_bottom
     for row, row_info in enumerate(row_infos):
         benchmark = row_info["benchmark"]
         config = row_info["config"]
         config_lines = row_info["config_lines"]
+        package_lines = row_info["package_lines"]
         row_height = row_heights[row]
         y = row_top - row_height
         if previous_benchmark is not None and benchmark != previous_benchmark:
@@ -380,6 +405,18 @@ def render_table(summary, output_path):
                 host, {"status": "Not Tested", "markers": []}
             )
             add_cell(ax, x, y, cell_width, row_height, cell["status"], cell["markers"])
+
+        for line_idx, package_line in enumerate(package_lines):
+            ax.text(
+                packages_left + packages_width / 2,
+                y + row_height * 0.5 - line_idx * 0.13,
+                package_line,
+                ha="center",
+                va="center",
+                fontsize=6.8,
+                fontfamily="serif",
+                color="#444444",
+            )
         row_top = y
 
     draw_legend(ax, left, table_bottom - 0.2, content_width)
