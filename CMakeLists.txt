@@ -5,4 +5,7 @@ INCLUDE(CTest)
 find_package(Python3 REQUIRED)
 
 add_test(NAME Gitlab
-        COMMAND ${CMAKE_COMMAND} -E $ENV{EXIT_CODE})
+        COMMAND bash -c "./bin/benchpark analyze --workspace-dir wkp/dane/kripke/workspace --ctest-emit &&
+        exec ${CMAKE_COMMAND} -E \"$EXIT_CODE\""
+)
+

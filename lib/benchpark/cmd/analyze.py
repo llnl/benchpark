@@ -364,6 +364,10 @@ def make_chart(**kwargs):
         "Note: ordering of regions in the figure are in reverse order of the tree."
     )
 
+    # CTest measurement file emission
+    if kwargs.get("ctest_emit"):
+        print(f"<CTestMeasurementFile type=\"image/png\" name=\"TestImage\">{filename}.png</CTestMeasurementFile>")
+
 
 # ----------------
 # Data Preparation
@@ -800,6 +804,12 @@ def setup_parser(root_parser):
         help="With 'archive', path for the .tar.gz (defaults to CWD/<workspace>-<timestamp>.tar.gz)",
     )
 
+    # CTest flags
+    root_parser.add_argument(
+        "--ctest-emit",
+        action="store_true",
+        help="Emit CTest measurement markup."
+    )
 
 def command(args):
     """
