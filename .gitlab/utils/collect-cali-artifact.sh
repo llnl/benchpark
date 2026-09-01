@@ -6,7 +6,7 @@ artifact_dir="${CI_PROJECT_DIR}/artifact-cali"
 baseline_artifact_dir="${CI_PROJECT_DIR}/baseline-cali"
 performance_json="${artifact_dir}/performance_metadata.json"
 baseline_performance_json="${baseline_artifact_dir}/performance_metadata.json"
-performance_metric="Avg time/rank"
+performance_metric="time"
 performance_region="main"
 performance_threshold="0.05"
 
