@@ -7,7 +7,7 @@ output_dir="$(dirname "${output_path}")"
 ref="${CI_COMMIT_REF_NAME:-}"
 artifact_path="artifact-test-metadata/test_metadata.json"
 pipeline_id="${CI_PIPELINE_ID:-}"
-summary_date="${CI_COMMIT_TIMESTAMP:-$(date -u +"%Y-%m-%dT%H:%M:%SZ")}"
+summary_date="${CI_PIPELINE_CREATED_AT:-$(date -u +"%Y-%m-%dT%H:%M:%SZ")}"
 git_sha="${CI_COMMIT_SHA:-$(git rev-parse HEAD 2>/dev/null || true)}"
 
 mkdir -p "${output_dir}"
