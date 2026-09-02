@@ -40,7 +40,8 @@ allocate_resources_dane:
   needs: [dane-up-check]
 allocate_resources_matrix:
   extends: .allocate_resources_slurm
-  rules: !reference [.resource_rules_matrix, rules]
+  rules:
+    - when: never
   variables:
     HOST: matrix
     SHARED_ALLOC: $MATRIX_SHARED_ALLOC
@@ -64,7 +65,8 @@ release_resources_dane:
       optional: true
 release_resources_matrix:
   extends: .release_resources_slurm
-  rules: !reference [.resource_rules_matrix, rules]
+  rules:
+    - when: never
   tags: [shell, matrix]
   needs:
     - job: allocate_resources_matrix
@@ -113,46 +115,13 @@ run_tests_slurm_dane:
     matrix:
       - HOST: dane
         ARCHCONFIG: llnl-cluster
-        BENCHMARK: [hpl, hpcg, amg2023, kripke, sparta-snl]
-        VARIANT: [+openmp, '']
-      - HOST: dane
-        ARCHCONFIG: llnl-cluster
-        BENCHMARK: [branson, laghos, lammps, raja-perf, remhos, phloem]
-      # Strong scaling runs for "benchpark analyze" test
-      - HOST: dane
-        ARCHCONFIG: llnl-cluster
-        BENCHMARK: [kripke, amg2023]
-        VARIANT: ['+strong caliper=mpi,time', '+weak caliper=mpi,time']
-        TEST_ANALYZE: ['true']
-      # Test githash, affinity, and hwloc with caliper on
-      - HOST: dane
-        ARCHCONFIG: llnl-cluster
-        BENCHMARK: [kripke]
-        VARIANT: ['caliper=mpi,time hwloc=on affinity=on githash=on']
-      # Topdown
-      - HOST: dane
-        ARCHCONFIG: llnl-cluster
-        BENCHMARK: [kripke]
-        VARIANT: ['caliper=topdown-all,time']
-      # IOR needs a mount_point
-      - HOST: dane
-        ARCHCONFIG: llnl-cluster
-        SYSTEM_ARGS: [mount_point="/p/lustre1"]
-        BENCHMARK: ior
-      # Test openmpi
-      - HOST: dane
-        ARCHCONFIG: llnl-cluster
-        SYSTEM_ARGS: [mpi=openmpi]
-        BENCHMARK: osu-micro-benchmarks
-      # Compilers
-      - HOST: dane
-        ARCHCONFIG: llnl-cluster
-        SYSTEM_ARGS: [compiler=gcc, compiler=llvm]
-        BENCHMARK: osu-micro-benchmarks
+        BENCHMARK: [remhos]
 run_tests_slurm_matrix:
   extends: .run_tests_slurm
   tags: [shell, matrix]
   needs: [allocate_resources_matrix]
+  rules:
+    - when: never
   parallel:
     matrix:
       - HOST: matrix

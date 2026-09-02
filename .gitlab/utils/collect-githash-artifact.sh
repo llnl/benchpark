@@ -56,6 +56,7 @@ generate_githash_metadata() {
     # shellcheck disable=SC1090
     . "${setup_script}" || return 1
     spack env activate "${spack_env_dir}" || return 1
+    spack concretize -U -f || return 1
     "${benchpark_python}" "${CI_PROJECT_DIR}/modifiers/githash/githash.py" \
         "${artifact_githash_json}" \
         "${CI_PROJECT_DIR}" \
