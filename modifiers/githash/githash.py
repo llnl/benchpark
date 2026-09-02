@@ -38,7 +38,7 @@ def extract_benchpark_dependencies_hash(repo_root):
 
 def spack_find_json(name):
     raw = subprocess.check_output(
-        ["spack", "find", "--json", name],
+        ["spack", "find", "-c", "--json", name],
         text=True,
     )
     return json.loads(raw)[0]

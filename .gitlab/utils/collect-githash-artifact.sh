@@ -12,10 +12,44 @@ run_status_file=$2
 run_workspace="${CI_PROJECT_DIR}/wkp/${HOST}/${BENCHMARK}/workspace"
 artifact_dir="${CI_PROJECT_DIR}/artifact-githash"
 githash_json=""
+artifact_githash_json="${artifact_dir}/githash_metadata.json"
 baseline_json="${artifact_dir}/baseline_githash_metadata.json"
 baseline_status_file="${artifact_dir}/baseline_job.status"
 githash_status="NOT_FOUND"
 baseline_githash_status="NOT_FOUND"
+
+generate_githash_metadata() {
+    local setup_script="${CI_PROJECT_DIR}/wkp/setup.sh"
+    local spack_yaml=""
+    local spack_env_dir=""
+
+    if [[ ! -f "${setup_script}" ]]; then
+        echo "Unable to locate Benchpark setup script at ${setup_script}" >&2
+        return 1
+    fi
+
+    if [[ -d "${run_workspace}/software/spack" ]]; then
+        spack_yaml=$(find "${run_workspace}/software/spack" -type f -path "*/${BENCHMARK}/spack.yaml" | sort | sed -n '1p')
+        if [[ -z "${spack_yaml}" ]]; then
+            spack_yaml=$(find "${run_workspace}/software/spack" -type f -name 'spack.yaml' | sort | sed -n '1p')
+        fi
+    fi
+
+    if [[ -z "${spack_yaml}" ]]; then
+        echo "Unable to locate Spack environment under ${run_workspace}/software/spack" >&2
+        return 1
+    fi
+
+    spack_env_dir=$(dirname "${spack_yaml}")
+
+    # shellcheck disable=SC1090
+    . "${setup_script}" || return 1
+    spack env activate "${spack_env_dir}" || return 1
+    python "${CI_PROJECT_DIR}/modifiers/githash/githash.py" \
+        "${artifact_githash_json}" \
+        "${CI_PROJECT_DIR}" \
+        "${BENCHMARK}" || return 1
+}
 
 if [[ -d "${run_workspace}/experiments" ]]; then
     githash_json=$(find "${run_workspace}/experiments" -type f -name 'githash_metadata.json' | sort | sed -n '1p')
@@ -23,10 +57,14 @@ fi
 
 mkdir -p "${artifact_dir}"
 if [[ -n "${githash_json}" ]]; then
-    cp "${githash_json}" "${artifact_dir}/githash_metadata.json"
+    cp "${githash_json}" "${artifact_githash_json}"
     githash_status="FOUND"
 else
     echo "Unable to locate ${checkout_label} githash metadata in ${run_workspace}" >&2
+    if generate_githash_metadata; then
+        githash_json="${artifact_githash_json}"
+        githash_status="FOUND"
+    fi
 fi
 
 fetch_args=(
