@@ -21,8 +21,7 @@ workflow:
       fi
 allocate_resources_tuolumne:
   extends: .allocate_resources_flux
-  rules:
-    - when: never
+  rules: !reference [.resource_rules_tuolumne, rules]
   parallel:
     matrix:
       - HOST: tuolumne
@@ -32,8 +31,7 @@ allocate_resources_tuolumne:
   needs: [tuolumne-up-check]
 allocate_resources_tioga:
   extends: .allocate_resources_flux
-  rules:
-    - when: never
+  rules: !reference [.resource_rules_tioga, rules]
   variables:
     HOST: tioga
     SHARED_ALLOC: $TIOGA_SHARED_ALLOC
@@ -49,8 +47,7 @@ allocate_resources_tioga:
   script: [. .gitlab/utils/cancel-flux.sh --no-clean]
 release_resources_flux_tuolumne:
   extends: .release_resources_flux
-  rules:
-    - when: never
+  rules: !reference [.resource_rules_tuolumne, rules]
   needs:
     - job: allocate_resources_tuolumne
     - job: run_tests_flux_tuolumne
@@ -62,8 +59,7 @@ release_resources_flux_tuolumne:
   tags: [shell, tuolumne]
 release_resources_flux_tioga:
   extends: .release_resources_flux
-  rules:
-    - when: never
+  rules: !reference [.resource_rules_tioga, rules]
   needs:
     - job: allocate_resources_tioga
     - job: run_tests_flux_tioga
@@ -109,8 +105,6 @@ run_tests_flux_tuolumne:
   extends: .run_tests_flux
   tags: [shell, tuolumne]
   needs: [allocate_resources_tuolumne]
-  rules:
-    - when: never
   parallel:
     matrix:
       - HOST: tuolumne
@@ -175,8 +169,6 @@ run_tests_flux_tioga:
   extends: .run_tests_flux
   tags: [shell, tioga]
   needs: [allocate_resources_tioga]
-  rules:
-    - when: never
   parallel:
     matrix:
       - HOST: tioga
