@@ -48,8 +48,8 @@ Benchpark depends on the build functionality provided in `Spack
 <https://github.com/spack/spack>`_, the Spack packages provided in `Spack-packages
 <https://github.com/spack/spack-packages>`_, and run functionality provided in 
 `Ramble <https://github.com/Ramble-Project/ramble>`_. To allow for testing before
-pulling in updates in Spack and Ramble, Benchpark clones and uses the versions of Spack
-and Ramble specified in ``checkout-versions.yaml``.
+pulling in updates in Spack and Ramble, Benchpark clones and uses the versions of
+Spack and Ramble specified in ``checkout-versions.yaml``.
 
 The user might notice this delay in Spack and Ramble versions in two ways:
 
