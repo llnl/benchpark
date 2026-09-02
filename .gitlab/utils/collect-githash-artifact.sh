@@ -20,8 +20,15 @@ baseline_githash_status="NOT_FOUND"
 
 generate_githash_metadata() {
     local setup_script="${CI_PROJECT_DIR}/wkp/setup.sh"
+    local venv_activate="/usr/workspace/benchpark-dev/benchpark-venv/${SYS_TYPE}/bin/activate"
+    local benchpark_python=""
     local spack_yaml=""
     local spack_env_dir=""
+
+    if [[ ! -f "${venv_activate}" ]]; then
+        echo "Unable to locate Benchpark Python environment at ${venv_activate}" >&2
+        return 1
+    fi
 
     if [[ ! -f "${setup_script}" ]]; then
         echo "Unable to locate Benchpark setup script at ${setup_script}" >&2
@@ -43,9 +50,13 @@ generate_githash_metadata() {
     spack_env_dir=$(dirname "${spack_yaml}")
 
     # shellcheck disable=SC1090
+    . "${venv_activate}" || return 1
+    benchpark_python=$(command -v python)
+
+    # shellcheck disable=SC1090
     . "${setup_script}" || return 1
     spack env activate "${spack_env_dir}" || return 1
-    python "${CI_PROJECT_DIR}/modifiers/githash/githash.py" \
+    "${benchpark_python}" "${CI_PROJECT_DIR}/modifiers/githash/githash.py" \
         "${artifact_githash_json}" \
         "${CI_PROJECT_DIR}" \
         "${BENCHMARK}" || return 1
