@@ -4,12 +4,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from spack.package import *
+from spack_repo.builtin.build_systems.cmake import CMakePackage
 from spack_repo.builtin.build_systems.cuda import CudaPackage
-from spack_repo.builtin.build_systems.makefile import MakefilePackage
 from spack_repo.builtin.build_systems.rocm import ROCmPackage
 
 
-class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
+class Remhos(CMakePackage, CudaPackage, ROCmPackage):
     """Remhos (REMap High-Order Solver) is a CEED miniapp that performs monotonic
     and conservative high-order discontinuous field interpolation (remap)
     using DG advection-based spatial discretization and explicit high-order
@@ -70,7 +70,7 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
     depends_on("hypre~rocm", when="~rocm")
     depends_on("mfem+rocm+mpi+umpire", when="+rocm")
     depends_on("mfem~rocm", when="~rocm")
-    
+
     for arch in ROCmPackage.amdgpu_targets:
         depends_on("hypre amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
         depends_on("mfem amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
@@ -78,29 +78,28 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
 
     depends_on("hypre+gpu-aware-mpi", when="+gpu-aware-mpi")
 
+    patch("remhos-cmake.patch")
+
     def setup_run_environment(self, env):
         if "+gpu-aware-mpi" in self.spec:
             env.set("MFEM_GPU_AWARE_MPI", "1")
 
-    @property
-    def build_targets(self):
-        targets = []
+    install_time_test_callbacks = []  # type: List[str]
+
+    def cmake_args(self):
         spec = self.spec
-
-        targets.append("MFEM_DIR=%s" % spec["mfem"].prefix)
-        targets.append("CONFIG_MK=%s" % spec["mfem"].package.config_mk)
-        targets.append("TEST_MK=%s" % spec["mfem"].package.test_mk)
-        if "+caliper" in self.spec:
-            targets.append("CALIPER_DIR=%s" % spec["caliper"].prefix)
-            targets.append("ADIAK_DIR=%s" % spec["adiak"].prefix)
-        return targets
-
-    # See lib/spack/spack/build_systems/makefile.py
-    def check(self):
-        with working_dir(self.build_directory):
-            make("test", *self.build_targets)
+        args = []
+        args.append(f"-DMFEM_DIR={spec['mfem'].prefix}")
+        if self.spec.satisfies("+rocm"):
+            args.append("-DMFEM_USE_HIP=ON")
+            args.append(f"-DCMAKE_HIP_COMPILER={env['HIPCXX']}")
+            args.append(f"-DCMAKE_CXX_COMPILER={env['HIPCXX']}")
+            amdgpu_target = ";".join(spec.variants["amdgpu_target"].value)
+            args.append(self.define("CMAKE_HIP_ARCHITECTURES", amdgpu_target))
+        if self.spec.satisfies("+caliper"):
+            args.append("-DREMHOS_USE_CALIPER=ON")
+        return args
 
     def install(self, spec, prefix):
-        mkdirp(prefix.bin)
-        install("remhos", prefix.bin)
-        install_tree("data", prefix.data)
+        super().install(spec, prefix)
+        install(self.prefix.bin.remhos_main, self.prefix.bin.remhos)

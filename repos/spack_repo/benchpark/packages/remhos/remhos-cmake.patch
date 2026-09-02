@@ -1,0 +1,155 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7ddec8b..efb0f38 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,10 +1,9 @@
+-cmake_minimum_required(VERSION 3.18)
++cmake_minimum_required(VERSION 3.21)
+ 
+ set(project remhos)
+ project(${project} LANGUAGES CXX)
+ set(CMAKE_CXX_STANDARD 17)
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+-set(CMAKE_CXX_COMPILER_LAUNCHER ccache)
+ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+ 
+ # CXX flags *******************************************************************
+@@ -18,21 +17,35 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2" CACHE STRING "" FORCE)
+ 
+ # Verbosity options ***********************************************************
+ set(CMAKE_VERBOSE_MAKEFILE OFF CACHE BOOL "" FORCE)
+-# set(CUDA_VERBOSE_BUILD OFF CACHE BOOL "" FORCE)
+-
+-# Include paths ***************************************************************
+-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../mfem)
+-if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+-include_directories(/usr/include/hypre /usr/include)
+-elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+-include_directories(/opt/homebrew/opt/fmt/include
+-                    /opt/homebrew/opt/openmpi/include
+-                    /opt/homebrew/opt/metis/include
+-                    /opt/homebrew/opt/hypre/include)
+-add_compile_definitions(MFEM_USE_CMAKE_TESTS)
+-else()
+-    message(FATAL_ERROR "Unsupported system")
++
++# Dependencies ****************************************************************
++find_package(HYPRE REQUIRED)
++find_package(MFEM REQUIRED)
++find_package(MPI REQUIRED)
++
++option(REMHOS_USE_CALIPER "Use Caliper" OFF)
++if (REMHOS_USE_CALIPER)
++    find_package(caliper REQUIRED)
++    find_package(adiak REQUIRED)
++endif()
++
++# HIP support *****************************************************************
++# Read MFEM_USE_HIP from MFEMConfig or from the cache (passed via -DMFEM_USE_HIP=ON)
++if (NOT DEFINED MFEM_USE_HIP)
++    set(MFEM_USE_HIP OFF)
++endif()
++
++if (MFEM_USE_HIP)
++    if(NOT DEFINED CMAKE_HIP_ARCHITECTURES)
++        set(CMAKE_HIP_ARCHITECTURES gfx942)
++    endif()
++    enable_language(HIP)
++    set(CMAKE_HIP_STANDARD ${CMAKE_CXX_STANDARD} CACHE STRING
++        "HIP standard to use.")
++    set(CMAKE_HIP_STANDARD_REQUIRED ON CACHE BOOL
++        "Force the use of the chosen HIP standard.")
++    set(CMAKE_HIP_EXTENSIONS OFF CACHE BOOL "Enable HIP standard extensions.")
++    message(STATUS "Using HIP architecture: ${CMAKE_HIP_ARCHITECTURES}")
+ endif()
+ 
+ # Copy mesh files *************************************************************
+@@ -46,40 +59,50 @@ add_custom_command(OUTPUT data_is_copied
+ add_custom_target(copy_mesh_files DEPENDS data_is_copied)
+ 
+ # Library source files ********************************************************
+-add_library(Remhos STATIC remhos.cpp remhos_fct.cpp 
+-                          remhos_ho.cpp remhos_lo.cpp 
+-                          remhos_mono.cpp remhos_sync.cpp 
+-                          remhos_tools.cpp)
+-
+-# Testing options *************************************************************
+-enable_testing()
+-function(add_remhos_test name)
+-    set(file ${name}.cpp)
+-    set(target ${name})
+-    list(LENGTH ARGN ARGN_COUNT)
+-    if(ARGN_COUNT GREATER 0) 
+-        list(GET ARGN 0 extra)
+-        string(APPEND name "_" ${extra})
+-        string(APPEND target "_" ${extra})
+-    endif()
+-    message(STATUS "Adding target: ${target}")
+-    add_executable(${target} ${file})
+-    add_dependencies(${target} copy_mesh_files)
+-    target_link_libraries(${target} Remhos -lmpi -lmfem -lhypre -lmetis -lfmt)
+-if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+-    target_link_directories(${target} PUBLIC /usr/lib/x86_64-linux-gnu) 
+-elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+-    target_link_directories(${target} PUBLIC /opt/homebrew/opt/openmpi/lib
+-                                          /opt/homebrew/opt/metis/lib
+-                                          /opt/homebrew/opt/hypre/lib
+-                                          /opt/homebrew/opt/fmt/lib) 
++set(LIB_SOURCES
++    remhos.cpp
++    remhos_fct.cpp
++    remhos_ho.cpp
++    remhos_lo.cpp
++    remhos_mono.cpp
++    remhos_solvers.cpp
++    remhos_sync.cpp
++    remhos_tools.cpp
++)
++
++if (MFEM_USE_HIP)
++    set_source_files_properties(${LIB_SOURCES} PROPERTIES LANGUAGE HIP)
+ endif()
+-    target_link_directories(${target} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../mfem)
+-    message(STATUS "Adding test: ${target}_n1")
+-    add_test(NAME ${target}_n1  COMMAND mpirun -n 1 ${target} ${extra})
+-    message(STATUS "Adding test: ${target}_n3")
+-    add_test(NAME ${target}_n3 COMMAND mpirun -n 3 ${target})
+-endfunction()
+-
+-add_remhos_test(remhos_main)
+-add_remhos_test(remhos_tests)
+\ No newline at end of file
++
++add_library(Remhos STATIC ${LIB_SOURCES})
++
++target_compile_definitions(Remhos PUBLIC MFEM_USE_CMAKE_TESTS)
++
++target_include_directories(Remhos PUBLIC
++    ${CMAKE_CURRENT_SOURCE_DIR}
++    ${MFEM_INCLUDE_DIRS}
++    ${MFEM_INCLUDE_DIRS}/mfem
++)
++
++target_link_libraries(Remhos
++    PUBLIC mfem
++    PUBLIC MPI::MPI_CXX
++    PUBLIC HYPRE::HYPRE
++)
++
++if (REMHOS_USE_CALIPER)
++    target_compile_definitions(Remhos PUBLIC REMHOS_USE_CALIPER)
++    target_link_libraries(Remhos PUBLIC caliper adiak::adiak)
++endif()
++
++# Executables *****************************************************************
++if (MFEM_USE_HIP)
++    set_source_files_properties(remhos_main.cpp PROPERTIES LANGUAGE HIP)
++endif()
++add_executable(remhos_main remhos_main.cpp)
++add_dependencies(remhos_main copy_mesh_files)
++target_link_libraries(remhos_main PRIVATE Remhos)
++
++# Install *********************************************************************
++install(TARGETS remhos_main DESTINATION bin)
++install(DIRECTORY data/ DESTINATION data)

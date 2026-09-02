@@ -309,6 +309,8 @@ class LlnlElcapitan(System):
         selections = {
             "packages": {
                 "all": {"require": [{"spec": "target=x86_64:"}]},
+                "camp": {"require": "@2025.09.0:"},
+                "blt": {"require": "@0.7.0:"},
                 "tar": {"externals": [{"spec": "tar@1.30", "prefix": "/usr"}]},
                 "coreutils": {
                     "externals": [{"spec": "coreutils@8.30", "prefix": "/usr"}]
@@ -838,7 +840,12 @@ class LlnlElcapitan(System):
         rocmcc_entry = compiler_def(
             f"llvm-amdgpu@{self.rocm_version}",
             f"/opt/rocm-{self.rocm_version}/llvm",
-            {"c": "amdclang", "cxx": "amdclang++", "fortran": "amdflang"},
+            {
+                "c": "amdclang",
+                "cxx": "amdclang++",
+                "fortran": "amdflang",
+                "hip": "amdclang++",
+            },
             modules=[f"rocm/{self.rocm_version}"],
             extra_rpaths=list(rpaths),
             env={
