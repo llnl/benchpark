@@ -12,6 +12,16 @@ git_sha="${CI_COMMIT_SHA:-$(git rev-parse HEAD 2>/dev/null || true)}"
 
 mkdir -p "${output_dir}"
 
+sanitize_filename_part() {
+    local value=$1
+    if [[ -z "${value}" ]]; then
+        value="none"
+    fi
+    printf '%s' "${value}" \
+        | tr '[:upper:]' '[:lower:]' \
+        | sed -E 's/[^a-z0-9._-]+/-/g; s/^-+//; s/-+$//; s/-+/-/g'
+}
+
 if [[ -z "${pipeline_id}" || -z "${ref}" ]]; then
     echo "Missing pipeline ID or ref." >&2
     exit 1
@@ -49,12 +59,18 @@ fi
 for metadata_file in "${metadata_files[@]}"; do
     host="$(jq -r '.host // empty' "${metadata_file}" | tr '[:upper:]' '[:lower:]')"
     if [[ -n "${host}" ]]; then
+        benchmark="$(sanitize_filename_part "$(jq -r '.benchmark // "unknown"' "${metadata_file}")")"
+        variant="$(sanitize_filename_part "$(jq -r '.variant // "none"' "${metadata_file}")")"
+        job_id="$(sanitize_filename_part "$(jq -r '.job.id // "unknown"' "${metadata_file}")")"
+        date_only="$(sanitize_filename_part "${summary_date%%T*}")"
+        output_filename="${benchmark}-${variant}-${job_id}-${date_only}.json"
+
         mkdir -p "${output_dir}/${host}"
         jq \
             --arg date "${summary_date}" \
             --arg gitSHA "${git_sha}" \
             '. + {date: $date, gitSHA: $gitSHA}' \
-            "${metadata_file}" > "${output_dir}/${host}/$(basename "${metadata_file}")"
+            "${metadata_file}" > "${output_dir}/${host}/${output_filename}"
     fi
 done
 
