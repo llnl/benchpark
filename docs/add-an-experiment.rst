@@ -41,13 +41,13 @@ and `Ramble application
 defined in Benchpark, so Benchpark will use these over the upstream `Spack package
 <https://github.com/spack/spack-packages/blob/develop/repos/spack_repo/builtin/packages/hpl/package.py>`__
 and `Ramble application
-<https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/applications/hpl/application.py>`__.
+<https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/applications/hpl/application.py>`__.
 For clarity, if ``benchpark/repos/spack_repo/benchpark/packages/hpl`` and
 ``benchpark/repos/ramble_applications/hpl`` did not exist, Benchpark would use the
 upstream versions. Additionally, the Benchpark HPL ``application.py`` inherits from the
 Ramble upstream, so they are equivalent aside from an extra Benchpark tag definition.
 Notice the HPL application in Ramble also inherits from a `base HPL application
-<https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/base_applications/hpl/base_application.py>`__,
+<https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_applications/hpl/base_application.py>`__,
 which is relevant because it contains the workload variables that we will need to define
 in our Benchpark experiment.
 
@@ -167,7 +167,7 @@ experiment variables here that will override the default values for the ``worklo
 variables`` in your ``application.py``. For HPL, we override the ``Ns``, ``N-Grids``,
 ``Ps``, ``Qs``, ``N-Ns``, ``N-NBs``, and ``NBs`` workload variables which are defined in
 the base `application
-<https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/base_applications/hpl/base_application.py>`__.
+<https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_applications/hpl/base_application.py>`__.
 
 Additionally, all of ``n_resources``, ``process_problem_size``, and
 ``total_problem_size`` must be set, which can be accomplished using
@@ -224,7 +224,7 @@ by default.
         if self.spec.satisfies("exec_mode=test"):
           self.add_experiment_variable("n_nodes", 1, True)
 
-          # Overwrite values in application (https://github.com/GoogleCloudPlatform/ramble/blob/3c3e6b7c58270397ad10dfbe9c52bfad790c0631/var/ramble/repos/builtin/base_applications/hpl/base_application.py#L411-L419)
+          # Overwrite values in application (https://github.com/Ramble-Project/ramble/blob/3c3e6b7c58270397ad10dfbe9c52bfad790c0631/var/ramble/repos/builtin/base_applications/hpl/base_application.py#L411-L419)
           self.add_experiment_variable("Ns", 10000, True)
           self.add_experiment_variable("N-Grids", 1, False)
           self.add_experiment_variable("Ps", "4 * {n_nodes}", True)
