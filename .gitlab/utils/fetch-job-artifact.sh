@@ -75,7 +75,7 @@ pipelines_json=$(
         --data-urlencode "ref=${ref}" \
         --data-urlencode "order_by=id" \
         --data-urlencode "sort=desc" \
-        --data-urlencode "per_page=20" \
+        --data-urlencode "per_page=100" \
         "${api_url}/projects/${project_id}/pipelines"
 )
 
