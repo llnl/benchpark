@@ -106,10 +106,11 @@ generate_test_summary:
   script:
     - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
     - ./bin/benchpark configure --bootstrap-location $CUSTOM_CI_BUILDS_DIR
-    - python .gitlab/utils/generate_test_summary_csv.py --output test-summary.csv
+    - bash .gitlab/utils/aggregate-test-metadata.sh
+    - python .gitlab/utils/generate_test_status_table.py artifact-test-summary/test_metadata_summary.json
   artifacts:
     when: always
-    paths: [test-summary.csv]
+    paths: [artifact-test-summary/]
   rules:
     - when: always
 cleanup_pipeline_dir:

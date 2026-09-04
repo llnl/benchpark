@@ -38,14 +38,14 @@ allocate_resources_dane:
     SHARED_ALLOC: $DANE_SHARED_ALLOC
   tags: [shell, dane]
   needs: [dane-up-check]
-allocate_resources_matrix:
-  extends: .allocate_resources_slurm
-  rules: !reference [.resource_rules_matrix, rules]
-  variables:
-    HOST: matrix
-    SHARED_ALLOC: $MATRIX_SHARED_ALLOC
-  tags: [shell, matrix]
-  needs: [matrix-up-check]
+# allocate_resources_matrix:
+#   extends: .allocate_resources_slurm
+#   rules: !reference [.resource_rules_matrix, rules]
+#   variables:
+#     HOST: matrix
+#     SHARED_ALLOC: $MATRIX_SHARED_ALLOC
+#   tags: [shell, matrix]
+#   needs: [matrix-up-check]
 ##########################
 # Resource Release Section
 ##########################
@@ -62,14 +62,14 @@ release_resources_dane:
     - job: allocate_resources_dane
     - job: run_tests_slurm_dane
       optional: true
-release_resources_matrix:
-  extends: .release_resources_slurm
-  rules: !reference [.resource_rules_matrix, rules]
-  tags: [shell, matrix]
-  needs:
-    - job: allocate_resources_matrix
-    - job: run_tests_slurm_matrix
-      optional: true
+# release_resources_matrix:
+#   extends: .release_resources_slurm
+#   rules: !reference [.resource_rules_matrix, rules]
+#   tags: [shell, matrix]
+#   needs:
+#     - job: allocate_resources_matrix
+#     - job: run_tests_slurm_matrix
+#       optional: true
 ##################
 # Test Run Section
 ##################
@@ -77,10 +77,10 @@ release_resources_matrix:
   extends: .run_test_rules
   stage: test
   variables:
-    BASELINE_REF: develop
+    BASELINE_REF: ci-summary
   artifacts:
     when: always
-    paths: [artifact-githash/githash_metadata.json, artifact-cali/]
+    paths: [artifact-githash/githash_metadata.json, artifact-cali/, artifact-test-metadata/test_metadata.json]
   before_script:
     - !reference [.report_status, before_script]
   script:
@@ -105,6 +105,8 @@ release_resources_matrix:
       bash .gitlab/utils/collect-cali-artifact.sh
     - |
       bash .gitlab/utils/collect-githash-artifact.sh PR "$CI_PROJECT_DIR/pr_flux.status"
+    - |
+      bash .gitlab/utils/write-test-metadata.sh PR "$CI_PROJECT_DIR/pr_flux.status"
 run_tests_slurm_dane:
   extends: .run_tests_slurm
   tags: [shell, dane]
@@ -113,66 +115,59 @@ run_tests_slurm_dane:
     matrix:
       - HOST: dane
         ARCHCONFIG: llnl-cluster
-        BENCHMARK: [hpl, hpcg, amg2023, kripke, sparta-snl]
+        BENCHMARK: [amg2023] #BENCHMARK: [hpl, hpcg, amg2023, kripke, sparta-snl]
         VARIANT: [+openmp, '']
-      - HOST: dane
-        ARCHCONFIG: llnl-cluster
-        BENCHMARK: [branson, laghos, lammps, raja-perf, remhos, phloem]
+      # - HOST: dane
+      #   ARCHCONFIG: llnl-cluster
+      #   BENCHMARK: [branson, laghos, lammps, raja-perf, remhos, phloem]
       # Strong scaling runs for "benchpark analyze" test
       - HOST: dane
         ARCHCONFIG: llnl-cluster
-        BENCHMARK: [kripke, amg2023]
+        BENCHMARK: [amg2023] #BENCHMARK: [kripke, amg2023]
         VARIANT: ['+strong caliper=mpi,time', '+weak caliper=mpi,time']
         TEST_ANALYZE: ['true']
       # Test githash, affinity, and hwloc with caliper on
-      - HOST: dane
-        ARCHCONFIG: llnl-cluster
-        BENCHMARK: [kripke]
-        VARIANT: ['caliper=mpi,time hwloc=on affinity=on githash=on']
+      # - HOST: dane
+      #   ARCHCONFIG: llnl-cluster
+      #   BENCHMARK: [kripke]
+      #   VARIANT: ['caliper=mpi,time hwloc=on affinity=on githash=on']
       # Topdown
-      - HOST: dane
-        ARCHCONFIG: llnl-cluster
-        BENCHMARK: [kripke]
-        VARIANT: ['caliper=topdown-all,time']
+      # - HOST: dane
+      #   ARCHCONFIG: llnl-cluster
+      #   BENCHMARK: [kripke]
+      #   VARIANT: ['caliper=topdown-all,time']
       # IOR needs a mount_point
-      - HOST: dane
-        ARCHCONFIG: llnl-cluster
-        SYSTEM_ARGS: [mount_point="/p/lustre1"]
-        BENCHMARK: ior
+      # - HOST: dane
+      #   ARCHCONFIG: llnl-cluster
+      #   SYSTEM_ARGS: [mount_point="/p/lustre1"]
+      #   BENCHMARK: ior
       # Test openmpi
-      - HOST: dane
-        ARCHCONFIG: llnl-cluster
-        SYSTEM_ARGS: [mpi=openmpi]
-        BENCHMARK: osu-micro-benchmarks
+      # - HOST: dane
+      #   ARCHCONFIG: llnl-cluster
+      #   SYSTEM_ARGS: [mpi=openmpi]
+      #   BENCHMARK: osu-micro-benchmarks
       # Compilers
-      - HOST: dane
-        ARCHCONFIG: llnl-cluster
-        SYSTEM_ARGS: [compiler=gcc, compiler=llvm]
-        BENCHMARK: osu-micro-benchmarks
-run_tests_slurm_matrix:
-  extends: .run_tests_slurm
-  tags: [shell, matrix]
-  needs: [allocate_resources_matrix]
-  parallel:
-    matrix:
-      - HOST: matrix
-        ARCHCONFIG: llnl-matrix
-        BENCHMARK:
-          - amg2023
-          - babelstream
-          - kripke
-          - laghos
-          - raja-perf
-          - remhos
-          - saxpy
-        VARIANT: [+cuda]
-      - HOST: matrix
-        ARCHCONFIG: llnl-matrix
-        BENCHMARK: [lammps, sparta-snl]
-        VARIANT: [+cuda~gpu-aware-mpi]
-      # spack-pip
-      - HOST: matrix
-        ARCHCONFIG: llnl-matrix
-        BENCHMARK: [py-scaffold]
-        VARIANT:
-          - +cuda package_manager=spack-pip caliper=mpi,time allocation=torchrun-hpc
+      # - HOST: dane
+      #   ARCHCONFIG: llnl-cluster
+      #   SYSTEM_ARGS: [compiler=gcc, compiler=llvm]
+      #   BENCHMARK: osu-micro-benchmarks
+# run_tests_slurm_matrix:
+#   extends: .run_tests_slurm
+#   tags: [shell, matrix]
+#   needs: [allocate_resources_matrix]
+#   parallel:
+#     matrix:
+#       - HOST: matrix
+#         ARCHCONFIG: llnl-matrix
+#         BENCHMARK: [amg2023] #BENCHMARK: [amg2023, babelstream, kripke, laghos, raja-perf, remhos, saxpy]
+#         VARIANT: [+cuda]
+#       # - HOST: matrix
+#       #   ARCHCONFIG: llnl-matrix
+#       #   BENCHMARK: [lammps, sparta-snl]
+#       #   VARIANT: [+cuda~gpu-aware-mpi]
+#       # spack-pip
+#       # - HOST: matrix
+#       #   ARCHCONFIG: llnl-matrix
+#       #   BENCHMARK: [py-scaffold]
+#       #   VARIANT:
+#       #     - +cuda package_manager=spack-pip caliper=mpi,time allocation=torchrun-hpc
