@@ -6,7 +6,9 @@
 import math
 from enum import Enum
 
+import ramble.config
 from ramble.modkit import *
+from spack.spec import Spec
 
 
 class AllocOpt(Enum):
@@ -226,6 +228,7 @@ def divide_into(dividend, divisor):
 class Allocation(BasicModifier):
 
     name = "allocation"
+    _whitelist_file_name = "benchpark_whitelist"
 
     tags("infrastructure")
 
@@ -236,6 +239,17 @@ class Allocation(BasicModifier):
 
     mode("standard", description="Standard execution mode for allocation")
     default_mode("standard")
+
+    register_phase(
+        "create_cleanup_whitelist", pipeline="setup", run_after=["make_experiments"]
+    )
+
+    def _create_cleanup_whitelist(self, workspace, app_inst):
+        whitelist_file = self.expander.expand_var(
+            f"{{experiment_run_dir}}/{self._whitelist_file_name}"
+        )
+        with open(whitelist_file, "w"):
+            pass
 
     def inherit_from_application(self, app):
         super().inherit_from_application(app)
@@ -254,7 +268,12 @@ class Allocation(BasicModifier):
                 val = ""
             app.define_variable(var, str(val))
 
-        if v.n_threads_per_proc:
+        benchpark_spec = ramble.config.get("config:spec")
+        if (
+            benchpark_spec
+            and Spec(benchpark_spec).satisfies("+openmp")
+            and v.n_threads_per_proc
+        ):
             self.env_var_modification(
                 "OMP_NUM_THREADS",
                 method="set",
@@ -380,6 +399,24 @@ class Allocation(BasicModifier):
             raise ValueError(err_msg)
 
     @staticmethod
+    def _cleanup_experiment_dir_cmd():
+        """Removes artifacts from previous runs, if the experiment is executed more than once.
+
+        Setup creates an empty whitelist file. The first execution populates it
+        with setup-created files, and later executions remove anything else.
+        """
+        whitelist_file = Allocation._whitelist_file_name
+        return "\n".join(
+            [
+                f"[ -s {whitelist_file} ] || "
+                'find . -mindepth 1 -maxdepth 1 -printf "%f\\n" | '
+                f"sort > {whitelist_file}",
+                'find . -mindepth 1 -maxdepth 1 -printf "%f\\n" | '
+                f'grep -Fxvf {whitelist_file} | xargs -r -d "\\n" rm -rf --',
+            ]
+        )
+
+    @staticmethod
     def _init_batch_and_cmd_opts(v):
         """System/experiment may have universal options they want to apply
         for all batch allocations or exec calls.
@@ -390,10 +427,11 @@ class Allocation(BasicModifier):
         if v.extra_cmd_opts:
             cmd_opts.extend(v.extra_cmd_opts.strip().split("\n"))
 
+        pre_exec_cmds = [Allocation._cleanup_experiment_dir_cmd()]
         if v.pre_exec_cmds:
-            v.pre_exec = v.pre_exec_cmds
-        else:
-            v.pre_exec = ""
+            pre_exec_cmds.append(v.pre_exec_cmds)
+        v.pre_exec = "\n".join(pre_exec_cmds)
+
         if v.post_exec_cmds:
             v.post_exec = v.post_exec_cmds
         else:

@@ -36,12 +36,19 @@ def extract_benchpark_dependencies_hash(repo_root):
     }
 
 
-def spack_find_json(name):
+def load_spack_json(raw):
+    json_start = raw.find("{")
+    if json_start < 0:
+        raise ValueError("Spack did not emit JSON output")
+    return json.loads(raw[json_start:])
+
+
+def spack_spec_json(name):
     raw = subprocess.check_output(
-        ["spack", "find", "--json", name],
+        ["spack", "spec", "--json", name],
         text=True,
     )
-    return json.loads(raw)[0]
+    return load_spack_json(raw)["spec"]["nodes"]
 
 
 def extract_package_hash(pkg_json):
@@ -56,12 +63,14 @@ def extract_package_hash(pkg_json):
 
 
 def collect_package_info(application_name):
-    pkg_json = spack_find_json(application_name)
+    specs = spack_spec_json(application_name)
+    specs_by_hash = {spec["hash"]: spec for spec in specs}
+    pkg_json = next(spec for spec in specs if spec["name"] == application_name)
 
     application = extract_package_hash(pkg_json)
     dependencies = {}
     for dep in pkg_json.get("dependencies"):
-        dep_info = extract_package_hash(spack_find_json(dep["name"]))
+        dep_info = extract_package_hash(specs_by_hash[dep["hash"]])
         dependencies[dep["name"]] = dep_info
     return {
         "application": application,
