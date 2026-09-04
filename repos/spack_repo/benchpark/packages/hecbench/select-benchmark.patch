@@ -1,0 +1,58 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f6e952b..1cf01ab 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -40,6 +40,7 @@ set(HECBENCH_HIP_ARCH "gfx90a" CACHE STRING "HIP architecture (e.g., gfx908, gfx
+ # Build configuration
+ option(HECBENCH_ENABLE_TESTING "Enable testing" ON)
+ option(HECBENCH_BUILD_ALL_BENCHMARKS "Build all benchmarks (vs selective)" ON)
++set(HECBENCH_BENCHMARK "" CACHE STRING "Benchmark to build in selective mode")
+ 
+ # Add cmake module path
+ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 5db9473..7e3d86c 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -558,15 +558,40 @@ set(HECBENCH_POC_BENCHMARKS
+     wenofv
+ )
+ 
++if(HECBENCH_BUILD_ALL_BENCHMARKS)
++    set(HECBENCH_BENCHMARKS_TO_BUILD ${HECBENCH_POC_BENCHMARKS})
++else()
++    if(NOT HECBENCH_BENCHMARK)
++        message(FATAL_ERROR
++            "HECBENCH_BENCHMARK must be set when HECBENCH_BUILD_ALL_BENCHMARKS=OFF")
++    endif()
++
++    list(FIND HECBENCH_POC_BENCHMARKS "${HECBENCH_BENCHMARK}" HECBENCH_BENCHMARK_INDEX)
++    if(HECBENCH_BENCHMARK_INDEX EQUAL -1)
++        message(FATAL_ERROR "Unknown HeCBench benchmark: ${HECBENCH_BENCHMARK}")
++    endif()
++
++    set(HECBENCH_BENCHMARKS_TO_BUILD "${HECBENCH_BENCHMARK}")
++endif()
++
+ # Include benchmark subdirectories
+-foreach(BENCHMARK ${HECBENCH_POC_BENCHMARKS})
++foreach(BENCHMARK ${HECBENCH_BENCHMARKS_TO_BUILD})
+     # Check which models exist for this benchmark
+     foreach(MODEL cuda hip sycl omp)
++        if(NOT HECBENCH_BUILD_ALL_BENCHMARKS)
++            if((MODEL STREQUAL "cuda" AND NOT HECBENCH_ENABLE_CUDA) OR
++               (MODEL STREQUAL "hip" AND NOT HECBENCH_ENABLE_HIP) OR
++               (MODEL STREQUAL "sycl" AND NOT HECBENCH_ENABLE_SYCL) OR
++               (MODEL STREQUAL "omp" AND NOT HECBENCH_ENABLE_OPENMP))
++                continue()
++            endif()
++        endif()
++
+         set(BENCHMARK_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${BENCHMARK}-${MODEL}")
+         if(EXISTS "${BENCHMARK_DIR}/CMakeLists.txt")
+             add_subdirectory(${BENCHMARK_DIR})
+         endif()
+     endforeach()
+ endforeach()
+ 
+ # Create category targets after all benchmarks are registered
