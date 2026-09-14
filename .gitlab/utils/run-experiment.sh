@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+TEST_RUNTIME_FILE="${CI_PROJECT_DIR:-$(pwd)}/.gitlab_test_runtime_seconds"
+
 # Activate Virtual Environment
 . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
 
@@ -44,8 +46,12 @@ if [ "$HOST" == "dane" ] && \
     find . -type f -name execute_experiment -exec sed -i 's/\bsrun\b/flux run --exclusive/g' {} +
 fi
 
-# Runs experiments where n_nodes == 1, and Print Log
+# Runs experiments where n_nodes == 1
+rm -f "${TEST_RUNTIME_FILE}"
+SECONDS=0
 ramble --disable-logger --workspace-dir . on --executor '{execute_experiment}' --where '{n_nodes} == 1'
+printf '%s\n' "$SECONDS" > "${TEST_RUNTIME_FILE}"
+# Print Log
 find experiments/ -type f -name "*.out" -exec cat {} +
 # Fail if log files are empty or don't exist
 find experiments/ -type f -name "*.out" | grep -q . || { echo "No .out files found"; exit 1; }; find experiments/ -type f -name "*.out" -empty -print -quit | grep -q . && { echo "Empty .out file found"; exit 1; }

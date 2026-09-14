@@ -30,6 +30,10 @@
       fi
     - |
       if [[ $RUN_CTEST == "true" ]]; then
+        TEST_RUNTIME_SECONDS=""
+        if [[ -f .gitlab_test_runtime_seconds ]]; then
+          TEST_RUNTIME_SECONDS=$(cat .gitlab_test_runtime_seconds)
+        fi
         # associative array (Bash 4+)
         declare -A DASHBOARD_NAMES
         # Map cluster names to their full dashboard names
@@ -50,7 +54,8 @@
           -DDASHBOARD_NAME="${DASHBOARD_NAME}" \
           -DBUILD_NAME="${BENCHMARK}${BV} ${VARIANT} ${SYSTEM_ARGS}" \
           -DSITE="$(hostname)" \
-          -DTEST_TYPE="${TEST_TYPE}"
+          -DTEST_TYPE="${TEST_TYPE}" \
+          -DTEST_RUNTIME_SECONDS="${TEST_RUNTIME_SECONDS}"
       else
         echo "Skipping ctest execution due to CI_JOB_STATUS=$CI_JOB_STATUS"
       fi
