@@ -120,8 +120,7 @@ deploy_nightly_performance_metadata:
   needs:
     - job: generate_test_summary
       artifacts: true
-  script:
-    - bash .gitlab/utils/push-to-perf-repo.sh
+  script: [bash .gitlab/utils/push-to-perf-repo.sh]
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: always
