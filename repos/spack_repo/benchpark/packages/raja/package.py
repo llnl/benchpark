@@ -10,6 +10,13 @@ from spack_repo.builtin.packages.raja.package import Raja as BuiltinRaja
 class Raja(BuiltinRaja):
 
     version(
+        "2026.07.0",
+        tag="v2026.07.0",
+        commit="80d218eba514a6d51bfd99ab6ebd6fbf83a74ca9",
+        submodules=False,
+    )
+
+    version(
         "2025.12.2",
         tag="v2025.12.2",
         commit="eca7c5015a5cf8bf7cc8ad1829fd36d3276ab274",
