@@ -24,13 +24,19 @@ class Hecbench(CMakePackage, CudaPackage, ROCmPackage):
     version("2026-08-13", commit="f9540404573a2be7ad1d1ee4b3106fd064825fa8")
     patch("select-benchmark.patch")
     patch("find-hipcc.patch")
+    patch("caliper-instrumentation.patch")
 
     variant(
         "benchmark",
         default="babelstream",
-        values=("babelstream", "softmax"),
+        values=("babelstream", "softmax", "nbody", "wmma"),
         multi=False,
         description="HeCBench benchmark to build",
+    )
+    variant(
+        "caliper",
+        default=False,
+        description="Instrument softmax, nbody, or wmma with Caliper",
     )
     variant(
         "cuda_arch",
@@ -58,14 +64,14 @@ class Hecbench(CMakePackage, CudaPackage, ROCmPackage):
         msg="Select exactly one programming model: +cuda or +rocm",
     )
     conflicts(
-        "benchmark=softmax",
-        when="+cuda",
-        msg="The Softmax benchmark is currently supported only with +rocm",
-    )
-    conflicts(
         "cuda_arch=none",
         when="+cuda",
         msg="CUDA builds require exactly one cuda_arch, e.g. cuda_arch=80",
+    )
+    conflicts(
+        "+caliper",
+        when="benchmark=babelstream",
+        msg="Caliper instrumentation is supported for softmax, nbody, and wmma",
     )
 
     depends_on("c", type="build")
@@ -75,6 +81,22 @@ class Hecbench(CMakePackage, CudaPackage, ROCmPackage):
     # Minimum toolkit versions documented for the pinned HeCBench revision.
     depends_on("hip@7.0:+rocm", when="+rocm")
     depends_on("cuda@12.2:", when="+cuda")
+
+    for arch in ROCmPackage.amdgpu_targets:
+        depends_on(
+            "rocwmma amdgpu_target={0}".format(arch),
+            when="benchmark=wmma +rocm amdgpu_target={0}".format(arch),
+        )
+        depends_on(
+            "caliper+rocm amdgpu_target={0}".format(arch),
+            when="+caliper +rocm amdgpu_target={0}".format(arch),
+        )
+
+    for arch in CudaPackage.cuda_arch_values:
+        depends_on(
+            "caliper+cuda cuda_arch={0}".format(arch),
+            when="+caliper +cuda cuda_arch={0}".format(arch),
+        )
 
     def selected_benchmark(self):
         return self.spec.variants["benchmark"].value
@@ -97,6 +119,7 @@ class Hecbench(CMakePackage, CudaPackage, ROCmPackage):
             self.define("HECBENCH_ENABLE_OPENMP", False),
             self.define("HECBENCH_ENABLE_SYCL", False),
             self.define("HECBENCH_ENABLE_TESTING", False),
+            self.define_from_variant("HECBENCH_ENABLE_CALIPER", "caliper"),
             self.define("HECBENCH_BUILD_ALL_BENCHMARKS", False),
             self.define("HECBENCH_BENCHMARK", self.selected_benchmark()),
         ]
@@ -111,9 +134,19 @@ class Hecbench(CMakePackage, CudaPackage, ROCmPackage):
                         "CMAKE_HIP_COMPILER",
                         join_path(spec["llvm-amdgpu"].prefix.bin, "amdclang++"),
                     ),
-                    self.define("HIP_COMPILER", join_path(spec["hip"].prefix.bin, "hipcc")),
+                    self.define(
+                        "HIP_COMPILER", join_path(spec["hip"].prefix.bin, "hipcc")
+                    ),
                 ]
             )
+            if self.selected_benchmark() == "wmma":
+                # The real HIP compiler bypasses Spack's compiler-wrapper includes.
+                args.append(
+                    self.define(
+                        "CMAKE_HIP_FLAGS",
+                        "-I{0}".format(spec["rocwmma"].prefix.include),
+                    )
+                )
 
         if "+cuda" in spec:
             cuda_arch = spec.variants["cuda_arch"].value
@@ -121,7 +154,10 @@ class Hecbench(CMakePackage, CudaPackage, ROCmPackage):
                 [
                     self.define("HECBENCH_CUDA_ARCH", cuda_arch),
                     self.define("CMAKE_CUDA_ARCHITECTURES", cuda_arch),
-                    self.define("CMAKE_CUDA_COMPILER", join_path(spec["cuda"].prefix.bin, "nvcc")),
+                    self.define(
+                        "CMAKE_CUDA_COMPILER",
+                        join_path(spec["cuda"].prefix.bin, "nvcc"),
+                    ),
                     self.define("CUDAToolkit_ROOT", spec["cuda"].prefix),
                 ]
             )
@@ -137,7 +173,9 @@ class Hecbench(CMakePackage, CudaPackage, ROCmPackage):
         benchmark = self.selected_benchmark()
         built_binary = join_path(self.build_directory, "bin", model, benchmark)
         if not os.path.isfile(built_binary):
-            raise InstallError("Expected HeCBench binary was not found: {0}".format(built_binary))
+            raise InstallError(
+                "Expected HeCBench binary was not found: {0}".format(built_binary)
+            )
 
         mkdirp(prefix.bin)
         install(built_binary, join_path(prefix.bin, self.selected_target()))
@@ -166,6 +204,30 @@ class Hecbench(CMakePackage, CudaPackage, ROCmPackage):
             if results != ["PASS"]:
                 raise RuntimeError(
                     "Expected Softmax validation results ['PASS'], got {0}".format(
+                        results
+                    )
+                )
+            return
+
+        if benchmark == "nbody":
+            output = executable("256", "3", output=str, error=str)
+            results = re.findall(r"^(PASS|FAIL)$", output, re.MULTILINE)
+            if results != ["PASS"]:
+                raise RuntimeError(
+                    "Expected N-body validation results ['PASS'], got {0}".format(
+                        results
+                    )
+                )
+            return
+
+        if benchmark == "wmma":
+            output = executable("0", "16", "16", "64", "1", "1", output=str, error=str)
+            results = re.findall(
+                r"^(PASSED|FAILED|Unsupported size!)$", output, re.MULTILINE
+            )
+            if results != ["PASSED"]:
+                raise RuntimeError(
+                    "Expected WMMA validation results ['PASSED'], got {0}".format(
                         results
                     )
                 )

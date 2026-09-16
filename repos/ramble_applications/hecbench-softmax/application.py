@@ -1,0 +1,79 @@
+# Copyright 2026 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+from ramble.appkit import *
+
+
+_FINITE = r"[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?"
+_AVERAGE_TIME = (
+    rf"^Average kernel execution time:\s+"
+    rf"(?P<average_time>{_FINITE})\s+\(ms\)\s*$"
+)
+
+
+class HecbenchSoftmax(ExecutableApplication):
+    """Softmax benchmark from HeCBench."""
+
+    name = "hecbench-softmax"
+
+    maintainers("chung38")
+    tags("synthetic", "micro-benchmark", "gpu")
+
+    with when("package_manager_family=spack"):
+        software_spec("hecbench-softmax", pkg_spec="hecbench")
+
+    required_package("hecbench")
+
+    executable(
+        "softmax",
+        "softmax-{model} {num_slices} {slice_size} {implementation} "
+        "{internal_repetitions}",
+        use_mpi=False,
+    )
+    workload("softmax", executables=["softmax"])
+
+    workload_variable(
+        "model",
+        default="hip",
+        values=["hip", "cuda"],
+        description="HeCBench programming-model suffix",
+        workloads=["softmax"],
+    )
+    workload_variable(
+        "num_slices",
+        default="8",
+        description="Number of independent Softmax slices",
+        workloads=["softmax"],
+    )
+    workload_variable(
+        "slice_size",
+        default="128",
+        description="Elements in each Softmax slice",
+        workloads=["softmax"],
+    )
+    workload_variable(
+        "implementation",
+        default="1",
+        values=["0", "1"],
+        description="Softmax implementation selector",
+        workloads=["softmax"],
+    )
+    workload_variable(
+        "internal_repetitions",
+        default="2",
+        description="Repetitions measured by Softmax's native timer",
+        workloads=["softmax"],
+    )
+
+    log_file = "{experiment_run_dir}/{experiment_name}.out"
+
+    figure_of_merit(
+        "Average kernel time",
+        log_file=log_file,
+        fom_regex=_AVERAGE_TIME,
+        group_name="average_time",
+        units="ms",
+        fom_type=FomType.TIME,
+    )
