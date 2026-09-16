@@ -92,7 +92,7 @@ stages:
   - test
   - release-resources
   - summarize
-  - deploy-performance
+  - publish-performance
   - cleanup-dir
 bootstrap_benchpark:
   tags: [shell, oslic]
@@ -116,7 +116,7 @@ generate_test_summary:
     - when: always
 deploy_nightly_performance_metadata:
   tags: [shell, oslic]
-  stage: deploy-performance
+  stage: publish-performance
   needs:
     - job: generate_test_summary
       artifacts: true
