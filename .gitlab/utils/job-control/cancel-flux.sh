@@ -26,5 +26,5 @@ if [[ -n "${URI}" ]]; then
 fi
 
 if ! $NO_CLEAN; then
-    bash .gitlab/utils/cancel-cleanup.sh "$CUSTOM_CI_BUILDS_DIR"
+    bash .gitlab/utils/job-control/cancel-cleanup.sh "$CUSTOM_CI_BUILDS_DIR"
 fi

@@ -144,5 +144,5 @@ echo -e "===============[TESTS]==============="
 echo "[Baseline]: ${baseline_status}, githash ${baseline_githash_status}"
 echo "[${checkout_label}]: ${run_status}, githash ${githash_status}"
 echo -e "====================================="
-bash .gitlab/utils/compare-githash-metadata.sh \
+bash .gitlab/utils/githash-metadata/compare-githash-metadata.sh \
     "${baseline_json}" "${githash_json}" "${changes_json}"

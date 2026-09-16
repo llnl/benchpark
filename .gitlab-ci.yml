@@ -107,8 +107,8 @@ generate_test_summary:
   script:
     - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
     - ./bin/benchpark configure --bootstrap-location $CUSTOM_CI_BUILDS_DIR
-    - bash .gitlab/utils/aggregate-test-metadata.sh
-    - python .gitlab/utils/generate_test_status_table.py artifact-test-summary/test_metadata_summary.json
+    - bash .gitlab/utils/performance/aggregate-test-metadata.sh
+    - python .gitlab/utils/performance/generate_test_status_table.py artifact-test-summary/test_metadata_summary.json
   artifacts:
     when: always
     paths: [artifact-test-summary/]
@@ -120,7 +120,7 @@ deploy_nightly_performance_metadata:
   needs:
     - job: generate_test_summary
       artifacts: true
-  script: [bash .gitlab/utils/push-to-perf-repo.sh]
+  script: [bash .gitlab/utils/performance/push-to-perf-repo.sh]
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: always

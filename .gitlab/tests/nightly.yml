@@ -176,19 +176,19 @@ nightly_test_run:
   script:
     - |
       nightly_rc=0
-      ./.gitlab/utils/run-experiment.sh || nightly_rc=$?
+      ./.gitlab/utils/job-control/run-experiment.sh || nightly_rc=$?
       echo "[Nightly Status]: Nightly checkout exit code = ${nightly_rc}"
       printf '%s\n' "${nightly_rc}" > "$CI_PROJECT_DIR/nightly_run.status"
       exit "${nightly_rc}"
   after_script:
     - !reference [.report_status, after_script]
     - |-
-      bash .gitlab/utils/collect-cali-artifact.sh
+      bash .gitlab/utils/performance/collect-cali-artifact.sh
     - |-
-      bash .gitlab/utils/collect-githash-artifact.sh \
+      bash .gitlab/utils/githash-metadata/collect-githash-artifact.sh \
         Nightly \
         "$CI_PROJECT_DIR/nightly_run.status"
     - |-
-      bash .gitlab/utils/write-test-metadata.sh \
+      bash .gitlab/utils/performance/write-test-metadata.sh \
         Nightly \
         "$CI_PROJECT_DIR/nightly_run.status"
