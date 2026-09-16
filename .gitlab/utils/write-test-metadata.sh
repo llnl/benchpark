@@ -58,7 +58,7 @@ fi
 printf '[]\n' > "${changed_files_json}"
 diff_base="origin/${BASELINE_REF:-develop}"
 if git rev-parse --verify --quiet "${diff_base}^{commit}" >/dev/null; then
-    git diff --name-only "${diff_base}" HEAD 2>/dev/null \
+    git diff --name-only "${diff_base}...HEAD" 2>/dev/null \
         | jq -R -s 'split("\n") | map(select(length > 0))' \
         > "${changed_files_json}" \
         || printf '[]\n' > "${changed_files_json}"
