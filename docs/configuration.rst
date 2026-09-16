@@ -45,6 +45,27 @@ The order in which repositories appear in ``<benchpark_root>/config/repos.yaml``
 determine their precedence, so if you desire to use a custom repository, it should be
 listed before any other repositories.
 
+Repositories can also group related definitions below the standard source directories.
+For example, the HeCBench experiment repository has the following structure::
+
+    experiments/
+      hecbench/
+        repo.yaml
+        softmax/
+          experiment.py
+
+The nested ``repo.yaml`` assigns the repository namespace ``hecbench``, and
+``config/repos.yaml`` registers ``../experiments/hecbench`` as an experiment
+repository. Select an experiment from that repository with a dot-qualified spec::
+
+    benchpark experiment init rocm721 hecbench.softmax +rocm
+
+An unqualified name such as ``softmax`` also resolves when that name is unique
+across the configured experiment repositories.
+
+The same structure applies to nested Ramble application repositories. Register each
+nested application repository in the ``applications`` list in ``config/repos.yaml``.
+
 **********************************************************************
  Automatically Generating Configurations with ``benchpark configure``
 **********************************************************************

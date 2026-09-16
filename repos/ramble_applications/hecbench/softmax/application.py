@@ -13,16 +13,16 @@ _AVERAGE_TIME = (
 )
 
 
-class HecbenchSoftmax(ExecutableApplication):
+class Softmax(ExecutableApplication):
     """Softmax benchmark from HeCBench."""
 
-    name = "hecbench-softmax"
+    name = "softmax"
 
     maintainers("chung38")
     tags("synthetic", "micro-benchmark", "gpu")
 
     with when("package_manager_family=spack"):
-        software_spec("hecbench-softmax", pkg_spec="hecbench")
+        software_spec("softmax", pkg_spec="hecbench")
 
     required_package("hecbench")
 

@@ -14,16 +14,16 @@ _AVERAGE_PERFORMANCE = (
 )
 
 
-class HecbenchNbody(ExecutableApplication):
+class Nbody(ExecutableApplication):
     """N-body benchmark from HeCBench."""
 
-    name = "hecbench-nbody"
+    name = "nbody"
 
     maintainers("chung38")
     tags("synthetic", "micro-benchmark", "gpu")
 
     with when("package_manager_family=spack"):
-        software_spec("hecbench-nbody", pkg_spec="hecbench")
+        software_spec("nbody", pkg_spec="hecbench")
 
     required_package("hecbench")
 
