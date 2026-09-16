@@ -15,16 +15,16 @@ _RESULT = (
 )
 
 
-class HecbenchWmma(ExecutableApplication):
+class Wmma(ExecutableApplication):
     """WMMA benchmark from HeCBench."""
 
-    name = "hecbench-wmma"
+    name = "wmma"
 
     maintainers("chung38")
     tags("synthetic", "micro-benchmark", "gpu")
 
     with when("package_manager_family=spack"):
-        software_spec("hecbench-wmma", pkg_spec="hecbench")
+        software_spec("wmma", pkg_spec="hecbench")
 
     required_package("hecbench")
 
