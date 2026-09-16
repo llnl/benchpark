@@ -88,10 +88,19 @@ fetch_job_artifact() {
     local artifact_output_path=$2
 
     artifact_archive=$(mktemp)
-    curl --location --silent --show-error --fail \
+    rm -f "${artifact_output_path}"
+    if ! curl --location --silent --show-error --fail \
         --header "${auth_header}" \
         "${api_url}/projects/${project_id}/jobs/${artifact_job_id}/artifacts" \
-        --output "${artifact_archive}"
+        --output "${artifact_archive}"; then
+        rm -f "${artifact_archive}"
+        if [[ "${optional}" == true ]]; then
+            echo "Unable to download optional artifact ${artifact_path}; skipping."
+            return 0
+        fi
+        echo "Unable to download artifacts for job ${artifact_job_id}." >&2
+        return 1
+    fi
 
     mkdir -p "$(dirname "${artifact_output_path}")"
     if ! unzip -p "${artifact_archive}" "${artifact_path}" > "${artifact_output_path}" 2>/dev/null; then
@@ -124,7 +133,9 @@ if [[ -n "${pipeline_stage}" ]]; then
         while IFS=$'\t' read -r stage_job_id stage_job_name; do
             [[ -z "${stage_job_id}" || -z "${stage_job_name}" ]] && continue
             fetch_job_artifact "${stage_job_id}" "${output_path}/${stage_job_id}.json"
-            echo "Fetched ${artifact_path} from job ${stage_job_id} (${stage_job_name}) to ${output_path}/${stage_job_id}.json"
+            if [[ -f "${output_path}/${stage_job_id}.json" ]]; then
+                echo "Fetched ${artifact_path} from job ${stage_job_id} (${stage_job_name}) to ${output_path}/${stage_job_id}.json"
+            fi
         done < <(
             printf '%s' "${jobs_json}" \
             | jq -r --arg stage "${pipeline_stage}" '
@@ -214,4 +225,6 @@ fi
 
 fetch_job_artifact "${job_id}" "${output_path}"
 
-echo "Fetched ${artifact_path} from job ${job_id} (status=${job_status}) to ${output_path}"
+if [[ -f "${output_path}" ]]; then
+    echo "Fetched ${artifact_path} from job ${job_id} (status=${job_status}) to ${output_path}"
+fi
