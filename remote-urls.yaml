@@ -3,6 +3,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 urls:
-  ramble: https://github.com/GoogleCloudPlatform/ramble.git
+  ramble: https://github.com/Ramble-Project/ramble.git
   spack: https://github.com/spack/spack.git
   spack-packages: https://github.com/spack/spack-packages.git
