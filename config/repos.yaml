@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 repos:
-  experiments: [../experiments, ../experiments/test]
+  experiments: [../experiments, ../experiments/hecbench, ../experiments/test]
   systems: [../systems]
-  applications: [../repos/ramble_applications]
+  applications: [../repos/ramble_applications, ../repos/ramble_applications/hecbench]
   packages: [../repos/spack_repo/benchpark]
