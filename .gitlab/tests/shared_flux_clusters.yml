@@ -17,7 +17,7 @@ workflow:
   after_script:
     - |
       if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
-        . .gitlab/utils/cancel-flux.sh
+        . .gitlab/utils/job-control/cancel-flux.sh
       fi
 allocate_resources_tuolumne:
   extends: .allocate_resources_flux
@@ -44,7 +44,7 @@ allocate_resources_tioga:
   stage: release-resources
   when: always
   # Do not cleanup dir yet
-  script: [. .gitlab/utils/cancel-flux.sh --no-clean]
+  script: [. .gitlab/utils/job-control/cancel-flux.sh --no-clean]
 release_resources_flux_tuolumne:
   extends: .release_resources_flux
   rules: !reference [.resource_rules_tuolumne, rules]
@@ -77,7 +77,10 @@ release_resources_flux_tioga:
     BASELINE_REF: develop
   artifacts:
     when: always
-    paths: [artifact-githash/githash_metadata.json, artifact-cali/]
+    paths:
+      - artifact-githash/githash_metadata.json
+      - artifact-cali/
+      - artifact-test-metadata/test_metadata.json
   before_script:
     - !reference [.report_status, before_script]
   script:
@@ -87,7 +90,7 @@ release_resources_flux_tioga:
       PROXY="$( [[ -n "${ALLOC_ID}" ]] && echo "flux proxy ${ALLOC_ID}" || echo "" )"
     - |
       pr_rc=0
-      ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${FLUX_ARGS} .gitlab/utils/run-experiment.sh ) || pr_rc=$?
+      ${PROXY} flux watch $( ${PROXY} flux batch -o output.stdout.type=kvs ${FLUX_ARGS} .gitlab/utils/job-control/run-experiment.sh ) || pr_rc=$?
       echo "[PR Status]: PR checkout exit code = ${pr_rc}"
       printf '%s\n' "${pr_rc}" > "$CI_PROJECT_DIR/pr_flux.status"
       exit "${pr_rc}"
@@ -95,12 +98,14 @@ release_resources_flux_tioga:
     - !reference [.report_status, after_script]
     - |
       if [[ "$CI_JOB_STATUS" == "canceled" ]]; then
-        . .gitlab/utils/cancel-flux.sh
+        . .gitlab/utils/job-control/cancel-flux.sh
       fi
     - |
-      bash .gitlab/utils/collect-cali-artifact.sh
+      bash .gitlab/utils/performance/collect-cali-artifact.sh
     - |
-      bash .gitlab/utils/collect-githash-artifact.sh PR "$CI_PROJECT_DIR/pr_flux.status"
+      bash .gitlab/utils/githash-metadata/collect-githash-artifact.sh PR "$CI_PROJECT_DIR/pr_flux.status"
+    - |
+      bash .gitlab/utils/performance/write-test-metadata.sh PR "$CI_PROJECT_DIR/pr_flux.status"
 run_tests_flux_tuolumne:
   extends: .run_tests_flux
   tags: [shell, tuolumne]

@@ -15,6 +15,7 @@ githash_json=""
 artifact_githash_json="${artifact_dir}/githash_metadata.json"
 baseline_json="${artifact_dir}/baseline_githash_metadata.json"
 baseline_status_file="${artifact_dir}/baseline_job.status"
+changes_json="${artifact_dir}/githash_changes.json"
 githash_status="NOT_FOUND"
 baseline_githash_status="NOT_FOUND"
 
@@ -143,8 +144,7 @@ echo -e "===============[TESTS]==============="
 echo "[Baseline]: ${baseline_status}, githash ${baseline_githash_status}"
 echo "[${checkout_label}]: ${run_status}, githash ${githash_status}"
 echo -e "====================================="
-if [[ "${baseline_githash_status}" == "FOUND" && "${githash_status}" == "FOUND" ]]; then
-    bash .gitlab/utils/compare-githash-metadata.sh "${baseline_json}" "${githash_json}"
-else
-    exit 1
+if [[ -f "${baseline_json}" && -f "${githash_json}" ]]; then
+    bash .gitlab/utils/githash-metadata/compare-githash-metadata.sh \
+        "${baseline_json}" "${githash_json}" "${changes_json}"
 fi
