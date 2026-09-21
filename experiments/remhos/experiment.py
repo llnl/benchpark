@@ -162,5 +162,5 @@ class Remhos(
         if self.spec.satisfies("+raja"):
             raja = "+raja"
         self.add_package_spec(
-            self.name, [f"remhos{self.determine_version()} +metis {gam} {raja}"]
+            self.name, [f"remhos{self.determine_version()} ~metis {gam} {raja}"]
         )

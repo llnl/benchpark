@@ -13,15 +13,22 @@ from spack_repo.builtin.packages.mfem.package import Mfem as BuiltinMfem
 
 class Mfem(BuiltinMfem):
 
+    version(
+        "4.10",
+        tag="v4.10",
+        commit="d964264cdb9a13e94a201b6c236c7721e0c8765f",
+        submodules=False,
+    )
+
     variant("caliper", default=False, description="Build Caliper support")
 
     depends_on("camp", when="+umpire")
-    depends_on("camp@2026.07.1", when="@develop +umpire")
-    depends_on("umpire@2026.07.1", when="@develop +umpire")
+    depends_on("camp@2026.07.1", when="@4.10: +umpire")
+    depends_on("umpire@2026.07.1", when="@4.10: +umpire")
 
     depends_on("camp", when="+raja")
-    depends_on("camp@2026.07.1", when="@develop +raja")
-    depends_on("raja@2026.07.0 ~examples~exercises cxxstd=20", when="@develop +raja")
+    depends_on("camp@2026.07.1", when="@4.10: +raja")
+    depends_on("raja@2026.07.0 ~examples~exercises cxxstd=20", when="@4.10: +raja")
 
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")

@@ -44,7 +44,7 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
     depends_on("adiak~shared", when="+caliper")
 
     depends_on("zlib+optimize+pic~shared")
-    depends_on("mfem@develop", when="@develop")
+    depends_on("mfem@4.10", when="@develop")
     depends_on("mfem@4.1.0:", when="@1.0")
     depends_on("mfem+caliper", when="+caliper")
     depends_on("mfem cxxstd=20", when="@develop")

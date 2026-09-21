@@ -11,6 +11,7 @@
         paths: &run_test_change_paths
           - .gitlab-ci.yml
           - .gitlab/**/*
+          - checkout-versions.yaml
           - bin/**/*
           - '**/$BENCHMARK/**/*'
           - systems/$ARCHCONFIG/**/*
@@ -34,6 +35,7 @@
         paths: &resource_dane_change_paths
           - .gitlab-ci.yml
           - .gitlab/**/*
+          - checkout-versions.yaml
           - bin/**/*
           - '**/amg2023/**/*'
           - '**/branson/**/*'
@@ -67,6 +69,7 @@
         paths: &resource_matrix_change_paths
           - .gitlab-ci.yml
           - .gitlab/**/*
+          - checkout-versions.yaml
           - bin/**/*
           - '**/amg2023/**/*'
           - '**/babelstream/**/*'
@@ -97,6 +100,7 @@
         paths: &resource_tioga_change_paths
           - .gitlab-ci.yml
           - .gitlab/**/*
+          - checkout-versions.yaml
           - bin/**/*
           - '**/amg2023/**/*'
           - '**/kripke/**/*'
@@ -123,6 +127,7 @@
         paths: &resource_tuolumne_change_paths
           - .gitlab-ci.yml
           - .gitlab/**/*
+          - checkout-versions.yaml
           - bin/**/*
           - '**/amg2023/**/*'
           - '**/branson/**/*'

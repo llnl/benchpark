@@ -44,7 +44,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     depends_on("adiak~shared", when="+caliper")
 
     depends_on("zlib+optimize+pic~shared")
-    depends_on("mfem@develop", when="@develop")
+    depends_on("mfem@4.10", when="@develop")
     depends_on("mfem@4.2.0:", when="@3.1")
     depends_on("mfem@4.1.0:4.1", when="@3.0")
     # Recommended mfem version for laghos v2.0 is: ^mfem@3.4.1-laghos-v2.0
