@@ -36,7 +36,7 @@ class Branson(
 
     variant(
         "n_groups",
-        default="30",
+        default=30,
         values=int,
         description="Number of groups",
     )
