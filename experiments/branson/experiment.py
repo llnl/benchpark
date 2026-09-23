@@ -69,54 +69,57 @@ class Branson(
         else:
             if self.spec.satisfies("+throughput"):
                 photons = [
-                    400000,
-                    800000,
-                    1200000,
-                    1600000,
-                    2000000,
-                    2400000,
-                    2800000,
-                    3200000,
-                    3600000,
-                    4000000,
-                    8000000,
-                    12000000,
-                    16000000,
+                    10000000,
                     20000000,
-                    26400000,
                     40000000,
-                    53200000,
                     80000000,
                     100000000,
+                    160000000,
                     200000000,
+                    320000000,
                     400000000,
+                    640000000,
                     800000000,
+                    1000000000,
+                    1280000000,
+                    2000000000,
+                    2560000000,
+                    4000000000,
+                    5120000000,
                 ]
-                pool_size = 64
+                pool_size = 100
             else:
-                photons = 100000000
-                pool_size = 20
+                # photons = 100000000
+                # pool_size = 20
+                photons = 200000000
+                pool_size = 32
             self.add_experiment_variable("num_particles", photons, True)
-        self.add_experiment_variable("resource_count", 4, False)
+        if self.spec.satisfies("+openmp"):
+            self.add_experiment_variable("n_nodes", 1, False)
+            resource_count = "n_nodes"
+            self.add_experiment_variable("resource_count", "{sys_cores_per_node} * {n_nodes}", False)
+        else:
+            self.add_experiment_variable("resource_count", 4, False)
+            resource_count = "resource_count"
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_experiment_variable("pool", pool_size, False)
-        self.add_experiment_variable("input_file", "3D_lb_hohlraum.xml", False)
-        self.add_experiment_variable("particle_message_size", "400000", False)
+        self.add_experiment_variable("input_file", "3D_hohlraum_single_node.xml", False)
+        self.add_experiment_variable("particle_message_size", "1600000", False)
 
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    resource_count: lambda var, itr, dim, scaling_factor: var.val(dim)
                     * scaling_factor,
                 },
                 ScalingMode.Weak: {
-                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    resource_count: lambda var, itr, dim, scaling_factor: var.val(dim)
                     * scaling_factor,
                     "num_particles": lambda var, itr, dim, scaling_factor: var.val(dim)
                     * scaling_factor,
                 },
                 ScalingMode.Throughput: {
-                    "resource_count": None,
+                    resource_count: None,
                     "num_particles": None,
                 },
             }
@@ -139,6 +142,7 @@ class Branson(
 
         if self.spec.satisfies("+openmp"):
             self.add_experiment_variable("n_threads_per_proc", 1, True)
+            self.set_environment_variable("FI_CXI_RX_MATCH_MODE", "hybrid")
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             self.add_experiment_variable("use_gpu", "TRUE")
             self.add_experiment_variable("n_gpus", "{n_resources}", True)
