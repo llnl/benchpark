@@ -22,9 +22,10 @@ class Hecbench(CMakePackage, CudaPackage, ROCmPackage):
     license("BSD-3-Clause")
 
     version("2026-08-13", commit="f9540404573a2be7ad1d1ee4b3106fd064825fa8")
-    patch("select-benchmark.patch")
-    patch("find-hipcc.patch")
-    patch("caliper-instrumentation.patch")
+    patch("select-benchmark.patch", when="~mpi")
+    patch("find-hipcc.patch", when="~mpi")
+    patch("caliper-instrumentation.patch", when="+caliper")
+    patch("mpi-replicas.patch", when="+mpi")
 
     variant(
         "benchmark",
@@ -37,6 +38,11 @@ class Hecbench(CMakePackage, CudaPackage, ROCmPackage):
         "caliper",
         default=False,
         description="Instrument softmax, nbody, or wmma with Caliper",
+    )
+    variant(
+        "mpi",
+        default=False,
+        description="Run each MPI rank as an independent benchmark replica",
     )
     variant(
         "cuda_arch",
@@ -73,10 +79,21 @@ class Hecbench(CMakePackage, CudaPackage, ROCmPackage):
         when="benchmark=babelstream",
         msg="Caliper instrumentation is supported for softmax, nbody, and wmma",
     )
+    conflicts(
+        "+mpi",
+        when="benchmark=babelstream",
+        msg="MPI replicas are supported for softmax, nbody, and wmma",
+    )
+    conflicts(
+        "+caliper",
+        when="+mpi",
+        msg="Caliper support is paused and has not been validated with MPI replicas",
+    )
 
     depends_on("c", type="build")
     depends_on("cxx", type="build")
     depends_on("cmake@3.21:", type="build")
+    depends_on("mpi", when="+mpi")
 
     # Minimum toolkit versions documented for the pinned HeCBench revision.
     depends_on("hip@7.0:+rocm", when="+rocm")
@@ -120,6 +137,7 @@ class Hecbench(CMakePackage, CudaPackage, ROCmPackage):
             self.define("HECBENCH_ENABLE_SYCL", False),
             self.define("HECBENCH_ENABLE_TESTING", False),
             self.define_from_variant("HECBENCH_ENABLE_CALIPER", "caliper"),
+            self.define_from_variant("HECBENCH_ENABLE_MPI_REPLICAS", "mpi"),
             self.define("HECBENCH_BUILD_ALL_BENCHMARKS", False),
             self.define("HECBENCH_BENCHMARK", self.selected_benchmark()),
         ]
@@ -200,6 +218,19 @@ class Hecbench(CMakePackage, CudaPackage, ROCmPackage):
 
         if benchmark == "softmax":
             output = executable("8", "128", "1", "2", output=str, error=str)
+            if "+mpi" in self.spec:
+                results = re.findall(
+                    r"^OVERALL (PASS|FAIL) \([0-9]+/[0-9]+ replica ranks\)$",
+                    output,
+                    re.MULTILINE,
+                )
+                if results != ["PASS"]:
+                    raise RuntimeError(
+                        "Expected Softmax MPI result ['PASS'], got {0}".format(
+                            results
+                        )
+                    )
+                return
             results = re.findall(r"^(PASS|FAIL)$", output, re.MULTILINE)
             if results != ["PASS"]:
                 raise RuntimeError(
@@ -211,6 +242,19 @@ class Hecbench(CMakePackage, CudaPackage, ROCmPackage):
 
         if benchmark == "nbody":
             output = executable("256", "3", output=str, error=str)
+            if "+mpi" in self.spec:
+                results = re.findall(
+                    r"^OVERALL (PASS|FAIL) \([0-9]+/[0-9]+ replica ranks\)$",
+                    output,
+                    re.MULTILINE,
+                )
+                if results != ["PASS"]:
+                    raise RuntimeError(
+                        "Expected N-body MPI result ['PASS'], got {0}".format(
+                            results
+                        )
+                    )
+                return
             results = re.findall(r"^(PASS|FAIL)$", output, re.MULTILINE)
             if results != ["PASS"]:
                 raise RuntimeError(
@@ -222,6 +266,20 @@ class Hecbench(CMakePackage, CudaPackage, ROCmPackage):
 
         if benchmark == "wmma":
             output = executable("0", "16", "16", "64", "1", "1", output=str, error=str)
+            if "+mpi" in self.spec:
+                results = re.findall(
+                    r"^OVERALL (PASSED|FAILED)"
+                    r"(?: \([0-9]+/[0-9]+ replica ranks\))?$",
+                    output,
+                    re.MULTILINE,
+                )
+                if results != ["PASSED"]:
+                    raise RuntimeError(
+                        "Expected WMMA MPI result ['PASSED'], got {0}".format(
+                            results
+                        )
+                    )
+                return
             results = re.findall(
                 r"^(PASSED|FAILED|Unsupported size!)$", output, re.MULTILINE
             )

@@ -10,7 +10,11 @@ from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
 
 class Softmax(
     Experiment,
-    ProgrammingModel(ProgrammingModelType.Cuda, ProgrammingModelType.Rocm),
+    ProgrammingModel(
+        ProgrammingModelType.Mpionly,
+        ProgrammingModelType.Cuda,
+        ProgrammingModelType.Rocm,
+    ),
 ):
     variant(
         "workload",
@@ -29,6 +33,18 @@ class Softmax(
         default="1",
         values=("0", "1"),
         description="Softmax implementation selector",
+    )
+    variant(
+        "replicas",
+        default="1",
+        values=int,
+        description="Independent MPI replica ranks",
+    )
+    variant(
+        "nodes",
+        default="1",
+        values=int,
+        description="Nodes assigned to the replica ranks",
     )
 
     maintainers("chung38")
@@ -53,13 +69,15 @@ class Softmax(
         self.add_experiment_variable(
             "internal_repetitions", internal_repetitions, True
         )
-        self.add_experiment_variable("n_nodes", 1, False)
-        self.add_experiment_variable("n_ranks", 1, False)
-        self.add_experiment_variable("n_gpus", 1, False)
+        replicas = self.spec.variants["replicas"][0]
+        nodes = self.spec.variants["nodes"][0]
+        self.add_experiment_variable("n_nodes", nodes, True)
+        self.add_experiment_variable("n_ranks", replicas, True)
+        self.add_experiment_variable("n_gpus", replicas, True)
         self.set_required_variables(
-            n_resources="1",
+            n_resources="{n_ranks}",
             process_problem_size="{num_slices}*{slice_size}",
-            total_problem_size="{num_slices}*{slice_size}",
+            total_problem_size="{num_slices}*{slice_size}*{n_ranks}",
         )
 
     def compute_package_section(self):
@@ -67,6 +85,6 @@ class Softmax(
             self.name,
             [
                 f"hecbench{self.determine_version()} "
-                "benchmark=softmax ~caliper "
+                "benchmark=softmax +mpi ~caliper "
             ],
         )

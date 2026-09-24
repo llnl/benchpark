@@ -7,11 +7,13 @@ from ramble.appkit import *
 
 
 _FINITE = r"[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?"
-_TOTAL_TIME = rf"^# Total Time \(s\)\s*:\s*(?P<total_time>{_FINITE})\s*$"
+_RANK_PREFIX = r"^\[rank (?P<rank>[0-9]+)\]\s+"
+_TOTAL_TIME = rf"{_RANK_PREFIX}# Total Time \(s\)\s*:\s*(?P<total_time>{_FINITE})\s*$"
 _AVERAGE_PERFORMANCE = (
-    rf"^# Average Performance\s*:\s*(?P<average_gflops>{_FINITE})"
+    rf"{_RANK_PREFIX}# Average Performance\s*:\s*(?P<average_gflops>{_FINITE})"
     rf"\s+\+-\s+{_FINITE}\s*$"
 )
+_RANK_CONTEXT = r"^\[rank (?P<rank>[0-9]+)\]"
 
 
 class Nbody(ExecutableApplication):
@@ -29,8 +31,8 @@ class Nbody(ExecutableApplication):
 
     executable(
         "nbody",
-        "nbody-{model} {particle_count} {integration_steps}",
-        use_mpi=False,
+        "{hecbench_path}/bin/nbody-{model} {particle_count} {integration_steps}",
+        use_mpi=True,
     )
     workload("nbody", executables=["nbody"])
 
@@ -56,12 +58,17 @@ class Nbody(ExecutableApplication):
 
     log_file = "{experiment_run_dir}/{experiment_name}.out"
 
+    figure_of_merit_context(
+        "replica_rank", regex=_RANK_CONTEXT, output_format="rank {rank}"
+    )
+
     figure_of_merit(
         "Average performance",
         log_file=log_file,
         fom_regex=_AVERAGE_PERFORMANCE,
         group_name="average_gflops",
         units="GFLOP/s",
+        contexts=["replica_rank"],
         fom_type=FomType.THROUGHPUT,
     )
     figure_of_merit(
@@ -70,5 +77,19 @@ class Nbody(ExecutableApplication):
         fom_regex=_TOTAL_TIME,
         group_name="total_time",
         units="s",
+        contexts=["replica_rank"],
         fom_type=FomType.TIME,
+    )
+
+    success_criteria(
+        "all_replicas_passed",
+        mode="string",
+        match=r"^OVERALL PASS \(([0-9]+)/\1 replica ranks\)$",
+        file=log_file,
+    )
+    success_criteria(
+        "no_replica_failed",
+        mode="string",
+        anti_match=r"^(?:\[rank [0-9]+\] )?FAIL$|^OVERALL FAIL",
+        file=log_file,
     )

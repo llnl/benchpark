@@ -9,10 +9,11 @@ from ramble.appkit import *
 _FINITE = r"[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?"
 _RESULT_PREFIX = (_FINITE + r"\s*,\s*") * 12
 _RESULT = (
-    rf"^\s*{_RESULT_PREFIX}"
+    rf"^\[rank (?P<rank>[0-9]+)\]\s+{_RESULT_PREFIX}"
     rf"(?P<elapsed_time>{_FINITE})\s*,\s*{_FINITE}\s*,\s*"
     rf"(?P<tflops>{_FINITE})\s*$"
 )
+_RANK_CONTEXT = r"^\[rank (?P<rank>[0-9]+)\]"
 
 
 class Wmma(ExecutableApplication):
@@ -30,9 +31,9 @@ class Wmma(ExecutableApplication):
 
     executable(
         "wmma",
-        "wmma-{model} {implementation} {matrix_m} {matrix_n} {matrix_k} "
-        "{internal_repetitions} {verify}",
-        use_mpi=False,
+        "{hecbench_path}/bin/wmma-{model} {implementation} {matrix_m} "
+        "{matrix_n} {matrix_k} {internal_repetitions} {verify}",
+        use_mpi=True,
     )
     workload("wmma", executables=["wmma"])
 
@@ -84,12 +85,17 @@ class Wmma(ExecutableApplication):
 
     log_file = "{experiment_run_dir}/{experiment_name}.out"
 
+    figure_of_merit_context(
+        "replica_rank", regex=_RANK_CONTEXT, output_format="rank {rank}"
+    )
+
     figure_of_merit(
         "Throughput",
         log_file=log_file,
         fom_regex=_RESULT,
         group_name="tflops",
         units="TFLOP/s",
+        contexts=["replica_rank"],
         fom_type=FomType.THROUGHPUT,
     )
     figure_of_merit(
@@ -98,5 +104,22 @@ class Wmma(ExecutableApplication):
         fom_regex=_RESULT,
         group_name="elapsed_time",
         units="ms",
+        contexts=["replica_rank"],
         fom_type=FomType.TIME,
+    )
+
+    success_criteria(
+        "all_replicas_passed",
+        mode="string",
+        match=r"^OVERALL PASSED \(([0-9]+)/\1 replica ranks\)$",
+        file=log_file,
+    )
+    success_criteria(
+        "no_replica_failed",
+        mode="string",
+        anti_match=(
+            r"^(?:\[rank [0-9]+\] )?(?:FAILED|Unsupported size!)$"
+            r"|^OVERALL FAILED"
+        ),
+        file=log_file,
     )

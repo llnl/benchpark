@@ -8,9 +8,10 @@ from ramble.appkit import *
 
 _FINITE = r"[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?"
 _AVERAGE_TIME = (
-    rf"^Average kernel execution time:\s+"
+    rf"^\[rank (?P<rank>[0-9]+)\]\s+Average kernel execution time:\s+"
     rf"(?P<average_time>{_FINITE})\s+\(ms\)\s*$"
 )
+_RANK_CONTEXT = r"^\[rank (?P<rank>[0-9]+)\]"
 
 
 class Softmax(ExecutableApplication):
@@ -28,9 +29,9 @@ class Softmax(ExecutableApplication):
 
     executable(
         "softmax",
-        "softmax-{model} {num_slices} {slice_size} {implementation} "
+        "{hecbench_path}/bin/softmax-{model} {num_slices} {slice_size} {implementation} "
         "{internal_repetitions}",
-        use_mpi=False,
+        use_mpi=True,
     )
     workload("softmax", executables=["softmax"])
 
@@ -69,11 +70,29 @@ class Softmax(ExecutableApplication):
 
     log_file = "{experiment_run_dir}/{experiment_name}.out"
 
+    figure_of_merit_context(
+        "replica_rank", regex=_RANK_CONTEXT, output_format="rank {rank}"
+    )
+
     figure_of_merit(
         "Average kernel time",
         log_file=log_file,
         fom_regex=_AVERAGE_TIME,
         group_name="average_time",
         units="ms",
+        contexts=["replica_rank"],
         fom_type=FomType.TIME,
+    )
+
+    success_criteria(
+        "all_replicas_passed",
+        mode="string",
+        match=r"^OVERALL PASS \(([0-9]+)/\1 replica ranks\)$",
+        file=log_file,
+    )
+    success_criteria(
+        "no_replica_failed",
+        mode="string",
+        anti_match=r"^(?:\[rank [0-9]+\] )?FAIL$|^OVERALL FAIL",
+        file=log_file,
     )
