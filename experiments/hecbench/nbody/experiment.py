@@ -24,8 +24,8 @@ class Nbody(
     )
     variant(
         "version",
-        default="2026-08-13",
-        values=("2026-08-13",),
+        default="2026-09-25",
+        values=("2026-08-13", "2026-09-25"),
         description="Pinned HeCBench source version",
     )
     variant(

@@ -21,11 +21,16 @@ class Hecbench(CMakePackage, CudaPackage, ROCmPackage):
 
     license("BSD-3-Clause")
 
+    version(
+        "2026-09-25",
+        commit="8f7cf72937d9d24e73f29287e89a3c22d9eb5591",
+        preferred=True,
+    )
     version("2026-08-13", commit="f9540404573a2be7ad1d1ee4b3106fd064825fa8")
-    patch("select-benchmark.patch", when="~mpi")
-    patch("find-hipcc.patch", when="~mpi")
-    patch("caliper-instrumentation.patch", when="+caliper")
-    patch("mpi-replicas.patch", when="+mpi")
+    patch("select-benchmark.patch", when="@2026-08-13 ~mpi")
+    patch("find-hipcc.patch", when="@2026-08-13 ~mpi")
+    patch("caliper-instrumentation.patch", when="@2026-08-13 +caliper")
+    patch("mpi-replicas.patch", when="@2026-08-13 +mpi")
 
     variant(
         "benchmark",
@@ -88,6 +93,11 @@ class Hecbench(CMakePackage, CudaPackage, ROCmPackage):
         "+caliper",
         when="+mpi",
         msg="Caliper support is paused and has not been validated with MPI replicas",
+    )
+    conflicts(
+        "+caliper",
+        when="@2026-09-25",
+        msg="Caliper instrumentation has not been rebased onto this HeCBench revision",
     )
 
     depends_on("c", type="build")
