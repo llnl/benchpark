@@ -2,7 +2,4 @@
 # Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: Apache-2.0
-packages:
-  blt:
-    require:
-      - one_of: ['%gcc', '%clang']
+packages: {}
