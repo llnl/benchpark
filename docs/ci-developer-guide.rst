@@ -87,10 +87,10 @@ specified by the ``.gitlab-ci.yml`` configuration file:
 4. ``.gitlab/utils/`` contains various utility functions for:
 
    a. Checking machine status ``machine_checks.yml``
-   b. Cancelling jobs ``cancel-flux.sh`` and ``cancel-slurm.sh``
+   b. Cancelling jobs ``job-control/cancel-flux.sh`` and ``job-control/cancel-slurm.sh``
    c. Defining common rules ``rules.yml``
    d. A reproducible script for executing an experiment in benchpark
-      ``run-experiment.sh``
+      ``job-control/run-experiment.sh``
    e. Reporting GitLab status to GitHub PRs ``status.yml``.
 
 ********

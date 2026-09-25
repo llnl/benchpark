@@ -84,7 +84,7 @@ using the ``compare-githash-metadata.sh`` script:
 
 ::
 
-    . .gitlab/utils/compare-githash-metadata.sh \
+    . .gitlab/utils/githash-metadata/compare-githash-metadata.sh \
         wkp/tioga_rocm_6.4.2/amg2023/workspace/experiments/amg2023/problem1/amg2023_problem1_test_mpi_rocm_no_scaling_caliper_time_mpi_80_80_40_2_2_1_4/githash_metadata.json \
         wkp/tioga_rocm_7.2.0/amg2023/workspace/experiments/amg2023/problem1/amg2023_problem1_test_mpi_rocm_no_scaling_caliper_time_mpi_80_80_40_2_2_1_4/githash_metadata.json
 
