@@ -142,6 +142,11 @@ class Spec(object):
         self._namespace = value
 
     @property
+    def fullname(self):
+        """Return the object name qualified by its repository namespace."""
+        return f"{self.namespace}.{self.name}" if self.namespace else self.name
+
+    @property
     def variants(self):
         return self._variants
 
@@ -248,7 +253,7 @@ class Spec(object):
 class ExperimentSpec(Spec):
     @property
     def experiment_class(self):
-        return repo_path.get_obj_class(self.name)
+        return repo_path.get_obj_class(self.fullname)
 
     @property
     def object_class(self):
