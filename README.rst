@@ -45,7 +45,7 @@ reproducible, working specifications for the following:
 
 * Source repo and version
 * Build configuration (with `Spack <https://github.com/spack/spack>`_)
-* Run configuration (with `Ramble <https://github.com/GoogleCloudPlatform/ramble>`_)
+* Run configuration (with `Ramble <https://github.com/Ramble-Project/ramble>`_)
 
 3. **Experiment Specifications** (specific benchmark experiment on a system specification)
 
@@ -57,7 +57,7 @@ Dependencies
 Benchpark uses the following open source projects for specifying configurations:
 
 * `Spack <https://github.com/spack/spack>`_ for building benchmark and dependencies
-* `Ramble <https://github.com/GoogleCloudPlatform/ramble>`_ for run configurations
+* `Ramble <https://github.com/Ramble-Project/ramble>`_ for run configurations
 
 Community
 ---------

@@ -92,6 +92,7 @@ stages:
   - test
   - release-resources
   - summarize
+  - publish-performance
   - cleanup-dir
 bootstrap_benchpark:
   tags: [shell, oslic]
@@ -106,12 +107,24 @@ generate_test_summary:
   script:
     - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
     - ./bin/benchpark configure --bootstrap-location $CUSTOM_CI_BUILDS_DIR
-    - python .gitlab/utils/generate_test_summary_csv.py --output test-summary.csv
+    - bash .gitlab/utils/performance/aggregate-test-metadata.sh
+    - python .gitlab/utils/performance/generate_test_status_table.py artifact-test-summary/test_metadata_summary.json
   artifacts:
     when: always
-    paths: [test-summary.csv]
+    paths: [artifact-test-summary/]
   rules:
     - when: always
+deploy_nightly_performance_metadata:
+  tags: [shell, oslic]
+  stage: publish-performance
+  needs:
+    - job: generate_test_summary
+      artifacts: true
+  script: [bash .gitlab/utils/performance/push-to-perf-repo.sh]
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: always
+    - when: never
 cleanup_pipeline_dir:
   tags: [shell, oslic]
   stage: cleanup-dir
