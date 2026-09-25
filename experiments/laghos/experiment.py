@@ -406,5 +406,5 @@ class Laghos(
         if self.spec.satisfies("+raja"):
             raja = "+raja"
         self.add_package_spec(
-            self.name, [f"laghos{self.determine_version()} +metis {gam} {raja}"]
+            self.name, [f"laghos{self.determine_version()} ~metis {gam} {raja}"]
         )
