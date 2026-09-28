@@ -15,15 +15,15 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     """
 
     homepage = "https://computing.llnl.gov/projects/co-design/kripke"
-    git = "https://github.com/LLNL/Kripke.git"
+    git = "https://github.com/rfhaque/Kripke.git"
 
     tags = ["proxy-app"]
 
-    maintainers("vsrana01")
+    maintainers("chen59")
 
     license("BSD-3-Clause")
 
-    version("develop", branch="develop", submodules=False)
+    version("develop", branch="kripke_chai_umpire", submodules=False)
     version("2025.12.0", submodules=False, commit="01f6f85c02ceffcd2bc06e42cee997867dd142c5")
     version("2025.07.0", submodules=False, commit="8cf38433a6a11e0dcd17864e649b2d045159ee9c")
     version(
@@ -56,6 +56,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
 
     variant("mpi", default=True, description="Build with MPI.")
     variant("chai", default=True, description="Build with CHAI/Umpire.")
+    variant("direct-device-plane", default=True, description="Use direct device allocator in Umpire for plane fields")
     variant("openmp", default=False, description="Build with OpenMP enabled.")
     variant("caliper", default=False, description="Build with Caliper support enabled.")
     variant("gpu-aware-mpi", default=False, description="Enable GPU-aware MPI")
