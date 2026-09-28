@@ -17,7 +17,8 @@ class Remhos(ExecutableApplication):
             'explicit-timestepping','finite-element','time-dependent','ode',
             'full-assembly','partial-assembly',
             'lagrangian','spatial-discretization','unstructured-grid',
-            'network-latency-bound','network-collectives','unstructured-grid']
+            'network-latency-bound','network-collectives','unstructured-grid',
+            'llnl-nightly','llnl-monthly','llnl-pr','llnl-weekly']
 
     executable('2d', 'remhos' +
                      ' -dim 2 ' +

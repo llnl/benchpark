@@ -45,7 +45,7 @@ def test_system_compute_variables_section(monkeypatch):
             "rocm_version": "6.4.3",
             "gtl_flag": True,
             "gpu_factor": 1,
-            "extra_batch_opts": "--setattr=gpumode=SPX\n--conf=resource.rediscover=true",
+            "extra_batch_opts": "-o spindle.level=off\n--setattr=gpumode=SPX\n--conf=resource.rediscover=true",
         }
     }
 

@@ -73,15 +73,63 @@ specified by the ``.gitlab-ci.yml`` configuration file:
            involves starting flux on the allocated node, which is necessary since
            testing the benchpark workflow involves submitting a job within a job step in
            this case, which is not possible using slurm.
+      iv. Shared test jobs and shared resource jobs use different rules from
+          ``rules.yml``. The test jobs use ``run_test_rules``, which watch benchmark and
+          system paths through the ``BENCHMARK`` and ``ARCHCONFIG`` variables. The
+          resource allocation and release jobs use host-specific ``resource_rules_*``
+          entries, each with an explicit watch list for the benchmarks that run on that
+          host. When adding a benchmark to a shared Flux or shared Slurm host, update
+          the matching ``resource_rules_*`` list so changes to that benchmark create the
+          allocate, test, and release jobs for that host. For example, if a shared host
+          runs kripke, its ``resource_rules_*`` entry should include
+          ``'**/kripke/**/*'``.
 
 4. ``.gitlab/utils/`` contains various utility functions for:
 
    a. Checking machine status ``machine_checks.yml``
-   b. Cancelling jobs ``cancel-flux.sh`` and ``cancel-slurm.sh``
+   b. Cancelling jobs ``job-control/cancel-flux.sh`` and ``job-control/cancel-slurm.sh``
    c. Defining common rules ``rules.yml``
    d. A reproducible script for executing an experiment in benchpark
-      ``run-experiment.sh``
+      ``job-control/run-experiment.sh``
    e. Reporting GitLab status to GitHub PRs ``status.yml``.
+   f. Fetching artifacts from previous jobs and pipelines ``fetch-job-artifact.sh``
+   g. Collecting and comparing package versions and commits under ``githash-metadata/``
+   h. Collecting performance data, writing and aggregating test metadata, rendering the
+      status table, and publishing nightly results under ``performance/``.
+
+CI Metadata Pipeline
+====================
+
+Each test job collects githash and Caliper data, then
+``performance/write-test-metadata.sh`` combines the available results with the job
+status in ``artifact-test-metadata/test_metadata.json``. The ``summarize`` stage runs
+``performance/aggregate-test-metadata.sh`` to collect these per-job files into a
+pipeline summary and per-host JSON files, then
+``performance/generate_test_status_table.py`` renders the status table. For scheduled
+pipelines, the ``publish-performance`` stage pushes the per-host files to the
+``benchpark-performance`` repository.
+
+Performance collection currently queries ``Avg time/rank`` for the ``main`` region and
+marks values more than 5 percent above the baseline as regressions. Test jobs use
+``develop`` as ``BASELINE_REF`` and look for an earlier job with the same normalized
+GitLab job name. A new or renamed matrix entry may therefore have no baseline. Missing
+githash, performance, or baseline data is recorded as unavailable and should not prevent
+the current test metadata from being written.
+
+The publishing job requires ``BENCHPARK_PERF_DEPLOY_TOKEN`` to contain, or point to a
+file containing, the SSH private key for ``benchpark-performance``.
+``BENCHPARK_PERF_REPO_URL`` indicates the destination repository.
+
+When adding a monitored benchmark, update its test matrix and matching
+``resource_rules_*`` entry.
+
+::
+
+    python .gitlab/utils/performance/generate_test_status_table.py test_metadata_summary.json
+
+For missing results, first check for Caliper files under the generated workspace, the
+expanded current and baseline job names, the preceding ``after_script`` commands, and
+the artifact-retention status of the baseline job.
 
 ********
  GitHub

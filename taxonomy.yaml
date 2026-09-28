@@ -149,6 +149,7 @@ benchpark-tags:
     - time-dependent
     - transformer
     - transport
+    - unet
     - workflow
   programming-language:
     - c
@@ -176,3 +177,21 @@ benchpark-tags:
     - sycl
     - tbb
     - thrust
+  testing-sites:
+    - anl-weekly
+    - aws-weekly
+    - csc-weekly
+    - cscs-weekly
+    - jsc-weekly
+    - lanl-weekly
+    - lbnl-weekly
+    - llnl-nightly
+    - llnl-monthly
+    - llnl-pr
+    - llnl-weekly
+    - ornl-weekly
+    - riken-nightly
+    - riken-monthly
+    - riken-pr
+    - snl-weekly
+    - riken-weekly

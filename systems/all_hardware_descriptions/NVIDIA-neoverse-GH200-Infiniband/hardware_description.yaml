@@ -1,0 +1,29 @@
+# Copyright 2023 Lawrence Livermore National Security, LLC and other
+# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+system_definition:
+  name: NVIDIA-neoverse-GH200-Infiniband
+  integrator:
+    vendor: NVIDIA
+    name: GH200
+  processor:
+    vendor: NVIDIA
+    name: Grace
+    ISA: Armv9
+    uArch: neoverse
+  accelerator:
+    vendor: NVIDIA
+    name: GH200
+    ISA: PTX
+    uArch: sm_90
+  interconnect:
+    vendor: NVIDIA
+    name: HDR200InfiniBand
+  systems-tested:
+    riken-gh200:
+      os: Rocky
+      scheduler: slurm
+      compiler: nvhpc
+      runtime: cuda
+      mpi: openmpi

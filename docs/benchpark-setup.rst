@@ -53,6 +53,22 @@ including ``--dry-run`` and ``--phases make_experiments``.
 
 Now you are ready to compile your experiments as described in :doc:`build-experiment`.
 
+********************************
+ Using pre-built Spack packages
+********************************
+
+You can specify a pre-existing spack, along with an environment within that Spack
+instance with pre-built specs:
+
+::
+
+    benchpark system init --dest=x <SystemName> compiler=<Compiler>
+    benchpark experiment init x y
+    benchpark setup x/y </output/path/to/workspace> --spack=custom-spack --environment=/abspath/to/spack/env
+
+If the provided environment has an install of the benchmark you need, then ``ramble
+workspace setup`` will not need to install any packages.
+
 *************************************
  Built-in System/Experiment Variants
 *************************************
@@ -60,15 +76,15 @@ Now you are ready to compile your experiments as described in :doc:`build-experi
 There are benchpark system and experiment variants that you can change, without needing
 to define them in your ``system.py`` and ``experiment.py``.
 
-#############
+*************
  For Systems
-#############
+*************
 
     - ``timeout`` - Job timeout limit in minutes.
 
-#################
+*****************
  For Experiments
-#################
+*****************
 
     - ``package_manager`` - Specify this variant to use a ramble package manager other
       than ``spack``. See :doc:`run-binary` to see an example.

@@ -41,12 +41,14 @@
     run-experiment
     analyze-experiment
     benchpark-analyze
+    benchpark-query
     configuration
     modifiers
     set-of-experiments
     run-binary
     create-mirror
     io-benchmarking
+    experiment-status
 
 .. toctree::
     :maxdepth: 1
@@ -56,6 +58,7 @@
     add-a-benchmark
     add-an-experiment
     testing-your-contribution
+    update-system-config
 
 .. toctree::
     :maxdepth: 1

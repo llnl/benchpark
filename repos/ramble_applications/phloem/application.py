@@ -10,7 +10,7 @@ from ramble.appkit import *
 
 class Phloem(ExecutableApplication):
     """Phloem benchmark"""
-    name = "Phloem"
+    name = "phloem"
 
     tags = ['synthetic',
             'large-scale','multi-node','single-node',

@@ -44,6 +44,7 @@ force-exclude = '''
 profile = "black"
 skip_gitignore = true
 color_output = true
+skip = ["experiments/hpl/experiment.py"]
 skip_glob = [
   "lib/benchpark/test_repo/**"
 ]

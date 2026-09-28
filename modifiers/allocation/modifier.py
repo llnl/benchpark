@@ -6,7 +6,9 @@
 import math
 from enum import Enum
 
+import ramble.config
 from ramble.modkit import *
+from spack.spec import Spec
 
 
 class AllocOpt(Enum):
@@ -19,6 +21,8 @@ class AllocOpt(Enum):
     N_GPUS = 6
     N_CORES_PER_NODE = 7
     OMP_NUM_THREADS = 8
+    PBS_MIN_NCPUS_PER_NODE = 9
+    PBS_EMIT_GPUS = 10
 
     # Descriptions of resources available on systems
     SYS_GPUS_PER_NODE = 100
@@ -224,6 +228,7 @@ def divide_into(dividend, divisor):
 class Allocation(BasicModifier):
 
     name = "allocation"
+    _whitelist_file_name = "benchpark_whitelist"
 
     tags("infrastructure")
 
@@ -234,6 +239,17 @@ class Allocation(BasicModifier):
 
     mode("standard", description="Standard execution mode for allocation")
     default_mode("standard")
+
+    register_phase(
+        "create_cleanup_whitelist", pipeline="setup", run_after=["make_experiments"]
+    )
+
+    def _create_cleanup_whitelist(self, workspace, app_inst):
+        whitelist_file = self.expander.expand_var(
+            f"{{experiment_run_dir}}/{self._whitelist_file_name}"
+        )
+        with open(whitelist_file, "w"):
+            pass
 
     def inherit_from_application(self, app):
         super().inherit_from_application(app)
@@ -252,7 +268,12 @@ class Allocation(BasicModifier):
                 val = ""
             app.define_variable(var, str(val))
 
-        if v.n_threads_per_proc:
+        benchpark_spec = ramble.config.get("config:spec")
+        if (
+            benchpark_spec
+            and Spec(benchpark_spec).satisfies("+openmp")
+            and v.n_threads_per_proc
+        ):
             self.env_var_modification(
                 "OMP_NUM_THREADS",
                 method="set",
@@ -325,6 +346,7 @@ class Allocation(BasicModifier):
                 srun_opts.append(f"-n {v.n_ranks_per_node}")
             else:
                 srun_opts.append(f"-n {v.n_ranks}")
+
             sbatch_opts.append(f"-n {v.n_ranks}")
         if v.n_gpus:
             if self._usage_mode == "torchrun-hpc":
@@ -334,6 +356,7 @@ class Allocation(BasicModifier):
             sbatch_opts.append(f"--gpus {v.n_gpus}")
         if v.n_nodes:
             srun_opts.append(f"-N {v.n_nodes}")
+            sbatch_opts.append(f"-N {v.n_nodes}")
 
         if v.queue:
             sbatch_opts.append(f"-p {v.queue}")
@@ -349,6 +372,7 @@ class Allocation(BasicModifier):
         sbatch_directives = list(f"#SBATCH {x}" for x in (sbatch_opts))
 
         v.mpi_command = f"{launch_cmd} {' '.join(srun_opts)}"
+        v.single_rank_mpi_command = f"srun -n 1 -N 1 {'--gpus 1' if v.n_gpus else ''}"
         v.batch_submit = "sbatch {execute_experiment}"
         v.allocation_directives = "\n".join(sbatch_directives)
 
@@ -375,6 +399,24 @@ class Allocation(BasicModifier):
             raise ValueError(err_msg)
 
     @staticmethod
+    def _cleanup_experiment_dir_cmd():
+        """Removes artifacts from previous runs, if the experiment is executed more than once.
+
+        Setup creates an empty whitelist file. The first execution populates it
+        with setup-created files, and later executions remove anything else.
+        """
+        whitelist_file = Allocation._whitelist_file_name
+        return "\n".join(
+            [
+                f"[ -s {whitelist_file} ] || "
+                'find . -mindepth 1 -maxdepth 1 -printf "%f\\n" | '
+                f"sort > {whitelist_file}",
+                'find . -mindepth 1 -maxdepth 1 -printf "%f\\n" | '
+                f'grep -Fxvf {whitelist_file} | xargs -r -d "\\n" rm -rf --',
+            ]
+        )
+
+    @staticmethod
     def _init_batch_and_cmd_opts(v):
         """System/experiment may have universal options they want to apply
         for all batch allocations or exec calls.
@@ -385,10 +427,11 @@ class Allocation(BasicModifier):
         if v.extra_cmd_opts:
             cmd_opts.extend(v.extra_cmd_opts.strip().split("\n"))
 
+        pre_exec_cmds = [Allocation._cleanup_experiment_dir_cmd()]
         if v.pre_exec_cmds:
-            v.pre_exec = v.pre_exec_cmds
-        else:
-            v.pre_exec = ""
+            pre_exec_cmds.append(v.pre_exec_cmds)
+        v.pre_exec = "\n".join(pre_exec_cmds)
+
         if v.post_exec_cmds:
             v.post_exec = v.post_exec_cmds
         else:
@@ -435,6 +478,7 @@ class Allocation(BasicModifier):
         batch_directives = list(f"# flux: {x}" for x in (batch_opts))
 
         v.mpi_command = f"{launch_cmd} {' '.join([cmd_ranks] + cmd_opts)}"
+        v.single_rank_mpi_command = f"flux run -n 1 -N 1 {'-g=1' if v.n_gpus else ''}"
         v.batch_submit = "flux batch {execute_experiment}"
         v.allocation_directives = "\n".join(batch_directives)
 
@@ -443,6 +487,7 @@ class Allocation(BasicModifier):
         cmd_opts.extend([f"-n {v.n_ranks}"])
 
         v.mpi_command = "mpirun " + " ".join(cmd_opts)
+        v.single_rank_mpi_command = "mpirun -n 1"
         v.batch_submit = "{execute_experiment}"
         v.allocation_directives = ""
 
@@ -473,6 +518,7 @@ class Allocation(BasicModifier):
         batch_directives = list(f"#BSUB {x}" for x in batch_opts)
 
         v.mpi_command = f"lrun {' '.join(cmd_opts)}"
+        v.single_rank_mpi_command = f"lrun -n 1 -N 1 {'-g 1' if v.n_gpus else ''}"
         v.batch_submit = "bsub {execute_experiment}"
         v.allocation_directives = "\n".join(batch_directives)
 
@@ -489,6 +535,7 @@ class Allocation(BasicModifier):
         batch_directives = list(f"#PJM {x}" for x in batch_opts)
 
         v.mpi_command = "mpiexec " + " ".join(cmd_opts)
+        v.single_rank_mpi_command = "mpiexec --mpi proc=1"
         v.batch_submit = "pjsub {execute_experiment}"
         v.allocation_directives = "\n".join(batch_directives)
 
@@ -507,11 +554,19 @@ class Allocation(BasicModifier):
         if v.n_threads_per_proc and v.n_threads_per_proc != 1:
             node_spec.append(f"ompthreads={v.n_threads_per_proc}")
 
-        n_cpus_per_node = v.n_ranks_per_node * v.n_threads_per_proc
+        # Some PBS sites need a scheduler-specific ncpus floor, for example to
+        # avoid a too-small cpuset.
+        layout_ncpus = v.n_ranks_per_node * v.n_threads_per_proc
+        n_cpus_per_node = max(
+            v.pbs_min_ncpus_per_node or 0,
+            v.n_cores_per_node or 0,
+            layout_ncpus,
+        )
+
         node_spec.append(f"ncpus={n_cpus_per_node}")
 
-        if v.n_gpus:
-            gpus_per_rank = self.gpus_as_gpus_per_rank(v.n_gpus)
+        if v.n_gpus and v.pbs_emit_gpus != 0:
+            gpus_per_rank = self.gpus_as_gpus_per_rank(v)
             node_spec.append(f"gpus={gpus_per_rank}")
 
         if node_spec:

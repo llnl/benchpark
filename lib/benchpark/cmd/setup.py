@@ -54,6 +54,14 @@ def setup_parser(root_parser):
         type=str,
         help="Where to install packages and store results for the experiments. Benchpark expects to manage this directory, and it should be empty/nonexistent the first time you run benchpark setup experiments.",
     )
+    root_parser.add_argument(
+        "--spack", type=str, help="Use the designated, pre-existing Spack instance"
+    )
+    root_parser.add_argument(
+        "--environment",
+        type=str,
+        help="Use an existing Spack environment (name or path) instead of creating one from package specs. Enables reuse of pre-installed packages.",
+    )
 
 
 def determine_experiment_id(exp_src_dir):
@@ -183,6 +191,38 @@ def command(args):
         include_fn,
     )
 
+    # If using --environment, configure ramble to use the external spack environment
+    # This enables reuse of pre-installed packages
+    if "spack" in pkg_manager and args.environment:
+        ramble_yaml_path = ramble_configs_dir / "ramble.yaml"
+        if ramble_yaml_path.exists():
+            # Read the symlinked file
+            with open(ramble_yaml_path, "r") as f:
+                ramble_config = yaml.safe_load(f)
+
+            # Replace symlink with actual file
+            ramble_yaml_path.unlink()
+
+            # Find and update the software environments section
+            if "ramble" in ramble_config and "software" in ramble_config["ramble"]:
+                software_section = ramble_config["ramble"]["software"]
+
+                if "environments" in software_section:
+                    # Update each environment to use the external environment
+                    for env_name in software_section["environments"]:
+                        env_config = software_section["environments"][env_name]
+                        # Replace packages list with external_env
+                        if "packages" in env_config:
+                            del env_config["packages"]
+                        env_config["external_env"] = args.environment
+                        print(
+                            f"  Configured environment '{env_name}' to use external spack environment: {args.environment}"
+                        )
+
+            # Write updated config
+            with open(ramble_yaml_path, "w") as f:
+                yaml.dump(ramble_config, f, default_flow_style=False)
+
     template_name = "execute_experiment.tpl"
     experiment_template_options = [
         configs_src_dir / template_name,
@@ -207,7 +247,39 @@ def command(args):
     repos_cfg = benchpark.config.configuration().repos
 
     pkg_str = ""
-    if "spack" in pkg_manager:
+    if "spack" in pkg_manager and args.spack:
+        # Things that are not applied:
+        # - the benchpark package repository
+        # - or any of the repositories configured
+        # - does not set a build stage
+        # basically these things are all configuration details of spack, and
+        # if the user says "use my specific spack instance" then I want to
+        # minimize changes to it. Note that Ramble may perform config commands
+        spack_user_cache_path = experiments_root / "spack-cache"
+        spack_location = experiments_root / "spack"
+
+        # Create symlink if it doesn't exist, or verify it points to the right place
+        if spack_location.exists():
+            if spack_location.is_symlink():
+                existing_target = os.readlink(spack_location)
+                if os.path.abspath(existing_target) != os.path.abspath(args.spack):
+                    print(
+                        f"Error: {spack_location} already points to {existing_target}"
+                    )
+                    print(f"       but --spack specifies {args.spack}")
+                    sys.exit(1)
+                # else: symlink already points to correct location, continue
+            else:
+                print(f"Error: {spack_location} exists but is not a symlink")
+                sys.exit(1)
+        else:
+            os.symlink(args.spack, spack_location)
+        pkg_str = f"""\
+export SPACK_USER_CACHE_PATH={spack_user_cache_path}
+export SPACK_DISABLE_LOCAL_CONFIG=1
+. {spack_location}/share/spack/setup-env.sh
+"""
+    elif "spack" in pkg_manager and not args.spack:
         spack_build_stage = experiments_root / "builds"
         spack_user_cache_path = experiments_root / "spack-cache"
         spack, first_time_spack = per_workspace_setup.spack_first_time_setup()

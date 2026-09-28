@@ -164,7 +164,7 @@ class Laghos(
             self.add_experiment_variable("qpts", "{quad}*{epm}*{resource_count}", False)
             self.add_experiment_variable("pool", 16, False)
             # resource_count is the number of resources used for this experiment:
-            self.add_experiment_variable("resource_count", 1, True)
+            self.add_experiment_variable("resource_count", 4, True)
 
         # Register the scaling variables and their respective scaling functions
         # required to correctly scale the experiment for the given scaliing policy
@@ -293,7 +293,7 @@ class Laghos(
             )
             self.add_experiment_variable("pool", 16, True)
             # resource_count is the number of resources used for this experiment:
-            self.add_experiment_variable("resource_count", 1, False)
+            self.add_experiment_variable("resource_count", 4, False)
 
             # Register the scaling variables and their respective scaling functions
             # required to correctly scale the experiment for the given scaliing policy

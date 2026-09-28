@@ -4,25 +4,36 @@ workflow:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: always
 
-    # Run pipelines only when these files/dirs change
-    - changes:
-        - .gitlab/**
-        - bin/**
-        - configs/**
-        - experiments/**
-        - lib/**
-        - modifiers/**
-        - repo/**
-        - var/**
-        - systems/llnl-elcapitan/system.py
-        - systems/llnl-cluster/system.py
-        - .gitlab-ci.yml
-        - checkout-versions.yaml
-        - CTestConfig.cmake
-        - CTestGitlab.cmake
-        - pyproject.toml
-        - remote-urls.yaml
-        - requirements.txt
+    # Always allow manually started pipelines
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: always
+
+    # Feature branch pipelines should diff against the integration target.
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != "develop"
+      changes:
+        compare_to: refs/heads/develop
+        paths: &workflow_change_paths
+          - .gitlab/**/*
+          - bin/**/*
+          - configs/**/*
+          - experiments/**/*
+          - lib/**/*
+          - modifiers/**/*
+          - repos/**/*
+          - var/**/*
+          - systems/llnl-elcapitan/system.py
+          - systems/llnl-cluster/system.py
+          - .gitlab-ci.yml
+          - checkout-versions.yaml
+          - CTestConfig.cmake
+          - CTestGitlab.cmake
+          - pyproject.toml
+          - remote-urls.yaml
+          - requirements.txt
+
+    # Develop pipelines should diff against the previous develop commit.
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "develop"
+      changes: *workflow_change_paths
 
     # Otherwise, don't create a pipeline
     - when: never
@@ -80,6 +91,8 @@ stages:
   - allocate-resources
   - test
   - release-resources
+  - summarize
+  - publish-performance
   - cleanup-dir
 bootstrap_benchpark:
   tags: [shell, oslic]
@@ -88,9 +101,36 @@ bootstrap_benchpark:
     - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
     - ./bin/benchpark configure --bootstrap-location $CUSTOM_CI_BUILDS_DIR
     - ./bin/benchpark bootstrap
+generate_test_summary:
+  tags: [shell, oslic]
+  stage: summarize
+  script:
+    - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
+    - ./bin/benchpark configure --bootstrap-location $CUSTOM_CI_BUILDS_DIR
+    - bash .gitlab/utils/performance/aggregate-test-metadata.sh
+    - python .gitlab/utils/performance/generate_test_status_table.py artifact-test-summary/test_metadata_summary.json
+  artifacts:
+    when: always
+    paths: [artifact-test-summary/]
+  rules:
+    - when: always
+deploy_nightly_performance_metadata:
+  tags: [shell, oslic]
+  stage: publish-performance
+  needs:
+    - job: generate_test_summary
+      artifacts: true
+  script: [bash .gitlab/utils/performance/push-to-perf-repo.sh]
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: always
+    - when: never
 cleanup_pipeline_dir:
   tags: [shell, oslic]
   stage: cleanup-dir
   script:
-    - echo "Removing $CUSTOM_CI_BUILDS_DIR"
-    - rm -rf $CUSTOM_CI_BUILDS_DIR
+    - CLEANUP_CI_BUILDS_DIR="${CUSTOM_CI_BUILDS_DIR/#\$HOME/$HOME}"
+    - echo "Removing $CLEANUP_CI_BUILDS_DIR"
+    - rm -rf "$CLEANUP_CI_BUILDS_DIR"
+  rules:
+    - when: always

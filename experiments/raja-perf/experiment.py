@@ -43,6 +43,13 @@ class RajaPerf(
         description="Execution mode",
     )
 
+    variant(
+        "subkernels",
+        default=True,
+        values=(True, False),
+        description="Profile kernel launches. Adds significant overhead for low problem sizes.",
+    )
+
     maintainers("michaelmckinsey1")
 
     def compute_applications_section(self):
@@ -72,6 +79,10 @@ class RajaPerf(
             )
             # Number of processes
             self.add_experiment_variable("n_resources", 1, False)
+        # Perf mode
+        else:
+            self.add_experiment_variable("process_problem_size", 33554432, True)
+            self.add_experiment_variable("n_resources", 4, False)
 
         self.set_required_variables(
             total_problem_size="{n_resources}*{process_problem_size}",
@@ -120,4 +131,9 @@ class RajaPerf(
             self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
     def compute_package_section(self):
-        self.add_package_spec(self.name, [f"raja-perf{self.determine_version()} +mpi"])
+        subkernels = (
+            "+subkernels" if self.spec.satisfies("+subkernels") else "~subkernels"
+        )
+        self.add_package_spec(
+            self.name, [f"raja-perf{self.determine_version()} +mpi {subkernels}"]
+        )
