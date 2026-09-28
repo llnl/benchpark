@@ -49,6 +49,13 @@ class Kripke(
         description="Enable CHAI",
     )
 
+    variant(
+        "direct-device-plane",
+        default=False,
+        values=(True, False),
+        description="Use direct device allocator in Umpire for plane fields",
+    )
+
     maintainers("pearce8")
 
     def compute_applications_section(self):
@@ -302,7 +309,8 @@ class Kripke(
             else "~gpu-aware-mpi"
         )
         chai = "+chai" if self.spec.variants["chai"][0] else "~chai"
+        direct_device_plane = "+direct-device-plane" if self.spec.variants["direct-device-plane"][0] else "~direct-device-plane"
         self.add_package_spec(
             self.name,
-            [f"kripke{self.determine_version()} {gam} {chai} +mpi"],
+            [f"kripke{self.determine_version()} {gam} {direct_device_plane} +mpi"],
         )
