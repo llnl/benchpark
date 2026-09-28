@@ -14,10 +14,10 @@ from spack_repo.builtin.packages.mfem.package import Mfem as BuiltinMfem
 class Mfem(BuiltinMfem):
 
     version(
-        "4.10",
-        tag="v4.10",
-        commit="d964264cdb9a13e94a201b6c236c7721e0c8765f",
-        submodules=False,
+        "4.10.0",
+        sha256="d01c26662ab96042ec5e3443a58ee9eb3c5c78c6632d899240b6e485f3a414cf",
+        url="https://bit.ly/4iEAcbE",
+        extension="tar.gz",
     )
 
     variant("caliper", default=False, description="Build Caliper support")
