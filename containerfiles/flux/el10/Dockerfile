@@ -1,83 +1,72 @@
 FROM fluxrm/flux-core:el10
 
 USER root
+ADD https://adpkicert.llnl.gov/PAN-cspca.llnl.gov.crt \
+	/etc/pki/ca-trust/source/anchors/cspca.crt
 
-RUN dnf clean all \
+RUN update-ca-trust extract \
+    && dnf clean all \
 	&& rm -rf /var/cache/dnf \
 	&& git config --global checkout.workers 1024 \
 	&& git config --global feature.manyFiles true \
     && git config --global core.sharedRepository false \
 	&& echo "* soft memlock unlimited" >> /etc/security/limits.conf \
-    && echo "* hard memlock unlimited" >> /etc/security/limits.conf
-
-# Install additional dependencies for Caliper/Adiak and analysis tools
-RUN dnf install -y \
-    cmake \
-    gcc-c++ \
-    python3-devel \
-    wget \
-    gzip \
-    patch \
-    tar \
-    unzip \
+    && echo "* hard memlock unlimited" >> /etc/security/limits.conf \
+    && dnf install -y \
     xz \
     zstd \
     bzip2 \
-    atlas-devel \
     gettext \
     ncurses-devel \
     sqlite \
     && dnf clean all \
     && rm -rf /var/cache/dnf
 
+# atlas-devel \ doesn't exist for aarch64
+
 USER fluxuser
 
-# Install mpibind
-RUN git clone https://github.com/LLNL/mpibind.git \
-	&& mkdir build \
-	&& cd mpibind \
-	&& ./bootstrap \
-	&& ./configure --prefix=$(pwd)/../build \
-	&& make -j install
+RUN pip install --upgrade pip \
+    && pip install pybind11
 
-ENV FLUX_SHELL_RC_PATH=/home/fluxuser/build/share/mpibind:$FLUX_SHELL_RC_PATH
-
-# Install Adiak and Caliper
 ENV CALI_INSTALL_PREFIX=/home/fluxuser/caliper-install \
-    GIT_CLONE_STAGING_DIR=/tmp/build
+    MPIBIND_INSTALL_PREFIX=/home/fluxuser/mpibind-install \
+    GIT_CLONE_STAGING_DIR=/tmp/build \
+    PATH=/home/fluxuser/.local/bin:${PATH}
 
-USER root
-
-RUN git clone https://github.com/LLNL/Caliper.git ${GIT_CLONE_STAGING_DIR}/Caliper && \
-    cd ${GIT_CLONE_STAGING_DIR}/Caliper && \
-    git fetch origin && \
-    git checkout v2.15.0 && \
-    git submodule update --init --recursive && \
-    git clone https://github.com/LLNL/Adiak.git ${GIT_CLONE_STAGING_DIR}/Adiak && \
-    cd ${GIT_CLONE_STAGING_DIR}/Adiak && \
-    git fetch origin && \
-    git checkout v0.5.0 && \
-    git submodule update --init --recursive
-
-RUN cd ${GIT_CLONE_STAGING_DIR}/Adiak && \
-    mkdir build && \
-    cd build && \
-    cmake \
+RUN source /etc/profile.d/modules.sh \
+    && module load mpi \
+    && git clone https://github.com/LLNL/mpibind.git ${GIT_CLONE_STAGING_DIR}/mpibind \
+	&& cd ${GIT_CLONE_STAGING_DIR}/mpibind \
+	&& ./bootstrap \
+	&& ./configure --prefix=${MPIBIND_INSTALL_PREFIX} \
+	&& make -j install \
+    && git clone https://github.com/LLNL/Adiak.git ${GIT_CLONE_STAGING_DIR}/Adiak \
+    && cd ${GIT_CLONE_STAGING_DIR}/Adiak \
+    && git fetch origin \
+    && git checkout v0.5.0 \
+    && git submodule update --init --recursive \
+    && cmake -B build \
     -DENABLE_MPI=ON \
     -DCMAKE_C_COMPILER=$(which gcc) \
     -DCMAKE_CXX_COMPILER=$(which g++) \
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_INSTALL_PREFIX=${CALI_INSTALL_PREFIX} \
-    .. && \
-    make -j 4 && \
-    make install
-
-RUN pip install pybind11
-
-RUN cd ${GIT_CLONE_STAGING_DIR}/Caliper && \
-    mkdir build && \
-    cd build && \
-    cmake \
+    && cmake --build build -j \
+    && cmake -B build \
+    -DENABLE_MPI=ON \
+    -DCMAKE_C_COMPILER=$(which gcc) \
+    -DCMAKE_CXX_COMPILER=$(which g++) \
+    -DBUILD_SHARED_LIBS=ON \
+    -DCMAKE_INSTALL_PREFIX=${CALI_INSTALL_PREFIX} \
+    && cmake --build build -j \
+    && cmake --install build \
+    && git clone https://github.com/LLNL/Caliper.git ${GIT_CLONE_STAGING_DIR}/Caliper \
+    && cd ${GIT_CLONE_STAGING_DIR}/Caliper \
+    && git fetch origin \
+    && git checkout v2.15.0 \
+    && git submodule update --init --recursive # \
+    && cmake -B build \
     -DWITH_TOOLS=ON \
     -DWITH_MPI=ON \
     -DWITH_ADIAK=ON \
@@ -88,37 +77,32 @@ RUN cd ${GIT_CLONE_STAGING_DIR}/Caliper && \
     -DCMAKE_CXX_COMPILER=$(which g++) \
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_INSTALL_PREFIX=${CALI_INSTALL_PREFIX} \
-    .. && \
-    make -j 4 && \
-    make install
+    && cmake --build build -j \
+    && cmake --install build \
+    && rm -rf ${GIT_CLONE_STAGING_DIR}/Caliper \
+    && rm -rf ${GIT_CLONE_STAGING_DIR}/Adiak \
+    && rm -rf ${GIT_CLONE_STAGING_DIR}/mpibind
 
-RUN rm -rf ${GIT_CLONE_STAGING_DIR}/Caliper && rm -rf ${GIT_CLONE_STAGING_DIR}/Adiak
-
-# Update environment for Caliper
-ENV PATH=${CALI_INSTALL_PREFIX}/bin:$PATH \
+ENV FLUX_SHELL_RC_PATH=/home/fluxuser/build/share/mpibind:$FLUX_SHELL_RC_PATH \
+    PATH=${CALI_INSTALL_PREFIX}/bin:$PATH \
     LD_LIBRARY_PATH=${CALI_INSTALL_PREFIX}/lib:${CALI_INSTALL_PREFIX}/lib64:$LD_LIBRARY_PATH \
     PYTHONPATH=${CALI_INSTALL_PREFIX}/lib/python3.9/site-packages:$PYTHONPATH
 
 # Install analysis tools: hatchet, thicket, treescape
-RUN pip install llnl-hatchet==2025.2.0 && \
-    pip install "llnl-thicket[plotting]==2026.1.0"
-
-RUN git clone https://github.com/LLNL/treescape ${GIT_CLONE_STAGING_DIR}/treescape && \
-    cd ${GIT_CLONE_STAGING_DIR}/treescape && \
-    git checkout main-2026-04-15 && \
-    pip install .
-
-RUN rm -rf ${GIT_CLONE_STAGING_DIR}/treescape
-
-USER fluxuser
+RUN pip install llnl-hatchet==2025.2.0 \
+    && pip install "llnl-thicket[plotting]==2026.1.0" \
+    && git clone https://github.com/LLNL/treescape ${GIT_CLONE_STAGING_DIR}/treescape \
+    && cd ${GIT_CLONE_STAGING_DIR}/treescape \
+    && git checkout main-2026-04-15 \
+    && pip install . \
+    && rm -rf ${GIT_CLONE_STAGING_DIR}/treescape
 
 # Copy and install benchpark
 COPY --chown=fluxuser:fluxuser . /home/fluxuser/benchpark
 
 WORKDIR /home/fluxuser/benchpark
 
-RUN pip install --upgrade pip \
-    && pip install -r requirements.txt \
+RUN pip install -r requirements.txt \
 	&& ./bin/benchpark bootstrap \
 	&& echo 'source /home/fluxuser/benchpark/setup-env.sh' >> /home/fluxuser/.bashrc
 
