@@ -18,6 +18,7 @@ from deepdiff import DeepDiff
 
 import benchpark.spec
 import benchpark.system
+import benchpark.system_external
 from benchpark.paths import paths
 
 
@@ -77,6 +78,11 @@ def system_external(args):
         pprint(new_packages)
         return
 
+    # The parser adds these fields for the branch's reconciliation interface.
+    # Callers using the pre-feature argument shape retain the original path.
+    if hasattr(args, "propose") or hasattr(args, "apply"):
+        return benchpark.system_external.run(args)
+
     system_spec = benchpark.spec.SystemSpec(" ".join(args.spec)).concretize()
     system = system_spec.system
 
@@ -134,9 +140,20 @@ def setup_parser(root_parser):
         help='Check packages using "spack external find" for current system against the definitions in benchpark.',
     )
     external_parser.add_argument("spec", nargs="+", help="System spec")
-    external_parser.add_argument(
+    external_modes = external_parser.add_mutually_exclusive_group()
+    external_modes.add_argument(
         "--new-system",
         help="Flag if system does not exist in benchpark",
+        action="store_true",
+    )
+    external_modes.add_argument(
+        "--propose",
+        help="Report deterministic, safe source changes without modifying source",
+        action="store_true",
+    )
+    external_modes.add_argument(
+        "--apply",
+        help="Apply deterministic, verified source changes atomically",
         action="store_true",
     )
 
@@ -148,4 +165,4 @@ def command(args):
         "external": system_external,
     }
     if args.system_subcommand in actions:
-        actions[args.system_subcommand](args)
+        return actions[args.system_subcommand](args)
