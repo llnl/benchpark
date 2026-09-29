@@ -32,12 +32,6 @@ class Xsbench(
         description="Which XSBench version to use.",
     )
 
-    # variant(
-    #     "amdgpu_target",
-    #     default="",
-    #     values=('gfx942'),
-    # )
-
     maintainers("matthewc2003")
 
     def compute_applications_section(self):
