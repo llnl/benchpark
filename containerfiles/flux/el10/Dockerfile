@@ -1,11 +1,8 @@
 FROM fluxrm/flux-core:el10
 
 USER root
-ADD https://adpkicert.llnl.gov/PAN-cspca.llnl.gov.crt \
-	/etc/pki/ca-trust/source/anchors/cspca.crt
 
-RUN update-ca-trust extract \
-    && dnf clean all \
+RUN dnf clean all \
 	&& rm -rf /var/cache/dnf \
 	&& git config --global checkout.workers 1024 \
 	&& git config --global feature.manyFiles true \
