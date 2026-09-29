@@ -309,7 +309,11 @@ class Kripke(
             else "~gpu-aware-mpi"
         )
         chai = "+chai" if self.spec.variants["chai"][0] else "~chai"
-        direct_device_plane = "+direct-device-plane" if self.spec.variants["direct-device-plane"][0] else "~direct-device-plane"
+        direct_device_plane = (
+            "+direct-device-plane"
+            if self.spec.variants["direct-device-plane"][0]
+            else "~direct-device-plane"
+        )
         self.add_package_spec(
             self.name,
             [f"kripke{self.determine_version()} {gam} {chai} {direct_device_plane} +mpi"],
