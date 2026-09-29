@@ -32,7 +32,7 @@ RUN pip install --upgrade pip \
 ENV CALI_INSTALL_PREFIX=/home/fluxuser/caliper-install \
     MPIBIND_INSTALL_PREFIX=/home/fluxuser/mpibind-install \
     GIT_CLONE_STAGING_DIR=/tmp/build \
-    PATH=/home/fluxuser/.local/bin:${PATH}
+    PATH=/home/fluxuser/.local/bin:${PATH:-}
 
 RUN source /etc/profile.d/modules.sh \
     && module load mpi \
@@ -83,10 +83,10 @@ RUN source /etc/profile.d/modules.sh \
     && rm -rf ${GIT_CLONE_STAGING_DIR}/Adiak \
     && rm -rf ${GIT_CLONE_STAGING_DIR}/mpibind
 
-ENV FLUX_SHELL_RC_PATH=/home/fluxuser/build/share/mpibind:$FLUX_SHELL_RC_PATH \
-    PATH=${CALI_INSTALL_PREFIX}/bin:$PATH \
-    LD_LIBRARY_PATH=${CALI_INSTALL_PREFIX}/lib:${CALI_INSTALL_PREFIX}/lib64:$LD_LIBRARY_PATH \
-    PYTHONPATH=${CALI_INSTALL_PREFIX}/lib/python3.9/site-packages:$PYTHONPATH
+ENV FLUX_SHELL_RC_PATH=/home/fluxuser/build/share/mpibind:${FLUX_SHELL_RC_PATH:-} \
+    PATH=${CALI_INSTALL_PREFIX}/bin:${PATH:-} \
+    LD_LIBRARY_PATH=${CALI_INSTALL_PREFIX}/lib:${CALI_INSTALL_PREFIX}/lib64:${LD_LIBRARY_PATH:-} \
+    PYTHONPATH=${CALI_INSTALL_PREFIX}/lib/python3.9/site-packages:${PYTHONPATH:-}
 
 # Install analysis tools: hatchet, thicket, treescape
 RUN pip install llnl-hatchet==2025.2.0 \
