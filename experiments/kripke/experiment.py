@@ -316,5 +316,7 @@ class Kripke(
         )
         self.add_package_spec(
             self.name,
-            [f"kripke{self.determine_version()} {gam} {chai} {direct_device_plane} +mpi"],
+            [
+                f"kripke{self.determine_version()} {gam} {chai} {direct_device_plane} +mpi"
+            ],
         )
