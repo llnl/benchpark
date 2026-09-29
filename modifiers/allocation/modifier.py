@@ -6,7 +6,9 @@
 import math
 from enum import Enum
 
+import ramble.config
 from ramble.modkit import *
+from spack.spec import Spec
 
 
 class AllocOpt(Enum):
@@ -266,7 +268,12 @@ class Allocation(BasicModifier):
                 val = ""
             app.define_variable(var, str(val))
 
-        if v.n_threads_per_proc:
+        benchpark_spec = ramble.config.get("config:spec")
+        if (
+            benchpark_spec
+            and Spec(benchpark_spec).satisfies("+openmp")
+            and v.n_threads_per_proc
+        ):
             self.env_var_modification(
                 "OMP_NUM_THREADS",
                 method="set",
