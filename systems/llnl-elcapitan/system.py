@@ -890,10 +890,7 @@ class LlnlElcapitan(System):
                 gpu_factor = 3
             elif gpumode in ("CPX", "CPXALL"):
                 gpu_factor = 6
-            if gpumode.endswith("ALL"):
-                extra_batch_opts.append(f"--amd-gpumode={gpumode}")
-            else:
-                extra_batch_opts.append(f"--setattr=gpumode={gpumode}")
+            extra_batch_opts.append(f"--amd-gpumode={gpumode}")
             extra_batch_opts.append("--conf=resource.rediscover=true")
 
             # Rabbits

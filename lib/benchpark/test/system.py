@@ -45,23 +45,23 @@ def test_system_compute_variables_section(monkeypatch):
             "rocm_version": "6.4.3",
             "gtl_flag": True,
             "gpu_factor": 1,
-            "extra_batch_opts": "-o spindle.level=off\n--setattr=gpumode=SPX\n--conf=resource.rediscover=true",
+            "extra_batch_opts": "-o spindle.level=off\n--amd-gpumode=SPX\n--conf=resource.rediscover=true",
         }
     }
 
 
 @pytest.mark.parametrize(
-    "gpumode,sys_gpus_per_node,gpu_factor,flux_option",
+    "gpumode,sys_gpus_per_node,gpu_factor",
     [
-        ("SPX", 4, 1, "--setattr=gpumode=SPX"),
-        ("TPX", 12, 3, "--setattr=gpumode=TPX"),
-        ("CPX", 24, 6, "--setattr=gpumode=CPX"),
-        ("SPXALL", 4, 1, "--amd-gpumode=SPXALL"),
-        ("TPXALL", 12, 3, "--amd-gpumode=TPXALL"),
-        ("CPXALL", 24, 6, "--amd-gpumode=CPXALL"),
+        ("SPX", 4, 1),
+        ("TPX", 12, 3),
+        ("CPX", 24, 6),
+        ("SPXALL", 4, 1),
+        ("TPXALL", 12, 3),
+        ("CPXALL", 24, 6),
     ],
 )
-def test_mi300a_gpumode_options(gpumode, sys_gpus_per_node, gpu_factor, flux_option):
+def test_mi300a_gpumode_options(gpumode, sys_gpus_per_node, gpu_factor):
     sys_spec = benchpark.spec.SystemSpec(
         f"llnl-elcapitan cluster=tuolumne gpumode={gpumode}"
     ).concretize()
@@ -71,13 +71,8 @@ def test_mi300a_gpumode_options(gpumode, sys_gpus_per_node, gpu_factor, flux_opt
     assert vars_section["sys_gpus_per_node"] == sys_gpus_per_node
     assert vars_section["gpu_factor"] == gpu_factor
     batch_options = vars_section["extra_batch_opts"].splitlines()
-    assert flux_option in batch_options
-    if gpumode.endswith("ALL"):
-        assert not any(
-            option.startswith("--setattr=gpumode=") for option in batch_options
-        )
-    else:
-        assert not any(option.startswith("--amd-gpumode=") for option in batch_options)
+    assert f"--amd-gpumode={gpumode}" in batch_options
+    assert not any(option.startswith("--setattr=gpumode=") for option in batch_options)
 
 
 def test_system_timeout():
