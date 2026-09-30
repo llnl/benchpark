@@ -91,10 +91,10 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     with when("+chai"):
         depends_on("chai+mpi", when="+mpi")
 
-        depends_on("chai@2026.07.0: +raja cxxstd=20", when="@develop")
-        depends_on("chai@2026.07.0 +raja cxxstd=20", when="@2026.09.0")
-        depends_on("chai@2025.12.0 +raja cxxstd=17", when="@2025.12.0")
-        depends_on("chai@2024.07.0 +raja cxxstd=14", when="@1.2.7.0:2025.07.0")
+        depends_on("chai@2026.07.0: ~examples +raja cxxstd=20", when="@develop")
+        depends_on("chai@2026.07.0 ~examples +raja cxxstd=20", when="@2026.09.0")
+        depends_on("chai@2025.12.0 ~examples +raja cxxstd=17", when="@2025.12.0")
+        depends_on("chai@2024.07.0 ~examples +raja cxxstd=14", when="@1.2.7.0:2025.07.0")
         depends_on("chai~examples+raja", when="@:1.2.7")
         depends_on("chai+openmp", when="+openmp")
         depends_on("chai~openmp", when="~openmp")
