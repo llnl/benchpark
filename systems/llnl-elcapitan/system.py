@@ -126,7 +126,7 @@ class LlnlElcapitan(System):
     variant(
         "gpumode",
         default="SPX",
-        values=("SPX", "TPX", "CPX"),
+        values=("SPX", "TPX", "CPX", "SPXALL", "TPXALL", "CPXALL"),
         description="compute partitioning modes for MI300A",
     )
     variant(
@@ -281,11 +281,17 @@ class LlnlElcapitan(System):
 
         # MI300A modes
         if self.rocm_arch == "gfx942":
-            if self.spec.satisfies("gpumode=SPX"):
+            if self.spec.satisfies("gpumode=SPX") or self.spec.satisfies(
+                "gpumode=SPXALL"
+            ):
                 self.sys_gpus_per_node = 4
-            elif self.spec.satisfies("gpumode=TPX"):
+            elif self.spec.satisfies("gpumode=TPX") or self.spec.satisfies(
+                "gpumode=TPXALL"
+            ):
                 self.sys_gpus_per_node = 12
-            elif self.spec.satisfies("gpumode=CPX"):
+            elif self.spec.satisfies("gpumode=CPX") or self.spec.satisfies(
+                "gpumode=CPXALL"
+            ):
                 self.sys_gpus_per_node = 24
             else:
                 raise ValueError(f"Invalid gpumode in spec: {self.spec}")
@@ -877,15 +883,17 @@ class LlnlElcapitan(System):
 
         if self.rocm_arch == "gfx942":
             # MI300A modes
-            if self.spec.satisfies("gpumode=SPX"):
+            gpumode = self.spec.variants["gpumode"][0]
+            if gpumode in ("SPX", "SPXALL"):
                 gpu_factor = 1
-            elif self.spec.satisfies("gpumode=TPX"):
+            elif gpumode in ("TPX", "TPXALL"):
                 gpu_factor = 3
-            elif self.spec.satisfies("gpumode=CPX"):
+            elif gpumode in ("CPX", "CPXALL"):
                 gpu_factor = 6
-            extra_batch_opts.append(
-                f"--setattr=gpumode={self.spec.variants['gpumode'][0]}"
-            )
+            if gpumode.endswith("ALL"):
+                extra_batch_opts.append(f"--amd-gpumode={gpumode}")
+            else:
+                extra_batch_opts.append(f"--setattr=gpumode={gpumode}")
             extra_batch_opts.append("--conf=resource.rediscover=true")
 
             # Rabbits
