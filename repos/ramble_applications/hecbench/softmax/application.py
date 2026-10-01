@@ -19,7 +19,7 @@ class Softmax(ExecutableApplication):
 
     name = "softmax"
 
-    maintainers("chung38")
+    maintainers("matthewc2003")
     tags("synthetic", "micro-benchmark", "gpu")
 
     with when("package_manager_family=spack"):

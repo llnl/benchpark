@@ -47,7 +47,7 @@ class Wmma(
         description="Nodes assigned to the replica ranks",
     )
 
-    maintainers("chung38")
+    maintainers("matthewc2003")
 
     def __init__(self, spec):
         super().__init__(spec)
