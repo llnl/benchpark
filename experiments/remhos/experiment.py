@@ -86,7 +86,7 @@ class Remhos(
         self.add_experiment_variable("lo", 5, False)
         self.add_experiment_variable("fct", 2, False)
         self.add_experiment_variable("vs", 1, False)
-        self.add_experiment_variable("ms", 5, False)
+        self.add_experiment_variable("ms", 100, False)
 
         # resource_count is the number of resources used for this experiment:
         self.add_experiment_variable("resource_count", 4, False)
@@ -162,5 +162,5 @@ class Remhos(
         if self.spec.satisfies("+raja"):
             raja = "+raja"
         self.add_package_spec(
-            self.name, [f"remhos{self.determine_version()} +metis {gam} {raja}"]
+            self.name, [f"remhos{self.determine_version()} ~metis {gam} {raja}"]
         )
