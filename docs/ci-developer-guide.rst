@@ -92,6 +92,44 @@ specified by the ``.gitlab-ci.yml`` configuration file:
    d. A reproducible script for executing an experiment in benchpark
       ``job-control/run-experiment.sh``
    e. Reporting GitLab status to GitHub PRs ``status.yml``.
+   f. Fetching artifacts from previous jobs and pipelines ``fetch-job-artifact.sh``
+   g. Collecting and comparing package versions and commits under ``githash-metadata/``
+   h. Collecting performance data, writing and aggregating test metadata, rendering the
+      status table, and publishing nightly results under ``performance/``.
+
+CI Metadata Pipeline
+====================
+
+Each test job collects githash and Caliper data, then
+``performance/write-test-metadata.sh`` combines the available results with the job
+status in ``artifact-test-metadata/test_metadata.json``. The ``summarize`` stage runs
+``performance/aggregate-test-metadata.sh`` to collect these per-job files into a
+pipeline summary and per-host JSON files, then
+``performance/generate_test_status_table.py`` renders the status table. For scheduled
+pipelines, the ``publish-performance`` stage pushes the per-host files to the
+``benchpark-performance`` repository.
+
+Performance collection currently queries ``Avg time/rank`` for the ``main`` region and
+marks values more than 5 percent above the baseline as regressions. Test jobs use
+``develop`` as ``BASELINE_REF`` and look for an earlier job with the same normalized
+GitLab job name. A new or renamed matrix entry may therefore have no baseline. Missing
+githash, performance, or baseline data is recorded as unavailable and should not prevent
+the current test metadata from being written.
+
+The publishing job requires ``BENCHPARK_PERF_DEPLOY_TOKEN`` to contain, or point to a
+file containing, the SSH private key for ``benchpark-performance``.
+``BENCHPARK_PERF_REPO_URL`` indicates the destination repository.
+
+When adding a monitored benchmark, update its test matrix and matching
+``resource_rules_*`` entry.
+
+::
+
+    python .gitlab/utils/performance/generate_test_status_table.py test_metadata_summary.json
+
+For missing results, first check for Caliper files under the generated workspace, the
+expanded current and baseline job names, the preceding ``after_script`` commands, and
+the artifact-retention status of the baseline job.
 
 ********
  GitHub
