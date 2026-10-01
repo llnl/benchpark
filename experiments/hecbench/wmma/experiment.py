@@ -68,9 +68,7 @@ class Wmma(
         self.add_experiment_variable("matrix_m", matrix_m, True)
         self.add_experiment_variable("matrix_n", matrix_n, True)
         self.add_experiment_variable("matrix_k", matrix_k, True)
-        self.add_experiment_variable(
-            "internal_repetitions", internal_repetitions, True
-        )
+        self.add_experiment_variable("internal_repetitions", internal_repetitions, True)
         self.add_experiment_variable("verify", 1, False)
         replicas = self.spec.variants["replicas"][0]
         nodes = self.spec.variants["nodes"][0]

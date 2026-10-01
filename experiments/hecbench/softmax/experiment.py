@@ -66,9 +66,7 @@ class Softmax(
         self.add_experiment_variable(
             "implementation", self.spec.variants["implementation"][0], True
         )
-        self.add_experiment_variable(
-            "internal_repetitions", internal_repetitions, True
-        )
+        self.add_experiment_variable("internal_repetitions", internal_repetitions, True)
         replicas = self.spec.variants["replicas"][0]
         nodes = self.spec.variants["nodes"][0]
         self.add_experiment_variable("n_nodes", nodes, True)
@@ -83,8 +81,5 @@ class Softmax(
     def compute_package_section(self):
         self.add_package_spec(
             self.name,
-            [
-                f"hecbench{self.determine_version()} "
-                "benchmark=softmax +mpi ~caliper "
-            ],
+            [f"hecbench{self.determine_version()} " "benchmark=softmax +mpi ~caliper "],
         )
