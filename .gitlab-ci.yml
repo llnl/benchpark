@@ -108,7 +108,12 @@ generate_test_summary:
     - . /usr/workspace/benchpark-dev/benchpark-venv/$SYS_TYPE/bin/activate
     - ./bin/benchpark configure --bootstrap-location $CUSTOM_CI_BUILDS_DIR
     - bash .gitlab/utils/performance/aggregate-test-metadata.sh
-    - python .gitlab/utils/performance/generate_test_status_table.py artifact-test-summary/test_metadata_summary.json $CI_PIPELINE_IID $CI_JOB_ID $CI_PIPELINE_CREATED_AT
+    - >
+      python .gitlab/utils/performance/generate_test_status_table.py
+      artifact-test-summary/test_metadata_summary.json
+      $CI_PIPELINE_IID
+      $CI_JOB_ID
+      $CI_PIPELINE_CREATED_AT
   artifacts:
     when: always
     paths: [artifact-test-summary/]
