@@ -504,7 +504,13 @@ def main():
     gitlab_pipeline_iid = args.gitlab_pipeline_iid
     gitlab_job_id = args.gitlab_job_id
     time_pipeline_created = args.pipeline_date
-    fname = "test_status_table_pipelineiid" + gitlab_pipeline_iid + "_jobid" + gitlab_job_id + ".png"
+    fname = (
+        "test_status_table_pipelineiid"
+        + gitlab_pipeline_iid
+        + "_jobid"
+        + gitlab_job_id
+        + ".png"
+    )
     output_path = summary_path.with_name(fname)
     render_table(load_summary(summary_path), output_path, time_pipeline_created)
     print(f"Wrote {output_path}")
