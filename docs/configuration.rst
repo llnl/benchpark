@@ -4,8 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-Configuring Benchpark
-=====================
+#######################
+ Configuring Benchpark
+#######################
 
 Benchpark offers several options to configure usage. This includes:
 
@@ -18,8 +19,9 @@ Benchpark offers several options to configure usage. This includes:
    ``experiments/systems/repos`` directories (``experiment.py``, ``system.py``,
    ``package.py``, and ``application.py``).
 
-Configuring the Benchpark Bootstrap Location
---------------------------------------------
+**********************************************
+ Configuring the Benchpark Bootstrap Location
+**********************************************
 
 Benchpark clones ``ramble``, ``spack``, and ``spack-packages`` into a centralized
 location (by default this is ``~/.benchpark``) to enable building and running
@@ -31,8 +33,9 @@ depend on the speed of the storage you select for the bootstrap location. The bo
 location can be configured in ``<benchpark_root>/config/bootstrap.yaml`` or by running
 ``benchpark configure --bootstrap-location <location>``.
 
-Configuring Which Repositories Benchpark Uses
----------------------------------------------
+***********************************************
+ Configuring Which Repositories Benchpark Uses
+***********************************************
 
 The ``<benchpark_root>/config/repos.yaml`` file is used to fully customize ``system``
 and ``experiment`` repositories used by Benchpark, ``application`` repositories used by
@@ -67,16 +70,18 @@ the configured experiment repositories.
 The same structure applies to nested Ramble application repositories. Register each
 nested application repository in the ``applications`` list in ``config/repos.yaml``.
 
-Automatically Generating Configurations with ``benchpark configure``
---------------------------------------------------------------------
+**********************************************************************
+ Automatically Generating Configurations with ``benchpark configure``
+**********************************************************************
 
 ``benchpark configure`` is designed to create the ``yaml`` configurations for you. As of
 now, it can only generate bootstrap config (``bootstrap.yaml``). If no bootstrap config
 is detected in the chosen scope, this will auto-generate it. ``benchpark configure``
 cannot generate a ``repos.yaml`` file at the moment, this must be written manually.
 
-Configuration Scopes
---------------------
+**********************
+ Configuration Scopes
+**********************
 
 Benchpark can pull configurations from one location, with the following priority
 (highest first):
