@@ -5,7 +5,6 @@
 
 from ramble.appkit import *
 
-
 _FINITE = r"[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?"
 _RESULT_PREFIX = (_FINITE + r"\s*,\s*") * 12
 _RESULT = (

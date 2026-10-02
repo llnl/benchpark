@@ -5,7 +5,6 @@
 
 from ramble.appkit import *
 
-
 _FINITE = r"[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?"
 _AVERAGE_TIME = (
     rf"^\[rank (?P<rank>[0-9]+)\]\s+Average kernel execution time:\s+"

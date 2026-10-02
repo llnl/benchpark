@@ -5,7 +5,6 @@
 
 from ramble.appkit import *
 
-
 _FINITE = r"[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?"
 _RANK_PREFIX = r"^\[rank (?P<rank>[0-9]+)\]\s+"
 _TOTAL_TIME = rf"{_RANK_PREFIX}# Total Time \(s\)\s*:\s*(?P<total_time>{_FINITE})\s*$"
