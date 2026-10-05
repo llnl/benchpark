@@ -12,7 +12,7 @@ import pathlib
 import re
 from typing import Iterable, Iterator, List, Match, Optional, Union
 
-import llnl.util.lang  # noqa
+import spack.util.lang  # noqa
 
 import benchpark.repo
 from benchpark.error import BenchparkError
