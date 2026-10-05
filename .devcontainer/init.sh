@@ -6,6 +6,5 @@ pip install --upgrade pip \
 && pip install docstrfmt codespell black \
 && source /workspaces/benchpark/setup-env.sh \
 && benchpark bootstrap \
-&& cp ~/.bashrc ~/.bashrc.bak \
-&& sed -i '$ d' ~/.bashrc
+&& sed -i 's|home/fluxuser|workspaces|g' ~/.bashrc \
 && echo -e 'source /workspaces/benchpark/setup-env.sh\n' >> ~/.bashrc

@@ -3,7 +3,7 @@
   "image": "ghcr.io/llnl/benchpark/benchpark-flux-el10:latest",
   // or "build": {"dockerfile": "Dockerfile"},
   "overrideCommand": true,
-  "entrypoint": ["exec /usr/bin/flux start /bin/bash", "-l"],
+  "entrypoint": ["exec", "/usr/bin/flux", "start", "/bin/bash"],
   "remoteUser": "fluxuser",
   "forwardPorts": [8000],
   "portsAttributes": {
