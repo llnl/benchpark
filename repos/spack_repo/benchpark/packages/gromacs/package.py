@@ -5,7 +5,6 @@
 
 import os
 
-import llnl.util.filesystem as fs
 from spack.package import *
 from spack_repo.builtin.build_systems.cmake import CMakeBuilder, CMakePackage
 from spack_repo.builtin.build_systems.cuda import CudaPackage
