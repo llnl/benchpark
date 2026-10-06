@@ -4,8 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-import llnl.util.tty.color as color
-
 from benchpark.accounting import (  # noqa: E402
     EXP_DICT,
     benchpark_benchmarks,
@@ -13,6 +11,7 @@ from benchpark.accounting import (  # noqa: E402
     benchpark_modifiers,
     benchpark_systems,
 )
+from benchpark.util.compat import color
 
 
 def _print_helper(name, collection, filter=None):

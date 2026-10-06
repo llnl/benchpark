@@ -12,7 +12,6 @@ import subprocess
 import sys
 from pprint import pprint
 
-import llnl.util.tty.color as color
 import yaml
 from deepdiff import DeepDiff
 
@@ -20,6 +19,7 @@ import benchpark.spec
 import benchpark.system
 import benchpark.system_external
 from benchpark.paths import paths
+from benchpark.util.compat import color
 
 
 def system_init(args):
