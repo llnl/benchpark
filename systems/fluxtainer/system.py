@@ -33,7 +33,7 @@ class Fluxtainer(System):
         self.scheduler = "flux"
         setattr(self, "sys_cores_per_node", 8)
         setattr(self, "sys_mem_per_node_GB", 1)
-        setattr(self, "n_nodes", 4)
+        setattr(self, "n_nodes", 1)
         attrs = self.id_to_resources.get(self.spec.variants["instance_type"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
