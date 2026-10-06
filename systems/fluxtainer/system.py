@@ -160,7 +160,7 @@ class Fluxtainer(System):
                     "buildable": False,
                 },
                 "caliper": {
-                    "externals": [{"spec": "caliper@master", "prefix": "/home/fluxuser/caliper-install/"}],
+                    "externals": [{"spec": "caliper@master+adiak~libdw~libunwind+mpi~papi", "prefix": "/home/fluxuser/caliper-install/"}],
                     "buildable": False,
                 },
                 "adiak": {
@@ -169,10 +169,6 @@ class Fluxtainer(System):
                 },
                 "expat": {
                     "externals": [{"spec": "expat@2.7.1", "prefix": "/usr"}],
-                    "buildable": False,
-                },
-                "fmt": {
-                    "externals": [{"spec": "fmt@11.0.2", "prefix": "/usr"}],
                     "buildable": False,
                 },
                 "gdbm": {
