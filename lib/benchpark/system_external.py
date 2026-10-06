@@ -104,7 +104,10 @@ fi
 
 spack_status=""
 if [ -n "${BENCHPARK_SPACK_REQUEST:-}" ]; then
-    printf '%s' "$BENCHPARK_SPACK_REQUEST" | "$BENCHPARK_SPACK_EXECUTABLE" python -c "$BENCHPARK_SPACK_CODE"
+    printf '%s' "$BENCHPARK_SPACK_REQUEST" | \
+        "$BENCHPARK_SPACK_EXECUTABLE" \
+        -c "$BENCHPARK_SPACK_REPOSITORY_CONFIG" \
+        python -c "$BENCHPARK_SPACK_CODE"
     spack_status=$?
 fi
 _emit "valid" "" "" "$loaded_modules" "$spack_status"
@@ -586,10 +589,28 @@ def _with_canonical_spec(external, spec, version):
 def _spack_command():
     return [
         str(paths.benchpark_home / "spack/bin/spack"),
+        "-c",
+        _spack_repository_config(),
         "python",
         "-c",
         "exec(" + repr(_SPACK_HELPER) + ")",
     ]
+
+
+def _spack_repository_config():
+    repository = (
+        paths.benchpark_home / "spack-packages" / "repos" / "spack_repo" / "builtin"
+    )
+    return f"repos:builtin:{repository}"
+
+
+def _spack_environment():
+    environment = os.environ.copy()
+    environment["SPACK_DISABLE_LOCAL_CONFIG"] = "1"
+    environment["SPACK_USER_CACHE_PATH"] = str(
+        paths.benchpark_home / "spack-user-cache"
+    )
+    return environment
 
 
 def _framed_response(stdout, prefix, producer):
@@ -622,7 +643,7 @@ def _run_spack_helper(request, *, timeout=_SPACK_TIMEOUT_SECONDS, site_purged=Fa
             "benchpark-system-external",
         ] + command
 
-    environment = os.environ.copy()
+    environment = _spack_environment()
     if site_purged:
         virtual_env = environment.pop("VIRTUAL_ENV", None)
         if virtual_env:
@@ -632,7 +653,6 @@ def _run_spack_helper(request, *, timeout=_SPACK_TIMEOUT_SECONDS, site_purged=Fa
                 for entry in environment.get("PATH", "").split(os.pathsep)
                 if entry != virtual_env_bin
             )
-    environment["SPACK_DISABLE_LOCAL_CONFIG"] = "1"
     completed = subprocess.run(
         command,
         input=json.dumps(request, sort_keys=True),
@@ -781,12 +801,12 @@ def _validate_module_sequence(modules, hybrid_request=None):
     if not modules:
         raise ValueError("module validation requires a declared module sequence")
 
-    environment = os.environ.copy()
-    environment["SPACK_DISABLE_LOCAL_CONFIG"] = "1"
+    environment = _spack_environment()
     environment["BENCHPARK_EXTERNAL_MODULE_EMITTER"] = _MODULE_RESULT_EMITTER
     if hybrid_request is not None:
         spack_command = _spack_command()
         environment["BENCHPARK_SPACK_EXECUTABLE"] = spack_command[0]
+        environment["BENCHPARK_SPACK_REPOSITORY_CONFIG"] = _spack_repository_config()
         environment["BENCHPARK_SPACK_CODE"] = spack_command[-1]
         environment["BENCHPARK_SPACK_REQUEST"] = json.dumps(
             hybrid_request, sort_keys=True
