@@ -16,6 +16,9 @@ RUN dnf clean all \
     gettext \
     ncurses-devel \
     sqlite \
+    pigz \
+    libmd-devel \
+    libbsd-devel \
     && dnf clean all \
     && rm -rf /var/cache/dnf
 

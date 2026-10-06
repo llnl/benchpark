@@ -155,6 +155,90 @@ class Fluxtainer(System):
                     "externals": [{"spec": "libtool@2.4.7", "prefix": "/usr"}],
                     "buildable": False,
                 },
+                "bzip2": {
+                    "externals": [{"spec": "bzip2@1.0.8", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "caliper": {
+                    "externals": [{"spec": "caliper@master", "prefix": "/home/fluxuser/caliper-install/"}],
+                    "buildable": False,
+                },
+                "adiak": {
+                    "externals": [{"spec": "adiak@master", "prefix": "/home/fluxuser/caliper-install/"}],
+                    "buildable": False,
+                },
+                "expat": {
+                    "externals": [{"spec": "expat@2.7.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "fmt": {
+                    "externals": [{"spec": "fmt@11.0.2", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "gdbm": {
+                    "externals": [{"spec": "gdbm@1.23", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "gettext": {
+                    "externals": [{"spec": "gettext@0.22.5", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "libffi": {
+                    "externals": [{"spec": "libffi@3.4.4", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "libxml2": {
+                    "externals": [{"spec": "libxml2@2.12.5", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "ncurses": {
+                    "externals": [{"spec": "ncurses@6.4", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "readline": {
+                    "externals": [{"spec": "readline@8.2", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "sqlite": {
+                    "externals": [{"spec": "sqlite@3.46.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "tar": {
+                    "externals": [{"spec": "tar@1.35", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "util-linux-uuid": {
+                    "externals": [{"spec": "util-linux-uuid@2.40.2", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "xz": {
+                    "externals": [{"spec": "xz@5.6.2", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "zstd": {
+                    "externals": [{"spec": "zstd@1.5.5", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "gmake": {
+                    "externals": [{"spec": "gmake@4.4.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "pigz": {
+                    "externals": [{"spec": "pigz@2.8.7", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "libmd": {
+                    "externals": [{"spec": "libmd@1.2.0", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "libbsd": {
+                    "externals": [{"spec": "libbsd@0.12.2", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "python": {
+                    "externals": [{"spec": "python@3.12.12", "prefix": "/usr"}],
+                    "buildable": False,
+                },
             }
         }
 
