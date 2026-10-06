@@ -408,7 +408,10 @@ class Laghos(
     def compute_package_section(self):
         gam = "~gpu-aware-mpi"
         raja = "~raja"
-        metis = "~metis"
+        if self.spec.satisfies("mesh-strategy=epm"):
+            metis = "~metis"
+        else:
+            metis = "+metis"
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             if self.spec.satisfies("+gpu-aware-mpi"):
                 gam = "+gpu-aware-mpi"

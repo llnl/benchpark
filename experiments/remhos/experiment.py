@@ -93,7 +93,7 @@ class Remhos(
         self.add_experiment_variable("lo", 5, False)
         self.add_experiment_variable("fct", 2, False)
         self.add_experiment_variable("vs", 1, False)
-        self.add_experiment_variable("ms", 100, False)
+        self.add_experiment_variable("ms", 5, False)
 
         # resource_count is the number of resources used for this experiment:
         self.add_experiment_variable("resource_count", 4, False)
