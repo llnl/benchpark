@@ -159,14 +159,6 @@ class Fluxtainer(System):
                     "externals": [{"spec": "bzip2@1.0.8", "prefix": "/usr"}],
                     "buildable": False,
                 },
-                "caliper": {
-                    "externals": [{"spec": "caliper@master+adiak~libdw~libunwind+mpi~papi", "prefix": "/home/fluxuser/caliper-install/"}],
-                    "buildable": False,
-                },
-                "adiak": {
-                    "externals": [{"spec": "adiak@master", "prefix": "/home/fluxuser/caliper-install/"}],
-                    "buildable": False,
-                },
                 "expat": {
                     "externals": [{"spec": "expat@2.7.1", "prefix": "/usr"}],
                     "buildable": False,
