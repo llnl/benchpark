@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: Apache-2.0
 import inspect
 
-import llnl.util.filesystem as fs
 from spack.package import *
+import spack.util.filesystem as fs
 from spack_repo.builtin.build_systems.makefile import MakefilePackage
 
 
