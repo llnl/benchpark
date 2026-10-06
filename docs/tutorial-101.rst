@@ -31,8 +31,8 @@ presentations of this tutorial (oldest to most recent):
   <https://pact2026.github.io/workshops/reproducible-benchmarking-tutorial/>`_ on
   Benchpark and Ramble.
 
-.. image:: tutorial/ICS26-Tutorial-Slide-Preview.jpg
-    :target: _static/slides/ICS26-Tutorial-Slides.pdf
+.. image:: tutorial/HPCIC26-Tutorial-Slide-Preview.jpg
+    :target: _static/slides/HPCIC26-Tutorial-Slides.pdf
     :height: 72px
     :align: left
     :alt: Slide Preview

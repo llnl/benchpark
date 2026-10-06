@@ -26,19 +26,6 @@ class RajaPerf(BuiltinRajaPerf):
         description="Enable Caliper subkernel regions when Caliper support is enabled",
     )
 
-    version(
-        "2025.12.1",
-        tag="v2025.12.1",
-        commit="e3c6197dfa8f1c9ac61635c26775c333411bdcd5",
-        submodules=True,
-    )
-    version(
-        "2025.12.0",
-        tag="v2025.12.0",
-        commit="f2ad263e08db89327ceccaa9a6c1e994b6d24e67",
-        submodules=True,
-    )
-
     def setup_run_environment(self, env):
         super().setup_run_environment(env)
 
