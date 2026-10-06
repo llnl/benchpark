@@ -245,7 +245,7 @@ def _detect(request):
         declared_specs = _parse_declared_specs(raw_declared_specs)
         if spack.repo.PATH.is_virtual(package):
             return {"outcome": "no_applicable_validator", "finders": []}
-        repository = spack.repo.PATH.ensure_unwrapped()
+        repository = spack.util.lang.ensure_unwrapped(spack.repo.PATH)
         package_class = repository.get_pkg_class(package)
     except Exception as error:
         return {"outcome": "failed", "detail": _error_detail(error), "finders": []}
@@ -2374,6 +2374,8 @@ def _frozen_validation_results(new_declarations, package_result):
         )
         if old_index is not None:
             old_result = old_results.pop(old_index)
+            if old_result.state == "REPLACEMENT":
+                old_result = replace(old_result, state="NOT_FOUND")
             validations.append(replace(old_result, external=declaration))
             continue
         matching_candidate = next(
