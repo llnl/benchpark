@@ -1,12 +1,12 @@
-# Copyright 2023 Lawrence Livermore National Security, LLC and other
-# Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+# Copyright Spack Project Developers. See COPYRIGHT file for details.
 #
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
-from spack.package import *
 from spack_repo.builtin.build_systems.cuda import CudaPackage
 from spack_repo.builtin.build_systems.makefile import MakefilePackage
 from spack_repo.builtin.build_systems.rocm import ROCmPackage
+
+from spack.package import *
 
 
 class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
@@ -16,35 +16,48 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     discretization and explicit high-order time-stepping.
     """
 
-    tags = ["proxy-app", "ecp-proxy-app"]
+    tags = ["proxy-app", "ecp-proxy-app", "e4s"]
 
-    homepage = "https://github.com/CEED/Laghos"
+    homepage = "https://computing.llnl.gov/projects/co-design/laghos"
+    url = "https://github.com/CEED/Laghos/archive/v1.0.tar.gz"
     git = "https://github.com/CEED/Laghos.git"
 
-    maintainers("wdhawkins")
+    maintainers("v-dobrev", "tzanio", "vladotomov")
 
     license("BSD-2-Clause")
 
     version("develop", branch="master")
+    version("4.0", branch="master")
+    version("3.1", sha256="49b65edcbf9732c7f6c228958620e18980c43ad8381315a8ba9957ecb7534cd5")
+    version("3.0", sha256="4db56286e15b42ecdc8d540c4888a7dec698b019df9c7ccb8319b7ea1f92d8b4")
+    version("2.0", sha256="dd3632d5558889beec2cd3c49eb60f633f99e6d886ac868731610dd006c44c14")
+    version("1.1", sha256="53b9bfe2af263c63eb4544ca1731dd26f40b73a0d2775a9883db51821bf23b7f")
+    version("1.0", sha256="af50a126355a41c758fcda335a43fdb0a3cd97e608ba51c485afda3dd84a5b34")
 
     variant("metis", default=True, description="Enable/disable METIS support")
-    variant("caliper", default=False, description="Enable/disable Caliper support")
     variant("ofast", default=False, description="Enable gcc optimization flags")
+    variant("caliper", default=False, description="Enable/disable Caliper support")
     variant("gpu-aware-mpi", default=False, description="Enable GPU aware MPI")
     variant("raja", default=True, description="Use RAJA backend for MFEM")
 
-    depends_on("c", type="build")
-    depends_on("cxx", type="build")
-    depends_on("fortran", type="build")
+    depends_on("cxx", type="build")  # generated
+
+    depends_on("mpi")
+
+    depends_on("camp@2026.07.1:", when="@develop")
+    depends_on("umpire@2026.07.1:", when="@develop")
+    depends_on("raja@2026.07.0: ~examples~exercises cxxstd=20", when="@develop")
+
+    depends_on("camp@2026.07.1", when="@4.0")
+    depends_on("umpire@2026.07.1", when="@4.0")
+    depends_on("raja@2026.07.0 ~examples~exercises cxxstd=20", when="@4.0")
 
     depends_on("mfem+mpi+metis", when="+metis")
     depends_on("mfem+mpi~metis", when="~metis")
     depends_on("mfem+raja", when="+raja")
-    depends_on("caliper", when="+caliper")
-    depends_on("adiak~shared", when="+caliper")
 
-    depends_on("zlib+optimize+pic~shared")
-    depends_on("mfem@4.10", when="@develop")
+    depends_on("mfem@develop", when="@develop")
+    depends_on("mfem@4.10", when="@4.0")
     depends_on("mfem@4.2.0:", when="@3.1")
     depends_on("mfem@4.1.0:4.1", when="@3.0")
     # Recommended mfem version for laghos v2.0 is: ^mfem@3.4.1-laghos-v2.0
@@ -53,37 +66,39 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     depends_on("mfem@3.3.1-laghos-v1.0", when="@1.0,1.1")
     depends_on("mfem+caliper", when="+caliper")
     depends_on("mfem cxxstd=20", when="@develop")
+    depends_on("mfem cxxstd=20", when="@4.0")
 
-    depends_on("camp@2026.07.1", when="@develop")
-    depends_on("umpire@2026.07.1", when="@develop")
-    depends_on("raja@2026.07.0 ~examples~exercises cxxstd=20", when="@develop")
+    depends_on("caliper", when="+caliper")
+    depends_on("adiak~shared", when="+caliper")
 
+    depends_on("zlib+optimize+pic~shared")
     requires("^[virtuals=zlib-api] zlib")
 
-    depends_on("mpi")
     depends_on("hypre+mpi")
     depends_on("hypre+mixedint~fortran")
     depends_on("hypre+caliper", when="+caliper")
 
-    depends_on("hypre+cuda+mpi+umpire", when="+cuda")
     depends_on("hypre~cuda", when="~cuda")
-    depends_on("mfem+cuda+mpi+umpire", when="+cuda")
     depends_on("mfem~cuda", when="~cuda")
 
-    for sm_ in CudaPackage.cuda_arch_values:
-        depends_on("hypre cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
-        depends_on("mfem cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
-        depends_on("umpire cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
+    with when("+cuda"):
+        depends_on("hypre+cuda+umpire")
+        depends_on("mfem+cuda+umpire")
+        for sm_ in CudaPackage.cuda_arch_values:
+            depends_on("hypre cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
+            depends_on("mfem cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
+            depends_on("umpire cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
 
-    depends_on("hypre+rocm+mpi+umpire", when="+rocm")
     depends_on("hypre~rocm", when="~rocm")
-    depends_on("mfem+rocm+mpi+umpire", when="+rocm")
     depends_on("mfem~rocm", when="~rocm")
     
-    for arch in ROCmPackage.amdgpu_targets:
-        depends_on("hypre amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
-        depends_on("mfem amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
-        depends_on("umpire amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
+    with when("+rocm"):
+        depends_on("hypre+rocm+umpire")
+        depends_on("mfem+rocm+umpire")
+        for arch in ROCmPackage.amdgpu_targets:
+            depends_on("hypre amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
+            depends_on("mfem amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
+            depends_on("umpire amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
 
     depends_on("hypre+gpu-aware-mpi", when="+gpu-aware-mpi")
 
@@ -125,5 +140,3 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         mkdirp(prefix.bin)
         install("laghos", prefix.bin)
         install_tree("data", prefix.data)
-
-    install_time_test_callbacks = []  # type: List[str]

@@ -46,7 +46,8 @@ class Laghos(
 
     variant(
         "version",
-        default="develop",
+        default="4.0",
+        values=("develop", "4.0"),
         description="app version",
     )
 
@@ -62,6 +63,13 @@ class Laghos(
         default="refinement",
         values=("epm", "refinement", "meshfile"),
         description="Type of mesh generation strategy to use",
+    )
+
+    variant(
+        "metis",
+        default=False,
+        values=(True, False),
+        description="Enable metis in mfem",
     )
 
     variant(
@@ -400,11 +408,14 @@ class Laghos(
     def compute_package_section(self):
         gam = "~gpu-aware-mpi"
         raja = "~raja"
+        metis = "~metis"
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             if self.spec.satisfies("+gpu-aware-mpi"):
                 gam = "+gpu-aware-mpi"
         if self.spec.satisfies("+raja"):
             raja = "+raja"
+        if self.spec.satisfies("+metis"):
+            metis = "+metis"
         self.add_package_spec(
-            self.name, [f"laghos{self.determine_version()} ~metis {gam} {raja}"]
+            self.name, [f"laghos{self.determine_version()} {metis} {gam} {raja}"]
         )
