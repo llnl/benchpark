@@ -75,8 +75,8 @@ def parse_args():
     parser.add_argument(
         "gitlab_pipeline_start_date", help="Date when GitLab pipeline was started."
     )
-    parser.add_argument("github_pr_branch", help="GitHub PR branch name.")
-    parser.add_argument("github_pr_num", help="GitHub PR number.")
+#    parser.add_argument("github_pr_branch", help="GitHub PR branch name.")
+#    parser.add_argument("github_pr_num", help="GitHub PR number.")
     return parser.parse_args()
 
 
@@ -228,7 +228,7 @@ def add_cell(ax, x, y, width, height, status, markers=None):
         )
 
 
-def render_table(summary, output_path, pipeline_date, branch_name, pr_num):
+def render_table(summary, output_path, pipeline_date):
     results = summary.get("results", [])
     rows, hosts, matrix, row_packages = build_matrix(results)
 
@@ -290,7 +290,7 @@ def render_table(summary, output_path, pipeline_date, branch_name, pr_num):
     ax.text(
         left + content_width / 2,
         title_y,
-        "CI Experiment Status\n" + pipeline_date + "\n" + branch_name + ", " + pr_num,
+        "CI Experiment Status\n" + pipeline_date,
         ha="center",
         va="center",
         fontsize=14,
@@ -508,8 +508,8 @@ def main():
     summary_path = Path(args.summary_json)
     gitlab_pipeline_iid = args.gitlab_pipeline_iid
     gitlab_job_id = args.gitlab_job_id
-    github_pr_branch = args.github_pr_branch
-    github_pr_num = args.github_pr_num
+#    github_pr_branch = args.github_pr_branch
+#    github_pr_num = args.github_pr_num
     time_pipeline_created = args.gitlab_pipeline_start_date
     fname = (
         "test_status_table_pipelineiid"
@@ -523,8 +523,8 @@ def main():
         load_summary(summary_path),
         output_path,
         time_pipeline_created,
-        github_pr_branch,
-        github_pr_num,
+#        github_pr_branch,
+#        github_pr_num,
     )
     print(f"Wrote {output_path}")
 

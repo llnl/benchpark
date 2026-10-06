@@ -114,8 +114,6 @@ generate_test_summary:
       $CI_PIPELINE_IID
       $CI_JOB_ID
       $CI_PIPELINE_CREATED_AT
-      $CI_EXTERNAL_PULL_REQUEST_SOURCE_BRANCH
-      $CI_EXTERNAL_PULL_REQUEST_IID
   artifacts:
     when: always
     paths: [artifact-test-summary/]
