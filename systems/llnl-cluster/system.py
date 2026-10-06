@@ -343,9 +343,9 @@ class LlnlCluster(System):
                     "externals": [
                         {
                             "spec": "mvapich2@2.3.7",
-                            "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2025.2.0",
+                            "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2025.3.1",
                             "extra_attributes": {
-                                "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2025.2.0/lib -lmpi"
+                                "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2025.3.1/lib -lmpi"
                             },
                         }
                     ],
@@ -355,9 +355,9 @@ class LlnlCluster(System):
                     "externals": [
                         {
                             "spec": "openmpi@4.1.2",
-                            "prefix": "/usr/tce/packages/openmpi/openmpi-4.1.2-intel-2025.2.0",
+                            "prefix": "/usr/tce/packages/openmpi/openmpi-4.1.2-intel-2025.3.1",
                             "extra_attributes": {
-                                "ldflags": "-L/usr/tce/packages/openmpi/openmpi-4.1.2-intel-2025.2.0/lib -lmpi"
+                                "ldflags": "-L/usr/tce/packages/openmpi/openmpi-4.1.2-intel-2025.3.1/lib -lmpi"
                             },
                         }
                     ],
@@ -430,8 +430,8 @@ class LlnlCluster(System):
                 "intel-oneapi-compilers",
                 [
                     compiler_def(
-                        "intel-oneapi-compilers@2025.2.0~envmods",
-                        "/usr/tce/packages/intel/intel-2025.2.0/compiler/2025.2/",
+                        "intel-oneapi-compilers@2025.3.1~envmods",
+                        "/usr/tce/packages/intel/intel-2025.3.1/compiler/2025.3/",
                         {"c": "icx", "cxx": "icpx", "fortran": "ifx"},
                     )
                 ],
