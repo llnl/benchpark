@@ -2639,25 +2639,13 @@ def _report_reconciliation(system_spec, package_results, *, heading=None):
 
 
 def _reconciliation_exit_status(package_results):
-    """Return the stable v1 result status, not an operational-error status."""
+    """Return failure only when a package validator could not execute."""
 
-    for package_result in package_results:
-        if package_result.validator_outcome in {
-            "VALIDATOR_FAILED",
-            "UNSUPPORTED_DETECTION",
-            "REVIEW_REQUIRED",
-        }:
-            return 1
-        if any(
-            declaration.state in {"NOT_FOUND", "REPLACEMENT", "REVIEW_REQUIRED"}
-            for declaration in package_result.declarations
-        ):
-            return 1
-        if any(
-            candidate.classification == "ADDITIONAL_VERSION"
-            for candidate in package_result.candidates
-        ):
-            return 1
+    if any(
+        package_result.validator_outcome == "VALIDATOR_FAILED"
+        for package_result in package_results
+    ):
+        return 1
     return 0
 
 
@@ -2670,7 +2658,7 @@ def run(args):
             "External reconciliation could not produce a trustworthy result: "
             f"{error}"
         )
-        return 2
+        return 1
 
     propose = getattr(args, "propose", False)
     apply = getattr(args, "apply", False)
@@ -2688,7 +2676,7 @@ def run(args):
     if not apply:
         return _reconciliation_exit_status(package_results)
     if source_error:
-        return _reconciliation_exit_status(package_results)
+        return 1
 
     try:
         package_results, applied = _apply_source_proposals(
@@ -2696,7 +2684,7 @@ def run(args):
         )
     except _ApplyVerificationError as error:
         print(f"External reconciliation apply failed: {error}")
-        return 2
+        return 1
     if applied:
         _report_reconciliation(
             system_spec, package_results, heading="Post-apply external reconciliation"

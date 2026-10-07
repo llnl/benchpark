@@ -5,8 +5,25 @@
 
 import json
 import subprocess
+from types import SimpleNamespace
 
 import benchpark.system_external as system_external
+
+
+def test_reconciliation_findings_are_successful():
+    package_results = [
+        SimpleNamespace(validator_outcome="SUCCESS"),
+        SimpleNamespace(validator_outcome="UNSUPPORTED_DETECTION"),
+        SimpleNamespace(validator_outcome="REVIEW_REQUIRED"),
+    ]
+
+    assert system_external._reconciliation_exit_status(package_results) == 0
+
+
+def test_validator_failure_is_an_operational_failure():
+    package_results = [SimpleNamespace(validator_outcome="VALIDATOR_FAILED")]
+
+    assert system_external._reconciliation_exit_status(package_results) == 1
 
 
 def test_spack_command_uses_pinned_package_repository(monkeypatch, tmp_path):

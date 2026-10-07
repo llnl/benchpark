@@ -64,6 +64,16 @@ updating the ROCm version to 7.2.0 as follows:
 The proposed changes are written to standard output. Changes that cannot be updated
 cleanly are reported for manual review.
 
+*************
+ Exit Status
+*************
+
+The command exits with status 0 when reconciliation completes, including when it
+reports missing packages, replacements, additional versions, unsupported detections,
+or items that require manual review. It exits with status 1 when a validator cannot
+execute, reconciliation cannot produce a result, or a requested source update cannot
+be completed and verified.
+
 ***********************************
  Apply Local Changes to the System
 ***********************************

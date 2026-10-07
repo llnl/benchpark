@@ -27,7 +27,7 @@ def main():
         unique_id = uuid.uuid4().hex
         coverage_file = coverage_dir / f".coverage.{unique_id}"
         # Run the code with coverage, writing to the unique file
-        return subprocess.run(
+        subprocess.run(
             [
                 sys.executable,
                 "-m",
@@ -38,10 +38,11 @@ def main():
                 main_py,
             ]
             + sys.argv[1:],
-        ).returncode
+            check=True,
+        )
     else:
-        return subprocess.run([sys.executable, main_py] + sys.argv[1:]).returncode
+        subprocess.run([sys.executable, main_py] + sys.argv[1:], check=True)
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
