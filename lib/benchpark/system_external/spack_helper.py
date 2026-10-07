@@ -18,7 +18,6 @@ import spack.repo
 import spack.spec
 from spack.detection.path import ExecutablesFinder, LibrariesFinder
 
-
 _RESULT_PREFIX = "BENCHPARK_EXTERNAL_RESULT="
 
 
