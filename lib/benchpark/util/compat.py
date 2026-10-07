@@ -17,5 +17,3 @@ from spack.util.lang import Singleton, dedupe
 # Spack removed HashableMap without providing a replacement. Ramble still
 # supplies the implementation required by Benchpark's VariantMap.
 from llnl.util.lang import HashableMap
-
-
