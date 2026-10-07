@@ -5,6 +5,7 @@
 
 import json
 import subprocess
+from pathlib import Path
 from types import SimpleNamespace
 
 import benchpark.system_external as system_external
@@ -38,6 +39,8 @@ def test_spack_command_uses_pinned_package_repository(monkeypatch, tmp_path):
         f"repos:builtin:{repository}",
         "python",
     ]
+    package_dir = Path(system_external.__file__).resolve().parent
+    assert command[4] == str(package_dir / "spack_helper.py")
 
 
 def test_spack_environment_uses_bootstrap_cache(monkeypatch, tmp_path):
@@ -90,4 +93,11 @@ def test_hybrid_module_validation_propagates_spack_settings(monkeypatch, tmp_pat
         f"repos:builtin:{repository}"
     )
     assert environment["SPACK_USER_CACHE_PATH"] == str(tmp_path / "spack-user-cache")
+    package_dir = Path(system_external.__file__).resolve().parent
+    assert environment["BENCHPARK_SPACK_HELPER"] == str(package_dir / "spack_helper.py")
+    assert captured["command"][:3] == [
+        "/bin/bash",
+        "-l",
+        str(package_dir / "module_validator.sh"),
+    ]
     assert result["spack_detection"] == expected_detection
