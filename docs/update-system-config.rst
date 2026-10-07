@@ -23,14 +23,13 @@ machine. For adding a new system, please see :doc:`add-a-system-config`.
 
 ``benchpark system external`` uses the Spack and ``spack-packages`` checkouts in
 Benchpark's configured bootstrap location. The command selects the pinned
-``spack-packages`` repository for each Spack invocation, so detection does not depend
-on package repositories downloaded into ``~/.spack`` or on the user's Spack
-configuration.
+``spack-packages`` repository for each Spack invocation, so detection does not depend on
+package repositories downloaded into ``~/.spack`` or on the user's Spack configuration.
 
-Spack's cache for this command is located at
-``<bootstrap-location>/spack-user-cache``. Spack creates this directory when the
-command first needs it; ``benchpark bootstrap`` does not create it in advance. The
-bootstrap location can be set with ``benchpark configure -bl <path>``.
+Spack's cache for this command is located at ``<bootstrap-location>/spack-user-cache``.
+Spack creates this directory when the command first needs it; ``benchpark bootstrap``
+does not create it in advance. The bootstrap location can be set with ``benchpark
+configure -bl <path>``.
 
 ************************************************************************
  Compare the Existing Software Specification to the Current Environment
@@ -68,11 +67,11 @@ cleanly are reported for manual review.
  Exit Status
 *************
 
-The command exits with status 0 when reconciliation completes, including when it
-reports missing packages, replacements, additional versions, unsupported detections,
-or items that require manual review. It exits with status 1 when a validator cannot
-execute, reconciliation cannot produce a result, or a requested source update cannot
-be completed and verified.
+The command exits with status 0 when reconciliation completes, including when it reports
+missing packages, replacements, additional versions, unsupported detections, or items
+that require manual review. It exits with status 1 when a validator cannot execute,
+reconciliation cannot produce a result, or a requested source update cannot be completed
+and verified.
 
 ***********************************
  Apply Local Changes to the System
