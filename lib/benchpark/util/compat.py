@@ -18,3 +18,4 @@ from spack.util.lang import Singleton, dedupe
 # supplies the implementation required by Benchpark's VariantMap.
 from llnl.util.lang import HashableMap
 
+
