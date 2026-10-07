@@ -14,6 +14,7 @@ import spack.util.tty.colify as colify
 import spack.util.tty.color as color
 from spack.util.lang import Singleton, dedupe
 
+
 # Spack removed HashableMap without providing a replacement. Ramble still
 # supplies the implementation required by Benchpark's VariantMap.
 from llnl.util.lang import HashableMap
