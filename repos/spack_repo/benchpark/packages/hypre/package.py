@@ -4,7 +4,6 @@
 
 import os
 from itertools import product
-
 from spack.package import *
 from spack_repo.builtin.build_systems.autotools import AutotoolsBuilder, AutotoolsPackage
 from spack_repo.builtin.build_systems.cmake import CMakeBuilder, CMakePackage
