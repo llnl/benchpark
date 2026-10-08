@@ -19,7 +19,6 @@ from benchpark.system import (
 
 
 class LbnlPerlmutter(System):
-
     maintainers("slabasan")
 
     id_to_resources = {

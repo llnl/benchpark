@@ -160,7 +160,6 @@ Example usage:
     sysd = {key: sysd[key] for key in args.systems if key in sysd}
 
     for name, tag in bp.items():
-
         if name not in os.listdir(os.getcwd()):
             subprocess.run(
                 ["git", "clone", "https://github.com/LLNL/benchpark.git", name]

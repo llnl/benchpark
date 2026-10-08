@@ -19,8 +19,8 @@
 .. image:: https://github.com/llnl/benchpark/workflows/nightly/badge.svg
     :target: https://github.com/LLNL/benchpark/actions/workflows/nightly.yml
 
-.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
-    :target: https://github.com/psf/black
+.. image:: https://img.shields.io/badge/code%20style-ruff-D7FF64.svg
+    :target: https://docs.astral.sh/ruff/
 
 .. image:: https://img.shields.io/badge/Dashboard-CDash-blue
     :target: https://my.cdash.org/index.php?project=Benchpark

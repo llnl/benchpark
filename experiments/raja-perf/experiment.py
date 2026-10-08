@@ -98,26 +98,26 @@ class RajaPerf(
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "n_resources": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
-                    "process_problem_size": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    )
-                    // scaling_factor,
+                    "n_resources": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
+                    "process_problem_size": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) // scaling_factor
+                    ),
                 },
                 ScalingMode.Weak: {
-                    "n_resources": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
-                    "process_problem_size": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
+                    "n_resources": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
+                    "process_problem_size": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim)
                     ),
                 },
                 ScalingMode.Throughput: {
                     "n_resources": lambda var, itr, dim, scaling_factor: var.val(dim),
-                    "process_problem_size": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    )
-                    * scaling_factor,
+                    "process_problem_size": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
                 },
             }
         )

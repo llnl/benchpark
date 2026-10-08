@@ -226,7 +226,6 @@ def divide_into(dividend, divisor):
 
 
 class Allocation(BasicModifier):
-
     name = "allocation"
     _whitelist_file_name = "benchpark_whitelist"
 

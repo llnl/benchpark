@@ -81,5 +81,5 @@ class Softmax(
     def compute_package_section(self):
         self.add_package_spec(
             self.name,
-            [f"hecbench{self.determine_version()} " "benchmark=softmax +mpi ~caliper "],
+            [f"hecbench{self.determine_version()} benchmark=softmax +mpi ~caliper "],
         )

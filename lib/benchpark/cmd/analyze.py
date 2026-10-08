@@ -31,11 +31,11 @@ hatchet_v = version("llnl-hatchet")
 thicket_v = version("llnl-thicket")
 
 assert Version(hatchet_v) >= Version(min_hatchet), (
-    f"llnl-hatchet {hatchet_v} installed; " f"require >= {min_hatchet}"
+    f"llnl-hatchet {hatchet_v} installed; require >= {min_hatchet}"
 )
 
 assert Version(thicket_v) >= Version(min_thicket), (
-    f"llnl-thicket {thicket_v} installed; " f"require >= {min_thicket}"
+    f"llnl-thicket {thicket_v} installed; require >= {min_thicket}"
 )
 
 # -----------------------------
@@ -403,13 +403,16 @@ def prepare_data(**kwargs):
         )
         query = th.query.Query().match(
             ".",
-            lambda row: row["name"]
-            .apply(
-                # 'n is None' avoid comparison for MPI in n (will cause error)
-                lambda n: n is None
-                or all(excl not in n for excl in exclude_regions)
-            )
-            .all(),
+            lambda row: (
+                row["name"]
+                .apply(
+                    # 'n is None' avoid comparison for MPI in n (will cause error)
+                    lambda n: (
+                        n is None or all(excl not in n for excl in exclude_regions)
+                    )
+                )
+                .all()
+            ),
         )
         tk = tk.query(query)
 

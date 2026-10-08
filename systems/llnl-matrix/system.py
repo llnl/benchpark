@@ -20,7 +20,6 @@ from benchpark.system import (
 
 
 class LlnlMatrix(System):
-
     maintainers("pearce8", "michaelmckinsey1")
 
     id_to_resources = {

@@ -193,15 +193,14 @@ style.yml - Lint
 
 The linter step checks:
 
-- Check Python code formatting using ``black``
-      - Fix black linter errors using ``python -m black dir/filename.py`` or
-            ``python -m black .`` (in source code dir).
+- Check Python code formatting using ``ruff format``
+      - Fix formatting errors using ``ruff format dir/filename.py`` or
+            ``ruff format .`` (in source code dir).
 - Check spelling using ``codespell``
       - Fix the spelling errors manually.
-- Sort imports using ``isort``
-      - Fix isort linter errors using ``isort .``
-- ``flake8`` for checking Python style enforcement
-      - Fix flake linter errors manually
+- ``ruff check`` for import sorting and Python style enforcement
+      - Fix supported lint errors using ``ruff check --fix .`` and fix the
+            remaining errors manually.
 - ``yamlfix`` for formatting ``.yaml``/``.yml`` files
       - Fix yaml linter errors using ``yamlfix dir.filename.yaml``
 - ``docstrfmt`` for formatting ``.rst`` files
