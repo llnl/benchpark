@@ -784,7 +784,10 @@ class LlnlElcapitan(System):
                 "rocblas": {
                     "externals": [
                         {
-                            "spec": f"rocblas@{self.rocm_version}",
+                            "spec": (
+                                f"rocblas@{self.rocm_version} "
+                                f"amdgpu_target={self.rocm_arch}"
+                            ),
                             "prefix": f"/opt/rocm-{self.rocm_version}",
                         }
                     ],
