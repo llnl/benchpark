@@ -42,6 +42,11 @@ def test_list():
                 "amg2023" in result_with_title.stdout
                 and "amg2023" in result_no_title.stdout
             )
+        elif subcmd == "experiments":
+            for experiment in ["nbody", "softmax", "wmma"]:
+                expected = f"hecbench.{experiment}+[cuda|rocm|mpi]"
+                assert expected in result_with_title.stdout
+            assert "    hecbench\n" not in result_with_title.stdout
 
     # Check filtering
     check_cuda = subprocess.run(

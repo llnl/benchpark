@@ -1,0 +1,1365 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index bcea2f625..42cb0d2f3 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -40,6 +40,9 @@ set(HECBENCH_HIP_ARCH "gfx90a" CACHE STRING "HIP architecture (e.g., gfx908, gfx
+ # Build configuration
+ option(HECBENCH_ENABLE_TESTING "Enable testing" ON)
+ option(HECBENCH_BUILD_ALL_BENCHMARKS "Build all benchmarks (vs selective)" ON)
++set(HECBENCH_BENCHMARK "" CACHE STRING "Benchmark to build in selective mode")
++option(HECBENCH_ENABLE_MPI_REPLICAS
++       "Enable independent MPI replicas for supported benchmarks" OFF)
+ 
+ # Add cmake module path
+ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
+@@ -86,6 +89,10 @@ endif()
+ # Include benchmark macros
+ include(BenchmarkMacros)
+ 
++if(HECBENCH_ENABLE_MPI_REPLICAS AND NOT MPI_CXX_FOUND)
++    message(FATAL_ERROR "MPI C++ support is required for MPI replicas")
++endif()
++
+ # Enable testing if requested
+ if(HECBENCH_ENABLE_TESTING)
+     enable_testing()
+@@ -111,6 +118,7 @@ if(HECBENCH_ENABLE_HIP)
+ endif()
+ message(STATUS "SYCL:    ${HECBENCH_ENABLE_SYCL}")
+ message(STATUS "OpenMP:  ${HECBENCH_ENABLE_OPENMP}")
++message(STATUS "MPI replicas: ${HECBENCH_ENABLE_MPI_REPLICAS}")
+ message(STATUS "Testing: ${HECBENCH_ENABLE_TESTING}")
+ message(STATUS "====================================")
+ message(STATUS "")
+diff --git a/cmake/modules/BenchmarkMacros.cmake b/cmake/modules/BenchmarkMacros.cmake
+index 63528e0b6..e758a77a0 100644
+--- a/cmake/modules/BenchmarkMacros.cmake
++++ b/cmake/modules/BenchmarkMacros.cmake
+@@ -11,6 +11,9 @@ set(DEPEND_ON_BOOST "hbc" "ge-spmm" "mmcsf" "warpsort" "gerbil")
+ # Global list for benchmarks that require MPI
+ set(DEPEND_ON_MPI "miniDGS" "miniWeather" "pingpong" "sparkler" "allreduce" "ccl" "halo-finder")
+ 
++# Benchmarks that can optionally run one independent problem per MPI rank.
++set(MPI_REPLICA_BENCHMARKS "softmax" "nbody" "wmma")
++
+ # Global list for benchmarks that require Eigen
+ set(DEPEND_ON_EIGEN "xlqc")
+ 
+@@ -159,6 +162,13 @@ function(add_hecbench_benchmark)
+     # Add executable
+     add_executable(${TARGET_NAME} ${BENCH_SOURCES})
+ 
++    if(HECBENCH_ENABLE_MPI_REPLICAS AND
++       ${BENCH_NAME} IN_LIST MPI_REPLICA_BENCHMARKS)
++        target_compile_definitions(${TARGET_NAME} PRIVATE
++                                   HECBENCH_ENABLE_MPI_REPLICAS)
++        target_link_libraries(${TARGET_NAME} PRIVATE MPI::MPI_CXX)
++    endif()
++
+     # Set target properties
+     set_target_properties(${TARGET_NAME} PROPERTIES
+         OUTPUT_NAME ${BENCH_NAME}
+diff --git a/cmake/modules/FindHIP.cmake b/cmake/modules/FindHIP.cmake
+index 466301849..c3fc0c3bc 100644
+--- a/cmake/modules/FindHIP.cmake
++++ b/cmake/modules/FindHIP.cmake
+@@ -11,6 +11,9 @@ if(HIP_FOUND)
+     return()
+ endif()
+ 
++# hip-lang sets HIP_COMPILER to the compiler ID, which hides a cached hipcc path.
++unset(HIP_COMPILER)
++
+ # Find hipcc compiler
+ find_program(HIP_COMPILER
+     NAMES hipcc
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index a1fcf804b..afbc4ea4c 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -557,10 +557,35 @@ set(HECBENCH_POC_BENCHMARKS
+     wenofv
+ )
+ 
++if(HECBENCH_BUILD_ALL_BENCHMARKS)
++    set(HECBENCH_BENCHMARKS_TO_BUILD ${HECBENCH_POC_BENCHMARKS})
++else()
++    if(NOT HECBENCH_BENCHMARK)
++        message(FATAL_ERROR
++            "HECBENCH_BENCHMARK must be set when HECBENCH_BUILD_ALL_BENCHMARKS=OFF")
++    endif()
++
++    list(FIND HECBENCH_POC_BENCHMARKS "${HECBENCH_BENCHMARK}" HECBENCH_BENCHMARK_INDEX)
++    if(HECBENCH_BENCHMARK_INDEX EQUAL -1)
++        message(FATAL_ERROR "Unknown HeCBench benchmark: ${HECBENCH_BENCHMARK}")
++    endif()
++
++    set(HECBENCH_BENCHMARKS_TO_BUILD "${HECBENCH_BENCHMARK}")
++endif()
++
+ # Include benchmark subdirectories
+-foreach(BENCHMARK ${HECBENCH_POC_BENCHMARKS})
++foreach(BENCHMARK ${HECBENCH_BENCHMARKS_TO_BUILD})
+     # Check which models exist for this benchmark
+     foreach(MODEL cuda hip sycl omp)
++        if(NOT HECBENCH_BUILD_ALL_BENCHMARKS)
++            if((MODEL STREQUAL "cuda" AND NOT HECBENCH_ENABLE_CUDA) OR
++               (MODEL STREQUAL "hip" AND NOT HECBENCH_ENABLE_HIP) OR
++               (MODEL STREQUAL "sycl" AND NOT HECBENCH_ENABLE_SYCL) OR
++               (MODEL STREQUAL "omp" AND NOT HECBENCH_ENABLE_OPENMP))
++                continue()
++            endif()
++        endif()
++
+         set(BENCHMARK_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${BENCHMARK}-${MODEL}")
+         if(EXISTS "${BENCHMARK_DIR}/CMakeLists.txt")
+             add_subdirectory(${BENCHMARK_DIR})
+diff --git a/src/nbody-cuda/GSimulation.cu b/src/nbody-cuda/GSimulation.cu
+index b24d77fb6..138c8924a 100644
+--- a/src/nbody-cuda/GSimulation.cu
++++ b/src/nbody-cuda/GSimulation.cu
+@@ -5,9 +5,30 @@
+ // =============================================================
+ 
+ #include <cuda.h>
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++#include <mpi.h>
++#endif
+ #include "GSimulation.hpp"
+ #include "GSimulationKernels.hpp"
+ 
++#define CHECK_CUDA_ERROR(status)                                              \
++  do {                                                                        \
++    cudaError_t error = (status);                                             \
++    if (error != cudaSuccess) {                                               \
++      std::cerr << "CUDA error: '" << cudaGetErrorString(error) << "'("      \
++                << error << ") at " << __FILE__ << ":" << __LINE__ << "\n"; \
++      /* A failed rank must not leave peers in the final reduction. */         \
++      fatal_exit();                                                           \
++    }                                                                         \
++  } while (0)
++
++static void fatal_exit() {
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++  MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
++#endif
++  exit(EXIT_FAILURE);
++}
++
+ /* Default Constructor for the GSimulation class which sets up the default
+  * values for number of particles, number of integration steps, time steo and
+  * sample frequency */
+@@ -102,12 +123,14 @@ void GSimulation::Start() {
+   double av = 0.0, dev = 0.0;
+ 
+   Particle *p;
+-  cudaMalloc((void**)&p, sizeof(Particle) * n);
+-  cudaMemcpyAsync(p, particles_.data(), sizeof(Particle) * n, cudaMemcpyHostToDevice, 0);
++  CHECK_CUDA_ERROR(cudaMalloc((void**)&p, sizeof(Particle) * n));
++  CHECK_CUDA_ERROR(cudaMemcpyAsync(p, particles_.data(), sizeof(Particle) * n,
++                                   cudaMemcpyHostToDevice, 0));
+ 
+   RealType *e;
+-  cudaMalloc((void**)&e, sizeof(RealType) * n);
+-  cudaMemcpyAsync(e, energy.data(), sizeof(RealType) * n, cudaMemcpyHostToDevice, 0);
++  CHECK_CUDA_ERROR(cudaMalloc((void**)&e, sizeof(RealType) * n));
++  CHECK_CUDA_ERROR(cudaMemcpyAsync(e, energy.data(), sizeof(RealType) * n,
++                                   cudaMemcpyHostToDevice, 0));
+ 
+   dim3 grids((n+255)/256);
+   dim3 threads(256);
+@@ -122,10 +145,11 @@ void GSimulation::Start() {
+     update_particles<<<grids, threads>>>(p, e, n, dt);
+     accumulate_energy<<<1,1>>>(e, n);
+ 
+-    cudaDeviceSynchronize();
++    CHECK_CUDA_ERROR(cudaDeviceSynchronize());
+     double elapsed_seconds = ts0.Elapsed();
+ 
+-    cudaMemcpy(energy.data(), e, sizeof(RealType), cudaMemcpyDeviceToHost);
++    CHECK_CUDA_ERROR(
++        cudaMemcpy(energy.data(), e, sizeof(RealType), cudaMemcpyDeviceToHost));
+ 
+     kenergy_ = 0.5 * energy[0];
+     if ((s % get_sfreq()) == 0) {
+@@ -153,13 +177,16 @@ void GSimulation::Start() {
+   dev = (nf == 3) ? 0.0 : sqrt(dev / (double)(nf - 2) - av * av);
+ 
+   std::cout << "\n";
++  if (rank_ >= 0) std::cout << "[rank " << rank_ << "] ";
+   std::cout << "# Total Energy        : " << kenergy_ << "\n";
++  if (rank_ >= 0) std::cout << "[rank " << rank_ << "] ";
+   std::cout << "# Total Time (s)      : " << total_time_ << "\n";
++  if (rank_ >= 0) std::cout << "[rank " << rank_ << "] ";
+   std::cout << "# Average Performance : " << av << " +- " << dev << "\n";
+   std::cout << "===============================\n";
+ 
+-  cudaFree(p);
+-  cudaFree(e);
++  CHECK_CUDA_ERROR(cudaFree(p));
++  CHECK_CUDA_ERROR(cudaFree(e));
+ }
+ 
+ #ifdef DEBUG
+diff --git a/src/nbody-cuda/GSimulation.hpp b/src/nbody-cuda/GSimulation.hpp
+index dce0ab5cf..deec27cb1 100644
+--- a/src/nbody-cuda/GSimulation.hpp
++++ b/src/nbody-cuda/GSimulation.hpp
+@@ -26,8 +26,9 @@ class GSimulation {
+   void Init();
+   void SetNumberOfParticles(int N);
+   void SetNumberOfSteps(int N);
++  void SetRank(int rank) { rank_ = rank; }
+   void Start();
+-  void Verify();
++  bool Verify();
+ 
+  private:
+   //  Particle *particles_;
+@@ -43,6 +44,7 @@ class GSimulation {
+ 
+   double total_time_;   // total time of the simulation
+   double total_flops_;  // total number of FLOPS
++  int rank_ = -1;       // MPI replica rank, or -1 for a non-MPI build
+ 
+   void InitPos();
+   void InitVel();
+diff --git a/src/nbody-cuda/GSimulationReference.hpp b/src/nbody-cuda/GSimulationReference.hpp
+index 70b1e504a..25233a4ec 100644
+--- a/src/nbody-cuda/GSimulationReference.hpp
++++ b/src/nbody-cuda/GSimulationReference.hpp
+@@ -64,7 +64,7 @@ accumulate_energy_ref(RealType *e, const int n)
+   for (int i = 1; i < n; i++) e[0] += e[i];
+ }
+ 
+-void GSimulation::Verify() {
++bool GSimulation::Verify() {
+   RealType dt = get_tstep();
+   int n = get_npart();
+   std::vector<RealType> energy(n, 0.f);
+@@ -99,5 +99,10 @@ void GSimulation::Verify() {
+   }  // end of the time step loop
+   std::cout << "\n";
+   bool ok = fabsf(kenergy_ - ref_kenergy_) < 1e-3f;
+-  printf("%s\n", ok ? "PASS" : "FAIL");
++  if (rank_ >= 0) {
++    printf("[rank %d] %s\n", rank_, ok ? "PASS" : "FAIL");
++  } else {
++    printf("%s\n", ok ? "PASS" : "FAIL");
++  }
++  return ok;
+ }
+diff --git a/src/nbody-cuda/main.cu b/src/nbody-cuda/main.cu
+index 290f51bd5..1bba88a73 100644
+--- a/src/nbody-cuda/main.cu
++++ b/src/nbody-cuda/main.cu
+@@ -5,14 +5,58 @@
+ // =============================================================
+ 
+ #include <iostream>
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++#include <cuda.h>
++#include <mpi.h>
++#endif
+ #include "GSimulation.hpp"
+ #include "GSimulationReference.hpp"
+ 
+ int main(int argc, char** argv) {
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++  MPI_Init(&argc, &argv);
++  int rank, rank_count, local_rank;
++  MPI_Comm local_comm;
++  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
++  MPI_Comm_size(MPI_COMM_WORLD, &rank_count);
++  MPI_Comm_split_type(MPI_COMM_WORLD, MPI_COMM_TYPE_SHARED, rank,
++                      MPI_INFO_NULL, &local_comm);
++  MPI_Comm_rank(local_comm, &local_rank);
++
++  int visible_devices = 0;
++  if (cudaGetDeviceCount(&visible_devices) != cudaSuccess || visible_devices < 1) {
++    std::cerr << "[rank " << rank << "] No visible CUDA device\n";
++    MPI_Abort(MPI_COMM_WORLD, 2);
++  }
++  int selected_device = visible_devices == 1 ? 0 : local_rank;
++  if (selected_device >= visible_devices) {
++    std::cerr << "[rank " << rank << "] local rank " << local_rank
++              << " cannot be mapped to " << visible_devices
++              << " visible CUDA devices\n";
++    MPI_Abort(MPI_COMM_WORLD, 2);
++  }
++  if (cudaSetDevice(selected_device) != cudaSuccess) {
++    std::cerr << "[rank " << rank << "] Failed to select CUDA device "
++              << selected_device << "\n";
++    MPI_Abort(MPI_COMM_WORLD, 2);
++  }
++  char processor[MPI_MAX_PROCESSOR_NAME];
++  int processor_length;
++  MPI_Get_processor_name(processor, &processor_length);
++  std::cout << "[rank " << rank << "/" << rank_count << " local_rank "
++            << local_rank << "] host=" << processor << " device="
++            << selected_device << " visible_devices=" << visible_devices
++            << "\n";
++  MPI_Comm_free(&local_comm);
++#endif
++
+   int n;      // number of particles
+   int nstep;  // number ot integration steps
+ 
+   GSimulation sim;
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++  sim.SetRank(rank);
++#endif
+ 
+   if (argc > 1) {
+     n = std::atoi(argv[1]);
+@@ -21,6 +65,9 @@ int main(int argc, char** argv) {
+       nstep = std::atoi(argv[2]);
+       if (nstep < 3) {
+         std::cerr << "The number of integration steps should be at least 3.\n";
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++        MPI_Finalize();
++#endif
+         return 1;
+       }
+       sim.SetNumberOfSteps(nstep);
+@@ -28,7 +75,21 @@ int main(int argc, char** argv) {
+   }
+ 
+   sim.Start();
+-  sim.Verify();
++  [[maybe_unused]] bool ok = sim.Verify();
++
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++  int local_pass = ok ? 1 : 0;
++  int passed_count = 0;
++  MPI_Allreduce(&local_pass, &passed_count, 1, MPI_INT, MPI_SUM,
++                MPI_COMM_WORLD);
++  if (rank == 0) {
++    std::cout << "OVERALL "
++              << (passed_count == rank_count ? "PASS" : "FAIL") << " ("
++              << passed_count << "/" << rank_count << " replica ranks)\n";
++  }
++  MPI_Finalize();
++  return passed_count == rank_count ? 0 : 2;
++#endif
+ 
+   return 0;
+ }
+diff --git a/src/nbody-hip/GSimulation.cu b/src/nbody-hip/GSimulation.cu
+index 3b82052d4..6f2bf9899 100644
+--- a/src/nbody-hip/GSimulation.cu
++++ b/src/nbody-hip/GSimulation.cu
+@@ -5,9 +5,30 @@
+ // =============================================================
+ 
+ #include <hip/hip_runtime.h>
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++#include <mpi.h>
++#endif
+ #include "GSimulation.hpp"
+ #include "GSimulationKernels.hpp"
+ 
++#define CHECK_HIP_ERROR(status)                                               \
++  do {                                                                        \
++    hipError_t error = (status);                                              \
++    if (error != hipSuccess) {                                                \
++      std::cerr << "HIP error: '" << hipGetErrorString(error) << "'("       \
++                << error << ") at " << __FILE__ << ":" << __LINE__ << "\n"; \
++      /* A failed rank must not leave peers in the final reduction. */         \
++      fatal_exit();                                                           \
++    }                                                                         \
++  } while (0)
++
++static void fatal_exit() {
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++  MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
++#endif
++  exit(EXIT_FAILURE);
++}
++
+ /* Default Constructor for the GSimulation class which sets up the default
+  * values for number of particles, number of integration steps, time steo and
+  * sample frequency */
+@@ -102,12 +123,14 @@ void GSimulation::Start() {
+   double av = 0.0, dev = 0.0;
+ 
+   Particle *p;
+-  hipMalloc((void**)&p, sizeof(Particle) * n);
+-  hipMemcpyAsync(p, particles_.data(), sizeof(Particle) * n, hipMemcpyHostToDevice, 0);
++  CHECK_HIP_ERROR(hipMalloc((void**)&p, sizeof(Particle) * n));
++  CHECK_HIP_ERROR(hipMemcpyAsync(p, particles_.data(), sizeof(Particle) * n,
++                                 hipMemcpyHostToDevice, 0));
+ 
+   RealType *e;
+-  hipMalloc((void**)&e, sizeof(RealType) * n);
+-  hipMemcpyAsync(e, energy.data(), sizeof(RealType) * n, hipMemcpyHostToDevice, 0);
++  CHECK_HIP_ERROR(hipMalloc((void**)&e, sizeof(RealType) * n));
++  CHECK_HIP_ERROR(hipMemcpyAsync(e, energy.data(), sizeof(RealType) * n,
++                                 hipMemcpyHostToDevice, 0));
+ 
+   dim3 grids((n+255)/256);
+   dim3 threads(256);
+@@ -122,10 +145,11 @@ void GSimulation::Start() {
+     update_particles<<<grids, threads>>>(p, e, n, dt);
+     accumulate_energy<<<1,1>>>(e, n);
+ 
+-    hipDeviceSynchronize();
++    CHECK_HIP_ERROR(hipDeviceSynchronize());
+     double elapsed_seconds = ts0.Elapsed();
+ 
+-    hipMemcpy(energy.data(), e, sizeof(RealType), hipMemcpyDeviceToHost);
++    CHECK_HIP_ERROR(
++        hipMemcpy(energy.data(), e, sizeof(RealType), hipMemcpyDeviceToHost));
+ 
+     kenergy_ = 0.5 * energy[0];
+     if ((s % get_sfreq()) == 0) {
+@@ -153,13 +177,16 @@ void GSimulation::Start() {
+   dev = (nf == 3) ? 0.0 : sqrt(dev / (double)(nf - 2) - av * av);
+ 
+   std::cout << "\n";
++  if (rank_ >= 0) std::cout << "[rank " << rank_ << "] ";
+   std::cout << "# Total Energy        : " << kenergy_ << "\n";
++  if (rank_ >= 0) std::cout << "[rank " << rank_ << "] ";
+   std::cout << "# Total Time (s)      : " << total_time_ << "\n";
++  if (rank_ >= 0) std::cout << "[rank " << rank_ << "] ";
+   std::cout << "# Average Performance : " << av << " +- " << dev << "\n";
+   std::cout << "===============================\n";
+ 
+-  hipFree(p);
+-  hipFree(e);
++  CHECK_HIP_ERROR(hipFree(p));
++  CHECK_HIP_ERROR(hipFree(e));
+ }
+ 
+ #ifdef DEBUG
+diff --git a/src/nbody-hip/GSimulation.hpp b/src/nbody-hip/GSimulation.hpp
+index dce0ab5cf..deec27cb1 100644
+--- a/src/nbody-hip/GSimulation.hpp
++++ b/src/nbody-hip/GSimulation.hpp
+@@ -26,8 +26,9 @@ class GSimulation {
+   void Init();
+   void SetNumberOfParticles(int N);
+   void SetNumberOfSteps(int N);
++  void SetRank(int rank) { rank_ = rank; }
+   void Start();
+-  void Verify();
++  bool Verify();
+ 
+  private:
+   //  Particle *particles_;
+@@ -43,6 +44,7 @@ class GSimulation {
+ 
+   double total_time_;   // total time of the simulation
+   double total_flops_;  // total number of FLOPS
++  int rank_ = -1;       // MPI replica rank, or -1 for a non-MPI build
+ 
+   void InitPos();
+   void InitVel();
+diff --git a/src/nbody-hip/main.cu b/src/nbody-hip/main.cu
+index a886e2904..51048b7f0 100644
+--- a/src/nbody-hip/main.cu
++++ b/src/nbody-hip/main.cu
+@@ -5,14 +5,58 @@
+ // =============================================================
+ 
+ #include <iostream>
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++#include <hip/hip_runtime.h>
++#include <mpi.h>
++#endif
+ #include "GSimulation.hpp"
+ #include "GSimulationReference.hpp"
+ 
+ int main(int argc, char** argv) {
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++  MPI_Init(&argc, &argv);
++  int rank, rank_count, local_rank;
++  MPI_Comm local_comm;
++  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
++  MPI_Comm_size(MPI_COMM_WORLD, &rank_count);
++  MPI_Comm_split_type(MPI_COMM_WORLD, MPI_COMM_TYPE_SHARED, rank,
++                      MPI_INFO_NULL, &local_comm);
++  MPI_Comm_rank(local_comm, &local_rank);
++
++  int visible_devices = 0;
++  if (hipGetDeviceCount(&visible_devices) != hipSuccess || visible_devices < 1) {
++    std::cerr << "[rank " << rank << "] No visible HIP device\n";
++    MPI_Abort(MPI_COMM_WORLD, 2);
++  }
++  int selected_device = visible_devices == 1 ? 0 : local_rank;
++  if (selected_device >= visible_devices) {
++    std::cerr << "[rank " << rank << "] local rank " << local_rank
++              << " cannot be mapped to " << visible_devices
++              << " visible HIP devices\n";
++    MPI_Abort(MPI_COMM_WORLD, 2);
++  }
++  if (hipSetDevice(selected_device) != hipSuccess) {
++    std::cerr << "[rank " << rank << "] Failed to select HIP device "
++              << selected_device << "\n";
++    MPI_Abort(MPI_COMM_WORLD, 2);
++  }
++  char processor[MPI_MAX_PROCESSOR_NAME];
++  int processor_length;
++  MPI_Get_processor_name(processor, &processor_length);
++  std::cout << "[rank " << rank << "/" << rank_count << " local_rank "
++            << local_rank << "] host=" << processor << " device="
++            << selected_device << " visible_devices=" << visible_devices
++            << "\n";
++  MPI_Comm_free(&local_comm);
++#endif
++
+   int n;      // number of particles
+   int nstep;  // number ot integration steps
+ 
+   GSimulation sim;
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++  sim.SetRank(rank);
++#endif
+ 
+   if (argc > 1) {
+     n = std::atoi(argv[1]);
+@@ -21,6 +65,9 @@ int main(int argc, char** argv) {
+       nstep = std::atoi(argv[2]);
+       if (nstep < 3) {
+         std::cerr << "The number of integration steps should be at least 3\n";
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++        MPI_Finalize();
++#endif
+         return 1;
+       }
+       sim.SetNumberOfSteps(nstep);
+@@ -28,7 +75,21 @@ int main(int argc, char** argv) {
+   }
+ 
+   sim.Start();
+-  sim.Verify();
++  [[maybe_unused]] bool ok = sim.Verify();
++
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++  int local_pass = ok ? 1 : 0;
++  int passed_count = 0;
++  MPI_Allreduce(&local_pass, &passed_count, 1, MPI_INT, MPI_SUM,
++                MPI_COMM_WORLD);
++  if (rank == 0) {
++    std::cout << "OVERALL "
++              << (passed_count == rank_count ? "PASS" : "FAIL") << " ("
++              << passed_count << "/" << rank_count << " replica ranks)\n";
++  }
++  MPI_Finalize();
++  return passed_count == rank_count ? 0 : 2;
++#endif
+ 
+   return 0;
+ }
+diff --git a/src/softmax-cuda/main.cu b/src/softmax-cuda/main.cu
+index 5bb28c61d..e524bb9ba 100644
+--- a/src/softmax-cuda/main.cu
++++ b/src/softmax-cuda/main.cu
+@@ -4,9 +4,29 @@
+ #include <cuda.h>
+ #include <cooperative_groups.h>
+ #include <cooperative_groups/reduce.h>
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++#include <mpi.h>
++#endif
+ 
+ #define BLOCK_SIZE 256
+ 
++#define CHECK_CUDA_ERROR(status)                                              \
++  do {                                                                        \
++    cudaError_t error = (status);                                             \
++    if (error != cudaSuccess) {                                               \
++      fprintf(stderr, "CUDA error: '%s'(%d) at %s:%d\n",                     \
++              cudaGetErrorString(error), error, __FILE__, __LINE__);          \
++      fatal_exit();                                                           \
++    }                                                                         \
++  } while (0)
++
++static void fatal_exit() {
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++  MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
++#endif
++  exit(EXIT_FAILURE);
++}
++
+ // A C model derived from the OpenCL kernel
+ void softMax_cpu(const int numSlice, const int sliceSize, const float* src, float* dest) {
+   for (int i = 0; i < numSlice; i++) {
+@@ -71,10 +91,49 @@ void softMax2 (const int numSlice, const int sliceSize,
+ 
+ 
+ int main(int argc, char* argv[]) {
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++  MPI_Init(&argc, &argv);
++  int rank, rank_count, local_rank;
++  MPI_Comm local_comm;
++  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
++  MPI_Comm_size(MPI_COMM_WORLD, &rank_count);
++  MPI_Comm_split_type(MPI_COMM_WORLD, MPI_COMM_TYPE_SHARED, rank,
++                      MPI_INFO_NULL, &local_comm);
++  MPI_Comm_rank(local_comm, &local_rank);
++
++  int visible_devices = 0;
++  if (cudaGetDeviceCount(&visible_devices) != cudaSuccess || visible_devices < 1) {
++    fprintf(stderr, "[rank %d] No visible CUDA device\n", rank);
++    MPI_Abort(MPI_COMM_WORLD, 2);
++  }
++  int selected_device = visible_devices == 1 ? 0 : local_rank;
++  if (selected_device >= visible_devices) {
++    fprintf(stderr,
++            "[rank %d] local rank %d cannot be mapped to %d visible CUDA devices\n",
++            rank, local_rank, visible_devices);
++    MPI_Abort(MPI_COMM_WORLD, 2);
++  }
++  if (cudaSetDevice(selected_device) != cudaSuccess) {
++    fprintf(stderr, "[rank %d] Failed to select CUDA device %d\n", rank,
++            selected_device);
++    MPI_Abort(MPI_COMM_WORLD, 2);
++  }
++  char processor[MPI_MAX_PROCESSOR_NAME];
++  int processor_length;
++  MPI_Get_processor_name(processor, &processor_length);
++  printf("[rank %d/%d local_rank %d] host=%s device=%d visible_devices=%d\n",
++         rank, rank_count, local_rank, processor, selected_device,
++         visible_devices);
++  MPI_Comm_free(&local_comm);
++#endif
++
+   if (argc != 5) {
+     printf("Usage: %s <number of slices> <slice size> <implementations> <repeat>\n", argv[0]);
+     printf("implementation 0: naive\n");
+     printf("implementation 1: optimized\n");
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++    MPI_Finalize();
++#endif
+     return 1;
+   }
+ 
+@@ -94,44 +153,56 @@ int main(int argc, char* argv[]) {
+       input[i*sliceSize+j] = rand() % 13;
+ 
+   float *d_input, *d_output;
+-  cudaMalloc((void**)&d_input, sizeof(float) * numElem);
+-  cudaMalloc((void**)&d_output, sizeof(float) * numElem);
+-  cudaMemcpy(d_input, input, sizeof(float) * numElem, cudaMemcpyHostToDevice);
++  CHECK_CUDA_ERROR(cudaMalloc((void**)&d_input, sizeof(float) * numElem));
++  CHECK_CUDA_ERROR(cudaMalloc((void**)&d_output, sizeof(float) * numElem));
++  CHECK_CUDA_ERROR(cudaMemcpy(d_input, input, sizeof(float) * numElem,
++                              cudaMemcpyHostToDevice));
+ 
+   if (kernel == 1) {
+     dim3 grids ((numSlice+BLOCK_SIZE/32-1)/(BLOCK_SIZE/32));
+     dim3 blocks (BLOCK_SIZE);
+ 
+-    cudaDeviceSynchronize();
++    CHECK_CUDA_ERROR(cudaDeviceSynchronize());
+     auto start = std::chrono::steady_clock::now();
+ 
+     for (int n = 0; n < repeat; n++) {
+       softMax2<<<grids, blocks>>>(numSlice, sliceSize, d_input, d_output);
+     }
+ 
+-    cudaDeviceSynchronize();
++    CHECK_CUDA_ERROR(cudaDeviceSynchronize());
+     auto end = std::chrono::steady_clock::now();
+     auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++    printf("[rank %d] Average kernel execution time: %f (ms)\n", rank,
++           (time * 1e-6f) / repeat);
++#else
+     printf("Average kernel execution time: %f (ms)\n", (time * 1e-6f) / repeat);
++#endif
+   }
+   else {
+     dim3 grids ((numSlice+BLOCK_SIZE-1)/BLOCK_SIZE);
+     dim3 blocks (BLOCK_SIZE);
+ 
+-    cudaDeviceSynchronize();
++    CHECK_CUDA_ERROR(cudaDeviceSynchronize());
+     auto start = std::chrono::steady_clock::now();
+ 
+     for (int n = 0; n < repeat; n++) {
+       softMax<<<grids, blocks>>>(numSlice, sliceSize, d_input, d_output);
+     }
+ 
+-    cudaDeviceSynchronize();
++    CHECK_CUDA_ERROR(cudaDeviceSynchronize());
+     auto end = std::chrono::steady_clock::now();
+     auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++    printf("[rank %d] Average kernel execution time: %f (ms)\n", rank,
++           (time * 1e-6f) / repeat);
++#else
+     printf("Average kernel execution time: %f (ms)\n", (time * 1e-6f) / repeat);
++#endif
+   }
+ 
+-  cudaMemcpy(output_gpu, d_output, sizeof(float) * numElem, cudaMemcpyDeviceToHost);
++  CHECK_CUDA_ERROR(cudaMemcpy(output_gpu, d_output, sizeof(float) * numElem,
++                              cudaMemcpyDeviceToHost));
+ 
+   // verification
+   bool ok = true;
+@@ -143,12 +214,29 @@ int main(int argc, char* argv[]) {
+       break;
+     }
+   }
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++  printf("[rank %d] %s\n", rank, ok ? "PASS" : "FAIL");
++  int local_pass = ok ? 1 : 0;
++  int passed_count = 0;
++  MPI_Allreduce(&local_pass, &passed_count, 1, MPI_INT, MPI_SUM,
++                MPI_COMM_WORLD);
++  if (rank == 0) {
++    printf("OVERALL %s (%d/%d replica ranks)\n",
++           passed_count == rank_count ? "PASS" : "FAIL", passed_count,
++           rank_count);
++  }
++#else
+   printf("%s\n", ok ? "PASS" : "FAIL");
++#endif
+ 
+   free(input);
+   free(output_cpu);
+   free(output_gpu);
+-  cudaFree(d_input);
+-  cudaFree(d_output);
++  CHECK_CUDA_ERROR(cudaFree(d_input));
++  CHECK_CUDA_ERROR(cudaFree(d_output));
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++  MPI_Finalize();
++  return passed_count == rank_count ? 0 : 2;
++#endif
+   return 0;
+ }
+diff --git a/src/softmax-hip/main.cu b/src/softmax-hip/main.cu
+index 67b0969c3..669ec3102 100644
+--- a/src/softmax-hip/main.cu
++++ b/src/softmax-hip/main.cu
+@@ -3,9 +3,31 @@
+ #include <cstdio>
+ #include <hip/hip_runtime.h>
+ #include <hip/hip_cooperative_groups.h>
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++#include <mpi.h>
++#endif
+ 
+ #define BLOCK_SIZE 256
+ 
++#define CHECK_HIP_ERROR(status)                                               \
++  do {                                                                        \
++    hipError_t error = (status);                                              \
++    if (error != hipSuccess) {                                                \
++      fprintf(stderr, "HIP error: '%s'(%d) at %s:%d\n",                      \
++              hipGetErrorString(error), error, __FILE__, __LINE__);           \
++      /* Avoid leaving peers waiting in the final correctness reduction. */   \
++      /* MPI_Abort is only available in replica builds. */                    \
++      fatal_exit();                                                           \
++    }                                                                         \
++  } while (0)
++
++static void fatal_exit() {
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++  MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
++#endif
++  exit(EXIT_FAILURE);
++}
++
+ 
+ // A C model derived from the OpenCL kernel
+ void softMax_cpu(const int numSlice, const int sliceSize, const float* src, float* dest) {
+@@ -80,10 +102,51 @@ void softMax2 (const int numSlice, const int sliceSize,
+ 
+ 
+ int main(int argc, char* argv[]) {
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++  MPI_Init(&argc, &argv);
++  int rank, rank_count, local_rank;
++  MPI_Comm local_comm;
++  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
++  MPI_Comm_size(MPI_COMM_WORLD, &rank_count);
++  MPI_Comm_split_type(MPI_COMM_WORLD, MPI_COMM_TYPE_SHARED, rank,
++                      MPI_INFO_NULL, &local_comm);
++  MPI_Comm_rank(local_comm, &local_rank);
++
++  int visible_devices = 0;
++  if (hipGetDeviceCount(&visible_devices) != hipSuccess || visible_devices < 1) {
++    fprintf(stderr, "[rank %d] No visible HIP device\n", rank);
++    MPI_Abort(MPI_COMM_WORLD, 2);
++  }
++  int selected_device = visible_devices == 1 ? 0 : local_rank;
++  if (selected_device >= visible_devices) {
++    fprintf(stderr,
++            "[rank %d] local rank %d cannot be mapped to %d visible HIP devices\n",
++            rank, local_rank, visible_devices);
++    MPI_Abort(MPI_COMM_WORLD, 2);
++  }
++  if (hipSetDevice(selected_device) != hipSuccess) {
++    fprintf(stderr, "[rank %d] Failed to select HIP device %d\n", rank,
++            selected_device);
++    MPI_Abort(MPI_COMM_WORLD, 2);
++  }
++  char processor[MPI_MAX_PROCESSOR_NAME];
++  int processor_length;
++  MPI_Get_processor_name(processor, &processor_length);
++  printf("[rank %d/%d local_rank %d] host=%s device=%d visible_devices=%d\n",
++         rank, rank_count, local_rank, processor, selected_device,
++         visible_devices);
++  MPI_Comm_free(&local_comm);
++#else
++  int selected_device = 0;
++#endif
++
+   if (argc != 5) {
+     printf("Usage: %s <number of slices> <slice size> <implementations> <repeat>\n", argv[0]);
+     printf("implementation 0: naive\n");
+     printf("implementation 1: optimized\n");
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++    MPI_Finalize();
++#endif
+     return 1;
+   }
+ 
+@@ -103,46 +166,59 @@ int main(int argc, char* argv[]) {
+       input[i*sliceSize+j] = rand() % 13;
+ 
+   float *d_input, *d_output;
+-  hipMalloc((void**)&d_input, sizeof(float) * numElem);
+-  hipMalloc((void**)&d_output, sizeof(float) * numElem);
+-  hipMemcpy(d_input, input, sizeof(float) * numElem, hipMemcpyHostToDevice);
++  CHECK_HIP_ERROR(hipMalloc((void**)&d_input, sizeof(float) * numElem));
++  CHECK_HIP_ERROR(hipMalloc((void**)&d_output, sizeof(float) * numElem));
++  CHECK_HIP_ERROR(
++      hipMemcpy(d_input, input, sizeof(float) * numElem, hipMemcpyHostToDevice));
+ 
+   if (kernel == 1) {
+     int warp_size;
+-    hipDeviceGetAttribute(&warp_size, hipDeviceAttributeWarpSize, 0);
++    CHECK_HIP_ERROR(hipDeviceGetAttribute(
++        &warp_size, hipDeviceAttributeWarpSize, selected_device));
+     dim3 grids ((numSlice+BLOCK_SIZE/warp_size-1)/(BLOCK_SIZE/warp_size));
+     dim3 blocks (BLOCK_SIZE);
+ 
+-    hipDeviceSynchronize();
++    CHECK_HIP_ERROR(hipDeviceSynchronize());
+     auto start = std::chrono::steady_clock::now();
+ 
+     for (int n = 0; n < repeat; n++) {
+       softMax2<<<grids, blocks>>>(numSlice, sliceSize, d_input, d_output);
+     }
+ 
+-    hipDeviceSynchronize();
++    CHECK_HIP_ERROR(hipDeviceSynchronize());
+     auto end = std::chrono::steady_clock::now();
+     auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++    printf("[rank %d] Average kernel execution time: %f (ms)\n", rank,
++           (time * 1e-6f) / repeat);
++#else
+     printf("Average kernel execution time: %f (ms)\n", (time * 1e-6f) / repeat);
++#endif
+   }
+   else {
+     dim3 grids ((numSlice+BLOCK_SIZE-1)/BLOCK_SIZE);
+     dim3 blocks (BLOCK_SIZE);
+ 
+-    hipDeviceSynchronize();
++    CHECK_HIP_ERROR(hipDeviceSynchronize());
+     auto start = std::chrono::steady_clock::now();
+ 
+     for (int n = 0; n < repeat; n++) {
+       softMax<<<grids, blocks>>>(numSlice, sliceSize, d_input, d_output);
+     }
+ 
+-    hipDeviceSynchronize();
++    CHECK_HIP_ERROR(hipDeviceSynchronize());
+     auto end = std::chrono::steady_clock::now();
+     auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++    printf("[rank %d] Average kernel execution time: %f (ms)\n", rank,
++           (time * 1e-6f) / repeat);
++#else
+     printf("Average kernel execution time: %f (ms)\n", (time * 1e-6f) / repeat);
++#endif
+   }
+ 
+-  hipMemcpy(output_gpu, d_output, sizeof(float) * numElem, hipMemcpyDeviceToHost);
++  CHECK_HIP_ERROR(hipMemcpy(output_gpu, d_output, sizeof(float) * numElem,
++                            hipMemcpyDeviceToHost));
+ 
+   // verification
+   bool ok = true;
+@@ -154,12 +230,29 @@ int main(int argc, char* argv[]) {
+       break;
+     }
+   }
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++  printf("[rank %d] %s\n", rank, ok ? "PASS" : "FAIL");
++  int local_pass = ok ? 1 : 0;
++  int passed_count = 0;
++  MPI_Allreduce(&local_pass, &passed_count, 1, MPI_INT, MPI_SUM,
++                MPI_COMM_WORLD);
++  if (rank == 0) {
++    printf("OVERALL %s (%d/%d replica ranks)\n",
++           passed_count == rank_count ? "PASS" : "FAIL", passed_count,
++           rank_count);
++  }
++#else
+   printf("%s\n", ok ? "PASS" : "FAIL");
++#endif
+ 
+   free(input);
+   free(output_cpu);
+   free(output_gpu);
+-  hipFree(d_input);
+-  hipFree(d_output);
++  CHECK_HIP_ERROR(hipFree(d_input));
++  CHECK_HIP_ERROR(hipFree(d_output));
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++  MPI_Finalize();
++  return passed_count == rank_count ? 0 : 2;
++#endif
+   return 0;
+ }
+diff --git a/src/wmma-cuda/main.cu b/src/wmma-cuda/main.cu
+index cfb3fa7de..40c633213 100644
+--- a/src/wmma-cuda/main.cu
++++ b/src/wmma-cuda/main.cu
+@@ -31,6 +31,9 @@
+ #include <vector>
+ #include <cuda.h>
+ #include <mma.h>
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++#include <mpi.h>
++#endif
+ 
+ typedef half fp16;
+ typedef float fp32;
+@@ -39,12 +42,24 @@ typedef float fp32;
+ 
+ using namespace nvcuda;
+ 
++enum class VerificationStatus { Unsupported = -1, Failed = 0, Passed = 1,
++                                Disabled = 2 };
++
++static int report_rank = -1;
++
++static void fatal_exit() {
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++  MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
++#endif
++  exit(EXIT_FAILURE);
++}
++
+ #ifndef CHECK_CUDA_ERROR
+ #define CHECK_CUDA_ERROR(status)                                               \
+   if (status != cudaSuccess) {                                                 \
+     fprintf(stderr, "CUDA error: '%s'(%d) at %s:%d\n",                         \
+             cudaGetErrorString(status), status, __FILE__, __LINE__);           \
+-    exit(EXIT_FAILURE);                                                        \
++    fatal_exit();                                                              \
+   }
+ #endif
+ 
+@@ -189,20 +204,23 @@ __global__ void gemm_impl1(const uint32_t m, const uint32_t n, const uint32_t k,
+                           wmma::mem_row_major);
+ }
+ 
+-__host__ void gemm_wmma(int impl, uint32_t m, uint32_t n, uint32_t k, fp32 alpha,
+-                        fp32 beta, int32_t repeat, int32_t verify) {
++__host__ VerificationStatus gemm_wmma(int impl, uint32_t m, uint32_t n,
++                                      uint32_t k, fp32 alpha, fp32 beta,
++                                      int32_t repeat, int32_t verify) {
+   // Bounds check
+   if (impl == 0) {
+     if (m < WMMA_M || n < WMMA_N || k < WMMA_K || m % WMMA_M || n % WMMA_N || k % WMMA_K) {
++      if (report_rank >= 0) std::cout << "[rank " << report_rank << "] ";
+       std::cout << "Unsupported size!\n";
+-      return;
++      return VerificationStatus::Unsupported;
+     }
+ 
+   } else {
+     if ((m < TILE_M) || n < TILE_N || k < WMMA_K || m % WMMA_M || n % WMMA_N || k % WMMA_K ||
+         TILE_M / WMMA_M * 32 * TILE_N / WMMA_N > 1024) {
++      if (report_rank >= 0) std::cout << "[rank " << report_rank << "] ";
+       std::cout << "Unsupported size!\n";
+-      return;
++      return VerificationStatus::Unsupported;
+     }
+   }
+ 
+@@ -278,6 +296,7 @@ __host__ void gemm_wmma(int impl, uint32_t m, uint32_t n, uint32_t k, fp32 alpha
+       gemm_impl1<<<gridDim, blockDim>>>(m, n, k, d_a, d_b, d_c, d_d, lda, ldb, ldc, ldd, alpha, beta);
+   }
+ 
++  VerificationStatus verification_status = VerificationStatus::Disabled;
+   if (verify) {
+     std::cout << "Validating result with reference..." << std::endl;
+ 
+@@ -291,9 +310,14 @@ __host__ void gemm_wmma(int impl, uint32_t m, uint32_t n, uint32_t k, fp32 alpha
+     gemm_cpu_h(m, n, k, matrixA.data(), matrixB.data(), matrixC.data(),
+                matrixD_ref.data(), lda, ldb, ldc, ldd, alpha, beta);
+ 
+-    compareEqual<fp32>(matrixD.data(), matrixD_ref.data(), m * n);
++    bool passed = compareEqual<fp32>(matrixD.data(), matrixD_ref.data(), m * n);
++    verification_status = passed ? VerificationStatus::Passed
++                                 : VerificationStatus::Failed;
++    if (report_rank >= 0) std::cout << "[rank " << report_rank << "] ";
++    std::cout << (passed ? "PASSED" : "FAILED") << "\n";
+   } else {
+-    std::cout << "Skip validating result with reference" << std::endl;
++    if (report_rank >= 0) std::cout << "[rank " << report_rank << "] ";
++    std::cout << "Verification disabled" << std::endl;
+   }
+ 
+   CHECK_CUDA_ERROR(cudaDeviceSynchronize());
+@@ -321,6 +345,7 @@ __host__ void gemm_wmma(int impl, uint32_t m, uint32_t n, uint32_t k, fp32 alpha
+             << "beta, ldc, ldd, "
+             << "elapsedMs, Problem Size(GFlops), TFlops/s" << std::endl;
+ 
++  if (report_rank >= 0) std::cout << "[rank " << report_rank << "] ";
+   std::cout << WMMA_M << ", " << WMMA_N << ", " << WMMA_K << ", " << m << ", "
+             << n << ", " << k << ", " << alpha << ", " << lda << ", " << ldb
+             << ", " << beta << ", " << ldc << ", " << ldd << ", "
+@@ -334,6 +359,7 @@ __host__ void gemm_wmma(int impl, uint32_t m, uint32_t n, uint32_t k, fp32 alpha
+   CHECK_CUDA_ERROR(cudaFree(d_d));
+ 
+   std::cout << "Finished!" << std::endl;
++  return verification_status;
+ }
+ 
+ void Usage(std::string program_name) {
+@@ -344,10 +370,47 @@ void Usage(std::string program_name) {
+   std::cout
+       << "Dense matrix-matrix multiplication: D = alpha * (A * B) + beta * C\n";
+   std::cout << "A: M * K, B: K * N, C: M * N, D: M * N\n";
+-  exit(-1);
++  fatal_exit();
+ }
+ 
+ int main(int argc, char *argv[]) {
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++  MPI_Init(&argc, &argv);
++  int rank_count, local_rank;
++  MPI_Comm local_comm;
++  MPI_Comm_rank(MPI_COMM_WORLD, &report_rank);
++  MPI_Comm_size(MPI_COMM_WORLD, &rank_count);
++  MPI_Comm_split_type(MPI_COMM_WORLD, MPI_COMM_TYPE_SHARED, report_rank,
++                      MPI_INFO_NULL, &local_comm);
++  MPI_Comm_rank(local_comm, &local_rank);
++
++  int visible_devices = 0;
++  if (cudaGetDeviceCount(&visible_devices) != cudaSuccess || visible_devices < 1) {
++    std::cerr << "[rank " << report_rank << "] No visible CUDA device\n";
++    MPI_Abort(MPI_COMM_WORLD, 2);
++  }
++  int selected_device = visible_devices == 1 ? 0 : local_rank;
++  if (selected_device >= visible_devices) {
++    std::cerr << "[rank " << report_rank << "] local rank " << local_rank
++              << " cannot be mapped to " << visible_devices
++              << " visible CUDA devices\n";
++    MPI_Abort(MPI_COMM_WORLD, 2);
++  }
++  if (cudaSetDevice(selected_device) != cudaSuccess) {
++    std::cerr << "[rank " << report_rank << "] Failed to select CUDA device "
++              << selected_device << "\n";
++    MPI_Abort(MPI_COMM_WORLD, 2);
++  }
++  char processor[MPI_MAX_PROCESSOR_NAME];
++  int processor_length;
++  MPI_Get_processor_name(processor, &processor_length);
++  std::cout << "[rank " << report_rank << "/" << rank_count
++            << " local_rank " << local_rank << "] host=" << processor
++            << " device=" << selected_device
++            << " visible_devices=" << visible_devices << "\n";
++  MPI_Comm_free(&local_comm);
++#endif
++
+   if (argc != 7) {
+     Usage(argv[0]);
+   }
+@@ -358,7 +421,28 @@ int main(int argc, char *argv[]) {
+   const uint32_t k = atoi(argv[4]);
+   const int32_t repeat = atoi(argv[5]);
+   const int32_t verify = atoi(argv[6]);
+-  gemm_wmma(impl, m, n, k, 0.5f, 2.0f, repeat, verify);
++  [[maybe_unused]] VerificationStatus status =
++      gemm_wmma(impl, m, n, k, 0.5f, 2.0f, repeat, verify);
++
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++  int local_status = static_cast<int>(status);
++  int overall_status = 0;
++  MPI_Allreduce(&local_status, &overall_status, 1, MPI_INT, MPI_MIN,
++                MPI_COMM_WORLD);
++  if (report_rank == 0) {
++    if (overall_status == static_cast<int>(VerificationStatus::Passed)) {
++      std::cout << "OVERALL PASSED (" << rank_count << "/" << rank_count
++                << " replica ranks)\n";
++    } else if (overall_status ==
++               static_cast<int>(VerificationStatus::Disabled)) {
++      std::cout << "OVERALL NOT VERIFIED (verification disabled)\n";
++    } else {
++      std::cout << "OVERALL FAILED\n";
++    }
++  }
++  MPI_Finalize();
++  return overall_status > static_cast<int>(VerificationStatus::Failed) ? 0 : 2;
++#endif
+ 
+   return 0;
+ }
+diff --git a/src/wmma-cuda/reference.h b/src/wmma-cuda/reference.h
+index afe2a4453..1f741ad04 100644
+--- a/src/wmma-cuda/reference.h
++++ b/src/wmma-cuda/reference.h
+@@ -1,6 +1,6 @@
+ // Element-wise comparison
+ template <typename T>
+-void compareEqual(T const *a, T const *b, uint32_t size,
++bool compareEqual(T const *a, T const *b, uint32_t size,
+                   double tolerance = 10.0) {
+   double max_relative_error = 0.0;
+ 
+@@ -15,14 +15,11 @@ void compareEqual(T const *a, T const *b, uint32_t size,
+     }
+   }
+   auto eps = std::numeric_limits<T>::epsilon();
+-  if (max_relative_error != max_relative_error ||
+-      max_relative_error > eps * tolerance) {
+-    std::cout << "FAILED\n";
+-  } else {
+-    std::cout << "PASSED\n";
+-  }
++  bool passed = max_relative_error == max_relative_error &&
++                max_relative_error <= eps * tolerance;
+ 
+   std::cout << "Max relative error: " << max_relative_error << std::endl;
++  return passed;
+ }
+ 
+ // Host GEMM validation
+diff --git a/src/wmma-hip/main.cu b/src/wmma-hip/main.cu
+index 8c6b56ce8..5efd07d88 100644
+--- a/src/wmma-hip/main.cu
++++ b/src/wmma-hip/main.cu
+@@ -31,6 +31,9 @@
+ #include <vector>
+ #include <hip/hip_runtime.h>
+ #include <rocwmma/rocwmma.hpp>
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++#include <mpi.h>
++#endif
+ 
+ typedef half fp16;
+ typedef float fp32;
+@@ -41,12 +44,25 @@ using namespace rocwmma;
+ 
+ namespace wmma = rocwmma;
+ 
++enum class VerificationStatus { Unsupported = -1, Failed = 0, Passed = 1,
++                                Disabled = 2 };
++
++static int report_rank = -1;
++static int selected_device = 0;
++
++static void fatal_exit() {
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++  MPI_Abort(MPI_COMM_WORLD, EXIT_FAILURE);
++#endif
++  exit(EXIT_FAILURE);
++}
++
+ #ifndef CHECK_HIP_ERROR
+ #define CHECK_HIP_ERROR(status)                                               \
+   if (status != hipSuccess) {                                                 \
+     fprintf(stderr, "HIP error: '%s'(%d) at %s:%d\n",                         \
+             hipGetErrorString(status), status, __FILE__, __LINE__);           \
+-    exit(EXIT_FAILURE);                                                        \
++    fatal_exit();                                                              \
+   }
+ #endif
+ 
+@@ -188,24 +204,28 @@ __global__ void gemm_impl1(const uint32_t m, const uint32_t n, const uint32_t k,
+                           wmma::mem_row_major);
+ }
+ 
+-__host__ void gemm_wmma(int impl, uint32_t m, uint32_t n, uint32_t k, fp32 alpha,
+-                        fp32 beta, int32_t repeat, int32_t verify) {
++__host__ VerificationStatus gemm_wmma(int impl, uint32_t m, uint32_t n,
++                                      uint32_t k, fp32 alpha, fp32 beta,
++                                      int32_t repeat, int32_t verify) {
+   int WAVE_SIZE;
+ 
+-  CHECK_HIP_ERROR(hipDeviceGetAttribute(&WAVE_SIZE, hipDeviceAttributeWarpSize, 0));
++  CHECK_HIP_ERROR(hipDeviceGetAttribute(&WAVE_SIZE, hipDeviceAttributeWarpSize,
++                                        selected_device));
+ 
+   // Bounds check
+   if (impl == 0) {
+     if (m < WMMA_M || n < WMMA_N || k < WMMA_K || m % WMMA_M || n % WMMA_N || k % WMMA_K) {
++      if (report_rank >= 0) std::cout << "[rank " << report_rank << "] ";
+       std::cout << "Unsupported size!\n";
+-      return;
++      return VerificationStatus::Unsupported;
+     }
+ 
+   } else {
+     if ((m < TILE_M) || n < TILE_N || k < WMMA_K || m % WMMA_M || n % WMMA_N || k % WMMA_K ||
+         TILE_M / WMMA_M * WAVE_SIZE * TILE_N / WMMA_N > 1024) {
++      if (report_rank >= 0) std::cout << "[rank " << report_rank << "] ";
+       std::cout << "Unsupported size!\n";
+-      return;
++      return VerificationStatus::Unsupported;
+     }
+   }
+ 
+@@ -284,6 +304,7 @@ __host__ void gemm_wmma(int impl, uint32_t m, uint32_t n, uint32_t k, fp32 alpha
+     }
+   }
+ 
++  VerificationStatus verification_status = VerificationStatus::Disabled;
+   if (verify) {
+     std::cout << "Validating result with reference..." << std::endl;
+ 
+@@ -297,7 +318,14 @@ __host__ void gemm_wmma(int impl, uint32_t m, uint32_t n, uint32_t k, fp32 alpha
+     gemm_cpu_h(m, n, k, matrixA.data(), matrixB.data(), matrixC.data(),
+                matrixD_ref.data(), lda, ldb, ldc, ldd, alpha, beta);
+ 
+-    compareEqual<fp32>(matrixD.data(), matrixD_ref.data(), m * n);
++    bool passed = compareEqual<fp32>(matrixD.data(), matrixD_ref.data(), m * n);
++    verification_status = passed ? VerificationStatus::Passed
++                                 : VerificationStatus::Failed;
++    if (report_rank >= 0) std::cout << "[rank " << report_rank << "] ";
++    std::cout << (passed ? "PASSED" : "FAILED") << "\n";
++  } else {
++    if (report_rank >= 0) std::cout << "[rank " << report_rank << "] ";
++    std::cout << "Verification disabled\n";
+   }
+ 
+   CHECK_HIP_ERROR(hipDeviceSynchronize()); // throughput
+@@ -328,6 +356,7 @@ __host__ void gemm_wmma(int impl, uint32_t m, uint32_t n, uint32_t k, fp32 alpha
+             << "beta, ldc, ldd, "
+             << "elapsedMs, Problem Size(GFlops), TFlops/s" << std::endl;
+ 
++  if (report_rank >= 0) std::cout << "[rank " << report_rank << "] ";
+   std::cout << WMMA_M << ", " << WMMA_N << ", " << WMMA_K << ", " << m << ", "
+             << n << ", " << k << ", " << alpha << ", " << lda << ", " << ldb
+             << ", " << beta << ", " << ldc << ", " << ldd << ", "
+@@ -341,6 +370,7 @@ __host__ void gemm_wmma(int impl, uint32_t m, uint32_t n, uint32_t k, fp32 alpha
+   CHECK_HIP_ERROR(hipFree(d_d));
+ 
+   std::cout << "Finished!" << std::endl;
++  return verification_status;
+ }
+ 
+ void Usage(std::string program_name) {
+@@ -351,10 +381,47 @@ void Usage(std::string program_name) {
+   std::cout
+       << "Dense matrix-matrix multiplication: D = alpha * (A * B) + beta * C\n";
+   std::cout << "A: M * K, B: K * N, C: M * N, D: M * N\n";
+-  exit(-1);
++  fatal_exit();
+ }
+ 
+ int main(int argc, char *argv[]) {
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++  MPI_Init(&argc, &argv);
++  int rank_count, local_rank;
++  MPI_Comm local_comm;
++  MPI_Comm_rank(MPI_COMM_WORLD, &report_rank);
++  MPI_Comm_size(MPI_COMM_WORLD, &rank_count);
++  MPI_Comm_split_type(MPI_COMM_WORLD, MPI_COMM_TYPE_SHARED, report_rank,
++                      MPI_INFO_NULL, &local_comm);
++  MPI_Comm_rank(local_comm, &local_rank);
++
++  int visible_devices = 0;
++  if (hipGetDeviceCount(&visible_devices) != hipSuccess || visible_devices < 1) {
++    std::cerr << "[rank " << report_rank << "] No visible HIP device\n";
++    MPI_Abort(MPI_COMM_WORLD, 2);
++  }
++  selected_device = visible_devices == 1 ? 0 : local_rank;
++  if (selected_device >= visible_devices) {
++    std::cerr << "[rank " << report_rank << "] local rank " << local_rank
++              << " cannot be mapped to " << visible_devices
++              << " visible HIP devices\n";
++    MPI_Abort(MPI_COMM_WORLD, 2);
++  }
++  if (hipSetDevice(selected_device) != hipSuccess) {
++    std::cerr << "[rank " << report_rank << "] Failed to select HIP device "
++              << selected_device << "\n";
++    MPI_Abort(MPI_COMM_WORLD, 2);
++  }
++  char processor[MPI_MAX_PROCESSOR_NAME];
++  int processor_length;
++  MPI_Get_processor_name(processor, &processor_length);
++  std::cout << "[rank " << report_rank << "/" << rank_count
++            << " local_rank " << local_rank << "] host=" << processor
++            << " device=" << selected_device
++            << " visible_devices=" << visible_devices << "\n";
++  MPI_Comm_free(&local_comm);
++#endif
++
+   if (argc != 7) {
+     Usage(argv[0]);
+   }
+@@ -365,7 +432,28 @@ int main(int argc, char *argv[]) {
+   const uint32_t k = atoi(argv[4]);
+   const int32_t repeat = atoi(argv[5]);
+   const int32_t verify = atoi(argv[6]);
+-  gemm_wmma(impl, m, n, k, 0.5f, 2.0f, repeat, verify);
++  [[maybe_unused]] VerificationStatus status =
++      gemm_wmma(impl, m, n, k, 0.5f, 2.0f, repeat, verify);
++
++#ifdef HECBENCH_ENABLE_MPI_REPLICAS
++  int local_status = static_cast<int>(status);
++  int overall_status = 0;
++  MPI_Allreduce(&local_status, &overall_status, 1, MPI_INT, MPI_MIN,
++                MPI_COMM_WORLD);
++  if (report_rank == 0) {
++    if (overall_status == static_cast<int>(VerificationStatus::Passed)) {
++      std::cout << "OVERALL PASSED (" << rank_count << "/" << rank_count
++                << " replica ranks)\n";
++    } else if (overall_status ==
++               static_cast<int>(VerificationStatus::Disabled)) {
++      std::cout << "OVERALL NOT VERIFIED (verification disabled)\n";
++    } else {
++      std::cout << "OVERALL FAILED\n";
++    }
++  }
++  MPI_Finalize();
++  return overall_status > static_cast<int>(VerificationStatus::Failed) ? 0 : 2;
++#endif
+ 
+   return 0;
+ }
+diff --git a/src/wmma-hip/reference.h b/src/wmma-hip/reference.h
+index afe2a4453..1f741ad04 100644
+--- a/src/wmma-hip/reference.h
++++ b/src/wmma-hip/reference.h
+@@ -1,6 +1,6 @@
+ // Element-wise comparison
+ template <typename T>
+-void compareEqual(T const *a, T const *b, uint32_t size,
++bool compareEqual(T const *a, T const *b, uint32_t size,
+                   double tolerance = 10.0) {
+   double max_relative_error = 0.0;
+ 
+@@ -15,14 +15,11 @@ void compareEqual(T const *a, T const *b, uint32_t size,
+     }
+   }
+   auto eps = std::numeric_limits<T>::epsilon();
+-  if (max_relative_error != max_relative_error ||
+-      max_relative_error > eps * tolerance) {
+-    std::cout << "FAILED\n";
+-  } else {
+-    std::cout << "PASSED\n";
+-  }
++  bool passed = max_relative_error == max_relative_error &&
++                max_relative_error <= eps * tolerance;
+ 
+   std::cout << "Max relative error: " << max_relative_error << std::endl;
++  return passed;
+ }
+ 
+ // Host GEMM validation

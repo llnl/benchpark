@@ -6,6 +6,8 @@
 import os
 from collections import defaultdict
 
+import yaml
+
 from benchpark.base_paths import base_paths
 
 PROGRAMMING_MODEL_CATEGORY = "programming_model"
@@ -29,23 +31,40 @@ MOD_DICT = {
 }
 
 
-def benchpark_experiments(exp_dict=EXP_DICT, exclude_variants=[]):
-    source_dir = base_paths.benchpark_root
-    experiments = []
-    experiments_dir = source_dir / "experiments"
+def _experiment_definitions():
+    """Return display names and source files for all bundled experiments."""
+    experiments_dir = base_paths.benchpark_root / "experiments"
+    definitions = []
 
-    for x in sorted(os.listdir(experiments_dir)):
-        if not os.path.isdir(experiments_dir / x):
-            continue
+    for repo_file in experiments_dir.rglob("repo.yaml"):
+        with open(repo_file, "r") as file:
+            repo_config = yaml.safe_load(file)["repo"]
+
+        namespace = repo_config["namespace"]
+        objects_dir = repo_file.parent / repo_config.get("subdirectory", "experiments")
+        for experiment_file in objects_dir.glob("*/experiment.py"):
+            experiment_name = experiment_file.parent.name
+            display_name = (
+                experiment_name
+                if namespace == "builtin"
+                else f"{namespace}.{experiment_name}"
+            )
+            definitions.append((display_name, experiment_file))
+
+    return sorted(definitions)
+
+
+def benchpark_experiments(exp_dict=EXP_DICT, exclude_variants=[]):
+    experiments = []
+
+    for experiment_name, experiment_file in _experiment_definitions():
         exp_pmodels_scaling = defaultdict(list)
-        expr_file = str(experiments_dir) + "/" + x + "/experiment.py"
-        if os.path.isfile(expr_file):
-            with open(expr_file, "r") as file:
-                file_text = file.read()
-                for var in exp_dict.keys():
-                    if var in file_text and var not in exclude_variants:
-                        category, option = exp_dict[var]
-                        exp_pmodels_scaling[category].append(option)
+        with open(experiment_file, "r") as file:
+            file_text = file.read()
+            for var in exp_dict.keys():
+                if var in file_text and var not in exclude_variants:
+                    category, option = exp_dict[var]
+                    exp_pmodels_scaling[category].append(option)
         end_str = ""
         for category in [PROGRAMMING_MODEL_CATEGORY, SCALING_CATEGORY]:
             if len(exp_pmodels_scaling[category]) == 0:
@@ -54,7 +73,7 @@ def benchpark_experiments(exp_dict=EXP_DICT, exclude_variants=[]):
             cat_str += "|".join(exp_pmodels_scaling[category])
             cat_str += "]"
             end_str += cat_str
-        experiments.append(x + end_str)
+        experiments.append(experiment_name + end_str)
     return experiments
 
 
