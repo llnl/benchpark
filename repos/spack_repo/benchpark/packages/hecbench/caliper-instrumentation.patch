@@ -1,0 +1,660 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index a907dd161..3836733c0 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -41,6 +41,7 @@ set(HECBENCH_HIP_ARCH "gfx90a" CACHE STRING "HIP architecture (e.g., gfx908, gfx
+ option(HECBENCH_ENABLE_TESTING "Enable testing" ON)
+ option(HECBENCH_BUILD_ALL_BENCHMARKS "Build all benchmarks (vs selective)" ON)
+ set(HECBENCH_BENCHMARK "" CACHE STRING "Benchmark to build in selective mode")
++option(HECBENCH_ENABLE_CALIPER "Enable Caliper instrumentation" OFF)
+ 
+ # Add cmake module path
+ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
+@@ -84,6 +85,10 @@ if(HECBENCH_ENABLE_OPENMP)
+     endif()
+ endif()
+ 
++if(HECBENCH_ENABLE_CALIPER)
++    find_package(caliper CONFIG REQUIRED)
++endif()
++
+ # Include benchmark macros
+ include(BenchmarkMacros)
+ 
+diff --git a/cmake/modules/BenchmarkMacros.cmake b/cmake/modules/BenchmarkMacros.cmake
+index 63528e0b6..4bf98da42 100644
+--- a/cmake/modules/BenchmarkMacros.cmake
++++ b/cmake/modules/BenchmarkMacros.cmake
+@@ -159,6 +159,11 @@ function(add_hecbench_benchmark)
+     # Add executable
+     add_executable(${TARGET_NAME} ${BENCH_SOURCES})
+ 
++    if(HECBENCH_ENABLE_CALIPER)
++        target_compile_definitions(${TARGET_NAME} PRIVATE HECBENCH_USE_CALIPER)
++        target_link_libraries(${TARGET_NAME} PRIVATE caliper)
++    endif()
++
+     # Set target properties
+     set_target_properties(${TARGET_NAME} PROPERTIES
+         OUTPUT_NAME ${BENCH_NAME}
+diff --git a/src/nbody-cuda/GSimulation.cu b/src/nbody-cuda/GSimulation.cu
+index b24d77fb6..cb09e8537 100644
+--- a/src/nbody-cuda/GSimulation.cu
++++ b/src/nbody-cuda/GSimulation.cu
+@@ -5,6 +5,9 @@
+ // =============================================================
+ 
+ #include <cuda.h>
++#ifdef HECBENCH_USE_CALIPER
++#include <caliper/cali.h>
++#endif
+ #include "GSimulation.hpp"
+ #include "GSimulationKernels.hpp"
+ 
+@@ -83,10 +86,16 @@ void GSimulation::Start() {
+   // allocate particles
+   particles_.resize(n);
+ 
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_BEGIN("initialization");
++#endif
+   InitPos();
+   InitVel();
+   InitAcc();
+   InitMass();
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_END("initialization");
++#endif
+ 
+ #ifdef DEBUG
+   PrintHeader();
+@@ -101,6 +110,9 @@ void GSimulation::Start() {
+   int nf = 0;
+   double av = 0.0, dev = 0.0;
+ 
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_BEGIN("device_setup");
++#endif
+   Particle *p;
+   cudaMalloc((void**)&p, sizeof(Particle) * n);
+   cudaMemcpyAsync(p, particles_.data(), sizeof(Particle) * n, cudaMemcpyHostToDevice, 0);
+@@ -111,6 +123,10 @@ void GSimulation::Start() {
+ 
+   dim3 grids((n+255)/256);
+   dim3 threads(256);
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_END("device_setup");
++  CALI_MARK_BEGIN("main_computation");
++#endif
+ 
+   TimeInterval t0;
+   int nsteps = get_nsteps();
+@@ -118,9 +134,23 @@ void GSimulation::Start() {
+   for (int s = 1; s <= nsteps; ++s) {
+     TimeInterval ts0;
+ 
++#ifdef HECBENCH_USE_CALIPER
++    CALI_MARK_BEGIN("acceleration");
++#endif
+     accelerate_particles<<<grids, threads>>>(p, n, kSofteningSquared, kG);
++#ifdef HECBENCH_USE_CALIPER
++    CALI_MARK_END("acceleration");
++    CALI_MARK_BEGIN("particle_update");
++#endif
+     update_particles<<<grids, threads>>>(p, e, n, dt);
++#ifdef HECBENCH_USE_CALIPER
++    CALI_MARK_END("particle_update");
++    CALI_MARK_BEGIN("energy_accumulation");
++#endif
+     accumulate_energy<<<1,1>>>(e, n);
++#ifdef HECBENCH_USE_CALIPER
++    CALI_MARK_END("energy_accumulation");
++#endif
+ 
+     cudaDeviceSynchronize();
+     double elapsed_seconds = ts0.Elapsed();
+@@ -147,6 +177,9 @@ void GSimulation::Start() {
+     }
+   }  // end of the time step loop
+   total_time_ = t0.Elapsed();
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_END("main_computation");
++#endif
+   total_flops_ = gflops * get_nsteps();
+   av /= (double)(nf - 2);
+   // when nf = 3, deviation is 0 (N/A)
+diff --git a/src/nbody-cuda/GSimulationReference.hpp b/src/nbody-cuda/GSimulationReference.hpp
+index 70b1e504a..3c9bab917 100644
+--- a/src/nbody-cuda/GSimulationReference.hpp
++++ b/src/nbody-cuda/GSimulationReference.hpp
+@@ -1,5 +1,9 @@
+ #include <cmath>
+ 
++#ifdef HECBENCH_USE_CALIPER
++#include <caliper/cali.h>
++#endif
++
+ void accelerate_particles_ref( Particle* p, const int n, const float kSofteningSquared, const float kG )
+ {
+   for (int i = 0; i < n; i++) {
+@@ -65,6 +69,9 @@ accumulate_energy_ref(RealType *e, const int n)
+ }
+ 
+ void GSimulation::Verify() {
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_BEGIN("validation");
++#endif
+   RealType dt = get_tstep();
+   int n = get_npart();
+   std::vector<RealType> energy(n, 0.f);
+@@ -100,4 +107,7 @@ void GSimulation::Verify() {
+   std::cout << "\n";
+   bool ok = fabsf(kenergy_ - ref_kenergy_) < 1e-3f;
+   printf("%s\n", ok ? "PASS" : "FAIL");
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_END("validation");
++#endif
+ }
+diff --git a/src/nbody-hip/GSimulation.cu b/src/nbody-hip/GSimulation.cu
+index 3b82052d4..6c74e779d 100644
+--- a/src/nbody-hip/GSimulation.cu
++++ b/src/nbody-hip/GSimulation.cu
+@@ -5,6 +5,9 @@
+ // =============================================================
+ 
+ #include <hip/hip_runtime.h>
++#ifdef HECBENCH_USE_CALIPER
++#include <caliper/cali.h>
++#endif
+ #include "GSimulation.hpp"
+ #include "GSimulationKernels.hpp"
+ 
+@@ -83,10 +86,16 @@ void GSimulation::Start() {
+   // allocate particles
+   particles_.resize(n);
+ 
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_BEGIN("initialization");
++#endif
+   InitPos();
+   InitVel();
+   InitAcc();
+   InitMass();
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_END("initialization");
++#endif
+ 
+ #ifdef DEBUG
+   PrintHeader();
+@@ -101,6 +110,9 @@ void GSimulation::Start() {
+   int nf = 0;
+   double av = 0.0, dev = 0.0;
+ 
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_BEGIN("device_setup");
++#endif
+   Particle *p;
+   hipMalloc((void**)&p, sizeof(Particle) * n);
+   hipMemcpyAsync(p, particles_.data(), sizeof(Particle) * n, hipMemcpyHostToDevice, 0);
+@@ -111,6 +123,10 @@ void GSimulation::Start() {
+ 
+   dim3 grids((n+255)/256);
+   dim3 threads(256);
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_END("device_setup");
++  CALI_MARK_BEGIN("main_computation");
++#endif
+ 
+   TimeInterval t0;
+   int nsteps = get_nsteps();
+@@ -118,9 +134,23 @@ void GSimulation::Start() {
+   for (int s = 1; s <= nsteps; ++s) {
+     TimeInterval ts0;
+ 
++#ifdef HECBENCH_USE_CALIPER
++    CALI_MARK_BEGIN("acceleration");
++#endif
+     accelerate_particles<<<grids, threads>>>(p, n, kSofteningSquared, kG);
++#ifdef HECBENCH_USE_CALIPER
++    CALI_MARK_END("acceleration");
++    CALI_MARK_BEGIN("particle_update");
++#endif
+     update_particles<<<grids, threads>>>(p, e, n, dt);
++#ifdef HECBENCH_USE_CALIPER
++    CALI_MARK_END("particle_update");
++    CALI_MARK_BEGIN("energy_accumulation");
++#endif
+     accumulate_energy<<<1,1>>>(e, n);
++#ifdef HECBENCH_USE_CALIPER
++    CALI_MARK_END("energy_accumulation");
++#endif
+ 
+     hipDeviceSynchronize();
+     double elapsed_seconds = ts0.Elapsed();
+@@ -147,6 +177,9 @@ void GSimulation::Start() {
+     }
+   }  // end of the time step loop
+   total_time_ = t0.Elapsed();
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_END("main_computation");
++#endif
+   total_flops_ = gflops * get_nsteps();
+   av /= (double)(nf - 2);
+   // when nf = 3, deviation is 0 (N/A)
+diff --git a/src/softmax-cuda/main.cu b/src/softmax-cuda/main.cu
+index 5bb28c61d..16d1c000d 100644
+--- a/src/softmax-cuda/main.cu
++++ b/src/softmax-cuda/main.cu
+@@ -5,6 +5,10 @@
+ #include <cooperative_groups.h>
+ #include <cooperative_groups/reduce.h>
+ 
++#ifdef HECBENCH_USE_CALIPER
++#include <caliper/cali.h>
++#endif
++
+ #define BLOCK_SIZE 256
+ 
+ // A C model derived from the OpenCL kernel
+@@ -84,6 +88,9 @@ int main(int argc, char* argv[]) {
+   int repeat = atoi(argv[4]);
+   int numElem = numSlice * sliceSize;
+ 
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_BEGIN("initialization");
++#endif
+   float* input = (float*) aligned_alloc(1024, sizeof(float) * numElem);
+   float* output_gpu = (float*) aligned_alloc(1024, sizeof(float) * numElem);
+   float* output_cpu = (float*) aligned_alloc(1024, sizeof(float) * numElem);
+@@ -92,17 +99,27 @@ int main(int argc, char* argv[]) {
+   for (int i = 0; i < numSlice; i++)
+     for (int j = 0; j < sliceSize; j++)
+       input[i*sliceSize+j] = rand() % 13;
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_END("initialization");
++  CALI_MARK_BEGIN("device_setup");
++#endif
+ 
+   float *d_input, *d_output;
+   cudaMalloc((void**)&d_input, sizeof(float) * numElem);
+   cudaMalloc((void**)&d_output, sizeof(float) * numElem);
+   cudaMemcpy(d_input, input, sizeof(float) * numElem, cudaMemcpyHostToDevice);
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_END("device_setup");
++#endif
+ 
+   if (kernel == 1) {
+     dim3 grids ((numSlice+BLOCK_SIZE/32-1)/(BLOCK_SIZE/32));
+     dim3 blocks (BLOCK_SIZE);
+ 
+     cudaDeviceSynchronize();
++#ifdef HECBENCH_USE_CALIPER
++    CALI_MARK_BEGIN("main_computation");
++#endif
+     auto start = std::chrono::steady_clock::now();
+ 
+     for (int n = 0; n < repeat; n++) {
+@@ -111,6 +128,9 @@ int main(int argc, char* argv[]) {
+ 
+     cudaDeviceSynchronize();
+     auto end = std::chrono::steady_clock::now();
++#ifdef HECBENCH_USE_CALIPER
++    CALI_MARK_END("main_computation");
++#endif
+     auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+     printf("Average kernel execution time: %f (ms)\n", (time * 1e-6f) / repeat);
+   }
+@@ -119,6 +139,9 @@ int main(int argc, char* argv[]) {
+     dim3 blocks (BLOCK_SIZE);
+ 
+     cudaDeviceSynchronize();
++#ifdef HECBENCH_USE_CALIPER
++    CALI_MARK_BEGIN("main_computation");
++#endif
+     auto start = std::chrono::steady_clock::now();
+ 
+     for (int n = 0; n < repeat; n++) {
+@@ -127,11 +150,21 @@ int main(int argc, char* argv[]) {
+ 
+     cudaDeviceSynchronize();
+     auto end = std::chrono::steady_clock::now();
++#ifdef HECBENCH_USE_CALIPER
++    CALI_MARK_END("main_computation");
++#endif
+     auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+     printf("Average kernel execution time: %f (ms)\n", (time * 1e-6f) / repeat);
+   }
+ 
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_BEGIN("result_transfer");
++#endif
+   cudaMemcpy(output_gpu, d_output, sizeof(float) * numElem, cudaMemcpyDeviceToHost);
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_END("result_transfer");
++  CALI_MARK_BEGIN("validation");
++#endif
+ 
+   // verification
+   bool ok = true;
+@@ -144,6 +177,9 @@ int main(int argc, char* argv[]) {
+     }
+   }
+   printf("%s\n", ok ? "PASS" : "FAIL");
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_END("validation");
++#endif
+ 
+   free(input);
+   free(output_cpu);
+diff --git a/src/softmax-hip/main.cu b/src/softmax-hip/main.cu
+index 67b0969c3..6e24efd89 100644
+--- a/src/softmax-hip/main.cu
++++ b/src/softmax-hip/main.cu
+@@ -4,6 +4,10 @@
+ #include <hip/hip_runtime.h>
+ #include <hip/hip_cooperative_groups.h>
+ 
++#ifdef HECBENCH_USE_CALIPER
++#include <caliper/cali.h>
++#endif
++
+ #define BLOCK_SIZE 256
+ 
+ 
+@@ -93,6 +97,9 @@ int main(int argc, char* argv[]) {
+   int repeat = atoi(argv[4]);
+   int numElem = numSlice * sliceSize;
+ 
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_BEGIN("initialization");
++#endif
+   float* input = (float*) aligned_alloc(1024, sizeof(float) * numElem);
+   float* output_gpu = (float*) aligned_alloc(1024, sizeof(float) * numElem);
+   float* output_cpu = (float*) aligned_alloc(1024, sizeof(float) * numElem);
+@@ -101,11 +108,18 @@ int main(int argc, char* argv[]) {
+   for (int i = 0; i < numSlice; i++)
+     for (int j = 0; j < sliceSize; j++)
+       input[i*sliceSize+j] = rand() % 13;
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_END("initialization");
++  CALI_MARK_BEGIN("device_setup");
++#endif
+ 
+   float *d_input, *d_output;
+   hipMalloc((void**)&d_input, sizeof(float) * numElem);
+   hipMalloc((void**)&d_output, sizeof(float) * numElem);
+   hipMemcpy(d_input, input, sizeof(float) * numElem, hipMemcpyHostToDevice);
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_END("device_setup");
++#endif
+ 
+   if (kernel == 1) {
+     int warp_size;
+@@ -114,6 +128,9 @@ int main(int argc, char* argv[]) {
+     dim3 blocks (BLOCK_SIZE);
+ 
+     hipDeviceSynchronize();
++#ifdef HECBENCH_USE_CALIPER
++    CALI_MARK_BEGIN("main_computation");
++#endif
+     auto start = std::chrono::steady_clock::now();
+ 
+     for (int n = 0; n < repeat; n++) {
+@@ -122,6 +139,9 @@ int main(int argc, char* argv[]) {
+ 
+     hipDeviceSynchronize();
+     auto end = std::chrono::steady_clock::now();
++#ifdef HECBENCH_USE_CALIPER
++    CALI_MARK_END("main_computation");
++#endif
+     auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+     printf("Average kernel execution time: %f (ms)\n", (time * 1e-6f) / repeat);
+   }
+@@ -130,6 +150,9 @@ int main(int argc, char* argv[]) {
+     dim3 blocks (BLOCK_SIZE);
+ 
+     hipDeviceSynchronize();
++#ifdef HECBENCH_USE_CALIPER
++    CALI_MARK_BEGIN("main_computation");
++#endif
+     auto start = std::chrono::steady_clock::now();
+ 
+     for (int n = 0; n < repeat; n++) {
+@@ -138,11 +161,21 @@ int main(int argc, char* argv[]) {
+ 
+     hipDeviceSynchronize();
+     auto end = std::chrono::steady_clock::now();
++#ifdef HECBENCH_USE_CALIPER
++    CALI_MARK_END("main_computation");
++#endif
+     auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+     printf("Average kernel execution time: %f (ms)\n", (time * 1e-6f) / repeat);
+   }
+ 
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_BEGIN("result_transfer");
++#endif
+   hipMemcpy(output_gpu, d_output, sizeof(float) * numElem, hipMemcpyDeviceToHost);
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_END("result_transfer");
++  CALI_MARK_BEGIN("validation");
++#endif
+ 
+   // verification
+   bool ok = true;
+@@ -155,6 +188,9 @@ int main(int argc, char* argv[]) {
+     }
+   }
+   printf("%s\n", ok ? "PASS" : "FAIL");
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_END("validation");
++#endif
+ 
+   free(input);
+   free(output_cpu);
+diff --git a/src/wmma-cuda/main.cu b/src/wmma-cuda/main.cu
+index cfb3fa7de..8cdc0c246 100644
+--- a/src/wmma-cuda/main.cu
++++ b/src/wmma-cuda/main.cu
+@@ -32,6 +32,10 @@
+ #include <cuda.h>
+ #include <mma.h>
+ 
++#ifdef HECBENCH_USE_CALIPER
++#include <caliper/cali.h>
++#endif
++
+ typedef half fp16;
+ typedef float fp32;
+ 
+@@ -213,6 +217,9 @@ __host__ void gemm_wmma(int impl, uint32_t m, uint32_t n, uint32_t k, fp32 alpha
+ 
+   std::cout << "Initializing host data..." << std::endl;
+ 
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_BEGIN("initialization");
++#endif
+   // Initialize input matrices
+   std::vector<fp16> matrixA(m * k);
+   std::vector<fp16> matrixB(k * n);
+@@ -225,9 +232,15 @@ __host__ void gemm_wmma(int impl, uint32_t m, uint32_t n, uint32_t k, fp32 alpha
+   fill(matrixA.data(), m, k);
+   fill(matrixB.data(), k, n);
+   fill(matrixC.data(), m, n);
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_END("initialization");
++#endif
+ 
+   std::cout << "Initializing device data..." << std::endl;
+ 
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_BEGIN("device_setup");
++#endif
+   // Allocate and copy device memory
+   fp16 *d_a, *d_b;
+   fp32 *d_c, *d_d;
+@@ -250,6 +263,9 @@ __host__ void gemm_wmma(int impl, uint32_t m, uint32_t n, uint32_t k, fp32 alpha
+       cudaMemcpy(d_c, matrixC.data(), bytesC, cudaMemcpyHostToDevice));
+   CHECK_CUDA_ERROR(
+       cudaMemcpy(d_d, matrixD.data(), bytesD, cudaMemcpyHostToDevice));
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_END("device_setup");
++#endif
+ 
+   std::cout << "Launching GEMM kernel..." << std::endl;
+   
+@@ -270,6 +286,9 @@ __host__ void gemm_wmma(int impl, uint32_t m, uint32_t n, uint32_t k, fp32 alpha
+     blockDim.y = TILE_N / WMMA_N;
+   }
+ 
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_BEGIN("warmup");
++#endif
+   // Warmup
+   for (int32_t w = 0; w < 30; w++) {
+     if (impl == 0)
+@@ -277,8 +296,14 @@ __host__ void gemm_wmma(int impl, uint32_t m, uint32_t n, uint32_t k, fp32 alpha
+     else if (impl == 1)
+       gemm_impl1<<<gridDim, blockDim>>>(m, n, k, d_a, d_b, d_c, d_d, lda, ldb, ldc, ldd, alpha, beta);
+   }
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_END("warmup");
++#endif
+ 
+   if (verify) {
++#ifdef HECBENCH_USE_CALIPER
++    CALI_MARK_BEGIN("validation");
++#endif
+     std::cout << "Validating result with reference..." << std::endl;
+ 
+     // Bring kernel result back to host
+@@ -292,11 +317,17 @@ __host__ void gemm_wmma(int impl, uint32_t m, uint32_t n, uint32_t k, fp32 alpha
+                matrixD_ref.data(), lda, ldb, ldc, ldd, alpha, beta);
+ 
+     compareEqual<fp32>(matrixD.data(), matrixD_ref.data(), m * n);
++#ifdef HECBENCH_USE_CALIPER
++    CALI_MARK_END("validation");
++#endif
+   } else {
+     std::cout << "Skip validating result with reference" << std::endl;
+   }
+ 
+   CHECK_CUDA_ERROR(cudaDeviceSynchronize());
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_BEGIN("main_computation");
++#endif
+   auto start = std::chrono::steady_clock::now();
+ 
+   for (int32_t w = 0; w < repeat; w++) {
+@@ -308,6 +339,9 @@ __host__ void gemm_wmma(int impl, uint32_t m, uint32_t n, uint32_t k, fp32 alpha
+   }
+   CHECK_CUDA_ERROR(cudaDeviceSynchronize());
+   auto end = std::chrono::steady_clock::now();
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_END("main_computation");
++#endif
+   auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+   double elapsedTimeMs = time * 1e-6;
+ 
+diff --git a/src/wmma-hip/main.cu b/src/wmma-hip/main.cu
+index 8c6b56ce8..725f0d586 100644
+--- a/src/wmma-hip/main.cu
++++ b/src/wmma-hip/main.cu
+@@ -32,6 +32,10 @@
+ #include <hip/hip_runtime.h>
+ #include <rocwmma/rocwmma.hpp>
+ 
++#ifdef HECBENCH_USE_CALIPER
++#include <caliper/cali.h>
++#endif
++
+ typedef half fp16;
+ typedef float fp32;
+ 
+@@ -216,6 +220,9 @@ __host__ void gemm_wmma(int impl, uint32_t m, uint32_t n, uint32_t k, fp32 alpha
+ 
+   std::cout << "Initializing host data..." << std::endl;
+ 
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_BEGIN("initialization");
++#endif
+   // Initialize input matrices
+   std::vector<fp16> matrixA(m * k);
+   std::vector<fp16> matrixB(k * n);
+@@ -228,9 +235,15 @@ __host__ void gemm_wmma(int impl, uint32_t m, uint32_t n, uint32_t k, fp32 alpha
+   fill(matrixA.data(), m, k);
+   fill(matrixB.data(), k, n);
+   fill(matrixC.data(), m, n);
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_END("initialization");
++#endif
+ 
+   std::cout << "Initializing device data..." << std::endl;
+ 
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_BEGIN("device_setup");
++#endif
+   // Allocate and copy device memory
+   fp16 *d_a, *d_b;
+   fp32 *d_c, *d_d;
+@@ -253,6 +266,9 @@ __host__ void gemm_wmma(int impl, uint32_t m, uint32_t n, uint32_t k, fp32 alpha
+       hipMemcpy(d_c, matrixC.data(), bytesC, hipMemcpyHostToDevice));
+   CHECK_HIP_ERROR(
+       hipMemcpy(d_d, matrixD.data(), bytesD, hipMemcpyHostToDevice));
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_END("device_setup");
++#endif
+ 
+   std::cout << "Launching GEMM kernel..." << std::endl;
+ 
+@@ -273,6 +289,9 @@ __host__ void gemm_wmma(int impl, uint32_t m, uint32_t n, uint32_t k, fp32 alpha
+     blockDim.y = TILE_N / WMMA_N;
+   }
+ 
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_BEGIN("warmup");
++#endif
+   for (int32_t w = 0; w < 30; w++) {
+     if (impl == 0)
+       gemm_impl0<<<gridDim, blockDim>>>(m, n, k, d_a, d_b, d_c, d_d, lda, ldb, ldc, ldd, alpha, beta);
+@@ -283,8 +302,14 @@ __host__ void gemm_wmma(int impl, uint32_t m, uint32_t n, uint32_t k, fp32 alpha
+          gemm_impl1<64><<<gridDim, blockDim>>>(m, n, k, d_a, d_b, d_c, d_d, lda, ldb, ldc, ldd, alpha, beta);
+     }
+   }
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_END("warmup");
++#endif
+ 
+   if (verify) {
++#ifdef HECBENCH_USE_CALIPER
++    CALI_MARK_BEGIN("validation");
++#endif
+     std::cout << "Validating result with reference..." << std::endl;
+ 
+     // Bring kernel result back to host
+@@ -298,9 +323,15 @@ __host__ void gemm_wmma(int impl, uint32_t m, uint32_t n, uint32_t k, fp32 alpha
+                matrixD_ref.data(), lda, ldb, ldc, ldd, alpha, beta);
+ 
+     compareEqual<fp32>(matrixD.data(), matrixD_ref.data(), m * n);
++#ifdef HECBENCH_USE_CALIPER
++    CALI_MARK_END("validation");
++#endif
+   }
+ 
+   CHECK_HIP_ERROR(hipDeviceSynchronize()); // throughput
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_BEGIN("main_computation");
++#endif
+   auto start = std::chrono::steady_clock::now();
+ 
+   for (int32_t w = 0; w < repeat; w++) {
+@@ -315,6 +346,9 @@ __host__ void gemm_wmma(int impl, uint32_t m, uint32_t n, uint32_t k, fp32 alpha
+   }
+   CHECK_HIP_ERROR(hipDeviceSynchronize()); // throughput
+   auto end = std::chrono::steady_clock::now();
++#ifdef HECBENCH_USE_CALIPER
++  CALI_MARK_END("main_computation");
++#endif
+   auto time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+   double elapsedTimeMs = time * 1e-6;
+ 

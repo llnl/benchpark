@@ -5,7 +5,10 @@
 import os
 from itertools import product
 
-from spack_repo.builtin.build_systems.autotools import AutotoolsBuilder, AutotoolsPackage
+from spack_repo.builtin.build_systems.autotools import (
+    AutotoolsBuilder,
+    AutotoolsPackage,
+)
 from spack_repo.builtin.build_systems.cmake import CMakeBuilder, CMakePackage
 from spack_repo.builtin.build_systems.cuda import CudaPackage
 from spack_repo.builtin.build_systems.rocm import ROCmPackage
