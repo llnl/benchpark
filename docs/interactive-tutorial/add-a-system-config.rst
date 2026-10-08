@@ -333,8 +333,6 @@ libraries (see externals examples for a `CUDA system
 <https://github.com/LLNL/benchpark/blob/e82e3a26aef54855cf281c088b8f149ab7d87d9d/systems/llnl-matrix/system.py#L274>`_,
 or a `ROCm system
 <https://github.com/LLNL/benchpark/blob/e82e3a26aef54855cf281c088b8f149ab7d87d9d/systems/llnl-elcapitan/system.py#L483>`_).
-See :ref:`adding-sys-packages`, for help on how to search for the packages available on
-your system.
 
 .. note::
 
@@ -400,99 +398,7 @@ If this completes without errors, you can continue by creating a benchmark
  System Appendix
 *****************
 
-.. _adding-sys-packages:
-
-1. Adding/Updating System Packages
-==================================
-
-External package definitions can be added/updated from the output of ``benchpark system
-external``. If you don't have any packages yet, define ``compute_packages_section`` as
-an empty dictionary:
-
-::
-
-    def compute_packages_section(self):
-        return {
-            "packages": {}
-        }
-
-And then whether or not you have packages, run ``benchpark system external <system>
-cluster=<cluster>``:
-
-::
-
-    [ruby]$ benchpark system external llnl-cluster cluster=ruby
-
-    $ benchpark system external llnl-cluster
-    ==> The following specs have been detected on this system and added to /g/g20/mckinsey/.benchmark/spack/etc/spack/packages.yaml
-    cmake@3.23.1  cmake@3.26.5  gmake@4.2.1  hwloc@2.11.2  python@2.7.18  python@2.7.18  python@3.6.8  python@3.9.12  python@3.10.8  python@3.12.8  tar@1.30
-                    The Packages are different. Here are the differences:
-    {'dictionary_item_added': ["root['gmake']['buildable']"],
-    'dictionary_item_removed': ["root['elfutils']", "root['papi']", "root['unwind']", "root['blas']", "root['lapack']", "root['fftw']", "root['mpi']"],
-    'iterable_item_added': {"root['cmake']['externals'][1]": {'prefix': '/usr/tce',
-                                                              'spec': 'cmake@3.23.1'},
-                            "root['python']['externals'][1]": {'prefix': '/usr',
-                                                                'spec': 'python@2.7.18+bz2+crypt+ctypes+dbm~lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl~tkinter+uuid+zlib'},
-                            "root['python']['externals'][2]": {'prefix': '/usr',
-                                                                'spec': 'python@3.6.8+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib'},
-                            "root['python']['externals'][3]": {'prefix': '/usr/tce',
-                                                                'spec': 'python@2.7.18+bz2+crypt+ctypes+dbm~lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib'},
-                            "root['python']['externals'][4]": {'prefix': '/usr/tce',
-                                                                'spec': 'python@3.9.12+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib'},
-                            "root['python']['externals'][5]": {'prefix': '/usr/workspace/wsa/mckinsey/venv/benchpark-3.12.8',
-                                                                'spec': 'python@3.12.8+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat+pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib'}},
-    'values_changed': {"root['cmake']['externals'][0]['prefix']": {'new_value': '/usr',
-                                                                    'old_value': '/usr/tce/packages/cmake/cmake-3.26.3'},
-                        "root['cmake']['externals'][0]['spec']": {'new_value': 'cmake@3.26.5',
-                                                                  'old_value': 'cmake@3.26.3'},
-                        "root['hwloc']['externals'][0]['spec']": {'new_value': 'hwloc@2.11.2',
-                                                                  'old_value': 'hwloc@2.9.1'},
-                        "root['python']['externals'][0]['prefix']": {'new_value': '/usr/WS1/mckinsey/venv/python-3.10.8',
-                                                                    'old_value': '/usr/tce/packages/python/python-3.9.12/'},
-                        "root['python']['externals'][0]['spec']": {'new_value': 'python@3.10.8+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat+pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib',
-                                                                  'old_value': 'python@3.9.12'}}}
-                    Here are all of the new packages:
-    {'cmake': {'buildable': False,
-              'externals': [{'prefix': '/usr', 'spec': 'cmake@3.26.5'},
-                            {'prefix': '/usr/tce', 'spec': 'cmake@3.23.1'}]},
-    'gmake': {'buildable': False,
-              'externals': [{'prefix': '/usr', 'spec': 'gmake@4.2.1'}]},
-    'hwloc': {'buildable': False,
-              'externals': [{'prefix': '/usr', 'spec': 'hwloc@2.11.2'}]},
-    'python': {'buildable': False,
-                'externals': [{'prefix': '/usr/WS1/mckinsey/venv/python-3.10.8',
-                              'spec': 'python@3.10.8+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat+pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib'},
-                              {'prefix': '/usr',
-                              'spec': 'python@2.7.18+bz2+crypt+ctypes+dbm~lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl~tkinter+uuid+zlib'},
-                              {'prefix': '/usr',
-                              'spec': 'python@3.6.8+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib'},
-                              {'prefix': '/usr/tce',
-                              'spec': 'python@2.7.18+bz2+crypt+ctypes+dbm~lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib'},
-                              {'prefix': '/usr/tce',
-                              'spec': 'python@3.9.12+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib'},
-                              {'prefix': '/usr/workspace/wsa/mckinsey/venv/benchpark-3.12.8',
-                              'spec': 'python@3.12.8+bz2+crypt+ctypes+dbm+lzma+nis+pyexpat+pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib'}]},
-    'tar': {'buildable': False,
-            'externals': [{'prefix': '/usr', 'spec': 'tar@1.30'}]}}
-
-where the command should be ran on a cluster that is defined for the given system, e.g.,
-ruby for llnl-cluster. Use this output to update your package definitions in your
-``system.py``'s ``compute_package_section()``.
-
-For packages that are not found by ``benchpark system external``, you can manually find
-them using a command like the ``module`` command, if your system has environment
-modules:
-
-::
-
-    [dane6:~]$ module display gcc/12.1.1
-    ...
-    prepend_path("PATH","/usr/tce/packages/gcc/gcc-12.1.1/bin")
-
-Therefore, the ``prefix`` is ``/usr/tce/packages/gcc/gcc-12.1.1/`` and the spec is
-``gcc@12.1.1``.
-
-2. Adding Accounts/Banks and Queues
+1. Adding Accounts/Banks and Queues
 ===================================
 
 Accounts and Banks
