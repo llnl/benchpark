@@ -9,12 +9,10 @@ import os
 import re
 import sys
 
-import llnl.util.filesystem
-import llnl.util.tty.colify as colify
-import llnl.util.tty.color as color
 import pytest
 
 from benchpark.paths import paths
+from benchpark.util.compat import colify, color, filesystem
 
 
 def setup_parser(subparser):
@@ -110,9 +108,7 @@ def do_list(args, extra_args):
     # To list the files we just need to inspect the filesystem,
     # which doesn't need to wait for pytest collection and doesn't
     # require parsing pytest output
-    files = llnl.util.filesystem.find(
-        root=paths.test_path, files="*.py", recursive=True
-    )
+    files = filesystem.find(root=paths.test_path, files="*.py", recursive=True)
     files = [
         os.path.relpath(f, start=paths.benchpark_root)
         for f in files
@@ -225,7 +221,7 @@ def command(args, unknown_args):
         )
 
     # pytest.ini lives in the root of the spack repository.
-    with llnl.util.filesystem.working_dir(pytest_root):
+    with filesystem.working_dir(pytest_root):
         if args.list:
             return do_list(args, pytest_args)
 

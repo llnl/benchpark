@@ -12,10 +12,9 @@ import pathlib
 import re
 from typing import Iterable, Iterator, List, Match, Optional, Union
 
-import llnl.util.lang  # noqa
-
 import benchpark.repo
 from benchpark.error import BenchparkError
+from benchpark.util.compat import HashableMap, dedupe
 
 repo_path = benchpark.repo.paths[benchpark.repo.ObjectTypes.experiments]
 sys_repo = benchpark.repo.paths[benchpark.repo.ObjectTypes.systems]
@@ -24,7 +23,7 @@ value_types = str, bool, int, float
 SingleValue = Union[value_types]
 
 
-class VariantMap(llnl.util.lang.HashableMap):
+class VariantMap(HashableMap):
     def __init__(self, init: "VariantMap" = None):
         super().__init__()
         if init:
@@ -57,7 +56,7 @@ class VariantMap(llnl.util.lang.HashableMap):
     def constrain(self, other: "VariantMap") -> None:
         for name in other:
             self_values = list(self.dict.get(name, []))
-            values = llnl.util.lang.dedupe(self_values + list(other[name]))
+            values = dedupe(self_values + list(other[name]))
             self[name] = values
 
     @staticmethod

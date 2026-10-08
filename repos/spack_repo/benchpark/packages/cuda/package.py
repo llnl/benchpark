@@ -5,10 +5,9 @@
 
 import pathlib
 
-import llnl.util.tty as tty
 import spack_repo.builtin.packages.cuda.package
-from llnl.util.filesystem import find_headers
 from spack.package import *
+from spack.util.filesystem import find_headers
 
 
 class Cuda(spack_repo.builtin.packages.cuda.package.Cuda):
@@ -28,7 +27,6 @@ class Cuda(spack_repo.builtin.packages.cuda.package.Cuda):
             version_component = prefix.name  # 12.5
             split_point = prefix.parent.parent
             cufft_base = split_point / "math_libs" / version_component
-            #tty.debug(f"<---- {prefix}\n\t{split_point}\n\t{cufft_base}")
             headers = headers + find_headers("cufft", root=str(cufft_base), recursive=True)
 
         return headers

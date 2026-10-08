@@ -43,6 +43,13 @@ class Remhos(
     )
 
     variant(
+        "metis",
+        default=False,
+        values=(True, False),
+        description="Enable metis in mfem",
+    )
+
+    variant(
         "raja",
         default=True,
         values=(True, False),
@@ -156,11 +163,14 @@ class Remhos(
     def compute_package_section(self):
         gam = "~gpu-aware-mpi"
         raja = "~raja"
+        metis = "~metis"
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             if self.spec.satisfies("+gpu-aware-mpi"):
                 gam = "+gpu-aware-mpi"
         if self.spec.satisfies("+raja"):
             raja = "+raja"
+        if self.spec.satisfies("+metis"):
+            metis = "+metis"
         self.add_package_spec(
-            self.name, [f"remhos{self.determine_version()} +metis {gam} {raja}"]
+            self.name, [f"remhos{self.determine_version()} {metis} {gam} {raja}"]
         )
