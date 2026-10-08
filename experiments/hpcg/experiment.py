@@ -16,7 +16,6 @@ class Hpcg(
     Scaling(ScalingMode.Strong, ScalingMode.Weak),
     Caliper,
 ):
-
     variant(
         "workload",
         default="standard",
@@ -41,15 +40,18 @@ class Hpcg(
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "num_procs": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
+                    "num_procs": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
                     "problem_sizes": lambda var, itr, dim, scaling_factor: var.val(dim),
                 },
                 ScalingMode.Weak: {
-                    "num_procs": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
-                    "problem_sizes": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
+                    "num_procs": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
+                    "problem_sizes": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
                 },
             }
         )

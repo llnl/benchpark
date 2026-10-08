@@ -607,8 +607,9 @@ class TokenContext:
 
     def advance(self):
         """Advance one token"""
-        self.current_token, self.next_token = self.next_token, next(
-            self.token_stream, None
+        self.current_token, self.next_token = (
+            self.next_token,
+            next(self.token_stream, None),
         )
 
     def accept(self, kind: TokenType):
@@ -676,9 +677,9 @@ class SpecParser(object):
                 spec.variants[name] = value
             elif self.ctx.accept(TokenType.KEY_VALUE_PAIR):
                 match = SPLIT_KVP.match(self.ctx.current_token.value)
-                assert (
-                    match
-                ), f"SPLIT_KVP cannot split pair {self.ctx.current_token.value}"
+                assert match, (
+                    f"SPLIT_KVP cannot split pair {self.ctx.current_token.value}"
+                )
 
                 name, value = match.groups()
                 spec.variants[name] = strip_quotes_and_unescape(value).split(",")

@@ -42,8 +42,9 @@ class MdTest(
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "n_ranks": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
+                    "n_ranks": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
                     "num-objects": lambda var, itr, dim, scaling_factor: var.val(dim),
                 },
             }

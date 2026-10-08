@@ -52,12 +52,12 @@ def _print_helper(name, collection, filter=None):
             item = item.replace("!", "")
             idx = 1
         if "=" not in item and "+" not in item:
-            color.cprint(f"    {strs[idx]+item+end}")
+            color.cprint(f"    {strs[idx] + item + end}")
         else:
             char = "=" if "=" in item else "+"
             item = item.split(char)
             color.cprint(
-                f"    {strs[0]+item[0]+end+char+char.join([strs[i]+item[i]+end for i in range(1,len(item))])}"
+                f"    {strs[0] + item[0] + end + char + char.join([strs[i] + item[i] + end for i in range(1, len(item))])}"
             )
 
 

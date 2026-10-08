@@ -106,14 +106,17 @@ class Branson(
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
+                    "resource_count": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
                 },
                 ScalingMode.Weak: {
-                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
-                    "num_particles": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
+                    "resource_count": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
+                    "num_particles": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
                 },
                 ScalingMode.Throughput: {
                     "resource_count": None,

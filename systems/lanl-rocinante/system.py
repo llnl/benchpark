@@ -17,7 +17,6 @@ from benchpark.system import (
 
 
 class LanlRocinante(System):
-
     maintainers("sriram-LANL")
 
     id_to_resources = {

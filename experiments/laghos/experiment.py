@@ -20,7 +20,6 @@ class Laghos(
     Scaling(ScalingMode.Strong, ScalingMode.Weak, ScalingMode.Throughput),
     Caliper,
 ):
-
     variant(
         "workload",
         default="sedov",
@@ -172,22 +171,26 @@ class Laghos(
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
-                    "epm": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    // scaling_factor,
+                    "resource_count": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
+                    "epm": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) // scaling_factor
+                    ),
                 },
                 ScalingMode.Weak: {
-                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
+                    "resource_count": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
                     "epm": lambda var, itr, dim, scaling_factor: var.val(dim),
                 },
                 ScalingMode.Throughput: {
                     "resource_count": lambda var, itr, dim, scaling_factor: var.val(
                         dim
                     ),
-                    "epm": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
+                    "epm": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
                 },
             }
         )
@@ -215,8 +218,8 @@ class Laghos(
                 problem_spec["rs"] = [4, 4, 4]
                 problem_spec["rp"] = [1, 2, 3]
         elif self.spec.satisfies("+strong"):
-            problem_spec["strong"] = (
-                lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor
+            problem_spec["strong"] = lambda var, itr, dim, scaling_factor: (
+                var.val(dim) * scaling_factor
             )
             if self.spec.satisfies("order=linear"):
                 problem_spec["rs"] = 4
@@ -301,10 +304,9 @@ class Laghos(
             self.register_scaling_config(
                 {
                     ScalingMode.Strong: {
-                        "resource_count": lambda var, itr, dim, scaling_factor: var.val(
-                            dim
-                        )
-                        * scaling_factor,
+                        "resource_count": lambda var, itr, dim, scaling_factor: (
+                            var.val(dim) * scaling_factor
+                        ),
                     },
                     ScalingMode.Weak: {
                         "resource_count": None,

@@ -18,7 +18,6 @@ from benchpark.system import (
 
 
 class RikenGh200(System):
-
     maintainers("jdomke", "SBA0486")
 
     id_to_resources = {

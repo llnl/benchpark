@@ -359,10 +359,12 @@ class Amg2023(
                 "px": 1,
                 "py": 1,
                 "pz": 1,
-                "strong_n": lambda var, itr, dim, scaling_factor: var.val(dim)
-                // scaling_factor,
-                "strong_p": lambda var, itr, dim, scaling_factor: var.val(dim)
-                * scaling_factor,
+                "strong_n": lambda var, itr, dim, scaling_factor: (
+                    var.val(dim) // scaling_factor
+                ),
+                "strong_p": lambda var, itr, dim, scaling_factor: (
+                    var.val(dim) * scaling_factor
+                ),
                 "weak_n": None,
                 "weak_p": None,
                 "throughput_n": None,
@@ -380,8 +382,9 @@ class Amg2023(
                 "strong_n": None,
                 "strong_p": None,
                 "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim),
-                "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim)
-                * scaling_factor,
+                "weak_p": lambda var, itr, dim, scaling_factor: (
+                    var.val(dim) * scaling_factor
+                ),
                 "throughput_n": None,
                 "throughput_p": None,
             }
@@ -444,15 +447,19 @@ class Amg2023(
                 "px": [2, 2],
                 "py": [2, 2],
                 "pz": [2, 2],
-                "strong_n": lambda var, itr, dim, scaling_factor: var.val(dim)
-                // scaling_factor,
-                "strong_p": lambda var, itr, dim, scaling_factor: var.val(dim)
-                * scaling_factor,
+                "strong_n": lambda var, itr, dim, scaling_factor: (
+                    var.val(dim) // scaling_factor
+                ),
+                "strong_p": lambda var, itr, dim, scaling_factor: (
+                    var.val(dim) * scaling_factor
+                ),
                 "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim),
-                "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim)
-                * scaling_factor,
-                "throughput_n": lambda var, itr, dim, scaling_factor: var.val(dim)
-                * scaling_factor,
+                "weak_p": lambda var, itr, dim, scaling_factor: (
+                    var.val(dim) * scaling_factor
+                ),
+                "throughput_n": lambda var, itr, dim, scaling_factor: (
+                    var.val(dim) * scaling_factor
+                ),
                 "throughput_p": lambda var, itr, dim, scaling_factor: var.val(dim),
             }
 
@@ -533,32 +540,28 @@ class Amg2023(
             self.register_scaling_config(
                 {
                     ScalingMode.Strong: {
-                        "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
-                            dim
-                        )
-                        * scaling_factor,
-                        "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
-                            dim
-                        )
-                        // scaling_factor,
+                        "n_resources_dict": lambda var, itr, dim, scaling_factor: (
+                            var.val(dim) * scaling_factor
+                        ),
+                        "process_problem_size_dict": lambda var, itr, dim, scaling_factor: (
+                            var.val(dim) // scaling_factor
+                        ),
                     },
                     ScalingMode.Weak: {
-                        "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
-                            dim
-                        )
-                        * scaling_factor,
-                        "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
-                            dim
+                        "n_resources_dict": lambda var, itr, dim, scaling_factor: (
+                            var.val(dim) * scaling_factor
+                        ),
+                        "process_problem_size_dict": lambda var, itr, dim, scaling_factor: (
+                            var.val(dim)
                         ),
                     },
                     ScalingMode.Throughput: {
-                        "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
-                            dim
+                        "n_resources_dict": lambda var, itr, dim, scaling_factor: (
+                            var.val(dim)
                         ),
-                        "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
-                            dim
-                        )
-                        * scaling_factor,
+                        "process_problem_size_dict": lambda var, itr, dim, scaling_factor: (
+                            var.val(dim) * scaling_factor
+                        ),
                     },
                 }
             )

@@ -18,7 +18,6 @@ class PyScaffold(
     Scaling(ScalingMode.Strong, ScalingMode.Weak),
     Caliper,
 ):
-
     maintainers("michaelmckinsey1")
 
     variant(
@@ -59,14 +58,17 @@ class PyScaffold(
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "n_gpus": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
-                    "batch_size": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    / scaling_factor,
+                    "n_gpus": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
+                    "batch_size": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) / scaling_factor
+                    ),
                 },
                 ScalingMode.Weak: {
-                    "n_gpus": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
+                    "n_gpus": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
                     "batch_size": lambda var, itr, dim, scaling_factor: var.val(dim),
                 },
             }

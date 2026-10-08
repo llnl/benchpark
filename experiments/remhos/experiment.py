@@ -20,7 +20,6 @@ class Remhos(
     Scaling(ScalingMode.Strong, ScalingMode.Weak, ScalingMode.Throughput),
     Caliper,
 ):
-
     variant(
         "workload",
         default="2d",
@@ -111,22 +110,26 @@ class Remhos(
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
-                    "epm": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    // scaling_factor,
+                    "resource_count": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
+                    "epm": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) // scaling_factor
+                    ),
                 },
                 ScalingMode.Weak: {
-                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
+                    "resource_count": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
                     "epm": lambda var, itr, dim, scaling_factor: var.val(dim),
                 },
                 ScalingMode.Throughput: {
                     "resource_count": lambda var, itr, dim, scaling_factor: var.val(
                         dim
                     ),
-                    "epm": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
+                    "epm": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
                 },
             }
         )
