@@ -79,6 +79,7 @@ RUN source /etc/profile.d/modules.sh \
     -DCMAKE_INSTALL_PREFIX=${CALI_INSTALL_PREFIX} \
     && cmake --build build -j \
     && cmake --install build \
+    && make -j install \
     && rm -rf ${GIT_CLONE_STAGING_DIR}/Caliper \
     && rm -rf ${GIT_CLONE_STAGING_DIR}/Adiak \
     && rm -rf ${GIT_CLONE_STAGING_DIR}/mpibind
