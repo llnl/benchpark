@@ -17,7 +17,9 @@ jobs:
           pip install -r .github/workflows/requirements/style.txt
       - name: Lint and Format Check
         run: |-
+          # Check format. To fix, run "ruff format ."
           ruff format --diff --check .
+          # Check PEP8 violations, logic/correctness errors, and sort imports. To fix, run "ruff check --fix ."
           ruff check .
           codespell --ignore-words=.codespellignore
           yamlfix --check --verbose .
