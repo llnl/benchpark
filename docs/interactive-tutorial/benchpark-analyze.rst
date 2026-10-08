@@ -248,5 +248,5 @@ only have one value per profile.
 ***********************
 
 You have completed the goal of analyzing an existing workload on an existing system.
-To begin another workflow, :doc:`query what is available in Benchpark
-<query-benchpark>`.
+To begin another workflow, :doc:`search what is available in Benchpark
+<search-benchpark>`.

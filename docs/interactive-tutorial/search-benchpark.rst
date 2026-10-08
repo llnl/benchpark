@@ -4,9 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-########################################
- Query What Is Available in Benchpark
-########################################
+#########################################
+ Search What Is Available in Benchpark
+#########################################
 
 Start by finding the system, benchmark, experiment, and modifiers that match your
 goal. The ``benchpark list`` command accepts one of four categories:

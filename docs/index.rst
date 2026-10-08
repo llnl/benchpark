@@ -36,7 +36,7 @@
     :maxdepth: 1
     :caption: Interactive Tutorial
 
-    interactive-tutorial/query-benchpark
+    interactive-tutorial/search-benchpark
     interactive-tutorial/setup-workspace
     interactive-tutorial/add-a-system-config
     interactive-tutorial/update-system-config
@@ -44,6 +44,7 @@
     interactive-tutorial/add-an-experiment
     interactive-tutorial/build-and-run-experiment
     interactive-tutorial/benchpark-analyze
+    interactive-tutorial/benchpark-query
 
 .. toctree::
     :maxdepth: 1
@@ -52,7 +53,6 @@
     build-experiment
     run-experiment
     analyze-experiment
-    benchpark-query
     configuration
     modifiers
     set-of-experiments

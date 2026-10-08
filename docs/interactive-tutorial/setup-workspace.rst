@@ -107,10 +107,12 @@ Continue with the step that matches your goal:
   <build-and-run-experiment>`.
 - To run an existing experiment on a new system, :doc:`add a system configuration
   <add-a-system-config>`.
-- To run a new benchmark on an existing system, :doc:`add the benchmark
-  <add-a-benchmark>`.
+- To run a new benchmark on an existing system, :doc:`add the experiment
+  <add-an-experiment>` and :doc:`add the benchmark <add-a-benchmark>`.
 - To run an existing experiment on an existing system but change the software,
   :doc:`update the system software specification <update-system-config>`.
 - To perform a scaling study of an existing workload on an existing system,
   [placeholder].
-- To analyze an existing workload, :doc:`use benchpark analyze <benchpark-analyze>`.
+- To analyze an existing workload, :doc:`use benchpark analyze <benchpark-analyze>`
+  for preconfigured analysis or :doc:`use benchpark query <benchpark-query>` for raw
+  data to make your own figures.
