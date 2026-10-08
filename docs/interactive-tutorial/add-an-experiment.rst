@@ -396,7 +396,7 @@ your experiment:
     benchpark experiment init --dest=hpl my-system hpl
 
 If this completes without errors, you can continue testing by setting up a benchpark
-workspace as described in :doc:`testing-your-contribution`.
+workspace as described in :doc:`/testing-your-contribution`.
 
 *********************
  Experiment Appendix
@@ -458,7 +458,7 @@ A detailed description of Ramble configuration files is available at `Ramble
 workspace_config <https://ramble.readthedocs.io/en/latest/workspace_config.html#>`__.
 
 For more advanced usage, such as customizing hardware allocation or performance
-profiling see :doc:`modifiers`.
+profiling see :doc:`/modifiers`.
 
 .. _add-expr-var:
 
@@ -619,3 +619,10 @@ variables will be:
 Note that scaling starts from the minimum value dimension (``pz``) of the first variable
 (``n_resources_dict``) and proceeds in a round-robin manner through the other
 dimensions. See AMG2023 or Kripke for examples of different scaling configurations.
+
+***********
+ Next Step
+***********
+
+To run the new benchmark on an existing system, :doc:`build and run the experiment
+<build-and-run-experiment>`.

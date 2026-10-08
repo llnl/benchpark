@@ -325,4 +325,4 @@ with a relatively stable ABI, which is important when building so much from sour
 2. Describe and build on system externals deterministically with Spack.
 
 More on how to do that second part for your own cluster is featured in :doc:`Adding a
-System <add-a-system-config>`
+System <interactive-tutorial/add-a-system-config>`

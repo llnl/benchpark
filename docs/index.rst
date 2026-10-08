@@ -34,13 +34,24 @@
 
 .. toctree::
     :maxdepth: 1
+    :caption: Interactive Tutorial
+
+    interactive-tutorial/query-benchpark
+    interactive-tutorial/setup-workspace
+    interactive-tutorial/add-a-system-config
+    interactive-tutorial/update-system-config
+    interactive-tutorial/add-a-benchmark
+    interactive-tutorial/add-an-experiment
+    interactive-tutorial/build-and-run-experiment
+    interactive-tutorial/benchpark-analyze
+
+.. toctree::
+    :maxdepth: 1
     :caption: Using Benchpark
 
-    benchpark-setup
     build-experiment
     run-experiment
     analyze-experiment
-    benchpark-analyze
     benchpark-query
     configuration
     modifiers
@@ -54,11 +65,7 @@
     :maxdepth: 1
     :caption: Contributing
 
-    add-a-system-config
-    add-a-benchmark
-    add-an-experiment
     testing-your-contribution
-    update-system-config
 
 .. toctree::
     :maxdepth: 1

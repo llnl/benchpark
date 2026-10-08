@@ -10,7 +10,8 @@
 
 These steps show how to use ``benchpark system external`` to compare and update the
 external packages defined by a Benchpark system against packages detected on the current
-machine. For adding a new system, please see :doc:`add-a-system-config`.
+machine. For adding a new system, please see
+:doc:`add-a-system-config`.
 
 .. note::
 
@@ -72,3 +73,10 @@ The resulting changes can be inspected with Git before committing:
 
 The updated system definition can then be committed and upstreamed through the standard
 Benchpark Git contribution workflow.
+
+***********
+ Next Step
+***********
+
+To use the updated software specification, :doc:`set up the experiment workspace
+<setup-workspace>`.

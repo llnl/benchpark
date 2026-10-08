@@ -20,7 +20,7 @@ files located in the systems directory: ``benchpark/systems/<system>/``.
 
 To determine if you need to create a new system:
 
-1. Identify a system in Benchpark with the same hardware. See :doc:`system-list` to see
+1. Identify a system in Benchpark with the same hardware. See :doc:`/system-list` to see
    hardware descriptions for all available benchpark systems.
 2. If a system with the same hardware does not exist, add a new hardware description, as
    described in :ref:`adding-system-hardware-specs`.
@@ -42,7 +42,7 @@ To determine if you need to create a new system:
 *********************************
 
 We list hardware descriptions of Systems specified in Benchpark in the System Catalogue
-in :doc:`system-list`. If you are running on a system with an accelerator, find an
+in :doc:`/system-list`. If you are running on a system with an accelerator, find an
 existing system with the same accelerator vendor, and then secondarily, if you can,
 match the actual accelerator.
 
@@ -540,3 +540,10 @@ new entry of the following form:
 where for each available entry in your variant, you must add a ``JobQueue`` object where
 you specify (1) the name, (2) the maximum time limit of that queue, and (3) the maximum
 number of nodes you can allocate at one time in that queue.
+
+***********
+ Next Step
+***********
+
+To run an existing experiment on the new system, :doc:`set up its workspace
+<setup-workspace>`.
