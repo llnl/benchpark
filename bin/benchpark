@@ -7,42 +7,35 @@
 
 import os
 import pathlib
-import subprocess
 import sys
 import uuid
 
+# Must run before importing main: main.py bootstraps at import time.
+if sys.version_info[:2] < (3, 8):
+    sys.exit("ERR: Benchpark requires Python 3.8 or later.")
 
-def main():
-    if sys.version_info[0] < 3 or sys.version_info[1] < 8:
-        raise Exception("\n\nERR: Must be using Python 3.8 or later!\n")
-    basedir = pathlib.Path(__file__).resolve().parents[1]
-    main_py = basedir / "lib" / "main.py"
+basedir = pathlib.Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(basedir / "lib"))
 
-    if os.environ.get("BENCHPARK_RUN_COVERAGE"):
-        # Create a unique coverage data file name
-        coverage_dir = (
-            basedir / f"coverage-data-{os.environ.get('BENCHPARK_RUN_COVERAGE')}"
-        )
-        coverage_dir.mkdir(exist_ok=True, parents=True)
-        unique_id = uuid.uuid4().hex
-        coverage_file = coverage_dir / f".coverage.{unique_id}"
-        # Run the code with coverage, writing to the unique file
-        subprocess.run(
-            [
-                sys.executable,
-                "-m",
-                "coverage",
-                "run",
-                f"--data-file={coverage_file}",
-                "--source=lib",
-                main_py,
-            ]
-            + sys.argv[1:],
-            check=True,
-        )
-    else:
-        subprocess.run([sys.executable, main_py] + sys.argv[1:], check=True)
+cov = None
+if os.environ.get("BENCHPARK_RUN_COVERAGE"):
+    import coverage
 
+    coverage_dir = basedir / f"coverage-data-{os.environ['BENCHPARK_RUN_COVERAGE']}"
+    coverage_dir.mkdir(exist_ok=True, parents=True)
+    cov = coverage.Coverage(
+        data_file=str(coverage_dir / f".coverage.{uuid.uuid4().hex}"),
+        source=[str(basedir / "lib")],
+    )
+    cov.start()
 
-if __name__ == "__main__":
-    main()
+try:
+    from main import main  # noqa: E402
+
+    exit_code = main()
+finally:
+    if cov is not None:
+        cov.stop()
+        cov.save()
+
+sys.exit(exit_code if isinstance(exit_code, int) else 0)
