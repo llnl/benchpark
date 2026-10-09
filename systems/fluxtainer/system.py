@@ -26,6 +26,13 @@ class Fluxtainer(System):
         description="Target Architecture",
     )
 
+    variant(
+        "compiler",
+        default="gcc",
+        values=("clang", "gcc"),
+        description="Which compiler to use",
+    )
+
     def __init__(self, spec):
         super().__init__(spec)
         self.programming_models = [OpenMPCPUOnlySystem()]
@@ -39,7 +46,7 @@ class Fluxtainer(System):
             setattr(self, k, v)
 
     def compute_compilers_section(self):
-        return compiler_section_for(
+        cfg = compiler_section_for(
             "gcc",
             [
                 compiler_def(
@@ -49,6 +56,20 @@ class Fluxtainer(System):
                 )
             ],
         )
+
+        if (self.spec.satisfies("compiler=clang")):
+            cfg = compiler_section_for(
+                "clang",
+                [
+                    compiler_def(
+                        "llvm@20.1.8",
+                        "/usr/lib64/ccache/",
+                        {"c": "clang", "cxx": "clang++"},
+                    )
+                ],
+            )
+
+        return cfg
 
     def compute_packages_section(self):
         return {
@@ -231,11 +252,14 @@ class Fluxtainer(System):
         }
 
     def compute_software_section(self):
+        default_compiler = "gcc"
+        if self.spec.satisfies("compiler=llvm"):
+            default_compiler = "llvm"
         return {
             "software": {
                 "packages": {
-                    "compiler-gcc": {"pkg_spec": "gcc@14.3.1"},
-                    "default-compiler": {"pkg_spec": "gcc"},
+                    "default-compiler": {"pkg_spec": default_compiler},
+                    "compiler-gcc": {"pkg_spec": "gcc"},
                     "default-mpi": {"pkg_spec": "mpich"},
                 }
             }
