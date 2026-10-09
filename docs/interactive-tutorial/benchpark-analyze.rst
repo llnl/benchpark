@@ -10,7 +10,7 @@
 
 The ``benchpark analyze`` command can be used to generate pre-defined charts for
 analysis of scaling studies using Caliper and Thicket. The study must use the Caliper
-modifier ``caliper=time,mpi`` (:doc:`modifiers`) to collect the performance data.
+modifier ``caliper=time,mpi`` (:doc:`/modifiers`) to collect the performance data.
 ``benchpark analyze`` uses the `Thicket <https://github.com/LLNL/thicket>`_ performance
 analysis library to compose and visualize the Caliper performance data.
 
@@ -94,7 +94,7 @@ Run ``benchpark analyze``:
 
     $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/
 
-.. figure:: _static/images/kripke_cuda_strong_raw_exc.png
+.. figure:: /_static/images/kripke_cuda_strong_raw_exc.png
     :width: 800
     :align: center
 
@@ -127,7 +127,7 @@ Run ``benchpark analyze``:
 
     $ benchpark analyze --workspace-dir wkp/kripke/cuda/weak/lassen/workspace/
 
-.. figure:: _static/images/kripke_cuda_weak_raw_exc.png
+.. figure:: /_static/images/kripke_cuda_weak_raw_exc.png
     :width: 800
     :align: center
 
@@ -149,7 +149,7 @@ Run ``benchpark analyze``:
 
     $ benchpark analyze --workspace-dir wkp/kripke/cuda/throughput/lassen/workspace/
 
-.. figure:: _static/images/kripke_cuda_throughput_raw_exc.png
+.. figure:: /_static/images/kripke_cuda_throughput_raw_exc.png
     :width: 800
     :align: center
 
@@ -165,7 +165,7 @@ The ``--chart-type percentage`` option, visualizes the y-axis metric, relative t
 summation of the metric for all regions. This is useful in this example to visualize
 what percentage of the time each region is taking.
 
-.. figure:: _static/images/kripke_cuda_strong_percentage_exc.png
+.. figure:: /_static/images/kripke_cuda_strong_percentage_exc.png
     :width: 800
     :align: center
 
@@ -182,7 +182,7 @@ Here we use ``Avg time/rank`` instead of ``Avg time/rank (exc)``. The ``main`` n
 automatically removed from the figure, because this information is redundant for the
 inclusive metric.
 
-.. figure:: _static/images/kripke_cuda_strong_raw_inc.png
+.. figure:: /_static/images/kripke_cuda_strong_raw_inc.png
     :width: 800
     :align: center
 
@@ -201,7 +201,7 @@ regions are shown as a single region. ``--top-n-regions`` filters the data to on
 the ``n`` regions with the highest values for the given metric (based on the first
 profile). We can also add the ``--no-mpi`` argument to filter out all ``MPI_*`` regions.
 
-.. figure:: _static/images/kripke_cuda_strong_raw_exc-2.png
+.. figure:: /_static/images/kripke_cuda_strong_raw_exc-2.png
     :width: 800
     :align: center
 
@@ -223,7 +223,7 @@ visualize a single node memory bandwidth study. Other options are ``bar`` and
 
     $ benchpark analyze --workspace-dir wkp/ --query-regions-byname Stream_TRIAD --chart-kind line --file-name-match Base_Seq-default --yaxis-metric 'Memory Bandwidth (GB/s)' --chart-yaxis-limits 8 2048 --chart-figsize 12 7 --yaxis-log --no-mpi
 
-.. figure:: _static/images/raja-perf_mpi_strong_raw_exc.png
+.. figure:: /_static/images/raja-perf_mpi_strong_raw_exc.png
     :width: 800
     :align: center
 
@@ -239,6 +239,13 @@ only have one value per profile.
 
     $ benchpark analyze --workspace-dir problem1/ --yaxis-metric Final-FOM --chart-kind line --disable-legend
 
-.. figure:: _static/images/amg2023_rocm_weak_raw_exc.png
+.. figure:: /_static/images/amg2023_rocm_weak_raw_exc.png
     :width: 800
     :align: center
+
+***********************
+ Choose Your Next Step
+***********************
+
+You have completed the goal of analyzing an existing workload on an existing system. To
+begin another workflow, :doc:`search what is available in Benchpark <search-benchpark>`.

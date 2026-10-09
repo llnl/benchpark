@@ -14,14 +14,15 @@ programming model. Finally, set up the workspace in a directory for your experim
 
 ::
 
-    benchpark system init --dest=</output/path/to/system_def_dir/mySystemName> <SystemName> compiler=<Compiler>
+    benchpark system init --dest=</output/path/to/system_def_dir/mySystemName> <SystemName> +/~<Boolean Variant> <String Variant>=<value>
     benchpark experiment init <mySystemName> <Benchmark> +/~<Boolean Variant> <String Variant>=<value>
     benchpark setup <mySystemName>/<Benchmark> </output/path/to/workspace>
 
 where:
 
-- ``<Benchmark>``: amg2023 | saxpy | etc. (specified choices in :doc:`benchmark-list`)
-- ``<SystemName>``: Cts | Tioga | etc. (specified systems in :doc:`system-list`)
+- ``<Benchmark>``: amg2023 | saxpy | etc. (specified choices in :doc:`/benchmark-list`)
+- ``<SystemName>``: llnl-elcapitan | llnl-cluster | etc. (specified systems in
+  :doc:`/system-list`)
 
 We recommend a fast access resource for the workspace location as all necessary files
 during the build process will be written to the workspace location. This command will
@@ -51,7 +52,8 @@ parameters to ``ramble workspace setup`` as `documented in Ramble
 <https://ramble.readthedocs.io/en/latest/getting_started.html#setting-up-a-workspace>`_,
 including ``--dry-run`` and ``--phases make_experiments``.
 
-Now you are ready to compile your experiments as described in :doc:`build-experiment`.
+Now you are ready to compile and run your experiments as described in
+:doc:`build-and-run-experiment`.
 
 ********************************
  Using pre-built Spack packages
@@ -73,7 +75,7 @@ workspace setup`` will not need to install any packages.
  Built-in System/Experiment Variants
 *************************************
 
-There are benchpark system and experiment variants that you can change, without needing
+There are Benchpark system and experiment variants that you can change, without needing
 to define them in your ``system.py`` and ``experiment.py``.
 
 *************
@@ -86,11 +88,35 @@ to define them in your ``system.py`` and ``experiment.py``.
  For Experiments
 *****************
 
-    - ``package_manager`` - Specify this variant to use a ramble package manager other
-      than ``spack``. See :doc:`run-binary` to see an example.
+    - ``exec_mode`` - Select the ``test`` or ``perf`` execution mode. The default is
+      ``test``, where you should expect short wall-clock experiments. ``perf`` mode is
+      for longer-running experiments, i.e. larger problem size.
+    - ``package_manager`` - Specify this variant to use a Ramble package manager other
+      than ``Spack``. See :doc:`/run-binary` to see an example.
     - ``append_path`` - Append to environment PATH during experiment execution.
     - ``prepend_path`` - Prepend to environment PATH during experiment execution.
     - ``n_repeats`` - number of times your experiment will be repeated (think of
       trials). ``n_repeats=5`` will repeat your experiment 5 times, resulting in 5
       trials. These will be separate job submission scripts, so separate resource
-      allocations. For combining these into the same allocation, see TBD.
+      allocations. To combine them into the same allocation, see :ref:`Run Multiple
+      Workspaces in One Allocation <run-multiple-workspaces-one-allocation>`.
+
+***********************
+ Choose Your Next Step
+***********************
+
+Continue with the step that matches your goal:
+
+- To repeat an experiment on a system, :doc:`build and run the experiment
+  <build-and-run-experiment>`.
+- To run an existing experiment on a new system, :doc:`add a system configuration
+  <add-a-system-config>`.
+- To add a new benchmark on an existing system, :doc:`add a spack package, add a ramble
+  application <add-a-benchmark>`, and :doc:`add an experiment <add-an-experiment>`.
+- To run an existing experiment on an existing system but change the software,
+  :doc:`update the system software specification <update-system-config>`.
+- To perform a scaling study of an existing workload on an existing system, see
+  :ref:`Step 3b: Define Scaling Options <step-3b-define-scaling-options>`.
+- To analyze an existing workload, :doc:`use benchpark analyze <benchpark-analyze>` for
+  preconfigured analysis or :doc:`use benchpark query <benchpark-query>` for raw data to
+  make your own figures.

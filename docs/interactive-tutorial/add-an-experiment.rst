@@ -262,6 +262,8 @@ by default.
 
 For more details on the ``add_experiment_variable`` function, see :ref:`add-expr-var`.
 
+.. _step-3b-define-scaling-options:
+
 Step 3b: Define Scaling Options
 ===============================
 
@@ -334,7 +336,7 @@ runtime parameters during experiment initialization, e.g., ``benchpark experimen
             }
         )
 
-See :ref:`this section <scaling-configs>` for more information on how to write Benchpark
+See :ref:`the Appendix <scaling-configs>` for more information on how to write Benchpark
 scaling configurations.
 
 ***************************************
@@ -396,7 +398,7 @@ your experiment:
     benchpark experiment init --dest=hpl my-system hpl
 
 If this completes without errors, you can continue testing by setting up a benchpark
-workspace as described in :doc:`testing-your-contribution`.
+workspace as described in :doc:`/testing-your-contribution`.
 
 *********************
  Experiment Appendix
@@ -458,7 +460,7 @@ A detailed description of Ramble configuration files is available at `Ramble
 workspace_config <https://ramble.readthedocs.io/en/latest/workspace_config.html#>`__.
 
 For more advanced usage, such as customizing hardware allocation or performance
-profiling see :doc:`modifiers`.
+profiling see :doc:`/modifiers`.
 
 .. _add-expr-var:
 
@@ -619,3 +621,10 @@ variables will be:
 Note that scaling starts from the minimum value dimension (``pz``) of the first variable
 (``n_resources_dict``) and proceeds in a round-robin manner through the other
 dimensions. See AMG2023 or Kripke for examples of different scaling configurations.
+
+***********
+ Next Step
+***********
+
+To run the new benchmark on an existing system, :doc:`build and run the experiment
+<build-and-run-experiment>`.

@@ -72,3 +72,10 @@ The resulting changes can be inspected with Git before committing:
 
 The updated system definition can then be committed and upstreamed through the standard
 Benchpark Git contribution workflow.
+
+***********
+ Next Step
+***********
+
+To use the updated software specification, :doc:`set up the experiment workspace
+<setup-workspace>`.
