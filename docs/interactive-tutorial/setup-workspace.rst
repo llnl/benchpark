@@ -20,9 +20,9 @@ programming model. Finally, set up the workspace in a directory for your experim
 
 where:
 
-- ``<Benchmark>``: amg2023 | saxpy | etc. (specified choices in
-  :doc:`/benchmark-list`)
-- ``<SystemName>``: llnl-elcapitan | llnl-cluster | etc. (specified systems in :doc:`/system-list`)
+- ``<Benchmark>``: amg2023 | saxpy | etc. (specified choices in :doc:`/benchmark-list`)
+- ``<SystemName>``: llnl-elcapitan | llnl-cluster | etc. (specified systems in
+  :doc:`/system-list`)
 
 We recommend a fast access resource for the workspace location as all necessary files
 during the build process will be written to the workspace location. This command will
@@ -89,7 +89,8 @@ to define them in your ``system.py`` and ``experiment.py``.
 *****************
 
     - ``exec_mode`` - Select the ``test`` or ``perf`` execution mode. The default is
-      ``test``, where you should expect short wall-clock experiments. ``perf`` mode is for longer-running experiments, i.e. larger problem size.
+      ``test``, where you should expect short wall-clock experiments. ``perf`` mode is
+      for longer-running experiments, i.e. larger problem size.
     - ``package_manager`` - Specify this variant to use a Ramble package manager other
       than ``Spack``. See :doc:`/run-binary` to see an example.
     - ``append_path`` - Append to environment PATH during experiment execution.
@@ -114,8 +115,8 @@ Continue with the step that matches your goal:
   <add-an-experiment>` and :doc:`add the benchmark <add-a-benchmark>`.
 - To run an existing experiment on an existing system but change the software,
   :doc:`update the system software specification <update-system-config>`.
-- To perform a scaling study of an existing workload on an existing system,
-  see :ref:`Step 3b: Define Scaling Options <step-3b-define-scaling-options>`.
-- To analyze an existing workload, :doc:`use benchpark analyze <benchpark-analyze>`
-  for preconfigured analysis or :doc:`use benchpark query <benchpark-query>` for raw
-  data to make your own figures.
+- To perform a scaling study of an existing workload on an existing system, see
+  :ref:`Step 3b: Define Scaling Options <step-3b-define-scaling-options>`.
+- To analyze an existing workload, :doc:`use benchpark analyze <benchpark-analyze>` for
+  preconfigured analysis or :doc:`use benchpark query <benchpark-query>` for raw data to
+  make your own figures.

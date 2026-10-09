@@ -4,11 +4,13 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-#########################################
+#######################################
  Search What Is Available in Benchpark
-#########################################
+#######################################
 
-All of the systems, benchmarks, experiments, and modifiers that are available in benchpark can be searched on the command line. The ``benchpark list`` command accepts one of four categories:
+All of the systems, benchmarks, experiments, and modifiers that are available in
+benchpark can be searched on the command line. The ``benchpark list`` command accepts
+one of four categories:
 
 .. code-block:: console
 
@@ -18,10 +20,11 @@ All of the systems, benchmarks, experiments, and modifiers that are available in
     $ benchpark list modifiers
 
 The generated :doc:`system catalogue </system-list>` and :doc:`benchmark catalogue
-</benchmark-list>` provide detailed information for systems and benchmarks in a tabular form.
+</benchmark-list>` provide detailed information for systems and benchmarks in a tabular
+form.
 
-For searching experiments, use the filter to find your targeted programming
-model. For example, this command only shows experiments that support ROCm:
+For searching experiments, use the filter to find your targeted programming model. For
+example, this command only shows experiments that support ROCm:
 
 .. code-block:: console
 
@@ -30,6 +33,7 @@ model. For example, this command only shows experiments that support ROCm:
 The same search can be performed for ROCm systems:
 
 .. code-block:: console
+
     $ benchpark list systems --programming-model rocm
 
 After choosing a system or experiment, inspect its variants and other configuration
@@ -47,12 +51,10 @@ Run the command help to see all supported filters and arguments:
     $ benchpark list --help
     $ benchpark info --help
 
-For a complete command reference, see :doc:`Benchpark Commands
-</benchpark-commands>`.
+For a complete command reference, see :doc:`Benchpark Commands </benchpark-commands>`.
 
 ***********
  Next Step
 ***********
 
-After selecting a system and experiment, :doc:`set up a workspace
-<setup-workspace>`.
+After selecting a system and experiment, :doc:`set up a workspace <setup-workspace>`.

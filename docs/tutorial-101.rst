@@ -374,5 +374,5 @@ on how to interact with Benchpark, and further guides.
 
 The second portion of this tutorial demonstrates how to add a new experiment to
 Benchpark. Follow the guide on :doc:`Adding an Experiment
-<./interactive-tutorial/add-an-experiment>` page as
-you `Watch Video Starting at 1:47:00 <https://www.youtube.com/watch?v=AeaUfpybJfg>`_.
+<./interactive-tutorial/add-an-experiment>` page as you `Watch Video Starting at 1:47:00
+<https://www.youtube.com/watch?v=AeaUfpybJfg>`_.

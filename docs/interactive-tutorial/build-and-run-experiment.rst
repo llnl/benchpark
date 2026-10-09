@@ -9,8 +9,8 @@
 #############################
 
 This page continues from :doc:`workspace setup <setup-workspace>`. The generated
-``setup.sh`` script activates Benchpark's Spack and Ramble environments and sets up
-each Ramble workspace:
+``setup.sh`` script activates Benchpark's Spack and Ramble environments and sets up each
+Ramble workspace:
 
 .. code-block:: console
 
@@ -50,14 +50,15 @@ invoke its generated script directly:
 
     $ ./experiments/<benchmark>/<workload>/<experiment-instance>/execute_experiment
 
-Re-running an experiment can overwrite its output. A benchmark with restart support
-can also use files left by the previous run, which changes the subsequent execution.
-Use a new workspace when you need to preserve results or guarantee a clean run.
+Re-running an experiment can overwrite its output. A benchmark with restart support can
+also use files left by the previous run, which changes the subsequent execution. Use a
+new workspace when you need to preserve results or guarantee a clean run.
 
 .. _run-multiple-workspaces-one-allocation:
 
-Run Multiple Workspaces in One Allocation
-==========================================
+*******************************************
+ Run Multiple Workspaces in One Allocation
+*******************************************
 
 Use ``benchpark aggregate`` to combine experiments from one or more workspaces into
 submission scripts:
@@ -75,12 +76,11 @@ system can use:
 
 The experiment output remains in each source workspace.
 
-***********************
- Choose Your Next Step
-***********************
+Choose Your Next Step
+=====================
 
-- If your goal was to repeat an experiment on a system, the workflow is
-  complete. To start another workflow, :doc:`search what is available in Benchpark
+- If your goal was to repeat an experiment on a system, the workflow is complete. To
+  start another workflow, :doc:`search what is available in Benchpark
   <search-benchpark>`.
 - If your goal is to analyze the performance results, :doc:`use benchpark analyze
   <benchpark-analyze>`.

@@ -312,6 +312,5 @@ benchmark/system pair, with hatching used to distinguish ROCm versions.
  Choose Your Next Step
 ***********************
 
-You have completed the goal of extracting raw performance data for custom analysis.
-To begin another workflow, :doc:`search what is available in Benchpark
-<search-benchpark>`.
+You have completed the goal of extracting raw performance data for custom analysis. To
+begin another workflow, :doc:`search what is available in Benchpark <search-benchpark>`.

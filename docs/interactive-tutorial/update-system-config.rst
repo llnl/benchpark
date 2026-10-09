@@ -10,8 +10,7 @@
 
 These steps show how to use ``benchpark system external`` to compare and update the
 external packages defined by a Benchpark system against packages detected on the current
-machine. For adding a new system, please see
-:doc:`add-a-system-config`.
+machine. For adding a new system, please see :doc:`add-a-system-config`.
 
 .. note::
 

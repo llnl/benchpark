@@ -247,6 +247,5 @@ only have one value per profile.
  Choose Your Next Step
 ***********************
 
-You have completed the goal of analyzing an existing workload on an existing system.
-To begin another workflow, :doc:`search what is available in Benchpark
-<search-benchpark>`.
+You have completed the goal of analyzing an existing workload on an existing system. To
+begin another workflow, :doc:`search what is available in Benchpark <search-benchpark>`.
