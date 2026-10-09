@@ -248,6 +248,14 @@ class Fluxtainer(System):
                     "externals": [{"spec": "python@3.12.12", "prefix": "/usr"}],
                     "buildable": False,
                 },
+                                "caliper": {
+                    "externals": [{"spec": "caliper@2.15.0+adiak~libdw~libunwind+mpi~papi", "prefix": "/home/fluxuser/caliper-install/"}],
+                    "buildable": False,
+                },
+                "adiak": {
+                    "externals": [{"spec": "adiak@0.5.0", "prefix": "/home/fluxuser/caliper-install/"}],
+                    "buildable": False,
+                },
             }
         }
 

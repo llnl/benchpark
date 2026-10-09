@@ -1,9 +1,7 @@
 {
   "name": "Benchpark Development",
-  "image": "ghcr.io/llnl/benchpark/benchpark-flux-el10:latest",
-  // or "build": {"dockerfile": "Dockerfile"},
-  "overrideCommand": true,
-  "entrypoint": ["exec", "/usr/bin/flux", "start", "/bin/bash"],
+  // "image": "ghcr.io/llnl/benchpark/benchpark-flux-el10:latest",
+  "build": {"dockerfile": "../containerfiles/flux/el10/Dockerfile"},
   "remoteUser": "fluxuser",
   "forwardPorts": [8000],
   "portsAttributes": {
