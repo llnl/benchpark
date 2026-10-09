@@ -26,7 +26,10 @@ class Githash(BasicModifier):
         githash_metadata_file_path = "{experiment_run_dir}/githash_metadata.json"
         repo_root = Path(self._file_path).resolve().parents[2]
 
-        application_name = app_inst.name
+        required_packages = list(app_inst.required_packages)
+        package_name = (
+            required_packages[0] if len(required_packages) == 1 else app_inst.name
+        )
 
         pre_exec = []
         post_exec = []
@@ -35,7 +38,7 @@ class Githash(BasicModifier):
             CommandExecutable(
                 f"write-json-{executable_name}",
                 template=[
-                    f"python {script_dir}/githash.py {githash_metadata_file_path} {repo_root} {application_name}"
+                    f"python {script_dir}/githash.py {githash_metadata_file_path} {repo_root} {package_name}"
                 ],
             )
         )

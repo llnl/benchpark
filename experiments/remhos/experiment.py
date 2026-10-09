@@ -30,8 +30,8 @@ class Remhos(
 
     variant(
         "version",
-        default="develop",
-        values=("develop", "latest", "1.0"),
+        default="2.0",
+        values=("develop", "latest", "1.0", "2.0"),
         description="app version",
     )
 
