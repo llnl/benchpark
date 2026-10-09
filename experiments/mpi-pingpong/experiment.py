@@ -27,7 +27,7 @@ class MpiPingpong(
     maintainers("stephanielam3211")
 
     def compute_applications_section(self):
-        n_nodes = 64  # max number of nodes
+        n_nodes = 1  # max number of nodes
         expr_vars = {
             "n_nodes": n_nodes,
             "iterations": 10000,
