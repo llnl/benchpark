@@ -262,6 +262,8 @@ by default.
 
 For more details on the ``add_experiment_variable`` function, see :ref:`add-expr-var`.
 
+.. _step-3b-define-scaling-options:
+
 Step 3b: Define Scaling Options
 ===============================
 
@@ -334,7 +336,7 @@ runtime parameters during experiment initialization, e.g., ``benchpark experimen
             }
         )
 
-See :ref:`this section <scaling-configs>` for more information on how to write Benchpark
+See :ref:`the Appendix <scaling-configs>` for more information on how to write Benchpark
 scaling configurations.
 
 ***************************************
