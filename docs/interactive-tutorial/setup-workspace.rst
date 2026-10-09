@@ -111,8 +111,8 @@ Continue with the step that matches your goal:
   <build-and-run-experiment>`.
 - To run an existing experiment on a new system, :doc:`add a system configuration
   <add-a-system-config>`.
-- To run a new benchmark on an existing system, :doc:`add the experiment
-  <add-an-experiment>` and :doc:`add the benchmark <add-a-benchmark>`.
+- To add a new benchmark on an existing system, :doc:`add a spack package, add a ramble
+  application <add-a-benchmark>`, and :doc:`add an experiment <add-an-experiment>`.
 - To run an existing experiment on an existing system but change the software,
   :doc:`update the system software specification <update-system-config>`.
 - To perform a scaling study of an existing workload on an existing system, see
