@@ -54,6 +54,8 @@ Re-running an experiment can overwrite its output. A benchmark with restart supp
 can also use files left by the previous run, which changes the subsequent execution.
 Use a new workspace when you need to preserve results or guarantee a clean run.
 
+.. _run-multiple-workspaces-one-allocation:
+
 Run Multiple Workspaces in One Allocation
 ==========================================
 

@@ -8,8 +8,7 @@
  Search What Is Available in Benchpark
 #########################################
 
-Start by finding the system, benchmark, experiment, and modifiers that match your
-goal. The ``benchpark list`` command accepts one of four categories:
+All of the systems, benchmarks, experiments, and modifiers that are available in benchpark can be searched on the command line. The ``benchpark list`` command accepts one of four categories:
 
 .. code-block:: console
 
@@ -19,15 +18,19 @@ goal. The ``benchpark list`` command accepts one of four categories:
     $ benchpark list modifiers
 
 The generated :doc:`system catalogue </system-list>` and :doc:`benchmark catalogue
-</benchmark-list>` provide the same system and experiment information in the
-documentation.
+</benchmark-list>` provide detailed information for systems and benchmarks in a tabular form.
 
-Use experiment filters to find experiments that support one or more programming
-models. For example, this command finds experiments that support OpenMP or ROCm:
+For searching experiments, use the filter to find your targeted programming
+model. For example, this command only shows experiments that support ROCm:
 
 .. code-block:: console
 
-    $ benchpark list experiments --experiment openmp rocm
+    $ benchpark list experiments --experiment rocm
+
+The same search can be performed for ROCm systems:
+
+.. code-block:: console
+    $ benchpark list systems --programming-model rocm
 
 After choosing a system or experiment, inspect its variants and other configuration
 details:
