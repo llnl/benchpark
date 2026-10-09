@@ -23,6 +23,9 @@ class MpiPingpong(CMakePackage, ROCmPackage, CudaPackage):
     depends_on("hip", when="+rocm")
     depends_on("cuda", when="+cuda")
 
+    depends_on("c", type="build")
+    depends_on("cxx", type="build")
+
     conflicts("+cuda +rocm", msg="Enable only one of +cuda or +rocm")
 
     root_cmakelists_dir = "repo/pingpong"
