@@ -23,6 +23,14 @@ def get_caliper_vars_section(expr_spec):
     return cali.compute_variables_section()
 
 
+def get_caliper_helper(expr_spec):
+    experiment = expr_spec.experiment
+    for helper in experiment.helpers:
+        if isinstance(helper, benchpark.caliper.Caliper.Helper):
+            return helper
+    raise AssertionError("caliper helper not found")
+
+
 def test_experiment_compute_variables_section_caliper(monkeypatch):
     expr_spec = benchpark.spec.ExperimentSpec("saxpy caliper=time").concretize()
     vars_section = get_caliper_vars_section(expr_spec)
@@ -31,6 +39,7 @@ def test_experiment_compute_variables_section_caliper(monkeypatch):
         "caliper_metadata": {
             "affinity": "none",
             "allocation": "standard",
+            "githash": "on",
             "hwloc": "none",
             "application_name": "{application_name}",
             "experiment_name": "{experiment_name}",
@@ -42,6 +51,7 @@ def test_experiment_compute_variables_section_caliper(monkeypatch):
             "append_path": "'",
             "cali_version": "master",
             "caliper": "time",
+            "caliper_services": "none",
             "exec_mode": "test",
             "package_manager": "spack",
             "prepend_path": "'",
@@ -124,10 +134,29 @@ def test_caliper_modifier(monkeypatch):
         "append_path": "'",
         "cali_version": "master",
         "caliper": "time",
+        "caliper_services": "none",
         "exec_mode": "test",
+        "githash": "on",
         "hwloc": "none",
         "package_manager": "spack",
         "prepend_path": "'",
         "version": "1.0.0",
         "workload": "problem",
+    }
+
+
+def test_caliper_nvtx_service_modifier_and_package_section():
+    expr_spec = benchpark.spec.ExperimentSpec(
+        "saxpy+cuda caliper_services=nvtx"
+    ).concretize()
+    cali = get_caliper_helper(expr_spec)
+
+    assert cali.compute_modifiers_section() == [{"name": "caliper", "mode": "nvtx"}]
+    assert cali.compute_package_section() == {
+        "packages": {
+            "caliper": {
+                "spack_pkg_spec": "caliper@master+adiak+mpi~libunwind~libdw~papi+cuda cuda_arch={cuda_arch}"
+            }
+        },
+        "environments": {"caliper": {"packages": ["caliper"]}},
     }

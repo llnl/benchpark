@@ -22,6 +22,7 @@ set(SAXPY_DEPENDENCIES )
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 find_package(MPI REQUIRED)
+target_include_directories(${PROJECT_NAME} PRIVATE ${MPI_CXX_INCLUDE_DIRS})
 list(APPEND SAXPY_DEPENDENCIES
   MPI::MPI_CXX)
 
@@ -44,7 +45,7 @@ if(USE_CUDA)
     set(CMAKE_CUDA_STANDARD_REQUIRED TRUE)
     set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
     set(CMAKE_CXX_EXTENSIONS OFF)
-    set(CMAKE_CUDA_FLAGS "-Xcompiler -DUSE_CUDA")
+    target_compile_definitions(${PROJECT_NAME} PRIVATE USE_CUDA)
     set_target_properties(${PROJECT_NAME} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 endif()
 

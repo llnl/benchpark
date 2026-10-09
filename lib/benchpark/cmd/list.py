@@ -4,14 +4,14 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-import llnl.util.tty.color as color
-
 from benchpark.accounting import (  # noqa: E402
+    EXP_DICT,
     benchpark_benchmarks,
     benchpark_experiments,
     benchpark_modifiers,
     benchpark_systems,
 )
+from benchpark.util.compat import color
 
 
 def _print_helper(name, collection, filter=None):
@@ -115,7 +115,7 @@ def setup_parser(root_parser):
         type=str,
         nargs="*",
         default=None,
-        choices=["cuda", "rocm", "openmp", "strong", "weak", "throughput"],
+        choices=set(val[1] for val in EXP_DICT.values()),
         help="Filter experiments containing a specific substring (e.g., 'cuda').",
     )
     experiments_parser.add_argument(

@@ -45,9 +45,34 @@ def test_system_compute_variables_section(monkeypatch):
             "rocm_version": "6.4.3",
             "gtl_flag": True,
             "gpu_factor": 1,
-            "extra_batch_opts": "--setattr=gpumode=SPX\n--conf=resource.rediscover=true",
+            "extra_batch_opts": "-o spindle.level=off\n--amd-gpumode=SPX\n--conf=resource.rediscover=true",
         }
     }
+
+
+@pytest.mark.parametrize(
+    "gpumode,sys_gpus_per_node,gpu_factor",
+    [
+        ("SPX", 4, 1),
+        ("TPX", 12, 3),
+        ("CPX", 24, 6),
+        ("SPXALL", 4, 1),
+        ("TPXALL", 12, 3),
+        ("CPXALL", 24, 6),
+    ],
+)
+def test_mi300a_gpumode_options(gpumode, sys_gpus_per_node, gpu_factor):
+    sys_spec = benchpark.spec.SystemSpec(
+        f"llnl-elcapitan cluster=tuolumne gpumode={gpumode}"
+    ).concretize()
+
+    vars_section = sys_spec.system.compute_variables_section()["variables"]
+
+    assert vars_section["sys_gpus_per_node"] == sys_gpus_per_node
+    assert vars_section["gpu_factor"] == gpu_factor
+    batch_options = vars_section["extra_batch_opts"].splitlines()
+    assert f"--amd-gpumode={gpumode}" in batch_options
+    assert not any(option.startswith("--setattr=gpumode=") for option in batch_options)
 
 
 def test_system_timeout():
@@ -56,3 +81,10 @@ def test_system_timeout():
             "llnl-elcapitan cluster=tioga queue=pdebug timeout=9999"
         ).concretize()
         sys_spec.system.compute_variables_section()
+
+
+def test_rocm7():
+    sys_spec = benchpark.spec.SystemSpec(
+        "llnl-elcapitan cluster=tuolumne rocm=7.2.0"
+    ).concretize()
+    sys_spec.system.compute_compilers_section()

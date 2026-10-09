@@ -27,8 +27,10 @@ def main():
                 "url": x.url,
                 "details": spec.package.versions[spec.version],
             }
-        else:
+        elif spec.package.has_code:
             raise Exception(f"Unexpected: {spec.name} has no url attribute")
+        # else: no source e.g. cray-mpich-gtl, which is meant to communicate
+        # information to spack
 
     result = {
         "root": z.name,

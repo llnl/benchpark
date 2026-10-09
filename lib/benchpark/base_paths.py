@@ -49,6 +49,7 @@ def determine_config_dir():
 
     possible_dirs = [
         base_paths.invocation_working_dir / "benchpark-config",
+        base_paths.benchpark_root / "user-config",
         base_paths.benchpark_root / "config",
     ]
     for pd in possible_dirs:

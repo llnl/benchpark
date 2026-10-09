@@ -10,13 +10,14 @@ from ramble.appkit import *
 
 class Kripke(ExecutableApplication):
     """Kripke benchmark uses RAJA Portability Layer"""
-    name = "Kripke"
+    name = "kripke"
 
     tags = ['asc','transport','deterministic','structured-grid',
             'large-scale','multi-node','single-node','c++','raja',
             'simd','vectorization','register-pressure','high-fp','atomics','high-branching',
             'high-memory-bandwidth','large-memory-footprint','regular-memory-access',
-            'mpi','network-latency-bound','network-collectives']
+            'mpi','network-latency-bound','network-collectives','llnl-nightly','llnl-monthly',
+            'llnl-pr','llnl-weekly']
 
     executable('kripke', 'kripke.exe' +
                      ' --groups {ngroups}' +
@@ -25,6 +26,7 @@ class Kripke(ExecutableApplication):
                      ' --zones {nzx},{nzy},{nzz}' +
                      ' --sigt {sigt0},{sigt1},{sigt2}' +
                      ' --sigs {sigs0},{sigs1},{sigs2}' +
+                     ' --dev_pool_size {pool}' +
                      ' --arch {arch}' +
                      ' --layout {layout}' +
 #                     ' --pdist {lout}' +
@@ -72,6 +74,9 @@ class Kripke(ExecutableApplication):
                       workloads=['kripke'])
     workload_variable('sigs2', default='0.05',
                       description='Total material cross-sections',
+                      workloads=['kripke'])
+    workload_variable('pool', default='4',
+                      description='Device memory pool size',
                       workloads=['kripke'])
     workload_variable('arch', default='Sequential',
                       description='Architecture selection. Selects the back-end used for computation, available are Sequential, OpenMP, CUDA and HIP. The default depends on capabilities selected by the build system and is selected from list of increasing precedence: Sequential, OpenMP, CUDA and HIP.',

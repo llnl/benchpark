@@ -14,5 +14,10 @@ class Caliper(BuiltinCaliper):
     directly into applications and activate them at runtime.
     """
 
+    def setup_build_environment(self, env):
+        # Do not insert -lmpi_gtl_hsa, this seems to cause a hang when doing
+        # rocm profiling in caliper
+        env.set("SPACK_GTL", "diverted")
+
     # rocp_sdk broken in upstream papi package for any ver less than 7.2
     depends_on("papi@7.2:+topdown", when="+papi")

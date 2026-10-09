@@ -31,8 +31,8 @@ class RajaPerf(
 
     variant(
         "version",
-        default="2025.03.0",
-        values=("develop", "latest", "2025.03.0", "2024.07.0"),
+        default="2025.12.1",
+        values=("develop", "latest", "2025.12.1", "2025.03.0", "2024.07.0"),
         description="app version",
     )
 
@@ -43,12 +43,19 @@ class RajaPerf(
         description="Execution mode",
     )
 
+    variant(
+        "subkernels",
+        default=True,
+        values=(True, False),
+        description="Profile kernel launches. Adds significant overhead for low problem sizes.",
+    )
+
     maintainers("michaelmckinsey1")
 
     def compute_applications_section(self):
         if self.spec.satisfies("exec_mode=test"):
             self.add_experiment_variable("process_problem_size", 1048576, True)
-            self.add_experiment_variable("n_resources", 1, False)
+            self.add_experiment_variable("n_resources", 4, False)
         elif self.spec.satisfies("exec_mode=singlenode_cpu_bandwidth"):
             # Need large enough problem size to stress cache, so system dependent.
             # Examples dane: 128*1024**2, lassen: 64*1024**2, tuolumne: 256*1024**2, rzgenie: 32*1024*1024, poodle: 128*1024*1024
@@ -72,6 +79,10 @@ class RajaPerf(
             )
             # Number of processes
             self.add_experiment_variable("n_resources", 1, False)
+        # Perf mode
+        else:
+            self.add_experiment_variable("process_problem_size", 33554432, True)
+            self.add_experiment_variable("n_resources", 4, False)
 
         self.set_required_variables(
             total_problem_size="{n_resources}*{process_problem_size}",
@@ -120,4 +131,9 @@ class RajaPerf(
             self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
     def compute_package_section(self):
-        self.add_package_spec(self.name, [f"raja-perf{self.determine_version()} +mpi"])
+        subkernels = (
+            "+subkernels" if self.spec.satisfies("+subkernels") else "~subkernels"
+        )
+        self.add_package_spec(
+            self.name, [f"raja-perf{self.determine_version()} +mpi {subkernels}"]
+        )

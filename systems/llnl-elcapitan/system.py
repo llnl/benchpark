@@ -127,7 +127,7 @@ class LlnlElcapitan(System):
     variant(
         "gpumode",
         default="SPX",
-        values=("SPX", "TPX", "CPX"),
+        values=("SPX", "TPX", "CPX", "SPXALL", "TPXALL", "CPXALL"),
         description="compute partitioning modes for MI300A",
     )
     variant(
@@ -141,8 +141,9 @@ class LlnlElcapitan(System):
             "6.4.1",
             "6.4.2",
             "6.4.3",
-            "7.1.0",
+            "7.1.1",
             "7.2.0",
+            "7.2.1",
         ),
         description="ROCm version",
     )
@@ -174,7 +175,7 @@ class LlnlElcapitan(System):
     variant(
         "bank",
         default="none",
-        values=("none", "guests", "asccasc", "lc", "fractale", "wbronze"),
+        values=("none", "guests", "asccasc", "lc", "fractale", "wbronze", "flask"),
         multi=False,
         description="Submit a job to a specific named bank",
     )
@@ -209,11 +210,20 @@ class LlnlElcapitan(System):
         description="Which mount point to use for IO benchmarks",
     )
 
+    variant(
+        "spindle",
+        default=False,
+        values=(True, False),
+        description="Use Spindle for improving the library-loading performance of dynamically linked HPC applications.",
+    )
+
     def __init__(self, spec):
         super().__init__(spec)
         self.programming_models = [ROCmSystem(), OpenMPCPUOnlySystem()]
         self.rocm_version = Version(self.spec.variants["rocm"][0])
         self.gtl_flag = self.spec.variants["gtl"][0]
+        self.override_cce_shortpath = None
+        self.rccl_version = None
 
         # TODO: Replace this with lookups into the working set
         if self.spec.satisfies("compiler=gcc"):
@@ -223,10 +233,13 @@ class LlnlElcapitan(System):
                 f"{self.gcc_version.major}.{self.gcc_version.minor}"
             )
         else:
-            if self.rocm_version >= Version("7.1.0"):
-                self.cce_version = Version("21.0.0")
+            if self.rocm_version >= Version("7.0.0"):
+                self.cce_version = Version("21.0.1")
                 self.mpi_version = Version("9.1.0")
+                # Modules for cce/21.0 named as cce/20.0, so do not change this
+                self.override_cce_shortpath = Version("20.0")
                 # No working self.rccl_version
+                self.rccl_version = None
             elif self.rocm_version >= Version("6.4.0"):
                 self.cce_version = Version("20.0.0")
                 self.mpi_version = Version("9.0.1")
@@ -239,6 +252,11 @@ class LlnlElcapitan(System):
                 self.cce_version = Version("16.0.0")
                 self.mpi_version = Version("8.1.26")
                 self.rccl_version = Version("5.4.3")
+            self.short_cce_version = (
+                f"{self.cce_version.major}.{self.cce_version.minor}"
+                if self.override_cce_shortpath is None
+                else self.override_cce_shortpath
+            )
         if self.rocm_version >= Version("7.1.0"):
             self.pmi_version = Version("6.1.16")
             self.pals_version = Version("1.2.12")
@@ -255,7 +273,6 @@ class LlnlElcapitan(System):
             self.pmi_version = Version("6.1.12")
             self.pals_version = Version("1.2.9")
             self.llvm_version = Version("16.0.0")
-        self.short_cce_version = f"{self.cce_version.major}.{self.cce_version.minor}"
         self.short_rocm_version = f"{self.rocm_version.major}.0"
         # TODO: Replace this with lookups into the working set
 
@@ -265,11 +282,17 @@ class LlnlElcapitan(System):
 
         # MI300A modes
         if self.rocm_arch == "gfx942":
-            if self.spec.satisfies("gpumode=SPX"):
+            if self.spec.satisfies("gpumode=SPX") or self.spec.satisfies(
+                "gpumode=SPXALL"
+            ):
                 self.sys_gpus_per_node = 4
-            elif self.spec.satisfies("gpumode=TPX"):
+            elif self.spec.satisfies("gpumode=TPX") or self.spec.satisfies(
+                "gpumode=TPXALL"
+            ):
                 self.sys_gpus_per_node = 12
-            elif self.spec.satisfies("gpumode=CPX"):
+            elif self.spec.satisfies("gpumode=CPX") or self.spec.satisfies(
+                "gpumode=CPXALL"
+            ):
                 self.sys_gpus_per_node = 24
             else:
                 raise ValueError(f"Invalid gpumode in spec: {self.spec}")
@@ -763,7 +786,10 @@ class LlnlElcapitan(System):
                 "rocblas": {
                     "externals": [
                         {
-                            "spec": f"rocblas@{self.rocm_version}",
+                            "spec": (
+                                f"rocblas@{self.rocm_version} "
+                                f"amdgpu_target={self.rocm_arch}"
+                            ),
                             "prefix": f"/opt/rocm-{self.rocm_version}",
                         }
                     ],
@@ -791,22 +817,37 @@ class LlnlElcapitan(System):
         }
 
     def rocm_cce_compiler_cfg(self):
+        cce_rocmcc = self.spec.variants["compiler"][0] in ["cce", "rocmcc"]
         rpaths = [
             f"/opt/rocm-{self.rocm_version}/lib",
             "/opt/cray/pe/gcc-libs",
-            f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib",
-            f"/collab/usr/global/tools/rccl/toss_4_x86_64_ib_cray/rocm-{self.rccl_version}/install/lib",
         ]
+        if cce_rocmcc:
+            rpaths.append(f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib")
+        # self.rccl_version non-existent for rocm7
+        if self.rccl_version:
+            rpaths.append(
+                f"/collab/usr/global/tools/rccl/toss_4_x86_64_ib_cray/rocm-{self.rccl_version}/install/lib"
+            )
         # Avoid libunwind.so.1 error on tioga
-        if self.spec.variants["cluster"][0] in ["tioga", "tuolumne"]:
-            rpaths.append(f"/opt/cray/pe/cce/{self.cce_version}/cce-clang/x86_64/lib/")
+        if cce_rocmcc and self.spec.variants["cluster"][0] in ["tioga", "tuolumne"]:
+            # cce/21 does not have libunwind.so.1
+            unwind_path = (
+                f"/opt/cray/pe/cce/{self.cce_version}/cce-clang/x86_64/lib/"
+                if self.cce_version <= Version("20.0.0")
+                else "/opt/cray/pe/cce/20.0.0/cce-clang/x86_64/lib/"
+            )
+            rpaths.append(unwind_path)
 
         cfgs = []
         # Always need an instance of llvm-gpu as an external. Sometimes as a compiler
         # and sometimes just for ROCm support
+        cce_path = (
+            f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:" if cce_rocmcc else ""
+        )
         rocmcc_entry = compiler_def(
             f"llvm-amdgpu@{self.rocm_version}",
-            f"/opt/rocm-{self.rocm_version}/",
+            f"/opt/rocm-{self.rocm_version}/llvm",
             {"c": "amdclang", "cxx": "amdclang++", "fortran": "amdflang"},
             modules=[f"rocm/{self.rocm_version}"],
             extra_rpaths=list(rpaths),
@@ -814,7 +855,7 @@ class LlnlElcapitan(System):
                 "set": {"RFE_811452_DISABLE": "1"},
                 "append_path": {"LD_LIBRARY_PATH": "/opt/cray/pe/gcc-libs"},
                 "prepend_path": {
-                    "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib",
+                    "LD_LIBRARY_PATH": f"{cce_path}/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib",
                     "LIBRARY_PATH": f"/opt/rocm-{self.rocm_version}/lib",
                 },
             },
@@ -829,7 +870,7 @@ class LlnlElcapitan(System):
                 extra_rpaths=list(rpaths),
                 env={
                     "prepend_path": {
-                        "LD_LIBRARY_PATH": f"/opt/cray/pe/cce/{self.cce_version}/cce/x86_64/lib:/opt/rocm-{self.rocm_version}/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib"
+                        "LD_LIBRARY_PATH": f"{cce_path}/opt/rocm-{self.rocm_version}/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib"
                     }
                 },
             )
@@ -839,28 +880,38 @@ class LlnlElcapitan(System):
     def system_specific_variables(self):
         opts = super().system_specific_variables()
 
-        extra_batch_opts = ""
+        extra_batch_opts = []
+
+        if not self.spec.variants["spindle"][0]:
+            extra_batch_opts.append("-o spindle.level=off")
+
         if self.rocm_arch == "gfx942":
             # MI300A modes
-            if self.spec.satisfies("gpumode=SPX"):
+            gpumode = self.spec.variants["gpumode"][0]
+            if gpumode in ("SPX", "SPXALL"):
                 gpu_factor = 1
-            elif self.spec.satisfies("gpumode=TPX"):
+            elif gpumode in ("TPX", "TPXALL"):
                 gpu_factor = 3
-            elif self.spec.satisfies("gpumode=CPX"):
+            elif gpumode in ("CPX", "CPXALL"):
                 gpu_factor = 6
-            extra_batch_opts += f"--setattr=gpumode={self.spec.variants['gpumode'][0]}\n--conf=resource.rediscover=true"
+            extra_batch_opts.append(f"--amd-gpumode={gpumode}")
+            extra_batch_opts.append("--conf=resource.rediscover=true")
 
             # Rabbits
             mt_point = self.spec.variants["mount_point"][0]
             if mt_point != "none" and "rabbits" in mt_point:
-                extra_batch_opts += f"\n-S dw={mt_point.lstrip('rabbits_')}"
+                extra_batch_opts.append(f"-S dw={mt_point.lstrip('rabbits_')}")
 
             opts.update(
                 {
                     "gpu_factor": gpu_factor,
-                    "extra_batch_opts": extra_batch_opts,
                 }
             )
+        opts.update(
+            {
+                "extra_batch_opts": "\n".join(extra_batch_opts),
+            }
+        )
         return opts
 
     def compute_software_section(self):

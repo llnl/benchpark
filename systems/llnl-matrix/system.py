@@ -146,6 +146,7 @@ class LlnlMatrix(System):
                 },
                 "cmake": {
                     "externals": [
+                        {"spec": "cmake@3.30.5", "prefix": "/usr"},
                         {"spec": "cmake@3.26.5", "prefix": "/usr"},
                         {"spec": "cmake@3.23.1", "prefix": "/usr/tce"},
                     ],

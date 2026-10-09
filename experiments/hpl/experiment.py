@@ -3,18 +3,18 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.caliper import Caliper
-from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
 from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
+from benchpark.caliper import Caliper
+from benchpark.directives import variant, maintainers
 from benchpark.scaling import Scaling, ScalingMode
 
 
 class Hpl(
     Experiment,
     ProgrammingModel(ProgrammingModelType.Mpionly, ProgrammingModelType.Openmp),
-    Scaling(ScalingMode.Strong, ScalingMode.Weak),
     Caliper,
+    Scaling(ScalingMode.Strong, ScalingMode.Weak),
 ):
 
     variant(

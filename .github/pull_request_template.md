@@ -23,3 +23,4 @@
 
 - [ ] Update docs
 - [ ] Update `.github/workflows` and `.gitlab/tests` unit tests (if needed)
+- [ ] Ensure `rules.yml` resource_rules_* change rules match `shared_*_clusters.yml` run_test_* job matricies. (if needed)

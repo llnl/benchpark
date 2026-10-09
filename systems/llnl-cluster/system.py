@@ -21,23 +21,6 @@ class LlnlCluster(System):
     maintainers("nhanford", "rfhaque")
 
     id_to_resources = {
-        "ruby": {
-            "cpu_arch": "icelake",
-            "sys_cores_per_node": 56,
-            "sys_cores_os_reserved_per_node": 0,  # No core or thread reservation
-            "sys_cores_os_reserved_per_node_list": None,
-            "sys_mem_per_node_GB": 206,
-            "sys_cpu_mem_per_node_MB": 77,
-            "sys_cpu_L1_KB": 32,  # 32KB for L1d and 32KB for L1i
-            "sys_cpu_L2_KB": 1024,
-            "sys_cpu_L3_MB": 38.5,  # 38.5 MB
-            "sys_sockets_per_node": 2,
-            "system_site": "llnl",
-            "hardware_key": str(hardware_descriptions)
-            + "/Supermicro-icelake-OmniPath/hardware_description.yaml",
-            "queues": [JobQueue("pdebug", 60, 12), JobQueue("pbatch", 1440, 520)],
-            "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
-        },
         "magma": {
             "cpu_arch": "icelake",
             "sys_cores_per_node": 96,
@@ -76,28 +59,50 @@ class LlnlCluster(System):
             "queues": [JobQueue("pdebug", 720, 43)],
             "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
         },
-        "poodle": {
-            "cpu_arch": "sapphirerapids",
-            "sys_cores_per_node": 112,
-            "sys_sockets_per_node": 2,
-            "sys_cpu_L2_KB": 2048,
-            "sys_cpu_L3_MB": 112.5,  # Depends on partition (could be 105)
-            "system_site": "llnl",
-            "hardware_key": str(hardware_descriptions)
-            + "/DELL-sapphirerapids-OmniPath/hardware_description.yaml",
-            "queues": [
-                JobQueue("pdebug", 30, 3),
-                JobQueue("pbatch", 12000, 29),
-                JobQueue("phighmem", 12000, 4),
-            ],
-            "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
-        },
     }
+
+    id_to_resources.update(
+        {
+            "ruby-deprecated": {
+                "cpu_arch": "icelake",
+                "sys_cores_per_node": 56,
+                "sys_cores_os_reserved_per_node": 0,  # No core or thread reservation
+                "sys_cores_os_reserved_per_node_list": None,
+                "sys_mem_per_node_GB": 206,
+                "sys_cpu_mem_per_node_MB": 77,
+                "sys_cpu_L1_KB": 32,  # 32KB for L1d and 32KB for L1i
+                "sys_cpu_L2_KB": 1024,
+                "sys_cpu_L3_MB": 38.5,  # 38.5 MB
+                "sys_sockets_per_node": 2,
+                "system_site": "llnl",
+                "hardware_key": str(hardware_descriptions)
+                + "/Supermicro-icelake-OmniPath/hardware_description.yaml",
+                "queues": [JobQueue("pdebug", 60, 12), JobQueue("pbatch", 1440, 520)],
+                "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
+            },
+            "poodle-deprecated": {
+                "cpu_arch": "sapphirerapids",
+                "sys_cores_per_node": 112,
+                "sys_sockets_per_node": 2,
+                "sys_cpu_L2_KB": 2048,
+                "sys_cpu_L3_MB": 112.5,  # Depends on partition (could be 105)
+                "system_site": "llnl",
+                "hardware_key": str(hardware_descriptions)
+                + "/DELL-sapphirerapids-OmniPath/hardware_description.yaml",
+                "queues": [
+                    JobQueue("pdebug", 30, 3),
+                    JobQueue("pbatch", 12000, 29),
+                    JobQueue("phighmem", 12000, 4),
+                ],
+                "mount_points": ["/l/ssd", "/p/lustre1", "/p/lustre2", "/p/lustre3"],
+            },
+        }
+    )
 
     variant(
         "cluster",
         default="dane",
-        values=("ruby", "magma", "dane", "rzgenie", "poodle"),
+        values=("magma", "dane", "rzgenie", "ruby-deprecated", "poodle-deprecated"),
         description="Which cluster to run on",
     )
 
@@ -202,8 +207,18 @@ class LlnlCluster(System):
                 },
                 "cmake": {
                     "externals": [
-                        {"spec": "cmake@3.26.5", "prefix": "/usr"},
-                        {"spec": "cmake@3.23.1", "prefix": "/usr/tce"},
+                        {
+                            "spec": "cmake@3.26.5",
+                            "prefix": "/usr/tce/packages/cmake/cmake-3.26.3",
+                        },
+                        {
+                            "spec": "cmake@3.23.1",
+                            "prefix": "/usr/tce/packages/cmake/cmake-3.23.1",
+                        },
+                        {
+                            "spec": "cmake@3.31.7",
+                            "prefix": "/collab/usr/global/tools/cmake/toss_4_x86_64_ib/cmake-3.31.7",
+                        },
                     ],
                     "buildable": False,
                 },
@@ -329,9 +344,9 @@ class LlnlCluster(System):
                     "externals": [
                         {
                             "spec": "mvapich2@2.3.7",
-                            "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2025.2.0",
+                            "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2025.3.1",
                             "extra_attributes": {
-                                "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2025.2.0/lib -lmpi"
+                                "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2025.3.1/lib -lmpi"
                             },
                         }
                     ],
@@ -341,9 +356,9 @@ class LlnlCluster(System):
                     "externals": [
                         {
                             "spec": "openmpi@4.1.2",
-                            "prefix": "/usr/tce/packages/openmpi/openmpi-4.1.2-intel-2025.2.0",
+                            "prefix": "/usr/tce/packages/openmpi/openmpi-4.1.2-intel-2025.3.1",
                             "extra_attributes": {
-                                "ldflags": "-L/usr/tce/packages/openmpi/openmpi-4.1.2-intel-2025.2.0/lib -lmpi"
+                                "ldflags": "-L/usr/tce/packages/openmpi/openmpi-4.1.2-intel-2025.3.1/lib -lmpi"
                             },
                         }
                     ],
@@ -416,8 +431,8 @@ class LlnlCluster(System):
                 "intel-oneapi-compilers",
                 [
                     compiler_def(
-                        "intel-oneapi-compilers@2025.2.0~envmods",
-                        "/usr/tce/packages/intel/intel-2025.2.0/compiler/2025.2/",
+                        "intel-oneapi-compilers@2025.3.1~envmods",
+                        "/usr/tce/packages/intel/intel-2025.3.1/compiler/2025.3/",
                         {"c": "icx", "cxx": "icpx", "fortran": "ifx"},
                     )
                 ],

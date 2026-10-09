@@ -3,6 +3,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import math
+
 from benchpark.caliper import Caliper
 from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
@@ -28,54 +30,52 @@ class PyScaffold(
     variant("version", default="main", values=("main",), description="app version")
 
     def compute_applications_section(self):
+
+        n_gpus = 4
+        config_url = "https://raw.githubusercontent.com/LBANN/ScaFFold/refs/heads/main/ScaFFold/configs/benchmark_default.yml"
+        batch_size = 1
+        sharding = [1, 1, 1]
+        shards = math.prod(sharding)
+
         if self.spec.satisfies("exec_mode=test"):
-            self.add_experiment_variable(
-                "config_url",
-                "https://raw.githubusercontent.com/LBANN/ScaFFold/refs/heads/main/ScaFFold/configs/benchmark_testing.yml",
-                False,
-            )
+            epochs = 10
+            problem_scale = 6
         else:
-            self.add_experiment_variable(
-                "config_url",
-                "https://raw.githubusercontent.com/LBANN/ScaFFold/refs/heads/main/ScaFFold/configs/benchmark_default.yml",
-                False,
-            )
+            epochs = -1
+            problem_scale = 7
 
         if self.spec.satisfies("+strong"):
-            n_gpus = 4
-            if self.spec.satisfies("exec_mode=test"):
-                problem_scale = 5
-            else:
-                problem_scale = 6
-        elif self.spec.satisfies("+weak"):
-            n_gpus = 1
-            problem_scale = 5
-        else:
-            n_gpus = 1
-            problem_scale = 5
+            batch_size = "{n_gpus} * {scaling_factor}**{scaling_iterations}"
 
         self.add_experiment_variable("n_gpus", n_gpus, True)
         self.add_experiment_variable("problem_scale", problem_scale, True)
+        self.add_experiment_variable("num_epochs", epochs, True)
+        self.add_experiment_variable("batch_size", batch_size, True)
+        self.add_experiment_variable("sharding", sharding, False)
+        self.add_experiment_variable("shards", shards, False)
+
+        self.add_experiment_variable("config_url", config_url, False)
 
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
                     "n_gpus": lambda var, itr, dim, scaling_factor: var.val(dim)
                     * scaling_factor,
-                    "problem_scale": lambda var, itr, dim, scaling_factor: var.val(dim),
+                    "batch_size": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    / scaling_factor,
                 },
                 ScalingMode.Weak: {
-                    "n_gpus": lambda var, itr, dim, scaling_factor: var.val(dim) * 2**3,
-                    "problem_scale": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    + 1,
+                    "n_gpus": lambda var, itr, dim, scaling_factor: var.val(dim)
+                    * scaling_factor,
+                    "batch_size": lambda var, itr, dim, scaling_factor: var.val(dim),
                 },
             }
         )
 
         self.set_required_variables(
             n_resources="{n_gpus}",
-            process_problem_size="({problem_scale}-4)/({n_gpus}/({problem_scale}-4)**3)",
-            total_problem_size="{problem_scale}",
+            process_problem_size="{batch_size}/{shards}",
+            total_problem_size="{batch_size}*{n_gpus}/{shards}",
         )
 
     def compute_package_section(self):

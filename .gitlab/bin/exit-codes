@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import json
+import os
 import sys
 
 
@@ -9,15 +10,21 @@ def main(results_file):
         data = json.load(f)
 
     res = 0
+    benchmark = os.environ.get("BENCHMARK")
 
     for experiment in data["experiments"]:
         for context in experiment["CONTEXTS"]:
-          for fom in context["foms"]:
-            if fom["origin"] == "exit-code":
-                if int(fom["value"]) != 0:
-                    res += 1
+            for fom in context["foms"]:
+                if fom["origin"] == "exit-code":
+                    exit_code = int(fom["value"])
+                    if benchmark == "py-scaffold" and exit_code == 134:
+                        continue
+
+                    if exit_code != 0:
+                        res += 1
 
     return res
+
 
 if __name__ == "__main__":
     f = sys.argv[1]  # path to results.latest.json

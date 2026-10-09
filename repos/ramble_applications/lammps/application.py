@@ -289,25 +289,48 @@ class Lammps(ExecutableApplication):
     )
 
     executable(
-        "set-lattice",
+        "setup-problem",
         template=[
             "sed -i -e 's/a equal .*/a equal {lc}/g' -i input.txt",
-            "sed -i -e 's/lattice .*/lattice {lattice} $a/g' -i input.txt",
-        ],
-        use_mpi=False,
-    )
-
-    executable(
-        "set-size",
-        template=[
-            "sed -i -e 's/box block .*/box block 0 {x} 0 {y} 0 {z}/g' -i input.txt",
+            "sed -i -e 's/lattice .*/lattice          {lattice} $a/g' -i input.txt",
+            "sed -i -e 's/region[[:space:]]\+.*/variable        L index {L}\\\n"
+            "region          box block 0 $\{L\} 0 $\{L\} 0 $\{L\}/g' -i input.txt",
+            "sed -i -e 's/pair_style .*/pair_style      pace product chunksize {chunksize}/g' -i input.txt",
+            "sed -i -e 's/thermo .*/thermo          {thermo}/g' -i input.txt",
+            "sed -i -e 's/thermo_style .*/thermo_style    custom step cpu temp epair etotal press v_delenergy v_delpress/g' -i input.txt",
+            "sed -i -e 's/run .*/##################################\\\n"
+            "### Benchmarking modifications ###\\\n"
+            "##################################\\\n"
+            "\\\n"
+            "# Add a thermostat to keep temperature from falling\\\n"
+            "variable        tdamp equal $(dt)\\\n"
+            "fix             mynvt all nvt temp 300.0 300.0 $\{tdamp\}\\\n"
+            "\\\n"
+            "# Some systems buffer extensively\\\n"
+            "thermo_modify   flush yes\\\n"
+            "\\\n"
+            "# Print out the value of L for parsing ease\\\n"
+            "print \"The value of L is $L\"\\\n"
+            "\\\n"
+            "### Throw out first 5 minutes for hardware equilibrium\\\n"
+            "\\\n"
+            "# Stop after 5.5 minutes\\\n"
+            "fix             2 all halt 10 tlimit > 330.0 message no error continue\\\n"
+            "run             {timesteps}\\\n"
+            "\\\n"
+            "### Run another 5 minutes for final FOM\\\n"
+            "unfix           2\\\n"
+            "\\\n"
+            "# Stop after 5.5 minutes\\\n"
+            "fix             3 all halt 10 tlimit > 330.0 message no\\\n"
+            "run             {timesteps}/g' -i input.txt",
         ],
         use_mpi=False,
     )
 
     workload(
         "pace",
-        executables=["copy-contents", "set-lattice", "set-size", "set-timesteps", "execute"],
+        executables=["copy-contents", "setup-problem", "execute"],
     )
 
     workload_variable(
@@ -325,23 +348,23 @@ class Lammps(ExecutableApplication):
     )
 
     workload_variable(
-        "x",
-        default="4",
-        description="Unit cells in the x direction",
+        "L",
+        default="64.0",
+        description="Length scale factor. This will scale the dimensions of the problem.",
         workloads=["pace"],
     )
 
     workload_variable(
-        "y",
-        default="4",
-        description="Unit cells in the y direction",
+        "thermo",
+        default="10",
+        description="Compute and print thermodynamic info",
         workloads=["pace"],
     )
 
     workload_variable(
-        "z",
-        default="4",
-        description="Unit cells in the z direction",
+        "chunksize",
+        default="49152",
+        description="Chunk size",
         workloads=["pace"],
     )
 

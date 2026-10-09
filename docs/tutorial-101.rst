@@ -10,23 +10,34 @@
 
 This tutorial will guide you through using Benchpark to run a strong scaling experiment
 with the `Kripke benchmark <https://github.com/LLNL/Kripke>`_ on an AWS instance. Recent
-presentations of this tutorial:
+presentations of this tutorial (oldest to most recent):
 
 - August 20, 2025. Half-day tutorial at `International Symposium on High-Performance
   Parallel and Distributed Computing (HPDC) <https://hpdc.sci.utah.edu/2025/>`_ on
   Caliper, Thicket, and Benchpark.
-- September 3, 2025. Half-day tutorial at `Livermore's HPC Tutorials
+- September 3, 2025. Half-day tutorial at `2025 Livermore's HPC Tutorials
   <https://hpcic.llnl.gov/tutorials/2025-hpc-tutorials>`_ on Benchpark and Ramble.
 - September 16, 2025. Half-day tutorial at `International Conference on eScience
   (eScience) <https://www.escience-conference.org/2025/>`_ on Benchpark and Ramble.
+- January 22, 2026. Half-day tutorial at RIKEN on Benchpark and Ramble.
+- June 22, 2026. Half-day tutorial at `ISC <https://isc-hpc.com/>`_ on Benchpark on
+  Ramble.
+- July 6, 2026. Full-day workshop at `International Conference on Supercomputing (ICS)
+  <https://dipsa-qub.github.io/ICS2026-webpage/>`_ on reproducible benchmarking.
+- Sept 1, 2026. Half-day tutorial at `2026 Livermore's HPC Tutorials
+  <https://hpcic.llnl.gov/tutorials>`_ on Benchpark with Ramble.
+- (Upcoming) Oct 19, 2026. Half-day tutorial at `International Conference on Parallel
+  Architectures and Compilation Techniques (PACT)
+  <https://pact2026.github.io/workshops/reproducible-benchmarking-tutorial/>`_ on
+  Benchpark and Ramble.
 
-.. image:: tutorial/RIKEN26-Tutorial-Slide-Preview.jpg
-    :target: _static/slides/RIKEN26-Tutorial-Slides.pdf
+.. image:: tutorial/HPCIC26-Tutorial-Slide-Preview.jpg
+    :target: _static/slides/HPCIC26-Tutorial-Slides.pdf
     :height: 72px
     :align: left
     :alt: Slide Preview
 
-:download:`Download Slides <_static/slides/RIKEN26-Tutorial-Slides.pdf>`.
+:download:`Download Slides <_static/slides/ICS26-Tutorial-Slides.pdf>`.
 
 `Watch HPCIC 2025 Tutorial Video <https://www.youtube.com/watch?v=AeaUfpybJfg>`_.
 
@@ -231,7 +242,7 @@ scaling experiment by running:
 This command does two things. First, it builds all necessary software using Spack.
 Building the software may take a while to complete, depending on how many external
 packages are contained in the system definition from :ref:`Step 3 <step3_label>`. For
-this tutorial, it should take roughly 2 minutes. Second, this command generates batch
+this tutorial, it should take roughly 5 minutes. Second, this command generates batch
 scripts (e.g., submission scripts) for executing the experiment. For each run in the
 experiment, a directory containing the files necessary for the run will be created under
 ``/home/jovyan/benchpark/wkp/kripke-benchmark/hpc-tutorial/workspace/experiments/kripke/kripke``.
@@ -363,6 +374,4 @@ on how to interact with Benchpark, and further guides.
 
 The second portion of this tutorial demonstrates how to add a new experiment to
 Benchpark. Follow the guide on :doc:`Adding an Experiment <./add-an-experiment>` page as
-you
-
-`Watch Video Starting at 1:47:00 <https://www.youtube.com/watch?v=AeaUfpybJfg>`_.
+you `Watch Video Starting at 1:47:00 <https://www.youtube.com/watch?v=AeaUfpybJfg>`_.

@@ -28,6 +28,6 @@ system_definition:
       runtime:
       mpi: mvapich
   top500-system-instances:
-    Ruby:
+    Ruby-deprecated:
       benchpark_system: llnl-cluster
       top500: <https://www.top500.org/system/179866>

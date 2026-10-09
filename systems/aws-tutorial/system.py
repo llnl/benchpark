@@ -188,6 +188,10 @@ class AwsTutorial(System):
                     "externals": [{"spec": "libtool@2.4.6", "prefix": "/usr"}],
                     "buildable": False,
                 },
+                "gettext": {
+                    "externals": [{"spec": "gettext@0.21", "prefix": "/usr"}],
+                    "buildable": False,
+                },
             }
         }
 

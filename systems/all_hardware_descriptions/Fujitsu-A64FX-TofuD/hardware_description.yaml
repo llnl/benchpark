@@ -21,9 +21,15 @@ system_definition:
     vendor: Fujitsu
     name: TofuInterconnectD
   systems-tested:
-    rccs-fugaku:
+    riken-fugaku:
       os: RHEL
       scheduler: pjm
+      compiler: fj
+      runtime:
+      mpi: fujitsu-mpi
+    riken-fx700:
+      os: RHEL
+      scheduler: slurm
       compiler: fj
       runtime:
       mpi: fujitsu-mpi
