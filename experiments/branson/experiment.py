@@ -62,6 +62,13 @@ class Branson(
         description="Particle transport algorithm",
     )
 
+    variant(
+        "metis",
+        default=True,
+        values=(True, False),
+        description="Enable metis in mfem",
+    )
+
     def compute_applications_section(self):
         if self.spec.satisfies("exec_mode=test"):
             self.add_experiment_variable("num_particles", 1000000, True)
@@ -157,9 +164,13 @@ class Branson(
             umpire = "+umpire"
         else:
             umpire = "~umpire"
+        if self.spec.satisfies("+metis"):
+            metis = "+metis"
+        else:
+            metis = "~metis"
         self.add_package_spec(
             self.name,
             [
-                f"branson@{app_version}{umpire} n_groups={self.spec.variants['n_groups'][0]} ",
+                f"branson@{app_version}{umpire} {metis} n_groups={self.spec.variants['n_groups'][0]} ",
             ],
         )
