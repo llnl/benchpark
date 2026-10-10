@@ -60,5 +60,7 @@ git config user.email "${GITLAB_USER_EMAIL:-benchpark-ci@llnl.gov}"
 
 git add "${copied_hosts[@]}"
 git commit -m "Update nightly performance metadata from ${CI_PIPELINE_ID:-unknown}"
+#git add "${copied_hosts[@]}" test_status_table_*.png
+#git commit -m "Update nightly performance metadata and status table from ${CI_PIPELINE_IID:-unknown}"
 GIT_SSH_COMMAND="${git_ssh_command}" GIT_TERMINAL_PROMPT=0 \
     git push origin HEAD
