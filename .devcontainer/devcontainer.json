@@ -1,7 +1,10 @@
 {
   "name": "Benchpark Development",
   // "image": "ghcr.io/llnl/benchpark/benchpark-flux-el10:latest",
-  "build": {"dockerfile": "../containerfiles/flux/el10/Dockerfile"},
+  "build": {
+    "dockerfile": "../containerfiles/flux/el10/Dockerfile",
+    "context": ".."
+  },
   "remoteUser": "fluxuser",
   "forwardPorts": [8000],
   "portsAttributes": {

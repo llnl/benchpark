@@ -94,4 +94,5 @@ RUN pip install -r requirements.txt \
 	&& ./bin/benchpark bootstrap \
 	&& echo 'source /home/fluxuser/benchpark/setup-env.sh' >> /home/fluxuser/.bashrc
 
-ENTRYPOINT ["/usr/bin/flux", "start", "/bin/bash"]
+ENTRYPOINT ["/usr/bin/flux", "start"]
+CMD ["/bin/bash"]
