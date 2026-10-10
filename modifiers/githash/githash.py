@@ -62,10 +62,10 @@ def extract_package_hash(pkg_json):
     }
 
 
-def collect_package_info(application_name):
-    specs = spack_spec_json(application_name)
+def collect_package_info(package_name):
+    specs = spack_spec_json(package_name)
     specs_by_hash = {spec["hash"]: spec for spec in specs}
-    pkg_json = next(spec for spec in specs if spec["name"] == application_name)
+    pkg_json = next(spec for spec in specs if spec["name"] == package_name)
 
     application = extract_package_hash(pkg_json)
     dependencies = {}
@@ -83,7 +83,7 @@ if __name__ == "__main__":
 
     parser.add_argument("githash_metadata_file_path", type=str)
     parser.add_argument("repo_root", type=str)
-    parser.add_argument("application_name", type=str)
+    parser.add_argument("package_name", type=str)
 
     args = parser.parse_args()
 
@@ -93,7 +93,7 @@ if __name__ == "__main__":
             "benchpark_dependencies": extract_benchpark_dependencies_hash(
                 args.repo_root
             ),
-            "packages": collect_package_info(args.application_name),
+            "packages": collect_package_info(args.package_name),
         }
 
     except Exception as e:
