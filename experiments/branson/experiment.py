@@ -104,7 +104,9 @@ class Branson(
         if self.spec.satisfies("+openmp"):
             self.add_experiment_variable("n_nodes", 1, False)
             resource_count = "n_nodes"
-            self.add_experiment_variable("resource_count", "{sys_cores_per_node} * {n_nodes}", False)
+            self.add_experiment_variable(
+                "resource_count", "{sys_cores_per_node} * {n_nodes}", False
+            )
         else:
             self.add_experiment_variable("resource_count", 4, False)
             resource_count = "resource_count"
