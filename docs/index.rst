@@ -38,6 +38,7 @@
 
     interactive-tutorial/search-benchpark
     interactive-tutorial/setup-workspace
+    interactive-tutorial/explore-benchpark-language
     interactive-tutorial/add-a-system-config
     interactive-tutorial/update-system-config
     interactive-tutorial/add-a-benchmark

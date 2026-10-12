@@ -120,3 +120,5 @@ Continue with the step that matches your goal:
 - To analyze an existing workload, :doc:`use benchpark analyze <benchpark-analyze>` for
   preconfigured analysis or :doc:`use benchpark query <benchpark-query>` for raw data to
   make your own figures.
+- To learn how Benchpark system and experiment specs are structured, :doc:`explore
+  Benchpark's configuration language <explore-benchpark-language>`.
