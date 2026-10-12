@@ -58,6 +58,14 @@ include:
           - remhos
           - sparta-snl
         VARIANT: [+rocm]
+      # spack-pip
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [py-scaffold]
+        GPUMODE: [SPX]
+        SYSTEM_ARGS: [rocm=7.1.1]
+        VARIANT:
+          - +rocm package_manager=spack-pip caliper=time,rocm,rocm-gputime,rccl allocation=torchrun-hpc
       # +openmp tests
       - HOST: dane
         ARCHCONFIG: llnl-cluster
@@ -101,6 +109,12 @@ include:
         SCHEDULER_PARAMETERS: $MATRIX_PARAMS
         BENCHMARK: [lammps, sparta-snl]
         VARIANT: [+cuda~gpu-aware-mpi]
+      # spack-pip
+      - HOST: matrix
+        ARCHCONFIG: llnl-matrix
+        BENCHMARK: [py-scaffold]
+        VARIANT:
+          - +cuda package_manager=spack-pip caliper=mpi,time allocation=torchrun-hpc
       #############
       # Other tests
       #############
