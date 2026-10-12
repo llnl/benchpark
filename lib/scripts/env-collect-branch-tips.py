@@ -2,15 +2,21 @@ import os
 import shutil
 import sys
 
-import spack.environment as ev
 import spack.repo
 from spack.fetch_strategy import GitFetchStrategy
+
+# Spack >= 1.3.0 moved active_environment to its own module
+try:
+    from spack.active_environment import active_environment
+except ImportError:
+    # Fall back to older Spack versions
+    from spack.environment import active_environment
 
 
 def main():
     destination = sys.argv[1]
 
-    e = ev.active_environment()
+    e = active_environment()
     for spec in e.all_specs():
         if spec.external:
             continue
