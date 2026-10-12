@@ -16,7 +16,6 @@ class Hpl(
     Caliper,
     Scaling(ScalingMode.Strong, ScalingMode.Weak),
 ):
-
     variant(
         "workload",
         default="standard",
@@ -71,15 +70,18 @@ class Hpl(
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "n_nodes": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
+                    "n_nodes": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
                     "Ns": lambda var, itr, dim, scaling_factor: var.val(dim),
                 },
                 ScalingMode.Weak: {
-                    "n_nodes": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
-                    "Ns": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
+                    "n_nodes": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
+                    "Ns": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
                 },
             }
         )
