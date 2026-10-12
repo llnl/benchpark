@@ -15,27 +15,28 @@ can be run with Benchpark.
  Create a New Benchmark
 ************************
 
-The following system-independent specification is required for each ${Benchmark1}:
+Each benchmark requires two system-independent definitions:
 
 - ``package.py`` is a Spack specification that defines how to build and install
-  ${Benchmark1}. See the `Spack Package Creation Tutorial
+  the benchmark. See the `Spack Package Creation Tutorial
   <https://spack-tutorial.readthedocs.io/en/latest/tutorial_packaging.html>`_ to learn
   how to create and test a Spack ``package.py``. If your benchmark already exists in
-  Spack, benchpark will use that version of the ``package.py``, unless you define a
-  version in ``benchpark/repo/``.
-- ``application.py`` is a Ramble specification that defines the ${Benchmark1} input and
+  Spack, Benchpark will use that ``package.py`` unless you provide a Benchpark-specific
+  definition.
+- ``application.py`` is a Ramble specification that defines the benchmark input and
   parameters. See the `Ramble Application Definition Developers Tutorial
   <https://ramble.readthedocs.io/en/latest/dev_guides/1_basic_application_definition_tutorial.html>`_
   to learn how to create a Ramble ``application.py``. We recommend testing your
   ``application.py`` using the `Ramble Testing Application Definitions
   <https://ramble.readthedocs.io/en/latest/dev_guides/1_basic_application_definition_tutorial.html#testing-application-definitions>`_
-  instructions. If your benchmark already exists in Ramble, benchpark will use that
-  version of the ``application.py``, unless you define a version in ``benchpark/repo/``.
+  instructions. If your benchmark already exists in Ramble, Benchpark will use that
+  ``application.py`` unless you provide a Benchpark-specific definition.
 
-Again, by default Benchpark will use ${Benchmark1} specifications (``application.py``
-and ``package.py``) provided in the Spack and Ramble upstream repositories. Overwrite
-the upstream definitions by adding the ``application.py`` and/or ``package.py`` to
-``benchpark/repo/${Benchmark1}``, see :doc:`/FAQ` for details.
+By default, Benchpark uses definitions provided by the upstream Spack and Ramble
+repositories. Override an upstream definition by adding a package to
+``repos/spack_repo/benchpark/packages/<benchmark-name>/package.py`` or an application to
+``repos/ramble_applications/<benchmark-name>/application.py``. See :doc:`/FAQ` for
+details.
 
 After satisfying the above prerequisites, create an experiment for the new benchmark.
 
