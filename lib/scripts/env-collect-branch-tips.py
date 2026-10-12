@@ -25,10 +25,10 @@ def main():
         derived_spec.versions = spec.versions
         pkg_obj = pkg_cls(derived_spec)
         df = pkg_obj.stage[0].default_fetcher
-        # Mirror git packages that use branches or tags (not just explicit commits)
-        # Modern Spack solidifies branches to commits during concretization,
-        # making them "cachable", but they still need the full repo mirrored
-        if isinstance(df, GitFetchStrategy) and (df.branch or df.tag or not df.cachable):
+        # Mirror git packages that use branches (not tags or explicit commits)
+        # Branch-based versions need the full repo for offline builds since branches can move
+        # Tag-based versions can use cached tarballs since tags are immutable
+        if isinstance(df, GitFetchStrategy) and (df.branch or not df.cachable):
             df.get_full_repo = True
             pkg_dst = os.path.join(destination, spec.name)
             if not os.path.exists(pkg_dst):
