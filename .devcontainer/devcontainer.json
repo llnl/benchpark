@@ -1,0 +1,25 @@
+{
+  "name": "Benchpark",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "remoteUser": "vscode",
+  "remoteEnv": {
+    "PATH": "${containerWorkspaceFolder}/bin:${containerEnv:PATH}"
+  },
+  "postCreateCommand": "pip install --no-cache-dir -e \".[analyze]\"",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": "/opt/venv/bin/python"
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-python.black-formatter",
+        "ms-python.flake8",
+        "ms-vscode.cmake-tools"
+      ]
+    }
+  }
+}
