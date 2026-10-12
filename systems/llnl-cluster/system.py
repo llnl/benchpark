@@ -17,7 +17,6 @@ from benchpark.system import (
 
 
 class LlnlCluster(System):
-
     maintainers("nhanford", "rfhaque")
 
     id_to_resources = {

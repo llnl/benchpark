@@ -106,24 +106,24 @@ class Caliper:
                     "caliper=rocm"
                 ) or self.spec.satisfies("caliper_services=rocprofiler")
                 if any("topdown" in var for var in self.spec.variants["caliper"]):
-                    package_specs["caliper"][
-                        "spack_pkg_spec"
-                    ] += "+libpfm~papi target={}".format(system_specs["cpu_arch"])
+                    package_specs["caliper"]["spack_pkg_spec"] += (
+                        "+libpfm~papi target={}".format(system_specs["cpu_arch"])
+                    )
                 elif cuda_support:
                     if cuda_support:
-                        package_specs["caliper"][
-                            "spack_pkg_spec"
-                        ] += "~papi+cuda cuda_arch={}".format(system_specs["cuda_arch"])
+                        package_specs["caliper"]["spack_pkg_spec"] += (
+                            "~papi+cuda cuda_arch={}".format(system_specs["cuda_arch"])
+                        )
                     else:
                         raise NotImplementedError(
                             "Target system does not support the cuda interface"
                         )
                 elif rocm_support:
                     if rocm_support:
-                        package_specs["caliper"][
-                            "spack_pkg_spec"
-                        ] += "~papi+rocm amdgpu_target={}".format(
-                            system_specs["rocm_arch"]
+                        package_specs["caliper"]["spack_pkg_spec"] += (
+                            "~papi+rocm amdgpu_target={}".format(
+                                system_specs["rocm_arch"]
+                            )
                         )
                     else:
                         raise NotImplementedError(
