@@ -44,25 +44,25 @@ packages available on the current system. The detected packages are then compare
 against the current specification defined in Benchpark. The command to do this is
 ``benchpark system external`` with the same system variants that would normally be
 passed to ``benchpark system init``. For example, to check the external packages of the
-Tioga system:
+AWS system defined in :doc:`add-a-system-config`:
 
 ::
 
-    benchpark system external llnl-elcapitan cluster=tioga
+    benchpark system external aws-tutorial
 
 To generate proposals for any version updates in the system definition, use
 ``--propose``:
 
 ::
 
-    benchpark system external llnl-elcapitan cluster=tioga --propose
+    benchpark system external aws-tutorial --propose
 
-Additional system variants can be specified in the same way. For example, we can propose
-updating the ROCm version to 7.2.0 as follows:
+Additional system variants can be specified in the same way. For example, select the
+other AWS instance type defined by the tutorial system as follows:
 
 ::
 
-    benchpark system external llnl-elcapitan cluster=tioga rocm=7.2.0 --propose
+    benchpark system external aws-tutorial instance_type=c7i.24xlarge --propose
 
 The proposed changes are written to standard output. Changes that cannot be updated
 cleanly are reported for manual review.
@@ -86,7 +86,7 @@ to the system's ``system.py``:
 
 ::
 
-    benchpark system external llnl-elcapitan cluster=tioga --apply
+    benchpark system external aws-tutorial --apply
 
 Benchpark validates the detected changes before updating the system definition. Only
 changes that can be matched and applied unambiguously are written automatically. Updates
@@ -96,7 +96,7 @@ The resulting changes can be inspected with Git before committing:
 
 ::
 
-    git diff -- systems/llnl-elcapitan/system.py
+    git diff -- systems/aws-tutorial/system.py
 
 The updated system definition can then be committed and upstreamed through the standard
 Benchpark Git contribution workflow.
