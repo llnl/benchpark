@@ -8,6 +8,10 @@
  Adding a Benchmark
 ####################
 
+**Glossary terms:** :ref:`Benchmark <beginner-tutorial-glossary-benchmark>`, :ref:`Package
+<beginner-tutorial-glossary-package>`, :ref:`Application
+<beginner-tutorial-glossary-application>`
+
 This guide is intended for application developers who want to add a benchmark so that it
 can be run with Benchpark.
 
@@ -44,5 +48,9 @@ After satisfying the above prerequisites, create an experiment for the new bench
  Next Step
 ***********
 
-I want to run this new benchmark on my existing system, so I need to :doc:`add an
-experiment <add-an-experiment>`.
+.. container:: tutorial-next-steps
+
+    .. container:: tutorial-next-step tutorial-goal-experiment
+
+        :doc:`I want to run this new benchmark on my existing system, so I need to add
+        an experiment. <add-an-experiment>`

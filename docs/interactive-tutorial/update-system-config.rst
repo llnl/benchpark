@@ -5,8 +5,12 @@
     SPDX-License-Identifier: Apache-2.0
 
 ############################################
- Updating the System Software Specification
+ Updating Software in a System
 ############################################
+
+**Glossary terms:** :ref:`Package <beginner-tutorial-glossary-package>`, :ref:`Variant
+<beginner-tutorial-glossary-variant>`, :ref:`System
+<beginner-tutorial-glossary-system>`
 
 These steps show how to use ``benchpark system external`` to compare and update the
 external packages defined by a Benchpark system against packages detected on the current
@@ -101,5 +105,9 @@ Benchpark Git contribution workflow.
  Next Step
 ***********
 
-I want to rerun my experiment using the updated system software stack, so I need to
-:doc:`set up the experiment workspace <setup-workspace>`.
+.. container:: tutorial-next-steps
+
+    .. container:: tutorial-next-step tutorial-goal-run
+
+        :doc:`I want to initialize, build, and rerun my experiment using the updated
+        system software stack. <build-and-run-experiment>`

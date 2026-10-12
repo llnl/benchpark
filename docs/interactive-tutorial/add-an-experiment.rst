@@ -8,6 +8,16 @@
  Adding an Experiment
 ######################
 
+**Glossary terms:** :ref:`Benchmark <beginner-tutorial-glossary-benchmark>`, :ref:`Package
+<beginner-tutorial-glossary-package>`, :ref:`Application
+<beginner-tutorial-glossary-application>`, :ref:`Spec
+<beginner-tutorial-glossary-spec>`, :ref:`Variant
+<beginner-tutorial-glossary-variant>`, :ref:`Experiment
+<beginner-tutorial-glossary-experiment>`, :ref:`System
+<beginner-tutorial-glossary-system>`, :ref:`Modifier
+<beginner-tutorial-glossary-modifier>`, :ref:`Scaling Study
+<beginner-tutorial-glossary-scaling-study>`
+
 This guide is intended for those who would like to add a new experiment for a specific
 benchmark.
 
@@ -626,5 +636,9 @@ dimensions. See AMG2023 or Kripke for examples of different scaling configuratio
  Next Step
 ***********
 
-I want to :doc:`build and run the new experiment <build-and-run-experiment>` on my
-existing system.
+.. container:: tutorial-next-steps
+
+    .. container:: tutorial-next-step tutorial-goal-run
+
+        :doc:`I want to build and run the new experiment on my existing system.
+        <build-and-run-experiment>`

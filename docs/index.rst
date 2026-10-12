@@ -36,9 +36,7 @@
     :maxdepth: 1
     :caption: Beginner Tutorial
 
-    interactive-tutorial/search-benchpark
-    interactive-tutorial/setup-workspace
-    interactive-tutorial/explore-benchpark-language
+    interactive-tutorial/glossary
     interactive-tutorial/add-a-system-config
     interactive-tutorial/update-system-config
     interactive-tutorial/add-a-benchmark
@@ -51,6 +49,7 @@
     :maxdepth: 1
     :caption: Using Benchpark
 
+    interactive-tutorial/setup-workspace
     build-experiment
     run-experiment
     analyze-experiment

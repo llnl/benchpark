@@ -8,6 +8,11 @@
  Adding a System
 #################
 
+**Glossary terms:** :ref:`Package <beginner-tutorial-glossary-package>`, :ref:`Spec
+<beginner-tutorial-glossary-spec>`, :ref:`Variant
+<beginner-tutorial-glossary-variant>`, :ref:`System
+<beginner-tutorial-glossary-system>`
+
 This guide is intended for those who would like to add a new system to benchpark, such
 as vendors, system administrators, or application developers. Benchpark provides an API
 for representing system specifications as objects and options to customize the
@@ -451,5 +456,9 @@ number of nodes you can allocate at one time in that queue.
  Next Step
 ***********
 
-I want to run an experiment someone gave me on this new system, so I need to :doc:`set up
-its workspace <setup-workspace>`.
+.. container:: tutorial-next-steps
+
+    .. container:: tutorial-next-step tutorial-goal-run
+
+        :doc:`I want to initialize, build, and run an experiment on this new system.
+        <build-and-run-experiment>`

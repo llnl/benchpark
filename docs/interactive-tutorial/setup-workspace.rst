@@ -8,6 +8,13 @@
  Set up a Workspace
 ####################
 
+**Glossary terms:** :ref:`Benchmark <beginner-tutorial-glossary-benchmark>`, :ref:`Package
+<beginner-tutorial-glossary-package>`, :ref:`Spec <beginner-tutorial-glossary-spec>`,
+:ref:`Variant <beginner-tutorial-glossary-variant>`, :ref:`Experiment
+<beginner-tutorial-glossary-experiment>`, :ref:`System
+<beginner-tutorial-glossary-system>`, :ref:`Scaling Study
+<beginner-tutorial-glossary-scaling-study>`
+
 To setup an experiment workspace you must first initialize the system you will be
 running on. Next, initialize the experiment you plan to run with the appropriate
 programming model. Finally, set up the workspace in a directory for your experiment.:
@@ -98,20 +105,5 @@ to define them in your ``system.py`` and ``experiment.py``.
     - ``n_repeats`` - number of times your experiment will be repeated (think of
       trials). ``n_repeats=5`` will repeat your experiment 5 times, resulting in 5
       trials. These will be separate job submission scripts, so separate resource
-      allocations. To combine them into the same allocation, see :ref:`Run Multiple
-      Workspaces in One Allocation <run-multiple-workspaces-one-allocation>`.
-
-***********************
- Choose Your Next Step
-***********************
-
-Continue with the step that matches your goal:
-
-- I want to :doc:`run an experiment <build-and-run-experiment>` someone gave me on the same system.
-- I want to run an experiment someone gave me, but on :doc:`my system that has different hardware/software <add-a-system-config>`.
-- I want to run a :doc:`new benchmark <add-a-benchmark>` on the system I have benchmarked before (this also requires :doc:`adding an experiment <add-an-experiment>`).
-- I want to rerun my experiment on a system, but the :doc:`system software stack has changed since I last ran it<update-system-config>`.
-- I want to run a :ref:`scaling study <step-3b-define-scaling-options>` of an experiment on my system, but there aren't any scaling options defined for the experiment.
-- I want to analyze the performance of an experiment on my system, either :doc:`generating preconfigured performance figures <benchpark-analyze>` (easy) or :doc:`generate raw performance data to make my own figures <benchpark-query>`.
-- To learn how Benchpark system and experiment specs are structured, :doc:`explore
-  Benchpark's Spec Syntax <explore-benchpark-language>`.
+      allocations. To combine them into the same allocation, see
+      :doc:`/run-experiment`.

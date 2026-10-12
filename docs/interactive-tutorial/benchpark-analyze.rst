@@ -8,6 +8,12 @@
  Analyze a Scaling Study
 #########################
 
+**Glossary terms:** :ref:`Benchmark <beginner-tutorial-glossary-benchmark>`,
+:ref:`Experiment <beginner-tutorial-glossary-experiment>`, :ref:`System
+<beginner-tutorial-glossary-system>`, :ref:`Modifier
+<beginner-tutorial-glossary-modifier>`, :ref:`Scaling Study
+<beginner-tutorial-glossary-scaling-study>`
+
 The ``benchpark analyze`` command can be used to generate pre-defined charts for
 analysis of scaling studies using Caliper and Thicket. The study must use the Caliper
 modifier ``caliper=time,mpi`` (:doc:`/modifiers`) to collect the performance data.
@@ -247,6 +253,10 @@ only have one value per profile.
  Choose Your Next Step
 ***********************
 
-I have generated preconfigured performance figures for an experiment on my system. I
-want to begin another workflow by :doc:`searching what is available in Benchpark
-<search-benchpark>`.
+.. container:: tutorial-next-steps
+
+    .. container:: tutorial-next-step tutorial-goal-search
+
+        :ref:`I have generated preconfigured performance figures for an experiment on
+        my system. I want to begin another workflow by searching what is available in
+        Benchpark. <search-benchpark>`

@@ -8,6 +8,12 @@
  Query Performance Data
 ########################
 
+**Glossary terms:** :ref:`Benchmark <beginner-tutorial-glossary-benchmark>`,
+:ref:`Application <beginner-tutorial-glossary-application>`, :ref:`Experiment
+<beginner-tutorial-glossary-experiment>`, :ref:`System
+<beginner-tutorial-glossary-system>`, :ref:`Modifier
+<beginner-tutorial-glossary-modifier>`
+
 The ``benchpark query`` command searches one or more directories for Caliper ``.cali``
 files and writes selected metadata or performance data to a CSV file. It is useful when
 you want tabular data for custom plotting or downstream analysis instead of the
@@ -312,5 +318,10 @@ benchmark/system pair, with hatching used to distinguish ROCm versions.
  Choose Your Next Step
 ***********************
 
-I have generated raw performance data to make my own figures. I want to begin another
-workflow by :doc:`searching what is available in Benchpark <search-benchpark>`.
+.. container:: tutorial-next-steps
+
+    .. container:: tutorial-next-step tutorial-goal-search
+
+        :ref:`I have generated raw performance data to make my own figures. I want to
+        begin another workflow by searching what is available in Benchpark.
+        <search-benchpark>`
