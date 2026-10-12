@@ -79,10 +79,8 @@ The experiment output remains in each source workspace.
 Choose Your Next Step
 =====================
 
-- If your goal was to repeat an experiment on a system, the workflow is complete. To
-  start another workflow, :doc:`search what is available in Benchpark
-  <search-benchpark>`.
-- If your goal is to analyze the performance results, :doc:`use benchpark analyze
-  <benchpark-analyze>`.
-- To perform custom analysis or export Caliper data, use :doc:`benchpark query
-  <benchpark-query>`.
+- I have run an experiment someone gave me on the same system. I want to start another
+  workflow by :doc:`searching what is available in Benchpark <search-benchpark>`.
+- I want to analyze the performance of an experiment on my system, either
+  :doc:`generating preconfigured performance figures <benchpark-analyze>` (easy) or
+  :doc:`generate raw performance data to make my own figures <benchpark-query>`.

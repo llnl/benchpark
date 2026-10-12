@@ -101,5 +101,5 @@ Benchpark Git contribution workflow.
  Next Step
 ***********
 
-To use the updated software specification, :doc:`set up the experiment workspace
-<setup-workspace>`.
+I want to rerun my experiment using the updated system software stack, so I need to
+:doc:`set up the experiment workspace <setup-workspace>`.

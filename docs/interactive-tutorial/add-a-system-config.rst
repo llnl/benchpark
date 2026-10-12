@@ -451,5 +451,5 @@ number of nodes you can allocate at one time in that queue.
  Next Step
 ***********
 
-To run an existing experiment on the new system, :doc:`set up its workspace
-<setup-workspace>`.
+I want to run an experiment someone gave me on this new system, so I need to :doc:`set up
+its workspace <setup-workspace>`.

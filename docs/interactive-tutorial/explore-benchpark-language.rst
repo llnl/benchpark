@@ -126,7 +126,7 @@ These related forms have different meanings in the two tools:
 
 Continue with the step that matches your goal:
 
-- To run an existing experiment on a new system, :doc:`add a system configuration
-  <add-a-system-config>`.
-- To add a new benchmark on an existing system, :doc:`add a Spack package and Ramble
-  application <add-a-benchmark>`, then :doc:`add an experiment <add-an-experiment>`.
+- I want to run an experiment someone gave me, but on :doc:`my system that has different
+  hardware/software <add-a-system-config>`.
+- I want to run a :doc:`new benchmark <add-a-benchmark>` on the system I have benchmarked
+  before (this also requires :doc:`adding an experiment <add-an-experiment>`).

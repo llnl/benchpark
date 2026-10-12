@@ -626,5 +626,5 @@ dimensions. See AMG2023 or Kripke for examples of different scaling configuratio
  Next Step
 ***********
 
-To run the new benchmark on an existing system, :doc:`build and run the experiment
-<build-and-run-experiment>`.
+I want to :doc:`build and run the new experiment <build-and-run-experiment>` on my
+existing system.

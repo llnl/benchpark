@@ -107,18 +107,11 @@ to define them in your ``system.py`` and ``experiment.py``.
 
 Continue with the step that matches your goal:
 
-- To repeat an experiment on a system, :doc:`build and run the experiment
-  <build-and-run-experiment>`.
-- To run an existing experiment on a new system, :doc:`add a system configuration
-  <add-a-system-config>`.
-- To add a new benchmark on an existing system, :doc:`add a spack package, add a ramble
-  application <add-a-benchmark>`, and :doc:`add an experiment <add-an-experiment>`.
-- To run an existing experiment on an existing system but change the software,
-  :doc:`update the system software specification <update-system-config>`.
-- To perform a scaling study of an existing workload on an existing system, see
-  :ref:`Step 3b: Define Scaling Options <step-3b-define-scaling-options>`.
-- To analyze an existing workload, :doc:`use benchpark analyze <benchpark-analyze>` for
-  preconfigured analysis or :doc:`use benchpark query <benchpark-query>` for raw data to
-  make your own figures.
+- I want to :doc:`run an experiment <build-and-run-experiment>` someone gave me on the same system.
+- I want to run an experiment someone gave me, but on :doc:`my system that has different hardware/software <add-a-system-config>`.
+- I want to run a :doc:`new benchmark <add-a-benchmark>` on the system I have benchmarked before (this also requires :doc:`adding an experiment <add-an-experiment>`).
+- I want to rerun my experiment on a system, but the :doc:`system software stack has changed since I last ran it<update-system-config>`.
+- I want to run a :ref:`scaling study <step-3b-define-scaling-options>` of an experiment on my system, but there aren't any scaling options defined for the experiment.
+- I want to analyze the performance of an experiment on my system, either :doc:`generating preconfigured performance figures <benchpark-analyze>` (easy) or :doc:`generate raw performance data to make my own figures <benchpark-query>`.
 - To learn how Benchpark system and experiment specs are structured, :doc:`explore
-  Benchpark's configuration language <explore-benchpark-language>`.
+  Benchpark's Spec Syntax <explore-benchpark-language>`.

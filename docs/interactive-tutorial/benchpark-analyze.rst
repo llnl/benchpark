@@ -247,5 +247,6 @@ only have one value per profile.
  Choose Your Next Step
 ***********************
 
-You have completed the goal of analyzing an existing workload on an existing system. To
-begin another workflow, :doc:`search what is available in Benchpark <search-benchpark>`.
+I have generated preconfigured performance figures for an experiment on my system. I
+want to begin another workflow by :doc:`searching what is available in Benchpark
+<search-benchpark>`.

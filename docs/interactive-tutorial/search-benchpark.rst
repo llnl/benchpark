@@ -57,4 +57,5 @@ For a complete command reference, see :doc:`Benchpark Commands </benchpark-comma
  Next Step
 ***********
 
-After selecting a system and experiment, :doc:`set up a workspace <setup-workspace>`.
+I want to :doc:`set up a workspace <setup-workspace>` for the system and experiment I
+selected.

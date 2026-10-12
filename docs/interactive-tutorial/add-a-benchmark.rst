@@ -44,5 +44,5 @@ After satisfying the above prerequisites, create an experiment for the new bench
  Next Step
 ***********
 
-To run a new benchmark on an existing system, :doc:`add an experiment
-<add-an-experiment>`.
+I want to run this new benchmark on my existing system, so I need to :doc:`add an
+experiment <add-an-experiment>`.
