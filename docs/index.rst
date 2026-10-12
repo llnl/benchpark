@@ -34,7 +34,7 @@
 
 .. toctree::
     :maxdepth: 1
-    :caption: Interactive Tutorial
+    :caption: Beginner Tutorial
 
     interactive-tutorial/search-benchpark
     interactive-tutorial/setup-workspace
