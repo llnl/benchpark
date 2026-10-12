@@ -16,7 +16,6 @@ class Qws(
     Scaling(ScalingMode.Strong, ScalingMode.Weak, ScalingMode.Throughput),
     Caliper,
 ):
-
     variant(
         "workload",
         default="qws",
@@ -69,32 +68,28 @@ class Qws(
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    )
-                    * scaling_factor,
-                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    )
-                    // scaling_factor,
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
+                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) // scaling_factor
+                    ),
                 },
                 ScalingMode.Weak: {
-                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    )
-                    * scaling_factor,
-                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
+                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim)
                     ),
                 },
                 ScalingMode.Throughput: {
                     "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
                         dim
                     ),
-                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    )
-                    * scaling_factor,
+                    "process_problem_size_dict": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
                 },
             }
         )
