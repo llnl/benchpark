@@ -19,8 +19,8 @@
 .. image:: https://github.com/llnl/benchpark/workflows/nightly/badge.svg
     :target: https://github.com/LLNL/benchpark/actions/workflows/nightly.yml
 
-.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
-    :target: https://github.com/psf/black
+.. image:: https://img.shields.io/badge/code%20style-ruff-D7FF64.svg
+    :target: https://docs.astral.sh/ruff/
 
 .. image:: https://img.shields.io/badge/Dashboard-CDash-blue
     :target: https://my.cdash.org/index.php?project=Benchpark
@@ -45,7 +45,7 @@ reproducible, working specifications for the following:
 
 * Source repo and version
 * Build configuration (with `Spack <https://github.com/spack/spack>`_)
-* Run configuration (with `Ramble <https://github.com/GoogleCloudPlatform/ramble>`_)
+* Run configuration (with `Ramble <https://github.com/Ramble-Project/ramble>`_)
 
 3. **Experiment Specifications** (specific benchmark experiment on a system specification)
 
@@ -57,7 +57,7 @@ Dependencies
 Benchpark uses the following open source projects for specifying configurations:
 
 * `Spack <https://github.com/spack/spack>`_ for building benchmark and dependencies
-* `Ramble <https://github.com/GoogleCloudPlatform/ramble>`_ for run configurations
+* `Ramble <https://github.com/Ramble-Project/ramble>`_ for run configurations
 
 Community
 ---------

@@ -45,20 +45,20 @@
     configuration
     modifiers
     set-of-experiments
-    experiment-status
     run-binary
     create-mirror
     io-benchmarking
+    experiment-status
 
 .. toctree::
     :maxdepth: 1
     :caption: Contributing
 
     add-a-system-config
-    update-system-config
     add-a-benchmark
     add-an-experiment
     testing-your-contribution
+    update-system-config
 
 .. toctree::
     :maxdepth: 1

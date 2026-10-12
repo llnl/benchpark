@@ -13,9 +13,10 @@ import benchpark.config
 
 # isort: off
 
-import llnl.util.lang  # noqa
 import ramble.language.language_base  # noqa
 import ramble.repository  # noqa
+
+from benchpark.util.compat import Singleton
 
 # isort: on
 
@@ -96,8 +97,8 @@ def _systems():
 
 
 paths = {
-    ObjectTypes.experiments: llnl.util.lang.Singleton(_exprs),
-    ObjectTypes.systems: llnl.util.lang.Singleton(_systems),
+    ObjectTypes.experiments: Singleton(_exprs),
+    ObjectTypes.systems: Singleton(_systems),
 }
 
 

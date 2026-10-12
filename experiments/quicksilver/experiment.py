@@ -52,23 +52,20 @@ class Quicksilver(
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    )
-                    * scaling_factor,
-                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
+                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim)
                     ),
                 },
                 ScalingMode.Weak: {
-                    "n_resources_dict": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    )
-                    * scaling_factor,
-                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    )
-                    * scaling_factor,
+                    "n_resources_dict": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
+                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
                 },
             }
         )

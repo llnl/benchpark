@@ -11,6 +11,32 @@ import yaml
 import benchpark.spec
 
 
+def test_namespaced_experiment_resolution():
+    spec = benchpark.spec.ExperimentSpec("hecbench.softmax +rocm").concretize()
+    unqualified_spec = benchpark.spec.ExperimentSpec("softmax +rocm").concretize()
+
+    assert spec.fullname == "hecbench.softmax"
+    assert unqualified_spec.fullname == spec.fullname
+    assert spec.experiment_class.namespace == "hecbench"
+    assert spec.experiment_class.__module__ == "benchpark.expr.hecbench.softmax"
+    assert spec.satisfies("+rocm")
+
+
+def test_experiment_repository_lookup_uses_namespace(monkeypatch):
+    requested_names = []
+    expected_class = object()
+
+    def get_obj_class(name):
+        requested_names.append(name)
+        return expected_class
+
+    monkeypatch.setattr(benchpark.spec.repo_path, "get_obj_class", get_obj_class)
+
+    spec = benchpark.spec.ExperimentSpec("test.saxpy")
+    assert spec.experiment_class is expected_class
+    assert requested_names == ["test.saxpy"]
+
+
 def test_write_yaml(monkeypatch, tmpdir):
     spec = benchpark.spec.ExperimentSpec("saxpy").concretize()
     experiment = spec.experiment

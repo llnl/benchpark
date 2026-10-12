@@ -12,7 +12,6 @@ class Genesis(
     Experiment,
     ProgrammingModel(ProgrammingModelType.Mpionly, ProgrammingModelType.Openmp),
 ):
-
     variant(
         "workload",
         default="DHFR",

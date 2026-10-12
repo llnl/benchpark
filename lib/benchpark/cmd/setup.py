@@ -18,7 +18,7 @@ from benchpark.paths import paths
 from benchpark.runtime import RuntimeResources
 
 
-# Note: it would be nice to vendor spack.llnl.util.link_tree, but that
+# Note: it would be nice to vendor spack.util.link_tree, but that
 # involves pulling in most of llnl/util/ and spack/util/
 def symlink_tree(src, dst, include_fn=None):
     """Like ``cp -R`` but instead of files, create symlinks"""
