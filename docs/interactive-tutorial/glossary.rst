@@ -264,15 +264,15 @@ Continue with the step that matches your goal:
 
 .. container:: tutorial-next-steps
 
-    .. container:: tutorial-next-step tutorial-goal-run
-
-        :doc:`I want to run an experiment someone gave me on the same system.
-        <build-and-run-experiment>`
-
     .. container:: tutorial-next-step tutorial-goal-system
 
         :doc:`I want to run an experiment someone gave me, but on my system that has
         different hardware/software. <add-a-system-config>`
+
+    .. container:: tutorial-next-step tutorial-goal-update-system
+
+        :doc:`I want to rerun my experiment on a system, but the system software stack
+        has changed since I last ran it. <update-system-config>`
 
     .. container:: tutorial-next-step tutorial-next-step-multiple tutorial-goal-benchmark
 
@@ -280,16 +280,16 @@ Continue with the step that matches your goal:
         benchmarked before (this also requires :doc:`adding an experiment
         <add-an-experiment>`).
 
-    .. container:: tutorial-next-step tutorial-goal-update-system
-
-        :doc:`I want to rerun my experiment on a system, but the system software stack
-        has changed since I last ran it. <update-system-config>`
-
     .. container:: tutorial-next-step tutorial-goal-scaling
 
         :ref:`I want to run a scaling study of an experiment on my system, but there
         aren't any scaling options defined for the experiment.
         <step-3b-define-scaling-options>`
+
+    .. container:: tutorial-next-step tutorial-goal-run
+
+        :doc:`I want to run an experiment someone gave me on the same system.
+        <build-and-run-experiment>`
 
     .. container:: tutorial-next-step tutorial-goal-analyze
 
