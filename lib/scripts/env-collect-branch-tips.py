@@ -1,6 +1,5 @@
-import os
-import shutil
 import sys
+import json
 
 import spack.repo
 from spack.fetch_strategy import GitFetchStrategy
@@ -14,7 +13,8 @@ except ImportError:
 
 
 def main():
-    destination = sys.argv[1]
+    # Dictionary mapping package name to requirement spec
+    requirements = {}
 
     e = active_environment()
     for spec in e.all_specs():
@@ -25,16 +25,24 @@ def main():
         derived_spec.versions = spec.versions
         pkg_obj = pkg_cls(derived_spec)
         df = pkg_obj.stage[0].default_fetcher
-        # Mirror git packages that use branches (not tags or explicit commits)
-        # Branch-based versions need the full repo for offline builds since branches can move
+
+        # Identify branch-based packages (not tags or explicit commits)
+        # Branch-based versions need commit pinning for offline builds since branches can move
         # Tag-based versions can use cached tarballs since tags are immutable
         if isinstance(df, GitFetchStrategy) and (df.branch or not df.cachable):
-            df.get_full_repo = True
-            pkg_dst = os.path.join(destination, spec.name)
-            if not os.path.exists(pkg_dst):
-                pkg_obj.stage.fetch()
-                shutil.move(pkg_obj.stage.source_path, pkg_dst)
-            print(f"{spec.name}")
+            # Extract the commit from the concretized spec
+            commit = None
+            if hasattr(spec, 'variants') and 'commit' in spec.variants:
+                commit = str(spec.variants['commit'].value)
+
+            if commit:
+                version_str = str(spec.version)
+                # Create requirement spec: @version commit=hash
+                require_spec = f"@{version_str} commit={commit}"
+                requirements[spec.name] = require_spec
+
+    # Output as JSON to stdout for easy parsing
+    print(json.dumps(requirements, indent=2))
 
 
 if __name__ == "__main__":
