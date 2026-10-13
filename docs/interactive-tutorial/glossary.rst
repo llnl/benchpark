@@ -100,92 +100,9 @@ it is built.
  Benchpark Spec Syntax
 ***********************
 
-Benchpark uses *specs* to select a system or experiment definition and configure its
-variants. You pass these specs to ``benchpark system init`` and ``benchpark experiment
-init``. For example:
-
-.. code-block:: console
-
-    $ benchpark system init --dest=<system-id> <system> +/~<boolean-variant> <variant>=<value>
-    $ benchpark experiment init <system-id> <benchmark> +/~<boolean-variant> <variant>=<value>
-
-The first command selects a system definition and configures its variants. The second
-command selects a benchmark's experiment definition and configures its variants for the
-initialized system. In these templates, ``+/~`` means that a Boolean variant can be
-enabled with ``+`` or disabled with ``~``.
-
-A Benchpark spec describes a Benchpark object. It is distinct from the Spack package
-specs that Benchpark later writes into the generated configuration. A system spec
-selects a definition under ``systems/``, while an experiment spec selects a definition
-under ``experiments/``.
-
-Inspect Available Variants
-==========================
-
-Each system and experiment defines its own variants, allowed values, and defaults.
-Inspect them before constructing a spec:
-
-.. code-block:: console
-
-    $ benchpark info system --variants <system>
-    $ benchpark info experiment --variants <benchmark>
-
-The ``benchpark info`` output includes variants inherited from reusable Benchpark
-components, such as programming models and scaling modes. Benchpark applies default
-values for omitted variants when it initializes the object. It rejects unknown variants,
-unsupported values, and invalid combinations.
-
-Write a Benchpark Spec
-======================
-
-Place the system or experiment name first, followed by zero or more variants:
-
-.. list-table:: Benchpark spec forms
-    :header-rows: 1
-    :widths: 24 30 46
-
-    - - Purpose
-      - Form
-      - Example
-    - - Select an object
-      - ``name``
-      - ``<name>``
-    - - Select a namespaced experiment
-      - ``namespace.name``
-      - ``<namespace>.<name>``
-    - - Enable a Boolean variant
-      - ``+name``
-      - ``+<boolean-variant>``
-    - - Disable a Boolean variant
-      - ``~name``
-      - ``~<boolean-variant>``
-    - - Select one value
-      - ``name=value``
-      - ``<variant>=<value>``
-    - - Select multiple values
-      - ``name=value1,value2``
-      - ``<variant>=<value1>,<value2>``
-
-Boolean variants can follow the object name without a space, as in
-``<name>+<boolean-variant>``. This form also prevents a shell from interpreting a
-disabled variant as a home-directory expression:
-
-.. code-block:: console
-
-    $ benchpark experiment init <system-id> <benchmark>~<boolean-variant>
-
-For a multi-valued Benchpark variant, the comma-separated values are the selected
-values. The general form is ``<variant>=<value1>,<value2>``.
-
-Relationship to Spack Specs
-===========================
-
-Benchpark's parser is derived from Spack's spec parser and uses the same basic syntax
-for `Boolean, single-valued, and multi-valued variants
-<https://spack.readthedocs.io/en/latest/spec_syntax.html#variants>`_. The complete
-`Spack spec syntax <https://spack.readthedocs.io/en/latest/spec_syntax.html>`_ is not a
-Benchpark language reference because Benchpark implements only the object-name and
-variant subset described on this page.
+Benchpark's parser is derived from Spack's spec parser. A Spack package spec can include
+versions, architecture constraints, compiler constraints, and dependencies in addition
+to its package name and variants:
 
 .. figure:: /_static/images/spack-spec_anatomy.svg
     :alt: Anatomy of a Spack package spec, showing its package name, versions, variants,
@@ -193,16 +110,47 @@ variant subset described on this page.
     :width: 100%
     :align: center
 
-    Anatomy of a Spack package spec. Benchpark adopts the name and variant portions for
-    its system and experiment specs.
+    Anatomy of a Spack package spec.
 
 Source: `Spack Spec Syntax
 <https://spack.readthedocs.io/en/latest/spec_syntax.html#spec-syntax>`_.
 
-In particular, Benchpark does not implement Spack's version (``@``), compiler (``%``),
-architecture, dependency (``^``), or installed-spec hash (``/hash``) constraint
-semantics. It also does not accept exact multi-value constraints (``:=``) or variant
-propagation (``++`` and ``==``).
+Benchpark implements only the object-name and variant portions of this syntax. The
+following examples show the name, Boolean variants, and named variants in Benchpark
+system and experiment specs:
+
+.. figure:: /_static/images/system-spec.png
+    :alt: Benchpark system spec with a system name, a Boolean variant, and several named
+        variants.
+    :width: 100%
+    :align: center
+
+    Benchpark system spec.
+
+.. figure:: /_static/images/experiment-spec.png
+    :alt: Benchpark experiment spec with an experiment name, a Boolean variant, and
+        named variants.
+    :width: 100%
+    :align: center
+
+    Benchpark experiment spec.
+
+In these examples, the red text is the system or experiment name, the green text is a
+Boolean variant, and the orange text contains named variants. ``compiler=cce`` and
+``version=2.3-caliper`` are named variants defined by their Benchpark objects. They are
+not Spack compiler (``%``) or version (``@``) constraints.
+
+A Benchpark spec describes a Benchpark object. It is distinct from the Spack package
+specs that Benchpark later writes into the generated configuration. A system spec
+selects a definition under ``systems/``, while an experiment spec selects a definition
+under ``experiments/``.
+
+Benchpark does not implement Spack's version (``@``), compiler (``%``), architecture,
+dependency (``^``), or installed-spec hash (``/hash``) constraint semantics. It also
+does not accept exact multi-value constraints (``:=``) or variant propagation (``++``
+and ``==``). Benchpark uses the same basic syntax as Spack for `Boolean, single-valued,
+and multi-valued variants
+<https://spack.readthedocs.io/en/latest/spec_syntax.html#variants>`_.
 
 These related forms have different meanings in the two tools:
 

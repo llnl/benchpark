@@ -60,3 +60,13 @@ Run the command help to see all supported filters and arguments:
     $ benchpark info --help
 
 For a complete command reference, see :doc:`Benchpark Commands </benchpark-commands>`.
+
+**********************
+ Return to Start Here
+**********************
+
+.. container:: tutorial-next-steps
+
+    .. container:: tutorial-next-step tutorial-goal-start
+
+        :doc:`I want to return to the start page. <glossary>`
