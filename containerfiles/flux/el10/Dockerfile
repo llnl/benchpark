@@ -35,8 +35,10 @@ ENV MPIBIND_INSTALL_PREFIX=/home/fluxuser/mpibind-install \
 RUN pip install --upgrade pip \
     && pip install pybind11 \
     jupyterlab \
+    jupyterhub==5.3.0 \
     ipywidgets \
     matplotlib \
+    ipykernel \
     && jupyter lab build --dev-build=False \
     && mkdir -p /home/fluxuser/.jupyter \
     && echo "c.ServerApp.ip = '0.0.0.0'" >> /home/fluxuser/.jupyter/jupyter_lab_config.py \
@@ -67,13 +69,13 @@ RUN pip install -r /home/fluxuser/benchpark/requirements.txt \
     && source /home/fluxuser/benchpark/setup-env.sh \
 	&& benchpark bootstrap \
     && pip install .[analyze] \
-    && benchpark system init --dest=hpc-tutorial fluxtainer instance_type=${TARGETARCH} \
-    && benchpark experiment init hpc-tutorial kripke +weak caliper=time,mpi scaling-iterations=2 \
-    && benchpark setup hpc-tutorial/kripke/ /home/fluxuser/benchpark/wkp/ \
-    && . /home/fluxuser/benchpark/wkp/setup.sh \
-    && ramble --workspace-dir /home/fluxuser/benchpark/wkp/hpc-tutorial/kripke/workspace workspace setup \
-    && rm -rf /home/fluxuser/benchpark/wkp /home/fluxuser/benchpark/hpc-tutorial *.out \
 	&& echo 'source /home/fluxuser/benchpark/setup-env.sh' >> /home/fluxuser/.bashrc
+
+    # && benchpark system init --dest=hpc-tutorial fluxtainer instance_type=${TARGETARCH} \
+    # && benchpark experiment init hpc-tutorial kripke +weak caliper=time,mpi scaling-iterations=2 \
+    # && benchpark setup hpc-tutorial/kripke/ /home/fluxuser/benchpark/wkp/ \
+    # && flux start /home/fluxuser/benchpark/containerfiles/tutorial.sh \
+    # && rm -rf /home/fluxuser/benchpark/wkp /home/fluxuser/benchpark/hpc-tutorial *.out \
 
 ENTRYPOINT ["/usr/bin/flux", "start"]
 CMD ["/bin/bash"]
