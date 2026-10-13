@@ -6,11 +6,16 @@
     "context": ".."
   },
   "remoteUser": "fluxuser",
-  "forwardPorts": [8000],
+  "forwardPorts": [8000,8888],
   "portsAttributes": {
     "8000": {
       "label": "Sphinx Docs",
       "onAutoForward": "notify"
+    },
+    "8888": {
+      "label": "JupyterLab",
+      "onAutoForward": "openBrowser",
+      "protocol": "http"
     }
   },
   "customizations": {
@@ -19,7 +24,8 @@
               "ms-vscode.python",
               "ms-python.black-formatter",
               "ms-python.flake8",
-              "ms-vscode.cmake-tools"
+              "ms-vscode.cmake-tools",
+              "ms-toolsai.jupyter"
           ],
           "settings": {
               "terminal.integrated.defaultProfile.linux": "bash"

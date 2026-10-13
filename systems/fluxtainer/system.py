@@ -9,20 +9,21 @@ from benchpark.system import System, compiler_def, compiler_section_for
 
 
 class Fluxtainer(System):
-    """This is the generic system class for an x86 system, gcc compiler, mpi.
-    It can be easily copied and modified to model other systems."""
+    """This is the system class for a container running Flux.
+    See https://flux-framework.readthedocs.io/en/latest/tutorials/containers/index.html for more
+    information."""
 
     maintainers("nhanford")
 
     id_to_resources = {
-        "arm": {"cpu_arch": "arm64"},
-        "x86": {"cpu_arch": "x86_64_v3"},
+        "arm64": {"cpu_arch": "arm64"},
+        "amd64": {"cpu_arch": "x86_64_v3"},
     }
 
     variant(
         "instance_type",
-        values=("arm", "x86"),
-        default="x86",
+        values=("arm64", "amd64"),
+        default="amd64",
         description="Target Architecture",
     )
 
@@ -38,7 +39,7 @@ class Fluxtainer(System):
         self.programming_models = [OpenMPCPUOnlySystem()]
 
         self.scheduler = "flux"
-        setattr(self, "sys_cores_per_node", 8)
+        setattr(self, "sys_cores_per_node", 4)
         setattr(self, "sys_mem_per_node_GB", 1)
         setattr(self, "n_nodes", 1)
         attrs = self.id_to_resources.get(self.spec.variants["instance_type"][0])
