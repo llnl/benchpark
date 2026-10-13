@@ -20,7 +20,6 @@ from benchpark.system import (
 
 
 class LlnlElcapitan(System):
-
     maintainers("pearce8", "nhanford", "rfhaque")
 
     id_to_resources = {
@@ -785,7 +784,10 @@ class LlnlElcapitan(System):
                 "rocblas": {
                     "externals": [
                         {
-                            "spec": f"rocblas@{self.rocm_version}",
+                            "spec": (
+                                f"rocblas@{self.rocm_version} "
+                                f"amdgpu_target={self.rocm_arch}"
+                            ),
                             "prefix": f"/opt/rocm-{self.rocm_version}",
                         }
                     ],

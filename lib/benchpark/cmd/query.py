@@ -130,12 +130,15 @@ def command(args):
     if args.exclude_regions:
         query = th.query.Query().match(
             ".",
-            lambda row: row["name"]
-            .apply(
-                lambda n: n is None
-                or all(excl not in n for excl in args.exclude_regions)
-            )
-            .all(),
+            lambda row: (
+                row["name"]
+                .apply(
+                    lambda n: (
+                        n is None or all(excl not in n for excl in args.exclude_regions)
+                    )
+                )
+                .all()
+            ),
         )
         tk = tk.query(query)
 
@@ -144,12 +147,16 @@ def command(args):
             th.query.Query()
             .match(
                 ".",
-                lambda row: row["name"]
-                .apply(
-                    lambda n: n is not None
-                    and any(r in n for r in args.query_regions_byname)
-                )
-                .all(),
+                lambda row: (
+                    row["name"]
+                    .apply(
+                        lambda n: (
+                            n is not None
+                            and any(r in n for r in args.query_regions_byname)
+                        )
+                    )
+                    .all()
+                ),
             )
             .rel("*")
         )

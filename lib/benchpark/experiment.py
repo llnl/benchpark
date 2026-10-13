@@ -135,9 +135,9 @@ class Affinity:
                 if self.spec.satisfies("+cuda"):
                     package_specs["affinity"]["spack_pkg_spec"] += "+cuda"
                 elif self.spec.satisfies("+rocm"):
-                    package_specs["affinity"][
-                        "spack_pkg_spec"
-                    ] += "+rocm amdgpu_target={rocm_arch}"
+                    package_specs["affinity"]["spack_pkg_spec"] += (
+                        "+rocm amdgpu_target={rocm_arch}"
+                    )
 
             return {
                 "packages": {k: v for k, v in package_specs.items() if v},
@@ -590,16 +590,14 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc, Githash):
 
         if "append_path" in self.spec.variants and (
             # Don't append " " to path (default value)
-            self.spec.variants["append_path"][0]
-            != " "
+            self.spec.variants["append_path"][0] != " "
         ):
             self.append_environment_variable(
                 "PATH", self.spec.variants["append_path"][0]
             )
         if "prepend_path" in self.spec.variants and (
             # Don't append " " to path (default value)
-            self.spec.variants["prepend_path"][0]
-            != " "
+            self.spec.variants["prepend_path"][0] != " "
         ):
             self.prepend_environment_variable(
                 "PATH", self.spec.variants["prepend_path"][0]
