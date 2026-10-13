@@ -233,6 +233,16 @@ Continue with the step that matches your goal:
 
         :doc:`I want to search what is available in Benchpark. <search-benchpark>`
 
+    .. container:: tutorial-next-step tutorial-goal-run
+
+        :doc:`I want to run an experiment someone gave me on the same system.
+        <build-and-run-experiment>`
+
+    .. container:: tutorial-next-step tutorial-goal-analyze
+
+        :doc:`I want to generate preconfigured performance figures for an experiment
+        on my system. <benchpark-analyze>`
+
     .. container:: tutorial-next-step tutorial-goal-system
 
         :doc:`I want to run an experiment someone gave me, but on my system that has
@@ -254,16 +264,6 @@ Continue with the step that matches your goal:
         :ref:`I want to run a scaling study of an experiment on my system, but there
         aren't any scaling options defined for the experiment.
         <step-3b-define-scaling-options>`
-
-    .. container:: tutorial-next-step tutorial-goal-run
-
-        :doc:`I want to run an experiment someone gave me on the same system.
-        <build-and-run-experiment>`
-
-    .. container:: tutorial-next-step tutorial-goal-analyze
-
-        :doc:`I want to generate preconfigured performance figures for an experiment
-        on my system. <benchpark-analyze>`
 
     .. container:: tutorial-next-step tutorial-goal-query
 
