@@ -37,6 +37,7 @@
     :caption: Beginner Tutorial
 
     interactive-tutorial/glossary
+    interactive-tutorial/search-benchpark
     interactive-tutorial/add-a-system-config
     interactive-tutorial/update-system-config
     interactive-tutorial/add-a-benchmark

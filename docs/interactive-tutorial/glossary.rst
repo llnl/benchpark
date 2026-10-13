@@ -7,8 +7,12 @@
 .. _beginner-tutorial-glossary:
 
 #####################
- Benchpark Glossary
+ Start Here
 #####################
+
+***********************
+ Benchpark Glossary
+***********************
 
 The Beginner Tutorial uses terms from Benchpark, Ramble, and Spack. This table defines
 how the tutorial uses each term and identifies the project that provides the underlying
@@ -205,57 +209,6 @@ These related forms have different meanings in the two tools:
       - Use ``<variant>:=<value1>,<value2>``. In Spack, ``=`` permits additional
         values.
 
-.. _search-benchpark:
-
-***************************************
- Search What Is Available in Benchpark
-***************************************
-
-All of the systems, benchmarks, experiments, and modifiers that are available in
-benchpark can be searched on the command line. The ``benchpark list`` command accepts
-one of four categories:
-
-.. code-block:: console
-
-    $ benchpark list systems
-    $ benchpark list benchmarks
-    $ benchpark list experiments
-    $ benchpark list modifiers
-
-The generated :doc:`system catalogue </system-list>` and :doc:`benchmark catalogue
-</benchmark-list>` provide detailed information for systems and benchmarks in a tabular
-form.
-
-For searching experiments, use the filter to find your targeted programming model. For
-example, this command only shows experiments that support ROCm:
-
-.. code-block:: console
-
-    $ benchpark list experiments --experiment rocm
-
-The same search can be performed for ROCm systems:
-
-.. code-block:: console
-
-    $ benchpark list systems --programming-model rocm
-
-After choosing a system or experiment, inspect its variants and other configuration
-details:
-
-.. code-block:: console
-
-    $ benchpark info system <system>
-    $ benchpark info experiment <experiment>
-
-Run the command help to see all supported filters and arguments:
-
-.. code-block:: console
-
-    $ benchpark list --help
-    $ benchpark info --help
-
-For a complete command reference, see :doc:`Benchpark Commands </benchpark-commands>`.
-
 ***********************
  Choose Your Next Step
 ***********************
@@ -263,6 +216,10 @@ For a complete command reference, see :doc:`Benchpark Commands </benchpark-comma
 Continue with the step that matches your goal:
 
 .. container:: tutorial-next-steps
+
+    .. container:: tutorial-next-step tutorial-goal-search
+
+        :doc:`I want to search what is available in Benchpark. <search-benchpark>`
 
     .. container:: tutorial-next-step tutorial-goal-system
 
