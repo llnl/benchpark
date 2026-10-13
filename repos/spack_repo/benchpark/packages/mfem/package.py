@@ -345,7 +345,6 @@ class Mfem(Package, CudaPackage, ROCmPackage):
     depends_on("hipcub", when="@4.9.0:+rocm")
 
     depends_on("caliper", when="+caliper")
-    depends_on("adiak", when="+caliper")
 
     with when("+mpi"):
         depends_on("hypre")
@@ -1345,8 +1344,6 @@ class Mfem(Package, CudaPackage, ROCmPackage):
         if "+caliper" in spec: 
             options += [
                 "CALIPER_DIR=%s" % self.spec["caliper"].prefix,
-                "MFEM_USE_ADIAK=ON",
-                "ADIAK_DIR=%s" % self.spec["adiak"].prefix,
             ]
 
         return options
