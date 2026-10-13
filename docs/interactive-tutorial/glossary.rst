@@ -187,6 +187,18 @@ for `Boolean, single-valued, and multi-valued variants
 Benchpark language reference because Benchpark implements only the object-name and
 variant subset described on this page.
 
+.. figure:: /_static/images/spack-spec_anatomy.svg
+    :alt: Anatomy of a Spack package spec, showing its package name, versions, variants,
+        architecture, compiler, and dependencies.
+    :width: 100%
+    :align: center
+
+    Anatomy of a Spack package spec. Benchpark adopts the name and variant portions for
+    its system and experiment specs.
+
+Source: `Spack Spec Syntax
+<https://spack.readthedocs.io/en/latest/spec_syntax.html#spec-syntax>`_.
+
 In particular, Benchpark does not implement Spack's version (``@``), compiler (``%``),
 architecture, dependency (``^``), or installed-spec hash (``/hash``) constraint
 semantics. It also does not accept exact multi-value constraints (``:=``) or variant
