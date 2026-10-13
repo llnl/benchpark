@@ -32,32 +32,25 @@ The generated :doc:`system catalogue </system-list>` and :doc:`benchmark catalog
 form.
 
 For searching experiments, use the filter to find your targeted programming model. For
-example, this command only shows experiments that support ROCm:
+example, this command only shows experiments that support strong scaling:
 
 .. code-block:: console
 
-    $ benchpark list experiments --experiment rocm
+    $ benchpark list experiments --experiment strong
 
-The same search can be performed for ROCm systems:
+We can also search for systems:
 
 .. code-block:: console
 
-    $ benchpark list systems --programming-model rocm
+    $ benchpark list systems
 
 After choosing a system or experiment, inspect its variants and other configuration
 details:
 
 .. code-block:: console
 
-    $ benchpark info system <system>
-    $ benchpark info experiment <experiment>
-
-Run the command help to see all supported filters and arguments:
-
-.. code-block:: console
-
-    $ benchpark list --help
-    $ benchpark info --help
+    $ benchpark info system aws-tutorial
+    $ benchpark info experiment hpl
 
 For a complete command reference, see :doc:`Benchpark Commands </benchpark-commands>`.
 

@@ -18,7 +18,7 @@ from :doc:`add-an-experiment`:
 .. code-block:: console
 
     $ benchpark system init --dest=aws-tutorial aws-tutorial
-    $ benchpark experiment init --dest=hpl aws-tutorial hpl
+    $ benchpark experiment init --dest=hpl aws-tutorial hpl+strong caliper=time,mpi
 
 Create the experiment workspace:
 

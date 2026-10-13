@@ -54,6 +54,8 @@
     build-experiment
     run-experiment
     analyze-experiment
+    benchpark-analyze
+    benchpark-query
     configuration
     modifiers
     set-of-experiments
@@ -66,6 +68,8 @@
     :maxdepth: 1
     :caption: Contributing
 
+    add-a-system-config
+    add-an-experiment
     testing-your-contribution
 
 .. toctree::
