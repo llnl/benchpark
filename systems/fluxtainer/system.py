@@ -58,7 +58,7 @@ class Fluxtainer(System):
             ],
         )
 
-        if (self.spec.satisfies("compiler=clang")):
+        if self.spec.satisfies("compiler=clang"):
             cfg = compiler_section_for(
                 "clang",
                 [
