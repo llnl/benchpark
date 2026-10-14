@@ -53,10 +53,6 @@ class Hpl(
             self.add_experiment_variable("N-NBs", 1, False)
             self.add_experiment_variable("NBs", 128, False)
 
-        self.add_experiment_variable(
-            "n_threads_per_proc", ["2"], named=True, matrixed=True
-        )
-
         # Set the variables required by the experiment
         self.set_required_variables(
             n_resources="{n_ranks}",
