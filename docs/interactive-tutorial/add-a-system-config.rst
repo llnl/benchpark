@@ -13,10 +13,10 @@
 <beginner-tutorial-glossary-variant>`, :ref:`System
 <beginner-tutorial-glossary-system>`
 
-This example defines the ``aws-tutorial`` system used throughout the Beginner Tutorial.
-Create ``systems/aws-tutorial/system.py`` with the following complete definition:
+This example defines the ``fluxtainer`` system. Create
+``systems/fluxtainer/system.py`` with the following complete definition:
 
-.. literalinclude:: ../../systems/aws-tutorial/system.py
+.. literalinclude:: ../../systems/fluxtainer/system.py
     :language: python
     :linenos:
 
@@ -25,19 +25,22 @@ Create ``systems/aws-tutorial/system.py`` with the following complete definition
 *******************************
 
 - ``System`` is the base class for a Benchpark system definition.
-- ``variant()`` exposes the AWS instance type in the Benchpark system spec.
-- ``id_to_resources`` maps each instance type to its processor and memory resources.
-- ``programming_models``, ``scheduler``, and ``hardware_key`` describe how Benchpark
-  runs experiments on the system.
+- ``variant()`` exposes the target architecture and compiler in the Benchpark system
+  spec.
+- ``id_to_resources`` maps each instance type to its processor architecture.
+- ``programming_models``, ``scheduler``, and the node-resource attributes describe how
+  Benchpark runs experiments on the system.
 - ``compute_packages_section()`` declares software already installed on the system.
-- ``compute_compilers_section()`` defines the compiler available to Spack.
-- ``compute_software_section()`` selects the compiler used by Ramble applications.
+- ``compute_compilers_section()`` defines the GCC and Clang compilers available to
+  Spack.
+- ``compute_software_section()`` selects the compiler and MPI implementation used by
+  Ramble applications.
 
 Initialize the system to validate the definition:
 
 .. code-block:: console
 
-    $ benchpark system init --dest=aws-tutorial aws-tutorial
+    $ benchpark system init --dest=fluxtainer fluxtainer
 
 For the complete system authoring reference, see :doc:`/add-a-system-config`.
 
