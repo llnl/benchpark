@@ -18,8 +18,8 @@ machine. For adding a new system, please see :doc:`add-a-system-config`.
 
 .. note::
 
-    You must run the following commands on the target system. Software is detected for
-    the current environment.
+    You must run the following commands in the Fluxtainer environment. Software is
+    detected for the current environment.
 
 ****************************
  Spack Repository and Cache
@@ -35,48 +35,56 @@ Spack creates this directory when the command first needs it; ``benchpark bootst
 does not create it in advance. The bootstrap location can be set with ``benchpark
 configure -bl <path>``.
 
-************************************************************************
- Compare the Existing Software Specification to the Current Environment
-************************************************************************
+***********************************
+ 1. Lower the Recorded Tar Version
+***********************************
 
-Benchpark can collect the current system software specification and detect external
-packages available on the current system. The detected packages are then compared
-against the current specification defined in Benchpark. The command to do this is
-``benchpark system external`` with the same system variants that would normally be
-passed to ``benchpark system init``. For example, to check the external packages of the
-AWS system defined in :doc:`add-a-system-config`:
+The Fluxtainer definition created in :doc:`add-a-system-config` records ``tar@1.35`` as
+an external package. In ``systems/fluxtainer/system.py``, change that entry to an older
+version:
 
-::
+.. code-block:: python
 
-    benchpark system external aws-tutorial
+    "tar": {
+        "externals": [{"spec": "tar@1.34", "prefix": "/usr"}],
+        "buildable": False,
+    },
 
-To generate proposals for any version updates in the system definition, use
-``--propose``:
+The system definition now differs from the Fluxtainer environment, which provides
+``tar@1.35``.
 
-::
+*******************************
+ 2. Preview the Detected Update
+*******************************
 
-    benchpark system external aws-tutorial --propose
+Run external detection from the Fluxtainer environment and request a proposed source
+change:
 
-Additional system variants can be specified in the same way. For example, select the
-other AWS instance type defined by the tutorial system as follows:
+.. code-block:: console
 
-::
+    $ benchpark system external fluxtainer --propose
 
-    benchpark system external aws-tutorial instance_type=c7i.24xlarge --propose
+``--propose`` reports the eligible update without modifying the file. The proposal
+changes the detected external package version back to ``tar@1.35``:
 
-The proposed changes are written to standard output. Changes that cannot be updated
-cleanly are reported for manual review.
+.. code-block:: diff
 
-After reviewing the proposed updates, use ``--apply`` to apply eligible changes directly
-to the system's ``system.py``:
+    - "externals": [{"spec": "tar@1.34", "prefix": "/usr"}],
+    + "externals": [{"spec": "tar@1.35", "prefix": "/usr"}],
 
-::
+******************************
+ 3. Apply the Detected Update
+******************************
 
-    benchpark system external aws-tutorial --apply
+Apply the proposed change to ``systems/fluxtainer/system.py``:
 
-Benchpark validates the detected changes before updating the system definition. Only
-changes that can be matched and applied unambiguously are written automatically. Updates
-that require manual review are reported without being applied.
+.. code-block:: console
+
+    $ benchpark system external fluxtainer --apply
+
+Benchpark validates the detected change before writing it. After the command completes,
+the external ``tar`` entry again contains ``tar@1.35``. Changes that cannot be matched
+and applied unambiguously are reported for manual review.
 
 ***********
  Next Step

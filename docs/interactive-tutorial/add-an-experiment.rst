@@ -164,11 +164,11 @@ Optional: Scaling Configuration
 study. Strong scaling increases ``n_ranks`` while keeping ``Ns`` constant. Weak scaling
 increases both values.
 
-Initialize the experiment with the AWS tutorial system to validate the definition:
+Initialize the experiment with the Fluxtainer system to validate the definition:
 
 .. code-block:: console
 
-    $ benchpark experiment init --dest=hpl aws-tutorial hpl +strong
+    $ benchpark experiment init --dest=hpl fluxtainer hpl+strong
 
 For the complete experiment authoring reference, see :doc:`/add-an-experiment`.
 

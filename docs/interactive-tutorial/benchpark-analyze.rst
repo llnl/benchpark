@@ -24,7 +24,7 @@ Analyze the completed HPL scaling study from :doc:`build-and-run-experiment`:
 
 .. code-block:: console
 
-    $ benchpark analyze --workspace-dir workspace/aws-tutorial/hpl/workspace
+    $ benchpark analyze --workspace-dir workspace/fluxtainer/hpl/workspace
 
 ****************
  Strong Scaling

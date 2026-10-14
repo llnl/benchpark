@@ -49,7 +49,7 @@ details:
 
 .. code-block:: console
 
-    $ benchpark info system aws-tutorial
+    $ benchpark info system fluxtainer
     $ benchpark info experiment hpl
 
 For a complete command reference, see :doc:`Benchpark Commands </benchpark-commands>`.
