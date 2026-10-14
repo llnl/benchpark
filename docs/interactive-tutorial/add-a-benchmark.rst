@@ -25,8 +25,7 @@ HPL requires a Spack package definition and a Ramble application definition.
   the benchmark. See the `Spack Package Creation Tutorial
   <https://spack-tutorial.readthedocs.io/en/latest/tutorial_packaging.html>`_ to learn
   how to create and test a Spack ``package.py``. If your benchmark already exists in
-  Spack, Benchpark will use that ``package.py`` unless you provide a Benchpark-specific
-  definition.
+  Spack, Benchpark will use that ``package.py`` unless you define one in ``benchpark/repos/spack_repo/benchpark/``.
 - ``application.py`` is a Ramble specification that defines the benchmark input and
   parameters. See the `Ramble Application Definition Developers Tutorial
   <https://ramble.readthedocs.io/en/latest/dev_guides/1_basic_application_definition_tutorial.html>`_
@@ -34,7 +33,7 @@ HPL requires a Spack package definition and a Ramble application definition.
   ``application.py`` using the `Ramble Testing Application Definitions
   <https://ramble.readthedocs.io/en/latest/dev_guides/1_basic_application_definition_tutorial.html#testing-application-definitions>`_
   instructions. If your benchmark already exists in Ramble, Benchpark will use that
-  ``application.py`` unless you provide a Benchpark-specific definition.
+  ``application.py`` unless you define one in ``benchpark/repos/ramble_applications``.
 
 Spack Package
 =============
