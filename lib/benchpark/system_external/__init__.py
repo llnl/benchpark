@@ -442,7 +442,7 @@ def _run_spack_batch(requests):
         )
     except subprocess.TimeoutExpired as error:
         raise _SpackHelperError(
-            "Spack batch timed out after " f"{_SPACK_BATCH_TIMEOUT_SECONDS} seconds"
+            f"Spack batch timed out after {_SPACK_BATCH_TIMEOUT_SECONDS} seconds"
         ) from error
     except OSError as error:
         raise _SpackHelperError(f"Spack batch could not start: {error}") from error
@@ -2358,8 +2358,7 @@ def run(args):
         package_results = _reconcile_system_externals(system_spec.system)
     except Exception as error:
         print(
-            "External reconciliation could not produce a trustworthy result: "
-            f"{error}"
+            f"External reconciliation could not produce a trustworthy result: {error}"
         )
         return 1
 
