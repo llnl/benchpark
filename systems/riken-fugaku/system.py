@@ -11,7 +11,6 @@ from benchpark.system import System, compiler_def, compiler_section_for
 
 
 class RikenFugaku(System):
-
     maintainers("jdomke", "SBA0486")
 
     id_to_resources = {
