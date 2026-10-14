@@ -27,7 +27,30 @@ queried data:
 
 .. code-block:: python
 
+    import pandas as pd
     import matplotlib.pyplot as plt
+
+    df_comp = pd.read_csv("computation-time.csv")
+    df_comm = pd.read_csv("communication-time.csv")
+
+    value_col = "Avg time/rank (exc)"
+    version_col = "packages.dependencies.hip.version"
+    group_cols = ["cluster", "application_name", version_col]
+
+    bar_df = (
+        pd.concat(
+            [
+                df_comp.assign(region="Computation"),
+                df_comm.assign(region="Communication"),
+            ],
+            ignore_index=True,
+        )
+        .groupby(group_cols + ["region"])[value_col]
+        .mean()
+        .unstack(fill_value=0)
+        .reset_index()
+    )
+    bar_df["total"] = bar_df["Computation"] + bar_df["Communication"]
 
     amg_df = bar_df[bar_df["application_name"] == "amg2023"].set_index(
         ["cluster", version_col]

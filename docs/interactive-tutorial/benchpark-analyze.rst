@@ -30,6 +30,14 @@ Analyze the completed HPL scaling study from :doc:`build-and-run-experiment`:
  Strong Scaling
 ****************
 
+The default stacked area chart shows the exclusive average time per rank for each
+instrumented region. The x-axis records the node and MPI-rank counts varied in the
+strong-scaling study.
+
+.. code-block:: console
+
+    $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/
+
 .. figure:: /_static/images/kripke_cuda_strong_raw_exc.png
     :width: 800
     :align: center
@@ -39,6 +47,14 @@ Analyze the completed HPL scaling study from :doc:`build-and-run-experiment`:
 **************
  Weak Scaling
 **************
+
+The weak-scaling chart shows the exclusive average time per rank as the problem size
+and allocated resources increase together. A constant total time indicates ideal
+weak-scaling behavior.
+
+.. code-block:: console
+
+    $ benchpark analyze --workspace-dir wkp/kripke/cuda/weak/lassen/workspace/
 
 .. figure:: /_static/images/kripke_cuda_weak_raw_exc.png
     :width: 800
@@ -50,6 +66,13 @@ Analyze the completed HPL scaling study from :doc:`build-and-run-experiment`:
  Throughput
 ************
 
+The throughput chart uses the same stacked-region view for a throughput scaling study.
+It shows how region timing changes across the study's node and MPI-rank configurations.
+
+.. code-block:: console
+
+    $ benchpark analyze --workspace-dir wkp/kripke/cuda/throughput/lassen/workspace/
+
 .. figure:: /_static/images/kripke_cuda_throughput_raw_exc.png
     :width: 800
     :align: center
@@ -59,6 +82,13 @@ Analyze the completed HPL scaling study from :doc:`build-and-run-experiment`:
 ************
  Percentage
 ************
+
+The percentage chart expresses each region's metric relative to the sum for all
+regions. This makes each region's share of total time easier to compare.
+
+.. code-block:: console
+
+    $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/ --chart-type percentage
 
 .. figure:: /_static/images/kripke_cuda_strong_percentage_exc.png
     :width: 800
@@ -70,6 +100,14 @@ Analyze the completed HPL scaling study from :doc:`build-and-run-experiment`:
  Inclusive Metrics
 *******************
 
+The inclusive chart uses ``Avg time/rank`` instead of ``Avg time/rank (exc)``. It
+removes the ``main`` region because its value would redundantly contain all child-region
+time.
+
+.. code-block:: console
+
+    $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/ --yaxis-metric "Avg time/rank"
+
 .. figure:: /_static/images/kripke_cuda_strong_raw_inc.png
     :width: 800
     :align: center
@@ -80,6 +118,14 @@ Analyze the completed HPL scaling study from :doc:`build-and-run-experiment`:
  Region Filtering
 ******************
 
+This figure combines regions that have the same name, then retains the regions with the
+highest metric values. The filtered view emphasizes the regions that contribute most
+to the measured time.
+
+.. code-block:: console
+
+    $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/ --group-regions-name --top-n-regions 10
+
 .. figure:: /_static/images/kripke_cuda_strong_raw_exc-2.png
     :width: 800
     :align: center
@@ -89,6 +135,13 @@ Analyze the completed HPL scaling study from :doc:`build-and-run-experiment`:
 *****************************
  Visualize a Metadata Column
 *****************************
+
+``benchpark analyze`` can visualize a metadata column instead of a performance-data
+column. This is useful for figures of merit that have one value per profile.
+
+.. code-block:: console
+
+    $ benchpark analyze --workspace-dir problem1/ --yaxis-metric Final-FOM --chart-kind line --disable-legend
 
 .. figure:: /_static/images/amg2023_rocm_weak_raw_exc.png
     :width: 800
