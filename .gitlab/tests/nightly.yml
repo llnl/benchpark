@@ -61,6 +61,7 @@ include:
       # spack-pip
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
+        SCHEDULER_PARAMETERS: $ELCAP_PARAMS
         BENCHMARK: [py-scaffold]
         GPUMODE: [SPX]
         SYSTEM_ARGS: [rocm=7.1.1]
@@ -112,6 +113,7 @@ include:
       # spack-pip
       - HOST: matrix
         ARCHCONFIG: llnl-matrix
+        SCHEDULER_PARAMETERS: $MATRIX_PARAMS
         BENCHMARK: [py-scaffold]
         VARIANT:
           - +cuda package_manager=spack-pip caliper=mpi,time allocation=torchrun-hpc
