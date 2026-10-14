@@ -10,58 +10,32 @@ packages = [
   "lib",
 ]
 
-[tool.black]
+[tool.ruff]
 line-length = 88
-color = true
-target-version = ['py38', 'py39', 'py310', 'py311']
-include = '\.pyi?$|bin\/benchpark$'
-exclude = '''
-/(
-    \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-  | repos
-)/
-'''
-force-exclude = '''
-/(
-    '/lib/benchpark/test_repo/(/.*)?$'
-  | /lib/benchpark/test_repo(/.*)?$
-  | lib/benchpark/test_repo
-  | '/bin/benchpark-python'
-  | \.github
-)/
-'''
-
-[tool.isort]
-profile = "black"
-skip_gitignore = true
-color_output = true
-skip = ["experiments/hpl/experiment.py"]
-skip_glob = [
-  "lib/benchpark/test_repo/**"
+target-version = "py38"
+builtins = ["IPython"]
+force-exclude = true
+extend-exclude = [
+  "build",
+  "lib/benchpark/test_repo",
+  "repos",
 ]
+include = ["*.py", "*.pyi", "bin/benchpark"]
+src = ["lib"]
 
-[tool.flake8]
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"experiments/hpl/experiment.py" = ["I"]
+"legacy/modifiers/*/modifier.py" = ["F403", "F405"]
+"modifiers/*/modifier.py" = ["F403", "F405"]
+
+[tool.ruff.format]
 exclude = [
-  "lib/benchpark/test_repo/**"
+  ".github/**",
 ]
-skip_glob = [
-  "lib/benchpark/test_repo/**"
-]
-force-exclude = [
-  "./lib/benchpark/test_repo/**"
-]
-per-file-ignores = """
-    ./lib/benchpark/test_repo/**
-"""
 
 [tool.codespell]
 skip = './docs/_build,./docs/_static,./taxonomy.yaml,./repos/spack_repo/*/*/*/*.patch'

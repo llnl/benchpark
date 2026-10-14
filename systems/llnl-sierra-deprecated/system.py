@@ -21,7 +21,6 @@ from benchpark.system import (
 
 
 class LlnlSierraDeprecated(System):
-
     maintainers("pearce8", "nhanford", "rfhaque")
 
     id_to_resources = {
