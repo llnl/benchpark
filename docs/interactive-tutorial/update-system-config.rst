@@ -46,7 +46,9 @@ version:
 .. code-block:: python
 
     "tar": {
-        "externals": [{"spec": "tar@1.34", "prefix": "/usr"}],
+        "externals": [
+            {"spec": "tar@=1.34", "prefix": "/usr"},
+        ],
         "buildable": False,
     },
 
