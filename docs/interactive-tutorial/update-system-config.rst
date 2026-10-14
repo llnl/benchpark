@@ -67,20 +67,6 @@ other AWS instance type defined by the tutorial system as follows:
 The proposed changes are written to standard output. Changes that cannot be updated
 cleanly are reported for manual review.
 
-*************
- Exit Status
-*************
-
-The command exits with status 0 when reconciliation completes, including when it reports
-missing packages, replacements, additional versions, unsupported detections, or items
-that require manual review. It exits with status 1 when a validator cannot execute,
-reconciliation cannot produce a result, or a requested source update cannot be completed
-and verified.
-
-***********************************
- Apply Local Changes to the System
-***********************************
-
 After reviewing the proposed updates, use ``--apply`` to apply eligible changes directly
 to the system's ``system.py``:
 
@@ -91,15 +77,6 @@ to the system's ``system.py``:
 Benchpark validates the detected changes before updating the system definition. Only
 changes that can be matched and applied unambiguously are written automatically. Updates
 that require manual review are reported without being applied.
-
-The resulting changes can be inspected with Git before committing:
-
-::
-
-    git diff -- systems/aws-tutorial/system.py
-
-The updated system definition can then be committed and upstreamed through the standard
-Benchpark Git contribution workflow.
 
 ***********
  Next Step
