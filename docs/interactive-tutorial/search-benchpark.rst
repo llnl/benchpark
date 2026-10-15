@@ -58,8 +58,8 @@ For a complete command reference, see :doc:`Benchpark Commands </benchpark-comma
  Return to Start Here
 **********************
 
-.. container:: tutorial-next-steps
+.. tutorialcontainer:: tutorial-next-steps
 
-    .. container:: tutorial-next-step tutorial-goal-start
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-start
 
         :doc:`I want to return to the start page. <glossary>`

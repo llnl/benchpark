@@ -8,10 +8,10 @@
  Set up a Workspace
 ####################
 
-**Glossary terms:** :ref:`Benchmark <beginner-tutorial-glossary-benchmark>`, :ref:`Package
-<beginner-tutorial-glossary-package>`, :ref:`Spec <beginner-tutorial-glossary-spec>`,
-:ref:`Variant <beginner-tutorial-glossary-variant>`, :ref:`Experiment
-<beginner-tutorial-glossary-experiment>`, :ref:`System
+**Glossary terms:** :ref:`Benchmark <beginner-tutorial-glossary-benchmark>`,
+:ref:`Package <beginner-tutorial-glossary-package>`, :ref:`Spec
+<beginner-tutorial-glossary-spec>`, :ref:`Variant <beginner-tutorial-glossary-variant>`,
+:ref:`Experiment <beginner-tutorial-glossary-experiment>`, :ref:`System
 <beginner-tutorial-glossary-system>`, :ref:`Scaling Study
 <beginner-tutorial-glossary-scaling-study>`
 
@@ -105,5 +105,4 @@ to define them in your ``system.py`` and ``experiment.py``.
     - ``n_repeats`` - number of times your experiment will be repeated (think of
       trials). ``n_repeats=5`` will repeat your experiment 5 times, resulting in 5
       trials. These will be separate job submission scripts, so separate resource
-      allocations. To combine them into the same allocation, see
-      :doc:`/run-experiment`.
+      allocations. To combine them into the same allocation, see :doc:`/run-experiment`.

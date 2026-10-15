@@ -253,9 +253,9 @@ only have one value per profile.
  Choose Your Next Step
 ***********************
 
-.. container:: tutorial-next-steps
+.. tutorialcontainer:: tutorial-next-steps
 
-    .. container:: tutorial-next-step tutorial-goal-search
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-search
 
         :ref:`I have generated preconfigured performance figures for an experiment on
         my system. I want to begin another workflow by searching what is available in

@@ -4,13 +4,12 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-############################################
+###############################
  Updating Software in a System
-############################################
+###############################
 
 **Glossary terms:** :ref:`Package <beginner-tutorial-glossary-package>`, :ref:`Variant
-<beginner-tutorial-glossary-variant>`, :ref:`System
-<beginner-tutorial-glossary-system>`
+<beginner-tutorial-glossary-variant>`, :ref:`System <beginner-tutorial-glossary-system>`
 
 These steps show how to use ``benchpark system external`` to compare and update the
 external packages defined by a Benchpark system against packages detected on the current
@@ -55,9 +54,9 @@ version:
 The system definition now differs from the Fluxtainer environment, which provides
 ``tar@1.35``.
 
-*******************************
+********************************
  2. Preview the Detected Update
-*******************************
+********************************
 
 Run external detection from the Fluxtainer environment and request a proposed source
 change:
@@ -92,9 +91,9 @@ and applied unambiguously are reported for manual review.
  Next Step
 ***********
 
-.. container:: tutorial-next-steps
+.. tutorialcontainer:: tutorial-next-steps
 
-    .. container:: tutorial-next-step tutorial-goal-run
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run
 
         :doc:`I want to initialize, build, and rerun my experiment using the updated
         system software stack. <build-and-run-experiment>`

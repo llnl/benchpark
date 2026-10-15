@@ -48,8 +48,8 @@ strong-scaling study.
  Weak Scaling
 **************
 
-The weak-scaling chart shows the exclusive average time per rank as the problem size
-and allocated resources increase together. A constant total time indicates ideal
+The weak-scaling chart shows the exclusive average time per rank as the problem size and
+allocated resources increase together. A constant total time indicates ideal
 weak-scaling behavior.
 
 .. code-block:: console
@@ -83,8 +83,8 @@ It shows how region timing changes across the study's node and MPI-rank configur
  Percentage
 ************
 
-The percentage chart expresses each region's metric relative to the sum for all
-regions. This makes each region's share of total time easier to compare.
+The percentage chart expresses each region's metric relative to the sum for all regions.
+This makes each region's share of total time easier to compare.
 
 .. code-block:: console
 
@@ -119,8 +119,8 @@ time.
 ******************
 
 This figure combines regions that have the same name, then retains the regions with the
-highest metric values. The filtered view emphasizes the regions that contribute most
-to the measured time.
+highest metric values. The filtered view emphasizes the regions that contribute most to
+the measured time.
 
 .. code-block:: console
 
@@ -155,9 +155,9 @@ For additional chart types and filtering options, see :doc:`/benchpark-analyze`.
  Choose Your Next Step
 ***********************
 
-.. container:: tutorial-next-steps
+.. tutorialcontainer:: tutorial-next-steps
 
-    .. container:: tutorial-next-step tutorial-goal-search
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-search
 
         :ref:`I have generated preconfigured performance figures for an experiment on
         my system. I want to begin another workflow by searching what is available in

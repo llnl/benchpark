@@ -79,9 +79,9 @@ For additional metrics, region selection, and CSV options, see :doc:`/benchpark-
  Choose Your Next Step
 ***********************
 
-.. container:: tutorial-next-steps
+.. tutorialcontainer:: tutorial-next-steps
 
-    .. container:: tutorial-next-step tutorial-goal-search
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-search
 
         :ref:`I have generated raw performance data to make my own figures. I want to
         begin another workflow by searching what is available in Benchpark.

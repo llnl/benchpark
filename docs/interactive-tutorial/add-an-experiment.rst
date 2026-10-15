@@ -8,12 +8,11 @@
  Adding an Experiment
 ######################
 
-**Glossary terms:** :ref:`Benchmark <beginner-tutorial-glossary-benchmark>`, :ref:`Package
-<beginner-tutorial-glossary-package>`, :ref:`Application
+**Glossary terms:** :ref:`Benchmark <beginner-tutorial-glossary-benchmark>`,
+:ref:`Package <beginner-tutorial-glossary-package>`, :ref:`Application
 <beginner-tutorial-glossary-application>`, :ref:`Spec
-<beginner-tutorial-glossary-spec>`, :ref:`Variant
-<beginner-tutorial-glossary-variant>`, :ref:`Experiment
-<beginner-tutorial-glossary-experiment>`, :ref:`System
+<beginner-tutorial-glossary-spec>`, :ref:`Variant <beginner-tutorial-glossary-variant>`,
+:ref:`Experiment <beginner-tutorial-glossary-experiment>`, :ref:`System
 <beginner-tutorial-glossary-system>`, :ref:`Modifier
 <beginner-tutorial-glossary-modifier>`, :ref:`Scaling Study
 <beginner-tutorial-glossary-scaling-study>`
@@ -107,8 +106,8 @@ the components omitted from this initial version.
 1. Add More Benchmark Versions
 ==============================
 
-Each explicit experiment version must be defined in the corresponding Spack package.
-For HPL, ``2.3`` and ``2.2`` are defined in
+Each explicit experiment version must be defined in the corresponding Spack package. For
+HPL, ``2.3`` and ``2.2`` are defined in
 ``repos/spack_repo/benchpark/packages/hpl/package.py``. The ``latest`` value is a
 Benchpark keyword that selects the newest version defined by the Spack package.
 
@@ -116,27 +115,29 @@ Replace the Step 1 placeholder in the ``values`` tuple with the additional versi
 
 .. code-block:: python
 
-                "2.3",
-                "2.2",
+    "2.3",
+    "2.2",
 
 2. Add a Performance Experiment
 ===============================
 
-The ``exec_mode=test`` experiment definition provides small values for the problem size and number of ranks. Replace the Step 2
-placeholder with the following ``else`` branch to define a set of experiment variables that is more suited to collecting performance data:
+The ``exec_mode=test`` experiment definition provides small values for the problem size
+and number of ranks. Replace the Step 2 placeholder with the following ``else`` branch
+to define a set of experiment variables that is more suited to collecting performance
+data:
 
 .. code-block:: python
 
-        # Must be exec_mode=perf if not test mode.
-        else:
-            self.add_experiment_variable("n_ranks", 32, True)
-            self.add_experiment_variable("Ns", 100000, True)
-            self.add_experiment_variable("N-Grids", 1, False)
-            self.add_experiment_variable("Ps", "({n_ranks} // 8)", True)
-            self.add_experiment_variable("Qs", "8", False)
-            self.add_experiment_variable("N-Ns", 1, False)
-            self.add_experiment_variable("N-NBs", 1, False)
-            self.add_experiment_variable("NBs", 128, False)
+    # Must be exec_mode=perf if not test mode.
+    else:
+        self.add_experiment_variable("n_ranks", 32, True)
+        self.add_experiment_variable("Ns", 100000, True)
+        self.add_experiment_variable("N-Grids", 1, False)
+        self.add_experiment_variable("Ps", "({n_ranks} // 8)", True)
+        self.add_experiment_variable("Qs", "8", False)
+        self.add_experiment_variable("N-Ns", 1, False)
+        self.add_experiment_variable("N-NBs", 1, False)
+        self.add_experiment_variable("NBs", 128, False)
 
 3. Set Required Variables
 =========================
@@ -147,18 +148,18 @@ problem size per rank, and the total HPL problem size:
 
 .. code-block:: python
 
-        # Set the variables required by the experiment
-        self.set_required_variables(
-            n_resources="{n_ranks}",
-            process_problem_size="{Ns}/{n_ranks}",
-            total_problem_size="{Ns}",
-        )
+    # Set the variables required by the experiment
+    self.set_required_variables(
+        n_resources="{n_ranks}",
+        process_problem_size="{Ns}/{n_ranks}",
+        total_problem_size="{Ns}",
+    )
 
 .. _step-3b-define-scaling-options:
 
-*******************************
-Optional: Scaling Configuration
-*******************************
+*********************************
+ Optional: Scaling Configuration
+*********************************
 
 ``register_scaling_config()`` identifies the variables that change during a scaling
 study. Strong scaling increases ``n_ranks`` while keeping ``Ns`` constant. Weak scaling
@@ -176,9 +177,9 @@ For the complete experiment authoring reference, see :doc:`/add-an-experiment`.
  Next Step
 ***********
 
-.. container:: tutorial-next-steps
+.. tutorialcontainer:: tutorial-next-steps
 
-    .. container:: tutorial-next-step tutorial-goal-run
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run
 
         :doc:`I want to build and run the new experiment on my existing system.
         <build-and-run-experiment>`

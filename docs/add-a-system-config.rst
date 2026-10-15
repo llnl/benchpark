@@ -9,9 +9,8 @@
 #################
 
 **Glossary terms:** :ref:`Package <beginner-tutorial-glossary-package>`, :ref:`Spec
-<beginner-tutorial-glossary-spec>`, :ref:`Variant
-<beginner-tutorial-glossary-variant>`, :ref:`System
-<beginner-tutorial-glossary-system>`
+<beginner-tutorial-glossary-spec>`, :ref:`Variant <beginner-tutorial-glossary-variant>`,
+:ref:`System <beginner-tutorial-glossary-system>`
 
 This guide is intended for those who would like to add a new system to benchpark, such
 as vendors, system administrators, or application developers. Benchpark provides an API
@@ -456,9 +455,9 @@ number of nodes you can allocate at one time in that queue.
  Next Step
 ***********
 
-.. container:: tutorial-next-steps
+.. tutorialcontainer:: tutorial-next-steps
 
-    .. container:: tutorial-next-step tutorial-goal-run
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run
 
         :doc:`I want to initialize, build, and run an experiment on this new system.
         </interactive-tutorial/build-and-run-experiment>`

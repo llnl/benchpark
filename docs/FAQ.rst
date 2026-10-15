@@ -18,9 +18,9 @@ question that you think should be here, please consider contributing to this pag
  Benchmark not yet in Spack/Ramble
 ***********************************
 
-By default, Benchpark uses benchmark definitions (``package.py`` and
-``application.py``) provided by the upstream Spack and Ramble repositories. Override
-either definition by adding it to the corresponding Benchpark repository:
+By default, Benchpark uses benchmark definitions (``package.py`` and ``application.py``)
+provided by the upstream Spack and Ramble repositories. Override either definition by
+adding it to the corresponding Benchpark repository:
 
 ::
 

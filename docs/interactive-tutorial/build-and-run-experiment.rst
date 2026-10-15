@@ -45,23 +45,24 @@ For workspace structure and additional build options, see :doc:`/build-experimen
 individual experiment instances, rerunning experiments, and combining workspaces into
 one allocation, see :doc:`/run-experiment`.
 
-Choose Your Next Step
-=====================
+***********************
+ Choose Your Next Step
+***********************
 
-.. container:: tutorial-next-steps
+.. tutorialcontainer:: tutorial-next-steps
 
-    .. container:: tutorial-next-step tutorial-goal-search
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-search
 
         :ref:`I have run an experiment someone gave me on the same system. I want to
         start another workflow by searching what is available in Benchpark.
         <search-benchpark>`
 
-    .. container:: tutorial-next-step tutorial-goal-analyze
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-analyze
 
         :doc:`I want to analyze the performance of an experiment on my system by
         generating preconfigured performance figures. <benchpark-analyze>`
 
-    .. container:: tutorial-next-step tutorial-goal-query
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-query
 
         :doc:`I want to generate raw performance data to make my own figures.
         <benchpark-query>`

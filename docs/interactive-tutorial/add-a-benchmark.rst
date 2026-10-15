@@ -8,8 +8,8 @@
  Adding a Benchmark
 ####################
 
-**Glossary terms:** :ref:`Benchmark <beginner-tutorial-glossary-benchmark>`, :ref:`Package
-<beginner-tutorial-glossary-package>`, :ref:`Application
+**Glossary terms:** :ref:`Benchmark <beginner-tutorial-glossary-benchmark>`,
+:ref:`Package <beginner-tutorial-glossary-package>`, :ref:`Application
 <beginner-tutorial-glossary-application>`
 
 This guide is intended for application developers who want to add a benchmark so that it
@@ -21,11 +21,12 @@ can be run with Benchpark.
 
 HPL requires a Spack package definition and a Ramble application definition.
 
-- ``package.py`` is a Spack specification that defines how to build and install
-  the benchmark. See the `Spack Package Creation Tutorial
+- ``package.py`` is a Spack specification that defines how to build and install the
+  benchmark. See the `Spack Package Creation Tutorial
   <https://spack-tutorial.readthedocs.io/en/latest/tutorial_packaging.html>`_ to learn
   how to create and test a Spack ``package.py``. If your benchmark already exists in
-  Spack, Benchpark will use that ``package.py`` unless you define one in ``benchpark/repos/spack_repo/benchpark/``.
+  Spack, Benchpark will use that ``package.py`` unless you define one in
+  ``benchpark/repos/spack_repo/benchpark/``.
 - ``application.py`` is a Ramble specification that defines the benchmark input and
   parameters. See the `Ramble Application Definition Developers Tutorial
   <https://ramble.readthedocs.io/en/latest/dev_guides/1_basic_application_definition_tutorial.html>`_
@@ -38,9 +39,8 @@ HPL requires a Spack package definition and a Ramble application definition.
 Spack Package
 =============
 
-Create the package at
-``repos/spack_repo/benchpark/packages/hpl/package.py`` with the following complete
-contents:
+Create the package at ``repos/spack_repo/benchpark/packages/hpl/package.py`` with the
+following complete contents:
 
 .. literalinclude:: ../../repos/spack_repo/benchpark/packages/hpl/package.py
     :language: python
@@ -69,9 +69,9 @@ the `Ramble Application Definition Developers Tutorial
  Next Step
 ***********
 
-.. container:: tutorial-next-steps
+.. tutorialcontainer:: tutorial-next-steps
 
-    .. container:: tutorial-next-step tutorial-goal-experiment
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-experiment
 
         :doc:`I want to run this new benchmark on my existing system, so I need to add
         an experiment. <add-an-experiment>`

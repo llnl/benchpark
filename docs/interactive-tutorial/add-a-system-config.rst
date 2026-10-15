@@ -9,17 +9,16 @@
 #################
 
 **Glossary terms:** :ref:`Package <beginner-tutorial-glossary-package>`, :ref:`Spec
-<beginner-tutorial-glossary-spec>`, :ref:`Variant
-<beginner-tutorial-glossary-variant>`, :ref:`System
-<beginner-tutorial-glossary-system>`
+<beginner-tutorial-glossary-spec>`, :ref:`Variant <beginner-tutorial-glossary-variant>`,
+:ref:`System <beginner-tutorial-glossary-system>`
 
 ******************************
  Create the System Definition
 ******************************
 
-This example defines the ``fluxtainer`` system. Start
-``systems/fluxtainer/system.py`` with the definition below. The steps that follow add
-the components omitted from this initial version.
+This example defines the ``fluxtainer`` system. Start ``systems/fluxtainer/system.py``
+with the definition below. The steps that follow add the components omitted from this
+initial version.
 
 .. code-block:: python
     :linenos:
@@ -349,8 +348,8 @@ executables are available. Replace the second Step 3 placeholder, immediately be
 4. Add the Tar Package
 ======================
 
-``compute_packages_section()`` records software already installed on the system.
-Replace the Step 4 placeholder with the external ``tar`` package definition:
+``compute_packages_section()`` records software already installed on the system. Replace
+the Step 4 placeholder with the external ``tar`` package definition:
 
 .. code-block:: python
 
@@ -359,7 +358,6 @@ Replace the Step 4 placeholder with the external ``tar`` package definition:
                         "externals": [{"spec": "tar@1.35", "prefix": "/usr"}],
                         "buildable": False,
                     },
-
 
 Initialize the system to validate the definition:
 
@@ -373,9 +371,9 @@ For the complete system authoring reference, see :doc:`/add-a-system-config`.
  Next Step
 ***********
 
-.. container:: tutorial-next-steps
+.. tutorialcontainer:: tutorial-next-steps
 
-    .. container:: tutorial-next-step tutorial-goal-run
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run
 
         :doc:`I want to initialize, build, and run an experiment on this new system.
         <build-and-run-experiment>`

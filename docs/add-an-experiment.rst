@@ -8,12 +8,11 @@
  Adding an Experiment
 ######################
 
-**Glossary terms:** :ref:`Benchmark <beginner-tutorial-glossary-benchmark>`, :ref:`Package
-<beginner-tutorial-glossary-package>`, :ref:`Application
+**Glossary terms:** :ref:`Benchmark <beginner-tutorial-glossary-benchmark>`,
+:ref:`Package <beginner-tutorial-glossary-package>`, :ref:`Application
 <beginner-tutorial-glossary-application>`, :ref:`Spec
-<beginner-tutorial-glossary-spec>`, :ref:`Variant
-<beginner-tutorial-glossary-variant>`, :ref:`Experiment
-<beginner-tutorial-glossary-experiment>`, :ref:`System
+<beginner-tutorial-glossary-spec>`, :ref:`Variant <beginner-tutorial-glossary-variant>`,
+:ref:`Experiment <beginner-tutorial-glossary-experiment>`, :ref:`System
 <beginner-tutorial-glossary-system>`, :ref:`Modifier
 <beginner-tutorial-glossary-modifier>`, :ref:`Scaling Study
 <beginner-tutorial-glossary-scaling-study>`
@@ -347,8 +346,8 @@ runtime parameters during experiment initialization, e.g., ``benchpark experimen
             }
         )
 
-See :ref:`the Appendix <contributing-scaling-configs>` for more information on how to write Benchpark
-scaling configurations.
+See :ref:`the Appendix <contributing-scaling-configs>` for more information on how to
+write Benchpark scaling configurations.
 
 ***************************************
  Step 4: Add a Package Manager Section
@@ -637,9 +636,9 @@ dimensions. See AMG2023 or Kripke for examples of different scaling configuratio
  Next Step
 ***********
 
-.. container:: tutorial-next-steps
+.. tutorialcontainer:: tutorial-next-steps
 
-    .. container:: tutorial-next-step tutorial-goal-run
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run
 
         :doc:`I want to build and run the new experiment on my existing system.
         </interactive-tutorial/build-and-run-experiment>`
