@@ -11,6 +11,14 @@
  Start Here
 ############
 
+.. image:: tutorial/HPCIC26-Tutorial-Slide-Preview.jpg
+    :target: _static/slides/HPCIC26-Tutorial-Slides.pdf
+    :height: 72px
+    :align: left
+    :alt: Slide Preview
+
+:download:`Download Slides <_static/slides/HPCIC26-Tutorial-Slides.pdf>`.
+
 ********************
  Benchpark Glossary
 ********************

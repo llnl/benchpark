@@ -40,15 +40,6 @@
 
 .. toctree::
     :maxdepth: 1
-    :caption: Tutorials
-
-    tutorial-101
-    tutorial-llnl
-    comparing-experiment-builds
-    containers
-
-.. toctree::
-    :maxdepth: 1
     :caption: Using Benchpark
 
     interactive-tutorial/setup-workspace
@@ -96,6 +87,15 @@
     :caption: Outreach
 
     ics
+
+.. toctree::
+    :maxdepth: 1
+    :caption: Tutorials
+
+    tutorial-101
+    tutorial-llnl
+    comparing-experiment-builds
+    containers
 
 .. toctree::
     :maxdepth: 2
