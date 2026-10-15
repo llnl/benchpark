@@ -99,50 +99,41 @@ Benchpark uses a Spack ``package.py`` to build and a Ramble ``application.py`` t
  Benchpark Spec Syntax
 ***********************
 
-Benchpark's parser is derived from Spack's spec parser. A Spack package spec can include
-versions, architecture constraints, compiler constraints, and dependencies in addition
-to its package name and variants:
+Benchpark's parser is derived from Spack's spec parser. A Spack package spec can include versions, architecture
+constraints, compiler constraints, and dependencies, in addition to it's package name and variants:
+
+**Spack Spec Syntax `Source <https://spack.readthedocs.io/en/latest/spec_syntax.html#spec-syntax>`_**
 
 .. figure:: /_static/images/spack-spec_anatomy.svg
-    :alt: Anatomy of a Spack package spec, showing its package name, versions, variants,
-        architecture, compiler, and dependencies.
+    :alt: Spack package spec: package name, versions, variants, architecture, compiler, and dependencies.
     :width: 100%
     :align: center
 
-    Anatomy of a Spack package spec.
+Benchpark implements the object name and variant portions of this syntax. The following examples show
+the name, Boolean variants, and named variants in Benchpark system and experiment specs:
 
-Source: `Spack Spec Syntax
-<https://spack.readthedocs.io/en/latest/spec_syntax.html#spec-syntax>`_.
-
-Benchpark implements only the object-name and variant portions of this syntax. The
-following examples show the name, Boolean variants, and named variants in Benchpark
-system and experiment specs:
+**Benchpark System Spec**
 
 .. figure:: /_static/images/system-spec.png
-    :alt: Benchpark system spec with a system name, a Boolean variant, and several named
-        variants.
+    :alt: Benchpark system spec with a system name, a Boolean variant, and named variants.
     :width: 100%
     :align: center
 
-    Benchpark system spec.
+
+**Benchpark Experiment Spec**
 
 .. figure:: /_static/images/experiment-spec.png
-    :alt: Benchpark experiment spec with an experiment name, a Boolean variant, and
-        named variants.
+    :alt: Benchpark experiment spec with an experiment name, a Boolean variant, and named variants.
     :width: 100%
     :align: center
-
-    Benchpark experiment spec.
 
 In these examples, the red text is the system or experiment name, the green text is a
 Boolean variant, and the orange text contains named variants. ``compiler=cce`` and
 ``version=2.3-caliper`` are named variants defined by their Benchpark objects. They are
 not Spack compiler (``%``) or version (``@``) constraints.
 
-A Benchpark spec describes a Benchpark object. It is distinct from the Spack package
-specs that Benchpark later writes into the generated configuration. A system spec
-selects a definition under ``systems/``, while an experiment spec selects a definition
-under ``experiments/``.
+A Benchpark spec describes a Benchpark object. A system spec selects a definition under
+``systems/``, and an experiment spec selects a definition under ``experiments/``.
 
 Benchpark does not implement Spack's version (``@``), compiler (``%``), architecture,
 dependency (``^``), or installed-spec hash (``/hash``) constraint semantics. It also
@@ -151,9 +142,7 @@ and ``==``). Benchpark uses the same basic syntax as Spack for `Boolean, single-
 and multi-valued variants
 <https://spack.readthedocs.io/en/latest/spec_syntax.html#variants>`_.
 
-These related forms have different meanings in the two tools:
-
-.. list-table:: Benchpark and Spack differences
+.. list-table:: Differences in Benchpark and Spack Specs:
     :header-rows: 1
     :widths: 27 36 37
 
@@ -164,8 +153,8 @@ These related forms have different meanings in the two tools:
       - Use a definition's variant: ``version=<value>``.
       - Use a version constraint: ``@<version>``.
     - - Select multiple values exactly
-      - Use ``<variant>=<value1>,<value2>``. Benchpark preserves the specified set.
-      - Use ``<variant>:=<value1>,<value2>``. In Spack, ``=`` permits additional
+      - Use ``<variant>=<value1>,<value2>``. 
+      - Use ``<variant>:=<value1>,<value2>``. In Spack, ``:=`` permits additional
         values.
 
 ***********************
