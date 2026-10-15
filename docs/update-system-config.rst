@@ -88,6 +88,13 @@ Benchpark validates the detected changes before updating the system definition. 
 changes that can be matched and applied unambiguously are written automatically. Updates
 that require manual review are reported without being applied.
 
+When the system has several clusters and an updated entry is shared by them, the update
+applies to every cluster that uses it. The output names those clusters, for example
+``(also changes cluster=magma, rzgenie)``, and Benchpark checks that each of them still
+resolves and changes only in the same way. Not-found markers are only written for
+entries that belong to the selected cluster alone, since a package missing on one
+cluster may be present on another.
+
 The resulting changes can be inspected with Git before committing:
 
 ::
