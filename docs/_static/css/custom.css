@@ -190,6 +190,32 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     --card-text: #34424f;
 }
 
+.tutorial-project-links {
+    align-items: center;
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+}
+
+.tutorial-project-links a {
+    display: flex;
+    justify-content: flex-start;
+    min-width: 0;
+}
+
+.tutorial-project-link {
+    text-align: left;
+}
+
+.tutorial-project-links img {
+    display: block;
+    height: auto;
+    max-height: 8rem;
+    max-width: 100%;
+    width: auto;
+}
+
 .rst-content .tutorial-next-step > p {
     height: 100%;
     margin: 0;

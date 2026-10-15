@@ -25,26 +25,27 @@
 
 .. toctree::
     :maxdepth: 1
+    :caption: Beginner Tutorial
+
+    interactive-tutorial/start-here
+    interactive-tutorial/search-benchpark
+    interactive-tutorial/build-and-run-experiment
+    interactive-tutorial/benchpark-analyze
+    interactive-tutorial/add-a-benchmark
+    interactive-tutorial/add-an-experiment
+    interactive-tutorial/update-system-config
+    interactive-tutorial/add-a-system-config
+    interactive-tutorial/add-a-scaling-configuration
+    interactive-tutorial/benchpark-query
+
+.. toctree::
+    :maxdepth: 1
     :caption: Tutorials
 
     tutorial-101
     tutorial-llnl
     comparing-experiment-builds
     containers
-
-.. toctree::
-    :maxdepth: 1
-    :caption: Beginner Tutorial
-
-    interactive-tutorial/glossary
-    interactive-tutorial/search-benchpark
-    interactive-tutorial/add-a-system-config
-    interactive-tutorial/update-system-config
-    interactive-tutorial/add-a-benchmark
-    interactive-tutorial/add-an-experiment
-    interactive-tutorial/build-and-run-experiment
-    interactive-tutorial/benchpark-analyze
-    interactive-tutorial/benchpark-query
 
 .. toctree::
     :maxdepth: 1

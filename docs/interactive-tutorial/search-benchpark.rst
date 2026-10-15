@@ -62,4 +62,4 @@ For a complete command reference, see :doc:`Benchpark Commands </benchpark-comma
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-start
 
-        :doc:`I want to return to the start page. <glossary>`
+        :doc:`I want to return to the start page. <start-here>`

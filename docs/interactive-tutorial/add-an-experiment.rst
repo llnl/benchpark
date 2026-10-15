@@ -34,7 +34,7 @@ the components omitted from this initial version.
     # SPDX-License-Identifier: Apache-2.0
 
     from benchpark.experiment import Experiment
-    from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
+    # Step 1 adds the programming-model import here.
     from benchpark.caliper import Caliper
     from benchpark.directives import variant, maintainers
     from benchpark.scaling import Scaling, ScalingMode
@@ -42,7 +42,7 @@ the components omitted from this initial version.
 
     class Hpl(
         Experiment,
-        ProgrammingModel(ProgrammingModelType.Mpionly, ProgrammingModelType.Openmp),
+        # Step 1 adds the supported programming models here.
         Caliper,
         Scaling(ScalingMode.Strong, ScalingMode.Weak),
     ):
@@ -52,16 +52,7 @@ the components omitted from this initial version.
             description="Which ramble workload to execute.",
         )
 
-        variant(
-            "version",
-            default="2.3-caliper",
-            values=(
-                "latest",
-                "2.3-caliper",
-                # Step 1 adds more package versions here.
-            ),
-            description="Which benchmark version to use.",
-        )
+        # Step 2 adds the version variant here.
 
         maintainers("daboehme")
 
@@ -77,9 +68,9 @@ the components omitted from this initial version.
                 self.add_experiment_variable("N-NBs", 1, False)
                 self.add_experiment_variable("NBs", 128, False)
 
-            # Step 2 adds the exec_mode=perf else block here.
+            # Step 3 adds the exec_mode=perf else block here.
 
-            # Step 3 adds the required-variable definitions here.
+            # Step 4 adds the required-variable definitions here.
 
             self.register_scaling_config(
                 {
@@ -103,26 +94,47 @@ the components omitted from this initial version.
         def compute_package_section(self):
             self.add_package_spec(self.name, [f"hpl{self.determine_version()}"])
 
-1. Add More Benchmark Versions
-==============================
+1. Add Programming Models
+=========================
+
+Programming models define the parallel execution modes supported by an experiment.
+Replace the first Step 1 placeholder with the programming-model import:
+
+.. code-block:: python
+
+    from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
+
+Replace the second Step 1 placeholder in the ``Hpl`` class bases with the supported MPI
+and OpenMP programming models:
+
+.. code-block:: python
+
+    ProgrammingModel(ProgrammingModelType.Mpionly, ProgrammingModelType.Openmp),
+
+2. Add the Version Variant
+==========================
 
 Each explicit experiment version must be defined in the corresponding Spack package. For
 HPL, ``2.3`` and ``2.2`` are defined in
 ``repos/spack_repo/benchpark/packages/hpl/package.py``. The ``latest`` value is a
 Benchpark keyword that selects the newest version defined by the Spack package.
 
-Replace the Step 1 placeholder in the ``values`` tuple with the additional versions:
+Replace the Step 2 placeholder with the complete version variant:
 
 .. code-block:: python
 
-    "2.3",
-    "2.2",
+    variant(
+        "version",
+        default="2.3-caliper",
+        values=("latest", "2.3-caliper", "2.3", "2.2"),
+        description="Which benchmark version to use.",
+    )
 
-2. Add a Performance Experiment
-===============================
+3. Add a Performance Mode
+=========================
 
 The ``exec_mode=test`` experiment definition provides small values for the problem size
-and number of ranks. Replace the Step 2 placeholder with the following ``else`` branch
+and number of ranks. Replace the Step 3 placeholder with the following ``else`` branch
 to define a set of experiment variables that is more suited to collecting performance
 data:
 
@@ -139,11 +151,11 @@ data:
         self.add_experiment_variable("N-NBs", 1, False)
         self.add_experiment_variable("NBs", 128, False)
 
-3. Set Required Variables
+4. Set Required Variables
 =========================
 
 Benchpark records the resources and problem sizes used by each experiment. Replace the
-Step 3 placeholder with the following call, which defines the number of ranks, the HPL
+Step 4 placeholder with the following call, which defines the number of ranks, the HPL
 problem size per rank, and the total HPL problem size:
 
 .. code-block:: python
@@ -155,22 +167,6 @@ problem size per rank, and the total HPL problem size:
         total_problem_size="{Ns}",
     )
 
-.. _step-3b-define-scaling-options:
-
-*********************************
- Optional: Scaling Configuration
-*********************************
-
-``register_scaling_config()`` identifies the variables that change during a scaling
-study. Strong scaling increases ``n_ranks`` while keeping ``Ns`` constant. Weak scaling
-increases both values.
-
-Initialize the experiment with the Fluxtainer system to validate the definition:
-
-.. code-block:: console
-
-    $ benchpark experiment init --dest=hpl fluxtainer hpl+strong
-
 For the complete experiment authoring reference, see :doc:`/add-an-experiment`.
 
 ***********
@@ -178,6 +174,11 @@ For the complete experiment authoring reference, see :doc:`/add-an-experiment`.
 ***********
 
 .. tutorialcontainer:: tutorial-next-steps
+
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-scaling
+
+        :doc:`I want to add a scaling configuration to this experiment.
+        <add-a-scaling-configuration>`
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-run
 
