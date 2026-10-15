@@ -249,6 +249,11 @@ class Fluxtainer(System):
                     "externals": [{"spec": "python@3.12.12", "prefix": "/usr"}],
                     "buildable": False,
                 },
+                "blas": {"buildable": False},
+                "lapack": {"buildable": False},
+                "netlib-lapack": {
+                    "externals": [{"spec": "netlib-lapack@3.12.0", "prefix": "/usr"}],
+                },
             }
         }
 
