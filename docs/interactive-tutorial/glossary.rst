@@ -115,7 +115,8 @@ the name, Boolean variants, and named variants in Benchpark system and experimen
 **Benchpark System Spec**
 
 .. figure:: /_static/images/system-spec.png
-    :alt: Benchpark system spec with a system name, a Boolean variant, and named variants.
+    :alt: Benchpark system spec annotated with its system name, runtime version,
+        compiler, specific system, library versions, and variants.
     :width: 100%
     :align: center
 
@@ -123,14 +124,22 @@ the name, Boolean variants, and named variants in Benchpark system and experimen
 **Benchpark Experiment Spec**
 
 .. figure:: /_static/images/experiment-spec.png
-    :alt: Benchpark experiment spec with an experiment name, a Boolean variant, and named variants.
+    :alt: Benchpark experiment spec annotated with its experiment name, programming
+        model, scaling mode, workload, source code version, and variants.
     :width: 100%
     :align: center
 
-In these examples, the red text is the system or experiment name, the green text is a
-Boolean variant, and the orange text contains named variants. ``compiler=cce`` and
-``version=2.3-caliper`` are named variants defined by their Benchpark objects. They are
-not Spack compiler (``%``) or version (``@``) constraints.
+In the system example, red identifies the system name, blue the runtime version, green
+the compiler, orange the specific system, purple the library versions, and the final
+orange fields the additional variants. In the experiment example, red identifies the
+experiment name, blue the programming model, green the scaling mode, orange the
+workload, purple the source code version, and the final orange field an additional
+variant.
+
+Every token after the system or experiment name is a Benchpark variant. Tokens beginning
+with ``+`` are Boolean variants, while tokens containing ``=`` are named variants.
+``compiler=cce`` and ``version=2.3-caliper`` are named variants defined by their
+Benchpark objects. They are not Spack compiler (``%``) or version (``@``) constraints.
 
 A Benchpark spec describes a Benchpark object. A system spec selects a definition under
 ``systems/``, and an experiment spec selects a definition under ``experiments/``.
