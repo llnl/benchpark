@@ -32,7 +32,7 @@ jobs:
           fetch-depth: 0
 
         # For pull requests it's not necessary to checkout the code
-      - uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d
+      - uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706
         id: filter
         with:
           # For merge group events, compare against the target branch (main)
@@ -66,7 +66,6 @@ jobs:
               - 'systems/**'
               - 'var/**'
               - 'pyproject.toml'
-              - '.flake8'
               - 'checkout-versions.yaml'
               - '.gitlab-ci.yml'
               - 'docs/**'
@@ -77,6 +76,7 @@ jobs:
               - 'checkout-versions.yaml'
               - 'experiments/**'
               - 'lib/**'
+              - 'modifiers/**'
               - 'repo/**'
               - 'requirements.txt'
               - 'systems/**'
@@ -89,6 +89,7 @@ jobs:
               - 'checkout-versions.yaml'
               - 'experiments/**'
               - 'lib/**'
+              - 'modifiers/**'
               - 'repo/**'
               - 'systems/**'
               - 'var/**'

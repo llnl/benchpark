@@ -1,0 +1,108 @@
+..
+    Copyright 2023 Lawrence Livermore National Security, LLC and other
+    Benchpark Project Developers. See the top-level COPYRIGHT file for details.
+
+    SPDX-License-Identifier: Apache-2.0
+
+####################
+ Set up a Workspace
+####################
+
+**Glossary terms:** :ref:`Benchmark <beginner-tutorial-glossary-benchmark>`,
+:ref:`Package <beginner-tutorial-glossary-package>`, :ref:`Spec
+<beginner-tutorial-glossary-spec>`, :ref:`Variant <beginner-tutorial-glossary-variant>`,
+:ref:`Experiment <beginner-tutorial-glossary-experiment>`, :ref:`System
+<beginner-tutorial-glossary-system>`, :ref:`Scaling Study
+<beginner-tutorial-glossary-scaling-study>`
+
+To setup an experiment workspace you must first initialize the system you will be
+running on. Next, initialize the experiment you plan to run with the appropriate
+programming model. Finally, set up the workspace in a directory for your experiment.:
+
+::
+
+    benchpark system init --dest=</output/path/to/system_def_dir/mySystemName> <SystemName> +/~<Boolean Variant> <String Variant>=<value>
+    benchpark experiment init <mySystemName> <Benchmark> +/~<Boolean Variant> <String Variant>=<value>
+    benchpark setup <mySystemName>/<Benchmark> </output/path/to/workspace>
+
+where:
+
+- ``<Benchmark>``: amg2023 | saxpy | etc. (specified choices in :doc:`/benchmark-list`)
+- ``<SystemName>``: llnl-elcapitan | llnl-cluster | etc. (specified systems in
+  :doc:`/system-list`)
+
+We recommend a fast access resource for the workspace location as all necessary files
+during the build process will be written to the workspace location. This command will
+assemble a Ramble workspace per experiment with a configuration for the specified
+benchmark and system with the following directory structure:
+
+::
+
+    experiments_root/
+        ramble/
+        spack/
+        <System>/
+            <Benchmark/ProgrammingModel>/
+                workspace/
+                    configs/
+                        (everything from system_def_dir)
+                        (everything from experiment_def_dir>)
+
+``benchpark setup`` will output instructions to follow:
+
+::
+
+    . <experiments_root>/setup.sh
+
+The ``setup.sh`` script calls the Spack and Ramble setup scripts. It optionally accepts
+parameters to ``ramble workspace setup`` as `documented in Ramble
+<https://ramble.readthedocs.io/en/latest/getting_started.html#setting-up-a-workspace>`_,
+including ``--dry-run`` and ``--phases make_experiments``.
+
+Now you are ready to compile and run your experiments as described in
+:doc:`build-and-run-experiment`.
+
+********************************
+ Using pre-built Spack packages
+********************************
+
+You can specify a pre-existing spack, along with an environment within that Spack
+instance with pre-built specs:
+
+::
+
+    benchpark system init --dest=x <SystemName> compiler=<Compiler>
+    benchpark experiment init x y
+    benchpark setup x/y </output/path/to/workspace> --spack=custom-spack --environment=/abspath/to/spack/env
+
+If the provided environment has an install of the benchmark you need, then ``ramble
+workspace setup`` will not need to install any packages.
+
+*************************************
+ Built-in System/Experiment Variants
+*************************************
+
+There are Benchpark system and experiment variants that you can change, without needing
+to define them in your ``system.py`` and ``experiment.py``.
+
+*************
+ For Systems
+*************
+
+    - ``timeout`` - Job timeout limit in minutes.
+
+*****************
+ For Experiments
+*****************
+
+    - ``exec_mode`` - Select the ``test`` or ``perf`` execution mode. The default is
+      ``test``, where you should expect short wall-clock experiments. ``perf`` mode is
+      for longer-running experiments, i.e. larger problem size.
+    - ``package_manager`` - Specify this variant to use a Ramble package manager other
+      than ``Spack``. See :doc:`/run-binary` to see an example.
+    - ``append_path`` - Append to environment PATH during experiment execution.
+    - ``prepend_path`` - Prepend to environment PATH during experiment execution.
+    - ``n_repeats`` - number of times your experiment will be repeated (think of
+      trials). ``n_repeats=5`` will repeat your experiment 5 times, resulting in 5
+      trials. These will be separate job submission scripts, so separate resource
+      allocations. To combine them into the same allocation, see :doc:`/run-experiment`.

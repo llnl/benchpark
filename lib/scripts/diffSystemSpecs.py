@@ -4,7 +4,6 @@ import subprocess
 from pprint import pprint
 
 import yaml
-from deepdiff import DeepDiff
 
 import benchpark.util.color as color
 
@@ -24,6 +23,7 @@ def load_yaml(file_path):
 
 def compare_yaml(file1, file2):
     """Compare two YAML files and print the differences."""
+    from deepdiff import DeepDiff
 
     def normalize_types(data):
         """fix to compare strings to int '56' == 56 for yaml purposes"""
@@ -121,7 +121,7 @@ Example usage:
             # "lanl-venado",
             "llnl-cluster",
             "llnl-elcapitan",
-            "llnl-sierra",
+            "llnl-sierra-deprecated",
             "riken-fugaku",
         ],
         help="List of systems to include for comparison (default: all systems).",
@@ -144,9 +144,15 @@ Example usage:
         "generic-x86": None,
         "jsc-juwels": None,
         "lanl-venado": ["grace-hopper", "grace-grace"],
-        "llnl-cluster": ["ruby", "magma", "dane"],
-        "llnl-elcapitan": ["tioga", "elcapitan"],
-        "llnl-sierra": None,
+        "llnl-cluster": [
+            "magma",
+            "dane",
+            "rzgenie",
+            "ruby-deprecated",
+            "poodle-deprecated",
+        ],
+        "llnl-elcapitan": ["tioga", "elcapitan", "tuolumne"],
+        "llnl-sierra-deprecated": None,
         "riken-fugaku": None,
     }
 
@@ -154,7 +160,6 @@ Example usage:
     sysd = {key: sysd[key] for key in args.systems if key in sysd}
 
     for name, tag in bp.items():
-
         if name not in os.listdir(os.getcwd()):
             subprocess.run(
                 ["git", "clone", "https://github.com/LLNL/benchpark.git", name]

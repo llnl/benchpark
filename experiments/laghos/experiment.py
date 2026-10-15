@@ -20,7 +20,6 @@ class Laghos(
     Scaling(ScalingMode.Strong, ScalingMode.Weak, ScalingMode.Throughput),
     Caliper,
 ):
-
     variant(
         "workload",
         default="sedov",
@@ -46,7 +45,8 @@ class Laghos(
 
     variant(
         "version",
-        default="develop",
+        default="4.0",
+        values=("develop", "4.0"),
         description="app version",
     )
 
@@ -62,6 +62,13 @@ class Laghos(
         default="refinement",
         values=("epm", "refinement", "meshfile"),
         description="Type of mesh generation strategy to use",
+    )
+
+    variant(
+        "metis",
+        default=False,
+        values=(True, False),
+        description="Enable metis in mfem",
     )
 
     variant(
@@ -164,7 +171,7 @@ class Laghos(
             self.add_experiment_variable("qpts", "{quad}*{epm}*{resource_count}", False)
             self.add_experiment_variable("pool", 16, False)
             # resource_count is the number of resources used for this experiment:
-            self.add_experiment_variable("resource_count", 1, True)
+            self.add_experiment_variable("resource_count", 4, True)
 
         # Register the scaling variables and their respective scaling functions
         # required to correctly scale the experiment for the given scaliing policy
@@ -172,22 +179,26 @@ class Laghos(
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
-                    "epm": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    // scaling_factor,
+                    "resource_count": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
+                    "epm": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) // scaling_factor
+                    ),
                 },
                 ScalingMode.Weak: {
-                    "resource_count": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
+                    "resource_count": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
                     "epm": lambda var, itr, dim, scaling_factor: var.val(dim),
                 },
                 ScalingMode.Throughput: {
                     "resource_count": lambda var, itr, dim, scaling_factor: var.val(
                         dim
                     ),
-                    "epm": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
+                    "epm": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
                 },
             }
         )
@@ -215,8 +226,8 @@ class Laghos(
                 problem_spec["rs"] = [4, 4, 4]
                 problem_spec["rp"] = [1, 2, 3]
         elif self.spec.satisfies("+strong"):
-            problem_spec["strong"] = (
-                lambda var, itr, dim, scaling_factor: var.val(dim) * scaling_factor
+            problem_spec["strong"] = lambda var, itr, dim, scaling_factor: (
+                var.val(dim) * scaling_factor
             )
             if self.spec.satisfies("order=linear"):
                 problem_spec["rs"] = 4
@@ -293,7 +304,7 @@ class Laghos(
             )
             self.add_experiment_variable("pool", 16, True)
             # resource_count is the number of resources used for this experiment:
-            self.add_experiment_variable("resource_count", 1, False)
+            self.add_experiment_variable("resource_count", 4, False)
 
             # Register the scaling variables and their respective scaling functions
             # required to correctly scale the experiment for the given scaliing policy
@@ -301,10 +312,9 @@ class Laghos(
             self.register_scaling_config(
                 {
                     ScalingMode.Strong: {
-                        "resource_count": lambda var, itr, dim, scaling_factor: var.val(
-                            dim
-                        )
-                        * scaling_factor,
+                        "resource_count": lambda var, itr, dim, scaling_factor: (
+                            var.val(dim) * scaling_factor
+                        ),
                     },
                     ScalingMode.Weak: {
                         "resource_count": None,
@@ -400,11 +410,17 @@ class Laghos(
     def compute_package_section(self):
         gam = "~gpu-aware-mpi"
         raja = "~raja"
+        if self.spec.satisfies("mesh-strategy=epm"):
+            metis = "~metis"
+        else:
+            metis = "+metis"
         if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
             if self.spec.satisfies("+gpu-aware-mpi"):
                 gam = "+gpu-aware-mpi"
         if self.spec.satisfies("+raja"):
             raja = "+raja"
+        if self.spec.satisfies("+metis"):
+            metis = "+metis"
         self.add_package_spec(
-            self.name, [f"laghos{self.determine_version()} +metis {gam} {raja}"]
+            self.name, [f"laghos{self.determine_version()} {metis} {gam} {raja}"]
         )

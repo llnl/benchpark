@@ -3,11 +3,11 @@ import os
 import subprocess
 import textwrap
 
-import llnl.util.tty.color as color
 import yaml
 
 import benchpark.spec
 from benchpark.paths import paths
+from benchpark.util.compat import color
 
 
 def indent():
@@ -67,7 +67,7 @@ def info_system(args):
                         )
                 else:
                     resource_key = "@*r" + resource_key + "@."
-                    color.cprint(f"{indent()*2}{resource_key}: {resource_value}")
+                    color.cprint(f"{indent() * 2}{resource_key}: {resource_value}")
 
     def _handle_query(query):
         key, value = query.split("=", 1)

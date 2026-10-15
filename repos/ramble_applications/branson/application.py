@@ -27,6 +27,7 @@ class Branson(ExecutableApplication):
            + " --dd-transport-type {decomposition}"
            + " --particle-storage {layout}"
            + " --particle-algorithm {algorithm}"
+           + " --particle-message-size {particle_message_size}"
            + " --umpire-device-pool-size {pool}"
     )
 
@@ -37,6 +38,10 @@ class Branson(ExecutableApplication):
     
     workload_variable('input_file', default='3D_hohlraum_multi_node.xml',
     	description='input file name',
+      	workloads=['branson'])
+
+    workload_variable('particle_message_size', default='10000',
+    	description='Message size',
       	workloads=['branson'])
 
     workload_variable('num_particles', default='250000000',

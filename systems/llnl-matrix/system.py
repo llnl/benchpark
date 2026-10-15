@@ -20,7 +20,6 @@ from benchpark.system import (
 
 
 class LlnlMatrix(System):
-
     maintainers("pearce8", "michaelmckinsey1")
 
     id_to_resources = {
@@ -38,7 +37,7 @@ class LlnlMatrix(System):
 
     variant(
         "cuda",
-        default="12.9.1",
+        default="13.1.1",
         values=("13.1.1", "12.9.1", "12.6.0", "12.2.2", "11.8.0"),
         description="CUDA version",
     )
@@ -146,6 +145,7 @@ class LlnlMatrix(System):
                 },
                 "cmake": {
                     "externals": [
+                        {"spec": "cmake@3.30.5", "prefix": "/usr"},
                         {"spec": "cmake@3.26.5", "prefix": "/usr"},
                         {"spec": "cmake@3.23.1", "prefix": "/usr/tce"},
                     ],

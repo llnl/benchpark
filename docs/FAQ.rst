@@ -18,27 +18,29 @@ question that you think should be here, please consider contributing to this pag
  Benchmark not yet in Spack/Ramble
 ***********************************
 
-By default, Benchpark will use ${Benchmark1} specifications (``package.py`` and
-``application.py``) provided in the Spack and Ramble repos. It is possible to overwrite
-the benchmark specifications provided in the Spack and Ramble repos. To do so, add
-``package.py`` and/or ``application.py`` for ${Benchmark1} in
-``benchpark/repo/${Benchmark1}``:
+By default, Benchpark uses benchmark definitions (``package.py`` and ``application.py``)
+provided by the upstream Spack and Ramble repositories. Override either definition by
+adding it to the corresponding Benchpark repository:
 
 ::
 
-    benchpark
-    └── repo
-       ├── ${Benchmark1}
-       │  ├── application.py
-       │  └── package.py
-       └── repo.yaml
+    benchpark/
+    └── repos/
+        ├── ramble_applications/
+        │   └── <benchmark-name>/
+        │       └── application.py
+        └── spack_repo/
+            └── benchpark/
+                └── packages/
+                    └── <benchmark-name>/
+                        └── package.py
 
-``benchpark/repo`` can be used as a staging area for the build and run specification for
-${Benchmark1} so that you can test them together with your experiment specification on a
-given system. Once the experiment is working and merged into the develop branch of
-Benchpark, we would like to encourage the contributors to upstream the ``package.py`` to
-Spack, and the ``application.py`` to Ramble. When those PRs are approved and merged,
-please submit a PR to remove the duplicated specification from ``benchpark/repo``.
+These Benchpark repositories can be used as staging areas for a benchmark's build and
+run definitions so that you can test them with the experiment definition on a given
+system. Once the experiment is working and merged into Benchpark's develop branch,
+contributors are encouraged to upstream ``package.py`` to Spack and ``application.py``
+to Ramble. After those pull requests are merged, submit a Benchpark pull request that
+removes the duplicated definitions.
 
 ************************************
  Spack/Ramble versions in Benchpark
@@ -47,9 +49,9 @@ please submit a PR to remove the duplicated specification from ``benchpark/repo`
 Benchpark depends on the build functionality provided in `Spack
 <https://github.com/spack/spack>`_, the Spack packages provided in `Spack-packages
 <https://github.com/spack/spack-packages>`_, and run functionality provided in `Ramble
-<https://github.com/GoogleCloudPlatform/ramble>`_. To allow for testing before pulling
-in updates in Spack and Ramble, Benchpark clones and uses the versions of Spack and
-Ramble specified in ``checkout-versions.yaml``.
+<https://github.com/Ramble-Project/ramble>`_. To allow for testing before pulling in
+updates in Spack and Ramble, Benchpark clones and uses the versions of Spack and Ramble
+specified in ``checkout-versions.yaml``.
 
 The user might notice this delay in Spack and Ramble versions in two ways:
 

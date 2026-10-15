@@ -1,2 +1,3 @@
 [tool.docstrfmt]
 line-length = 88
+format-python-code-blocks = false

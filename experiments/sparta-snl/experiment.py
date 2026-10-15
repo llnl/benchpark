@@ -76,10 +76,10 @@ class SpartaSnl(
             ppc = 16
             stats = 10
             run = 100
-            xmin = -1.0
-            xmax = 1.1
-            ymin = -1.1
-            ymax = 1.1
+            xmin = -0.5
+            xmax = 0.5
+            ymin = -0.5
+            ymax = 0.5
         else:
             L = 1  # will increase problem size by 4X
             ppc = 47
