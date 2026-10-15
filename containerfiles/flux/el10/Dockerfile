@@ -23,6 +23,8 @@ RUN dnf clean all \
     libbsd-devel \
     nodejs \
     npm \
+    blas \
+    lapack \
     && dnf clean all \
     && rm -rf /var/cache/dnf
 
