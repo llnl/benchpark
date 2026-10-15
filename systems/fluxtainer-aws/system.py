@@ -10,7 +10,7 @@ from benchpark.system import System, compiler_def, compiler_section_for
 
 # Probably want this to inherit from the Fluxtainer class instead of a
 # copy-paste
-class Fluxtainer(System):
+class FluxtainerAws(System):
     """This is the system class for a container running Flux.
     See https://flux-framework.readthedocs.io/en/latest/tutorials/containers/index.html for more
     information."""
