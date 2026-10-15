@@ -14,9 +14,7 @@
  Benchpark Glossary
 ***********************
 
-The Beginner Tutorial uses terms from Benchpark, Ramble, and Spack. This table defines
-how the tutorial uses each term and identifies the project that provides the underlying
-concept.
+The Beginner Tutorial uses the following terms from Spack, Ramble, and Benchpark:
 
 .. list-table::
     :header-rows: 1
@@ -33,20 +31,11 @@ concept.
         software.
     - - .. _beginner-tutorial-glossary-application:
 
-        **Application**
-      - `Ramble
-        <https://ramble.readthedocs.io/en/latest/getting_started.html#application-workloads>`_
-      - A Ramble object that describes how to configure, execute, and analyze a program.
-        An application defines one or more workloads from which Ramble experiments can
-        be generated.
-    - - .. _beginner-tutorial-glossary-package:
-
         **Package**
       - `Spack
         <https://spack.readthedocs.io/en/latest/packaging_guide_creation.html#structure-of-a-package>`_
-      - A Python module named ``package.py`` that describes how to build and test
-        software according to a Spack spec. It contains the software metadata,
-        dependencies, variants, and build behavior.
+      - A Python module named ``package.py`` that records a recipe or installation script detailing exactly 
+        how to download, build, test, and deploy a specific piece of software from source code.
     - - .. _beginner-tutorial-glossary-spec:
 
         **Spec**
@@ -64,35 +53,45 @@ concept.
         be Boolean, single-valued, or multi-valued.
     - - .. _beginner-tutorial-glossary-experiment:
 
+        **Application**
+      - `Ramble
+        <https://ramble.readthedocs.io/en/latest/getting_started.html#application-workloads>`_
+      - A Python module named ``application.py`` that records a recipe or runtime script detailing exactly
+        how to configure the runtime parameters of a program, execute it, and analyze its figure of merit.
+    - - .. _beginner-tutorial-glossary-package:
+
         **Experiment**
       - :doc:`Benchpark <add-an-experiment>`
-      - A Benchpark ``experiment.py`` definition that selects a benchmark workload and
-        describes its programming model, scaling behavior, variables, instrumentation,
-        and generated Ramble experiments.
+      - A Python module named ``experiment.py`` that records the programming model(s) 
+        a given benchmark uses to parallelize execution on a node, how to scale the benchmark
+        (strong scaling, weak scaling, throughput), and what type of instrumentation
+        can be enabled in the benchmark.
     - - .. _beginner-tutorial-glossary-system:
 
         **System**
       - :doc:`Benchpark <add-a-system-config>`
-      - A Benchpark ``system.py`` definition of the hardware resources, scheduler, and
-        software configurations for a target machine or group of machines.
+      - A Python module named ``system.py`` that records the hardware resources, scheduler, and
+        system software for a specific HPC system (machine) or group of systems.
     - - .. _beginner-tutorial-glossary-modifier:
 
         **Modifier**
       - :doc:`Benchpark </modifiers>`
-      - A reusable configuration that can be applied to experiments. A modifier can
-        inject performance instrumentation, configure runtime behavior, or set up
-        system resources.
+      - A reusable object that can inject commands before, after, or during experiment execution
+        to capture available system resources or experiment data and metadata, record Linux thread
+        and GPU affinity, or inject performance analysis tools.
     - - .. _beginner-tutorial-glossary-scaling-study:
 
         **Scaling Study**
       - :ref:`Benchpark <step-3b-define-scaling-options>`
-      - A set of related experiments that varies allocated resources and, depending on
-        the scaling mode, problem size. Benchpark supports strong, weak, and throughput
-        scaling studies.
+      - A set of related experiments that varies allocated resources and/or problem size. 
+        Benchpark supports strong scaling (varying number of processes or threads for a constant size problem), 
+        weak scaling (varying number of processes while keeping the per-process problem size constant),
+        and throughput scaling (varying the problem size while keeping the number of processes constant).
 
-Ramble does not define an object named ``Benchmark``. Benchpark uses a Ramble
-application to describe how a benchmark is executed and a Spack package to describe how
-it is built.
+Benchpark provides a ``system.py`` to describe a system, and an ``experiment.py`` to describe how to
+map a benchmark onto this system.
+Benchpark uses a Spack ``package.py`` to build and a Ramble ``application.py`` to run the benchmark.
+
 
 .. _benchpark-spec-syntax:
 
