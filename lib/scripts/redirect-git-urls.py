@@ -26,7 +26,7 @@ def main(benchpark_wkp_dir, commit_info_file=None):
     if commit_info_file:
         commit_info_path = base_dir / commit_info_file
         if commit_info_path.exists():
-            with open(commit_info_path, 'r') as f:
+            with open(commit_info_path, "r") as f:
                 requirements = json.load(f)
 
     # Add require constraints for branch-based git packages
