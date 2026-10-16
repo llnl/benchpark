@@ -35,6 +35,7 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("c", type="build")
     depends_on("cxx", type="build")
 
+    variant("metis", default=True, description="Enable METIS support")
     variant("openmp", default=False, description="Enable OpenMP support")
     variant("caliper", default=False, description="Enable Caliper monitoring")
     variant("n_groups", default=30, values=int, description="Number of groups")
@@ -53,8 +54,8 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
 
     depends_on("mpi@2:")
 
-    depends_on("metis")
-    depends_on("parmetis", when="@:0.81")
+    depends_on("metis", when="+metis")
+    depends_on("parmetis", when="@:0.81 +metis")
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
 
@@ -78,7 +79,8 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
         args.append(f"-DMPI_C_COMPILER={spec['mpi'].mpicc}")
         args.append(f"-DMPI_CXX_COMPILER={spec['mpi'].mpicxx}")
 
-        args.append(f"-DMETIS_ROOT_DIR={spec['metis'].prefix}")
+        if '+metis' in spec:
+            args.append(f"-DMETIS_ROOT_DIR={spec['metis'].prefix}")
 
         if '+cuda' in spec:
             args.append("-DUSE_CUDA=ON")
