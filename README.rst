@@ -64,9 +64,10 @@ Community
 Benchpark is an open source project.  Questions, discussion,and contributions of
 new specifications as well as updates and improvements to existing specifications are welcome.
 
-* `Adding a System Specification <https://software.llnl.gov/benchpark/add-a-system-config.html>`_
-* `Adding a Benchmark Specification <https://software.llnl.gov/benchpark/add-a-benchmark.html>`_
-* `Adding an Experiment Specification <https://software.llnl.gov/benchpark/add-an-experiment.html>`_
+* `Adding a System Specification <https://software.llnl.gov/benchpark/interactive-tutorial/add-a-system-config.html>`_
+* `Adding a Spack Package <https://software.llnl.gov/benchpark/interactive-tutorial/add-a-spack-package.html>`_
+* `Adding a Ramble Application <https://software.llnl.gov/benchpark/interactive-tutorial/add-a-ramble-application.html>`_
+* `Adding an Experiment Specification <https://software.llnl.gov/benchpark/interactive-tutorial/add-an-experiment.html>`_
 
 We use `github discussions <https://github.com/llnl/benchpark/discussions>`_ for Q&A and discussion.
 

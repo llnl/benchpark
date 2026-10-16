@@ -34,8 +34,8 @@ class Hpl(
     def compute_applications_section(self):
 
         if self.spec.satisfies("exec_mode=test"):
-            self.add_experiment_variable("n_ranks", 2, True)
-            self.add_experiment_variable("Ns", 10000, True)
+            self.add_experiment_variable("n_ranks", 1, True)
+            self.add_experiment_variable("Ns", 1000, True)
             self.add_experiment_variable("N-Grids", 1, False)
             self.add_experiment_variable("Ps", "{n_ranks}", True)
             self.add_experiment_variable("Qs", "1", False)
@@ -52,10 +52,6 @@ class Hpl(
             self.add_experiment_variable("N-Ns", 1, False)
             self.add_experiment_variable("N-NBs", 1, False)
             self.add_experiment_variable("NBs", 128, False)
-
-        self.add_experiment_variable(
-            "n_threads_per_proc", ["2"], named=True, matrixed=True
-        )
 
         # Set the variables required by the experiment
         self.set_required_variables(

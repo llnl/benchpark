@@ -6,6 +6,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
+import ast
+import functools
+import io
 import json
 import os
 import re
@@ -15,6 +18,7 @@ import subprocess
 import sys
 import tempfile
 import textwrap
+import tokenize
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import contextmanager
@@ -33,6 +37,7 @@ _VALIDATOR_CONCURRENCY = 4
 _SPACK_RESULT_PREFIX = "BENCHPARK_EXTERNAL_RESULT="
 _MODULE_RESULT_PREFIX = "BENCHPARK_EXTERNAL_MODULE_RESULT="
 _NOT_FOUND_MARKER = "# benchpark: external-status=not-found"
+_MARKER_ACTIONS = frozenset({"MARK_NOT_FOUND", "CLEAR_NOT_FOUND_MARKER"})
 _SPACK_SITE_PURGED_SHELL = """
 if type module >/dev/null 2>&1; then
     module --force purge || exit $?
@@ -108,6 +113,7 @@ class _Proposal:
     candidate: Optional[_External] = None
     source_mutable: bool = False
     source_reason: Optional[str] = None
+    also_changes: Tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -1555,29 +1561,177 @@ def _detected_literal_external(external):
     return _source_literal(external.spec, external.raw_prefix or external.prefix)
 
 
-def _not_found_marker_source(source, declaration, *, add):
-    """Add or remove only an exact machine-owned marker above one literal."""
+def _entry_values(node):
+    """(spec, prefix) of a literal {"spec": str, "prefix": str} dict node, else None."""
 
-    literal = _declared_literal_external(declaration)
-    if literal is None:
+    if not isinstance(node, ast.Dict) or len(node.keys) != 2:
+        return None
+    fields = {}
+    for key, value in zip(node.keys, node.values):
+        if not isinstance(key, ast.Constant) or not isinstance(key.value, str):
+            return None
+        if not isinstance(value, ast.Constant) or not isinstance(value.value, str):
+            return None
+        fields[key.value] = value.value
+    if set(fields) != {"spec", "prefix"}:
+        return None
+    return fields["spec"], fields["prefix"]
+
+
+@dataclass(frozen=True)
+class _EntrySite:
+    """Character offsets of one literal entry and the externals list holding it."""
+
+    start: int
+    end: int
+    list_start: int
+    list_end: int
+    elements: Tuple[Tuple[int, int], ...]
+
+
+def _line_starts(source):
+    starts = [0]
+    for line in source.split("\n"):
+        starts.append(starts[-1] + len(line) + 1)
+    return starts
+
+
+@functools.lru_cache(maxsize=16)
+def _entry_index(source):
+    """Index every literal spec/prefix entry in an "externals" list by its values.
+
+    Entries are found by parsing, so any layout ruff produces is supported: a
+    one-line list, one entry per line, or an entry split across several lines.
+    """
+
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return {}
+    lines = source.split("\n")
+    starts = _line_starts(source)
+
+    def offset(row, column):  # ast columns count UTF-8 bytes
+        line_prefix = lines[row - 1].encode("utf-8")[:column].decode("utf-8")
+        return starts[row - 1] + len(line_prefix)
+
+    index = {}
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Dict):
+            continue
+        for key, value in zip(node.keys, node.values):
+            if not isinstance(key, ast.Constant) or key.value != "externals":
+                continue
+            if not isinstance(value, ast.List):
+                continue
+            elements = tuple(
+                (
+                    offset(element.lineno, element.col_offset),
+                    offset(element.end_lineno, element.end_col_offset),
+                )
+                for element in value.elts
+            )
+            for element, (start, end) in zip(value.elts, elements):
+                values = _entry_values(element)
+                if values is not None:
+                    index.setdefault(values, []).append(
+                        _EntrySite(
+                            start,
+                            end,
+                            offset(value.lineno, value.col_offset),
+                            offset(value.end_lineno, value.end_col_offset),
+                            elements,
+                        )
+                    )
+    return {values: tuple(sites) for values, sites in index.items()}
+
+
+def _entry_sites(source, spec, prefix):
+    return _entry_index(source).get((spec, prefix), ())
+
+
+def _declared_site(source, declaration):
+    if _declared_literal_external(declaration) is None:
         return None, "declaration is not a supported direct prefix-only literal"
-    if source.count(literal) != 1:
+    sites = _entry_sites(source, declaration.raw_spec, declaration.raw_prefix)
+    if len(sites) != 1:
         return None, "literal preimage does not occur exactly once"
+    return sites[0], None
 
-    literal_start = source.index(literal)
-    line_start = source.rfind("\n", 0, literal_start) + 1
-    line_end = source.find("\n", literal_start)
+
+def _entry_lines(source, site):
+    """Line bounds around an entry, its indentation, and whether it stands alone."""
+
+    line_start = source.rfind("\n", 0, site.start) + 1
+    line_end = source.find("\n", site.end)
     if line_end == -1:
         line_end = len(source)
-    else:
-        line_end += 1
-    line = source[line_start:line_end]
-    line_without_newline = line.rstrip("\r\n")
-    if line_without_newline.strip() not in {literal, literal + ","}:
-        return None, "literal is not on a standalone source line"
-    indentation = line_without_newline[
-        : len(line_without_newline) - len(line_without_newline.lstrip())
-    ]
+    before = source[line_start : site.start]
+    after = source[site.end : line_end].rstrip("\r")
+    standalone = not before.strip() and after.strip() in {"", ","}
+    return line_start, line_end, before, standalone
+
+
+def _list_has_comments(source, site):
+    starts = _line_starts(source)
+    try:
+        tokens = list(tokenize.generate_tokens(io.StringIO(source).readline))
+    except (tokenize.TokenError, SyntaxError):
+        return True
+    return any(
+        site.list_start < starts[token.start[0] - 1] + token.start[1] < site.list_end
+        for token in tokens
+        if token.type == tokenize.COMMENT
+    )
+
+
+def _explode_externals_list(source, site):
+    """Rewrite the list holding site one element per line, each followed by a comma.
+
+    The trailing commas make ruff keep the list in this layout from then on.
+    """
+
+    line_start = source.rfind("\n", 0, site.list_start) + 1
+    indentation = re.match(r"[ \t]*", source[line_start:]).group(0)
+    newline = "\r\n" if "\r\n" in source else "\n"
+    body = "".join(
+        f"{newline}{indentation}    {source[start:end]},"
+        for start, end in site.elements
+    )
+    return (
+        source[: site.list_start]
+        + "["
+        + body
+        + newline
+        + indentation
+        + "]"
+        + source[site.list_end :]
+    )
+
+
+def _not_found_marker_source(source, declaration, *, add):
+    """Add or remove the machine-owned marker above one literal entry.
+
+    A marker needs its own line, so adding one to an entry that shares a line first
+    rewrites that one externals list with one entry per line.
+    """
+
+    site, reason = _declared_site(source, declaration)
+    if site is None:
+        return None, reason
+    line_start, line_end, indentation, standalone = _entry_lines(source, site)
+    if not standalone:
+        if not add:
+            return source, None  # markers only ever sit above a standalone entry
+        if _list_has_comments(source, site):
+            return None, "externals list holding the literal contains comments"
+        source = _explode_externals_list(source, site)
+        site, reason = _declared_site(source, declaration)
+        if site is None:
+            return None, reason
+        line_start, line_end, indentation, standalone = _entry_lines(source, site)
+        if not standalone:
+            return None, "literal could not be placed on its own line"
     marker_line = indentation + _NOT_FOUND_MARKER
 
     previous_start = source.rfind("\n", 0, max(line_start - 1, 0)) + 1
@@ -1586,7 +1740,7 @@ def _not_found_marker_source(source, declaration, *, add):
     if add:
         if marker_present:
             return source, None
-        newline = "\r\n" if line.endswith("\r\n") else "\n"
+        newline = "\r\n" if source[:line_end].endswith("\r") else "\n"
         return source[:line_start] + marker_line + newline + source[line_start:], None
     if not marker_present:
         return source, None
@@ -1594,113 +1748,45 @@ def _not_found_marker_source(source, declaration, *, add):
 
 
 def _replace_literal_external(source, declaration, candidate):
-    """Replace one complete supported literal and clear its owned marker."""
+    """Replace one complete literal entry and clear its owned marker."""
 
     source, marker_reason = _not_found_marker_source(source, declaration, add=False)
     if source is None:
         return None, marker_reason
-    old_literal = _declared_literal_external(declaration)
     new_literal = _detected_literal_external(candidate)
-    if old_literal is None or new_literal is None:
+    if new_literal is None:
         return None, "replacement is not a supported direct prefix-only literal"
-    if source.count(old_literal) != 1:
-        return None, "literal preimage does not occur exactly once"
-    return source.replace(old_literal, new_literal, 1), None
-
-
-def _supported_externals_lists(source, literal):
-    lines = source.splitlines(keepends=True)
-    open_re = re.compile(r'^(?P<indent>[ \t]*)"externals": \[\r?\n?$')
-    close_re = re.compile(r"^(?P<indent>[ \t]*)\],?\r?\n?$")
-    entry_re = re.compile(
-        r'^(?P<indent>[ \t]*)\{"spec": "[^"\\\r\n]+", '
-        r'"prefix": "[^"\\\r\n]+"\},\r?\n?$'
-    )
-    marker_re = re.compile(
-        r"^(?P<indent>[ \t]*)# benchpark: external-status=not-found\r?\n?$"
-    )
-
-    matches = []
-    for opening_index, opening_line in enumerate(lines):
-        opening = open_re.match(opening_line)
-        if not opening:
-            continue
-        closing_index = None
-        for index in range(opening_index + 1, len(lines)):
-            closing = close_re.match(lines[index])
-            if closing and closing.group("indent") == opening.group("indent"):
-                closing_index = index
-                break
-        if closing_index is None:
-            continue
-
-        entry_indent = None
-        entry_lines = []
-        valid = True
-        for index in range(opening_index + 1, closing_index):
-            entry = entry_re.match(lines[index])
-            marker = marker_re.match(lines[index])
-            if entry:
-                if entry_indent is None:
-                    entry_indent = entry.group("indent")
-                elif entry.group("indent") != entry_indent:
-                    valid = False
-                    break
-                entry_lines.append(index)
-                continue
-            if marker:
-                following_entry = (
-                    entry_re.match(lines[index + 1])
-                    if index + 1 < closing_index
-                    else None
-                )
-                if following_entry is None:
-                    valid = False
-                    break
-                if marker.group("indent") != following_entry.group("indent"):
-                    valid = False
-                    break
-                if entry_indent is None:
-                    entry_indent = following_entry.group("indent")
-                elif marker.group("indent") != entry_indent:
-                    valid = False
-                    break
-                continue
-            valid = False
-            break
-        if not valid or not entry_lines:
-            continue
-
-        literal_lines = [
-            index
-            for index in entry_lines
-            if lines[index].rstrip("\r\n").strip() == literal + ","
-        ]
-        if len(literal_lines) != 1:
-            continue
-        list_preimage = "".join(lines[opening_index : closing_index + 1])
-        if source.count(list_preimage) != 1:
-            continue
-        matches.append((closing_index, entry_indent, lines))
-    return matches
+    site, reason = _declared_site(source, declaration)
+    if site is None:
+        return None, reason
+    return source[: site.start] + new_literal + source[site.end :], None
 
 
 def _add_literal_external(source, declaration, candidate):
-    """Append one detected literal to a strictly supported multiline list."""
+    """Add one detected literal right after the declared entry in its list."""
 
-    old_literal = _declared_literal_external(declaration)
     new_literal = _detected_literal_external(candidate)
-    if old_literal is None or new_literal is None:
+    if new_literal is None:
         return None, "addition is not a supported direct prefix-only literal"
-    if source.count(old_literal) != 1:
-        return None, "literal preimage does not occur exactly once"
-    matches = _supported_externals_lists(source, old_literal)
-    if len(matches) != 1:
-        return None, "no supported multiline externals list contains the literal"
-    closing_index, entry_indent, lines = matches[0]
-    newline = "\r\n" if lines[closing_index].endswith("\r\n") else "\n"
-    lines.insert(closing_index, entry_indent + new_literal + "," + newline)
-    return "".join(lines), None
+    site, reason = _declared_site(source, declaration)
+    if site is None:
+        return None, reason
+    _, line_end, indentation, standalone = _entry_lines(source, site)
+    if not standalone:
+        return source[: site.end] + ", " + new_literal + source[site.end :], None
+    crlf = source[:line_end].endswith("\r")
+    end_of_line = line_end - 1 if crlf else line_end
+    comma = "" if source[site.end : end_of_line].strip() == "," else ","
+    return (
+        source[: site.end]
+        + comma
+        + source[site.end : end_of_line]
+        + ("\r\n" if crlf else "\n")
+        + indentation
+        + new_literal
+        + ","
+        + source[end_of_line:]
+    ), None
 
 
 def _system_source_path(system_spec):
@@ -1743,15 +1829,15 @@ def _system_spec_with_cluster(system_spec, cluster):
     return benchpark.spec.SystemSpec(" ".join(parts)).concretize()
 
 
-def _cluster_scope(system_spec, declaration):
-    """Prove that a source-controlled external is unique to one cluster."""
+def _sibling_clusters(system_spec):
+    """Return the system's other cluster values, or None and why they are unknown."""
 
     if "cluster" not in system_spec.variants:
-        return True, None
+        return (), None
 
     selected = system_spec.variants["cluster"]
     if len(selected) != 1:
-        return False, "cluster scope cannot be proven for a multi-valued cluster"
+        return None, "cluster scope cannot be proven for a multi-valued cluster"
 
     applicable = []
     for condition, variants in system_spec.system_class.variants.items():
@@ -1759,26 +1845,38 @@ def _cluster_scope(system_spec, declaration):
         if cluster_variant is not None and system_spec.satisfies(condition):
             applicable.append(cluster_variant)
     if not applicable:
-        return False, "cluster scope cannot be proven from the system definition"
+        return None, "cluster scope cannot be proven from the system definition"
     if any(variant.values is None for variant in applicable):
-        return False, "cluster scope cannot be proven from non-enumerable values"
+        return None, "cluster scope cannot be proven from non-enumerable values"
 
     value_sets = {tuple(variant.values) for variant in applicable}
     if len(value_sets) != 1:
-        return False, "cluster scope cannot be proven from multiple cluster definitions"
+        return None, "cluster scope cannot be proven from multiple cluster definitions"
     clusters = next(iter(value_sets))
-    siblings = [cluster for cluster in clusters if cluster != selected[0]]
-    if not siblings:
-        return True, None
+    return tuple(cluster for cluster in clusters if cluster != selected[0]), None
+
+
+def _cluster_scope(system_spec, declaration):
+    """Return the other clusters that use this same source entry.
+
+    Editing a shared entry changes it for every one of those clusters, so apply
+    checks them too (see _verify_other_clusters). Returns None and a reason when
+    the other clusters cannot be listed or resolved.
+    """
+
+    siblings, reason = _sibling_clusters(system_spec)
+    if siblings is None:
+        return None, reason
 
     identity = _source_external_identity(declaration)
+    shared = []
     for sibling in siblings:
         try:
             sibling_spec = _system_spec_with_cluster(system_spec, sibling)
             sibling_externals = _extract_system_externals(sibling_spec.system)
         except Exception as error:
             return (
-                False,
+                None,
                 f"cluster scope cannot be proven because cluster={sibling} "
                 f"could not resolve: {error}",
             )
@@ -1786,11 +1884,15 @@ def _cluster_scope(system_spec, declaration):
             _source_external_identity(external) == identity
             for external in sibling_externals
         ):
-            return (
-                False,
-                f"external is also produced by cluster={sibling}",
-            )
-    return True, None
+            shared.append(sibling)
+    return tuple(shared), None
+
+
+def _shared_clusters(system_spec, declaration, scope_cache):
+    identity = _source_external_identity(declaration)
+    if identity not in scope_cache:
+        scope_cache[identity] = _cluster_scope(system_spec, declaration)
+    return scope_cache[identity]
 
 
 def _proposal_direct_source_reason(system_spec, declaration, scope_cache):
@@ -1799,13 +1901,8 @@ def _proposal_direct_source_reason(system_spec, declaration, scope_cache):
     if _declared_literal_external(declaration) is None:
         return "declaration is not a supported direct prefix-only literal"
 
-    identity = _source_external_identity(declaration)
-    if identity not in scope_cache:
-        scope_cache[identity] = _cluster_scope(system_spec, declaration)
-    scoped, reason = scope_cache[identity]
-    if not scoped:
-        return reason
-    return None
+    _, reason = _shared_clusters(system_spec, declaration, scope_cache)
+    return reason
 
 
 def _logical_proposals(package_result):
@@ -1846,7 +1943,10 @@ def _source_mutability_for_addition(
             proposal,
             source_reason="detected external is not a supported prefix-only literal",
         )
-    if source.count(candidate_literal):
+    candidate = proposal.candidate
+    if source.count(candidate_literal) or _entry_sites(
+        source, candidate.spec, candidate.raw_prefix or candidate.prefix
+    ):
         return replace(
             proposal,
             source_reason="detected literal already occurs in source",
@@ -1871,7 +1971,13 @@ def _source_mutability_for_addition(
         writable.append(declaration)
 
     if len(writable) == 1:
-        return replace(proposal, declaration=writable[0], source_mutable=True)
+        shared, _ = _shared_clusters(system_spec, writable[0], scope_cache)
+        return replace(
+            proposal,
+            declaration=writable[0],
+            source_mutable=True,
+            also_changes=shared,
+        )
     if len(writable) > 1:
         return replace(
             proposal,
@@ -1908,13 +2014,20 @@ def _source_mutability(system_spec, package_result, proposal, source, scope_cach
     )
     if reason is not None:
         return replace(proposal, source_reason=reason)
+    shared, _ = _shared_clusters(system_spec, proposal.declaration, scope_cache)
+    if shared and proposal.action in _MARKER_ACTIONS:
+        # Not finding a package here says nothing about the other clusters.
+        return replace(
+            proposal,
+            source_reason=f"external is also produced by cluster={shared[0]}",
+        )
 
     rewritten, reason = _proposal_source_edit(source, proposal)
     if rewritten is None:
         return replace(proposal, source_reason=reason)
     if rewritten == source:
         return replace(proposal, source_reason="source already has the requested state")
-    return replace(proposal, source_mutable=True)
+    return replace(proposal, source_mutable=True, also_changes=shared)
 
 
 def _with_source_proposals(system_spec, package_results, source):
@@ -1985,15 +2098,8 @@ def _proposal_source_edit(source, proposal):
     return None, "unsupported source mutation"
 
 
-def _strip_not_found_markers(source):
-    marker = re.compile(r"^[ \t]*# benchpark: external-status=not-found(?:\r?\n|$)")
-    return "".join(
-        line for line in source.splitlines(keepends=True) if not marker.match(line)
-    )
-
-
 def _verify_marker_text(source, rewritten, proposals):
-    """Confirm marker-only edits did not alter any other source text."""
+    """Confirm marker edits changed no code (comments and layout may differ)."""
 
     non_marker_source = source
     for proposal in proposals:
@@ -2002,9 +2108,7 @@ def _verify_marker_text(source, rewritten, proposals):
         non_marker_source, reason = _proposal_source_edit(non_marker_source, proposal)
         if non_marker_source is None:
             raise _ApplyVerificationError(reason)
-    if _strip_not_found_markers(rewritten) != _strip_not_found_markers(
-        non_marker_source
-    ):
+    if ast.dump(ast.parse(rewritten)) != ast.dump(ast.parse(non_marker_source)):
         raise _ApplyVerificationError(
             "machine-owned marker edits changed unrelated source text"
         )
@@ -2201,6 +2305,52 @@ def _atomic_replace_source(source_path, original_bytes, rewritten_source):
         raise _ApplyVerificationError(str(error)) from error
 
 
+def _identity_counter(externals):
+    return Counter(_source_external_identity(external) for external in externals)
+
+
+def _counter_within(smaller, larger):
+    return all(count <= larger[key] for key, count in smaller.items())
+
+
+def _verify_other_clusters(system_spec, source_path, rewritten, before, after):
+    """Confirm every other cluster changed only the way the verified cluster did.
+
+    An edited entry may be shared with other clusters, so each of them must still
+    resolve and may only lose and gain externals this cluster lost and gained.
+    """
+
+    siblings, _ = _sibling_clusters(system_spec)
+    removed, added = before - after, after - before
+    for sibling in siblings or ():
+        try:
+            sibling_spec = _system_spec_with_cluster(system_spec, sibling)
+            sibling_before = _identity_counter(
+                _extract_system_externals(sibling_spec.system)
+            )
+            with _candidate_system_spec(
+                sibling_spec, source_path, rewritten
+            ) as candidate_spec:
+                sibling_after = _identity_counter(
+                    _extract_system_externals(candidate_spec.system)
+                )
+        except _ApplyVerificationError:
+            raise
+        except Exception as error:
+            raise _ApplyVerificationError(
+                f"cluster={sibling} could not resolve with the candidate source: "
+                f"{error}"
+            ) from error
+        if not (
+            _counter_within(sibling_before - sibling_after, removed)
+            and _counter_within(sibling_after - sibling_before, added)
+        ):
+            raise _ApplyVerificationError(
+                f"cluster={sibling} externals changed in a way the selected "
+                "cluster's did not"
+            )
+
+
 def _apply_source_proposals(
     system_spec, package_results, source_path, source_bytes, source
 ):
@@ -2226,12 +2376,14 @@ def _apply_source_proposals(
         raise _ApplyVerificationError(f"candidate source has invalid syntax: {error}")
     _verify_marker_text(source, rewritten, proposals)
 
+    before = _identity_counter(_extract_system_externals(system_spec.system))
     try:
         with _candidate_system_spec(
             system_spec, source_path, rewritten
         ) as candidate_spec:
+            candidate_externals = _extract_system_externals(candidate_spec.system)
             candidate_declarations = _canonicalize_declared_externals(
-                _extract_system_externals(candidate_spec.system)
+                candidate_externals
             )
     except _ApplyVerificationError:
         raise
@@ -2246,6 +2398,13 @@ def _apply_source_proposals(
         raise _ApplyVerificationError(
             "candidate system external delta does not match the logical proposal"
         )
+    _verify_other_clusters(
+        system_spec,
+        source_path,
+        rewritten,
+        before,
+        _identity_counter(candidate_externals),
+    )
     reconciled = _reconcile_frozen_evidence(package_results, candidate_declarations)
     _atomic_replace_source(source_path, source_bytes, rewritten)
     return reconciled, True
@@ -2330,6 +2489,8 @@ def _report_reconciliation(system_spec, package_results, *, heading=None):
             )
             writable = "writable" if proposal.source_mutable else "report-only"
             reason = f" ({proposal.source_reason})" if proposal.source_reason else ""
+            if proposal.also_changes:
+                reason = f" (also changes cluster={', '.join(proposal.also_changes)})"
             target = (
                 _external_text(proposal.declaration)
                 if proposal.declaration
