@@ -174,6 +174,17 @@ def test_default_modifiers_section():
     ]
 
 
+def test_compiler_attribution_modifier_section():
+    spec = benchpark.spec.ExperimentSpec(
+        "saxpy compiler_attribution=on"
+    ).concretize()
+    experiment = spec.experiment
+
+    modifiers_section = experiment.compute_modifiers_section_wrapper()
+
+    assert {"name": "compiler_attribution", "mode": "on"} in modifiers_section
+
+
 def test_multiple_models():
     with pytest.raises(
         benchpark.error.BenchparkError,

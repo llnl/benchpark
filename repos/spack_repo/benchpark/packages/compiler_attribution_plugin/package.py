@@ -14,16 +14,16 @@ CLANG_LIKE_COMPILERS = ("llvm", "llvm-amdgpu", "rocmcc", "cce")
 class CompilerAttributionPlugin(CMakePackage):
     """LLVM pass plugin that attributes static compiler evidence to Caliper regions."""
 
-    homepage = "https://github.com/TauferLab/Src_LLNL_Perf_Analysis_with_Compiler_Remarks"
-    git = "git@github.com:TauferLab/Src_LLNL_Perf_Analysis_with_Compiler_Remarks.git"
+    homepage = "https://github.com/llnl/benchpark-llvm"
+    git = "git@github.com:llnl/benchpark-llvm.git"
 
     maintainers("yejashi")
 
-    license("UNKNOWN")
+    license("Apache-2.0 WITH LLVM-exception")
 
-    version("0.1.0", commit="c6e518672d5f2a3aa6f51dcfe191af83dc5affee")
+    version("0.1.0", branch="develop")
 
-    root_cmakelists_dir = "compiler_attribution_plugin"
+    root_cmakelists_dir = "Strata/compiler_attribution_plugin"
 
     variant(
         "association",
