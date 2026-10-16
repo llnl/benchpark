@@ -230,22 +230,37 @@ Benchpark objects. They are not Spack compiler (``%``) or version (``@``) constr
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-search
 
-        :doc:`I want to search what is available in Benchpark. <search-benchpark>`
+        :doc:`I want to search what is available in Benchpark.
+        .. class:: text-right
+
+        5 min.
+        <search-benchpark>`
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-run
 
         :doc:`I want to run an experiment someone gave me on the same system.
+        .. class:: text-right
+
+        10 min.
         <build-and-run-experiment>`
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-analyze
 
         :doc:`I want to generate preconfigured performance figures for an experiment
-        on my system. <benchpark-analyze>`
+        on my system. 
+        .. class:: text-right
+
+        10 min + 10 min.
+        <benchpark-analyze>`
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-experiment
 
         :doc:`I want to run a new benchmark on the system I have
-        benchmarked before. <add-an-experiment>`
+        benchmarked before.
+        .. class:: text-right
+
+        20 min.
+        <add-an-experiment>`
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-update-system
 
