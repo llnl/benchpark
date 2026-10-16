@@ -242,11 +242,10 @@ Benchpark objects. They are not Spack compiler (``%``) or version (``@``) constr
         :doc:`I want to generate preconfigured performance figures for an experiment
         on my system. <benchpark-analyze>`
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-next-step-multiple tutorial-goal-benchmark
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-experiment
 
-        I want to run a :doc:`new benchmark <add-a-benchmark>` on the system I have
-        benchmarked before (this also requires :doc:`adding an experiment
-        <add-an-experiment>`).
+        :doc:`I want to run a new benchmark on the system I have
+        benchmarked before. <add-an-experiment>`
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-update-system
 
