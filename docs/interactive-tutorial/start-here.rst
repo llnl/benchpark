@@ -5,6 +5,7 @@
     SPDX-License-Identifier: Apache-2.0
 
 .. _beginner-tutorial-glossary:
+
 .. _beginner-tutorial-start-here:
 
 ############
