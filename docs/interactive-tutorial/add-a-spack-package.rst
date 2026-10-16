@@ -24,16 +24,16 @@ the following complete contents:
     :language: python
     :linenos:
 
-For a benchmark without an upstream package, follow the `Spack Package Creation
-Tutorial <https://spack-tutorial.readthedocs.io/en/latest/tutorial_packaging.html>`_ to
-create and test its ``package.py``.
+For a benchmark without an upstream package, follow the `Spack Package Creation Tutorial
+<https://spack-tutorial.readthedocs.io/en/latest/tutorial_packaging.html>`_ to create
+and test its ``package.py``.
 
 Before adding the experiment, create its :doc:`Ramble application
 <add-a-ramble-application>` if one is also missing.
 
-**********
+***********
  Next Step
-**********
+***********
 
 .. tutorialcontainer:: tutorial-next-steps
 

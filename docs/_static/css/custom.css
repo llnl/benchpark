@@ -325,7 +325,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     outline-offset: 3px;
 }
 
-.rst-content .tutorial-next-step:is(
+.rst-content .tutorial-next-step:not(.tutorial-unnumbered):is(
     .tutorial-goal-search,
     .tutorial-goal-run,
     .tutorial-goal-analyze,
@@ -340,7 +340,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     min-height: 9.5rem;
 }
 
-.rst-content .tutorial-next-step > p > a::before {
+.rst-content .tutorial-next-step:not(.tutorial-unnumbered) > p > a::before {
     align-items: center;
     background: var(--card-accent);
     border: 1px solid var(--card-accent);
@@ -359,7 +359,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     transition: background-color 150ms ease, color 150ms ease;
 }
 
-.rst-content .tutorial-next-step > p > a:hover::before {
+.rst-content .tutorial-next-step:not(.tutorial-unnumbered) > p > a:hover::before {
     background: #ffffff;
     color: var(--card-hover);
 }

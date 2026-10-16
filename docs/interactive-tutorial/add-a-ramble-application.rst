@@ -15,8 +15,8 @@ A Ramble ``application.py`` defines a benchmark's inputs and runtime parameters.
 application already exists in the `Ramble Applications repository
 <https://github.com/Ramble-Project/ramble/tree/develop/var/ramble/repos/builtin/applications>`_,
 Benchpark uses that definition. An application in
-``repos/ramble_applications/<benchmark-name>/application.py`` overrides the corresponding
-upstream application.
+``repos/ramble_applications/<benchmark-name>/application.py`` overrides the
+corresponding upstream application.
 
 For the HPL example, create ``repos/ramble_applications/hpl/application.py`` with the
 following complete contents:
@@ -38,9 +38,9 @@ instructions
 Before adding the experiment, create its :doc:`Spack package <add-a-spack-package>` if
 one is also missing.
 
-**********
+***********
  Next Step
-**********
+***********
 
 .. tutorialcontainer:: tutorial-next-steps
 
