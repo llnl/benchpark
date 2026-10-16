@@ -239,8 +239,7 @@ class CompilerAttribution(BasicModifier):
             )
         except subprocess.CalledProcessError as exc:
             logger.die(
-                "compiler_attribution setup command failed: "
-                f"{shlex.join(cmd)}\n{exc}"
+                f"compiler_attribution setup command failed: {shlex.join(cmd)}\n{exc}"
             )
 
     @staticmethod
@@ -273,7 +272,7 @@ class CompilerAttribution(BasicModifier):
                 f"set-compiler-attribution-trace-{executable_name}",
                 template=[
                     f"export TRACE_LOG_OUTPUT_PATH={trace_file}",
-                    "export " f"COMPILER_ATTRIBUTION_EXTRACTION_DIR={extraction_dir}",
+                    f"export COMPILER_ATTRIBUTION_EXTRACTION_DIR={extraction_dir}",
                 ],
             )
         ]
