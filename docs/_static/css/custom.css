@@ -110,12 +110,17 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     margin: 0;
 }
 
+.rst-content .tutorial-goal-run {
+    --goal-number: "2";
+}
+
 .rst-content .tutorial-goal-system {
     --card-accent: #4d82b5;
     --card-background: #eaf3fb;
     --card-border: #bdd4e8;
     --card-hover: #477aa9;
     --card-text: #294f73;
+    --goal-number: "6";
 }
 
 .rst-content .tutorial-goal-benchmark {
@@ -132,6 +137,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     --card-border: #d8c4e6;
     --card-hover: #795294;
     --card-text: #513566;
+    --goal-number: "5";
 }
 
 .rst-content .tutorial-goal-scaling {
@@ -140,6 +146,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     --card-border: #b9ddd8;
     --card-hover: #337e76;
     --card-text: #245d57;
+    --goal-number: "7";
 }
 
 .rst-content .tutorial-goal-analyze {
@@ -148,6 +155,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     --card-border: #efc9bd;
     --card-hover: #a94e38;
     --card-text: #6f3528;
+    --goal-number: "3 (requires #2)";
 }
 
 .rst-content .tutorial-goal-query {
@@ -156,6 +164,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     --card-border: #c9cce8;
     --card-hover: #565e96;
     --card-text: #3c426f;
+    --goal-number: "8";
 }
 
 .rst-content .tutorial-goal-spec {
@@ -180,6 +189,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     --card-border: #e8c9ad;
     --card-hover: #9f5d25;
     --card-text: #67401f;
+    --goal-number: "4";
 }
 
 .rst-content .tutorial-goal-search {
@@ -188,6 +198,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     --card-border: #c8d0d7;
     --card-hover: #4f5f6e;
     --card-text: #34424f;
+    --goal-number: "1";
 }
 
 .tutorial-project-links {
@@ -214,6 +225,65 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     max-height: 8rem;
     max-width: 100%;
     width: auto;
+}
+
+.tutorial-prerequisite-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 0.75rem 0 1.5rem;
+}
+
+.rst-content .tutorial-prerequisite-link {
+    margin: 0;
+}
+
+.rst-content .tutorial-prerequisite-link > p {
+    margin: 0;
+}
+
+.rst-content .tutorial-prerequisite-link a,
+.rst-content .tutorial-prerequisite-link a:visited {
+    align-items: center;
+    background: var(--prerequisite-background);
+    border: 1px solid var(--prerequisite-border);
+    border-radius: 1rem;
+    color: var(--prerequisite-text);
+    display: inline-flex;
+    font-weight: 600;
+    padding: 0.35rem 0.8rem;
+    text-decoration: none;
+}
+
+.rst-content .tutorial-prerequisite-link a:hover {
+    background: var(--prerequisite-accent);
+    color: #ffffff;
+}
+
+.rst-content .tutorial-prerequisite-link a:focus-visible {
+    outline: 3px solid var(--prerequisite-accent);
+    outline-offset: 2px;
+}
+
+.tutorial-prerequisite-spack {
+    --prerequisite-accent: #0f3a80;
+    --prerequisite-background: #edf3fc;
+    --prerequisite-border: #a9bfdf;
+    --prerequisite-text: #0f3a80;
+}
+
+.tutorial-prerequisite-ramble {
+    --prerequisite-accent: #5d3425;
+    --prerequisite-background: #f7f0df;
+    --prerequisite-border: #cfb99b;
+    --prerequisite-text: #5d3425;
+}
+
+.tutorial-prerequisite-experiment {
+    --prerequisite-accent: #356533;
+    --prerequisite-background: #eef7ec;
+    --prerequisite-border: #a8c6a4;
+    --prerequisite-text: #285426;
 }
 
 .rst-content .tutorial-spec-figure {
@@ -253,6 +323,45 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
 .rst-content .tutorial-next-step a:focus-visible {
     outline: 3px solid var(--card-accent);
     outline-offset: 3px;
+}
+
+.rst-content .tutorial-next-step:is(
+    .tutorial-goal-search,
+    .tutorial-goal-run,
+    .tutorial-goal-analyze,
+    .tutorial-goal-experiment,
+    .tutorial-goal-update-system,
+    .tutorial-goal-system,
+    .tutorial-goal-scaling,
+    .tutorial-goal-query
+) > p > a {
+    align-items: flex-start;
+    flex-direction: column;
+    min-height: 9.5rem;
+}
+
+.rst-content .tutorial-next-step > p > a::before {
+    align-items: center;
+    background: var(--card-accent);
+    border: 1px solid var(--card-accent);
+    border-radius: 1rem;
+    color: #ffffff;
+    content: var(--goal-number);
+    display: inline-flex;
+    flex: 0 0 auto;
+    font-size: 0.9rem;
+    font-variant-numeric: tabular-nums;
+    min-height: 2rem;
+    min-width: 2rem;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+    padding: 0.25rem 0.65rem;
+    transition: background-color 150ms ease, color 150ms ease;
+}
+
+.rst-content .tutorial-next-step > p > a:hover::before {
+    background: #ffffff;
+    color: var(--card-hover);
 }
 
 .rst-content .tutorial-with-duration {

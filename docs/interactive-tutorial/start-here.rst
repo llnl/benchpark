@@ -250,7 +250,7 @@ not Spack compiler (``%``) or version (``@``) constraints.
 
         .. tutorialcontainer:: tutorial-duration
 
-            10 min + 10 min.
+            #2 + 10 min.
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-experiment tutorial-with-duration
 

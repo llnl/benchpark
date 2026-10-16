@@ -44,9 +44,11 @@ A benchmark specification defines the application build and run behavior, utiliz
 spack for build and dependency management.
 
 If you are creating a new benchmark that has not been defined in Benchpark yet, proceed
-to :doc:`interactive-tutorial/add-a-benchmark` for the following:
+to :doc:`interactive-tutorial/add-a-spack-package` and
+:doc:`interactive-tutorial/add-a-ramble-application` for the following:
 
-- Add a ``benchmark``
+- Add a Spack ``package.py``
+- Add a Ramble ``application.py``
 
 *****************************
  D. Experiment Specification

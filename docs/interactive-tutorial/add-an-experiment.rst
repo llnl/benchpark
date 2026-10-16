@@ -17,18 +17,29 @@
 <beginner-tutorial-glossary-modifier>`, :ref:`Scaling Study
 <beginner-tutorial-glossary-scaling-study>`
 
+Create either missing prerequisite before adding the experiment:
+
+.. tutorialcontainer:: tutorial-prerequisite-links
+
+    .. tutorialcontainer:: tutorial-prerequisite-link tutorial-prerequisite-spack
+
+        :doc:`Missing a Spack package? <add-a-spack-package>`
+
+    .. tutorialcontainer:: tutorial-prerequisite-link tutorial-prerequisite-ramble
+
+        :doc:`Missing a Ramble application? <add-a-ramble-application>`
+
 This guide is intended for developers who want to add the ability to run a benchmark
-with Benchpark. If you do not already have a Spack ``package.py`` and a Ramble
-``application.py`` for the benchmark, you will first need to write them as described in
-:doc:`Prereqs for adding an Experiment <add-a-benchmark>`. The next step is creating the
-``experiment.py``, which we will demonstrate for HPL momentarily.
+with Benchpark. Once a Spack ``package.py`` and Ramble ``application.py`` describe how
+to build and run the benchmark, the next step is creating its ``experiment.py``. This
+guide demonstrates that process for HPL.
 
 **********************************
  Create the Experiment Definition
 **********************************
 
-This example defines the HPL experiment used throughout the Beginner Tutorial. Start
-``experiments/hpl/experiment.py`` with the definition below.
+This example defines the HPL experiment used throughout the Beginner Tutorial. Replace
+``experiments/hpl/experiment.py`` with the below definition:
 
 .. code-block:: python
     :linenos:
