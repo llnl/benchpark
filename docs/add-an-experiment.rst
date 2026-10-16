@@ -8,6 +8,15 @@
  Adding an Experiment
 ######################
 
+**Glossary terms:** :ref:`Benchmark <beginner-tutorial-glossary-benchmark>`,
+:ref:`Package <beginner-tutorial-glossary-package>`, :ref:`Application
+<beginner-tutorial-glossary-application>`, :ref:`Spec
+<beginner-tutorial-glossary-spec>`, :ref:`Variant <beginner-tutorial-glossary-variant>`,
+:ref:`Experiment <beginner-tutorial-glossary-experiment>`, :ref:`System
+<beginner-tutorial-glossary-system>`, :ref:`Modifier
+<beginner-tutorial-glossary-modifier>`, :ref:`Scaling Study
+<beginner-tutorial-glossary-scaling-study>`
+
 This guide is intended for those who would like to add a new experiment for a specific
 benchmark.
 
@@ -84,7 +93,7 @@ performance profiling library (via a `fork
 to Caliper. Enabling these variants in our Benchpark experiment only requires
 inheritance from the pre-defined ``ProgrammingModelType.Openmp`` and ``Caliper``
 classes. For more details on the configurability of experiment variants, see
-:ref:`experiment-variants`.
+:ref:`contributing-experiment-variants`.
 
 ::
 
@@ -260,7 +269,10 @@ by default.
           total_problem_size="{Ns}",
         )
 
-For more details on the ``add_experiment_variable`` function, see :ref:`add-expr-var`.
+For more details on the ``add_experiment_variable`` function, see
+:ref:`contributing-add-expr-var`.
+
+.. _contributing-step-3b-define-scaling-options:
 
 Step 3b: Define Scaling Options
 ===============================
@@ -334,8 +346,8 @@ runtime parameters during experiment initialization, e.g., ``benchpark experimen
             }
         )
 
-See :ref:`this section <scaling-configs>` for more information on how to write Benchpark
-scaling configurations.
+See :ref:`the Appendix <contributing-scaling-configs>` for more information on how to
+write Benchpark scaling configurations.
 
 ***************************************
  Step 4: Add a Package Manager Section
@@ -396,13 +408,13 @@ your experiment:
     benchpark experiment init --dest=hpl my-system hpl
 
 If this completes without errors, you can continue testing by setting up a benchpark
-workspace as described in :doc:`testing-your-contribution`.
+workspace as described in :doc:`/testing-your-contribution`.
 
 *********************
  Experiment Appendix
 *********************
 
-.. _experiment-variants:
+.. _contributing-experiment-variants:
 
 More on Inherited Experiment Variants
 =====================================
@@ -458,9 +470,9 @@ A detailed description of Ramble configuration files is available at `Ramble
 workspace_config <https://ramble.readthedocs.io/en/latest/workspace_config.html#>`__.
 
 For more advanced usage, such as customizing hardware allocation or performance
-profiling see :doc:`modifiers`.
+profiling see :doc:`/modifiers`.
 
-.. _add-expr-var:
+.. _contributing-add-expr-var:
 
 More on add_experiment_variable
 ===============================
@@ -526,7 +538,7 @@ A variable also can be assigned a list of values, each individual value correspo
 a single experiment. Refer to the Ramble documentation for a detailed explanation of zip
 and matrix.
 
-.. _scaling-configs:
+.. _contributing-scaling-configs:
 
 More on Scaling Configurations
 ==============================
@@ -619,3 +631,14 @@ variables will be:
 Note that scaling starts from the minimum value dimension (``pz``) of the first variable
 (``n_resources_dict``) and proceeds in a round-robin manner through the other
 dimensions. See AMG2023 or Kripke for examples of different scaling configurations.
+
+***********
+ Next Step
+***********
+
+.. tutorialcontainer:: tutorial-next-steps
+
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run
+
+        :doc:`I want to build and run the new experiment on my existing system.
+        </interactive-tutorial/build-and-run-experiment>`
