@@ -27,16 +27,15 @@ one of four categories:
     $ benchpark list experiments
     $ benchpark list modifiers
 
-The generated :doc:`system catalogue </system-list>` and :doc:`benchmark catalogue
-</benchmark-list>` provide detailed information for systems and benchmarks in a tabular
-form.
+The Benchpark Catalogue shows detailed information on :doc:`Benchpark Systems </system-list>`
+and :doc:`Benchpark Experiments </benchmark-list>` in tabular form.
 
-For searching experiments, use the filter to find your targeted programming model. For
-example, this command only shows experiments that support strong scaling:
+Use the filter to find experiments with your targeted programming model or specific type of scaling.
+For example, this command will display only the CUDA experiments:
 
 .. code-block:: console
 
-    $ benchpark list experiments --experiment strong
+    $ benchpark list experiments --experiment cuda
 
 We can also search for systems:
 
@@ -44,8 +43,7 @@ We can also search for systems:
 
     $ benchpark list systems
 
-After choosing a system or experiment, inspect its variants and other configuration
-details:
+After choosing a system or experiment, inspect its variants and configuration details:
 
 .. code-block:: console
 
