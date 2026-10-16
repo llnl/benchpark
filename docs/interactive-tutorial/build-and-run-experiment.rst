@@ -12,6 +12,15 @@
 :ref:`Experiment <beginner-tutorial-glossary-experiment>`, :ref:`System
 <beginner-tutorial-glossary-system>`
 
+Before initializing the system, open ``experiments/hpl/experiment.py`` and configure the
+``exec_mode=test`` branch to use one MPI rank and a problem size of 1,000:
+
+.. code-block:: python
+
+    if self.spec.satisfies("exec_mode=test"):
+        self.add_experiment_variable("n_ranks", 1, True)
+        self.add_experiment_variable("Ns", 1000, True)
+
 Initialize the AWS tutorial system and the HPL experiment. The explicit instance type
 matches the `Benchpark tutorial infrastructure
 <https://github.com/llnl/benchpark-tutorial>`_:
