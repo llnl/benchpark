@@ -11,13 +11,49 @@
  Start Here
 ############
 
-.. image:: tutorial/HPCIC26-Tutorial-Slide-Preview.jpg
-    :target: _static/slides/HPCIC26-Tutorial-Slides.pdf
-    :height: 72px
-    :align: left
-    :alt: Slide Preview
+.. tutorialcontainer:: tutorial-project-links
 
-:download:`Download Slides <_static/slides/HPCIC26-Tutorial-Slides.pdf>`.
+    .. tutorialcontainer:: tutorial-project-link
+
+        .. rubric:: Benchpark Source
+
+        .. image:: /_static/images/benchpark-icon.svg
+            :alt: Benchpark on GitHub
+            :target: https://github.com/llnl/benchpark
+
+    .. tutorialcontainer:: tutorial-project-link
+
+        .. rubric:: Benchpark Tutorial Slides
+
+        .. image:: tutorial/HPCIC26-Tutorial-Slide-Preview.jpg
+            :alt: Benchpark Tutorial Slides
+            :target: _static/slides/HPCIC26-Tutorial-Slides.pdf
+
+    .. tutorialcontainer:: tutorial-project-link
+
+        .. rubric:: Benchpark on CDash
+
+        .. image:: /_static/images/cdash.svg
+            :alt: Benchpark CDash
+            :target: https://my.cdash.org/index.php?project=Benchpark
+
+    .. tutorialcontainer:: tutorial-project-link
+
+        .. rubric:: Spack
+
+        .. image:: https://spack.readthedocs.io/en/latest/_static/spack-logo-text.svg
+            :alt: Spack
+            :target: https://spack.readthedocs.io/en/latest/
+
+    .. tutorialcontainer:: tutorial-project-link
+
+        .. rubric:: Ramble
+
+        .. image:: https://avatars.githubusercontent.com/u/318055132?s=60&v=4
+            :alt: Ramble
+            :target: https://ramble.readthedocs.io/en/latest/
+
+|
 
 ********************
  Benchpark Glossary
@@ -114,62 +150,53 @@ to build and a Ramble ``application.py`` to run the benchmark.
 
 .. _benchpark-spec-syntax:
 
-***********************
- Benchpark Spec Syntax
-***********************
+*********************
+  Spack Spec Syntax
+*********************
 
-Benchpark's parser is derived from Spack's spec parser. A Spack package spec can include
-versions, architecture constraints, compiler constraints, and dependencies, in addition
-to it's package name and variants:
-
-**Spack Spec Syntax**
+A Spack package spec can include versions, architecture constraints, compiler constraints, 
+and dependencies, in addition to it's package name and variants.
 
 .. figure:: /_static/images/spack-spec_anatomy.svg
     :alt: Spack package spec: package name, versions, variants, architecture, compiler, and dependencies.
     :width: 100%
     :align: center
 
-Benchpark implements the object name and variant portions of this syntax. The following
-examples show the name, Boolean variants, and named variants in Benchpark system and
-experiment specs:
+|
 
-**Benchpark System Spec**
-
-.. figure:: /_static/images/system-spec.png
-    :alt: Annotated Benchpark system spec.
-    :width: 100%
-    :align: center
-
-**Benchpark Experiment Spec**
-
-.. figure:: /_static/images/experiment-spec.png
-    :alt: Annotated Benchpark experiment spec.
-    :width: 100%
-    :align: center
-
-In the system example, red identifies the system name, blue the runtime version, green
-the compiler, orange the specific system, purple the library versions, and the final
-orange fields the additional variants. In the experiment example, red identifies the
-experiment name, blue the programming model, green the scaling mode, orange the
-workload, purple the source code version, and the final orange field an additional
-variant.
-
-Every token after the system or experiment name is a Benchpark variant. Tokens beginning
-with ``+`` are Boolean variants, while tokens containing ``=`` are named variants.
-``compiler=cce`` and ``version=2.3-caliper`` are named variants defined by their
-Benchpark objects. They are not Spack compiler (``%``) or version (``@``) constraints.
+*************************
+  Benchpark System Spec
+*************************
 
 A Benchpark spec describes a Benchpark object. A system spec selects a definition under
 ``systems/``, and an experiment spec selects a definition under ``experiments/``.
 
-Benchpark does not implement Spack's version (``@``), compiler (``%``), architecture,
-dependency (``^``), or installed-spec hash (``/hash``) constraint semantics. It also
-does not accept exact multi-value constraints (``:=``) or variant propagation (``++``
-and ``==``). Benchpark uses the same basic syntax as Spack for `Boolean, single-valued,
-and multi-valued variants
-<https://spack.readthedocs.io/en/latest/spec_syntax.html#variants>`_.
+Benchpark's parser is derived from Spack's spec parser, and implements the object name and variant
+portions of this syntax <https://spack.readthedocs.io/en/latest/spec_syntax.html#variants>`_.
+Every token after the system or experiment name is a Benchpark variant. 
+Tokens beginning with ``+`` are Boolean variants, while tokens containing ``=`` are named variants.
+``compiler=cce`` and ``version=2.3-caliper`` are named variants defined by their
+Benchpark objects. They are not Spack compiler (``%``) or version (``@``) constraints.
 
-.. list-table:: Differences in Benchpark and Spack Specs:
+.. figure:: /_static/images/system-spec.png
+    :alt: Annotated Benchpark system spec
+    :width: 100%
+    :align: center
+
+|
+
+*****************************
+  Benchpark Experiment Spec
+*****************************
+
+.. figure:: /_static/images/experiment-spec.png
+    :alt: Annotated Benchpark experiment spec
+    :width: 100%
+    :align: center
+
+|
+
+.. list-table:: Differences in Benchpark and Spack Specs
     :header-rows: 1
     :widths: 27 36 37
 
@@ -177,40 +204,27 @@ and multi-valued variants
       - Benchpark
       - Spack
     - - Select a version
-      - Use a definition's variant: ``version=<value>``.
+      - Use a definition's variant: ``version=<value>``
       - Use a version constraint: ``@<version>``.
     - - Select multiple values exactly
       - Use ``<variant>=<value1>,<value2>``.
       - Use ``<variant>:=<value1>,<value2>``. In Spack, ``:=`` permits additional
-        values.
+        values
+    - - compiler
+      - Not applicable
+      - ``%``
+    - - dependency
+      - Not applicable
+      - ``^``
+    - - installed-spec hash
+      - Not applicable
+      - ``/hash``
 
-***********
- Benchpark & Cdash Dashboard
-***********
+|
 
-.. tutorialcontainer:: tutorial-project-links
-
-    .. tutorialcontainer:: tutorial-project-link
-
-        .. rubric:: Benchpark Source
-
-        .. image:: /_static/images/benchpark-icon.svg
-            :alt: Benchpark on GitHub
-            :target: https://github.com/llnl/benchpark
-
-    .. tutorialcontainer:: tutorial-project-link
-
-        .. rubric:: Benchpark CDash Dashboard
-
-        .. image:: /_static/images/cdash.svg
-            :alt: Benchpark on CDash
-            :target: https://my.cdash.org/index.php?project=Benchpark
-
-***********************
- Choose Your Next Step
-***********************
-
-Continue with the step that matches your goal:
+************************************************
+ Continue with the step that matches your goal
+************************************************
 
 .. tutorialcontainer:: tutorial-next-steps
 
