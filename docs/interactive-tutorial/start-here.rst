@@ -5,6 +5,7 @@
     SPDX-License-Identifier: Apache-2.0
 
 .. _beginner-tutorial-glossary:
+
 .. _beginner-tutorial-start-here:
 
 ############
@@ -184,9 +185,9 @@ and multi-valued variants
       - Use ``<variant>:=<value1>,<value2>``. In Spack, ``:=`` permits additional
         values.
 
-***********
+*****************************
  Benchpark & Cdash Dashboard
-***********
+*****************************
 
 .. tutorialcontainer:: tutorial-project-links
 

@@ -86,8 +86,9 @@ does not yet register its scaling configuration.
         def compute_package_section(self):
             self.add_package_spec(self.name, [f"hpl{self.determine_version()}"])
 
-1. Register the Scaling Configuration
-=====================================
+***************************************
+ 1. Register the Scaling Configuration
+***************************************
 
 Replace the Step 1 placeholder in ``compute_applications_section()`` with the following
 call. Strong scaling increases ``n_ranks`` while keeping ``Ns`` constant. Weak scaling
@@ -123,9 +124,8 @@ definition:
 
 For the complete experiment authoring reference, see :doc:`/add-an-experiment`.
 
-***********
- Next Step
-***********
+Next Step
+=========
 
 .. tutorialcontainer:: tutorial-next-steps
 
