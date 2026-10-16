@@ -6,10 +6,11 @@ import os
 import shutil
 import sys
 
-from spack.package import *
 from spack_repo.builtin.build_systems.cuda import CudaPackage
 from spack_repo.builtin.build_systems.generic import Package
 from spack_repo.builtin.build_systems.rocm import ROCmPackage
+
+from spack.package import *
 
 
 class Mfem(Package, CudaPackage, ROCmPackage):
@@ -345,7 +346,6 @@ class Mfem(Package, CudaPackage, ROCmPackage):
     depends_on("hipcub", when="@4.9.0:+rocm")
 
     depends_on("caliper", when="+caliper")
-    depends_on("adiak", when="+caliper")
 
     with when("+mpi"):
         depends_on("hypre")
@@ -1342,12 +1342,10 @@ class Mfem(Package, CudaPackage, ROCmPackage):
         if "+enzyme" in spec:
             options += ["ENZYME_DIR=%s" % spec["enzyme"].prefix]
 
-        if "+caliper" in spec: 
-            options += [
-                "CALIPER_DIR=%s" % self.spec["caliper"].prefix,
-                "MFEM_USE_ADIAK=ON",
-                "ADIAK_DIR=%s" % self.spec["adiak"].prefix,
-            ]
+        if "+caliper" in spec:
+            options += ["CALIPER_DIR=%s" % self.spec["caliper"].prefix]
+            if "+adiak" in spec["caliper"]:
+                options += ["ADIAK_DIR=%s" % self.spec["adiak"].prefix]
 
         return options
 
