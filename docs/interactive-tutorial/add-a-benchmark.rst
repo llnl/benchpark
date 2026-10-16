@@ -4,66 +4,66 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-####################
- Adding a Benchmark
-####################
+##################################
+ Prereqs for adding an Experiment
+##################################
 
 **Glossary terms:** :ref:`Benchmark <beginner-tutorial-glossary-benchmark>`,
 :ref:`Package <beginner-tutorial-glossary-package>`, :ref:`Application
 <beginner-tutorial-glossary-application>`
 
-This guide is intended for application developers who want to add a benchmark so that it
-can be run with Benchpark.
+Each experiment in Benchmark must have a Spack ``package.py`` for building,
+and a Ramble ``application.py`` for run instructions.  This guide demonstrates
+how to write them using HPL as an example.   
 
-************************
- Create a New Benchmark
-************************
-
-HPL requires a Spack package definition and a Ramble application definition.
-
-- ``package.py`` is a Spack specification that defines how to build and install the
-  benchmark. See the `Spack Package Creation Tutorial
-  <https://spack-tutorial.readthedocs.io/en/latest/tutorial_packaging.html>`_ to learn
-  how to create and test a Spack ``package.py``. If your benchmark already exists in
-  Spack, Benchpark will use that ``package.py`` unless you define one in
-  ``benchpark/repos/spack_repo/benchpark/``.
-- ``application.py`` is a Ramble specification that defines the benchmark input and
-  parameters. See the `Ramble Application Definition Developers Tutorial
-  <https://ramble.readthedocs.io/en/latest/dev_guides/1_basic_application_definition_tutorial.html>`_
-  to learn how to create a Ramble ``application.py``. We recommend testing your
-  ``application.py`` using the `Ramble Testing Application Definitions
-  <https://ramble.readthedocs.io/en/latest/dev_guides/1_basic_application_definition_tutorial.html#testing-application-definitions>`_
-  instructions. If your benchmark already exists in Ramble, Benchpark will use that
-  ``application.py`` unless you define one in ``benchpark/repos/ramble_applications``.
 
 Spack Package
 =============
 
-Create the package at ``repos/spack_repo/benchpark/packages/hpl/package.py`` with the
-following complete contents:
+``package.py`` is a Spack specification that defines how to download, build, and install the benchmark. 
+If a Spack package already exists in the `Spack Packages repo <https://packages.spack.io>`_,
+Benchpark will use that ``package.py``.  If a ``package.py`` exists in 
+``benchpark/repos/spack_repo/benchpark/packages/BenchmarkName``, it will override the
+one in the Spack Packages repo.
+
+For our HPL example, create a file named ``package.py`` in ``repos/spack_repo/benchpark/packages/hpl/``
+with the following complete contents:
 
 .. literalinclude:: ../../repos/spack_repo/benchpark/packages/hpl/package.py
     :language: python
     :linenos:
 
-The package defines how Spack downloads, configures, builds, and installs HPL.
+For benchmarks that do not already have a Spack ``package.py`` in the `Spack Packages repo
+<https://packages.spack.io>`_, see the `Spack Package Creation Tutorial
+<https://spack-tutorial.readthedocs.io/en/latest/tutorial_packaging.html>`_ 
+to learn how to create and test a Spack ``package.py``. 
+
 
 Ramble Application
 ==================
 
-Create the application at ``repos/ramble_applications/hpl/application.py`` with the
-following complete contents:
+``application.py`` is a Ramble specification that defines the benchmark input and parameters. 
+If a Ramble application already exists in the `Ramble Applications repo
+<https://github.com/Ramble-Project/ramble/tree/develop/var/ramble/repos/builtin/applications>`_,
+Benchpark will use that ``application.py``.  If a ``application.py`` exists in
+``benchpark/repos/ramble_applications``, it will override the one in the Ramble Applications repo.
+
+For our HPL example, create a file named ``application.py`` in ``repos/ramble_applications/hpl/``
+with the following complete contents:
 
 .. literalinclude:: ../../repos/ramble_applications/hpl/application.py
     :language: python
     :linenos:
 
-The application inherits Ramble's HPL definition and adds Benchpark catalogue tags.
+This ``application.py`` inherits Ramble's HPL definition and adds Benchpark catalogue tags.
 
-For benchmarks that do not already exist upstream, see the `Spack Package Creation
-Tutorial <https://spack-tutorial.readthedocs.io/en/latest/tutorial_packaging.html>`_ and
-the `Ramble Application Definition Developers Tutorial
+For benchmarks that do not already have an ``application.py`` in the `Ramble Applications repo
+<https://github.com/Ramble-Project/ramble/tree/develop/var/ramble/repos/builtin/applications>`_,
+see the `Ramble Application Definition Developers Tutorial
 <https://ramble.readthedocs.io/en/latest/dev_guides/1_basic_application_definition_tutorial.html>`_.
+We recommend testing your ``application.py`` using the `Ramble Testing Application Definitions
+<https://ramble.readthedocs.io/en/latest/dev_guides/1_basic_application_definition_tutorial.html#testing-application-definitions>`_
+instructions.
 
 ***********
  Next Step
@@ -73,5 +73,4 @@ the `Ramble Application Definition Developers Tutorial
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-experiment
 
-        :doc:`I want to run this new benchmark on my existing system, so I need to add
-        an experiment. <add-an-experiment>`
+        :doc:`I want to run a new benchmark on my existing system <add-an-experiment>`
