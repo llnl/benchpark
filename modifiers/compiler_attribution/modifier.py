@@ -79,12 +79,13 @@ class CompilerAttribution(BasicModifier):
         )
 
         build_stage = self._first_absolute_build_stage(env_path)
+        source_root = os.path.commonpath([build_stage, env_path])
         extraction_root = os.path.join(env_path, "compiler-attribution")
         os.makedirs(extraction_root, exist_ok=True)
 
         plugin_spec = self._plugin_spec(workspace, app_inst)
         inst_env = self._instrumented_env(
-            plugin_prefix, extraction_root, build_stage, plugin_spec
+            plugin_prefix, extraction_root, source_root, plugin_spec
         )
         self._run_spack(
             [
@@ -188,7 +189,7 @@ class CompilerAttribution(BasicModifier):
         )
 
     def _instrumented_env(
-        self, plugin_prefix, extraction_root, build_stage, plugin_spec
+        self, plugin_prefix, extraction_root, source_root, plugin_spec
     ):
         env = os.environ.copy()
         lib_dir = os.path.join(plugin_prefix, "lib")
@@ -209,9 +210,9 @@ class CompilerAttribution(BasicModifier):
         for name in ("SPACK_LDFLAGS", "LDFLAGS"):
             self._append_flag(env, name, link_flags)
 
-        env["EXTRACTION_SRC_PATH"] = build_stage
+        env["EXTRACTION_SRC_PATH"] = source_root
         env["EXTRACTION_OUT_PATH"] = extraction_root
-        env["ASSOCIATION_SRC_PATH"] = build_stage
+        env["ASSOCIATION_SRC_PATH"] = source_root
         env["EXTRACTION_REMARK_COUNTS"] = self._variant_enabled(
             plugin_spec, "+remark_counts"
         )
