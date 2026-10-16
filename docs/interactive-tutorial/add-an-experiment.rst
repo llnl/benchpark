@@ -17,13 +17,19 @@
 <beginner-tutorial-glossary-modifier>`, :ref:`Scaling Study
 <beginner-tutorial-glossary-scaling-study>`
 
+This guide is intended for developers who want to add the ability to run a benchmark
+with Benchpark.  If you do not already have a Spack ``package.py`` and a Ramble
+``application.py`` for the benchmark, you will first need to write them
+as described in :doc:`Prereqs for adding an Experiment <add-a-benchmark>`. The next 
+step is creating the ``experiment.py``, which we will demonstrate for HPL momentarily.
+
+
 **********************************
  Create the Experiment Definition
 **********************************
 
 This example defines the HPL experiment used throughout the Beginner Tutorial. Start
-``experiments/hpl/experiment.py`` with the definition below. The steps that follow add
-the components omitted from this initial version.
+``experiments/hpl/experiment.py`` with the definition below. 
 
 .. code-block:: python
     :linenos:
@@ -97,7 +103,7 @@ the components omitted from this initial version.
 1. Add Programming Models
 =========================
 
-Programming models define the parallel execution modes supported by an experiment.
+Programming models specify how the source code parallelizes the benchmark.
 Replace the first Step 1 placeholder with the programming-model import:
 
 .. code-block:: python
@@ -114,8 +120,8 @@ and OpenMP programming models:
 2. Add the Version Variant
 ==========================
 
-Each explicit experiment version must be defined in the corresponding Spack package. For
-HPL, ``2.3`` and ``2.2`` are defined in
+The version variant will enable us to build and run the source code versions specified
+in the benchmark's Spack package. For HPL, ``2.3`` and ``2.2`` are defined in
 ``repos/spack_repo/benchpark/packages/hpl/package.py``. The ``latest`` value is a
 Benchpark keyword that selects the newest version defined by the Spack package.
 
@@ -134,9 +140,9 @@ Replace the Step 2 placeholder with the complete version variant:
 =========================
 
 The ``exec_mode=test`` experiment definition provides small values for the problem size
-and number of ranks. Replace the Step 3 placeholder with the following ``else`` branch
-to define a set of experiment variables that is more suited to collecting performance
-data:
+and number of ranks, suitable for short CI runs. Replace the Step 3 placeholder with the
+following ``else`` branch to define a set of larger experiment variables for collecting
+performance data:
 
 .. code-block:: python
 
@@ -154,9 +160,9 @@ data:
 4. Set Required Variables
 =========================
 
-Benchpark records the resources and problem sizes used by each experiment. Replace the
-Step 4 placeholder with the following call, which defines the number of ranks, the HPL
-problem size per rank, and the total HPL problem size:
+We record the problem sizes for each experiment, and the resources the experiment requires.
+Replace the Step 4 placeholder with the following call, which defines the number of ranks,
+the HPL problem size per rank, and the total HPL problem size:
 
 .. code-block:: python
 
