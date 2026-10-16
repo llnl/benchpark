@@ -18,18 +18,17 @@
 <beginner-tutorial-glossary-scaling-study>`
 
 This guide is intended for developers who want to add the ability to run a benchmark
-with Benchpark.  If you do not already have a Spack ``package.py`` and a Ramble
-``application.py`` for the benchmark, you will first need to write them
-as described in :doc:`Prereqs for adding an Experiment <add-a-benchmark>`. The next 
-step is creating the ``experiment.py``, which we will demonstrate for HPL momentarily.
-
+with Benchpark. If you do not already have a Spack ``package.py`` and a Ramble
+``application.py`` for the benchmark, you will first need to write them as described in
+:doc:`Prereqs for adding an Experiment <add-a-benchmark>`. The next step is creating the
+``experiment.py``, which we will demonstrate for HPL momentarily.
 
 **********************************
  Create the Experiment Definition
 **********************************
 
 This example defines the HPL experiment used throughout the Beginner Tutorial. Start
-``experiments/hpl/experiment.py`` with the definition below. 
+``experiments/hpl/experiment.py`` with the definition below.
 
 .. code-block:: python
     :linenos:
@@ -103,8 +102,8 @@ This example defines the HPL experiment used throughout the Beginner Tutorial. S
 1. Add Programming Models
 =========================
 
-Programming models specify how the source code parallelizes the benchmark.
-Replace the first Step 1 placeholder with the programming-model import:
+Programming models specify how the source code parallelizes the benchmark. Replace the
+first Step 1 placeholder with the programming-model import:
 
 .. code-block:: python
 
@@ -121,9 +120,9 @@ and OpenMP programming models:
 ==========================
 
 The version variant will enable us to build and run the source code versions specified
-in the benchmark's Spack package. For HPL, ``2.3-caliper``, ``2.3`` and ``2.2`` are defined in
-``repos/spack_repo/benchpark/packages/hpl/package.py``. The ``latest`` value is a
-Benchpark keyword that selects the newest version defined by the Spack package.
+in the benchmark's Spack package. For HPL, ``2.3-caliper``, ``2.3`` and ``2.2`` are
+defined in ``repos/spack_repo/benchpark/packages/hpl/package.py``. The ``latest`` value
+is a Benchpark keyword that selects the newest version defined by the Spack package.
 
 Replace the Step 2 placeholder with the complete version variant:
 
@@ -160,9 +159,9 @@ performance data:
 4. Set Required Variables
 =========================
 
-We record the problem sizes for each experiment, and the resources the experiment requires.
-Replace the Step 4 placeholder with the following call, which defines the number of ranks,
-the HPL problem size per rank, and the total HPL problem size:
+We record the problem sizes for each experiment, and the resources the experiment
+requires. Replace the Step 4 placeholder with the following call, which defines the
+number of ranks, the HPL problem size per rank, and the total HPL problem size:
 
 .. code-block:: python
 

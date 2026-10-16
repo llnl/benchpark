@@ -27,11 +27,11 @@ one of four categories:
     $ benchpark list experiments
     $ benchpark list modifiers
 
-The Benchpark Catalogue shows detailed information on :doc:`Benchpark Systems </system-list>`
-and :doc:`Benchpark Experiments </benchmark-list>` in tabular form.
+The Benchpark Catalogue shows detailed information on :doc:`Benchpark Systems
+</system-list>` and :doc:`Benchpark Experiments </benchmark-list>` in tabular form.
 
-Use the filter to find experiments with your targeted programming model or specific type of scaling.
-For example, this command will display only the CUDA experiments:
+Use the filter to find experiments with your targeted programming model or specific type
+of scaling. For example, this command will display only the CUDA experiments:
 
 .. code-block:: console
 

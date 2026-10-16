@@ -151,12 +151,12 @@ to build and a Ramble ``application.py`` to run the benchmark.
 
 .. _benchpark-spec-syntax:
 
-*********************
-  Spack Spec Syntax
-*********************
+*******************
+ Spack Spec Syntax
+*******************
 
-A Spack package spec can include versions, architecture constraints, compiler constraints,
-and dependencies, in addition to its package name and variants.
+A Spack package spec can include versions, architecture constraints, compiler
+constraints, and dependencies, in addition to its package name and variants.
 
 .. figure:: /_static/images/spack-spec_anatomy.svg
     :alt: Spack package spec: package name, versions, variants, architecture, compiler, and dependencies.
@@ -164,15 +164,15 @@ and dependencies, in addition to its package name and variants.
     :width: 100%
     :align: center
 
-*************************
-  Benchpark System Spec
-*************************
+***********************
+ Benchpark System Spec
+***********************
 
 A Benchpark spec describes a Benchpark object. A system spec selects a definition under
 ``systems/``, and an experiment spec selects a definition under ``experiments/``.
 
-Benchpark's parser is derived from Spack's spec parser and implements the object name and
-`variant portions of its syntax
+Benchpark's parser is derived from Spack's spec parser and implements the object name
+and `variant portions of its syntax
 <https://spack.readthedocs.io/en/latest/spec_syntax.html#variants>`_. Every token after
 the system or experiment name is a Benchpark variant. Tokens beginning with ``+`` are
 Boolean variants, while tokens containing ``=`` are named variants. ``compiler=cce`` and
@@ -185,9 +185,9 @@ not Spack compiler (``%``) or version (``@``) constraints.
     :width: 100%
     :align: center
 
-*****************************
-  Benchpark Experiment Spec
-*****************************
+***************************
+ Benchpark Experiment Spec
+***************************
 
 .. figure:: /_static/images/experiment-spec.png
     :alt: Annotated Benchpark experiment spec
@@ -220,9 +220,9 @@ not Spack compiler (``%``) or version (``@``) constraints.
       - Not supported.
       - Use ``/hash``.
 
-************************************************
+***********************************************
  Continue with the step that matches your goal
-************************************************
+***********************************************
 
 .. tutorialcontainer:: tutorial-next-steps
 
