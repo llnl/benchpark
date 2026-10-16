@@ -121,7 +121,7 @@ and OpenMP programming models:
 ==========================
 
 The version variant will enable us to build and run the source code versions specified
-in the benchmark's Spack package. For HPL, ``2.3`` and ``2.2`` are defined in
+in the benchmark's Spack package. For HPL, ``2.3-caliper``, ``2.3`` and ``2.2`` are defined in
 ``repos/spack_repo/benchpark/packages/hpl/package.py``. The ``latest`` value is a
 Benchpark keyword that selects the newest version defined by the Spack package.
 
