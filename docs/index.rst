@@ -20,8 +20,8 @@
     :maxdepth: 1
     :caption: Catalogue
 
-    system-list
-    benchmark-list
+    Benchpark Systems <system-list>
+    Benchpark Experiments <benchmark-list>
 
 .. toctree::
     :maxdepth: 1

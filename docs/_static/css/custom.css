@@ -216,6 +216,10 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     width: auto;
 }
 
+.rst-content .tutorial-spec-figure {
+    margin: 1.5rem 0 2rem;
+}
+
 .rst-content .tutorial-next-step > p {
     height: 100%;
     margin: 0;
@@ -249,6 +253,33 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
 .rst-content .tutorial-next-step a:focus-visible {
     outline: 3px solid var(--card-accent);
     outline-offset: 3px;
+}
+
+.rst-content .tutorial-with-duration {
+    position: relative;
+}
+
+.rst-content .tutorial-with-duration a,
+.rst-content .tutorial-with-duration a:visited {
+    padding-bottom: 3rem;
+}
+
+.rst-content .tutorial-with-duration .tutorial-duration {
+    bottom: 1rem;
+    color: var(--card-text);
+    pointer-events: none;
+    position: absolute;
+    right: 1.25rem;
+    text-align: right;
+    transition: color 150ms ease;
+}
+
+.rst-content .tutorial-with-duration .tutorial-duration p {
+    margin: 0;
+}
+
+.rst-content .tutorial-with-duration:hover .tutorial-duration {
+    color: #ffffff;
 }
 
 .rst-content .tutorial-next-step-multiple {

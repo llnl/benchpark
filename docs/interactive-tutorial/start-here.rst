@@ -26,9 +26,9 @@
 
         .. rubric:: Benchpark Tutorial Slides
 
-        .. image:: tutorial/HPCIC26-Tutorial-Slide-Preview.jpg
+        .. image:: /tutorial/HPCIC26-Tutorial-Slide-Preview.jpg
             :alt: Benchpark Tutorial Slides
-            :target: _static/slides/HPCIC26-Tutorial-Slides.pdf
+            :target: ../_static/slides/HPCIC26-Tutorial-Slides.pdf
 
     .. tutorialcontainer:: tutorial-project-link
 
@@ -50,7 +50,7 @@
 
         .. rubric:: Ramble
 
-        .. image:: https://avatars.githubusercontent.com/u/318055132?s=60&v=4
+        .. image:: https://avatars.githubusercontent.com/u/318055132?s=240&v=4
             :alt: Ramble
             :target: https://ramble.readthedocs.io/en/latest/
 
@@ -155,15 +155,14 @@ to build and a Ramble ``application.py`` to run the benchmark.
   Spack Spec Syntax
 *********************
 
-A Spack package spec can include versions, architecture constraints, compiler constraints, 
-and dependencies, in addition to it's package name and variants.
+A Spack package spec can include versions, architecture constraints, compiler constraints,
+and dependencies, in addition to its package name and variants.
 
 .. figure:: /_static/images/spack-spec_anatomy.svg
     :alt: Spack package spec: package name, versions, variants, architecture, compiler, and dependencies.
+    :figclass: tutorial-spec-figure
     :width: 100%
     :align: center
-
-|
 
 *************************
   Benchpark System Spec
@@ -172,19 +171,19 @@ and dependencies, in addition to it's package name and variants.
 A Benchpark spec describes a Benchpark object. A system spec selects a definition under
 ``systems/``, and an experiment spec selects a definition under ``experiments/``.
 
-Benchpark's parser is derived from Spack's spec parser, and implements the object name and variant
-portions of this syntax <https://spack.readthedocs.io/en/latest/spec_syntax.html#variants>`_.
-Every token after the system or experiment name is a Benchpark variant. 
-Tokens beginning with ``+`` are Boolean variants, while tokens containing ``=`` are named variants.
-``compiler=cce`` and ``version=2.3-caliper`` are named variants defined by their
-Benchpark objects. They are not Spack compiler (``%``) or version (``@``) constraints.
+Benchpark's parser is derived from Spack's spec parser and implements the object name and
+`variant portions of its syntax
+<https://spack.readthedocs.io/en/latest/spec_syntax.html#variants>`_. Every token after
+the system or experiment name is a Benchpark variant. Tokens beginning with ``+`` are
+Boolean variants, while tokens containing ``=`` are named variants. ``compiler=cce`` and
+``version=2.3-caliper`` are named variants defined by their Benchpark objects. They are
+not Spack compiler (``%``) or version (``@``) constraints.
 
 .. figure:: /_static/images/system-spec.png
     :alt: Annotated Benchpark system spec
+    :figclass: tutorial-spec-figure
     :width: 100%
     :align: center
-
-|
 
 *****************************
   Benchpark Experiment Spec
@@ -192,13 +191,13 @@ Benchpark objects. They are not Spack compiler (``%``) or version (``@``) constr
 
 .. figure:: /_static/images/experiment-spec.png
     :alt: Annotated Benchpark experiment spec
+    :figclass: tutorial-spec-figure
     :width: 100%
     :align: center
 
-|
-
 .. list-table:: Differences in Benchpark and Spack Specs
     :header-rows: 1
+    :stub-columns: 1
     :widths: 27 36 37
 
     - - Goal
@@ -209,19 +208,17 @@ Benchpark objects. They are not Spack compiler (``%``) or version (``@``) constr
       - Use a version constraint: ``@<version>``.
     - - Select multiple values exactly
       - Use ``<variant>=<value1>,<value2>``.
-      - Use ``<variant>:=<value1>,<value2>``. In Spack, ``:=`` permits additional
-        values
-    - - compiler
-      - Not applicable
-      - ``%``
-    - - dependency
-      - Not applicable
-      - ``^``
-    - - installed-spec hash
-      - Not applicable
-      - ``/hash``
-
-|
+      - Use ``<variant>:=<value1>,<value2>``. In Spack, ``=`` also matches specs
+        containing additional values, while ``:=`` requires an exact match.
+    - - Select a compiler
+      - Not supported.
+      - Use ``%<compiler>``.
+    - - Select a dependency
+      - Not supported.
+      - Use ``^<dependency>``.
+    - - Select an installed spec by hash
+      - Not supported.
+      - Use ``/hash``.
 
 ************************************************
  Continue with the step that matches your goal
@@ -229,39 +226,40 @@ Benchpark objects. They are not Spack compiler (``%``) or version (``@``) constr
 
 .. tutorialcontainer:: tutorial-next-steps
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-search
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-search tutorial-with-duration
 
-        :doc:`I want to search what is available in Benchpark.
-        .. class:: text-right
+        :doc:`I want to search what is available in Benchpark. <search-benchpark>`
 
-        5 min.
-        <search-benchpark>`
+        .. tutorialcontainer:: tutorial-duration
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run
+            5 min.
+
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run tutorial-with-duration
 
         :doc:`I want to run an experiment someone gave me on the same system.
-        .. class:: text-right
-
-        10 min.
         <build-and-run-experiment>`
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-analyze
+        .. tutorialcontainer:: tutorial-duration
+
+            10 min.
+
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-analyze tutorial-with-duration
 
         :doc:`I want to generate preconfigured performance figures for an experiment
-        on my system. 
-        .. class:: text-right
+        on my system. <benchpark-analyze>`
 
-        10 min + 10 min.
-        <benchpark-analyze>`
+        .. tutorialcontainer:: tutorial-duration
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-experiment
+            10 min + 10 min.
 
-        :doc:`I want to run a new benchmark on the system I have
-        benchmarked before.
-        .. class:: text-right
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-experiment tutorial-with-duration
 
-        20 min.
+        :doc:`I want to run a new benchmark on the system I have benchmarked before.
         <add-an-experiment>`
+
+        .. tutorialcontainer:: tutorial-duration
+
+            20 min.
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-update-system
 
