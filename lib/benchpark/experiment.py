@@ -195,7 +195,34 @@ class Githash:
             return githash_modifier_list
 
 
-class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc, Githash):
+class CompilerAttribution:
+    variant(
+        "compiler_attribution",
+        default="none",
+        values=(
+            "none",
+            "on",
+        ),
+        multi=False,
+        description="Collect compiler attribution plugin trace data",
+    )
+
+    class Helper(ExperimentHelper):
+        def compute_modifiers_section(self):
+            if self.spec.satisfies("compiler_attribution=none"):
+                return []
+
+            return [{"name": "compiler_attribution", "mode": "on"}]
+
+
+class Experiment(
+    ExperimentSystemBase,
+    ExecMode,
+    Affinity,
+    Hwloc,
+    Githash,
+    CompilerAttribution,
+):
     """This is the superclass for all benchpark experiments.
 
     ***The Experiment class***
