@@ -170,13 +170,19 @@ export SPACK_DISABLE_LOCAL_CONFIG=1
 """)
 
     env_dir = os.path.dirname(find_one(ramble_workspace, "spack.yaml"))
-    git_repo_dst = os.path.join(dest, "git-repos")
+
+    # Get commit requirements for branch-based git packages
     repo_copy_script = os.path.join(
         paths.benchpark_root, "lib", "scripts", "env-collect-branch-tips.py"
     )
     out, err = run_command(
-        f"spack -e {env_dir} python {repo_copy_script} {git_repo_dst}"
+        f"spack -e {env_dir} python {repo_copy_script}"
     )
+
+    # Save JSON output to mirror directory for redirect-git-urls.py to consume
+    commit_info_file = os.path.join(dest, "git-commit-info.json")
+    with open(commit_info_file, 'w') as f:
+        f.write(out)
 
     git_redirect_script = os.path.join(
         paths.benchpark_root, "lib", "scripts", "redirect-git-urls.py"
@@ -204,7 +210,7 @@ spack repo add --scope=spack $this_script_dir/spack-packages/repos/spack_repo/bu
 spack repo add --scope=spack $this_script_dir/repos/spack_repo/benchpark/
 spack config --scope=spack add "config:misc_cache:$this_script_dir/spack-misc-cache"
 spack bootstrap add --scope=spack --trust local-sources "$this_script_dir/spack-bootstrap-mirror/metadata/sources/"
-spack python $this_script_dir/redirect-git-urls.py $this_script_dir/{benchpark_workspace_relative}
+spack python $this_script_dir/redirect-git-urls.py $this_script_dir/{benchpark_workspace_relative} git-commit-info.json
 
 # We deleted the repo config because it may have absolute paths;
 # it is reinstantiated here
