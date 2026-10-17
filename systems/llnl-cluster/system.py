@@ -205,10 +205,7 @@ class LlnlCluster(System):
                 },
                 "cmake": {
                     "externals": [
-                        {
-                            "spec": "cmake@3.26.5",
-                            "prefix": "/usr/tce/packages/cmake/cmake-3.26.3",
-                        },
+                        {"spec": "cmake@=3.26.5", "prefix": "/usr"},
                         {
                             "spec": "cmake@3.23.1",
                             "prefix": "/usr/tce/packages/cmake/cmake-3.23.1",
@@ -221,7 +218,7 @@ class LlnlCluster(System):
                     "buildable": False,
                 },
                 "tar": {
-                    "externals": [{"spec": "tar@1.30", "prefix": "/usr"}],
+                    "externals": [{"spec": "tar@=1.30", "prefix": "/usr"}],
                     "buildable": False,
                 },
                 "autoconf": {
@@ -266,7 +263,7 @@ class LlnlCluster(System):
                     "buildable": False,
                 },
                 "hwloc": {
-                    "externals": [{"spec": "hwloc@2.11.2", "prefix": "/usr"}],
+                    "externals": [{"spec": "hwloc@=2.14.0", "prefix": "/usr"}],
                     "buildable": False,
                 },
                 "gmake": {
