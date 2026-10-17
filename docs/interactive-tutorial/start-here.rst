@@ -26,9 +26,9 @@
 
         .. rubric:: Benchpark Tutorial Slides
 
-        .. image:: /tutorial/HPCIC26-Tutorial-Slide-Preview.jpg
+        .. image:: /tutorial/PACT26-Tutorial-Slide-Preview.jpg
             :alt: Benchpark Tutorial Slides
-            :target: ../_static/slides/HPCIC26-Tutorial-Slides.pdf
+            :target: ../_static/slides/PACT26-Tutorial-Slides.pdf
 
     .. tutorialcontainer:: tutorial-project-link
 
