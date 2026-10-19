@@ -23,6 +23,8 @@ class CompilerAttributionPlugin(CMakePackage):
 
     version("0.1.0", branch="develop")
 
+    patch("skip-modules-outside-source-root.patch", when="@0.1.0 +association")
+
     root_cmakelists_dir = "Strata/compiler_attribution_plugin"
 
     variant(
