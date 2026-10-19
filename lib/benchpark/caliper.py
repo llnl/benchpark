@@ -6,7 +6,7 @@
 import warnings
 
 from benchpark.directives import variant
-from benchpark.experiment_helper import ExperimentHelper
+from benchpark.experiment import ExperimentHelper
 
 
 class Caliper:

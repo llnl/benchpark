@@ -7,7 +7,7 @@
 from enum import Enum
 
 from benchpark.directives import requires, variant
-from benchpark.experiment_helper import ExperimentHelper
+from benchpark.experiment import ExperimentHelper
 
 
 class ProgrammingModelType(Enum):
