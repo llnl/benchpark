@@ -26,7 +26,7 @@ class CompilerAttribution(BasicModifier):
     with when("package_manager_family=spack"):
         software_spec(
             "compiler_attribution_plugin",
-            pkg_spec="compiler-attribution-plugin",
+            pkg_spec="compiler-attribution-plugin +association",
             inject_if_missing=True,
         )
 
@@ -74,8 +74,28 @@ class CompilerAttribution(BasicModifier):
                 "compiler_attribution could not locate compiler-attribution-plugin"
             )
 
+        plugin_spec = self._plugin_spec(workspace, app_inst)
+        instrumented_spec = self._instrumented_spec(
+            benchmark_spec, plugin_prefix, plugin_spec
+        )
+        if instrumented_spec != benchmark_spec:
+            benchmark_name = self._normalize_name(
+                self._application_package(workspace, app_inst).name
+            )
+            self._run_spack(
+                [
+                    "-e",
+                    env_path,
+                    "change",
+                    "--match-spec",
+                    benchmark_name,
+                    instrumented_spec,
+                ]
+            )
+            self._run_spack(["-e", env_path, "concretize", "--force"])
+
         self._run_spack(
-            ["-e", env_path, "install", "--only", "dependencies", benchmark_spec]
+            ["-e", env_path, "install", "--only", "dependencies", instrumented_spec]
         )
 
         build_stage = self._first_absolute_build_stage(env_path)
@@ -83,7 +103,6 @@ class CompilerAttribution(BasicModifier):
         extraction_root = os.path.join(env_path, "compiler-attribution")
         os.makedirs(extraction_root, exist_ok=True)
 
-        plugin_spec = self._plugin_spec(workspace, app_inst)
         inst_env = self._instrumented_env(
             plugin_prefix, extraction_root, source_root, plugin_spec
         )
@@ -98,7 +117,7 @@ class CompilerAttribution(BasicModifier):
                 "--overwrite",
                 "--no-cache",
                 "--dirty",
-                benchmark_spec,
+                instrumented_spec,
             ],
             env=inst_env,
         )
@@ -200,15 +219,8 @@ class CompilerAttribution(BasicModifier):
         if "+kru" in plugin_spec:
             compile_flags += " -mllvm -pass-remarks-analysis=kernel-resource-usage"
 
-        link_flags = ""
-        if "+association" in plugin_spec:
-            runtime_path = os.path.join(lib_dir, "CaliperAssociationLib.so")
-            link_flags = f"{runtime_path} -Wl,-rpath,{lib_dir} -Wl,--export-dynamic"
-
         for name in ("SPACK_CXXFLAGS", "CXXFLAGS", "HIPFLAGS"):
             self._append_flag(env, name, compile_flags)
-        for name in ("SPACK_LDFLAGS", "LDFLAGS"):
-            self._append_flag(env, name, link_flags)
 
         env["EXTRACTION_SRC_PATH"] = source_root
         env["EXTRACTION_OUT_PATH"] = extraction_root
@@ -225,6 +237,16 @@ class CompilerAttribution(BasicModifier):
             plugin_spec, "+per_pass_ir_metrics"
         )
         return env
+
+    @staticmethod
+    def _instrumented_spec(benchmark_spec, plugin_prefix, plugin_spec):
+        if "+association" not in plugin_spec:
+            return benchmark_spec
+
+        lib_dir = os.path.join(plugin_prefix, "lib")
+        runtime_path = os.path.join(lib_dir, "CaliperAssociationLib.so")
+        link_flags = f"{runtime_path} -Wl,-rpath,{lib_dir} -Wl,--export-dynamic"
+        return f"{benchmark_spec} ldflags={shlex.quote(link_flags)}"
 
     def _run_spack(self, args, env=None, capture_output=False):
         cmd = ["spack"] + args
