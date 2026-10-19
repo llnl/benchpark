@@ -7,7 +7,7 @@ import ramble.repository
 from benchpark.paths import paths
 
 
-def test_compiler_attribution_enables_default_metrics():
+def test_compiler_attribution_declares_feature_modes():
     repo = ramble.repository.Repo(
         str(paths.benchpark_root / "modifiers"),
         object_type=ramble.repository.ObjectTypes.modifiers,
@@ -17,9 +17,15 @@ def test_compiler_attribution_enables_default_metrics():
     plugin_specs = modifier_class.software_specs["compiler_attribution_plugin"]
 
     assert len(plugin_specs) == 1
-    assert plugin_specs[0].pkg_spec == (
-        "compiler-attribution-plugin +association +remark_counts +kru +ir_metrics"
-    )
+    assert plugin_specs[0].pkg_spec == "compiler-attribution-plugin"
+    assert {
+        "association",
+        "remark_counts",
+        "remark_details",
+        "kru",
+        "ir_metrics",
+        "per_pass_ir_metrics",
+    }.issubset(modifier_class.modes)
 
 
 def test_compiler_attribution_adds_postprocessing_command():
@@ -28,6 +34,7 @@ def test_compiler_attribution_adds_postprocessing_command():
         object_type=ramble.repository.ObjectTypes.modifiers,
     )
     modifier = repo.get("compiler-attribution")
+    modifier.set_usage_mode("association")
 
     pre_exec, post_exec = modifier.compiler_attribution("run", None)
 
@@ -42,6 +49,17 @@ def test_compiler_attribution_adds_postprocessing_command():
         "'{experiment_run_dir}/{experiment_name}.run.compiler_attribution.trace.jsonl' "
         "'{experiment_run_dir}/{experiment_name}.run.compiler_attribution.postprocessed.json'"
     ]
+
+
+def test_compiler_attribution_skips_postprocessing_without_association():
+    repo = ramble.repository.Repo(
+        str(paths.benchpark_root / "modifiers"),
+        object_type=ramble.repository.ObjectTypes.modifiers,
+    )
+    modifier = repo.get("compiler-attribution")
+    modifier.set_usage_mode("kru")
+
+    assert modifier.compiler_attribution("run", None) == ([], [])
 
 
 def test_compiler_attribution_adds_association_runtime_to_root_spec():

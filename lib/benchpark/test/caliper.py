@@ -7,11 +7,10 @@ import json
 import sys
 import tempfile
 
-from ramble.expander import Expander
-
 import benchpark.caliper
 import benchpark.spec
 from benchpark.paths import paths
+from ramble.expander import Expander
 
 
 def get_caliper_vars_section(expr_spec):
@@ -166,7 +165,7 @@ def test_caliper_nvtx_service_modifier_and_package_section():
 
 def test_compiler_attribution_enables_caliper_annotations():
     expr_spec = benchpark.spec.ExperimentSpec(
-        "saxpy compiler_attribution=on"
+        "saxpy compiler_attribution=association,remark_counts,kru"
     ).concretize()
     experiment = expr_spec.experiment
     cali = get_caliper_helper(expr_spec)
@@ -178,4 +177,20 @@ def test_compiler_attribution_enables_caliper_annotations():
             "spack_pkg_spec"
         ]
         == "saxpy@1.0.0~openmp ~cuda ~rocm +caliper"
+    )
+
+
+def test_compiler_attribution_without_association_does_not_enable_caliper():
+    expr_spec = benchpark.spec.ExperimentSpec(
+        "saxpy compiler_attribution=remark_counts,kru"
+    ).concretize()
+    experiment = expr_spec.experiment
+    cali = get_caliper_helper(expr_spec)
+
+    assert cali.get_spack_variants() == "~caliper"
+    assert (
+        experiment.compute_package_section_wrapper()["packages"]["saxpy"][
+            "spack_pkg_spec"
+        ]
+        == "saxpy@1.0.0~openmp ~cuda ~rocm ~caliper"
     )

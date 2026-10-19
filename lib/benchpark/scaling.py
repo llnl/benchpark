@@ -8,7 +8,7 @@ from enum import Enum
 
 from benchpark.directives import variant
 from benchpark.error import BenchparkError
-from benchpark.experiment import ExperimentHelper
+from benchpark.experiment_helper import ExperimentHelper
 
 
 class ScalingMode(Enum):

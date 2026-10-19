@@ -16,20 +16,24 @@ class CompilerAttribution(BasicModifier):
 
     maintainers("yejashi")
 
+    modifier_conflict("name_mode")
+
+    mode(name="association", description="Collect Caliper region associations")
+    mode(name="remark_counts", description="Collect optimization remark counts")
+    mode(name="remark_details", description="Collect optimization remark details")
+    mode(name="kru", description="Collect HIP kernel resource usage")
+    mode(name="ir_metrics", description="Collect phase IR metrics")
     mode(
-        name="on",
-        description="Collect compiler attribution plugin trace data",
+        name="per_pass_ir_metrics",
+        description="Collect before and after IR metrics for each optimization pass",
     )
 
-    default_mode("on")
+    default_mode("association")
 
     with when("package_manager_family=spack"):
         software_spec(
             "compiler_attribution_plugin",
-            pkg_spec=(
-                "compiler-attribution-plugin +association +remark_counts +kru "
-                "+ir_metrics"
-            ),
+            pkg_spec="compiler-attribution-plugin",
             inject_if_missing=True,
         )
 
@@ -286,6 +290,9 @@ class CompilerAttribution(BasicModifier):
 
     def compiler_attribution(self, executable_name, executable, app_inst=None):
         from ramble.util.executable import CommandExecutable
+
+        if self._usage_mode != "association":
+            return [], []
 
         postprocess_script = (
             '"$(spack -e \'{env_path}\' location -i '

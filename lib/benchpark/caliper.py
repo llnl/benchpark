@@ -6,7 +6,7 @@
 import warnings
 
 from benchpark.directives import variant
-from benchpark.experiment import ExperimentHelper
+from benchpark.experiment_helper import ExperimentHelper
 
 
 class Caliper:
@@ -159,7 +159,7 @@ class Caliper:
             return "_".join(parts)
 
         def get_spack_variants(self):
-            if self.spec.satisfies("compiler_attribution=on"):
+            if self.spec.satisfies("compiler_attribution=association"):
                 return "+caliper"
 
             if self.spec.satisfies("caliper=none") and self.spec.satisfies(
