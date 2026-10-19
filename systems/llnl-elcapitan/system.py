@@ -344,7 +344,7 @@ class LlnlElcapitan(System):
                 "libtool": {"externals": [{"spec": "libtool@2.4.6", "prefix": "/usr"}]},
                 "flex": {"externals": [{"spec": "flex@2.6.1+lex", "prefix": "/usr"}]},
                 "openssl": {
-                    "externals": [{"spec": "openssl@1.1.1k", "prefix": "/usr"}]
+                    "externals": [{"spec": "openssl@1.1.1k", "prefix": "/usr"}, {"spec": "openssl@=3.5.5", "prefix": "/usr"}]
                 },
                 "m4": {"externals": [{"spec": "m4@1.4.18", "prefix": "/usr"}]},
                 "groff": {"externals": [{"spec": "groff@1.22.3", "prefix": "/usr"}]},
@@ -384,13 +384,13 @@ class LlnlElcapitan(System):
                 "swig": {"externals": [{"spec": "swig@3.0.12", "prefix": "/usr"}]},
                 "gawk": {"externals": [{"spec": "gawk@4.2.1", "prefix": "/usr"}]},
                 "binutils": {
-                    "externals": [{"spec": "binutils@2.30.113", "prefix": "/usr"}]
+                    "externals": [{"spec": "binutils@=2.30.128~gold+headers", "prefix": "/usr"}]
                 },
                 "findutils": {
                     "externals": [{"spec": "findutils@4.6.0", "prefix": "/usr"}]
                 },
                 "git-lfs": {
-                    "externals": [{"spec": "git-lfs@2.11.0", "prefix": "/usr/tce"}]
+                    "externals": [{"spec": "git-lfs@2.11.0", "prefix": "/usr/tce"}, {"spec": "git-lfs@=3.4.1", "prefix": "/usr"}]
                 },
                 "ccache": {"externals": [{"spec": "ccache@3.7.7", "prefix": "/usr"}]},
                 "automake": {
@@ -434,7 +434,7 @@ class LlnlElcapitan(System):
                 "hypre": {"variants": f"amdgpu_target={self.rocm_arch}"},
                 "hwloc": {
                     "buildable": False,
-                    "externals": [{"spec": "hwloc@2.9.1", "prefix": "/usr"}],
+                    "externals": [{"spec": "hwloc@=2.14.0", "prefix": "/usr"}],
                 },
                 "fftw": {"buildable": False},
                 "intel-oneapi-mkl": {
@@ -452,7 +452,7 @@ class LlnlElcapitan(System):
                 },
                 "mpi": {"require": "cray-mpich-gtl"},
                 "libfabric": {
-                    "externals": [{"spec": "libfabric@2.3.1", "prefix": "/usr"}],
+                    "externals": [{"spec": "libfabric@=2.6.0 fabrics=cxi,efa,lnx,psm2,psm3,shm,sockets,tcp,udp,usnic,verbs", "prefix": "/usr"}],
                     "buildable": False,
                 },
                 "ncurses": {
