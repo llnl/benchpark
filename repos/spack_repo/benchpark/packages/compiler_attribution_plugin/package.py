@@ -87,6 +87,7 @@ class CompilerAttributionPlugin(CMakePackage):
     @property
     def sanity_check_is_file(self):
         files = [
+            "bin/compiler-attribution-postprocess",
             "lib/CompilerAttributionPlugin.so",
             "lib/cmake/CompilerAttributionPlugin/CompilerAttributionPluginConfig.cmake",
         ]
@@ -145,6 +146,19 @@ class CompilerAttributionPlugin(CMakePackage):
                 "COMPILER_ATTRIBUTION_ENABLE_ASSOCIATION", "association"
             ),
         ]
+
+    @run_after("install")
+    def install_postprocessor(self):
+        mkdirp(self.prefix.bin)
+        install(
+            join_path(
+                self.stage.source_path,
+                "Strata",
+                "postprocess",
+                "postprocess.py",
+            ),
+            join_path(self.prefix.bin, "compiler-attribution-postprocess"),
+        )
 
     def extraction_dir(self, dependent_spec):
         return join_path(dependent_spec.prefix, "share", "compiler-attribution")

@@ -26,7 +26,10 @@ class CompilerAttribution(BasicModifier):
     with when("package_manager_family=spack"):
         software_spec(
             "compiler_attribution_plugin",
-            pkg_spec="compiler-attribution-plugin +association",
+            pkg_spec=(
+                "compiler-attribution-plugin +association +remark_counts +kru "
+                "+ir_metrics"
+            ),
             inject_if_missing=True,
         )
 
@@ -284,11 +287,19 @@ class CompilerAttribution(BasicModifier):
     def compiler_attribution(self, executable_name, executable, app_inst=None):
         from ramble.util.executable import CommandExecutable
 
+        postprocess_script = (
+            '"$(spack -e \'{env_path}\' location -i '
+            'compiler-attribution-plugin)/bin/compiler-attribution-postprocess"'
+        )
         trace_file = (
             "{experiment_run_dir}/{experiment_name}."
             f"{executable_name}.compiler_attribution.trace.jsonl"
         )
         extraction_dir = "{env_path}/compiler-attribution/extraction_plugin_output"
+        postprocessed_file = (
+            "{experiment_run_dir}/{experiment_name}."
+            f"{executable_name}.compiler_attribution.postprocessed.json"
+        )
         pre_exec = [
             CommandExecutable(
                 f"set-compiler-attribution-trace-{executable_name}",
@@ -298,5 +309,21 @@ class CompilerAttribution(BasicModifier):
                 ],
             )
         ]
+        post_exec = [
+            CommandExecutable(
+                f"postprocess-compiler-attribution-{executable_name}",
+                template=[
+                    " ".join(
+                        (
+                            "python3",
+                            postprocess_script,
+                            shlex.quote(extraction_dir),
+                            shlex.quote(trace_file),
+                            shlex.quote(postprocessed_file),
+                        )
+                    )
+                ],
+            )
+        ]
 
-        return pre_exec, []
+        return pre_exec, post_exec

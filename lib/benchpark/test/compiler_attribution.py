@@ -4,11 +4,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import ramble.repository
-
 from benchpark.paths import paths
 
 
-def test_compiler_attribution_enables_association():
+def test_compiler_attribution_enables_default_metrics():
     repo = ramble.repository.Repo(
         str(paths.benchpark_root / "modifiers"),
         object_type=ramble.repository.ObjectTypes.modifiers,
@@ -18,7 +17,31 @@ def test_compiler_attribution_enables_association():
     plugin_specs = modifier_class.software_specs["compiler_attribution_plugin"]
 
     assert len(plugin_specs) == 1
-    assert plugin_specs[0].pkg_spec == "compiler-attribution-plugin +association"
+    assert plugin_specs[0].pkg_spec == (
+        "compiler-attribution-plugin +association +remark_counts +kru +ir_metrics"
+    )
+
+
+def test_compiler_attribution_adds_postprocessing_command():
+    repo = ramble.repository.Repo(
+        str(paths.benchpark_root / "modifiers"),
+        object_type=ramble.repository.ObjectTypes.modifiers,
+    )
+    modifier = repo.get("compiler-attribution")
+
+    pre_exec, post_exec = modifier.compiler_attribution("run", None)
+
+    assert len(pre_exec) == 1
+    assert len(post_exec) == 1
+    assert post_exec[0].name == "postprocess-compiler-attribution-run"
+    assert post_exec[0].template == [
+        "python3 "
+        '"$(spack -e \'{env_path}\' location -i '
+        'compiler-attribution-plugin)/bin/compiler-attribution-postprocess" '
+        "'{env_path}/compiler-attribution/extraction_plugin_output' "
+        "'{experiment_run_dir}/{experiment_name}.run.compiler_attribution.trace.jsonl' "
+        "'{experiment_run_dir}/{experiment_name}.run.compiler_attribution.postprocessed.json'"
+    ]
 
 
 def test_compiler_attribution_adds_association_runtime_to_root_spec():
