@@ -142,6 +142,8 @@ class LlnlElcapitan(System):
             "7.1.1",
             "7.2.0",
             "7.2.1",
+            "7.14",
+            "10.0"
         ),
         description="ROCm version",
     )
@@ -231,13 +233,34 @@ class LlnlElcapitan(System):
                 f"{self.gcc_version.major}.{self.gcc_version.minor}"
             )
         else:
-            if self.rocm_version >= Version("7.0.0"):
-                self.cce_version = Version("21.0.1")
+            if self.rocm_version >= Version("10.0"):
+                self.cce_version = Version("21.0.3")
                 self.mpi_version = Version("9.1.0")
                 # Modules for cce/21.0 named as cce/20.0, so do not change this
                 self.override_cce_shortpath = Version("20.0")
                 # No working self.rccl_version
                 self.rccl_version = None
+            elif self.rocm_version >= Version("7.14"):
+                self.cce_version = Version("21.0.3")
+                self.mpi_version = Version("9.1.0")
+                # Modules for cce/21.0 named as cce/20.0, so do not change this
+                self.override_cce_shortpath = Version("20.0")
+                # No working self.rccl_version
+                self.rccl_version = Version("7.14")
+            elif self.rocm_version >= Version("7.2.0"):
+                self.cce_version = Version("21.0.2")
+                self.mpi_version = Version("9.1.0")
+                # Modules for cce/21.0 named as cce/20.0, so do not change this
+                self.override_cce_shortpath = Version("20.0")
+                # No working self.rccl_version
+                self.rccl_version = Version("7.2.0")
+            elif self.rocm_version >= Version("7.0.0"):
+                self.cce_version = Version("21.0.1")
+                self.mpi_version = Version("9.1.0")
+                # Modules for cce/21.0 named as cce/20.0, so do not change this
+                self.override_cce_shortpath = Version("20.0")
+                # No working self.rccl_version
+                self.rccl_version = Version("7.1.1")
             elif self.rocm_version >= Version("6.4.0"):
                 self.cce_version = Version("20.0.0")
                 self.mpi_version = Version("9.0.1")
