@@ -221,6 +221,13 @@ class LlnlElcapitan(System):
         super().__init__(spec)
         self.programming_models = [ROCmSystem(), OpenMPCPUOnlySystem()]
         self.rocm_version = Version(self.spec.variants["rocm"][0])
+        if self.rocm_version >= Version("7.14"):
+            # rocm moved locations starting in 7.14
+            self.rocm_prefix = f"/opt/rocm/core-{self.rocm_version}"
+            self.rocm_llvm_prefix = f"{self.rocm_prefix}/lib/llvm"
+        else:
+            self.rocm_prefix = f"/opt/rocm-{self.rocm_version}"
+            self.rocm_llvm_prefix = f"{self.rocm_prefix}/llvm"
         self.gtl_flag = self.spec.variants["gtl"][0]
         self.override_cce_shortpath = None
         self.rccl_version = None
@@ -646,7 +653,7 @@ class LlnlElcapitan(System):
                     "externals": [
                         {
                             "spec": f"hipfft@{self.rocm_version}",
-                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                            "prefix": self.rocm_prefix,
                         }
                     ],
                     "buildable": False,
@@ -655,7 +662,7 @@ class LlnlElcapitan(System):
                     "externals": [
                         {
                             "spec": f"rocfft@{self.rocm_version}",
-                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                            "prefix": self.rocm_prefix,
                         }
                     ],
                     "buildable": False,
@@ -664,7 +671,7 @@ class LlnlElcapitan(System):
                     "externals": [
                         {
                             "spec": f"rocprim@{self.rocm_version}",
-                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                            "prefix": self.rocm_prefix,
                         }
                     ],
                     "buildable": False,
@@ -673,7 +680,7 @@ class LlnlElcapitan(System):
                     "externals": [
                         {
                             "spec": f"rocrand@{self.rocm_version}",
-                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                            "prefix": self.rocm_prefix,
                         }
                     ],
                     "buildable": False,
@@ -682,7 +689,7 @@ class LlnlElcapitan(System):
                     "externals": [
                         {
                             "spec": f"rocsparse@{self.rocm_version}",
-                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                            "prefix": self.rocm_prefix,
                         }
                     ],
                     "buildable": False,
@@ -691,7 +698,7 @@ class LlnlElcapitan(System):
                     "externals": [
                         {
                             "spec": f"rocthrust@{self.rocm_version}",
-                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                            "prefix": self.rocm_prefix,
                         }
                     ],
                     "buildable": False,
@@ -700,7 +707,7 @@ class LlnlElcapitan(System):
                     "externals": [
                         {
                             "spec": f"hip@{self.rocm_version}",
-                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                            "prefix": self.rocm_prefix,
                         }
                     ],
                     "buildable": False,
@@ -709,7 +716,7 @@ class LlnlElcapitan(System):
                     "externals": [
                         {
                             "spec": f"hsa-rocr-dev@{self.rocm_version}",
-                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                            "prefix": self.rocm_prefix,
                         }
                     ],
                     "buildable": False,
@@ -718,7 +725,7 @@ class LlnlElcapitan(System):
                     "externals": [
                         {
                             "spec": f"rocprofiler-sdk@{self.rocm_version}",
-                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                            "prefix": self.rocm_prefix,
                         }
                     ],
                     "buildable": False,
@@ -727,7 +734,7 @@ class LlnlElcapitan(System):
                     "externals": [
                         {
                             "spec": f"comgr@{self.rocm_version}",
-                            "prefix": f"/opt/rocm-{self.rocm_version}/",
+                            "prefix": self.rocm_prefix,
                         }
                     ],
                     "buildable": False,
@@ -736,7 +743,7 @@ class LlnlElcapitan(System):
                     "externals": [
                         {
                             "spec": f"hiprand@{self.rocm_version}",
-                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                            "prefix": self.rocm_prefix,
                         }
                     ],
                     "buildable": False,
@@ -745,7 +752,7 @@ class LlnlElcapitan(System):
                     "externals": [
                         {
                             "spec": f"hipsparse@{self.rocm_version}",
-                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                            "prefix": self.rocm_prefix,
                         }
                     ],
                     "buildable": False,
@@ -754,7 +761,7 @@ class LlnlElcapitan(System):
                     "externals": [
                         {
                             "spec": f"hipblas@{self.rocm_version}",
-                            "prefix": f"/opt/rocm-{self.rocm_version}/",
+                            "prefix": self.rocm_prefix,
                         }
                     ],
                     "buildable": False,
@@ -763,7 +770,7 @@ class LlnlElcapitan(System):
                     "externals": [
                         {
                             "spec": f"hipsolver@{self.rocm_version}",
-                            "prefix": f"/opt/rocm-{self.rocm_version}/",
+                            "prefix": self.rocm_prefix,
                         }
                     ],
                     "buildable": False,
@@ -772,7 +779,7 @@ class LlnlElcapitan(System):
                     "externals": [
                         {
                             "spec": f"hsakmt-roct@{self.rocm_version}",
-                            "prefix": f"/opt/rocm-{self.rocm_version}/",
+                            "prefix": self.rocm_prefix,
                         }
                     ],
                     "buildable": False,
@@ -781,7 +788,7 @@ class LlnlElcapitan(System):
                     "externals": [
                         {
                             "spec": f"roctracer-dev-api@{self.rocm_version}",
-                            "prefix": f"/opt/rocm-{self.rocm_version}/",
+                            "prefix": self.rocm_prefix,
                         }
                     ],
                     "buildable": False,
@@ -790,7 +797,7 @@ class LlnlElcapitan(System):
                     "externals": [
                         {
                             "spec": f"rocminfo@{self.rocm_version}",
-                            "prefix": f"/opt/rocm-{self.rocm_version}/",
+                            "prefix": self.rocm_prefix,
                         }
                     ],
                     "buildable": False,
@@ -799,7 +806,7 @@ class LlnlElcapitan(System):
                     "externals": [
                         {
                             "spec": f"llvm@{self.llvm_version}",
-                            "prefix": f"/opt/rocm-{self.rocm_version}/llvm",
+                            "prefix": self.rocm_llvm_prefix,
                         },
                     ],
                     "buildable": False,
@@ -811,7 +818,7 @@ class LlnlElcapitan(System):
                                 f"rocblas@{self.rocm_version} "
                                 f"amdgpu_target={self.rocm_arch}"
                             ),
-                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                            "prefix": self.rocm_prefix,
                         }
                     ],
                     "buildable": False,
@@ -820,7 +827,7 @@ class LlnlElcapitan(System):
                     "externals": [
                         {
                             "spec": f"rocsolver@{self.rocm_version}",
-                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                            "prefix": self.rocm_prefix,
                         }
                     ],
                     "buildable": False,
@@ -829,7 +836,7 @@ class LlnlElcapitan(System):
                     "externals": [
                         {
                             "spec": f"rccl@{self.rocm_version}",
-                            "prefix": f"/opt/rocm-{self.rocm_version}",
+                            "prefix": self.rocm_prefix,
                         }
                     ],
                     "buildable": False,
@@ -840,7 +847,7 @@ class LlnlElcapitan(System):
     def rocm_cce_compiler_cfg(self):
         cce_rocmcc = self.spec.variants["compiler"][0] in ["cce", "rocmcc"]
         rpaths = [
-            f"/opt/rocm-{self.rocm_version}/lib",
+            f"{self.rocm_prefix}/lib",
             "/opt/cray/pe/gcc-libs",
         ]
         if cce_rocmcc:
@@ -868,7 +875,7 @@ class LlnlElcapitan(System):
         )
         rocmcc_entry = compiler_def(
             f"llvm-amdgpu@{self.rocm_version}",
-            f"/opt/rocm-{self.rocm_version}/llvm",
+            self.rocm_llvm_prefix,
             {"c": "amdclang", "cxx": "amdclang++", "fortran": "amdflang"},
             modules=[f"rocm/{self.rocm_version}"],
             extra_rpaths=list(rpaths),
@@ -877,7 +884,7 @@ class LlnlElcapitan(System):
                 "append_path": {"LD_LIBRARY_PATH": "/opt/cray/pe/gcc-libs"},
                 "prepend_path": {
                     "LD_LIBRARY_PATH": f"{cce_path}/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib",
-                    "LIBRARY_PATH": f"/opt/rocm-{self.rocm_version}/lib",
+                    "LIBRARY_PATH": f"{self.rocm_prefix}/lib",
                 },
             },
         )
@@ -891,7 +898,7 @@ class LlnlElcapitan(System):
                 extra_rpaths=list(rpaths),
                 env={
                     "prepend_path": {
-                        "LD_LIBRARY_PATH": f"{cce_path}/opt/rocm-{self.rocm_version}/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib"
+                        "LD_LIBRARY_PATH": f"{cce_path}{self.rocm_prefix}/lib:/opt/cray/pe/pmi/{self.pmi_version}/lib:/opt/cray/pe/pals/{self.pals_version}/lib"
                     }
                 },
             )
