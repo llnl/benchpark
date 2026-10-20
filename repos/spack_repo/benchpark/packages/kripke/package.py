@@ -14,7 +14,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     """
 
     homepage = "https://computing.llnl.gov/projects/co-design/kripke"
-    git = "https://github.com/rfhaque/Kripke.git"
+    git = "https://github.com/LLNL/Kripke.git"
 
     tags = ["proxy-app"]
 
@@ -22,8 +22,8 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
 
     license("BSD-3-Clause")
 
-    version("develop", branch="kripke_chai_umpire", submodules=False)
-    version("2026.10.0", branch="kripke_chai_umpire", submodules=False)
+    version("develop", branch="develop", submodules=False)
+    version("2026.10.0", submodules=False, commit="aeaa69f12ccc52243dbeb41194a08d0be53c4c41")
     version("2025.12.0", submodules=False, commit="01f6f85c02ceffcd2bc06e42cee997867dd142c5")
     version("2025.07.0", submodules=False, commit="8cf38433a6a11e0dcd17864e649b2d045159ee9c")
     version(
