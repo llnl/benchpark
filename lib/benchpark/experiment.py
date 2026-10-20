@@ -250,7 +250,7 @@ class Experiment(
                 f"Please specify a programming model in your {self.name}/experiment.py (e.g. ProgrammingModelType.Mpionly, ProgrammingModelType.Openmp, ProgrammingModelType.Cuda, ProgrammingModelType.Rocm). See other experiments for examples."
             )
         # Check if experiment is trying to run in MpiOnly mode without being an ProgrammingModelType.Mpionly experiment
-        elif "mpi" not in str(self.spec) and not any(
+        elif not self.spec.satisfies("+mpi") and not any(
             self.spec.satisfies("+" + model) for model in models[1:]
         ):
             raise BenchparkError(
