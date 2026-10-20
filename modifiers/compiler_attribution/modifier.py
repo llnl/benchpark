@@ -295,7 +295,7 @@ class CompilerAttribution(BasicModifier):
             return [], []
 
         postprocess_script = (
-            '"$(spack -e \'{env_path}\' location -i '
+            "\"$(spack -e '{env_path}' location -i "
             'compiler-attribution-plugin)/bin/compiler-attribution-postprocess"'
         )
         trace_file = (
