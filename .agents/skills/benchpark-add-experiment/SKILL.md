@@ -1,6 +1,6 @@
 ---
 name: benchpark-add-experiment
-description: "Add a new benchmark experiment to Benchpark (experiments/<benchmark>/experiment.py) or extend an existing one with programming models (+openmp/+cuda/+rocm), scaling studies (strong/weak/throughput), workloads, or Caliper support. Use this whenever someone wants to add, port, or onboard a benchmark to Benchpark, write or fix an experiment.py, wire it to its Spack package.py and Ramble application.py, or debug a failing `benchpark experiment init`, `benchpark audit`, or CI dryrun for an experiment, even if they never say the word 'experiment'."
+description: "Add a new benchmark experiment to Benchpark (experiments/{benchmark}/experiment.py) or extend an existing one with programming models (+openmp/+cuda/+rocm), scaling studies (strong/weak/throughput), workloads, or Caliper support. Use this whenever someone wants to add, port, or onboard a benchmark to Benchpark, write or fix an experiment.py, wire it to its Spack package.py and Ramble application.py, or debug a failing `benchpark experiment init`, `benchpark audit`, or CI dryrun for an experiment, even if they never say the word 'experiment'."
 ---
 
 # Benchpark: Add an Experiment
