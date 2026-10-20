@@ -114,13 +114,13 @@ The Beginner Tutorial uses the following terms from Spack, Ramble, and Benchpark
         **Modifier**
 
       - `Ramble
-        <https://ramble.readthedocs.io/en/latest/tutorials/10_using_modifiers.html>`_
+        <https://ramble.readthedocs.io/en/latest/tutorials/10_using_modifiers.html>`__
       - An object that encapsulates reusable experiment configuration. Benchpark
-        provides modifier implementations, including Caliper and Allocation, that
-        follow Ramble's modifier syntax. These modifiers can inject commands before,
-        after, or during experiment execution to capture system resources, experiment
-        data, and metadata, or to enable performance analysis tools. See
-        :doc:`Benchpark Modifiers </modifiers>`.
+        provides modifier implementations, including Caliper and Allocation, that follow
+        Ramble's modifier syntax. These modifiers can inject commands before, after, or
+        during experiment execution to capture system resources, experiment data, and
+        metadata, or to enable performance analysis tools. See :doc:`Benchpark Modifiers
+        </modifiers>`.
     - - .. tutorialtarget:: beginner-tutorial-glossary-experiment
 
         **Experiment**
