@@ -26,9 +26,9 @@
 
         .. rubric:: Benchpark Tutorial Slides
 
-        .. image:: /tutorial/HPCIC26-Tutorial-Slide-Preview.jpg
+        .. image:: /tutorial/PACT26-Tutorial-Slide-Preview.jpg
             :alt: Benchpark Tutorial Slides
-            :target: ../_static/slides/HPCIC26-Tutorial-Slides.pdf
+            :target: ../_static/slides/PACT26-Tutorial-Slides.pdf
 
     .. tutorialcontainer:: tutorial-project-link
 
@@ -232,7 +232,7 @@ not Spack compiler (``%``) or version (``@``) constraints.
 
         .. tutorialcontainer:: tutorial-duration
 
-            5 min.
+            10 min.
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-run tutorial-with-duration
 
@@ -241,7 +241,7 @@ not Spack compiler (``%``) or version (``@``) constraints.
 
         .. tutorialcontainer:: tutorial-duration
 
-            10 min.
+            25 min.
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-analyze tutorial-with-duration
 
@@ -250,7 +250,7 @@ not Spack compiler (``%``) or version (``@``) constraints.
 
         .. tutorialcontainer:: tutorial-duration
 
-            #2 + 10 min.
+            #2 + 25 min.
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-experiment tutorial-with-duration
 
