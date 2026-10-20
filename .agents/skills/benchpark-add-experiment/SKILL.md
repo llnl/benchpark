@@ -23,7 +23,7 @@ Naming ties the layers together. For `experiments/my-bench/`:
 
 Each item is enforced somewhere. Several of the resulting errors don't point at their cause; the error lookup at the end maps each one back.
 
-1. **License header**, copied verbatim from an existing experiment. CI runs `python .github/workflows/bin/license verify` over `experiments/`.
+1. **License header**, copied verbatim from an existing experiment, year included: the checker accepts only 2023 or 2024 and reports "Copyright date mismatch" for any other year. CI runs `python .github/workflows/bin/license verify` over `experiments/`.
 2. **Bases: `Experiment` plus `ProgrammingModel(...)` with at least one `ProgrammingModelType`.** Without it, init fails with `AttributeError: '<Class>' object has no attribute '_available_programming_models'`. Without `ProgrammingModelType.Mpionly`, the experiment can only be initialized with `+cuda`, `+rocm`, or `+openmp`.
 3. **A `workload` variant** whose values are workload names in the Ramble application. Fails with "Package <name> must define a workload variant". List `values=` so a typo fails at init instead of inside Ramble.
 4. **A `version` variant** listing versions from `package.py`, plus `latest` (no `@` constraint) and branch names such as `develop` if the package has them. `determine_version()` reads it; without it init fails with `KeyError: 'version'`.
@@ -48,9 +48,9 @@ Declare only what the layers support. A programming model needs the matching pac
 
 - **Programming models append Spack variants.** For each declared model, the mixin appends one of these pairs: `+openmp`/`~openmp`, `+cuda cuda_arch={cuda_arch}`/`~cuda`, `+rocm amdgpu_target={rocm_arch}`/`~rocm`.
   - `Mpionly` appends nothing, so add `+mpi` yourself if the package has an `mpi` variant.
-  - If the package names these variants differently, override the helper as `experiments/babelstream/experiment.py` does (`+omp`, `+hip`).
+  - If the package names these variants differently, override the helper as `experiments/babelstream/experiment.py` does (`+omp`, `+hip`). If it has no such variant at all, as with a package that only ever builds for one GPU vendor, make the override return `""`.
 - **`Caliper` appends `+caliper`/`~caliper`.** Inherit it only if the package has a `caliper` variant and the source is instrumented.
-- **Dry-runs never concretize, so CI can't catch a variant mismatch.** A dry-run passes even when a mixin appends `+openmp` to a package with no `openmp` variant. After `. workspace/setup.sh`, run `spack info <package>` and confirm every variant in the generated `spack_pkg_spec` exists. Only a real build proves the layers agree.
+- **Dry-runs never concretize, so CI can't catch a variant mismatch.** A dry-run passes even when a mixin appends `+openmp` to a package with no `openmp` variant. After `. workspace/setup.sh`, run `spack info <package>` and confirm every variant in the generated `spack_pkg_spec` exists. Short of a build, `spack -e <workspace>/software/spack/<name> concretize -f --fresh` solves against the system's real externals and shows which dependencies would be built from source; it needs the site's module system if the system loads compilers through modules. Only a real build proves the layers agree.
 - **Appended variants get no leading space** (the generated spec reads `saxpy@1.0.0~openmp ~cuda`). If your spec string ends in a `key=value` token, end the string with a space, as the hecbench experiments do.
 - **Experiment variables feed `application.py`.** Use the exact names of its `workload_variable(...)`s, including ones inherited from a base application, and of anything its executables reference. Otherwise `ramble workspace setup` fails.
 - **Experiment names come from `named=True` variables.** Together, the named variables must distinguish every generated experiment (anything given a list, matrixed, or scaled), or Ramble fails with "Experiment ... is not unique".
@@ -274,6 +274,7 @@ After the dry runs:
 | `X does not implement compute_...` (audit) / `Each experiment must implement compute_...` (init) | Define the method on this class |
 | `KeyError: 'version'` | Add the `version` variant |
 | `got an unexpected keyword argument 'matrix'` | The keyword is `matrixed` |
+| `Copyright date mismatch` (license verify) | Use the header year from an existing experiment (2023 or 2024) |
 | Ramble setup: `Must specify one of: n_nodes, n_ranks, n_gpus` | Add a resource variable |
 | Ramble setup: `unsupported operand type(s) for //: 'NoneType' and 'int'` | `n_nodes` set without `n_ranks`, `n_gpus`, or `n_ranks_per_node` |
 | Ramble setup: `Experiment requests more cores per rank than are available on a node` | `n_threads_per_proc` exceeds the system's cores per node; use 1 in test mode |
