@@ -27,7 +27,7 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
     license("BSD-2-Clause")
 
     version("develop", branch="master")
-    version("2.0", branch="master")
+    version("2.0", commit="b5e1e828e65431cf28f97c20856711540c571abb")
     version("1.0", sha256="e60464a867fe5b1fd694fbb37bb51773723427f071c0ae26852a2804c08bbb32")
 
     variant("metis", default=True, description="Enable/disable METIS support")
@@ -58,8 +58,7 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
     depends_on("mfem cxxstd=20", when="@develop")
     depends_on("mfem cxxstd=20", when="@2.0")
 
-    depends_on("caliper", when="+caliper")
-    depends_on("adiak~shared", when="+caliper")
+    depends_on("caliper+adiak", when="+caliper")
 
     depends_on("zlib+optimize+pic~shared")
     requires("^[virtuals=zlib-api] zlib")
