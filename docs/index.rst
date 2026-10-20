@@ -20,23 +20,30 @@
     :maxdepth: 1
     :caption: Catalogue
 
-    system-list
-    benchmark-list
+    Benchpark Systems <system-list>
+    Benchpark Experiments <benchmark-list>
 
 .. toctree::
     :maxdepth: 1
-    :caption: Tutorials
+    :caption: Beginner Tutorial
 
-    tutorial-101
-    tutorial-llnl
-    comparing-experiment-builds
-    containers
+    interactive-tutorial/start-here
+    interactive-tutorial/search-benchpark
+    interactive-tutorial/build-and-run-experiment
+    interactive-tutorial/benchpark-analyze
+    interactive-tutorial/add-a-spack-package
+    interactive-tutorial/add-a-ramble-application
+    interactive-tutorial/add-an-experiment
+    interactive-tutorial/update-system-config
+    interactive-tutorial/add-a-system-config
+    interactive-tutorial/add-a-scaling-configuration
+    interactive-tutorial/benchpark-query
 
 .. toctree::
     :maxdepth: 1
     :caption: Using Benchpark
 
-    benchpark-setup
+    interactive-tutorial/setup-workspace
     build-experiment
     run-experiment
     analyze-experiment
@@ -55,10 +62,8 @@
     :caption: Contributing
 
     add-a-system-config
-    add-a-benchmark
     add-an-experiment
     testing-your-contribution
-    update-system-config
 
 .. toctree::
     :maxdepth: 1
@@ -83,6 +88,15 @@
     :caption: Outreach
 
     ics
+
+.. toctree::
+    :maxdepth: 1
+    :caption: Tutorials
+
+    tutorial-101
+    tutorial-llnl
+    comparing-experiment-builds
+    containers
 
 .. toctree::
     :maxdepth: 2
