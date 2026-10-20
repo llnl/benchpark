@@ -43,7 +43,7 @@ def test_compiler_attribution_adds_postprocessing_command():
     assert post_exec[0].name == "postprocess-compiler-attribution-run"
     assert post_exec[0].template == [
         "python3 "
-        '"$(spack -e \'{env_path}\' location -i '
+        "\"$(spack -e '{env_path}' location -i "
         'compiler-attribution-plugin)/bin/compiler-attribution-postprocess" '
         "'{env_path}/compiler-attribution/extraction_plugin_output' "
         "'{experiment_run_dir}/{experiment_name}.run.compiler_attribution.trace.jsonl' "
