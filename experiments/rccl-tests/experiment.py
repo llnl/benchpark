@@ -7,22 +7,12 @@ from benchpark.directives import maintainers, variant
 from benchpark.experiment import Experiment
 from benchpark.programming_model import ProgrammingModel, ProgrammingModelType
 
-RcclTestsProgrammingModel = ProgrammingModel(ProgrammingModelType.Rocm)
-
-
-class RcclTestsProgrammingModelHelper(RcclTestsProgrammingModel.Helper):
-    def get_spack_variants(self):
-        # The rccl-tests package is ROCm-only and has no rocm or amdgpu_target
-        # variants; its CMake build targets a default list of AMD GPUs instead.
-        return ""
-
-
-RcclTestsProgrammingModel.Helper = RcclTestsProgrammingModelHelper
-
 
 class RcclTests(
     Experiment,
-    RcclTestsProgrammingModel,
+    ProgrammingModel(
+        ProgrammingModelType.Rocm,
+    ),
 ):
     variant(
         "workload",
@@ -52,7 +42,7 @@ class RcclTests(
         description="app version",
     )
 
-    maintainers("your-github-username")
+    maintainers("nhanford")
 
     def compute_applications_section(self):
         # One MPI rank per GPU; RCCL does the communication between them.
