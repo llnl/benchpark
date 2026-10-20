@@ -395,8 +395,9 @@ system:
 
     benchpark system init --dest=aws-tutorial aws-tutorial
 
-If this completes without errors, you can continue by creating a benchmark
-:doc:`/interactive-tutorial/add-a-benchmark`.
+If this completes without errors, define any missing benchmark build and run recipes by
+:doc:`adding a Spack package </interactive-tutorial/add-a-spack-package>` and
+:doc:`adding a Ramble application </interactive-tutorial/add-a-ramble-application>`.
 
 *****************
  System Appendix

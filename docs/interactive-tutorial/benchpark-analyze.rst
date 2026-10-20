@@ -14,6 +14,12 @@
 <beginner-tutorial-glossary-modifier>`, :ref:`Scaling Study
 <beginner-tutorial-glossary-scaling-study>`
 
+.. tutorialcontainer:: tutorial-prerequisite-links
+
+    .. tutorialcontainer:: tutorial-prerequisite-link tutorial-prerequisite-experiment
+
+        :doc:`Prerequisite: Build and Run an Experiment <build-and-run-experiment>`
+
 Install the analysis dependencies once from the Benchpark repository:
 
 .. code-block:: console
@@ -21,10 +27,6 @@ Install the analysis dependencies once from the Benchpark repository:
     $ pip install .[analyze]
 
 Analyze the completed HPL scaling study from :doc:`build-and-run-experiment`:
-
-.. code-block:: console
-
-    $ benchpark analyze --workspace-dir workspace/fluxtainer/hpl/workspace
 
 ****************
  Strong Scaling
@@ -36,48 +38,13 @@ strong-scaling study.
 
 .. code-block:: console
 
-    $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/
+    $ benchpark analyze --workspace-dir workspace/aws-tutorial/hpl/workspace
 
-.. figure:: /_static/images/kripke_cuda_strong_raw_exc.png
+.. figure:: /_static/images/hpl_mpi_strong_raw_exc.png
     :width: 800
     :align: center
 
     Strong-scaling area chart.
-
-**************
- Weak Scaling
-**************
-
-The weak-scaling chart shows the exclusive average time per rank as the problem size and
-allocated resources increase together. A constant total time indicates ideal
-weak-scaling behavior.
-
-.. code-block:: console
-
-    $ benchpark analyze --workspace-dir wkp/kripke/cuda/weak/lassen/workspace/
-
-.. figure:: /_static/images/kripke_cuda_weak_raw_exc.png
-    :width: 800
-    :align: center
-
-    Weak-scaling area chart.
-
-************
- Throughput
-************
-
-The throughput chart uses the same stacked-region view for a throughput scaling study.
-It shows how region timing changes across the study's node and MPI-rank configurations.
-
-.. code-block:: console
-
-    $ benchpark analyze --workspace-dir wkp/kripke/cuda/throughput/lassen/workspace/
-
-.. figure:: /_static/images/kripke_cuda_throughput_raw_exc.png
-    :width: 800
-    :align: center
-
-    Throughput-scaling area chart.
 
 ************
  Percentage
@@ -88,9 +55,9 @@ This makes each region's share of total time easier to compare.
 
 .. code-block:: console
 
-    $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/ --chart-type percentage
+    $ benchpark analyze --workspace-dir workspace/aws-tutorial/hpl/workspace --chart-type percentage
 
-.. figure:: /_static/images/kripke_cuda_strong_percentage_exc.png
+.. figure:: /_static/images/hpl_mpi_strong_percentage_exc.png
     :width: 800
     :align: center
 
@@ -100,15 +67,13 @@ This makes each region's share of total time easier to compare.
  Inclusive Metrics
 *******************
 
-The inclusive chart uses ``Avg time/rank`` instead of ``Avg time/rank (exc)``. It
-removes the ``main`` region because its value would redundantly contain all child-region
-time.
+The inclusive chart uses ``Avg time/rank`` instead of ``Avg time/rank (exc)``.
 
 .. code-block:: console
 
-    $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/ --yaxis-metric "Avg time/rank"
+    $ benchpark analyze --workspace-dir workspace/aws-tutorial/hpl/workspace --yaxis-metric "Avg time/rank"
 
-.. figure:: /_static/images/kripke_cuda_strong_raw_inc.png
+.. figure:: /_static/images/hpl_mpi_strong_raw.png
     :width: 800
     :align: center
 
@@ -124,30 +89,13 @@ the measured time.
 
 .. code-block:: console
 
-    $ benchpark analyze --workspace-dir wkp/kripke/cuda/strong/lassen/workspace/ --group-regions-name --top-n-regions 10
+    $ benchpark analyze --workspace-dir workspace/aws-tutorial/hpl/workspace --group-regions-name --top-n-regions 10
 
-.. figure:: /_static/images/kripke_cuda_strong_raw_exc-2.png
+.. figure:: /_static/images/hpl_mpi_strong_raw_exc_region.png
     :width: 800
     :align: center
 
     Strong-scaling data after filtering regions.
-
-*****************************
- Visualize a Metadata Column
-*****************************
-
-``benchpark analyze`` can visualize a metadata column instead of a performance-data
-column. This is useful for figures of merit that have one value per profile.
-
-.. code-block:: console
-
-    $ benchpark analyze --workspace-dir problem1/ --yaxis-metric Final-FOM --chart-kind line --disable-legend
-
-.. figure:: /_static/images/amg2023_rocm_weak_raw_exc.png
-    :width: 800
-    :align: center
-
-    Metadata values shown as a line chart.
 
 For additional chart types and filtering options, see :doc:`/benchpark-analyze`.
 
