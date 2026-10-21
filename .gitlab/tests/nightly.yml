@@ -134,7 +134,7 @@ include:
         SCHEDULER_PARAMETERS: $ELCAP_PARAMS
         BENCHMARK: raja-perf
         BENCHMARK_VERSION: develop
-        VARIANT: ['+rocm compiler_attribution=on caliper=time']
+        VARIANT: [+rocm compiler_attribution=on caliper=time]
         SYSTEM_ARGS: [rocm=6.4.3, rocm=7.2.1]
         GPUMODE: SPX
       # Test benchmark@develop
