@@ -14,6 +14,8 @@ class RcclTests(
         ProgrammingModelType.Rocm,
     ),
 ):
+    two_rank_workloads = ("send-recv",)
+
     variant(
         "workload",
         default="all-reduce",
@@ -55,7 +57,15 @@ class RcclTests(
             self.add_experiment_variable("end_message_size", "8G", False)
             self.add_experiment_variable("num_iters", 100, False)
 
-        self.add_experiment_variable("n_gpus", "{n_nodes}*{sys_gpus_per_node}", True)
+        if any(
+            self.spec.satisfies(f"workload={workload}")
+            for workload in self.two_rank_workloads
+        ):
+            self.add_experiment_variable("n_gpus", 2, True)
+        else:
+            self.add_experiment_variable(
+                "n_gpus", "{n_nodes}*{sys_gpus_per_node}", True
+            )
         self.add_experiment_variable("num_gpus_per_task", 1, False)
 
         # Each test sweeps message sizes, so there is no single problem size
