@@ -6,12 +6,12 @@
 import sys
 from typing import Dict
 
+import ramble.language.language_base  # noqa
+import ramble.language.language_helpers  # noqa
 import yaml  # TODO: some way to ensure yaml available
 
 import benchpark.spec
 import benchpark.variant
-import ramble.language.language_base  # noqa
-import ramble.language.language_helpers  # noqa
 from benchpark.compiler_attribution import CompilerAttribution
 from benchpark.directives import ExperimentSystemBase, variant
 from benchpark.error import BenchparkError

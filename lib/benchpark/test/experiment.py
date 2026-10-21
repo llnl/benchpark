@@ -5,10 +5,10 @@
 
 import sys
 
+import pytest
 import yaml
 
 import benchpark.spec
-import pytest
 
 
 def test_namespaced_experiment_resolution():
