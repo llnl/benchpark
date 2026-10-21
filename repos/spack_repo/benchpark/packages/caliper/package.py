@@ -21,3 +21,16 @@ class Caliper(BuiltinCaliper):
 
     # rocp_sdk broken in upstream papi package for any ver less than 7.2
     depends_on("papi@7.2:+topdown", when="+papi")
+
+    # Caliper's rocprofiler service logs "already active, disabling!" for every
+    # extra channel but never returns, so all of RAJAPerf's per-variant channels
+    # register and channel teardown dereferences a null s_instance (SIGSEGV at
+    # exit). Drop once LLNL/Caliper adds the missing return.
+    @run_before("cmake", when="+rocm")
+    def _fix_rocprofiler_reregistration(self):
+        filter_file(
+            r'(rocprofiler service is already active, disabling!" << std::endl;)',
+            r"\1 return;",
+            "src/services/rocprofiler/RocProfiler.cpp",
+            ignore_absent=True,
+        )
