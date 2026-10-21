@@ -13,18 +13,19 @@ class RcclTests(CMakePackage, ROCmPackage):
     """These tests check both the performance and the correctness of RCCL
     operations. They can be compiled against RCCL."""
 
-    homepage = "https://czgitlab.llnl.gov/dryden1/rccl-tests-multi"
-    git = "https://czgitlab.llnl.gov/dryden1/rccl-tests-multi.git"
-    url = "https://czgitlab.llnl.gov/dryden1/rccl-tests-multi.git"
+    homepage = "https://github.com/ROCm/rocm-systems/tree/develop/projects/rccl-tests"
+    git = "https://github.com/ROCm/rocm-systems.git"
+    url = "https://github.com/ROCm/rocm-systems/archive/refs/heads/develop.tar.gz"
+    root_cmakelists_dir = "projects/rccl-tests"
     tags = ["rocm"]
 
     maintainers("michaelmckinsey1")
 
     license("BSD-3-Clause")
 
-    # Keep Benchpark's version names as aliases for the fork's main branch.
-    version("develop", branch="main", preferred=True)
-    version("master", branch="main")
+    version("develop", branch="develop", preferred=True)
+    # Retain master as a compatibility alias for the develop branch.
+    version("master", branch="develop")
 
     variant("mpi", default=True, description="with MPI support")
 
@@ -36,6 +37,10 @@ class RcclTests(CMakePackage, ROCmPackage):
     depends_on("mpi", when="+mpi")
 
     conflicts("~rocm", msg="rccl-tests requires ROCm")
+
+    def setup_run_environment(self, env):
+        # Each rank sees its assigned GPU as device 0.
+        env.set("NCCL_TESTS_DEVICE", "0")
 
     def cmake_args(self):
         args = [
