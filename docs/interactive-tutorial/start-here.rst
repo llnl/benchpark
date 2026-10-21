@@ -5,19 +5,56 @@
     SPDX-License-Identifier: Apache-2.0
 
 .. _beginner-tutorial-glossary:
+
 .. _beginner-tutorial-start-here:
 
 ############
  Start Here
 ############
 
-.. image:: tutorial/HPCIC26-Tutorial-Slide-Preview.jpg
-    :target: _static/slides/HPCIC26-Tutorial-Slides.pdf
-    :height: 72px
-    :align: left
-    :alt: Slide Preview
+.. tutorialcontainer:: tutorial-project-links
 
-:download:`Download Slides <_static/slides/HPCIC26-Tutorial-Slides.pdf>`.
+    .. tutorialcontainer:: tutorial-project-link
+
+        .. rubric:: Benchpark Source
+
+        .. image:: /_static/images/benchpark-icon.svg
+            :alt: Benchpark on GitHub
+            :target: https://github.com/llnl/benchpark
+
+    .. tutorialcontainer:: tutorial-project-link
+
+        .. rubric:: Benchpark Tutorial Slides
+
+        .. image:: /tutorial/PACT26-Tutorial-Slide-Preview.jpg
+            :alt: Benchpark Tutorial Slides
+            :target: ../_static/slides/PACT26-Tutorial-Slides.pdf
+
+    .. tutorialcontainer:: tutorial-project-link
+
+        .. rubric:: Benchpark on CDash
+
+        .. image:: /_static/images/cdash.svg
+            :alt: Benchpark CDash
+            :target: https://my.cdash.org/index.php?project=Benchpark
+
+    .. tutorialcontainer:: tutorial-project-link
+
+        .. rubric:: Spack
+
+        .. image:: https://spack.readthedocs.io/en/latest/_static/spack-logo-text.svg
+            :alt: Spack
+            :target: https://spack.readthedocs.io/en/latest/
+
+    .. tutorialcontainer:: tutorial-project-link
+
+        .. rubric:: Ramble
+
+        .. image:: https://avatars.githubusercontent.com/u/318055132?s=240&v=4
+            :alt: Ramble
+            :target: https://ramble.readthedocs.io/en/latest/
+
+|
 
 ********************
  Benchpark Glossary
@@ -72,6 +109,18 @@ The Beginner Tutorial uses the following terms from Spack, Ramble, and Benchpark
       - A Python module named ``application.py`` that records a recipe or runtime script
         detailing exactly how to configure the runtime parameters of a program, execute
         it, and analyze its figure of merit.
+    - - .. tutorialtarget:: beginner-tutorial-glossary-modifier
+
+        **Modifier**
+
+      - `Ramble
+        <https://ramble.readthedocs.io/en/latest/tutorials/10_using_modifiers.html>`__
+      - An object that encapsulates reusable experiment configuration. Benchpark
+        provides modifier implementations, including Caliper and Allocation, that follow
+        Ramble's modifier syntax. These modifiers can inject commands before, after, or
+        during experiment execution to capture system resources, experiment data, and
+        metadata, or to enable performance analysis tools. See :doc:`Benchpark Modifiers
+        </modifiers>`.
     - - .. tutorialtarget:: beginner-tutorial-glossary-experiment
 
         **Experiment**
@@ -89,14 +138,6 @@ The Beginner Tutorial uses the following terms from Spack, Ramble, and Benchpark
       - A Python module named ``system.py`` that records the hardware resources,
         scheduler, and system software for a specific HPC system (machine) or group of
         systems.
-    - - .. tutorialtarget:: beginner-tutorial-glossary-modifier
-
-        **Modifier**
-
-      - :doc:`Benchpark </modifiers>`
-      - A reusable object that can inject commands before, after, or during experiment
-        execution to capture available system resources or experiment data and metadata,
-        record Linux thread and GPU affinity, or inject performance analysis tools.
     - - .. tutorialtarget:: beginner-tutorial-glossary-scaling-study
 
         **Scaling Study**
@@ -114,125 +155,115 @@ to build and a Ramble ``application.py`` to run the benchmark.
 
 .. _benchpark-spec-syntax:
 
-***********************
- Benchpark Spec Syntax
-***********************
+*******************
+ Spack Spec Syntax
+*******************
 
-Benchpark's parser is derived from Spack's spec parser. A Spack package spec can include
-versions, architecture constraints, compiler constraints, and dependencies, in addition
-to it's package name and variants:
-
-**Spack Spec Syntax**
+A Spack package spec can include versions, architecture constraints, compiler
+constraints, and dependencies, in addition to its package name and variants.
 
 .. figure:: /_static/images/spack-spec_anatomy.svg
     :alt: Spack package spec: package name, versions, variants, architecture, compiler, and dependencies.
+    :figclass: tutorial-spec-figure
     :width: 100%
     :align: center
 
-Benchpark implements the object name and variant portions of this syntax. The following
-examples show the name, Boolean variants, and named variants in Benchpark system and
-experiment specs:
-
-**Benchpark System Spec**
-
-.. figure:: /_static/images/system-spec.png
-    :alt: Annotated Benchpark system spec.
-    :width: 100%
-    :align: center
-
-**Benchpark Experiment Spec**
-
-.. figure:: /_static/images/experiment-spec.png
-    :alt: Annotated Benchpark experiment spec.
-    :width: 100%
-    :align: center
-
-In the system example, red identifies the system name, blue the runtime version, green
-the compiler, orange the specific system, purple the library versions, and the final
-orange fields the additional variants. In the experiment example, red identifies the
-experiment name, blue the programming model, green the scaling mode, orange the
-workload, purple the source code version, and the final orange field an additional
-variant.
-
-Every token after the system or experiment name is a Benchpark variant. Tokens beginning
-with ``+`` are Boolean variants, while tokens containing ``=`` are named variants.
-``compiler=cce`` and ``version=2.3-caliper`` are named variants defined by their
-Benchpark objects. They are not Spack compiler (``%``) or version (``@``) constraints.
+***********************
+ Benchpark System Spec
+***********************
 
 A Benchpark spec describes a Benchpark object. A system spec selects a definition under
 ``systems/``, and an experiment spec selects a definition under ``experiments/``.
 
-Benchpark does not implement Spack's version (``@``), compiler (``%``), architecture,
-dependency (``^``), or installed-spec hash (``/hash``) constraint semantics. It also
-does not accept exact multi-value constraints (``:=``) or variant propagation (``++``
-and ``==``). Benchpark uses the same basic syntax as Spack for `Boolean, single-valued,
-and multi-valued variants
-<https://spack.readthedocs.io/en/latest/spec_syntax.html#variants>`_.
+Benchpark's parser is derived from Spack's spec parser and implements the object name
+and `variant portions of its syntax
+<https://spack.readthedocs.io/en/latest/spec_syntax.html#variants>`_. Every token after
+the system or experiment name is a Benchpark variant. Tokens beginning with ``+`` are
+Boolean variants, while tokens containing ``=`` are named variants. ``compiler=cce`` and
+``version=2.3-caliper`` are named variants defined by their Benchpark objects. They are
+not Spack compiler (``%``) or version (``@``) constraints.
 
-.. list-table:: Differences in Benchpark and Spack Specs:
+.. figure:: /_static/images/system-spec.png
+    :alt: Annotated Benchpark system spec
+    :figclass: tutorial-spec-figure
+    :width: 100%
+    :align: center
+
+***************************
+ Benchpark Experiment Spec
+***************************
+
+.. figure:: /_static/images/experiment-spec.png
+    :alt: Annotated Benchpark experiment spec
+    :figclass: tutorial-spec-figure
+    :width: 100%
+    :align: center
+
+.. list-table:: Differences in Benchpark and Spack Specs
     :header-rows: 1
+    :stub-columns: 1
     :widths: 27 36 37
 
     - - Goal
       - Benchpark
       - Spack
     - - Select a version
-      - Use a definition's variant: ``version=<value>``.
+      - Use a definition's variant: ``version=<value>``
       - Use a version constraint: ``@<version>``.
     - - Select multiple values exactly
       - Use ``<variant>=<value1>,<value2>``.
-      - Use ``<variant>:=<value1>,<value2>``. In Spack, ``:=`` permits additional
-        values.
+      - Use ``<variant>:=<value1>,<value2>``. In Spack, ``=`` also matches specs
+        containing additional values, while ``:=`` requires an exact match.
+    - - Select a compiler
+      - Not supported.
+      - Use ``%<compiler>``.
+    - - Select a dependency
+      - Not supported.
+      - Use ``^<dependency>``.
+    - - Select an installed spec by hash
+      - Not supported.
+      - Use ``/hash``.
 
-***********
- Benchpark & Cdash Dashboard
-***********
-
-.. tutorialcontainer:: tutorial-project-links
-
-    .. tutorialcontainer:: tutorial-project-link
-
-        .. rubric:: Benchpark Source
-
-        .. image:: /_static/images/benchpark-icon.svg
-            :alt: Benchpark on GitHub
-            :target: https://github.com/llnl/benchpark
-
-    .. tutorialcontainer:: tutorial-project-link
-
-        .. rubric:: Benchpark CDash Dashboard
-
-        .. image:: /_static/images/cdash.svg
-            :alt: Benchpark on CDash
-            :target: https://my.cdash.org/index.php?project=Benchpark
-
-***********************
- Choose Your Next Step
-***********************
-
-Continue with the step that matches your goal:
+***********************************************
+ Continue with the step that matches your goal
+***********************************************
 
 .. tutorialcontainer:: tutorial-next-steps
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-search
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-search tutorial-with-duration
 
         :doc:`I want to search what is available in Benchpark. <search-benchpark>`
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run
+        .. tutorialcontainer:: tutorial-duration
+
+            10 min.
+
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run tutorial-with-duration
 
         :doc:`I want to run an experiment someone gave me on the same system.
         <build-and-run-experiment>`
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-analyze
+        .. tutorialcontainer:: tutorial-duration
+
+            25 min.
+
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-analyze tutorial-with-duration
 
         :doc:`I want to generate preconfigured performance figures for an experiment
         on my system. <benchpark-analyze>`
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-next-step-multiple tutorial-goal-benchmark
+        .. tutorialcontainer:: tutorial-duration
 
-        I want to run a :doc:`new benchmark <add-a-benchmark>` on the system I have
-        benchmarked before (this also requires :doc:`adding an experiment
-        <add-an-experiment>`).
+            #2 + 25 min.
+
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-experiment tutorial-with-duration
+
+        :doc:`I want to run a new benchmark on the system I have benchmarked before.
+        <add-an-experiment>`
+
+        .. tutorialcontainer:: tutorial-duration
+
+            20 min.
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-update-system
 

@@ -71,7 +71,8 @@ RUN pip install -r /home/fluxuser/benchpark/requirements.txt \
     && source /home/fluxuser/benchpark/setup-env.sh \
 	&& benchpark bootstrap \
     && pip install .[analyze] \
-	&& echo 'source /home/fluxuser/benchpark/setup-env.sh' >> /home/fluxuser/.bashrc
+	&& echo 'source /home/fluxuser/benchpark/setup-env.sh' >> /home/fluxuser/.bashrc \
+    && echo 'source /home/fluxuser/.benchpark/ramble/share/ramble/setup-env.sh' >> /home/fluxuser/.bashrc
 
     # && benchpark system init --dest=hpc-tutorial fluxtainer instance_type=${TARGETARCH} \
     # && benchpark experiment init hpc-tutorial kripke +weak caliper=time,mpi scaling-iterations=2 \

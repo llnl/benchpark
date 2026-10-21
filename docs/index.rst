@@ -20,8 +20,8 @@
     :maxdepth: 1
     :caption: Catalogue
 
-    system-list
-    benchmark-list
+    Benchpark Systems <system-list>
+    Benchpark Experiments <benchmark-list>
 
 .. toctree::
     :maxdepth: 1
@@ -31,7 +31,8 @@
     interactive-tutorial/search-benchpark
     interactive-tutorial/build-and-run-experiment
     interactive-tutorial/benchpark-analyze
-    interactive-tutorial/add-a-benchmark
+    interactive-tutorial/add-a-spack-package
+    interactive-tutorial/add-a-ramble-application
     interactive-tutorial/add-an-experiment
     interactive-tutorial/update-system-config
     interactive-tutorial/add-a-system-config

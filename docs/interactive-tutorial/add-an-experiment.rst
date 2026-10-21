@@ -17,13 +17,29 @@
 <beginner-tutorial-glossary-modifier>`, :ref:`Scaling Study
 <beginner-tutorial-glossary-scaling-study>`
 
+Create either missing prerequisite before adding the experiment:
+
+.. tutorialcontainer:: tutorial-prerequisite-links
+
+    .. tutorialcontainer:: tutorial-prerequisite-link tutorial-prerequisite-spack
+
+        :doc:`Missing a Spack package? <add-a-spack-package>`
+
+    .. tutorialcontainer:: tutorial-prerequisite-link tutorial-prerequisite-ramble
+
+        :doc:`Missing a Ramble application? <add-a-ramble-application>`
+
+This guide is intended for developers who want to add the ability to run a benchmark
+with Benchpark. Once a Spack ``package.py`` and Ramble ``application.py`` describe how
+to build and run the benchmark, the next step is creating its ``experiment.py``. This
+guide demonstrates that process for HPL.
+
 **********************************
  Create the Experiment Definition
 **********************************
 
-This example defines the HPL experiment used throughout the Beginner Tutorial. Start
-``experiments/hpl/experiment.py`` with the definition below. The steps that follow add
-the components omitted from this initial version.
+This example defines the HPL experiment used throughout the Beginner Tutorial. Replace
+``experiments/hpl/experiment.py`` with the below definition:
 
 .. code-block:: python
     :linenos:
@@ -59,8 +75,8 @@ the components omitted from this initial version.
         def compute_applications_section(self):
 
             if self.spec.satisfies("exec_mode=test"):
-                self.add_experiment_variable("n_ranks", 2, True)
-                self.add_experiment_variable("Ns", 10000, True)
+                self.add_experiment_variable("n_ranks", 1, True)
+                self.add_experiment_variable("Ns", 1000, True)
                 self.add_experiment_variable("N-Grids", 1, False)
                 self.add_experiment_variable("Ps", "{n_ranks}", True)
                 self.add_experiment_variable("Qs", "1", False)
@@ -97,8 +113,8 @@ the components omitted from this initial version.
 1. Add Programming Models
 =========================
 
-Programming models define the parallel execution modes supported by an experiment.
-Replace the first Step 1 placeholder with the programming-model import:
+Programming models specify how the source code parallelizes the benchmark. Replace the
+first Step 1 placeholder with the programming-model import:
 
 .. code-block:: python
 
@@ -114,10 +130,10 @@ and OpenMP programming models:
 2. Add the Version Variant
 ==========================
 
-Each explicit experiment version must be defined in the corresponding Spack package. For
-HPL, ``2.3`` and ``2.2`` are defined in
-``repos/spack_repo/benchpark/packages/hpl/package.py``. The ``latest`` value is a
-Benchpark keyword that selects the newest version defined by the Spack package.
+The version variant will enable us to build and run the source code versions specified
+in the benchmark's Spack package. For HPL, ``2.3-caliper``, ``2.3`` and ``2.2`` are
+defined in ``repos/spack_repo/benchpark/packages/hpl/package.py``. The ``latest`` value
+is a Benchpark keyword that selects the newest version defined by the Spack package.
 
 Replace the Step 2 placeholder with the complete version variant:
 
@@ -134,9 +150,9 @@ Replace the Step 2 placeholder with the complete version variant:
 =========================
 
 The ``exec_mode=test`` experiment definition provides small values for the problem size
-and number of ranks. Replace the Step 3 placeholder with the following ``else`` branch
-to define a set of experiment variables that is more suited to collecting performance
-data:
+and number of ranks, suitable for short CI runs. Replace the Step 3 placeholder with the
+following ``else`` branch to define a set of larger experiment variables for collecting
+performance data:
 
 .. code-block:: python
 
@@ -154,9 +170,9 @@ data:
 4. Set Required Variables
 =========================
 
-Benchpark records the resources and problem sizes used by each experiment. Replace the
-Step 4 placeholder with the following call, which defines the number of ranks, the HPL
-problem size per rank, and the total HPL problem size:
+We record the problem sizes for each experiment, and the resources the experiment
+requires. Replace the Step 4 placeholder with the following call, which defines the
+number of ranks, the HPL problem size per rank, and the total HPL problem size:
 
 .. code-block:: python
 
