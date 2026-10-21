@@ -14,7 +14,7 @@ import benchpark.spec
 import benchpark.variant
 from benchpark.directives import ExperimentSystemBase, variant
 from benchpark.error import BenchparkError
-from benchpark.variables import VariableDict
+from benchpark.variables import Variable, VariableDict
 
 
 class ExperimentHelper:
@@ -424,6 +424,49 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc, Githash):
             if matrixed:
                 self.matrix.append(name)
 
+    def apply_variable_overrides(self):
+        """Apply CLI values after experiment defaults and before scaling."""
+
+        def parse_value(value):
+            # Scaling functions need numeric inputs. Keep expressions and other
+            # strings intact for Ramble to expand later.
+            for value_type in (int, float):
+                try:
+                    return value_type(value)
+                except ValueError:
+                    pass
+            return value
+
+        overrides = {
+            name: [parse_value(value) for value in values]
+            for name, values in self.spec.variable_overrides.items()
+        }
+        remaining = set(overrides)
+        for name, var in list(self.expr_vars.items()):
+            if not any(dim in overrides for dim in var.dims()):
+                continue
+            values = {dim: overrides.get(dim, var[dim]) for dim in var.dims()}
+            remaining.difference_update(var.dims())
+            # Broadcast scalar values within a zipped, multidimensional variable.
+            length = max(len(value) for value in values.values())
+            values = {
+                dim: value * length if len(value) == 1 else value
+                for dim, value in values.items()
+            }
+            self.expr_vars.assign_variable(
+                name, Variable(values, var.is_named, var.is_zipped, var.is_matrixed)
+            )
+
+        for name, values in overrides.items():
+            if name not in remaining:
+                continue
+            if name in self.zips:
+                raise BenchparkError(
+                    f"Override dimensions of '{name}' individually: "
+                    + ", ".join(self.zips[name])
+                )
+            self.add_experiment_variable(name, values)
+
     def set_environment_variable(self, name, values):
         """Set value of environment variable"""
         self.env_vars["set"][name] = values
@@ -474,6 +517,7 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc, Githash):
             self.add_experiment_variable(self.name + "_path", "None")
 
         self.compute_applications_section()
+        self.apply_variable_overrides()
 
         if any([self.spec.satisfies(s) for s in ["+strong", "+weak", "+throughput"]]):
             self.expr_vars.extend(self.scale())

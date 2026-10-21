@@ -251,6 +251,24 @@ class Spec(object):
 
 class ExperimentSpec(Spec):
     @property
+    def variable_overrides(self):
+        """Key-value assignments that are not declared experiment variants.
+
+        Keep these in the spec so serialization, equality, and hashing include
+        the overrides. Boolean flags must still name a declared variant.
+        """
+        declared = {
+            name
+            for variants in self.experiment_class.variants.values()
+            for name in variants
+        }
+        return {
+            name: values
+            for name, values in self.variants.items()
+            if name not in declared and not any(isinstance(v, bool) for v in values)
+        }
+
+    @property
     def experiment_class(self):
         return repo_path.get_obj_class(self.fullname)
 
@@ -318,9 +336,15 @@ class ConcreteSpec(Spec):
                     f"Package {self.name} must define a workload variant"
                 )
 
+        variable_overrides = (
+            self.variable_overrides if isinstance(self, ExperimentSpec) else {}
+        )
+
         # For variants that are set, set whatever they imply
         variants_to_check = set(
-            (name, values) for name, values in self.variants.items()
+            (name, values)
+            for name, values in self.variants.items()
+            if name not in variable_overrides
         )
         checked = set()
         while variants_to_check:
@@ -367,6 +391,8 @@ class ConcreteSpec(Spec):
 
         # Validate all set variant values
         for name, values in self.variants.items():
+            if name in variable_overrides:
+                continue
             try:
                 variant = next(
                     v
