@@ -498,9 +498,9 @@ variables. e.g.:
 
 ::
 
-    self.add_experiment_variable("n_resources_dict", {"px": 2, "py": 2, "pz": 1}, named=True, matrix=True)
-    self.add_experiment_variable("groups", 16, named=True, matrix=True)
-    self.add_experiment_variable("n_gpus", 8, named=False, matrix=False)
+    self.add_experiment_variable("n_resources_dict", {"px": 2, "py": 2, "pz": 1}, named=True, matrixed=True)
+    self.add_experiment_variable("groups", 16, named=True, matrixed=True)
+    self.add_experiment_variable("n_gpus", 8, named=False, matrixed=False)
 
 In the above example, ``n_resources_dict`` is added as 3D variable with dimensions
 ``px``, ``py`` and ``pz`` and assigned the values ``2``, ``2``, and ``1`` respectively.
@@ -510,9 +510,9 @@ dimension names for multi-dimensional variables) is appended to the experiment n
 ``ramble.yaml``
 
 Every multi-dimensional experiment variable is defined as a zip in the ``ramble.yaml``.
-If ``matrixed`` is set to ``True``, the variable (or the zip iin case of a
+If ``matrixed`` is set to ``True``, the variable (or the zip in case of a
 multi-dimensional variable) is declared as a matrix in ``ramble.yaml``. The generated
-``ramble.yaml`` for the above example would be look like:
+``ramble.yaml`` for the above example would look like:
 
 ::
 
@@ -522,7 +522,7 @@ multi-dimensional variable) is declared as a matrix in ``ramble.yaml``. The gene
         variables:
             px: 2
             py: 2
-            pz: 2
+            pz: 1
             groups: 16
             n_gpus: 8
         zips:

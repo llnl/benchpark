@@ -55,6 +55,14 @@ find experiments/ -type f -name "*.out" -exec cat {} +
 # Fail if log files are empty or don't exist
 find experiments/ -type f -name "*.out" | grep -q . || { echo "No .out files found"; exit 1; }; find experiments/ -type f -name "*.out" -empty -print -quit | grep -q . && { echo "Empty .out file found"; exit 1; }
 
+if [[ " ${VARIANT} " == *" compiler_attribution=on "* ]]; then
+    find experiments/ -type f -name "*.compiler_attribution.trace.jsonl" -size +0c -print -quit \
+        | grep -q . || { echo "No nonempty compiler-attribution trace found"; exit 1; }
+    find software/ -type f -path "*/compiler-attribution/extraction_plugin_output/*" \
+        -name "*.device.json" -size +0c -print -quit \
+        | grep -q . || { echo "No nonempty compiler-attribution device extraction found"; exit 1; }
+fi
+
 # Analyze Experiments
 ramble --disable-logger --workspace-dir . workspace analyze --format json yaml text
 

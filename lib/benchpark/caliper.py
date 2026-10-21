@@ -159,6 +159,9 @@ class Caliper:
             return "_".join(parts)
 
         def get_spack_variants(self):
+            if self.spec.satisfies("compiler_attribution=association"):
+                return "+caliper"
+
             if self.spec.satisfies("caliper=none") and self.spec.satisfies(
                 "caliper_services=none"
             ):
