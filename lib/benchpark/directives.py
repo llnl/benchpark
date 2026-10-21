@@ -18,7 +18,6 @@ import ramble.language.language_helpers
 import ramble.language.shared_language
 from ramble.language.language_base import DirectiveError
 
-import benchpark.repo
 import benchpark.runtime
 import benchpark.spec
 import benchpark.variant
@@ -39,18 +38,11 @@ class classproperty:
 
 
 class DirectiveMeta(ramble.language.shared_language.SharedMeta):
-    """
-    metaclass for supporting directives (e.g., depends_on) and phases
-    """
+    """Collect directives on experiments, systems, and their helper mixins.
 
-    _directive_names = set()
-    _directives_to_be_executed = []
-
-    # Hack to be able to use SharedMeta outside of Ramble
-    # will ask Ramble to implement fix on their end and then we can remove this
-    def __init__(self, *args, **kwargs):
-        with benchpark.repo.override_ramble_hardcoded_globals():
-            super(DirectiveMeta, self).__init__(*args, **kwargs)
+    Ramble 0.7 collects directives during class creation, so mixins that
+    declare directives must also use this metaclass.
+    """
 
 
 benchpark_directive = DirectiveMeta.directive

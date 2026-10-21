@@ -5,11 +5,11 @@
 
 import warnings
 
-from benchpark.directives import variant
+from benchpark.directives import DirectiveMeta, variant
 from benchpark.experiment import ExperimentHelper
 
 
-class Caliper:
+class Caliper(metaclass=DirectiveMeta):
     variant(
         "caliper",
         default="none",

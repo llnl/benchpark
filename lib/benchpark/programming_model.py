@@ -6,7 +6,7 @@
 
 from enum import Enum
 
-from benchpark.directives import requires, variant
+from benchpark.directives import DirectiveMeta, requires, variant
 from benchpark.experiment import ExperimentHelper
 
 
@@ -29,7 +29,7 @@ def ProgrammingModel(*types):
     def is_available(mod):
         return mod in _available
 
-    class BaseModel:
+    class BaseModel(metaclass=DirectiveMeta):
         if "mpi" in _available:
             requires("mpi", when="+mpi")
             variant("mpi", default=True, description="Run with MPI")

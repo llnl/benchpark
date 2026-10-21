@@ -13,7 +13,7 @@ import yaml
 
 import benchpark.spec
 import benchpark.variant
-from benchpark.directives import ExperimentSystemBase, provides, variant
+from benchpark.directives import DirectiveMeta, ExperimentSystemBase, provides, variant
 
 
 def _hash_id(content_list):
@@ -23,7 +23,7 @@ def _hash_id(content_list):
     return sha256_hash.hexdigest()
 
 
-class MPISystem:
+class MPISystem(metaclass=DirectiveMeta):
     provides("mpi")
 
     name = "mpi"
