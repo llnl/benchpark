@@ -3,9 +3,59 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import pickle
+from types import SimpleNamespace
+
 import pytest
+import yaml
 
 import benchpark.spec
+from benchpark.cmd.experiment import experiment_init
+
+
+@pytest.mark.parametrize(
+    "system_spec",
+    [
+        "cscs-daint",
+        "jcahpc-miyabi-g",
+        "jsc-juwels",
+        "lanl-venado cluster=grace-hopper",
+        "lbnl-perlmutter",
+        "llnl-matrix",
+        "riken-dgx",
+        "riken-gh200",
+    ],
+)
+@pytest.mark.parametrize("experiment_spec", ["sparta-snl+cuda", "test.saxpy+cuda"])
+def test_cuda_experiment_init_with_system(system_spec, experiment_spec, tmp_path):
+    spec = benchpark.spec.SystemSpec(system_spec).concretize()
+    spec.destdir = str(tmp_path)
+    with (tmp_path / "system.pkl").open("wb") as stream:
+        pickle.dump(spec, stream)
+
+    experiment_init(
+        SimpleNamespace(system=str(tmp_path), dest="experiment", spec=[experiment_spec])
+    )
+
+    with (tmp_path / "experiment" / "ramble.yaml").open() as stream:
+        config = yaml.safe_load(stream)
+    assert (
+        config["ramble"]["config"]["system"]["name"] == spec.system.__class__.__name__
+    )
+
+
+def test_system_enforces_active_programming_models():
+    cpu = benchpark.spec.SystemSpec("generic-x86").concretize().system
+    gpu = benchpark.spec.SystemSpec("riken-dgx").concretize().system
+
+    cpu.enforce("mpi")
+    cpu.enforce("openmp")
+    gpu.enforce("mpi")
+    gpu.enforce("cuda")
+    with pytest.raises(AttributeError, match='does not provide "cuda"'):
+        cpu.enforce("cuda")
+    with pytest.raises(AttributeError, match='does not provide "rocm"'):
+        gpu.enforce("rocm")
 
 
 def test_system_compute_variables_section(monkeypatch):
