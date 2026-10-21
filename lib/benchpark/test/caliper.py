@@ -160,3 +160,16 @@ def test_caliper_nvtx_service_modifier_and_package_section():
         },
         "environments": {"caliper": {"packages": ["caliper"]}},
     }
+
+
+def test_variable_overrides_use_runtime_caliper_metadata():
+    spec = benchpark.spec.ExperimentSpec(
+        "saxpy caliper=time n_resources=1536 n_cores_per_rank=21 "
+        "extra_cmd_opts='--label --setattr=foo'"
+    ).concretize()
+    metadata = get_caliper_vars_section(spec)["caliper_metadata"]
+
+    assert metadata["n_resources"] == "{n_resources}"
+    assert metadata["n_cores_per_rank"] == "{n_cores_per_rank}"
+    assert metadata["extra_cmd_opts"] == "{extra_cmd_opts}"
+    assert "--setattr" not in metadata
