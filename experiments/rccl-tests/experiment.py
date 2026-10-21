@@ -67,6 +67,8 @@ class RcclTests(
                 "n_gpus", "{n_nodes}*{sys_gpus_per_node}", True
             )
         self.add_experiment_variable("num_gpus_per_task", 1, False)
+        # Each rank sees its assigned GPU as device 0.
+        self.set_environment_variable("NCCL_TESTS_DEVICE", 0)
 
         # Each test sweeps message sizes, so there is no single problem size
         self.set_required_variables(
