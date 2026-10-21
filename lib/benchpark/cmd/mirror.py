@@ -175,9 +175,12 @@ export SPACK_DISABLE_LOCAL_CONFIG=1
     repo_copy_script = os.path.join(
         paths.benchpark_root, "lib", "scripts", "env-collect-branch-tips.py"
     )
-    out, err = run_command(
-        f"spack -e {env_dir} python {repo_copy_script}"
-    )
+    out, err = run_command(f"spack -e {env_dir} python {repo_copy_script}")
+
+    # Save JSON output to mirror directory for redirect-git-urls.py to consume
+    commit_info_file = os.path.join(dest, "git-commit-info.json")
+    with open(commit_info_file, "w") as f:
+        f.write(out)
 
     # Save JSON output to mirror directory for redirect-git-urls.py to consume
     commit_info_file = os.path.join(dest, "git-commit-info.json")

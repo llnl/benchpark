@@ -1,4 +1,3 @@
-import sys
 import json
 
 import spack.repo
@@ -32,8 +31,8 @@ def main():
         if isinstance(df, GitFetchStrategy) and (df.branch or not df.cachable):
             # Extract the commit from the concretized spec
             commit = None
-            if hasattr(spec, 'variants') and 'commit' in spec.variants:
-                commit = str(spec.variants['commit'].value)
+            if hasattr(spec, "variants") and "commit" in spec.variants:
+                commit = str(spec.variants["commit"].value)
 
             if commit:
                 version_str = str(spec.version)
