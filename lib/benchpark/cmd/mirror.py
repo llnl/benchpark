@@ -182,11 +182,6 @@ export SPACK_DISABLE_LOCAL_CONFIG=1
     with open(commit_info_file, "w") as f:
         f.write(out)
 
-    # Save JSON output to mirror directory for redirect-git-urls.py to consume
-    commit_info_file = os.path.join(dest, "git-commit-info.json")
-    with open(commit_info_file, 'w') as f:
-        f.write(out)
-
     git_redirect_script = os.path.join(
         paths.benchpark_root, "lib", "scripts", "redirect-git-urls.py"
     )
