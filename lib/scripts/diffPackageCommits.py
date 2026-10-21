@@ -101,7 +101,7 @@ def main():
             # Check if there is no diff
             if not diff_list:
                 color.cprint(
-                    f"    @*gNo differences found. Please delete 'benchpark/repo/{package}/package.py' (use spack upstream)@."
+                    f"    @*gNo differences found. Please delete 'repos/spack_repo/benchpark/packages/{package}/package.py' (use spack upstream)@."
                 )
                 EXIT_CODE = 1
 
