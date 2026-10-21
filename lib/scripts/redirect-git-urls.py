@@ -1,6 +1,5 @@
 import json
 import sys
-import json
 from pathlib import Path
 
 import spack.config as config
