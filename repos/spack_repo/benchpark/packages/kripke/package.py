@@ -75,12 +75,12 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("mpi", when="+mpi")
     depends_on("blt", type="build", when="@:1.2.7")
 
-    depends_on("camp@2026.07.1:", when="@develop")
+    depends_on("camp@2026.07.2:", when="@develop")
     depends_on("camp@2026.07.1", when="@2026.10.0")
     depends_on("camp@2025.12.0", when="@2025.12.0")
     depends_on("camp@2024.07.0", when="@1.2.7.0:2025.07.0")
 
-    depends_on("raja@2026.07.0: ~examples~exercises cxxstd=20", when="@develop")
+    depends_on("raja@2026.07.1: ~examples~exercises cxxstd=20", when="@develop")
     depends_on("raja@2026.07.0 ~examples~exercises cxxstd=20", when="@2026.10.0")
     depends_on("raja@2025.12.0 ~examples~exercises cxxstd=17", when="@2025.12.0")
     depends_on("raja@2024.07.0 ~examples~exercises cxxstd=14", when="@1.2.7.0:2025.07.0")
@@ -102,7 +102,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
         depends_on("chai~rocm", when="~rocm")
         depends_on("fmt@9.1", when="^chai@2024.07.0")
 
-        depends_on("umpire@2026.07.1: ~examples", when="@develop")
+        depends_on("umpire@2026.07.2: ~examples", when="@develop")
         depends_on("umpire@2026.07.1 ~examples", when="@2026.10.0")
         depends_on("umpire@2025.12.0 ~examples", when="@2025.12.0")
         depends_on("umpire@2024.07.0 ~examples", when="@1.2.7.0:2025.07.0")
