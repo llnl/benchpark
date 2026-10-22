@@ -58,6 +58,13 @@ include:
           - remhos
           - sparta-snl
         VARIANT: [+rocm]
+      # New ROCm version coverage
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        SCHEDULER_PARAMETERS: $ELCAP_PARAMS
+        BENCHMARK: saxpy
+        SYSTEM_ARGS: [rocm=7.2.1, rocm=7.14, rocm=10.0]
+        VARIANT: [+rocm]
       # spack-pip
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
