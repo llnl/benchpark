@@ -22,10 +22,10 @@ one of four categories:
 
 .. code-block:: console
 
-    $ benchpark list systems
-    $ benchpark list benchmarks
-    $ benchpark list experiments
-    $ benchpark list modifiers
+    ~]$ benchpark list systems
+    ~]$ benchpark list benchmarks
+    ~]$ benchpark list experiments
+    ~]$ benchpark list modifiers
 
 The Benchpark Catalogue shows detailed information on :doc:`Benchpark Systems
 </system-list>` and :doc:`Benchpark Experiments </benchmark-list>` in tabular form.
@@ -35,20 +35,20 @@ of scaling. For example, this command will display only the CUDA experiments:
 
 .. code-block:: console
 
-    $ benchpark list experiments --experiment cuda
+    ~]$ benchpark list experiments --experiment cuda
 
 We can also search for systems:
 
 .. code-block:: console
 
-    $ benchpark list systems
+    ~]$ benchpark list systems
 
 After choosing a system or experiment, inspect its variants and configuration details:
 
 .. code-block:: console
 
-    $ benchpark info system aws-tutorial
-    $ benchpark info experiment hpl
+    ~]$ benchpark info system fluxtainer-aws
+    ~]$ benchpark info experiment hpl
 
 For a complete command reference, see :doc:`Benchpark Commands </benchpark-commands>`.
 
