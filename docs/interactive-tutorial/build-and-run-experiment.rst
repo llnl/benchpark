@@ -12,12 +12,27 @@
 :ref:`Experiment <beginner-tutorial-glossary-experiment>`, :ref:`System
 <beginner-tutorial-glossary-system>`
 
-Initialize the AWS tutorial system and the HPL experiment:
+Initialize the AWS tutorial system:
 
 .. code-block:: console
 
     ~/benchpark]$ benchpark system init --dest=hpc-tutorial fluxtainer-aws
-    ~/benchpark]$ benchpark experiment init --dest=hpl hpc-tutorial hpl+strong caliper=time,mpi
+
+.. figure:: /_static/images/fluxtainer-aws-system-spec.png
+    :alt: Tutorial system spec
+    :width: 50%
+    :align: center
+
+Then, initialize the HPL experiment:
+
+.. code-block:: console
+
+    ~/benchpark]$ benchpark experiment init --dest=hpl hpc-tutorial hpl +strong caliper=time,mpi
+
+.. figure:: /_static/images/fluxtainer-aws-experiment-spec.png
+    :alt: Tutorial experiment spec
+    :width: 50%
+    :align: center
 
 Create the experiment workspace:
 
