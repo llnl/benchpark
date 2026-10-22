@@ -188,10 +188,12 @@ class Kripke(
                     "layout": "GDZ",
                     "strong_n": None,
                     "strong_p": None,
-                    "weak_n": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
-                    "weak_p": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
+                    "weak_n": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
+                    "weak_p": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
                     "throughput_n": None,
                     "throughput_p": None,
                 }
