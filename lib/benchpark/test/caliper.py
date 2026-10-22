@@ -175,6 +175,8 @@ def test_variable_overrides_use_runtime_caliper_metadata():
     assert metadata["n_cores_per_rank"] == "{n_cores_per_rank}"
     assert metadata["extra_cmd_opts"] == "{extra_cmd_opts}"
     assert "--setattr" not in metadata
+
+
 def test_compiler_attribution_enables_caliper_annotations():
     expr_spec = benchpark.spec.ExperimentSpec(
         "saxpy compiler_attribution=association,remark_counts,kru"
