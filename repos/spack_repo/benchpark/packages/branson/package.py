@@ -37,7 +37,7 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
 
     variant("openmp", default=False, description="Enable OpenMP support")
     variant("caliper", default=False, description="Enable Caliper monitoring")
-    variant("n_groups", default=30, values=int, description="Number of groups")
+    variant("n_groups", default="30", values=int, description="Number of groups")
     variant("umpire", default=False, description="Use umpire memory pool")
 
     with when("+umpire"):
