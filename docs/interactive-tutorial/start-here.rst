@@ -109,6 +109,18 @@ The Beginner Tutorial uses the following terms from Spack, Ramble, and Benchpark
       - A Python module named ``application.py`` that records a recipe or runtime script
         detailing exactly how to configure the runtime parameters of a program, execute
         it, and analyze its figure of merit.
+    - - .. tutorialtarget:: beginner-tutorial-glossary-modifier
+
+        **Modifier**
+
+      - `Ramble
+        <https://ramble.readthedocs.io/en/latest/tutorials/10_using_modifiers.html>`__
+      - An object that encapsulates reusable experiment configuration. Benchpark
+        provides modifier implementations, including Caliper and Allocation, that follow
+        Ramble's modifier syntax. These modifiers can inject commands before, after, or
+        during experiment execution to capture system resources, experiment data, and
+        metadata, or to enable performance analysis tools. See :doc:`Benchpark Modifiers
+        </modifiers>`.
     - - .. tutorialtarget:: beginner-tutorial-glossary-experiment
 
         **Experiment**
@@ -126,14 +138,6 @@ The Beginner Tutorial uses the following terms from Spack, Ramble, and Benchpark
       - A Python module named ``system.py`` that records the hardware resources,
         scheduler, and system software for a specific HPC system (machine) or group of
         systems.
-    - - .. tutorialtarget:: beginner-tutorial-glossary-modifier
-
-        **Modifier**
-
-      - :doc:`Benchpark </modifiers>`
-      - A reusable object that can inject commands before, after, or during experiment
-        execution to capture available system resources or experiment data and metadata,
-        record Linux thread and GPU affinity, or inject performance analysis tools.
     - - .. tutorialtarget:: beginner-tutorial-glossary-scaling-study
 
         **Scaling Study**
@@ -232,7 +236,7 @@ not Spack compiler (``%``) or version (``@``) constraints.
 
         .. tutorialcontainer:: tutorial-duration
 
-            5 min.
+            10 min.
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-run tutorial-with-duration
 
@@ -241,7 +245,7 @@ not Spack compiler (``%``) or version (``@``) constraints.
 
         .. tutorialcontainer:: tutorial-duration
 
-            10 min.
+            25 min.
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-analyze tutorial-with-duration
 
@@ -250,7 +254,7 @@ not Spack compiler (``%``) or version (``@``) constraints.
 
         .. tutorialcontainer:: tutorial-duration
 
-            #2 + 10 min.
+            #2 + 25 min.
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-experiment tutorial-with-duration
 

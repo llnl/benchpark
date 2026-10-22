@@ -174,6 +174,29 @@ def test_default_modifiers_section():
     ]
 
 
+def test_compiler_attribution_modifier_section():
+    spec = benchpark.spec.ExperimentSpec(
+        "saxpy compiler_attribution=association,remark_counts,kru"
+    ).concretize()
+    experiment = spec.experiment
+
+    modifiers_section = experiment.compute_modifiers_section_wrapper()
+
+    assert {"name": "compiler_attribution", "mode": "association"} in modifiers_section
+    assert {
+        "name": "compiler_attribution",
+        "mode": "remark_counts",
+    } in modifiers_section
+    assert {"name": "compiler_attribution", "mode": "kru"} in modifiers_section
+
+    package_section = experiment.compute_package_section_wrapper()
+    assert package_section["packages"]["compiler_attribution_plugin"] == {
+        "spack_pkg_spec": (
+            "compiler-attribution-plugin +association +remark_counts +kru"
+        )
+    }
+
+
 def test_multiple_models():
     with pytest.raises(
         benchpark.error.BenchparkError,
