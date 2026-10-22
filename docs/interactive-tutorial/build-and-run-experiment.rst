@@ -51,9 +51,54 @@ the experiments:
     $ ramble --workspace-dir workspace/aws-tutorial/hpl/workspace workspace setup
     $ ramble --workspace-dir workspace/aws-tutorial/hpl/workspace on
 
-For workspace structure and additional build options, see :doc:`/build-experiment`. For
-individual experiment instances, rerunning experiments, and combining workspaces into
-one allocation, see :doc:`/run-experiment`.
+This command submits the batch scripts (e.g., submission scripts) generated in ``ramble
+workspace`` to the system's resource manager (which is specified in the files generated
+by ``benchpark system init``). For the AWS infrastructure used in this tutorial, the
+resource manager is LLNL's `Flux resource manager <https://flux-framework.org/>`_.
+
+If the above command is successful, you should see something like:
+
+.. code-block:: bash
+
+    ==> Streaming details to log:
+    ==>   /home/joyvan/benchpark/wkp/hpc-tutorial/hpl/workspace/logs/execute.2025-07-09_18.14.08.out
+    ==>   Executing 4 out of 4 experiments:
+    ==>   Log files for experiments are stored in: /home/joyvan/benchpark/wkp/hpc-tutorial/hpl/workspace/logs/execute.2025-07-09_18.14.08
+    ==> Running executors...
+    ƒV54uD5o5
+    ƒV57fKkEK
+    ƒV5ANUS6s
+    ƒV5D498h5
+
+The final lines printed by the ``ramble on`` command are the job IDs produced by the
+system resource manager. You can use these IDs to track the progress of the jobs in your
+experiment. For example, with Flux, you can see job status by running:
+
+.. code-block:: bash
+
+    flux jobs -a
+
+This command will produce an output like:
+
+.. image:: ../flux_jobs_a_output.png
+    :alt: Example output of flux jobs -a
+    :width: 750px
+    :align: center
+
+.. note::
+
+    If you are running on our `AWS infrastructure
+    <https://github.com/llnl/benchpark-tutorial>`_, it should take roughly 1 minute for
+    all jobs to finish running. Additionally, only one job will run at a time under our
+    infrastructure because each user only has 1 node. If you are running on an HPC
+    system, expect the jobs to complete faster.
+
+After all the jobs are finished, each job directory (i.e., subdirectories of
+``/home/jovyan/benchpark/wkp/hpc-tutorial/hpl/workspace/experiments/hpl/hpl``) will
+contain a Caliper output file (i.e., a ``.cali`` file) containing performance data for
+the job. For workspace structure and additional build options, see
+:doc:`/build-experiment`. For individual experiment instances, rerunning experiments,
+and combining workspaces into one allocation, see :doc:`/run-experiment`.
 
 ***********************
  Choose Your Next Step
