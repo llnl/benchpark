@@ -52,6 +52,7 @@ def test_experiment_compute_variables_section_caliper(monkeypatch):
             "cali_version": "master",
             "caliper": "time",
             "caliper_services": "none",
+            "compiler_attribution": "none",
             "exec_mode": "test",
             "package_manager": "spack",
             "prepend_path": "'",
@@ -135,6 +136,7 @@ def test_caliper_modifier(monkeypatch):
         "cali_version": "master",
         "caliper": "time",
         "caliper_services": "none",
+        "compiler_attribution": "none",
         "exec_mode": "test",
         "githash": "on",
         "hwloc": "none",
@@ -173,3 +175,34 @@ def test_variable_overrides_use_runtime_caliper_metadata():
     assert metadata["n_cores_per_rank"] == "{n_cores_per_rank}"
     assert metadata["extra_cmd_opts"] == "{extra_cmd_opts}"
     assert "--setattr" not in metadata
+def test_compiler_attribution_enables_caliper_annotations():
+    expr_spec = benchpark.spec.ExperimentSpec(
+        "saxpy compiler_attribution=association,remark_counts,kru"
+    ).concretize()
+    experiment = expr_spec.experiment
+    cali = get_caliper_helper(expr_spec)
+
+    assert cali.compute_modifiers_section() == []
+    assert cali.get_spack_variants() == "+caliper"
+    assert (
+        experiment.compute_package_section_wrapper()["packages"]["saxpy"][
+            "spack_pkg_spec"
+        ]
+        == "saxpy@1.0.0~openmp ~cuda ~rocm +caliper"
+    )
+
+
+def test_compiler_attribution_without_association_does_not_enable_caliper():
+    expr_spec = benchpark.spec.ExperimentSpec(
+        "saxpy compiler_attribution=remark_counts,kru"
+    ).concretize()
+    experiment = expr_spec.experiment
+    cali = get_caliper_helper(expr_spec)
+
+    assert cali.get_spack_variants() == "~caliper"
+    assert (
+        experiment.compute_package_section_wrapper()["packages"]["saxpy"][
+            "spack_pkg_spec"
+        ]
+        == "saxpy@1.0.0~openmp ~cuda ~rocm ~caliper"
+    )

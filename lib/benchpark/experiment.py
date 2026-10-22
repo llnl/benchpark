@@ -12,63 +12,11 @@ import yaml  # TODO: some way to ensure yaml available
 
 import benchpark.spec
 import benchpark.variant
+from benchpark.compiler_attribution import CompilerAttribution
 from benchpark.directives import ExperimentSystemBase, variant
 from benchpark.error import BenchparkError
+from benchpark.experiment_helper import ExperimentHelper
 from benchpark.variables import Variable, VariableDict
-
-
-class ExperimentHelper:
-    def __init__(self, exp):
-        self.spec = exp.spec
-        self._expr_vars = VariableDict()
-        self.env_vars = {
-            "set": {},
-            "append": [{"paths": {}, "vars": {}}],
-            "prepend": [{"paths": {}, "vars": {}}],
-        }
-
-    def compute_include_section(self):
-        return []
-
-    def compute_config_section(self):
-        return {}
-
-    def compute_modifiers_section(self):
-        return []
-
-    def compute_applications_section(self):
-        return {}
-
-    def compute_package_section(self):
-        return {}
-
-    def get_helper_name_prefix(self):
-        return None
-
-    def get_spack_variants(self):
-        return None
-
-    def compute_variables_section(self):
-        return {}
-
-    def set_environment_variable(self, name, value):
-        """Set value of environment variable"""
-        self.env_vars["set"][name] = value
-
-    def append_environment_variable(self, name, value, target="paths"):
-        """Append to existing environment variable PATH ('paths') or other variable ('vars')"""
-        self.env_vars["append"][0][target][name] = value
-
-    def prepend_environment_variable(self, name, value, target="paths"):
-        """Prepend to existing environment variable PATH ('paths') or other variable ('vars')"""
-        self.env_vars["prepend"][0][target][name] = value
-
-    def compute_config_variables(self):
-        pass
-
-    def compute_config_variables_wrapper(self):
-        self.compute_config_variables()
-        return self._expr_vars, self.env_vars
 
 
 class ExecMode:
@@ -195,7 +143,14 @@ class Githash:
             return githash_modifier_list
 
 
-class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc, Githash):
+class Experiment(
+    ExperimentSystemBase,
+    ExecMode,
+    Affinity,
+    Hwloc,
+    Githash,
+    CompilerAttribution,
+):
     """This is the superclass for all benchpark experiments.
 
     ***The Experiment class***
@@ -295,7 +250,7 @@ class Experiment(ExperimentSystemBase, ExecMode, Affinity, Hwloc, Githash):
                 f"Please specify a programming model in your {self.name}/experiment.py (e.g. ProgrammingModelType.Mpionly, ProgrammingModelType.Openmp, ProgrammingModelType.Cuda, ProgrammingModelType.Rocm). See other experiments for examples."
             )
         # Check if experiment is trying to run in MpiOnly mode without being an ProgrammingModelType.Mpionly experiment
-        elif "mpi" not in str(self.spec) and not any(
+        elif not self.spec.satisfies("+mpi") and not any(
             self.spec.satisfies("+" + model) for model in models[1:]
         ):
             raise BenchparkError(
