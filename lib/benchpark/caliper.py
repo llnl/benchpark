@@ -5,6 +5,7 @@
 
 import warnings
 
+import benchpark.spec
 from benchpark.directives import DirectiveMeta, variant
 from benchpark.experiment import ExperimentHelper
 
@@ -159,6 +160,9 @@ class Caliper(metaclass=DirectiveMeta):
             return "_".join(parts)
 
         def get_spack_variants(self):
+            if self.spec.satisfies("compiler_attribution=association"):
+                return "+caliper"
+
             if self.spec.satisfies("caliper=none") and self.spec.satisfies(
                 "caliper_services=none"
             ):
@@ -182,8 +186,15 @@ class Caliper(metaclass=DirectiveMeta):
                 "process_problem_size": "{process_problem_size}",
                 "total_problem_size": "{total_problem_size}",
             }
-            # parse the spec for more metadata
-            for i, variant_spec in enumerate(str.split(str(self.spec.variants))):
+            # Runtime variables can change during scaling. Resolve their final
+            # values in Ramble instead of recording the CLI inputs as metadata.
+            variants = benchpark.spec.VariantMap(self.spec.variants)
+            for name in self.spec.variable_overrides:
+                metadata_dict[name] = "{" + name + "}"
+                del variants[name]
+
+            # parse the declared variants for more metadata
+            for i, variant_spec in enumerate(str.split(str(variants))):
                 values = variant_spec.split("=")
                 if len(values) == 1:
                     if i == 0:

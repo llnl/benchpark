@@ -95,7 +95,7 @@ def _make_when_spec(
     return benchpark.spec.Spec(value)
 
 
-@benchpark_directive("maintainers")
+@benchpark_directive("maintainers", init_value=[])
 def maintainers(*names: str):
     """Define the maintainers of the system/experiment.
 
