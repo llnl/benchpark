@@ -88,3 +88,44 @@ def test_rocm7():
         "llnl-elcapitan cluster=tuolumne rocm=7.2.0"
     ).concretize()
     sys_spec.system.compute_compilers_section()
+
+
+@pytest.mark.parametrize(
+    "version,rocm_prefix,llvm_prefix",
+    [
+        ("7.2.1", "/opt/rocm-7.2.1", "/opt/rocm-7.2.1/llvm"),
+        ("7.14", "/opt/rocm/core-7.14", "/opt/rocm/core-7.14/lib/llvm"),
+        ("10.0", "/opt/rocm/core-10.0", "/opt/rocm/core-10.0/lib/llvm"),
+    ],
+)
+def test_rocm_install_prefix(version, rocm_prefix, llvm_prefix):
+    sys_spec = benchpark.spec.SystemSpec(
+        f"llnl-elcapitan cluster=tuolumne rocm={version}"
+    ).concretize()
+    system = sys_spec.system
+
+    assert system.rocm_prefix == rocm_prefix
+    assert system.rocm_llvm_prefix == llvm_prefix
+
+    packages = system.rocm_config()["packages"]
+    for package_name, package_config in packages.items():
+        if "externals" not in package_config:
+            continue
+        expected_prefix = llvm_prefix if package_name == "llvm" else rocm_prefix
+        assert package_config["externals"][0]["prefix"] == expected_prefix
+
+    compiler_packages = system.rocm_cce_compiler_cfg()["packages"]
+    rocm_compiler = compiler_packages["llvm-amdgpu"]["externals"][0]
+    assert rocm_compiler["prefix"] == llvm_prefix
+    compiler_attributes = rocm_compiler["extra_attributes"]
+    assert all(
+        path.startswith(f"{llvm_prefix}/bin/")
+        for path in compiler_attributes["compilers"].values()
+    )
+    assert f"{rocm_prefix}/lib" in compiler_attributes["extra_rpaths"]
+
+    cce_attributes = compiler_packages["cce"]["externals"][0]["extra_attributes"]
+    cce_library_paths = cce_attributes["environment"]["prepend_path"][
+        "LD_LIBRARY_PATH"
+    ].split(":")
+    assert f"{rocm_prefix}/lib" in cce_library_paths

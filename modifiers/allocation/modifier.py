@@ -457,6 +457,8 @@ class Allocation(BasicModifier):
                 cmd_ranks = f"-n {v.n_ranks_per_node}"
             else:
                 cmd_ranks = f"-n {v.n_ranks}"
+        if v.n_cores_per_rank:
+            cmd_opts.append(f"--cores-per-task={v.n_cores_per_rank}")
         if v.n_gpus:
             gpus_per_rank = 1  # self.gpus_as_gpus_per_rank(v)
             if self._usage_mode == "torchrun-hpc":

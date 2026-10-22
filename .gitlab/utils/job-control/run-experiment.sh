@@ -50,10 +50,21 @@ fi
 
 # Runs experiments where n_nodes == 1, and Print Log
 printf 'Run\n' > "${TEST_STATUS_FILE}"
-ramble --disable-logger --workspace-dir . on --executor '{execute_experiment}' --where '{n_nodes} == 1'
+# Bound the run and always print experiment logs, even if it hangs (124 = timed out)
+run_rc=0
+timeout -k 60 60m ramble --disable-logger --workspace-dir . on --executor '{execute_experiment}' --where '{n_nodes} == 1' || run_rc=$?
 find experiments/ -type f -name "*.out" -exec cat {} +
+if [[ ${run_rc} -ne 0 ]]; then echo "ramble on exited with ${run_rc}"; exit ${run_rc}; fi
 # Fail if log files are empty or don't exist
 find experiments/ -type f -name "*.out" | grep -q . || { echo "No .out files found"; exit 1; }; find experiments/ -type f -name "*.out" -empty -print -quit | grep -q . && { echo "Empty .out file found"; exit 1; }
+
+if [[ " ${VARIANT} " == *" compiler_attribution=on "* ]]; then
+    find experiments/ -type f -name "*.compiler_attribution.trace.jsonl" -size +0c -print -quit \
+        | grep -q . || { echo "No nonempty compiler-attribution trace found"; exit 1; }
+    find software/ -type f -path "*/compiler-attribution/extraction_plugin_output/*" \
+        -name "*.device.json" -size +0c -print -quit \
+        | grep -q . || { echo "No nonempty compiler-attribution device extraction found"; exit 1; }
+fi
 
 # Analyze Experiments
 ramble --disable-logger --workspace-dir . workspace analyze --format json yaml text
