@@ -16,7 +16,6 @@ include:
         SCHEDULER_PARAMETERS: $DANE_PARAMS
         BENCHMARK:
           - amg2023
-          - gpcnet
           - hpcg
           - hpl
           - kripke
