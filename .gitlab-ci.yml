@@ -55,7 +55,7 @@ variables:
   # CI_DEBUG_TRACE: 'true'
   # Job variables
   ALLOC_NAME: ${CI_PROJECT_NAME}_ci_${CI_PIPELINE_ID}
-  FLUX_ARGS: -N 1 --exclusive
+  FLUX_ARGS: -N 1 --exclusive -t 90m
   # Dane
   DANE_SHARED_ALLOC: -N 1 -t 04:00:00 --exclusive --reservation=ci
   # Matrix (NODES ARE SHARED WITHOUT --exclusive)
