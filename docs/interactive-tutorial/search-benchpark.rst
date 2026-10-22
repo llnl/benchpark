@@ -22,10 +22,7 @@ one of four categories:
 
 .. code-block:: console
 
-    ~]$ benchpark list systems
-    ~]$ benchpark list benchmarks
-    ~]$ benchpark list experiments
-    ~]$ benchpark list modifiers
+    ~]$ benchpark list {benchmarks,experiments,modifiers,systems}
 
 The Benchpark Catalogue shows detailed information on :doc:`Benchpark Systems
 </system-list>` and :doc:`Benchpark Experiments </benchmark-list>` in tabular form.

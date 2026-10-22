@@ -12,9 +12,7 @@
 :ref:`Experiment <beginner-tutorial-glossary-experiment>`, :ref:`System
 <beginner-tutorial-glossary-system>`
 
-Initialize the AWS tutorial system and the HPL experiment. The explicit instance type
-matches the `Benchpark tutorial infrastructure
-<https://github.com/llnl/benchpark-tutorial>`_:
+Initialize the AWS tutorial system and the HPL experiment:
 
 .. code-block:: console
 
