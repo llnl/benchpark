@@ -108,8 +108,18 @@ jobs:
             diffpackages:
               - 'repos/spack_repo/benchpark/packages/**/package.py'
             containers:
+              - 'bin/**'
+              - 'checkout-versions.yaml'
+              - 'config/**'
               - 'containerfiles/**'
+              - 'experiments/**'
+              - 'lib/**'
+              - 'modifiers/**'
+              - 'repos/**'
+              - 'requirements.txt'
               - 'systems/fluxtainer/**'
+              - 'systems/fluxtainer-aws/**'
+              - 'var/**'
       - name: Get modified package directories in repos/
         id: get_modified_repo_dirs
         run: |
