@@ -102,11 +102,11 @@ This command will produce an output like:
     system, expect the jobs to complete faster.
 
 After all the jobs are finished, each job directory (i.e., subdirectories of
-``wkp/hpc-tutorial/hpl/workspace/experiments/hpl/standard``) will
-contain a Caliper output file (i.e., a ``.cali`` file) containing performance data for
-the job. For workspace structure and additional build options, see
-:doc:`/build-experiment`. For individual experiment instances, rerunning experiments,
-and combining workspaces into one allocation, see :doc:`/run-experiment`.
+``wkp/hpc-tutorial/hpl/workspace/experiments/hpl/standard``) will contain a Caliper
+output file (i.e., a ``.cali`` file) containing performance data for the job. For
+workspace structure and additional build options, see :doc:`/build-experiment`. For
+individual experiment instances, rerunning experiments, and combining workspaces into
+one allocation, see :doc:`/run-experiment`.
 
 ***********************
  Choose Your Next Step

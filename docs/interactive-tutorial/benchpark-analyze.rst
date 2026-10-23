@@ -20,8 +20,8 @@
 
         :doc:`Prerequisite: Build and Run an Experiment <build-and-run-experiment>`
 
-Install the analysis dependencies once from the Benchpark repository (this has
-already been installed in the container for the hands-on tutorials):
+Install the analysis dependencies once from the Benchpark repository (this has already
+been installed in the container for the hands-on tutorials):
 
 .. code-block:: console
 
