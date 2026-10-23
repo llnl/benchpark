@@ -81,14 +81,14 @@ class Phloem(
         use_gpus = self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm")
         resource_var = "n_gpus" if use_gpus else "n_ranks"
 
-        # All workloads: use minimum 4 ranks on one node
+        # All workloads: use minimum 2 ranks on one node
         sys = self.system_spec.system
-        # Use at least 4 ranks, but can fill nodes if system has more resources
+        # Use at least 2 ranks, but can fill nodes if system has more resources
         resources_per_node = (
             sys.sys_gpus_per_node if use_gpus else sys.sys_cores_per_node
         )
-        # Ensure minimum of 4 ranks for all workloads
-        min_resources = 4
+        # Ensure minimum of 2 ranks for all workloads
+        min_resources = 2
         actual_resources = max(min_resources, resources_per_node)
         self.add_experiment_variable(resource_var, actual_resources, True)
         self.add_experiment_variable("n_nodes", 1, True)
@@ -116,6 +116,4 @@ class Phloem(
         )
 
     def compute_package_section(self):
-        self.add_package_spec(
-            self.name, [f"phloem{self.determine_version()}"]
-        )
+        self.add_package_spec(self.name, [f"phloem{self.determine_version()}"])
