@@ -13,7 +13,7 @@ import yaml
 
 import benchpark.spec
 import benchpark.variant
-from benchpark.directives import ExperimentSystemBase, provides, variant
+from benchpark.directives import DirectiveMeta, ExperimentSystemBase, provides, variant
 
 
 def _hash_id(content_list):
@@ -23,7 +23,7 @@ def _hash_id(content_list):
     return sha256_hash.hexdigest()
 
 
-class MPISystem:
+class MPISystem(metaclass=DirectiveMeta):
     provides("mpi")
 
     name = "mpi"
@@ -117,7 +117,11 @@ class System(ExperimentSystemBase):
             pm.verify(self)
 
     def enforce(self, attr):
-        if attr not in self.provides:
+        # Programming model helpers are composed into systems at runtime.
+        # Their directives belong to the helpers, not to the system class.
+        if attr not in self.provides and not any(
+            attr in model.provides for model in self.programming_models
+        ):
             raise AttributeError(f'{self.spec.name} does not provide "{attr}"')
 
     def system_specific_variables(self):
