@@ -4,7 +4,12 @@ ARG TARGETARCH
 
 USER root
 
-RUN dnf clean all \
+COPY var/certs/ /tmp/extra-certs/
+
+RUN find /tmp/extra-certs -type f \( -name '*.crt' -o -name '*.pem' \) \
+    -exec cp {} /etc/pki/ca-trust/source/anchors/ \; \
+    && update-ca-trust \
+	&& dnf clean all \
 	&& rm -rf /var/cache/dnf \
 	&& git config --global checkout.workers 1024 \
 	&& git config --global feature.manyFiles true \
@@ -73,12 +78,6 @@ RUN pip install -r /home/fluxuser/benchpark/requirements.txt \
     && pip install .[analyze] \
 	&& echo 'source /home/fluxuser/benchpark/setup-env.sh' >> /home/fluxuser/.bashrc \
     && echo 'source /home/fluxuser/.benchpark/ramble/share/ramble/setup-env.sh' >> /home/fluxuser/.bashrc
-
-    # && benchpark system init --dest=hpc-tutorial fluxtainer instance_type=${TARGETARCH} \
-    # && benchpark experiment init hpc-tutorial kripke +weak caliper=time,mpi scaling-iterations=2 \
-    # && benchpark setup hpc-tutorial/kripke/ /home/fluxuser/benchpark/wkp/ \
-    # && flux start /home/fluxuser/benchpark/containerfiles/tutorial.sh \
-    # && rm -rf /home/fluxuser/benchpark/wkp /home/fluxuser/benchpark/hpc-tutorial *.out \
 
 ENTRYPOINT ["/usr/bin/flux", "start"]
 CMD ["/bin/bash"]
