@@ -37,6 +37,21 @@ where:
 - ``<Benchmark>``: amg2023 | saxpy | etc. (predefined choices in :doc:`benchmark-list`)
 - ``<SystemName>``: Cts | Tioga | etc. (predefined systems in :doc:`system-list`)
 
+Experiment variables can be overridden with ``name=value`` assignments, even when the
+experiment does not declare them as variants. For example:
+
+::
+
+    benchpark experiment init tuolumne raja-perf+rocm n_nodes=384 n_resources=1536 n_cores_per_rank=21
+
+Declared variant names keep their existing validation. Other assignments override
+experiment and helper variable defaults, or add variables when absent. These values are
+applied before scaling, so scaling starts from the supplied values. Integers and
+floating-point values are converted to numbers; expressions and other strings are
+preserved. Comma-separated values define a list, and shell quotes preserve values
+containing spaces. For grouped variables, override the individual dimensions, such as
+``npx=4 npy=2 npz=1``.
+
 ``benchpark setup`` will output instructions to follow:
 
 ::
