@@ -39,7 +39,14 @@ fi
 # Setup Workspace
 cd ./wkp/${HOST}/${BENCHMARK}/workspace/
 
-ramble --disable-logger --workspace-dir . workspace setup
+# Build with a raised stack limit: the kernel caps a command line at a quarter
+# of it, and lammps' CUDA link through Kokkos' nvcc_wrapper exceeds the default.
+# Scoped to the build so experiments still run with the normal limit.
+(
+    ulimit -s unlimited 2>/dev/null || ulimit -s hard
+    echo "Build stack limit: $(ulimit -s)"
+    ramble --disable-logger --workspace-dir . workspace setup
+)
 
 # Using flux on dane (srun called in "ramble on")
 if [ "$HOST" == "dane" ] && \
