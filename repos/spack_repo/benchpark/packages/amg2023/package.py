@@ -61,6 +61,9 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("hypre+mixedint", when="+mixedint")
 
     depends_on("hypre~cuda", when="~cuda")
+
+    conflicts("+umpire", when="~cuda~rocm")
+
     with when("+cuda"):
         depends_on("hypre+cuda")
         with when("+umpire"):
