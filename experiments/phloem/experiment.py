@@ -79,7 +79,9 @@ class Phloem(
                 # Remove individual mpiBench workloads and add bundled one
                 workloads = [w for w in workloads if not w.startswith("mpiBench_")]
                 # Store the test types for later use (space-separated for mpiBench)
-                self._bundled_mpibench_types = [w.replace("mpiBench_", "") for w in mpibench_workloads]
+                self._bundled_mpibench_types = [
+                    w.replace("mpiBench_", "") for w in mpibench_workloads
+                ]
                 # Add bundled workload
                 workloads.append("mpiBench_bundled")
             else:
@@ -102,12 +104,12 @@ class Phloem(
 
     def compute_applications_section(self):
         # If we have bundled mpiBench workloads, set the test types (space-separated)
-        if hasattr(self, '_bundled_mpibench_types') and self._bundled_mpibench_types:
+        if hasattr(self, "_bundled_mpibench_types") and self._bundled_mpibench_types:
             bundled_types = " ".join(self._bundled_mpibench_types)
             self.add_experiment_variable("bundled_test_types", bundled_types, False)
 
         # If we have bundled com workloads, set the test types (comma-separated)
-        if hasattr(self, '_bundled_com_types') and self._bundled_com_types:
+        if hasattr(self, "_bundled_com_types") and self._bundled_com_types:
             bundled_com_tests = ",".join(self._bundled_com_types)
             self.add_experiment_variable("bundled_com_tests", bundled_com_tests, False)
 
