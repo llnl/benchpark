@@ -64,7 +64,52 @@ class Phloem(
 
     maintainers("nhanford")
 
+    def __init__(self, spec):
+        super().__init__(spec)
+
+        # Bundle mpiBench and com workloads if multiple are selected
+        if "workload" in spec.variants:
+            # spec.variants["workload"] is already a tuple/list of workload names
+            workloads = list(spec.variants["workload"])
+            mpibench_workloads = [w for w in workloads if w.startswith("mpiBench_")]
+            com_workloads = [w for w in workloads if w.startswith("com_")]
+
+            # Bundle mpiBench workloads
+            if len(mpibench_workloads) > 1:
+                # Remove individual mpiBench workloads and add bundled one
+                workloads = [w for w in workloads if not w.startswith("mpiBench_")]
+                # Store the test types for later use (space-separated for mpiBench)
+                self._bundled_mpibench_types = [w.replace("mpiBench_", "") for w in mpibench_workloads]
+                # Add bundled workload
+                workloads.append("mpiBench_bundled")
+            else:
+                self._bundled_mpibench_types = None
+
+            # Bundle com workloads
+            if len(com_workloads) > 1:
+                # Remove individual com workloads and add bundled one
+                workloads = [w for w in workloads if not w.startswith("com_")]
+                # Store the test types for later use (comma-separated for com)
+                self._bundled_com_types = [w.replace("com_", "") for w in com_workloads]
+                # Add bundled workload
+                workloads.append("com_bundled")
+            else:
+                self._bundled_com_types = None
+
+            # Update the workload variant with bundled workloads
+            if self._bundled_mpibench_types or self._bundled_com_types:
+                self.workload = workloads
+
     def compute_applications_section(self):
+        # If we have bundled mpiBench workloads, set the test types (space-separated)
+        if hasattr(self, '_bundled_mpibench_types') and self._bundled_mpibench_types:
+            bundled_types = " ".join(self._bundled_mpibench_types)
+            self.add_experiment_variable("bundled_test_types", bundled_types, False)
+
+        # If we have bundled com workloads, set the test types (comma-separated)
+        if hasattr(self, '_bundled_com_types') and self._bundled_com_types:
+            bundled_com_tests = ",".join(self._bundled_com_types)
+            self.add_experiment_variable("bundled_com_tests", bundled_com_tests, False)
 
         if self.spec.satisfies("exec_mode=test"):
             # All workloads use minimum 4 ranks in test mode

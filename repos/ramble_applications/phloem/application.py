@@ -21,12 +21,20 @@ class Phloem(ExecutableApplication):
     # Define executables for each benchmark program
     executable('sqmr', 'sqmr --num_cores={num_cores} --num_nbors={num_nbors}', use_mpi=True)
     executable('mpiBench', 'mpiBench {test_type} -e {max_msgsize}', use_mpi=True)
+    executable('mpiBench_bundled', 'mpiBench {bundled_test_types} -e {max_msgsize}', use_mpi=True)
     executable('mpiGraph', 'mpiGraph', use_mpi=True)
     executable('com', 'com {test_type} -e {max_msgsize}', use_mpi=True)
+    executable('com_bundled', 'com -w {bundled_com_tests} -e {max_msgsize}', use_mpi=True)
 
     # Define workloads - workload names use underscores instead of spaces
     # sqmr workload (no test type)
     workload('sqmr', executables=['sqmr'])
+
+    # Bundled mpiBench workload (for multiple tests)
+    workload('mpiBench_bundled', executables=['mpiBench_bundled'])
+
+    # Bundled com workload (for multiple tests)
+    workload('com_bundled', executables=['com_bundled'])
 
     # mpiBench workloads (collective operations)
     workload('mpiBench_Barrier', executables=['mpiBench'])
@@ -121,22 +129,123 @@ class Phloem(ExecutableApplication):
 
     workload_variable('max_msgsize', default='33554432',
                       description='Maximum message size in bytes (default: 32 MB)',
-                      workloads=mpibench_workloads + com_workloads)
+                      workloads=mpibench_workloads + com_workloads + ['mpiBench_bundled', 'com_bundled'])
+
+    # Bundled test types variable for running multiple mpiBench tests together
+    workload_variable('bundled_test_types', default='',
+                      description='Space-separated list of test types for bundled execution',
+                      workloads=['mpiBench_bundled'])
+
+    # Bundled test types variable for running multiple com tests together (comma-separated)
+    workload_variable('bundled_com_tests', default='',
+                      description='Comma-separated list of test types for bundled execution',
+                      workloads=['com_bundled'])
 
     # Define figure of merit patterns for different test types
-    figure_of_merit('Latency',
-                    log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex=r'(?P<latency>[0-9]+\.?[0-9]*)\s+(?:us|usec|microseconds)',
-                    group_name='latency', units='usec')
 
-    figure_of_merit('Bandwidth',
+    # ========== mpiBench FOMs (OSU-style output format) ==========
+    # Capture mpiBench summary statistics from table format
+    # Format: #bytes  #repetitions  t_min[usec]  t_max[usec]  t_avg[usec]  Mbytes/sec
+    figure_of_merit('mpiBench_t_min',
                     log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex=r'(?P<bandwidth>[0-9]+\.?[0-9]*)\s+(?:MB/s|MBps)',
-                    group_name='bandwidth', units='MB/s')
+                    fom_regex=r't_min\[usec\]\s*[=:]?\s*(?P<mpib_t_min>[0-9]+\.?[0-9]*)',
+                    group_name='mpib_t_min', units='usec')
 
-    figure_of_merit('Time',
+    figure_of_merit('mpiBench_t_avg',
                     log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex=r'(?P<time>[0-9]+\.?[0-9]*)\s+(?:ms|msec|milliseconds)',
-                    group_name='time', units='ms')
+                    fom_regex=r't_avg\[usec\]\s*[=:]?\s*(?P<mpib_t_avg>[0-9]+\.?[0-9]*)',
+                    group_name='mpib_t_avg', units='usec')
+
+    figure_of_merit('mpiBench_t_max',
+                    log_file='{experiment_run_dir}/{experiment_name}.out',
+                    fom_regex=r't_max\[usec\]\s*[=:]?\s*(?P<mpib_t_max>[0-9]+\.?[0-9]*)',
+                    group_name='mpib_t_max', units='usec')
+
+    figure_of_merit('mpiBench_bandwidth',
+                    log_file='{experiment_run_dir}/{experiment_name}.out',
+                    fom_regex=r'Mbytes/sec\s+(?P<mpib_bw>[0-9]+\.?[0-9]*)',
+                    group_name='mpib_bw', units='MB/s')
+
+    # ========== COM FOMs (Phloem com benchmark format) ==========
+    # COM summary lines format: "# Summary  :  min/mean/max =  X.XXX / Y.YYY / Z.ZZZ"
+    # Bidirectional Test Results (bandwidth)
+    figure_of_merit('com_Bidirectional_min',
+                    log_file='{experiment_run_dir}/{experiment_name}.out',
+                    fom_regex=r'#Bidirectional[^\n]*\n(?:.*\n)*?# Summary\s*:\s*min/mean/max\s*=\s*(?P<bidir_min>[0-9]+\.?[0-9]*)',
+                    group_name='bidir_min', units='MB/s')
+
+    figure_of_merit('com_Bidirectional_mean',
+                    log_file='{experiment_run_dir}/{experiment_name}.out',
+                    fom_regex=r'#Bidirectional[^\n]*\n(?:.*\n)*?# Summary\s*:\s*min/mean/max\s*=\s*[0-9]+\.?[0-9]*\s*/\s*(?P<bidir_mean>[0-9]+\.?[0-9]*)',
+                    group_name='bidir_mean', units='MB/s')
+
+    figure_of_merit('com_Bidirectional_max',
+                    log_file='{experiment_run_dir}/{experiment_name}.out',
+                    fom_regex=r'#Bidirectional[^\n]*\n(?:.*\n)*?# Summary\s*:\s*min/mean/max\s*=\s*[0-9]+\.?[0-9]*\s*/\s*[0-9]+\.?[0-9]*\s*/\s*(?P<bidir_max>[0-9]+\.?[0-9]*)',
+                    group_name='bidir_max', units='MB/s')
+
+    # Latency Test Results
+    figure_of_merit('com_Latency_min',
+                    log_file='{experiment_run_dir}/{experiment_name}.out',
+                    fom_regex=r'#Latency[^\n]*\n(?:.*\n)*?# Summary\s*:\s*min/mean/max\s*=\s*(?P<lat_min>[0-9]+\.?[0-9]*)',
+                    group_name='lat_min', units='usec')
+
+    figure_of_merit('com_Latency_mean',
+                    log_file='{experiment_run_dir}/{experiment_name}.out',
+                    fom_regex=r'#Latency[^\n]*\n(?:.*\n)*?# Summary\s*:\s*min/mean/max\s*=\s*[0-9]+\.?[0-9]*\s*/\s*(?P<lat_mean>[0-9]+\.?[0-9]*)',
+                    group_name='lat_mean', units='usec')
+
+    figure_of_merit('com_Latency_max',
+                    log_file='{experiment_run_dir}/{experiment_name}.out',
+                    fom_regex=r'#Latency[^\n]*\n(?:.*\n)*?# Summary\s*:\s*min/mean/max\s*=\s*[0-9]+\.?[0-9]*\s*/\s*[0-9]+\.?[0-9]*\s*/\s*(?P<lat_max>[0-9]+\.?[0-9]*)',
+                    group_name='lat_max', units='usec')
+
+    # BidirAsync Test Results
+    figure_of_merit('com_BidirAsync_min',
+                    log_file='{experiment_run_dir}/{experiment_name}.out',
+                    fom_regex=r'#BidirAsync[^\n]*\n(?:.*\n)*?# Summary\s*:\s*min/mean/max\s*=\s*(?P<bidirasync_min>[0-9]+\.?[0-9]*)',
+                    group_name='bidirasync_min', units='MB/s')
+
+    figure_of_merit('com_BidirAsync_mean',
+                    log_file='{experiment_run_dir}/{experiment_name}.out',
+                    fom_regex=r'#BidirAsync[^\n]*\n(?:.*\n)*?# Summary\s*:\s*min/mean/max\s*=\s*[0-9]+\.?[0-9]*\s*/\s*(?P<bidirasync_mean>[0-9]+\.?[0-9]*)',
+                    group_name='bidirasync_mean', units='MB/s')
+
+    figure_of_merit('com_BidirAsync_max',
+                    log_file='{experiment_run_dir}/{experiment_name}.out',
+                    fom_regex=r'#BidirAsync[^\n]*\n(?:.*\n)*?# Summary\s*:\s*min/mean/max\s*=\s*[0-9]+\.?[0-9]*\s*/\s*[0-9]+\.?[0-9]*\s*/\s*(?P<bidirasync_max>[0-9]+\.?[0-9]*)',
+                    group_name='bidirasync_max', units='MB/s')
+
+    # Unidirectional Test Results
+    figure_of_merit('com_Unidirectional_min',
+                    log_file='{experiment_run_dir}/{experiment_name}.out',
+                    fom_regex=r'#Unidirectional[^\n]*\n(?:.*\n)*?# Summary\s*:\s*min/mean/max\s*=\s*(?P<unidir_min>[0-9]+\.?[0-9]*)',
+                    group_name='unidir_min', units='MB/s')
+
+    figure_of_merit('com_Unidirectional_mean',
+                    log_file='{experiment_run_dir}/{experiment_name}.out',
+                    fom_regex=r'#Unidirectional[^\n]*\n(?:.*\n)*?# Summary\s*:\s*min/mean/max\s*=\s*[0-9]+\.?[0-9]*\s*/\s*(?P<unidir_mean>[0-9]+\.?[0-9]*)',
+                    group_name='unidir_mean', units='MB/s')
+
+    figure_of_merit('com_Unidirectional_max',
+                    log_file='{experiment_run_dir}/{experiment_name}.out',
+                    fom_regex=r'#Unidirectional[^\n]*\n(?:.*\n)*?# Summary\s*:\s*min/mean/max\s*=\s*[0-9]+\.?[0-9]*\s*/\s*[0-9]+\.?[0-9]*\s*/\s*(?P<unidir_max>[0-9]+\.?[0-9]*)',
+                    group_name='unidir_max', units='MB/s')
+
+    # UnidirAsync Test Results
+    figure_of_merit('com_UnidirAsync_min',
+                    log_file='{experiment_run_dir}/{experiment_name}.out',
+                    fom_regex=r'#UnidirAsync[^\n]*\n(?:.*\n)*?# Summary\s*:\s*min/mean/max\s*=\s*(?P<unidirasync_min>[0-9]+\.?[0-9]*)',
+                    group_name='unidirasync_min', units='MB/s')
+
+    figure_of_merit('com_UnidirAsync_mean',
+                    log_file='{experiment_run_dir}/{experiment_name}.out',
+                    fom_regex=r'#UnidirAsync[^\n]*\n(?:.*\n)*?# Summary\s*:\s*min/mean/max\s*=\s*[0-9]+\.?[0-9]*\s*/\s*(?P<unidirasync_mean>[0-9]+\.?[0-9]*)',
+                    group_name='unidirasync_mean', units='MB/s')
+
+    figure_of_merit('com_UnidirAsync_max',
+                    log_file='{experiment_run_dir}/{experiment_name}.out',
+                    fom_regex=r'#UnidirAsync[^\n]*\n(?:.*\n)*?# Summary\s*:\s*min/mean/max\s*=\s*[0-9]+\.?[0-9]*\s*/\s*[0-9]+\.?[0-9]*\s*/\s*(?P<unidirasync_max>[0-9]+\.?[0-9]*)',
+                    group_name='unidirasync_max', units='MB/s')
 
     success_criteria('pass', mode='string', match=r'.*', file='{experiment_run_dir}/{experiment_name}.out')
