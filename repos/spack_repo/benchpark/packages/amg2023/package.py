@@ -44,10 +44,8 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("mpi", when="+mpi")
 
     with when("+umpire"):
-        depends_on("camp@2026.07.1:", when="@develop")
-        depends_on("umpire@2026.07.1:", when="@develop")
-        depends_on("camp@2026.07.1", when="@20261006")
-        depends_on("umpire@2026.07.1", when="@20261006")
+        depends_on("umpire@2026.07.2:", when="@develop")
+        depends_on("umpire@2026.07.2", when="@20261006")
 
     depends_on("hypre+mpi", when="+mpi")
     requires("+mpi", when="^hypre+mpi")
