@@ -27,4 +27,4 @@ deprecation
 deepdiff
 distro
 archspec
-jsonschema>=3.2
+jsonschema>=4.26.0
