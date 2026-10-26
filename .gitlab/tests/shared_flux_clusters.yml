@@ -128,6 +128,10 @@ run_tests_flux_tuolumne:
           - sparta-snl
         VARIANT: [+rocm]
         GPUMODE: SPX
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [phloem]
+        GPUMODE: SPX
       # Test openmp on tuolumne
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
@@ -185,6 +189,9 @@ run_tests_flux_tioga:
           - remhos
           - smb
         VARIANT: ['+rocm caliper=time,mpi']
+      - HOST: tioga
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [phloem]
       # spack-pip
       - HOST: tioga
         ARCHCONFIG: llnl-elcapitan
