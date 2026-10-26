@@ -361,7 +361,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
     conflicts("~openmp", when="+omptarget", msg="OpenMP target requires OpenMP")
     conflicts("+cuda", when="+rocm")
     conflicts(
-        "+rocm", when="+omptarget", msg="Cant support both rocm and openmp device backends at once"
+        "+rocm", when="+omptarget", msg="Can't support both rocm and openmp device backends at once"
     )
     conflicts("+ipc_shmem", when="@:5.0.1")
     conflicts("+mpi3_shmem", when="@:2024.07.0")
@@ -634,7 +634,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
 
     def test_recipe_dynamic_pool_heuristic(self):
         """Multiple use allocator test"""
-        self.run_example("recipe_dynamic_pool_heuristic", ["in the pool", "releas"])
+        self.run_example("recipe_dynamic_pool_heuristic", ["in the pool", "release"])
 
     def test_recipe_no_introspection(self):
         """Test without introspection"""

@@ -217,7 +217,7 @@ class Raja(CachedCMakePackage, CudaPackage, ROCmPackage):
     )
 
     # Backward compatibility is stopped from ROCm 6.0
-    # Future relase will have the change from PR https://github.com/LLNL/RAJA/pull/1568
+    # Future release will have the change from PR https://github.com/LLNL/RAJA/pull/1568
     patch(
         "https://github.com/LLNL/RAJA/commit/406eb8dee05a41eb32c421c375688a4863b60642.patch?full_index=1",
         sha256="d9ce5ef038555cbccb330a9016b7be77e56ae0660583cba955dab9d0297a4b07",
@@ -743,7 +743,7 @@ class Raja(CachedCMakePackage, CudaPackage, ROCmPackage):
 
     # TODO: this test seems to hang or take a long time?
     # SGS 2026-05-22: Did not see hangs/long execution times on LC systems or Redhat workstation
-    #                 clarify with Cody where this was occuring.
+    #                 clarify with Cody where this was occurring.
     # def test_matrix_multiply(self):
     #     """check batched matrix multiple tutorial"""
     #     self.build_and_run_example(
