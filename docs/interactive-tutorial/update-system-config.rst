@@ -15,6 +15,21 @@ These steps show how to use ``benchpark system external`` to compare and update 
 external packages defined by a Benchpark system against packages detected on the current
 machine. For adding a new system, please see :doc:`add-a-system-config`.
 
+Detection includes both the general Spack search and searches at declared prefixes. When
+an existing version is detected with different spec details, Benchpark proposes updating
+that entry. Newly detected versions are added independently. Versions that are not
+detected remain declared unchanged and are reported as ``NOT_FOUND`` in the terminal;
+detecting a newer version does not prove that an older version is absent. Ambiguous
+matches within one version are reported for review.
+
+Edits to declarations shared by multiple clusters apply to all of those clusters,
+assuming a shared software installation. The report lists the affected clusters.
+
+Terminal output highlights confirmed entries in green, updates in blue, additions in
+cyan, review findings in yellow, and validator failures in red. Redirected output is
+plain text by default. Set ``SPACK_COLOR=always`` or ``SPACK_COLOR=never`` to override
+automatic color selection.
+
 .. note::
 
     You must run the following commands in the Fluxtainer environment. Software is
@@ -65,13 +80,16 @@ change:
 
     $ benchpark system external fluxtainer --propose
 
-``--propose`` reports the eligible update without modifying the file. The proposal
-changes the detected external package version back to ``tar@1.35``:
+``--propose`` reports eligible changes without modifying the file. If detection finds
+``tar@1.35`` and does not find ``tar@1.34``, the proposal adds the detected version and
+retains the unconfirmed declaration unchanged:
 
 .. code-block:: diff
 
-    - "externals": [{"spec": "tar@1.34", "prefix": "/usr"}],
-    + "externals": [{"spec": "tar@1.35", "prefix": "/usr"}],
+      "externals": [
+          {"spec": "tar@=1.34", "prefix": "/usr"},
+    +     {"spec": "tar@=1.35", "prefix": "/usr"},
+      ],
 
 ******************************
  3. Apply the Detected Update
@@ -84,8 +102,9 @@ Apply the proposed change to ``systems/fluxtainer/system.py``:
     $ benchpark system external fluxtainer --apply
 
 Benchpark validates the detected change before writing it. After the command completes,
-the external ``tar`` entry again contains ``tar@1.35``. Changes that cannot be matched
-and applied unambiguously are reported for manual review.
+the external ``tar`` list contains both versions. The unconfirmed ``tar@1.34`` entry
+remains available for review. Changes that cannot be matched and applied unambiguously
+are reported for manual review.
 
 ***********
  Next Step
