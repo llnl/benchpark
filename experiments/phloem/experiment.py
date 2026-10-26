@@ -114,8 +114,8 @@ class Phloem(
             self.add_experiment_variable("bundled_com_tests", bundled_com_tests, False)
 
         if self.spec.satisfies("exec_mode=test"):
-            # All workloads use minimum 4 ranks in test mode
-            num_nodes = {"n_nodes": 1, "n_ranks": 4}
+            # All workloads use minimum 2 ranks in test mode
+            num_nodes = {"n_nodes": 1, "n_ranks": 2}
             for pk, pv in num_nodes.items():
                 self.add_experiment_variable(pk, pv, True)
 
