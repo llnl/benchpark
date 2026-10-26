@@ -25,3 +25,6 @@ google-cloud-bigquery
 tqdm
 deprecation
 deepdiff
+distro
+archspec
+jsonschema>=3.2

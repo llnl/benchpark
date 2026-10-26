@@ -144,11 +144,6 @@ run_tests_slurm_dane:
         ARCHCONFIG: llnl-cluster
         SYSTEM_ARGS: [mount_point="/p/lustre1"]
         BENCHMARK: ior
-      # Test openmpi
-      - HOST: dane
-        ARCHCONFIG: llnl-cluster
-        SYSTEM_ARGS: [mpi=openmpi]
-        BENCHMARK: osu-micro-benchmarks
       # Compilers
       - HOST: dane
         ARCHCONFIG: llnl-cluster

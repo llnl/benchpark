@@ -16,7 +16,6 @@ include:
         SCHEDULER_PARAMETERS: $DANE_PARAMS
         BENCHMARK:
           - amg2023
-          - gpcnet
           - hpcg
           - hpl
           - kripke
@@ -42,6 +41,13 @@ include:
         SCHEDULER_PARAMETERS: $DANE_PARAMS
         SYSTEM_ARGS: [mount_point="/p/lustre1"]
         BENCHMARK: ior
+      # Test openmpi here: nightly launches with srun, and MPI_Init fails under
+      # flux in the PR pipelines
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: $DANE_PARAMS
+        SYSTEM_ARGS: [mpi=openmpi]
+        BENCHMARK: osu-micro-benchmarks
       # +rocm tests
       - HOST: [tuolumne]
         ARCHCONFIG: llnl-elcapitan

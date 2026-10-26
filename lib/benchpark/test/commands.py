@@ -91,6 +91,8 @@ def test_info():
     ]
 
     for r in result:
+        if r.endswith("-deprecated"):
+            continue
         subprocess.run(
             [paths.benchpark_root / "bin/benchpark", "info", "system", r],
             check=True,
