@@ -259,6 +259,10 @@ class LlnlCluster(System):
                             "spec": "python@3.9.12+bz2+crypt+ctypes+dbm+lzma+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
                             "prefix": "/usr/tce",
                         },
+                        {
+                            "spec": "python@=3.13.2+bz2+ctypes+dbm~freethreading+lzma+pyexpat~pythoncmd+readline+sqlite3+ssl~tix+tkinter+uuid+zlib",
+                            "prefix": "/usr/tce",
+                        },
                     ],
                     "buildable": False,
                 },
@@ -271,7 +275,12 @@ class LlnlCluster(System):
                     "buildable": False,
                 },
                 "perl": {
-                    "externals": [{"spec": "perl@5.26.3", "prefix": "/usr"}],
+                    "externals": [
+                        {
+                            "spec": "perl@=5.26.3+cpanm+opcode+open+shared+threads",
+                            "prefix": "/usr",
+                        }
+                    ],
                     "buildable": False,
                 },
             }

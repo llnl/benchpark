@@ -8,17 +8,14 @@
 
 import ast
 import functools
-import io
 import json
 import os
-import re
 import shutil
 import stat
 import subprocess
 import sys
 import tempfile
 import textwrap
-import tokenize
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import contextmanager
@@ -30,14 +27,13 @@ import benchpark.repo
 import benchpark.spec
 import benchpark.system
 from benchpark.paths import paths
+from benchpark.util.compat import color
 
 _SPACK_TIMEOUT_SECONDS = 60
 _SPACK_BATCH_TIMEOUT_SECONDS = 600
 _VALIDATOR_CONCURRENCY = 4
 _SPACK_RESULT_PREFIX = "BENCHPARK_EXTERNAL_RESULT="
 _MODULE_RESULT_PREFIX = "BENCHPARK_EXTERNAL_MODULE_RESULT="
-_NOT_FOUND_MARKER = "# benchpark: external-status=not-found"
-_MARKER_ACTIONS = frozenset({"MARK_NOT_FOUND", "CLEAR_NOT_FOUND_MARKER"})
 _SPACK_SITE_PURGED_SHELL = """
 if type module >/dev/null 2>&1; then
     module --force purge || exit $?
@@ -1153,7 +1149,7 @@ def _classify_additional(candidate, declarations):
 
 
 def _reconcile_package(package, declarations, candidates, validation_results=None):
-    """Apply deterministic exact matching and cardinality rules for one package."""
+    """Match instances within each version, then report independent additions."""
 
     if validation_results is not None and len(validation_results) != len(declarations):
         raise ValueError("validation results must align with package declarations")
@@ -1211,7 +1207,8 @@ def _reconcile_package(package, declarations, candidates, validation_results=Non
             (
                 candidate_index
                 for candidate_index in unmatched_candidates
-                if _candidate_matches_declaration(
+                if declaration.spec == candidates[candidate_index].spec
+                and _candidate_matches_declaration(
                     declaration, candidates[candidate_index], validation
                 )
             ),
@@ -1234,42 +1231,73 @@ def _reconcile_package(package, declarations, candidates, validation_results=Non
             work.validation_basis = "broad_spack_detection"
         work.matched_candidate = candidates[matching_candidate]
 
-    unmatched_declarations = [
-        index
-        for index, work in enumerate(declaration_work)
-        if work.state in {None, "NOT_FOUND"}
-    ]
-    unmatched_declaration_count = len(unmatched_declarations)
-    unmatched_candidate_count = len(unmatched_candidates)
-    if unmatched_candidate_count == 0:
-        for declaration_index in unmatched_declarations:
-            declaration_work[declaration_index].state = "NOT_FOUND"
-    elif unmatched_declaration_count == 1 and unmatched_candidate_count == 1:
-        declaration_index = unmatched_declarations[0]
-        candidate_index = unmatched_candidates[0]
-        declaration_work[declaration_index].state = "REPLACEMENT"
-        declaration_work[declaration_index].matched_candidate = candidates[
-            candidate_index
+    # A different version is an addition, never evidence that an old version
+    # was replaced. Prefer the same prefix when updating spec details; only
+    # infer a prefix change for a unique remaining pair within one version.
+    versions = sorted({item.version for item in candidates})
+    for version in versions:
+        remaining_declarations = [
+            index
+            for index, work in enumerate(declaration_work)
+            if work.state != "REVIEW_REQUIRED"
+            and work.matched_candidate is None
+            and work.external.version == version
+            and _prefix_only(work.external)
         ]
-        matched_candidates.add(candidate_index)
-    elif unmatched_declaration_count == 1 and unmatched_candidate_count > 1:
-        declaration_work[unmatched_declarations[0]].state = "REVIEW_REQUIRED"
-    elif unmatched_declaration_count > 1 and unmatched_candidate_count >= 1:
-        for declaration_index in unmatched_declarations:
-            declaration_work[declaration_index].state = "REVIEW_REQUIRED"
+        remaining_candidates = [
+            index
+            for index in unmatched_candidates
+            if candidates[index].version == version and _prefix_only(candidates[index])
+        ]
+
+        def match_update(declaration_index, candidate_index):
+            work = declaration_work[declaration_index]
+            candidate = candidates[candidate_index]
+            work.state = "REPLACEMENT"
+            work.reason = work.detail = work.failed_module = None
+            work.matched_candidate = candidate
+            work.evidence = _coalesce_observations(work.evidence + (candidate,))
+            remaining_declarations.remove(declaration_index)
+            remaining_candidates.remove(candidate_index)
+            unmatched_candidates.remove(candidate_index)
+            matched_candidates.add(candidate_index)
+
+        for declaration_index in tuple(remaining_declarations):
+            prefix = declarations[declaration_index].prefix
+            at_prefix = [
+                index
+                for index in remaining_candidates
+                if candidates[index].prefix == prefix
+            ]
+            declarations_at_prefix = [
+                index
+                for index in remaining_declarations
+                if declarations[index].prefix == prefix
+            ]
+            if len(at_prefix) == 1 and len(declarations_at_prefix) == 1:
+                match_update(declaration_index, at_prefix[0])
+
+        if len(remaining_declarations) == 1 and len(remaining_candidates) == 1:
+            match_update(remaining_declarations[0], remaining_candidates[0])
+        elif remaining_candidates:
+            for index in remaining_declarations:
+                declaration_work[index].state = "REVIEW_REQUIRED"
+                declaration_work[index].reason = "AMBIGUOUS_MATCH"
+
+    for work in declaration_work:
+        if work.state is None:
+            work.state = "NOT_FOUND"
 
     candidate_classifications = [None] * len(candidates)
-    if unmatched_declaration_count == 0:
-        comparable_declarations = [
-            declaration
-            for declaration in declarations
-            if declaration.invalid_detail is None and declaration.spec is not None
-        ]
-        if comparable_declarations:
-            for candidate_index in unmatched_candidates:
-                candidate_classifications[candidate_index] = _classify_additional(
-                    candidates[candidate_index], comparable_declarations
-                )
+    comparable_declarations = [
+        declaration
+        for declaration in declarations
+        if declaration.invalid_detail is None and declaration.spec is not None
+    ]
+    for candidate_index in unmatched_candidates:
+        candidate_classifications[candidate_index] = _classify_additional(
+            candidates[candidate_index], comparable_declarations
+        )
 
     declaration_results = tuple(
         _DeclarationResult(
@@ -1486,15 +1514,26 @@ def _reconcile_system_externals(system):
 
         broad = broad_results.get(package)
         package_observations = broad_observations.get(package, ())
+        # Successful prefix searches discover candidates too. Module-scoped
+        # evidence remains bound to its validated module environment.
+        targeted = targeted_results.get(package)
+        candidate_observations = (
+            package_observations if broad and broad.get("outcome") == "success" else ()
+        )
+        if targeted and targeted.get("outcome") == "success":
+            candidate_observations += _spack_observations(
+                package, targeted, "targeted_prefix_validation"
+            )
+        candidate_observations = _coalesce_observations(candidate_observations)
         candidates = tuple(
             external
-            for external in package_observations
+            for external in candidate_observations
             if external.invalid_detail is None
         )
         candidates = _merge_validation_provenance(candidates, validations)
         invalid_observations = tuple(
             external
-            for external in package_observations
+            for external in candidate_observations
             if external.invalid_detail is not None
         )
         conflict_details = [
@@ -1586,7 +1625,6 @@ class _EntrySite:
     end: int
     list_start: int
     list_end: int
-    elements: Tuple[Tuple[int, int], ...]
 
 
 def _line_starts(source):
@@ -1640,7 +1678,6 @@ def _entry_index(source):
                             end,
                             offset(value.lineno, value.col_offset),
                             offset(value.end_lineno, value.end_col_offset),
-                            elements,
                         )
                     )
     return {values: tuple(sites) for values, sites in index.items()}
@@ -1672,87 +1709,9 @@ def _entry_lines(source, site):
     return line_start, line_end, before, standalone
 
 
-def _list_has_comments(source, site):
-    starts = _line_starts(source)
-    try:
-        tokens = list(tokenize.generate_tokens(io.StringIO(source).readline))
-    except (tokenize.TokenError, SyntaxError):
-        return True
-    return any(
-        site.list_start < starts[token.start[0] - 1] + token.start[1] < site.list_end
-        for token in tokens
-        if token.type == tokenize.COMMENT
-    )
-
-
-def _explode_externals_list(source, site):
-    """Rewrite the list holding site one element per line, each followed by a comma.
-
-    The trailing commas make ruff keep the list in this layout from then on.
-    """
-
-    line_start = source.rfind("\n", 0, site.list_start) + 1
-    indentation = re.match(r"[ \t]*", source[line_start:]).group(0)
-    newline = "\r\n" if "\r\n" in source else "\n"
-    body = "".join(
-        f"{newline}{indentation}    {source[start:end]},"
-        for start, end in site.elements
-    )
-    return (
-        source[: site.list_start]
-        + "["
-        + body
-        + newline
-        + indentation
-        + "]"
-        + source[site.list_end :]
-    )
-
-
-def _not_found_marker_source(source, declaration, *, add):
-    """Add or remove the machine-owned marker above one literal entry.
-
-    A marker needs its own line, so adding one to an entry that shares a line first
-    rewrites that one externals list with one entry per line.
-    """
-
-    site, reason = _declared_site(source, declaration)
-    if site is None:
-        return None, reason
-    line_start, line_end, indentation, standalone = _entry_lines(source, site)
-    if not standalone:
-        if not add:
-            return source, None  # markers only ever sit above a standalone entry
-        if _list_has_comments(source, site):
-            return None, "externals list holding the literal contains comments"
-        source = _explode_externals_list(source, site)
-        site, reason = _declared_site(source, declaration)
-        if site is None:
-            return None, reason
-        line_start, line_end, indentation, standalone = _entry_lines(source, site)
-        if not standalone:
-            return None, "literal could not be placed on its own line"
-    marker_line = indentation + _NOT_FOUND_MARKER
-
-    previous_start = source.rfind("\n", 0, max(line_start - 1, 0)) + 1
-    previous_line = source[previous_start:line_start].rstrip("\r\n")
-    marker_present = previous_line == marker_line
-    if add:
-        if marker_present:
-            return source, None
-        newline = "\r\n" if source[:line_end].endswith("\r") else "\n"
-        return source[:line_start] + marker_line + newline + source[line_start:], None
-    if not marker_present:
-        return source, None
-    return source[:previous_start] + source[line_start:], None
-
-
 def _replace_literal_external(source, declaration, candidate):
-    """Replace one complete literal entry and clear its owned marker."""
+    """Replace one complete literal entry."""
 
-    source, marker_reason = _not_found_marker_source(source, declaration, add=False)
-    if source is None:
-        return None, marker_reason
     new_literal = _detected_literal_external(candidate)
     if new_literal is None:
         return None, "replacement is not a supported direct prefix-only literal"
@@ -1906,7 +1865,13 @@ def _proposal_direct_source_reason(system_spec, declaration, scope_cache):
 
 
 def _logical_proposals(package_result):
-    proposals = []
+    # Insertions use original declarations as anchors, including entries that
+    # are updated later in the same transaction.
+    proposals = [
+        _Proposal("ADDITIONAL_VERSION", None, candidate.external)
+        for candidate in package_result.candidates
+        if candidate.classification == "ADDITIONAL_VERSION"
+    ]
     for declaration in package_result.declarations:
         if declaration.state == "REPLACEMENT":
             proposals.append(
@@ -1916,27 +1881,12 @@ def _logical_proposals(package_result):
                     declaration.matched_candidate,
                 )
             )
-        elif declaration.state == "NOT_FOUND":
-            proposals.append(_Proposal("MARK_NOT_FOUND", declaration.external))
-    for candidate in package_result.candidates:
-        if candidate.classification == "ADDITIONAL_VERSION":
-            proposals.append(_Proposal("ADDITIONAL_VERSION", None, candidate.external))
     return proposals
 
 
 def _source_mutability_for_addition(
     system_spec, package_result, proposal, source, scope_cache
 ):
-    if package_result.validator_outcome != "SUCCESS":
-        return replace(
-            proposal,
-            source_reason="package candidate validation is incomplete",
-        )
-    if any(
-        declaration.state == "REVIEW_REQUIRED"
-        for declaration in package_result.declarations
-    ):
-        return replace(proposal, source_reason="package has unresolved declarations")
     candidate_literal = _detected_literal_external(proposal.candidate)
     if candidate_literal is None:
         return replace(
@@ -1952,11 +1902,9 @@ def _source_mutability_for_addition(
             source_reason="detected literal already occurs in source",
         )
 
-    writable = []
+    writable = {}
     reasons = []
     for declaration_result in package_result.declarations:
-        if declaration_result.state != "VALID":
-            continue
         declaration = declaration_result.external
         reason = _proposal_direct_source_reason(system_spec, declaration, scope_cache)
         if reason is not None:
@@ -1968,13 +1916,28 @@ def _source_mutability_for_addition(
         if rewritten is None:
             reasons.append(reason)
             continue
-        writable.append(declaration)
+        site, _ = _declared_site(source, declaration)
+        location = (site.list_start, site.list_end)
+        # Entries in the same list are equivalent insertion locations. Prefer
+        # an anchor at the discovered prefix when multiple lists are present.
+        previous = writable.get(location)
+        if previous is None or declaration.prefix == candidate.prefix:
+            writable[location] = declaration
+
+    same_prefix = {
+        location: declaration
+        for location, declaration in writable.items()
+        if declaration.prefix == candidate.prefix
+    }
+    if same_prefix:
+        writable = same_prefix
 
     if len(writable) == 1:
-        shared, _ = _shared_clusters(system_spec, writable[0], scope_cache)
+        anchor = next(iter(writable.values()))
+        shared, _ = _shared_clusters(system_spec, anchor, scope_cache)
         return replace(
             proposal,
-            declaration=writable[0],
+            declaration=anchor,
             source_mutable=True,
             also_changes=shared,
         )
@@ -1996,31 +1959,19 @@ def _source_mutability(system_spec, package_result, proposal, source, scope_cach
 
     if source is None:
         return replace(proposal, source_reason="canonical system source is unavailable")
+    if proposal.candidate is not None and proposal.candidate.observation_conflict:
+        return replace(proposal, source_reason=proposal.candidate.observation_conflict)
     if proposal.action == "ADDITIONAL_VERSION":
         return _source_mutability_for_addition(
             system_spec, package_result, proposal, source, scope_cache
         )
 
-    if (
-        proposal.action == "REPLACEMENT"
-        and package_result.validator_outcome != "SUCCESS"
-    ):
-        return replace(
-            proposal,
-            source_reason="package candidate validation is incomplete",
-        )
     reason = _proposal_direct_source_reason(
         system_spec, proposal.declaration, scope_cache
     )
     if reason is not None:
         return replace(proposal, source_reason=reason)
     shared, _ = _shared_clusters(system_spec, proposal.declaration, scope_cache)
-    if shared and proposal.action in _MARKER_ACTIONS:
-        # Not finding a package here says nothing about the other clusters.
-        return replace(
-            proposal,
-            source_reason=f"external is also produced by cluster={shared[0]}",
-        )
 
     rewritten, reason = _proposal_source_edit(source, proposal)
     if rewritten is None:
@@ -2037,18 +1988,6 @@ def _with_source_proposals(system_spec, package_results, source):
     proposed_results = []
     for package_result in package_results:
         proposals = _logical_proposals(package_result)
-        if source is not None:
-            for declaration in package_result.declarations:
-                if declaration.state != "VALID":
-                    continue
-                cleared, reason = _not_found_marker_source(
-                    source, declaration.external, add=False
-                )
-                if cleared is not None and cleared != source:
-                    proposals.append(
-                        _Proposal("CLEAR_NOT_FOUND_MARKER", declaration.external)
-                    )
-
         proposals = tuple(
             _source_mutability(
                 system_spec, package_result, proposal, source, scope_cache
@@ -2091,27 +2030,7 @@ def _proposal_source_edit(source, proposal):
         )
     if proposal.action == "ADDITIONAL_VERSION":
         return _add_literal_external(source, proposal.declaration, proposal.candidate)
-    if proposal.action == "MARK_NOT_FOUND":
-        return _not_found_marker_source(source, proposal.declaration, add=True)
-    if proposal.action == "CLEAR_NOT_FOUND_MARKER":
-        return _not_found_marker_source(source, proposal.declaration, add=False)
     return None, "unsupported source mutation"
-
-
-def _verify_marker_text(source, rewritten, proposals):
-    """Confirm marker edits changed no code (comments and layout may differ)."""
-
-    non_marker_source = source
-    for proposal in proposals:
-        if proposal.action in {"MARK_NOT_FOUND", "CLEAR_NOT_FOUND_MARKER"}:
-            continue
-        non_marker_source, reason = _proposal_source_edit(non_marker_source, proposal)
-        if non_marker_source is None:
-            raise _ApplyVerificationError(reason)
-    if ast.dump(ast.parse(rewritten)) != ast.dump(ast.parse(non_marker_source)):
-        raise _ApplyVerificationError(
-            "machine-owned marker edits changed unrelated source text"
-        )
 
 
 @contextmanager
@@ -2215,13 +2134,13 @@ def _frozen_validation_results(new_declarations, package_result):
         )
         if (
             matching_candidate is not None
-            and package_result.validator_outcome == "SUCCESS"
+            and not matching_candidate.observation_conflict
         ):
             validations.append(
                 _DeclarationResult(
                     declaration,
                     "VALID",
-                    validation_basis="frozen_broad_spack_detection",
+                    validation_basis="frozen_spack_detection",
                     evidence=(matching_candidate,),
                 )
             )
@@ -2374,7 +2293,6 @@ def _apply_source_proposals(
         compile(rewritten, str(source_path), "exec")
     except SyntaxError as error:
         raise _ApplyVerificationError(f"candidate source has invalid syntax: {error}")
-    _verify_marker_text(source, rewritten, proposals)
 
     before = _identity_counter(_extract_system_externals(system_spec.system))
     try:
@@ -2424,10 +2342,36 @@ def _external_text(external):
     return " | ".join(fields)
 
 
+def _styled(text, style):
+    """Color literal text without interpreting Spack's @ syntax as markup."""
+
+    return color.colorize(f"@{style}{{{color.cescape(text)}}}")
+
+
+def _status_text(status):
+    styles = {
+        "SUCCESS": "g",
+        "VALID": "g",
+        "MATCHED": "g",
+        "REPLACEMENT": "*b",
+        "ADDITIONAL_VERSION": "*c",
+        "ADDITIONAL_INSTANCE": "c",
+        "ADDITIONAL_SPEC": "c",
+        "NOT_FOUND": "y",
+        "REVIEW_REQUIRED": "*y",
+        "NO_APPLICABLE_VALIDATOR": "y",
+        "UNSUPPORTED_DETECTION": "y",
+        "VALIDATOR_FAILED": "*r",
+        "writable": "*g",
+        "report-only": "y",
+    }
+    return _styled(status, styles[status]) if status in styles else status
+
+
 def _report_reconciliation(system_spec, package_results, *, heading=None):
     """Render the private result in a concise human-readable form."""
 
-    print(heading or f"External reconciliation for {system_spec}")
+    print(_styled(heading or f"External reconciliation for {system_spec}", "*"))
     for package_result in package_results:
         validator = package_result.validator_outcome or "NOT_REQUIRED"
         validator_detail = (
@@ -2436,8 +2380,8 @@ def _report_reconciliation(system_spec, package_results, *, heading=None):
             else ""
         )
         print(
-            f"\n{package_result.package} "
-            f"(broad Spack detection: {validator}{validator_detail})"
+            f"\n{_styled(package_result.package, '*')} "
+            f"(broad Spack detection: {_status_text(validator)}{validator_detail})"
         )
         for declaration in package_result.declarations:
             suffix = f" [{declaration.reason}]" if declaration.reason else ""
@@ -2447,7 +2391,7 @@ def _report_reconciliation(system_spec, package_results, *, heading=None):
                 else ""
             )
             print(
-                f"  {declaration.state}{suffix}: "
+                f"  {_status_text(declaration.state)}{suffix}: "
                 f"{_external_text(declaration.external)}{basis}"
             )
             if declaration.failed_module:
@@ -2480,10 +2424,12 @@ def _report_reconciliation(system_spec, package_results, *, heading=None):
                 if candidate.external.observed_by
                 else ""
             )
-            print(f"  {label}: {_external_text(candidate.external)}{provenance}")
+            print(
+                f"  {_status_text(label)}: {_external_text(candidate.external)}{provenance}"
+            )
         for proposal in package_result.proposals:
             candidate = (
-                " -> " + _external_text(proposal.candidate)
+                " -> " + _styled(_external_text(proposal.candidate), "g")
                 if proposal.candidate is not None
                 else ""
             )
@@ -2497,7 +2443,7 @@ def _report_reconciliation(system_spec, package_results, *, heading=None):
                 else package_result.package
             )
             print(
-                f"  proposal {proposal.action} [{writable}]: "
+                f"  proposal {_status_text(proposal.action)} [{_status_text(writable)}]: "
                 f"{target}{candidate}{reason}"
             )
 
@@ -2519,7 +2465,10 @@ def run(args):
         package_results = _reconcile_system_externals(system_spec.system)
     except Exception as error:
         print(
-            f"External reconciliation could not produce a trustworthy result: {error}"
+            _styled(
+                f"External reconciliation could not produce a trustworthy result: {error}",
+                "*r",
+            )
         )
         return 1
 
@@ -2532,7 +2481,7 @@ def run(args):
         )
         package_results = _with_source_proposals(system_spec, package_results, source)
         if source_error:
-            print(f"Source mutation is unavailable: {source_error}")
+            print(_styled(f"Source mutation is unavailable: {source_error}", "y"))
 
     _report_reconciliation(system_spec, package_results)
 
@@ -2546,12 +2495,12 @@ def run(args):
             system_spec, package_results, source_path, source_bytes, source
         )
     except _ApplyVerificationError as error:
-        print(f"External reconciliation apply failed: {error}")
+        print(_styled(f"External reconciliation apply failed: {error}", "*r"))
         return 1
     if applied:
         _report_reconciliation(
             system_spec, package_results, heading="Post-apply external reconciliation"
         )
     else:
-        print("No eligible source changes were applied.")
+        print(_styled("No eligible source changes were applied.", "y"))
     return _reconciliation_exit_status(package_results)
