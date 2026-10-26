@@ -60,8 +60,10 @@ include:
           - laghos
           - lammps
           - osu-micro-benchmarks
+          - phloem
           - raja-perf
           - remhos
+          - smb
           - sparta-snl
         VARIANT: [+rocm]
       # New ROCm version coverage
@@ -113,9 +115,11 @@ include:
           - kripke
           - laghos
           - osu-micro-benchmarks
+          - phloem
           - raja-perf
           - remhos
           - saxpy
+          - smb
         VARIANT: [+cuda]
       # Matrix no gpu-aware mpi
       - HOST: matrix
