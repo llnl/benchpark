@@ -43,13 +43,11 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
 
     depends_on("mpi")
 
-    depends_on("camp@2026.07.1:", when="@develop")
-    depends_on("umpire@2026.07.1:", when="@develop")
-    depends_on("raja@2026.07.0: ~examples~exercises cxxstd=20", when="@develop")
+    depends_on("umpire@2026.07.2:", when="@develop")
+    depends_on("raja@2026.07.1: ~examples~exercises cxxstd=20", when="@develop")
 
-    depends_on("camp@2026.07.1", when="@4.0")
-    depends_on("umpire@2026.07.1", when="@4.0")
-    depends_on("raja@2026.07.0 ~examples~exercises cxxstd=20", when="@4.0")
+    depends_on("umpire@2026.07.2", when="@4.0")
+    depends_on("raja@2026.07.1 ~examples~exercises cxxstd=20", when="@4.0")
 
     depends_on("mfem+mpi+metis", when="+metis")
     depends_on("mfem+mpi~metis", when="~metis")
