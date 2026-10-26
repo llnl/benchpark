@@ -6,4 +6,4 @@ versions:
   # Shallow fetch requires the full commit sha
   ramble: e1389bd51ab82e1a67e100f6c39dba5ea819b157  # Oct 15 2026 (v0.7.0)
   spack: c7c444853df6d525e7823c7cc730225a20bd5650  # Oct 1 2026 after v1.2.2 (2026-07-20)
-  spack-packages: b3d8012ad57176893e0d05f4f5992ba84cd70e41  # Oct 20 2026 after v2026.10.0
+  spack-packages: e6081dc042bb50a52182526a5bf6f1fe7b368693 # Oct 26 2026 after v2026.10.0
