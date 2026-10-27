@@ -142,3 +142,5 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         install_tree("data", prefix.data)
 
 # This triggers CI
+#
+
