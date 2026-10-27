@@ -21,6 +21,7 @@ class Stream(CMakePackage):
 
     version("5.10-caliper", git="https://github.com/daboehme/STREAM.git",
             branch="caliper-benchpark")
+    version("develop", branch="master")
 
     variant("caliper", default=False, description="Enable Caliper/Adiak support")
 
