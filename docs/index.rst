@@ -22,6 +22,7 @@
 
     Benchpark Systems <system-list>
     Benchpark Experiments <benchmark-list>
+    performance-dashboard
 
 .. toctree::
     :maxdepth: 1
