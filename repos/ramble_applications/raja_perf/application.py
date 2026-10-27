@@ -12,7 +12,7 @@ class RajaPerf(ExecutableApplication):
     """RAJA Performance suite"""
     name = "raja-perf"
 
-    tags = ['asc','single-node','sub-node','structured-grid',
+    tags = ['asc','ats-6','single-node','sub-node','structured-grid',
             'atomics','simd','vectorization','register-pressure',
             'high-memory-bandwidth','regular-memory-access',
             'mpi','network-point-to-point','network-latency-bound',
