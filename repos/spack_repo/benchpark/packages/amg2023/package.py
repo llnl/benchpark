@@ -25,6 +25,7 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     license("Apache-2.0")
 
     version("develop", branch="main")
+    version("ats-6", tag="ats-6")
     version("20261006", commit="fc4d32089c7c8c72e1dfa48101aaa5a29247effe")
     version("20240511", branch="20240511")
 
