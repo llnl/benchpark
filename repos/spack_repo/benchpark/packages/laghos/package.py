@@ -40,7 +40,9 @@ class Laghos(CMakePackage, CudaPackage, ROCmPackage):
     variant("gpu-aware-mpi", default=False, description="Enable GPU aware MPI")
     variant("raja", default=True, description="Use RAJA backend for MFEM")
 
-    depends_on("cxx", type="build")  # generated
+    depends_on("cxx", type="build")
+    depends_on("c", type="build")
+    depends_on("hip-lang", type="build")
 
     depends_on("mpi")
 
