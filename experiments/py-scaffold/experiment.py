@@ -38,10 +38,10 @@ class PyScaffold(
 
         if self.spec.satisfies("exec_mode=test"):
             epochs = 10
-            problem_scale = 6
+            problem_scale = 7
         else:
             epochs = -1
-            problem_scale = 7
+            problem_scale = 8
 
         if self.spec.satisfies("+strong"):
             batch_size = "{n_gpus} * {scaling_factor}**{scaling_iterations}"
@@ -49,8 +49,10 @@ class PyScaffold(
         self.add_experiment_variable("n_gpus", n_gpus, True)
         self.add_experiment_variable("problem_scale", problem_scale, True)
         self.add_experiment_variable("num_epochs", epochs, True)
-        self.add_experiment_variable("batch_size", batch_size, True)
-        self.add_experiment_variable("sharding", sharding, False)
+        self.add_experiment_variable("local_batch_size", batch_size, True)
+        self.add_experiment_variable(
+            "sharding", " ".join(str(shard) for shard in sharding), False
+        )
         self.add_experiment_variable("shards", shards, False)
 
         self.add_experiment_variable("config_url", config_url, False)
@@ -91,13 +93,16 @@ class PyScaffold(
             )
 
         # Spec that will be written into requirements.txt for pip install
-        sys_name = self.system_spec._name
+        find_links = [
+            "--find-links https://download.pytorch.org/whl/torch/",
+            "--find-links https://download.pytorch.org/whl/torchaudio/",
+            "--find-links https://download.pytorch.org/whl/torchvision/",
+        ]
         if self.spec.satisfies("+rocm"):
-            if "llnl" in sys_name:
-                # site-specific wheel for rocm
-                model = "rocmwci"
-            else:
-                model = "rocm"
+            model = "rocm"
+            find_links.append(
+                "--find-links https://download.pytorch.org/whl/triton-rocm/"
+            )
         elif self.spec.satisfies("+cuda"):
             model = "cuda"
         self.add_package_spec(
@@ -108,8 +113,9 @@ class PyScaffold(
         self.add_package_spec(
             self.name,
             [
-                # extra index for torch wheel and pypi index for packages that won't be found on WCI
-                f"--extra-index-url https://download.pytorch.org/whl/\n--extra-index-url https://pypi.org/simple\nScaFFold[{model}] @ git+https://github.com/LBANN/ScaFFold.git",
+                "\n".join(find_links)
+                + "\n"
+                + f"ScaFFold[{model}] @ git+https://github.com/LBANN/ScaFFold.git",
             ],
             package_manager="pip",
         )
