@@ -495,6 +495,7 @@ class Mfem(Package, CudaPackage, ROCmPackage):
     depends_on("raja@0.14.0:2022.03", when="@4.4.0:4.5.0+raja")
     depends_on("raja@2022.10.3:", when="@4.5.2:+raja")
     conflicts("cxxstd=11", when="^raja@2022.03.0:")
+    requires("cxxstd=20", when="^raja cxxstd=20")
     for sm_ in CudaPackage.cuda_arch_values:
         depends_on(
             "raja+cuda cuda_arch={0}".format(sm_), when="+raja+cuda cuda_arch={0}".format(sm_)

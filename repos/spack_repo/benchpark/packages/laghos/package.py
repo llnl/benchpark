@@ -122,12 +122,14 @@ class Laghos(CMakePackage, CudaPackage, ROCmPackage):
         build_dir = self.build_directory
         install(join_path(build_dir, "laghos"), prefix.bin)
         install(join_path(build_dir, "sedov"), prefix.bin)
-        install_tree(join_path(build_dir, "data"), prefix.data)
+        install_tree(join_path(self.stage.source_path, "data"), prefix.data)
 
     def cmake_args(self):
         spec = self.spec
         args = []
         args.append(f"-DMFEM_DIR={spec['mfem'].prefix}")
+        if self.spec.satisfies("^mfem cxxstd=20"):
+            args.append("-DCMAKE_CXX_STANDARD=20")
         if self.spec.satisfies("+rocm"):
             args.append("-DMFEM_USE_HIP=ON")
             args.append(f"-DCMAKE_HIP_COMPILER={env['HIPCXX']}")
