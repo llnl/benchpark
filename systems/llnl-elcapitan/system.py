@@ -543,6 +543,12 @@ class LlnlElcapitan(System):
                     "gcc@12.2.0 languages=c,c++,fortran",
                     "/opt/cray/pe/gcc/12.2.0/",
                     {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                    flags={
+                        "ldflags": (
+                            f"-Wl,-rpath-link,/opt/cray/pe/pmi/{self.pmi_version}/lib "
+                            f"-Wl,-rpath-link,/opt/cray/pe/pals/{self.pals_version}/lib"
+                        )
+                    },
                 )
             ],
         )
