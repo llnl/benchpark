@@ -25,6 +25,8 @@ class Remhos(CMakePackage, CudaPackage, ROCmPackage):
 
     license("BSD-2-Clause")
 
+    patch("remhos-cmake.patch")
+
     version("develop", branch="master")
     version("2.0", branch="master")
     version("1.0", sha256="e60464a867fe5b1fd694fbb37bb51773723427f071c0ae26852a2804c08bbb32")
@@ -34,7 +36,9 @@ class Remhos(CMakePackage, CudaPackage, ROCmPackage):
     variant("gpu-aware-mpi", default=False, description="Enable GPU aware MPI")
     variant("raja", default=True, description="Use RAJA backend for MFEM")
 
-    depends_on("cxx", type="build")  # generated
+    depends_on("cxx", type="build")
+    depends_on("c", type="build")
+    depends_on("hip-lang", type="build")
 
     depends_on("mpi")
 
@@ -107,6 +111,8 @@ class Remhos(CMakePackage, CudaPackage, ROCmPackage):
             args.append(f"-DCMAKE_CXX_COMPILER={env['HIPCXX']}")
             amdgpu_target = ";".join(spec.variants["amdgpu_target"].value)
             args.append(self.define("CMAKE_HIP_ARCHITECTURES", amdgpu_target))
+        if self.spec.satisfies("^mfem cxxstd=20"):
+            args.append("-DCMAKE_CXX_STANDARD=20")
         if self.spec.satisfies("+caliper"):
             args.append("-DREMHOS_USE_CALIPER=ON")
         return args
