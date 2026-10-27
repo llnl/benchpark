@@ -63,7 +63,6 @@ include:
           - phloem
           - raja-perf
           - remhos
-          - smb
           - sparta-snl
         VARIANT: [+rocm]
       # New ROCm version coverage
@@ -71,7 +70,7 @@ include:
         ARCHCONFIG: llnl-elcapitan
         SCHEDULER_PARAMETERS: $ELCAP_PARAMS
         BENCHMARK: saxpy
-        SYSTEM_ARGS: [rocm=7.2.1, rocm=7.14, rocm=10.0]
+        SYSTEM_ARGS: [rocm=7.2.1, rocm=7.14, rocm=10.0 compiler=rocmcc]
         VARIANT: [+rocm]
       # spack-pip
       - HOST: tuolumne
@@ -119,7 +118,6 @@ include:
           - raja-perf
           - remhos
           - saxpy
-          - smb
         VARIANT: [+cuda]
       # Matrix no gpu-aware mpi
       - HOST: matrix
