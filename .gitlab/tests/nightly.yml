@@ -71,7 +71,7 @@ include:
         ARCHCONFIG: llnl-elcapitan
         SCHEDULER_PARAMETERS: $ELCAP_PARAMS
         BENCHMARK: saxpy
-        SYSTEM_ARGS: [rocm=7.2.1, rocm=7.14, 'rocm=10.0 compiler=rocmcc']
+        SYSTEM_ARGS: [rocm=7.2.1, rocm=7.14, rocm=10.0 compiler=rocmcc]
         VARIANT: [+rocm]
       # spack-pip
       - HOST: tuolumne
