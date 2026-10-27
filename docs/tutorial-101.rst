@@ -24,15 +24,15 @@ presentations of this tutorial (oldest to most recent):
   Ramble.
 - July 6, 2026. Full-day workshop at `International Conference on Supercomputing (ICS)
   <https://dipsa-qub.github.io/ICS2026-webpage/>`_ on reproducible benchmarking.
-- (Upcoming) Sept 1, 2026. Half-day tutorial at `2026 Livermore's HPC Tutorials
-  <https://hpcic.llnl.gov/tutorials>`_ on Benchpark and Ramble.
+- Sept 1, 2026. Half-day tutorial at `2026 Livermore's HPC Tutorials
+  <https://hpcic.llnl.gov/tutorials>`_ on Benchpark with Ramble.
 - (Upcoming) Oct 19, 2026. Half-day tutorial at `International Conference on Parallel
   Architectures and Compilation Techniques (PACT)
   <https://pact2026.github.io/workshops/reproducible-benchmarking-tutorial/>`_ on
   Benchpark and Ramble.
 
-.. image:: tutorial/ICS26-Tutorial-Slide-Preview.jpg
-    :target: _static/slides/ICS26-Tutorial-Slides.pdf
+.. image:: tutorial/HPCIC26-Tutorial-Slide-Preview.jpg
+    :target: _static/slides/HPCIC26-Tutorial-Slides.pdf
     :height: 72px
     :align: left
     :alt: Slide Preview
@@ -373,5 +373,6 @@ check out our :doc:`Benchpark Workflow <./benchpark-workflow>` page for more inf
 on how to interact with Benchpark, and further guides.
 
 The second portion of this tutorial demonstrates how to add a new experiment to
-Benchpark. Follow the guide on :doc:`Adding an Experiment <./add-an-experiment>` page as
-you `Watch Video Starting at 1:47:00 <https://www.youtube.com/watch?v=AeaUfpybJfg>`_.
+Benchpark. Follow the guide on :doc:`Adding an Experiment
+<./interactive-tutorial/add-an-experiment>` page as you `Watch Video Starting at 1:47:00
+<https://www.youtube.com/watch?v=AeaUfpybJfg>`_.

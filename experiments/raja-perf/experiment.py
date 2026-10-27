@@ -31,8 +31,8 @@ class RajaPerf(
 
     variant(
         "version",
-        default="2025.12.1",
-        values=("develop", "latest", "2025.12.1", "2025.03.0", "2024.07.0"),
+        default="2026.07.0",
+        values=("develop", "latest", "2026.07.0", "2025.12.1", "2025.03.0"),
         description="app version",
     )
 
@@ -41,6 +41,13 @@ class RajaPerf(
         default="test",
         values=("test", "perf", "singlenode_cpu_bandwidth"),
         description="Execution mode",
+    )
+
+    variant(
+        "subkernels",
+        default=True,
+        values=(True, False),
+        description="Profile kernel launches. Adds significant overhead for low problem sizes.",
     )
 
     maintainers("michaelmckinsey1")
@@ -91,26 +98,26 @@ class RajaPerf(
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "n_resources": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
-                    "process_problem_size": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    )
-                    // scaling_factor,
+                    "n_resources": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
+                    "process_problem_size": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) // scaling_factor
+                    ),
                 },
                 ScalingMode.Weak: {
-                    "n_resources": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
-                    "process_problem_size": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
+                    "n_resources": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
+                    "process_problem_size": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim)
                     ),
                 },
                 ScalingMode.Throughput: {
                     "n_resources": lambda var, itr, dim, scaling_factor: var.val(dim),
-                    "process_problem_size": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    )
-                    * scaling_factor,
+                    "process_problem_size": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
                 },
             }
         )
@@ -124,4 +131,9 @@ class RajaPerf(
             self.add_experiment_variable("n_ranks", "{n_resources}", True)
 
     def compute_package_section(self):
-        self.add_package_spec(self.name, [f"raja-perf{self.determine_version()} +mpi"])
+        subkernels = (
+            "+subkernels" if self.spec.satisfies("+subkernels") else "~subkernels"
+        )
+        self.add_package_spec(
+            self.name, [f"raja-perf{self.determine_version()} +mpi {subkernels}"]
+        )

@@ -32,6 +32,8 @@ def _all_files(root="."):
     """Generates root-relative paths of all files in the repository."""
     visited = set()
     for cur_root, folders, files in os.walk(root):
+        # Skip bytecode caches (binary) written when experiments are imported
+        folders[:] = [f for f in folders if f != "__pycache__"]
         for filename in files:
             path = os.path.realpath(os.path.join(cur_root, filename))
 

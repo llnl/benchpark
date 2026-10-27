@@ -17,7 +17,6 @@ from benchpark.system import (
 
 
 class LlnlCluster(System):
-
     maintainers("nhanford", "rfhaque")
 
     id_to_resources = {
@@ -206,10 +205,7 @@ class LlnlCluster(System):
                 },
                 "cmake": {
                     "externals": [
-                        {
-                            "spec": "cmake@3.26.5",
-                            "prefix": "/usr/tce/packages/cmake/cmake-3.26.3",
-                        },
+                        {"spec": "cmake@=3.26.5", "prefix": "/usr"},
                         {
                             "spec": "cmake@3.23.1",
                             "prefix": "/usr/tce/packages/cmake/cmake-3.23.1",
@@ -222,7 +218,7 @@ class LlnlCluster(System):
                     "buildable": False,
                 },
                 "tar": {
-                    "externals": [{"spec": "tar@1.30", "prefix": "/usr"}],
+                    "externals": [{"spec": "tar@=1.30", "prefix": "/usr"}],
                     "buildable": False,
                 },
                 "autoconf": {
@@ -263,11 +259,15 @@ class LlnlCluster(System):
                             "spec": "python@3.9.12+bz2+crypt+ctypes+dbm+lzma+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
                             "prefix": "/usr/tce",
                         },
+                        {
+                            "spec": "python@=3.13.2+bz2+ctypes+dbm~freethreading+lzma+pyexpat~pythoncmd+readline+sqlite3+ssl~tix+tkinter+uuid+zlib",
+                            "prefix": "/usr/tce",
+                        },
                     ],
                     "buildable": False,
                 },
                 "hwloc": {
-                    "externals": [{"spec": "hwloc@2.11.2", "prefix": "/usr"}],
+                    "externals": [{"spec": "hwloc@=2.14.0", "prefix": "/usr"}],
                     "buildable": False,
                 },
                 "gmake": {
@@ -275,7 +275,12 @@ class LlnlCluster(System):
                     "buildable": False,
                 },
                 "perl": {
-                    "externals": [{"spec": "perl@5.26.3", "prefix": "/usr"}],
+                    "externals": [
+                        {
+                            "spec": "perl@=5.26.3+cpanm+opcode+open+shared+threads",
+                            "prefix": "/usr",
+                        }
+                    ],
                     "buildable": False,
                 },
             }
@@ -343,9 +348,9 @@ class LlnlCluster(System):
                     "externals": [
                         {
                             "spec": "mvapich2@2.3.7",
-                            "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2025.2.0",
+                            "prefix": "/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2025.3.1",
                             "extra_attributes": {
-                                "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2025.2.0/lib -lmpi"
+                                "ldflags": "-L/usr/tce/packages/mvapich2/mvapich2-2.3.7-intel-2025.3.1/lib -lmpi"
                             },
                         }
                     ],
@@ -430,8 +435,8 @@ class LlnlCluster(System):
                 "intel-oneapi-compilers",
                 [
                     compiler_def(
-                        "intel-oneapi-compilers@2025.2.0~envmods",
-                        "/usr/tce/packages/intel/intel-2025.2.0/compiler/2025.2/",
+                        "intel-oneapi-compilers@2025.3.1~envmods",
+                        "/usr/tce/packages/intel/intel-2025.3.1/compiler/2025.3/",
                         {"c": "icx", "cxx": "icpx", "fortran": "ifx"},
                     )
                 ],

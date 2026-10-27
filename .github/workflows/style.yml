@@ -7,7 +7,7 @@ jobs:
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
       - name: Set up Python 3.11
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
         with:
           python-version: '3.11'
           cache: pip
@@ -17,9 +17,10 @@ jobs:
           pip install -r .github/workflows/requirements/style.txt
       - name: Lint and Format Check
         run: |-
-          black --diff --check .
+          # Check format. To fix, run "ruff format ."
+          ruff format --diff --check .
+          # Check PEP8 violations, logic/correctness errors, and sort imports. To fix, run "ruff check --fix ."
+          ruff check .
           codespell --ignore-words=.codespellignore
-          isort --check-only .
-          flake8 .
           yamlfix --check --verbose .
           docstrfmt -p .github/workflows/requirements/docstrfmt.toml --check --verbose --exclude docs/ics.rst --ignore-cache docs/

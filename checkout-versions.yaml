@@ -4,6 +4,6 @@
 # SPDX-License-Identifier: Apache-2.0
 versions:
   # Shallow fetch requires the full commit sha
-  ramble: 100f97d9dfbc588058e37f0dfd94abd8ba742a57  # develop on 04/25/2026 (newer than 0.6.0 release)
-  spack: 7972f0370da13ad67708b6f3e8d8f9f9b664b297  # 1.2.1 + module loading fix: https://github.com/scheibelp/spack/tree/fix-module-load
-  spack-packages: 7c22b542e49de17f7849987e4f35aa5cd71913ee  # Tip of https://github.com/spack/spack-packages/pull/4411
+  ramble: e1389bd51ab82e1a67e100f6c39dba5ea819b157  # Oct 15 2026 (v0.7.0)
+  spack: c7c444853df6d525e7823c7cc730225a20bd5650  # Oct 1 2026 after v1.2.2 (2026-07-20)
+  spack-packages: b70010e90bc4e70936940a12543a294b2d2a0cc3  # Tip of 4411

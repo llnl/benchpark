@@ -18,7 +18,7 @@ class Branson(ExecutableApplication):
 
     executable('setup_experiment',
            template=[
-               'cp {branson}/inputs/* {experiment_run_dir}/.',
+               'cp -r {branson}/inputs/* {experiment_run_dir}/.',
            ])
 
     common_args = (
@@ -70,7 +70,7 @@ class Branson(ExecutableApplication):
 
     figure_of_merit('Photons per Second',
                     log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex=r'Photons Per Second \(FOM\):\s+(?P<fom>[0-9]+\.[0-9]*([0-9]*)?e\+[0-9]*)',
+                    fom_regex=r'Photons Per Second \(FOM\):\s+(?P<fom>[0-9]+(?:\.[0-9]*)?(?:[eE][+-]?[0-9]+)?)',
                     group_name='fom', units='photons')
 
     success_criteria('pass', mode='string', match=r'.*', file='{experiment_run_dir}/{experiment_name}.out')

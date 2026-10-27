@@ -5,11 +5,12 @@
 
 import warnings
 
-from benchpark.directives import variant
+import benchpark.spec
+from benchpark.directives import DirectiveMeta, variant
 from benchpark.experiment import ExperimentHelper
 
 
-class Caliper:
+class Caliper(metaclass=DirectiveMeta):
     variant(
         "caliper",
         default="none",
@@ -49,6 +50,7 @@ class Caliper:
         default="master",
         values=(
             "master",
+            "2.15.0",
             "2.14.0",
             "2.13.1",
         ),
@@ -106,24 +108,24 @@ class Caliper:
                     "caliper=rocm"
                 ) or self.spec.satisfies("caliper_services=rocprofiler")
                 if any("topdown" in var for var in self.spec.variants["caliper"]):
-                    package_specs["caliper"][
-                        "spack_pkg_spec"
-                    ] += "+libpfm~papi target={}".format(system_specs["cpu_arch"])
+                    package_specs["caliper"]["spack_pkg_spec"] += (
+                        "+libpfm~papi target={}".format(system_specs["cpu_arch"])
+                    )
                 elif cuda_support:
                     if cuda_support:
-                        package_specs["caliper"][
-                            "spack_pkg_spec"
-                        ] += "~papi+cuda cuda_arch={}".format(system_specs["cuda_arch"])
+                        package_specs["caliper"]["spack_pkg_spec"] += (
+                            "~papi+cuda cuda_arch={}".format(system_specs["cuda_arch"])
+                        )
                     else:
                         raise NotImplementedError(
                             "Target system does not support the cuda interface"
                         )
                 elif rocm_support:
                     if rocm_support:
-                        package_specs["caliper"][
-                            "spack_pkg_spec"
-                        ] += "~papi+rocm amdgpu_target={}".format(
-                            system_specs["rocm_arch"]
+                        package_specs["caliper"]["spack_pkg_spec"] += (
+                            "~papi+rocm amdgpu_target={}".format(
+                                system_specs["rocm_arch"]
+                            )
                         )
                     else:
                         raise NotImplementedError(
@@ -158,6 +160,9 @@ class Caliper:
             return "_".join(parts)
 
         def get_spack_variants(self):
+            if self.spec.satisfies("compiler_attribution=association"):
+                return "+caliper"
+
             if self.spec.satisfies("caliper=none") and self.spec.satisfies(
                 "caliper_services=none"
             ):
@@ -181,8 +186,15 @@ class Caliper:
                 "process_problem_size": "{process_problem_size}",
                 "total_problem_size": "{total_problem_size}",
             }
-            # parse the spec for more metadata
-            for i, variant_spec in enumerate(str.split(str(self.spec.variants))):
+            # Runtime variables can change during scaling. Resolve their final
+            # values in Ramble instead of recording the CLI inputs as metadata.
+            variants = benchpark.spec.VariantMap(self.spec.variants)
+            for name in self.spec.variable_overrides:
+                metadata_dict[name] = "{" + name + "}"
+                del variants[name]
+
+            # parse the declared variants for more metadata
+            for i, variant_spec in enumerate(str.split(str(variants))):
                 values = variant_spec.split("=")
                 if len(values) == 1:
                     if i == 0:

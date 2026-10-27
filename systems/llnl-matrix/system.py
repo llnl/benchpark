@@ -20,7 +20,6 @@ from benchpark.system import (
 
 
 class LlnlMatrix(System):
-
     maintainers("pearce8", "michaelmckinsey1")
 
     id_to_resources = {
@@ -38,7 +37,7 @@ class LlnlMatrix(System):
 
     variant(
         "cuda",
-        default="12.9.1",
+        default="13.1.1",
         values=("13.1.1", "12.9.1", "12.6.0", "12.2.2", "11.8.0"),
         description="CUDA version",
     )
@@ -164,21 +163,29 @@ class LlnlMatrix(System):
                     "buildable": False,
                     "externals": [
                         {
-                            "spec": "python@3.9.12",
+                            "spec": "python@=3.9.12+bz2+crypt+ctypes+dbm+lzma+pyexpat+pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
                             "prefix": "/usr/tce/packages/python/python-3.9.12",
                         },
                         {
-                            "spec": "python@3.11.5",
+                            "spec": "python@=3.6.8+bz2+crypt+ctypes+dbm+lzma+pyexpat~pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
+                            "prefix": "/usr",
+                        },
+                        {
+                            "spec": "python@=2.7.18+bz2+crypt+ctypes+dbm~lzma+pyexpat~pythoncmd+readline+sqlite3+ssl~tkinter+uuid+zlib",
+                            "prefix": "/usr",
+                        },
+                        {
+                            "spec": "python@=3.11.5+bz2+crypt+ctypes+dbm+lzma+pyexpat+pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
                             "prefix": "/usr/tce/packages/python/python-3.11.5",
                         },
                         {
-                            "spec": "python@3.12.2",
+                            "spec": "python@=3.12.2+bz2+crypt+ctypes+dbm+lzma+pyexpat+pythoncmd+readline+sqlite3+ssl+tix+tkinter+uuid+zlib",
                             "prefix": "/usr/tce/packages/python/python-3.12.2",
                         },
                     ],
                 },
                 "hwloc": {
-                    "externals": [{"spec": "hwloc@2.11.2", "prefix": "/usr"}],
+                    "externals": [{"spec": "hwloc@=2.14.0", "prefix": "/usr"}],
                     "buildable": False,
                 },
                 "gmake": {
@@ -186,11 +193,13 @@ class LlnlMatrix(System):
                     "buildable": False,
                 },
                 "curl": {
-                    "externals": [{"spec": "curl@7.61.1", "prefix": "/usr"}],
+                    "externals": [
+                        {"spec": "curl@=7.61.1+gssapi+ldap+nghttp2", "prefix": "/usr"}
+                    ],
                     "buildable": False,
                 },
                 "git": {
-                    "externals": [{"spec": "git@2.43.7", "prefix": "/usr"}],
+                    "externals": [{"spec": "git@=2.43.7+tcltk", "prefix": "/usr"}],
                     "buildable": False,
                 },
                 "mpi": {"buildable": False},

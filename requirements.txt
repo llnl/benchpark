@@ -21,3 +21,7 @@ pandas
 matplotlib
 setuptools
 scipy
+# Ramble 0.7 no longer vendors these runtime dependencies.
+distro
+archspec
+jsonschema>=3.2

@@ -1,9 +1,15 @@
 import argparse
 
 import spack.cmd
-import spack.environment as ev
 import spack.traverse as traverse
-from llnl.util.tty.color import cwrite
+from spack.util.tty.color import cwrite
+
+# Spack >= 1.3.0 moved active_environment to its own module
+try:
+    from spack.active_environment import active_environment
+except ImportError:
+    # Fall back to older Spack versions
+    from spack.environment import active_environment
 
 
 def diff_specs(spec_a, spec_b, truncate=False):
@@ -148,7 +154,7 @@ def diff_specs(spec_a, spec_b, truncate=False):
 
 
 def main():
-    env = ev.active_environment()
+    env = active_environment()
 
     parser = argparse.ArgumentParser(
         description="""Diff two build specs.

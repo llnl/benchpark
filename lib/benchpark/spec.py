@@ -12,10 +12,9 @@ import pathlib
 import re
 from typing import Iterable, Iterator, List, Match, Optional, Union
 
-import llnl.util.lang  # noqa
-
 import benchpark.repo
 from benchpark.error import BenchparkError
+from benchpark.util.compat import HashableMap, dedupe
 
 repo_path = benchpark.repo.paths[benchpark.repo.ObjectTypes.experiments]
 sys_repo = benchpark.repo.paths[benchpark.repo.ObjectTypes.systems]
@@ -24,7 +23,7 @@ value_types = str, bool, int, float
 SingleValue = Union[value_types]
 
 
-class VariantMap(llnl.util.lang.HashableMap):
+class VariantMap(HashableMap):
     def __init__(self, init: "VariantMap" = None):
         super().__init__()
         if init:
@@ -57,7 +56,7 @@ class VariantMap(llnl.util.lang.HashableMap):
     def constrain(self, other: "VariantMap") -> None:
         for name in other:
             self_values = list(self.dict.get(name, []))
-            values = llnl.util.lang.dedupe(self_values + list(other[name]))
+            values = dedupe(self_values + list(other[name]))
             self[name] = values
 
     @staticmethod
@@ -140,6 +139,11 @@ class Spec(object):
     @namespace.setter
     def namespace(self, value: str):
         self._namespace = value
+
+    @property
+    def fullname(self):
+        """Return the object name qualified by its repository namespace."""
+        return f"{self.namespace}.{self.name}" if self.namespace else self.name
 
     @property
     def variants(self):
@@ -247,8 +251,26 @@ class Spec(object):
 
 class ExperimentSpec(Spec):
     @property
+    def variable_overrides(self):
+        """Key-value assignments that are not declared experiment variants.
+
+        Keep these in the spec so serialization, equality, and hashing include
+        the overrides. Boolean flags must still name a declared variant.
+        """
+        declared = {
+            name
+            for variants in self.experiment_class.variants.values()
+            for name in variants
+        }
+        return {
+            name: values
+            for name, values in self.variants.items()
+            if name not in declared and not any(isinstance(v, bool) for v in values)
+        }
+
+    @property
     def experiment_class(self):
-        return repo_path.get_obj_class(self.name)
+        return repo_path.get_obj_class(self.fullname)
 
     @property
     def object_class(self):
@@ -314,9 +336,15 @@ class ConcreteSpec(Spec):
                     f"Package {self.name} must define a workload variant"
                 )
 
+        variable_overrides = (
+            self.variable_overrides if isinstance(self, ExperimentSpec) else {}
+        )
+
         # For variants that are set, set whatever they imply
         variants_to_check = set(
-            (name, values) for name, values in self.variants.items()
+            (name, values)
+            for name, values in self.variants.items()
+            if name not in variable_overrides
         )
         checked = set()
         while variants_to_check:
@@ -363,6 +391,8 @@ class ConcreteSpec(Spec):
 
         # Validate all set variant values
         for name, values in self.variants.items():
+            if name in variable_overrides:
+                continue
             try:
                 variant = next(
                     v
@@ -608,8 +638,9 @@ class TokenContext:
 
     def advance(self):
         """Advance one token"""
-        self.current_token, self.next_token = self.next_token, next(
-            self.token_stream, None
+        self.current_token, self.next_token = (
+            self.next_token,
+            next(self.token_stream, None),
         )
 
     def accept(self, kind: TokenType):
@@ -677,9 +708,9 @@ class SpecParser(object):
                 spec.variants[name] = value
             elif self.ctx.accept(TokenType.KEY_VALUE_PAIR):
                 match = SPLIT_KVP.match(self.ctx.current_token.value)
-                assert (
-                    match
-                ), f"SPLIT_KVP cannot split pair {self.ctx.current_token.value}"
+                assert match, (
+                    f"SPLIT_KVP cannot split pair {self.ctx.current_token.value}"
+                )
 
                 name, value = match.groups()
                 spec.variants[name] = strip_quotes_and_unescape(value).split(",")

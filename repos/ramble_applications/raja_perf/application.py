@@ -29,7 +29,7 @@ class RajaPerf(ExecutableApplication):
             cali_args = "-atsc ${CALI_CONFIG_MODE} -atcc ${OTHER_CALI_CONFIG}"
         app_inst.variables["custom_cali_args"] = cali_args
 
-    executable('run', 'raja-perf.exe --size {process_problem_size} {custom_cali_args}', use_mpi=True)
+    executable('run', 'raja-perf.exe --size {process_problem_size} -k Stream_TRIAD {custom_cali_args}', use_mpi=True)
 
     workload('suite', executables=['run'])
 

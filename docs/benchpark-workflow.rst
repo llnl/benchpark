@@ -19,7 +19,7 @@ you will need to add or edit any Benchpark files.
 
 If you are running on an existing ``system``, and the ``benchmark`` and ``experiment``
 are already configured, you can proceed directly to the Running Benchpark Steps,
-starting with :doc:`benchpark-setup` for:
+starting with :doc:`interactive-tutorial/setup-workspace` for:
 
 - Setup / Run / Analyze
 
@@ -31,7 +31,7 @@ A system specification defines the hardware, scheduling system, compilers, and a
 external libraries that might exist on a system.
 
 If you are running on a new system that has not been defined in Benchpark yet, proceed
-to :doc:`add-a-system-config` for the following:
+to :doc:`interactive-tutorial/add-a-system-config` for the following:
 
 - Find a similar ``system``
 - Add or edit a ``system``
@@ -44,9 +44,11 @@ A benchmark specification defines the application build and run behavior, utiliz
 spack for build and dependency management.
 
 If you are creating a new benchmark that has not been defined in Benchpark yet, proceed
-to :doc:`add-a-benchmark` for the following:
+to :doc:`interactive-tutorial/add-a-spack-package` and
+:doc:`interactive-tutorial/add-a-ramble-application` for the following:
 
-- Add a ``benchmark``
+- Add a Spack ``package.py``
+- Add a Ramble ``application.py``
 
 *****************************
  D. Experiment Specification
@@ -56,6 +58,6 @@ An experiment specification defines application parameters for experiments that 
 one or more application runs, such as single-node, scaling, or throughput runs.
 
 If you are adding experiments to a new or existing benchmark, proceed to
-:doc:`add-an-experiment` for the following:
+:doc:`interactive-tutorial/add-an-experiment` for the following:
 
 - Add/edit an ``experiment``

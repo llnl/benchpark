@@ -8,6 +8,15 @@
  Adding an Experiment
 ######################
 
+**Glossary terms:** :ref:`Benchmark <beginner-tutorial-glossary-benchmark>`,
+:ref:`Package <beginner-tutorial-glossary-package>`, :ref:`Application
+<beginner-tutorial-glossary-application>`, :ref:`Spec
+<beginner-tutorial-glossary-spec>`, :ref:`Variant <beginner-tutorial-glossary-variant>`,
+:ref:`Experiment <beginner-tutorial-glossary-experiment>`, :ref:`System
+<beginner-tutorial-glossary-system>`, :ref:`Modifier
+<beginner-tutorial-glossary-modifier>`, :ref:`Scaling Study
+<beginner-tutorial-glossary-scaling-study>`
+
 This guide is intended for those who would like to add a new experiment for a specific
 benchmark.
 
@@ -41,13 +50,13 @@ and `Ramble application
 defined in Benchpark, so Benchpark will use these over the upstream `Spack package
 <https://github.com/spack/spack-packages/blob/develop/repos/spack_repo/builtin/packages/hpl/package.py>`__
 and `Ramble application
-<https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/applications/hpl/application.py>`__.
+<https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/applications/hpl/application.py>`__.
 For clarity, if ``benchpark/repos/spack_repo/benchpark/packages/hpl`` and
 ``benchpark/repos/ramble_applications/hpl`` did not exist, Benchpark would use the
 upstream versions. Additionally, the Benchpark HPL ``application.py`` inherits from the
 Ramble upstream, so they are equivalent aside from an extra Benchpark tag definition.
 Notice the HPL application in Ramble also inherits from a `base HPL application
-<https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/base_applications/hpl/base_application.py>`__,
+<https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_applications/hpl/base_application.py>`__,
 which is relevant because it contains the workload variables that we will need to define
 in our Benchpark experiment.
 
@@ -84,7 +93,7 @@ performance profiling library (via a `fork
 to Caliper. Enabling these variants in our Benchpark experiment only requires
 inheritance from the pre-defined ``ProgrammingModelType.Openmp`` and ``Caliper``
 classes. For more details on the configurability of experiment variants, see
-:ref:`experiment-variants`.
+:ref:`contributing-experiment-variants`.
 
 ::
 
@@ -167,7 +176,7 @@ experiment variables here that will override the default values for the ``worklo
 variables`` in your ``application.py``. For HPL, we override the ``Ns``, ``N-Grids``,
 ``Ps``, ``Qs``, ``N-Ns``, ``N-NBs``, and ``NBs`` workload variables which are defined in
 the base `application
-<https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/base_applications/hpl/base_application.py>`__.
+<https://github.com/Ramble-Project/ramble/blob/develop/var/ramble/repos/builtin/base_applications/hpl/base_application.py>`__.
 
 Additionally, all of ``n_resources``, ``process_problem_size``, and
 ``total_problem_size`` must be set, which can be accomplished using
@@ -224,7 +233,7 @@ by default.
         if self.spec.satisfies("exec_mode=test"):
           self.add_experiment_variable("n_nodes", 1, True)
 
-          # Overwrite values in application (https://github.com/GoogleCloudPlatform/ramble/blob/3c3e6b7c58270397ad10dfbe9c52bfad790c0631/var/ramble/repos/builtin/base_applications/hpl/base_application.py#L411-L419)
+          # Overwrite values in application (https://github.com/Ramble-Project/ramble/blob/3c3e6b7c58270397ad10dfbe9c52bfad790c0631/var/ramble/repos/builtin/base_applications/hpl/base_application.py#L411-L419)
           self.add_experiment_variable("Ns", 10000, True)
           self.add_experiment_variable("N-Grids", 1, False)
           self.add_experiment_variable("Ps", "4 * {n_nodes}", True)
@@ -260,7 +269,10 @@ by default.
           total_problem_size="{Ns}",
         )
 
-For more details on the ``add_experiment_variable`` function, see :ref:`add-expr-var`.
+For more details on the ``add_experiment_variable`` function, see
+:ref:`contributing-add-expr-var`.
+
+.. _contributing-step-3b-define-scaling-options:
 
 Step 3b: Define Scaling Options
 ===============================
@@ -334,8 +346,8 @@ runtime parameters during experiment initialization, e.g., ``benchpark experimen
             }
         )
 
-See :ref:`this section <scaling-configs>` for more information on how to write Benchpark
-scaling configurations.
+See :ref:`the Appendix <contributing-scaling-configs>` for more information on how to
+write Benchpark scaling configurations.
 
 ***************************************
  Step 4: Add a Package Manager Section
@@ -396,13 +408,13 @@ your experiment:
     benchpark experiment init --dest=hpl my-system hpl
 
 If this completes without errors, you can continue testing by setting up a benchpark
-workspace as described in :doc:`testing-your-contribution`.
+workspace as described in :doc:`/testing-your-contribution`.
 
 *********************
  Experiment Appendix
 *********************
 
-.. _experiment-variants:
+.. _contributing-experiment-variants:
 
 More on Inherited Experiment Variants
 =====================================
@@ -458,9 +470,9 @@ A detailed description of Ramble configuration files is available at `Ramble
 workspace_config <https://ramble.readthedocs.io/en/latest/workspace_config.html#>`__.
 
 For more advanced usage, such as customizing hardware allocation or performance
-profiling see :doc:`modifiers`.
+profiling see :doc:`/modifiers`.
 
-.. _add-expr-var:
+.. _contributing-add-expr-var:
 
 More on add_experiment_variable
 ===============================
@@ -486,9 +498,9 @@ variables. e.g.:
 
 ::
 
-    self.add_experiment_variable("n_resources_dict", {"px": 2, "py": 2, "pz": 1}, named=True, matrix=True)
-    self.add_experiment_variable("groups", 16, named=True, matrix=True)
-    self.add_experiment_variable("n_gpus", 8, named=False, matrix=False)
+    self.add_experiment_variable("n_resources_dict", {"px": 2, "py": 2, "pz": 1}, named=True, matrixed=True)
+    self.add_experiment_variable("groups", 16, named=True, matrixed=True)
+    self.add_experiment_variable("n_gpus", 8, named=False, matrixed=False)
 
 In the above example, ``n_resources_dict`` is added as 3D variable with dimensions
 ``px``, ``py`` and ``pz`` and assigned the values ``2``, ``2``, and ``1`` respectively.
@@ -498,9 +510,9 @@ dimension names for multi-dimensional variables) is appended to the experiment n
 ``ramble.yaml``
 
 Every multi-dimensional experiment variable is defined as a zip in the ``ramble.yaml``.
-If ``matrixed`` is set to ``True``, the variable (or the zip iin case of a
+If ``matrixed`` is set to ``True``, the variable (or the zip in case of a
 multi-dimensional variable) is declared as a matrix in ``ramble.yaml``. The generated
-``ramble.yaml`` for the above example would be look like:
+``ramble.yaml`` for the above example would look like:
 
 ::
 
@@ -510,7 +522,7 @@ multi-dimensional variable) is declared as a matrix in ``ramble.yaml``. The gene
         variables:
             px: 2
             py: 2
-            pz: 2
+            pz: 1
             groups: 16
             n_gpus: 8
         zips:
@@ -526,7 +538,7 @@ A variable also can be assigned a list of values, each individual value correspo
 a single experiment. Refer to the Ramble documentation for a detailed explanation of zip
 and matrix.
 
-.. _scaling-configs:
+.. _contributing-scaling-configs:
 
 More on Scaling Configurations
 ==============================
@@ -619,3 +631,14 @@ variables will be:
 Note that scaling starts from the minimum value dimension (``pz``) of the first variable
 (``n_resources_dict``) and proceeds in a round-robin manner through the other
 dimensions. See AMG2023 or Kripke for examples of different scaling configurations.
+
+***********
+ Next Step
+***********
+
+.. tutorialcontainer:: tutorial-next-steps
+
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run
+
+        :doc:`I want to build and run the new experiment on my existing system.
+        </interactive-tutorial/build-and-run-experiment>`

@@ -19,7 +19,6 @@ class OsuMicroBenchmarks(
     ),
     Scaling(ScalingMode.Strong, ScalingMode.Throughput),
 ):
-
     two_rank_workloads = [
         "osu_bibw",
         "osu_bw",
@@ -149,10 +148,12 @@ class OsuMicroBenchmarks(
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "n_nodes": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
-                    resource_var: lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
+                    "n_nodes": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
+                    resource_var: lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
                     "process_problem_size": "",
                     "total_problem_size": "",
                 },

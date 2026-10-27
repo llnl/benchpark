@@ -6,7 +6,7 @@
 
 from enum import Enum
 
-from benchpark.directives import variant
+from benchpark.directives import DirectiveMeta, variant
 from benchpark.error import BenchparkError
 from benchpark.experiment import ExperimentHelper
 
@@ -23,7 +23,7 @@ def Scaling(*modes):
             raise ValueError(f"Invalid scaling mode: {mode}")
 
     # Base scaling class
-    class BaseScaling:
+    class BaseScaling(metaclass=DirectiveMeta):
         variant(
             "scaling-factor",
             default="2",

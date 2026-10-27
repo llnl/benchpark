@@ -3,6 +3,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import importlib
+import importlib.util
 import os
 import pathlib
 import shlex
@@ -162,13 +164,62 @@ class RuntimeResources:
         else:
             self._check_and_update_bootstrap(self.pkgs_commit, self.pkgs_location)
 
-        # Spack does not go in sys.path, but we will manually access modules from it
-        # The reason for this oddity is that spack modules will compete with the internal
-        # spack modules from ramble
+        # Spack does not go in sys.path because its modules compete with the
+        # internal Spack modules bundled with Ramble.
         if not self.spack_location.exists():
             self._install_spack()
         else:
             self._check_and_update_bootstrap(self.spack_commit, self.spack_location)
+
+        self._register_spack_utilities()
+
+    def _register_spack_utilities(self):
+        """Expose current Spack utilities without replacing Ramble's Spack package."""
+        # Initialize Ramble before extending spack.util. Ramble requires its
+        # bundled Spack schemas and is incompatible with the current schemas.
+        import ramble.repository  # noqa: F401
+        import spack.util
+
+        spack_root = self.spack_location / "lib" / "spack" / "spack"
+        spack_util_path = str(spack_root / "util")
+        if spack_util_path not in spack.util.__path__:
+            spack.util.__path__.insert(0, spack_util_path)
+
+        # spack.util.filesystem imports Spack's vendored typing_extensions.
+        # Register only the vendor package, not the full current Spack package,
+        # to keep its schemas outside Ramble's package search path.
+        vendor_name = "spack.vendor"
+        vendor_path = spack_root / "vendor"
+        vendor_spec = importlib.util.spec_from_file_location(
+            vendor_name,
+            vendor_path / "__init__.py",
+            submodule_search_locations=[str(vendor_path)],
+        )
+        vendor = importlib.util.module_from_spec(vendor_spec)
+        sys.modules[vendor_name] = vendor
+        vendor_spec.loader.exec_module(vendor)
+
+        # Ramble may have loaded older modules with these names. Ramble keeps
+        # direct references to the objects it already imported, so replace the
+        # module registrations before Benchpark imports the current utilities.
+        utility_names = ("executable", "filesystem", "lang", "path", "tty")
+        for name in utility_names:
+            qualified_name = f"spack.util.{name}"
+            for module_name in tuple(sys.modules):
+                if module_name == qualified_name or module_name.startswith(
+                    qualified_name + "."
+                ):
+                    del sys.modules[module_name]
+            if hasattr(spack.util, name):
+                delattr(spack.util, name)
+
+        for module_name in (
+            "spack.util.filesystem",
+            "spack.util.lang",
+            "spack.util.tty.colify",
+            "spack.util.tty.color",
+        ):
+            importlib.import_module(module_name)
 
     def _install_ramble(self):
         print(f"Cloning Ramble to {self.ramble_location}")
@@ -202,7 +253,12 @@ class RuntimeResources:
         if not self.ramble_location.exists():
             first_time = True
             self._install_ramble()
-        return Command(self.ramble_location / "bin" / "ramble", env={}), first_time
+        # Ramble's launcher runs $RAMBLE_PYTHON, else the first python3 on PATH.
+        # This environment is otherwise empty (no PATH), so without this Ramble
+        # falls back to the system python3, which lacks the dependencies that
+        # Ramble >= 0.7 no longer vendors (archspec, distro, jsonschema).
+        env = {"RAMBLE_PYTHON": sys.executable}
+        return Command(self.ramble_location / "bin" / "ramble", env=env), first_time
 
     def _spack(self):
         if not self.pkgs_location.exists():

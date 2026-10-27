@@ -9,21 +9,29 @@ from benchpark.system import System, compiler_def, compiler_section_for
 
 
 class Fluxtainer(System):
-    """This is the generic system class for an x86 system, gcc compiler, mpi.
-    It can be easily copied and modified to model other systems."""
+    """This is the system class for a container running Flux.
+    See https://flux-framework.readthedocs.io/en/latest/tutorials/containers/index.html for more
+    information."""
 
     maintainers("nhanford")
 
     id_to_resources = {
-        "arm": {"cpu_arch": "arm64"},
-        "x86": {"cpu_arch": "x86_64_v3"},
+        "arm64": {"cpu_arch": "arm64"},
+        "amd64": {"cpu_arch": "x86_64_v3"},
     }
 
     variant(
         "instance_type",
-        values=("arm", "x86"),
-        default="x86",
+        values=("arm64", "amd64"),
+        default="amd64",
         description="Target Architecture",
+    )
+
+    variant(
+        "compiler",
+        default="gcc",
+        values=("clang", "gcc"),
+        description="Which compiler to use",
     )
 
     def __init__(self, spec):
@@ -31,15 +39,15 @@ class Fluxtainer(System):
         self.programming_models = [OpenMPCPUOnlySystem()]
 
         self.scheduler = "flux"
-        setattr(self, "sys_cores_per_node", 8)
+        setattr(self, "sys_cores_per_node", 4)
         setattr(self, "sys_mem_per_node_GB", 1)
-        setattr(self, "n_nodes", 4)
+        setattr(self, "n_nodes", 1)
         attrs = self.id_to_resources.get(self.spec.variants["instance_type"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
 
     def compute_compilers_section(self):
-        return compiler_section_for(
+        cfg = compiler_section_for(
             "gcc",
             [
                 compiler_def(
@@ -50,6 +58,20 @@ class Fluxtainer(System):
             ],
         )
 
+        if self.spec.satisfies("compiler=clang"):
+            cfg = compiler_section_for(
+                "clang",
+                [
+                    compiler_def(
+                        "llvm@20.1.8",
+                        "/usr/lib64/ccache/",
+                        {"c": "clang", "cxx": "clang++"},
+                    )
+                ],
+            )
+
+        return cfg
+
     def compute_packages_section(self):
         return {
             "packages": {
@@ -57,7 +79,7 @@ class Fluxtainer(System):
                 "mpich": {
                     "externals": [
                         {
-                            "spec": "mpich@4.1.2%gcc@14.3.1",
+                            "spec": "mpich@4.1.2",
                             "prefix": "/usr/lib64/mpich",
                         }
                     ]
@@ -155,15 +177,95 @@ class Fluxtainer(System):
                     "externals": [{"spec": "libtool@2.4.7", "prefix": "/usr"}],
                     "buildable": False,
                 },
+                "bzip2": {
+                    "externals": [{"spec": "bzip2@1.0.8", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "expat": {
+                    "externals": [{"spec": "expat@2.7.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "gdbm": {
+                    "externals": [{"spec": "gdbm@1.23", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "gettext": {
+                    "externals": [{"spec": "gettext@0.22.5", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "libffi": {
+                    "externals": [{"spec": "libffi@3.4.4", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "libxml2": {
+                    "externals": [{"spec": "libxml2@2.12.5", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "ncurses": {
+                    "externals": [{"spec": "ncurses@6.4", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "readline": {
+                    "externals": [{"spec": "readline@8.2", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "sqlite": {
+                    "externals": [{"spec": "sqlite@3.46.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "tar": {
+                    "externals": [{"spec": "tar@1.35", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "util-linux-uuid": {
+                    "externals": [{"spec": "util-linux-uuid@2.40.2", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "xz": {
+                    "externals": [{"spec": "xz@5.6.2", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "zstd": {
+                    "externals": [{"spec": "zstd@1.5.5", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "gmake": {
+                    "externals": [{"spec": "gmake@4.4.1", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "pigz": {
+                    "externals": [{"spec": "pigz@2.8.7", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "libmd": {
+                    "externals": [{"spec": "libmd@1.2.0", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "libbsd": {
+                    "externals": [{"spec": "libbsd@0.12.2", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "python": {
+                    "externals": [{"spec": "python@3.12.12", "prefix": "/usr"}],
+                    "buildable": False,
+                },
+                "blas": {"buildable": False},
+                "lapack": {"buildable": False},
+                "netlib-lapack": {
+                    "externals": [{"spec": "netlib-lapack@3.12.0", "prefix": "/usr"}],
+                },
             }
         }
 
     def compute_software_section(self):
+        default_compiler = "gcc"
+        if self.spec.satisfies("compiler=llvm"):
+            default_compiler = "llvm"
         return {
             "software": {
                 "packages": {
-                    "compiler-gcc": {"pkg_spec": "gcc@14.3.1"},
-                    "default-compiler": {"pkg_spec": "gcc"},
+                    "default-compiler": {"pkg_spec": default_compiler},
+                    "compiler-gcc": {"pkg_spec": "gcc"},
                     "default-mpi": {"pkg_spec": "mpich"},
                 }
             }
