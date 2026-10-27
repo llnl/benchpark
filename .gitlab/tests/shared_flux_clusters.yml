@@ -120,10 +120,17 @@ run_tests_flux_tuolumne:
           - kripke
           - laghos
           - lammps
+          - osu-micro-benchmarks
+          - phloem
           - raja-perf
           - remhos
+          - smb
           - sparta-snl
         VARIANT: [+rocm]
+        GPUMODE: SPX
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [phloem]
         GPUMODE: SPX
       # Test openmp on tuolumne
       - HOST: tuolumne
@@ -172,8 +179,19 @@ run_tests_flux_tioga:
     matrix:
       - HOST: tioga
         ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [amg2023, kripke, laghos, raja-perf, remhos]
+        BENCHMARK:
+          - amg2023
+          - kripke
+          - laghos
+          - osu-micro-benchmarks
+          - phloem
+          - raja-perf
+          - remhos
+          - smb
         VARIANT: ['+rocm caliper=time,mpi']
+      - HOST: tioga
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [phloem]
       # spack-pip
       - HOST: tioga
         ARCHCONFIG: llnl-elcapitan
