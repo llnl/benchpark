@@ -12,7 +12,7 @@ class Remhos(ExecutableApplication):
     """Remhos benchmark"""
     name = "remhos"
 
-    tags = ['asc','engineering','mfem','cfd','large-scale',
+    tags = ['asc','ats-6','engineering','mfem','cfd','large-scale',
             'multi-node','single-node','mpi','c++','high-order','hydrodynamics',
             'explicit-timestepping','finite-element','time-dependent','ode',
             'full-assembly','partial-assembly',

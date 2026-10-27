@@ -12,7 +12,7 @@ class Phloem(ExecutableApplication):
     """Phloem benchmark"""
     name = "phloem"
 
-    tags = ['synthetic',
+    tags = ['synthetic','ats-6',
             'large-scale','multi-node','single-node',
             'c','mpi','network-point-to-point',
             'network-bandwidth-bound','network-latency-bound',
