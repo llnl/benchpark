@@ -49,6 +49,7 @@
           - '**/phloem/**/*'
           - '**/raja[-_]perf/**/*'
           - '**/remhos/**/*'
+          - '**/smb/**/*'
           - '**/sparta[-_]snl/**/*'
           - systems/llnl-cluster/**/*
           - modifiers/**/*
@@ -76,10 +77,13 @@
           - '**/kripke/**/*'
           - '**/laghos/**/*'
           - '**/lammps/**/*'
+          - '**/osu[-_]micro[-_]benchmarks/**/*'
+          - '**/phloem/**/*'
           - '**/py[-_]scaffold/**/*'
           - '**/raja[-_]perf/**/*'
           - '**/remhos/**/*'
           - '**/saxpy/**/*'
+          - '**/smb/**/*'
           - '**/sparta[-_]snl/**/*'
           - systems/llnl-matrix/**/*
           - modifiers/**/*
@@ -105,9 +109,12 @@
           - '**/amg2023/**/*'
           - '**/kripke/**/*'
           - '**/laghos/**/*'
+          - '**/osu[-_]micro[-_]benchmarks/**/*'
+          - '**/phloem/**/*'
           - '**/py[-_]scaffold/**/*'
           - '**/raja[-_]perf/**/*'
           - '**/remhos/**/*'
+          - '**/smb/**/*'
           - systems/llnl-elcapitan/**/*
           - modifiers/**/*
           - var/**/*
@@ -134,9 +141,12 @@
           - '**/kripke/**/*'
           - '**/laghos/**/*'
           - '**/lammps/**/*'
+          - '**/osu[-_]micro[-_]benchmarks/**/*'
+          - '**/phloem/**/*'
           - '**/py[-_]scaffold/**/*'
           - '**/raja[-_]perf/**/*'
           - '**/remhos/**/*'
+          - '**/smb/**/*'
           - '**/sparta[-_]snl/**/*'
           - '**/stream/**/*'
           - systems/llnl-elcapitan/**/*

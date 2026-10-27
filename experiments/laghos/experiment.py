@@ -45,8 +45,8 @@ class Laghos(
 
     variant(
         "version",
-        default="4.0",
-        values=("develop", "4.0"),
+        default="ats-6",
+        values=("develop", "4.0", "ats-6"),
         description="app version",
     )
 

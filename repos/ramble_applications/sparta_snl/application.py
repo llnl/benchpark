@@ -13,7 +13,10 @@ class SpartaSnl(ExecutableApplication):
     """Define SNL Sparta application"""
 
     name = "sparta-snl"
-
+    tags = ['asc','ats-6','chemistry','particles',
+            'direct-solve','montecarlo','structured-grid',
+            'large-scale','multi-node',
+            'mpi','c++',]
     maintainers("rfhaque")
     
     executable('sparta', 'spa_ -in {in} {sparta_flags}', use_mpi=True)
