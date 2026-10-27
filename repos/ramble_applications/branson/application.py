@@ -12,7 +12,7 @@ class Branson(ExecutableApplication):
     """Branson benchmark"""
     name = "branson"
 
-    tags = ['asc','montecarlo','particles',
+    tags = ['asc','ats-6','montecarlo','particles',
             'high-branching','irregular-memory-access',
             'mpi','c++','llnl-nightly','llnl-monthly','llnl-pr','llnl-weekly']
 
