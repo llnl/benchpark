@@ -63,7 +63,6 @@ include:
           - phloem
           - raja-perf
           - remhos
-          - smb
           - sparta-snl
         VARIANT: [+rocm]
       # New ROCm version coverage
@@ -119,7 +118,6 @@ include:
           - raja-perf
           - remhos
           - saxpy
-          - smb
         VARIANT: [+cuda]
       # Matrix no gpu-aware mpi
       - HOST: matrix

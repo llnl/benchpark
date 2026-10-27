@@ -124,7 +124,6 @@ run_tests_flux_tuolumne:
           - phloem
           - raja-perf
           - remhos
-          - smb
           - sparta-snl
         VARIANT: [+rocm]
         GPUMODE: SPX
@@ -187,7 +186,6 @@ run_tests_flux_tioga:
           - phloem
           - raja-perf
           - remhos
-          - smb
         VARIANT: ['+rocm caliper=time,mpi']
       - HOST: tioga
         ARCHCONFIG: llnl-elcapitan
