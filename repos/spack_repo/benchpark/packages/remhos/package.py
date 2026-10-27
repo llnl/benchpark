@@ -91,8 +91,6 @@ class Remhos(CMakePackage, CudaPackage, ROCmPackage):
 
     depends_on("hypre+gpu-aware-mpi", when="+gpu-aware-mpi")
 
-    patch("remhos-cmake.patch")
-
     def setup_run_environment(self, env):
         if "+gpu-aware-mpi" in self.spec:
             env.set("MFEM_GPU_AWARE_MPI", "1")
