@@ -3,11 +3,11 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant
+from benchpark.directives import DirectiveMeta, variant
 from benchpark.experiment_helper import ExperimentHelper
 
 
-class CompilerAttribution:
+class CompilerAttribution(metaclass=DirectiveMeta):
     features = (
         "association",
         "remark_counts",

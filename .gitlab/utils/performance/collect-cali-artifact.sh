@@ -7,7 +7,13 @@ baseline_artifact_dir="${CI_PROJECT_DIR}/baseline-cali"
 performance_json="${artifact_dir}/performance_metadata.json"
 baseline_performance_json="${baseline_artifact_dir}/performance_metadata.json"
 performance_metric="Avg time/rank"
-performance_region="main"
+# Caliper region to read the metric from; PERFORMANCE_REGION overrides.
+# Defaults to "main", except for benchmarks whose top-level region differs.
+case "${BENCHMARK:-}" in
+    raja-perf) default_performance_region="RAJAPerf" ;;
+    *) default_performance_region="main" ;;
+esac
+performance_region="${PERFORMANCE_REGION:-${default_performance_region}}"
 performance_threshold="0.05"
 
 mkdir -p "${artifact_dir}"

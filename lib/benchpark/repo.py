@@ -13,7 +13,6 @@ import benchpark.config
 
 # isort: off
 
-import ramble.language.language_base  # noqa
 import ramble.repository  # noqa
 
 from benchpark.util.compat import Singleton
@@ -21,7 +20,6 @@ from benchpark.util.compat import Singleton
 # isort: on
 
 global_namespace = "benchpark"
-namespaces = ["benchpark.expr", "benchpark.sys"]
 
 #: Guaranteed unused default value for some functions.
 NOT_PROVIDED = object()
@@ -62,17 +60,14 @@ def override_ramble_hardcoded_globals():
     _old = (
         ramble.repository.type_definitions,
         ramble.repository.global_namespace,
-        ramble.language.language_base.namespaces,
     )
     ramble.repository.type_definitions = type_definitions
     ramble.repository.global_namespace = global_namespace
-    ramble.language.language_base.namespaces = namespaces
-
-    yield
-
-    ramble.repository.type_definitions = _old[0]
-    ramble.repository.global_namespace = _old[1]
-    ramble.language.language_base.namespaces = _old[2]
+    try:
+        yield
+    finally:
+        ramble.repository.type_definitions = _old[0]
+        ramble.repository.global_namespace = _old[1]
 
 
 def _add_repo(repo_dirs, obj_type):

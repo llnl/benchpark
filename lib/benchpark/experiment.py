@@ -13,13 +13,13 @@ import yaml  # TODO: some way to ensure yaml available
 import benchpark.spec
 import benchpark.variant
 from benchpark.compiler_attribution import CompilerAttribution
-from benchpark.directives import ExperimentSystemBase, variant
+from benchpark.directives import DirectiveMeta, ExperimentSystemBase, variant
 from benchpark.error import BenchparkError
 from benchpark.experiment_helper import ExperimentHelper
 from benchpark.variables import Variable, VariableDict
 
 
-class ExecMode:
+class ExecMode(metaclass=DirectiveMeta):
     variant(
         "exec_mode",
         default="test",
@@ -32,7 +32,7 @@ class ExecMode:
             return self.spec.variants["exec_mode"][0]
 
 
-class Affinity:
+class Affinity(metaclass=DirectiveMeta):
     variant(
         "affinity",
         default="none",
@@ -93,7 +93,7 @@ class Affinity:
             }
 
 
-class Hwloc:
+class Hwloc(metaclass=DirectiveMeta):
     variant(
         "hwloc",
         default="none",
@@ -118,7 +118,7 @@ class Hwloc:
             return hwloc_modifier_list
 
 
-class Githash:
+class Githash(metaclass=DirectiveMeta):
     variant(
         "githash",
         default="on",
