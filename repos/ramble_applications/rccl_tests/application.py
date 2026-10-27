@@ -17,7 +17,7 @@ class RcclTests(ExecutableApplication):
 
     name = "rccl-tests"
 
-    tags = ['synthetic',
+    tags = ['synthetic','ats-6',
             'single-node','multi-node',
             'rccl','mpi','rocm','hip',
             'network-collectives','network-point-to-point',

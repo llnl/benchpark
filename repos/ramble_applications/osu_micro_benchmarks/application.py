@@ -13,7 +13,7 @@ from ramble.appkit import *
 
 class OsuMicroBenchmarks(OsuMicroBenchmarksBase):
 
-    tags = ['synthetic',
+    tags = ['synthetic','ats-6',
             'large-scale','multi-node','single-node',
             'atomics','managed-memory',
             'mpi','openshmem','upc','upc++','nccl','rccl',

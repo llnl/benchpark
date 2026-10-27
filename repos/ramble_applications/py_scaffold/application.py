@@ -13,7 +13,7 @@ class PyScaffold(ExecutableApplication):
     name = "py-scaffold"
 
     tags = ["python",'ai','ai-training','unet','pytorch','low-precision',
-            'mpi','nccl','rccl','network-collectives',
+            'ats-6','mpi','nccl','rccl','network-collectives',
             'large-scale','weak-scaling','strong-scaling',
             'llnl-nightly','llnl-monthly','llnl-pr','llnl-weekly']
 

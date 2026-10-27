@@ -15,6 +15,7 @@ class Laghos(ExecutableApplication):
 
     tags = [
         "asc",
+        "ats-6",
         "engineering",
         "hypre",
         "solver",
