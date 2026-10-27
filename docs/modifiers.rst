@@ -285,11 +285,13 @@ pinned to commit ``e229827a58479ba87a1efd0b1255a8ad6eb911d5`` from PR #8.
 
 Setup checks that the Python reader imports before building the benchmark.
 Count and trace runs repeat this check before launching. The NumPy dependency
-uses Benchpark's NumPy recipe, which disables Meson's ``b_asneeded`` option
-for MKL builds to retain its interface, threading, and core libraries with lld.
-For existing environments, setup uses Spack's concrete-spec update API to select
-the corrected NumPy recipe and replace the affected dependency
-builds while preserving unrelated package selections.
+uses Spack's builtin ``py-numpy`` recipe. With MKL, reader processes preload
+the interface, threading, and core libraries before importing NumPy. This
+handles Meson builds in which lld omits the latter two libraries from NumPy's
+direct dependencies. Benchmark processes run without these reader preloads.
+For existing environments that used Benchpark's NumPy override, setup selects
+the builtin recipe through Spack's concrete-spec update API while preserving
+unrelated package selections.
 
 The modes are:
 
@@ -305,9 +307,10 @@ instrumented builds. Compiler flags identify the mode and tracing options in
 the Spack spec. Dependencies are installed without the tracing environment;
 only the benchmark root is instrumented. Catalogs and ``builds.json`` are under
 ``{env_path}/compiler-memtrace/<configuration>/``. The latter records executable
-prefixes, reader paths, and collection options. Count and trace must use the
-same sources and inputs. Applications that modify input files during execution
-must restore those inputs between runs or use separate experiment workflows.
+prefixes, reader paths and preloads, and collection options. Count and trace
+must use the same sources and inputs. Applications that modify input files
+during execution must restore those inputs between runs or use separate
+experiment workflows.
 
 For CMake packages, setup adds MemTrace compile and link options to targets
 in the staged benchmark source tree. CMake's compiler checks run without these

@@ -78,7 +78,7 @@ compiler = Spec('builtin.llvm-amdgpu@=7.2.1', external_path={str(tmp_path / 'com
 hip = Spec('builtin.hip@=7.2.1', external_path={str(tmp_path / 'hip')!r})
 python = Spec('builtin.python@=' + '.'.join(map(str, sys.version_info[:3])),
               external_path=sys.prefix)
-numpy = Spec('builtin.py-numpy@=2.0', external_path={str(tmp_path / 'numpy')!r})
+numpy = Spec('benchpark.py-numpy@=2.0', external_path={str(tmp_path / 'numpy')!r})
 for name, spec in (
     ('raja-perf', 'raja-perf@=develop +rocm amdgpu_target=gfx942 build_system=cmake cxxflags="-O3"'),
     ('memtrace-llvm', 'benchpark.memtrace-llvm@=0.1.0 +runtime +python build_system=cmake'),
@@ -158,6 +158,7 @@ def test_root_info_through_spack_python_console(
         tmp_path / "memtrace-llvm/share/memtrace/python"
     )
     assert plugin["reader_paths"][1:]
+    assert plugin["reader_preload"] == []
     assert all(
         tmp_path / "numpy" in Path(path).parents and path.endswith("site-packages")
         for path in plugin["reader_paths"][1:]
@@ -178,13 +179,13 @@ def test_root_info_reports_invalid_json(modifier, monkeypatch, capsys, output):
     assert f"Spack stdout: {output!r}" in error
 
 
-def test_reader_requirement_updates_existing_environment(
+def test_reader_uses_builtin_numpy_in_existing_environment(
     modifier, metadata_environment
 ):
     env_path = metadata_environment
     benchmark = modifier._root_info(env_path, "raja-perf")
     old_reader = modifier._root_info(env_path, "memtrace-llvm")
-    modifier._require_reader_linkage(env_path)
+    modifier._use_builtin_numpy(env_path)
     reader = modifier._root_info(env_path, "memtrace-llvm")
     assert reader["hash"] != old_reader["hash"]
     manifest = (env_path / "spack.yaml").read_text()
@@ -192,12 +193,12 @@ def test_reader_requirement_updates_existing_environment(
         "from spack.active_environment import active_environment; "
         "e = active_environment(); "
         "s = next(s for s in e.concrete_roots() if s.name == 'memtrace-llvm'); "
-        "assert s['py-numpy'].namespace == 'benchpark'; "
+        "assert s['py-numpy'].namespace == 'builtin'; "
         "assert len(e.user_specs) == 2"
     )
     modifier._run_spack(["-e", env_path, "python", "-c", code])
     assert modifier._root_info(env_path, "raja-perf") == benchmark
-    modifier._require_reader_linkage(env_path)
+    modifier._use_builtin_numpy(env_path)
     assert modifier._root_info(env_path, "memtrace-llvm") == reader
     assert (env_path / "spack.yaml").read_text() == manifest
 
@@ -598,7 +599,11 @@ def test_setup_builds_distinct_prefixes_and_caches_only_success(
         if cmake:
             data["cmake_root"] = "."
         if name == "memtrace-llvm":
-            data.update(python=sys.executable, reader_paths=[str(reader)])
+            data.update(
+                python=sys.executable,
+                reader_paths=[str(reader)],
+                reader_preload=[],
+            )
         return data
 
     def spack(args, env=None):
@@ -910,6 +915,7 @@ def test_wrapper_executes_build_and_rejects_reused_output(
     app.write_text(
         f"#!{sys.executable}\nimport os, shutil, sys\n"
         f"shutil.copytree({str(runs / 'count')!r}, os.environ['MEMTRACE_RUN_OUT'], dirs_exist_ok=True)\n"
+        "assert 'libm.so.6' not in os.environ.get('LD_PRELOAD', '')\n"
         "assert 'MEMTRACE_COUNT_RUN' not in os.environ\n"
         "assert sys.argv[1:] == ['two words']\n"
     )
@@ -921,11 +927,13 @@ def test_wrapper_executes_build_and_rejects_reused_output(
                 "original": str(prefix),
                 "prefixes": {"count": str(prefix)},
                 "reader_paths": [str(Path(memtrace.__file__).parent.parent)],
+                "reader_preload": ["libm.so.6"],
             }
         )
     )
     output = tmp_path / "output"
     monkeypatch.setenv("MEMTRACE_COUNT_RUN", "/unrelated/count")
+    monkeypatch.delenv("LD_PRELOAD", raising=False)
     for name in (
         "FLUX_TASK_RANK",
         "PMIX_RANK",
@@ -959,7 +967,7 @@ def test_reader_import_failure_prevents_benchmark(runner, modifier, tmp_path, ca
     (reader / "memtrace.py").write_text(
         'raise ImportError("test: unresolved BLAS symbol")\n'
     )
-    plugin = {"python": sys.executable, "reader_paths": [str(reader)]}
+    plugin = {"python": sys.executable, "reader_paths": [str(reader)], "reader_preload": []}
     with pytest.raises(SystemExit):
         modifier._check_reader(plugin)
     assert "unresolved BLAS symbol" in capsys.readouterr().err

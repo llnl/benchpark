@@ -22,9 +22,6 @@ class CompilerMemtrace(BasicModifier):
     """Build and run separate HIP memory-operation count and trace executables."""
 
     name = "compiler_memtrace"
-    # Increment when build preparation changes so incomplete or incorrectly
-    # instrumented installations and catalogs cannot satisfy a corrected build.
-    _build_revision = 2
     tags("profiler", "performance-analysis", "compiler-analysis")
     modifier_conflict("name_only")
 
@@ -111,9 +108,7 @@ class CompilerMemtrace(BasicModifier):
     def _build_root(self, app_inst, options):
         # Separate options and modes must never overwrite another experiment's build.
         key = hashlib.sha256(
-            json.dumps(
-                [self._build_revision, self._usage_mode, options], sort_keys=True
-            ).encode()
+            json.dumps([self._usage_mode, options], sort_keys=True).encode()
         ).hexdigest()[:16]
         return Path(app_inst.expander.env_path) / "compiler-memtrace" / key
 
@@ -137,8 +132,7 @@ class CompilerMemtrace(BasicModifier):
     def _run_spack(self, args, env=None):
         command = ["spack"] + [str(arg) for arg in args]
         env = dict(os.environ if env is None else env)
-        # Spack runs PYTHONSTARTUP even for `python -c`. Interactive startup
-        # hooks (e.g. VS Code's REPL banner) corrupt machine-readable stdout.
+        # Interactive startup hooks can corrupt machine-readable stdout.
         env.pop("PYTHONSTARTUP", None)
         logger.msg(f"compiler_memtrace: running {shlex.join(command)}")
         try:
@@ -154,11 +148,14 @@ class CompilerMemtrace(BasicModifier):
     def _check_reader(self, plugin):
         command = [
             plugin["python"],
-            "-c",
-            f"import sys; sys.path[:0] = {plugin['reader_paths']!r}; "
-            "from memtrace import Run",
+            str(Path(self._file_path).resolve().with_name("check_reader.py")),
+            *plugin["reader_paths"],
         ]
-        result = subprocess.run(command, capture_output=True, text=True)
+        env = os.environ.copy()
+        preload = plugin.get("reader_preload", [])
+        if preload:
+            env["LD_PRELOAD"] = " ".join(preload + env.get("LD_PRELOAD", "").split())
+        result = subprocess.run(command, capture_output=True, text=True, env=env)
         if result.returncode:
             logger.die(
                 "compiler_memtrace reader check failed before benchmark builds. "
@@ -167,58 +164,17 @@ class CompilerMemtrace(BasicModifier):
                 + result.stderr
             )
 
-    def _require_reader_linkage(self, env_path):
-        # Recipe changes alone do not invalidate installed DAGs reused by Spack.
-        # Select the corrected NumPy recipe using Spack's concrete-spec API.
-        # This rehashes NumPy and its parents without reselecting compilers or
-        # unrelated benchmark dependencies in an existing environment.
-        code = """
-from spack.active_environment import active_environment
-from spack.spec import Spec
-env = active_environment()
-with env.write_transaction():
-    root = next(s for s in env.concrete_roots() if s.name == 'memtrace-llvm')
-    numpy = root['py-numpy']
-    if numpy.namespace != 'benchpark':
-        env.mutate(
-            selectors=[Spec('/' + numpy.dag_hash())],
-            mutators=[Spec('benchpark.py-numpy')],
-        )
-        print('compiler_memtrace: updated NumPy linkage; replacing the reader dependency build')
-"""
-        output = self._run_spack(["-e", env_path, "python", "-c", f"exec({code!r})"])
+    def _use_builtin_numpy(self, env_path):
+        helper = Path(self._file_path).resolve().with_name("spack_env.py")
+        output = self._run_spack(["-e", env_path, "python", helper, "use-builtin-numpy"])
         if output:
             logger.msg(output)
 
     def _root_info(self, env_path, name):
         # Query the active environment with its own Spack, not Ramble's older
         # bundled Spec implementation (which cannot parse modern compiler edges).
-        code = f"""
-import json
-import os
-from spack.active_environment import active_environment
-s = next(s for s in active_environment().concrete_roots() if s.name == {name!r})
-data = dict(prefix=str(s.prefix), hash=s.dag_hash(), compiler=s['cxx'].dag_hash(),
-            flags={{k: [str(f) for f in v] for k, v in s.compiler_flags.items()}},
-            rocm=s.satisfies('+rocm'))
-if 'hip' in s:
-    data['hip'] = str(s['hip'].prefix)
-if 'amdgpu_target' in s.variants:
-    data['targets'] = list(s.variants['amdgpu_target'].value)
-if s.satisfies('build_system=cmake'):
-    import spack.builder
-    root = str(spack.builder.create(s.package).root_cmakelists_dir)
-    data['cmake_root'] = (os.path.relpath(root, s.package.stage.source_path)
-                          if os.path.isabs(root) else root)
-if s.name == 'memtrace-llvm':
-    data['python'] = s['python'].command.path
-    data['reader_paths'] = s.package.reader_paths()
-print(json.dumps(data))
-"""
-        # Spack's -c uses InteractiveConsole.runsource(), which accepts one
-        # interactive statement. exec() keeps this multiline query one statement.
-        command = f"exec({code!r})"
-        output = self._run_spack(["-e", env_path, "python", "-c", command])
+        helper = Path(self._file_path).resolve().with_name("spack_env.py")
+        output = self._run_spack(["-e", env_path, "python", helper, "root-info", name])
         try:
             return json.loads(output)
         except json.JSONDecodeError as exc:
@@ -456,7 +412,7 @@ print(json.dumps(data))
         parent = Path(app_inst.expander.env_path)
         app_inst.package_manager._software_create_env(workspace, app_inst)
         self._run_spack(["-e", parent, "concretize"])
-        self._require_reader_linkage(parent)
+        self._use_builtin_numpy(parent)
         package = self._benchmark_package(workspace, app_inst)
         benchmark = package.spec_str(
             all_packages=workspace.software_environments._rendered_packages,
@@ -485,6 +441,7 @@ print(json.dumps(data))
             "original": original["prefix"],
             "python": plugin["python"],
             "reader_paths": plugin["reader_paths"],
+            "reader_preload": plugin["reader_preload"],
             "prefixes": {},
             "options": options,
         }

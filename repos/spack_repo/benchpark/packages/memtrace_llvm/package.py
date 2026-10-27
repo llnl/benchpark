@@ -3,7 +3,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import json
 import os
+import shlex
 
 from spack.package import *
 from spack_repo.builtin.build_systems.cmake import CMakePackage
@@ -34,8 +36,7 @@ class MemtraceLlvm(CMakePackage):
     depends_on("nlohmann-json@3.11.3:")
     depends_on("hip@6.4:", when="+runtime", type=("build", "link", "run"))
     depends_on("python@3.8:", when="+python", type=("build", "run"))
-    # This recipe retains all MKL libraries in Meson builds with lld.
-    depends_on("benchpark.py-numpy@1.24:", when="+python", type="run")
+    depends_on("py-numpy@1.24:", when="+python", type="run")
 
     requires(
         "%llvm",
@@ -84,7 +85,14 @@ class MemtraceLlvm(CMakePackage):
         if self.spec.satisfies("+runtime"):
             files.append("lib/libmemtrace_runtime.so")
         if self.spec.satisfies("+python"):
-            files.extend(["bin/memtrace", "share/memtrace/python/memtrace/__init__.py"])
+            files.extend(
+                [
+                    "bin/memtrace",
+                    "share/memtrace/python/memtrace/__init__.py",
+                    "share/memtrace/reader_cli.py",
+                    "share/memtrace/reader.json",
+                ]
+            )
         return files
 
     def reader_paths(self):
@@ -92,6 +100,21 @@ class MemtraceLlvm(CMakePackage):
         return [join_path(self.prefix.share, "memtrace", "python")] + [
             join_path(self.spec["py-numpy"].prefix, path)
             for path in dict.fromkeys((python.purelib, python.platlib))
+        ]
+
+    def reader_preload(self):
+        """Load all MKL DSOs before NumPy built with Meson and lld is imported."""
+        numpy = self.spec["py-numpy"]
+        if "blas" not in numpy or numpy["blas"].name not in (
+            "intel-oneapi-mkl",
+            "intel-mkl",
+            "intel-parallel-studio",
+        ):
+            return []
+        return [
+            str(path)
+            for path in numpy["blas"].libs.files
+            if os.path.basename(str(path)).startswith("libmkl_")
         ]
 
     @run_after("install")
@@ -103,15 +126,25 @@ class MemtraceLlvm(CMakePackage):
             join_path(self.stage.source_path, "memtrace-llvm", "python", "memtrace"),
             destination,
         )
+        reader_root = join_path(self.prefix.share, "memtrace")
+        install(
+            join_path(os.path.dirname(__file__), "reader_cli.py"),
+            join_path(reader_root, "reader_cli.py"),
+        )
+        with open(join_path(reader_root, "reader.json"), "w") as stream:
+            json.dump(
+                {"paths": self.reader_paths(), "preload": self.reader_preload()},
+                stream,
+            )
         mkdirp(self.prefix.bin)
         cli = join_path(self.prefix.bin, "memtrace")
         with open(cli, "w") as stream:
             stream.write(
-                f"#!{self.spec['python'].command.path}\n"
-                "import sys\n"
-                f"sys.path[:0] = {self.reader_paths()!r}\n"
-                "from memtrace.cli import main\n"
-                "sys.exit(main())\n"
+                "#!/bin/sh\nexec "
+                + shlex.quote(self.spec["python"].command.path)
+                + " "
+                + shlex.quote(join_path(reader_root, "reader_cli.py"))
+                + ' "$@"\n'
             )
         set_executable(cli)
 
@@ -137,3 +170,5 @@ class MemtraceLlvm(CMakePackage):
             env.prepend_path("PATH", self.prefix.bin)
             for path in reversed(self.reader_paths()):
                 env.prepend_path("PYTHONPATH", path)
+            for path in reversed(self.reader_preload()):
+                env.prepend_path("LD_PRELOAD", path, separator=" ")

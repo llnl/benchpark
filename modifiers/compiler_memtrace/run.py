@@ -98,6 +98,15 @@ def check_reader():
         raise RuntimeError(f"Cannot load the memtrace reader: {exc}") from exc
 
 
+def ensure_reader_preload(libraries):
+    """Restart with MKL loaded before the Python reader imports NumPy."""
+    current = os.environ.get("LD_PRELOAD", "").split()
+    if any(path not in current for path in libraries):
+        env = os.environ.copy()
+        env["LD_PRELOAD"] = " ".join(libraries + current)
+        os.execvpe(sys.executable, [sys.executable, *sys.argv], env)
+
+
 def validate_pair(count_path, trace_path, timing=False):
     count = load_run(count_path, "count")
     trace = load_run(trace_path, "trace")
@@ -122,11 +131,22 @@ def validate_pair(count_path, trace_path, timing=False):
 def run(args):
     with open(args.builds) as stream:
         builds = json.load(stream)
+    preload = builds.get("reader_preload", [])
+    if args.mode != "baseline":
+        ensure_reader_preload(preload)
     sys.path[:0] = builds["reader_paths"]
     command = benchmark_command(
         args.command, builds["original"], builds["prefixes"][args.mode]
     )
     env = os.environ.copy()
+    if preload:
+        remaining = [
+            path for path in env.get("LD_PRELOAD", "").split() if path not in preload
+        ]
+        if remaining:
+            env["LD_PRELOAD"] = " ".join(remaining)
+        else:
+            env.pop("LD_PRELOAD", None)
     # An enclosing profiling session must not override this experiment's settings.
     for name in (
         "MEMTRACE_RUN_OUT",
