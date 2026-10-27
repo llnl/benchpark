@@ -236,9 +236,10 @@ class LlnlElcapitan(System):
         if self.spec.satisfies("compiler=gcc"):
             self.gcc_version = Version("12.2.0")
             self.mpi_version = Version("9.0.1")
-            self.short_gcc_version = (
-                f"{self.gcc_version.major}.{self.gcc_version.minor}"
-            )
+            # cray-mpich ships one GNU build per release, named for the GCC ABI
+            # HPE built it with (not the gcc used here): ofi/gnu/11.2 for
+            # cray-mpich 8.1.30 through 9.1.0 on the El Capitan systems.
+            self.mpi_gnu_abi = "11.2"
         else:
             if self.rocm_version >= Version("10.0"):
                 self.cce_version = Version("21.0.3")
@@ -645,10 +646,10 @@ class LlnlElcapitan(System):
                         "externals": [
                             {
                                 "spec": f"cray-mpich@{self.mpi_version}{gtl_spec}+wrappers %gcc@{self.gcc_version}",
-                                "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/{self.short_gcc_version}",
+                                "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/{self.mpi_gnu_abi}",
                                 "extra_attributes": {
                                     "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
-                                    "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/{self.short_gcc_version}/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
+                                    "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/{self.mpi_gnu_abi}/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
                                     "gtl_libs": "libmpi_gtl_hsa",
                                 },
                             }
