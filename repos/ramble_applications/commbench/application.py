@@ -28,5 +28,5 @@ class Commbench(ExecutableApplication):
     workload_variable("lib", default="mpi", values=["mpi", "ipc_get", "ipc_put", "xccl"], description="Communication library to benchmark", workload="basic")
     workload_variable("pat", default="p2p", values=["p2p", "gather", "scatter", "broadcast", "alltoall", "allgather"], description="Communication pattern", workload="basic")
     # workload_variable("mpi_command", default="mpirun -n {n_ranks}", description="mpi command", workload="basic")
-    
+
     # success_criteria("pass", "string", match="[\s\S.]*PASSED![\s\S.]*")
