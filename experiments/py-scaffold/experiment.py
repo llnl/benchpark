@@ -98,6 +98,7 @@ class PyScaffold(
             "--find-links https://download.pytorch.org/whl/torchaudio/",
             "--find-links https://download.pytorch.org/whl/torchvision/",
         ]
+        extra_reqs = []
         if self.spec.satisfies("+rocm"):
             model = "rocm"
             find_links.append(
@@ -105,6 +106,8 @@ class PyScaffold(
             )
         elif self.spec.satisfies("+cuda"):
             model = "cuda"
+            # prevent using +mpich version from wci
+            extra_reqs.append("mpi4py===4.1.1")
         self.add_package_spec(
             self.name,
             [f"py-scaffold@{self.spec.variants['version'][0]}"],
@@ -113,9 +116,11 @@ class PyScaffold(
         self.add_package_spec(
             self.name,
             [
-                "\n".join(find_links)
-                + "\n"
-                + f"ScaFFold[{model}] @ git+https://github.com/LBANN/ScaFFold.git",
+                "\n".join(
+                    find_links
+                    + [f"ScaFFold[{model}] @ git+https://github.com/LBANN/ScaFFold.git"]
+                    + extra_reqs
+                ),
             ],
             package_manager="pip",
         )
