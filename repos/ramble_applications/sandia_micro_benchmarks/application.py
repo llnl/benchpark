@@ -20,7 +20,7 @@ class SandiaMicroBenchmarks(ExecutableApplication):
     name = "Sandia Micro Benchmarks"
 
     # Tags for benchmark categorization
-    tags = ["mpi", "communication", "microbenchmark"]
+    tags = ("mpi", "communication", "microbenchmark")
 
     # MPI overhead benchmark (2 ranks)
     executable('mpi_overhead_exe', 'mpi_overhead', use_mpi=True)
