@@ -64,15 +64,11 @@ class PyScaffold(ExecutableApplication):
         "modules",
         "{mods}",
     )
-    # ScaFFold initializes MPI on import, even for generate_fractals. Started
-    # bare inside a batch job, MPI init can fail (cray-mpich under flux on
-    # El Capitan systems aborts in MPIR_pmi_init), so the fractals are never
-    # written and "run" then fails. Launch it as a one-rank job instead.
+
     executable(
         "generate",
-        "{single_rank_mpi_command} $(which scaffold) generate_fractals "
-        "-c {config_file} --problem-scale {problem_scale}",
-        use_mpi=False,
+        "$(which scaffold) generate_fractals -c {config_file} --problem-scale {problem_scale}",
+        use_mpi=True,
     )
     executable(
         "run",
