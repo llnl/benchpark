@@ -68,6 +68,9 @@ COPY --chown=fluxuser:fluxuser . /home/fluxuser/benchpark
 WORKDIR /home/fluxuser/benchpark
 
 RUN pip install -r /home/fluxuser/benchpark/requirements.txt \
+    && pip install sphinx_copybutton \
+    sphinx_rtd_theme \
+    sphinxcontrib.programoutput \
     && source /home/fluxuser/benchpark/setup-env.sh \
 	&& benchpark bootstrap \
     && pip install .[analyze] \

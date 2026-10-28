@@ -14,7 +14,7 @@ class Qws(ExecutableApplication):
     """
     name = "QWS"
 
-    tags = ['qcd','c++','mpi', 'weak-scaling']
+    tags('qcd','c++','mpi', 'weak-scaling')
 
     executable('qws', 'qws.exe' +
                       ' {lx} {ly} {lz} {lt}' +
