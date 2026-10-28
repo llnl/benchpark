@@ -63,11 +63,6 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
 
     flag_handler = build_system_flags
 
-    def setup_run_environment(self, env):
-      if self.compiler.extra_rpaths:
-        for rpath in self.compiler.extra_rpaths:
-          env.prepend_path("LD_LIBRARY_PATH", rpath)
-
     def cmake_args(self):
         spec = self.spec
         args = []

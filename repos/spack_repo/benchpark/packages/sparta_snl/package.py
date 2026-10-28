@@ -83,17 +83,7 @@ class SpartaSnl(CMakePackage, CudaPackage, ROCmPackage):
     conflicts("+rocm", when="+cuda")
     conflicts("+cuda", when="+rocm")
 
-    def setup_run_environment(self, env):
-        if self.spec.satisfies("+kokkos+rocm fft_kokkos=hipfft"):
-            env.prepend_path("LD_LIBRARY_PATH", self.spec["hipfft"].prefix.lib)
-
-        if self.compiler.extra_rpaths:
-            for rpath in self.compiler.extra_rpaths:
-                env.prepend_path("LD_LIBRARY_PATH", rpath)
-
     def setup_build_environment(self, env):
-        if self.spec.satisfies("+kokkos+rocm fft_kokkos=hipfft"):
-            env.prepend_path("LD_LIBRARY_PATH", self.spec["hipfft"].prefix.lib)
         if "+mpi" in self.spec:
             if self.spec["mpi"].extra_attributes and "ldflags" in self.spec["mpi"].extra_attributes:
                 env.append_flags("LDFLAGS", self.spec["mpi"].extra_attributes["ldflags"])

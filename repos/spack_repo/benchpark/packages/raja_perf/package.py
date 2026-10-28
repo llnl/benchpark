@@ -26,13 +26,6 @@ class RajaPerf(BuiltinRajaPerf):
         description="Enable Caliper subkernel regions when Caliper support is enabled",
     )
 
-    def setup_run_environment(self, env):
-        super().setup_run_environment(env)
-
-        if self.compiler.extra_rpaths:
-            for rpath in self.compiler.extra_rpaths:
-                env.prepend_path("LD_LIBRARY_PATH", rpath)
-
     def initconfig_package_entries(self):
         entries = super().initconfig_package_entries()
         entries.append(
