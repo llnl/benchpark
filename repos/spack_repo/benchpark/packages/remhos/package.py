@@ -38,7 +38,6 @@ class Remhos(CMakePackage, CudaPackage, ROCmPackage):
 
     depends_on("cxx", type="build")
     depends_on("c", type="build")
-    depends_on("hip-lang", type="build")
 
     depends_on("mpi")
 

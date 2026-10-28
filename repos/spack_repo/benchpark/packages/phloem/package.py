@@ -46,7 +46,6 @@ class Phloem(CachedCMakePackage, CudaPackage, ROCmPackage):
 
     depends_on("c", type="build")
     depends_on("cxx", type="build")
-    depends_on("hip-lang", type="build")
 
     def initconfig_mpi_entries(self):
         entries = super().initconfig_mpi_entries()
