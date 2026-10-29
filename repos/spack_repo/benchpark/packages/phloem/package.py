@@ -47,6 +47,13 @@ class Phloem(CachedCMakePackage, CudaPackage, ROCmPackage):
     depends_on("c", type="build")
     depends_on("cxx", type="build")
 
+    def setup_run_environment(self, env):
+        super().setup_run_environment(env)
+
+        if self.compiler.extra_rpaths:
+            for rpath in self.compiler.extra_rpaths:
+                env.prepend_path("LD_LIBRARY_PATH", rpath)
+
     def initconfig_mpi_entries(self):
         entries = super().initconfig_mpi_entries()
         entries.extend(
