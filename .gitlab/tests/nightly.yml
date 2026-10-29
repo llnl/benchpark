@@ -168,7 +168,7 @@ include:
         ARCHCONFIG: llnl-matrix
         SCHEDULER_PARAMETERS: $MATRIX_PARAMS
         BENCHMARK: [lammps]
-        VARIANT: [+cuda workload=pace]
+        VARIANT: [+cuda~gpu-aware-mpi workload=pace]
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
         SCHEDULER_PARAMETERS: $ELCAP_PARAMS
