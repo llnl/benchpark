@@ -3,7 +3,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import json
 import os
 import shlex
 
@@ -89,8 +88,6 @@ class MemtraceLlvm(CMakePackage):
                 [
                     "bin/memtrace",
                     "share/memtrace/python/memtrace/__init__.py",
-                    "share/memtrace/reader_cli.py",
-                    "share/memtrace/reader.json",
                 ]
             )
         return files
@@ -126,26 +123,30 @@ class MemtraceLlvm(CMakePackage):
             join_path(self.stage.source_path, "memtrace-llvm", "python", "memtrace"),
             destination,
         )
-        reader_root = join_path(self.prefix.share, "memtrace")
-        install(
-            join_path(os.path.dirname(__file__), "reader_cli.py"),
-            join_path(reader_root, "reader_cli.py"),
+        # LD_PRELOAD only takes effect when a process starts, so the wrapper sets it,
+        # along with the reader's import paths, before exec'ing Python.
+        script = ["#!/bin/sh"]
+        script.append(
+            f"PYTHONPATH={shlex.quote(':'.join(self.reader_paths()))}"
+            "${PYTHONPATH:+:$PYTHONPATH}; export PYTHONPATH"
         )
-        with open(join_path(reader_root, "reader.json"), "w") as stream:
-            json.dump(
-                {"paths": self.reader_paths(), "preload": self.reader_preload()},
-                stream,
+        preload = self.reader_preload()
+        if preload:
+            script.append(
+                f"LD_PRELOAD={shlex.quote(' '.join(preload))}"
+                "${LD_PRELOAD:+ $LD_PRELOAD}; export LD_PRELOAD"
             )
+        # Run the CLI's main() the way a console-script entry point would.
+        entry = (
+            'import sys; sys.argv[0] = "memtrace"; '
+            "from memtrace.cli import main; sys.exit(main())"
+        )
+        python = shlex.quote(self.spec["python"].command.path)
+        script.append(f'exec {python} -c {shlex.quote(entry)} "$@"')
         mkdirp(self.prefix.bin)
         cli = join_path(self.prefix.bin, "memtrace")
         with open(cli, "w") as stream:
-            stream.write(
-                "#!/bin/sh\nexec "
-                + shlex.quote(self.spec["python"].command.path)
-                + " "
-                + shlex.quote(join_path(reader_root, "reader_cli.py"))
-                + ' "$@"\n'
-            )
+            stream.write("\n".join(script) + "\n")
         set_executable(cli)
 
     def setup_run_environment(self, env):
