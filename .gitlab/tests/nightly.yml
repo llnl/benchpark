@@ -114,7 +114,7 @@ include:
           - kripke
           - laghos
           - osu-micro-benchmarks
-          - phloem
+          # - phloem  # Uncomment this once gpu-aware MPI available on Matrix system.py (likely in https://github.com/llnl/benchpark/issues/1423)
           - raja-perf
           - remhos
           - saxpy
@@ -168,7 +168,7 @@ include:
         ARCHCONFIG: llnl-matrix
         SCHEDULER_PARAMETERS: $MATRIX_PARAMS
         BENCHMARK: [lammps]
-        VARIANT: [+cuda workload=pace]
+        VARIANT: [+cuda~gpu-aware-mpi workload=pace]
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
         SCHEDULER_PARAMETERS: $ELCAP_PARAMS

@@ -17,12 +17,12 @@ class RcclTests(ExecutableApplication):
 
     name = "rccl-tests"
 
-    tags = ['synthetic','ats-6',
-            'single-node','multi-node',
-            'rccl','mpi','rocm','hip',
-            'network-collectives','network-point-to-point',
-            'network-bandwidth-bound','network-latency-bound',
-            'c++']
+    tags('synthetic','ats-6',
+         'single-node','multi-node',
+         'rccl','mpi','rocm','hip',
+         'network-collectives','network-point-to-point',
+         'network-bandwidth-bound','network-latency-bound',
+         'c++')
 
     # workload name -> installed executable (src/<test>.cu builds <test>_perf)
     tests = {

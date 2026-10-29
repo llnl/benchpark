@@ -12,12 +12,12 @@ class Kripke(ExecutableApplication):
     """Kripke benchmark uses RAJA Portability Layer"""
     name = "kripke"
 
-    tags = ['asc','ats-6','transport','deterministic','structured-grid',
-            'large-scale','multi-node','single-node','c++','raja',
-            'simd','vectorization','register-pressure','high-fp','atomics','high-branching',
-            'high-memory-bandwidth','large-memory-footprint','regular-memory-access',
-            'mpi','network-latency-bound','network-collectives','llnl-nightly','llnl-monthly',
-            'llnl-pr','llnl-weekly']
+    tags('asc','ats-6','transport','deterministic','structured-grid',
+         'large-scale','multi-node','single-node','c++','raja',
+         'simd','vectorization','register-pressure','high-fp','atomics','high-branching',
+         'high-memory-bandwidth','large-memory-footprint','regular-memory-access',
+         'mpi','network-latency-bound','network-collectives','llnl-nightly','llnl-monthly',
+         'llnl-pr','llnl-weekly')
 
     executable('kripke', 'kripke.exe' +
                      ' --groups {ngroups}' +

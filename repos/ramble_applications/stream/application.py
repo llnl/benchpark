@@ -17,10 +17,10 @@ class Stream(ExecutableApplication):
 
     tags('memorybenchmark', 'microbenchmark', 'memory-benchmark', 'micro-benchmark')
 
-    tags = ['synthetic',
-            'large-scale','multi-node','single-node','sub-node',
-            'high-memory-bandwidth','regular-memory-access',
-            'mpi','c','fortran']
+    tags('synthetic',
+         'large-scale','multi-node','single-node','sub-node',
+         'high-memory-bandwidth','regular-memory-access',
+         'mpi','c','fortran')
 
     with when("package_manager_family=spack"):
         software_spec('stream',
