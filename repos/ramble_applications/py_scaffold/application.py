@@ -22,7 +22,7 @@ class PyScaffold(ExecutableApplication):
     )
 
     def _prepend_library_path(self, workspace, app_inst=None):
-        """Function to prepend to LD_LIBRARY_PATH, can't do in spack because python_platlib points to wrong site-packages dir"""
+        """Expose pip packages and libraries ahead of the Spack view."""
 
         app_inst.variables["mods"] = ""
         if "rocm_arch" in app_inst.variables:
@@ -39,9 +39,8 @@ class PyScaffold(ExecutableApplication):
         elif "cuda_arch" in app_inst.variables:
             app_inst.variables["mods"] = "\n".join(
                 (
+                    "export PYTHONPATH={pip_purelib_path}:$PYTHONPATH",
                     "export LD_LIBRARY_PATH="
-                    "/collab/usr/gapps/python/toss_4_x86_64_ib/"
-                    "anaconda3-2023.09/lib:"
                     "{pip_purelib_path}/nvidia/cudnn/lib:"
                     "{pip_purelib_path}/torch/lib:"
                     "$LD_LIBRARY_PATH",
