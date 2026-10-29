@@ -30,7 +30,7 @@ class PyScaffold(
 
     def compute_applications_section(self):
 
-        n_gpus = 4
+        n_gpus = 1
         config_url = "https://raw.githubusercontent.com/LBANN/ScaFFold/refs/heads/main/ScaFFold/configs/benchmark_default.yml"
         batch_size = 1
         sharding = [1, 1, 1]
@@ -42,6 +42,7 @@ class PyScaffold(
         else:
             epochs = -1
             problem_scale = 8
+            n_gpus = 4
 
         if self.spec.satisfies("+strong"):
             batch_size = "{n_gpus} * {scaling_factor}**{scaling_iterations}"
