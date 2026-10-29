@@ -132,7 +132,6 @@ class Laghos(CMakePackage, CudaPackage, ROCmPackage):
         if self.spec.satisfies("+rocm"):
             args.append("-DMFEM_USE_HIP=ON")
             args.append(f"-DCMAKE_HIP_COMPILER={env['HIPCXX']}")
-            args.append(f"-DCMAKE_CXX_COMPILER={env['HIPCXX']}")
             amdgpu_target = ";".join(spec.variants["amdgpu_target"].value)
             args.append(self.define("CMAKE_HIP_ARCHITECTURES", amdgpu_target))
             #flags = [
