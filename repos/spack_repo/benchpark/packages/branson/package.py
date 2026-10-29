@@ -35,6 +35,8 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("c", type="build")
     depends_on("cxx", type="build")
 
+    patch("respect-cmake-hip-compiler.patch")
+
     variant("metis", default=True, description="Enable METIS support")
     variant("openmp", default=False, description="Enable OpenMP support")
     variant("caliper", default=False, description="Enable Caliper monitoring")
@@ -67,12 +69,10 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
         spec = self.spec
         args = []
 
-        args.append(f"-DCMAKE_C_COMPILER={spec['mpi'].mpicc}")
-        args.append(f"-DCMAKE_CXX_COMPILER={spec['mpi'].mpicxx}")
-        args.append(f"-DCMAKE_Fortran_COMPILER={spec['mpi'].mpifc}")
         args.append(f"-DCMAKE_CXX_STANDARD=17")
         args.append(f"-DMPI_C_COMPILER={spec['mpi'].mpicc}")
         args.append(f"-DMPI_CXX_COMPILER={spec['mpi'].mpicxx}")
+        args.append(f"-DMPI_Fortran_COMPILER={spec['mpi'].mpifc}")
 
         if '+metis' in spec:
             args.append(f"-DMETIS_ROOT_DIR={spec['metis'].prefix}")
@@ -89,6 +89,7 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
         else:
             args.append("-DUSE_CUDA=OFF")
             if '+rocm' in spec:
+                args.append(f"-DCMAKE_HIP_COMPILER={env['HIPCXX']}")
                 args.append("-DUSE_HIP=ON")
                 args.append("-DUSE_GPU=ON")
                 rocm_arch_vals = spec.variants["amdgpu_target"].value

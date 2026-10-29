@@ -1,0 +1,13 @@
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -307,7 +307,9 @@ elseif("${GPU_DBS_STRING}" STREQUAL "HIP" )
+       endif()
+     endif()
+
+-    set(CMAKE_HIP_COMPILER "${ROCM_PATH}/llvm/bin/clang++")
++    if(NOT CMAKE_HIP_COMPILER)
++      set(CMAKE_HIP_COMPILER "${ROCM_PATH}/llvm/bin/clang++")
++    endif()
+     list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}/lib/cmake")
+
+     find_package(hip REQUIRED)
