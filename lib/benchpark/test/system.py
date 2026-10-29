@@ -11,6 +11,7 @@ import yaml
 
 import benchpark.spec
 from benchpark.cmd.experiment import experiment_init
+from benchpark.cmd.system import system_init
 
 
 @pytest.mark.parametrize(
@@ -100,6 +101,68 @@ def test_system_compute_variables_section(monkeypatch):
     }
 
 
+@pytest.mark.parametrize("suffix", ["", " extra_batch_opts=none extra_cmd_opts=none"])
+def test_system_extra_options_default_to_none(suffix):
+    system = benchpark.spec.SystemSpec(f"generic-x86{suffix}").concretize().system
+    variables = system.compute_variables_section()["variables"]
+
+    assert "extra_batch_opts" not in variables
+    assert "extra_cmd_opts" not in variables
+
+
+def test_system_extra_options_append_to_system_defaults():
+    default_system = (
+        benchpark.spec.SystemSpec("llnl-elcapitan cluster=tuolumne").concretize().system
+    )
+    default_variables = default_system.compute_variables_section()["variables"]
+    system = (
+        benchpark.spec.SystemSpec(
+            "llnl-elcapitan cluster=tuolumne "
+            'extra_batch_opts="--requires=hosts:a,b" '
+            'extra_cmd_opts="-o mpibind=greedy:0,verbose"'
+        )
+        .concretize()
+        .system
+    )
+    variables = system.compute_variables_section()["variables"]
+
+    assert variables["extra_batch_opts"] == (
+        default_variables["extra_batch_opts"] + "\n--requires=hosts:a,b"
+    )
+    assert variables["extra_cmd_opts"] == "-o mpibind=greedy:0,verbose"
+
+
+def test_system_extra_options_follow_trailing_newline():
+    system = (
+        benchpark.spec.SystemSpec('riken-fugaku extra_cmd_opts="--label output"')
+        .concretize()
+        .system
+    )
+
+    variables = system.compute_variables_section()["variables"]
+    assert variables["extra_cmd_opts"] == "-std-proc fjmpioutdir/bmexe\n--label output"
+
+
+def test_system_init_writes_extra_options_with_spaces_and_commas(tmp_path):
+    destination = tmp_path / "system"
+    system_init(
+        SimpleNamespace(
+            dest=str(destination),
+            basedir=None,
+            spec=[
+                "generic-x86",
+                "extra_batch_opts=--requires=hosts:a,b",
+                "extra_cmd_opts=-o mpibind=greedy:0,verbose",
+            ],
+        )
+    )
+
+    with (destination / "variables.yaml").open() as stream:
+        variables = yaml.safe_load(stream)["variables"]
+    assert variables["extra_batch_opts"] == "--requires=hosts:a,b"
+    assert variables["extra_cmd_opts"] == "-o mpibind=greedy:0,verbose"
+
+
 @pytest.mark.parametrize(
     "gpumode,sys_gpus_per_node,gpu_factor",
     [
@@ -179,3 +242,46 @@ def test_rocm_install_prefix(version, rocm_prefix, llvm_prefix):
         "LD_LIBRARY_PATH"
     ].split(":")
     assert f"{rocm_prefix}/lib" in cce_library_paths
+
+
+def test_system_passthrough_opts_append():
+    sys_spec = benchpark.spec.SystemSpec(
+        "llnl-elcapitan cluster=elcapitan "
+        "extra_batch_opts=--requires=hosts:elcap9376,elcap9800 "
+        "extra_cmd_opts=--setopt=mpibind=greedy:0"
+    ).concretize()
+
+    vars_section = sys_spec.system.compute_variables_section()["variables"]
+
+    batch_options = vars_section["extra_batch_opts"].splitlines()
+    # The system's own options survive, and the user's come last, commas intact
+    assert "--amd-gpumode=SPX" in batch_options
+    assert batch_options[-1] == "--requires=hosts:elcap9376,elcap9800"
+    assert vars_section["extra_cmd_opts"] == "--setopt=mpibind=greedy:0"
+
+
+def test_system_init_accepts_literal_quotes(tmp_path):
+    # CI expands SYSTEM_ARGS unquoted, so quotes reach benchpark literally and
+    # values containing spaces arrive split across argv entries
+    # (e.g. .gitlab/tests/nightly.yml: SYSTEM_ARGS: [mount_point="/p/lustre1"])
+    dest = tmp_path / "dane"
+    system_init(
+        SimpleNamespace(
+            spec=[
+                "llnl-cluster",
+                "cluster=dane",
+                'mount_point="/p/lustre1"',
+                'extra_cmd_opts="-o',
+                'mpibind=greedy:0"',
+                "timeout=60",
+            ],
+            dest=str(dest),
+            basedir=None,
+        )
+    )
+
+    assert "mount_point=/p/lustre1" in (dest / "system_id.yaml").read_text()
+    with (dest / "variables.yaml").open() as stream:
+        variables = yaml.safe_load(stream)["variables"]
+    assert variables["extra_cmd_opts"] == "-o mpibind=greedy:0"
+    assert variables["timeout"] == "60"

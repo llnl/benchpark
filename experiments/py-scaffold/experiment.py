@@ -30,7 +30,7 @@ class PyScaffold(
 
     def compute_applications_section(self):
 
-        n_gpus = 4
+        n_gpus = 1
         config_url = "https://raw.githubusercontent.com/LBANN/ScaFFold/refs/heads/main/ScaFFold/configs/benchmark_default.yml"
         batch_size = 1
         sharding = [1, 1, 1]
@@ -42,6 +42,7 @@ class PyScaffold(
         else:
             epochs = -1
             problem_scale = 8
+            n_gpus = 4
 
         if self.spec.satisfies("+strong"):
             batch_size = "{n_gpus} * {scaling_factor}**{scaling_iterations}"
@@ -98,6 +99,7 @@ class PyScaffold(
             "--find-links https://download.pytorch.org/whl/torchaudio/",
             "--find-links https://download.pytorch.org/whl/torchvision/",
         ]
+        extra_reqs = []
         if self.spec.satisfies("+rocm"):
             model = "rocm"
             find_links.append(
@@ -105,6 +107,8 @@ class PyScaffold(
             )
         elif self.spec.satisfies("+cuda"):
             model = "cuda"
+            # prevent using +mpich version from wci
+            extra_reqs.append("mpi4py===4.1.1")
         self.add_package_spec(
             self.name,
             [f"py-scaffold@{self.spec.variants['version'][0]}"],
@@ -113,9 +117,11 @@ class PyScaffold(
         self.add_package_spec(
             self.name,
             [
-                "\n".join(find_links)
-                + "\n"
-                + f"ScaFFold[{model}] @ git+https://github.com/LBANN/ScaFFold.git",
+                "\n".join(
+                    find_links
+                    + [f"ScaFFold[{model}] @ git+https://github.com/LBANN/ScaFFold.git"]
+                    + extra_reqs
+                ),
             ],
             package_manager="pip",
         )
