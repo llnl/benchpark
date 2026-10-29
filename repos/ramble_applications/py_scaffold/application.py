@@ -67,7 +67,8 @@ class PyScaffold(ExecutableApplication):
 
     executable(
         "generate",
-        "$(which scaffold) generate_fractals -c {config_file} --problem-scale {problem_scale}",
+        "$(which scaffold) generate_fractals -c {config_file} "
+        "--problem-scale {problem_scale} --fract-base-dir {fractals_dir}",
         use_mpi=True,
     )
     executable(
@@ -75,8 +76,15 @@ class PyScaffold(ExecutableApplication):
         "$(which scaffold) benchmark -c {config_file} "
         "--problem-scale {problem_scale} --epochs {num_epochs} "
         "--local-batch-size {local_batch_size} "
-        "--dc-num-shards {sharding} --fract-base-dir ../fractals",
+        "--dc-num-shards {sharding} --fract-base-dir {fractals_dir}",
         use_mpi=True,
     )
 
     workload("sweep", executables=["modules", "generate", "run"], input="config_file")
+
+    workload_variable(
+        "fractals_dir",
+        default="{experiment_run_dir}/fractals",
+        description="Directory generate writes the fractals to and run reads them from",
+        workloads=["sweep"],
+    )
