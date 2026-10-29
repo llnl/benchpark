@@ -59,6 +59,20 @@ class System(ExperimentSystemBase):
         description="Set job timeout limit (in minutes). Has to be under the limit for selected 'queue'.",
     )
 
+    variant(
+        "extra_batch_opts",
+        default="none",
+        multi=True,
+        description="Scheduler options added to every allocation, after the system's own",
+    )
+
+    variant(
+        "extra_cmd_opts",
+        default="none",
+        multi=True,
+        description="Launcher options added to every run command, after the system's own",
+    )
+
     def __init__(self, spec):
         self.spec: "benchpark.spec.ConcreteSystemSpec" = spec
         super().__init__()
@@ -165,6 +179,16 @@ class System(ExperimentSystemBase):
         system_specific = {}
         for k, v in self.system_specific_variables().items():
             system_specific[k] = v
+
+        # Append user passthrough options to the system's computed ones (never
+        # replace them). The spec parser splits values on commas, so rejoin:
+        # flags like --requires=hosts:a,b or -o mpibind=greedy:0,verbose need them.
+        for key in ("extra_batch_opts", "extra_cmd_opts"):
+            user = [x for x in self.spec.variants[key] if x != "none"]
+            if user:
+                system_specific[key] = "\n".join(
+                    filter(None, [system_specific.get(key), ",".join(user)])
+                )
 
         job_configuration_options = {}
         self.timeout = job_configuration_options["timeout"] = self.spec.variants[
