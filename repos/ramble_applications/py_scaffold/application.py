@@ -33,6 +33,7 @@ class PyScaffold(ExecutableApplication):
                     "export MPICH_GPU_SUPPORT_ENABLED=0",
                     "export SCAFFOLD_GROUPNORM_TRITON=1",
                     "export SCAFFOLD_CONV_TRITON=1",
+                    "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:{pip_purelib_path}/torch/lib",
                 )
             )
         elif "cuda_arch" in app_inst.variables:
