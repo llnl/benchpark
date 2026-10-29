@@ -12,12 +12,12 @@ class Quicksilver(ExecutableApplication):
     """Quicksilver benchmark"""
     name = "quicksilver"
 
-    tags = ['asc','montecarlo',
-            'single-node',
-            'high-branching',
-            'irregular-memory-access',
-            'mpi',
-            'c++']
+    tags('asc','montecarlo',
+         'single-node',
+         'high-branching',
+         'irregular-memory-access',
+         'mpi',
+         'c++')
 
     executable('run', 'qs'+
             ' -i {i}' +
@@ -53,7 +53,7 @@ class Quicksilver(ExecutableApplication):
     workload_variable('l', default='',
                       description='enable/disable load balancing',
                       workloads=['quicksilver'])
-    
+
     workload_variable('c', default='',
                       description='enable/disable cycle timers',
                       workloads=['quicksilver'])
