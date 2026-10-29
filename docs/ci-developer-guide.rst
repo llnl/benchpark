@@ -120,9 +120,9 @@ the current test metadata from being written.
 
 The publishing job requires ``BENCHPARK_PERF_DEPLOY_TOKEN`` to contain, or point to a
 file containing, the SSH private key for ``benchpark-performance``.
-``BENCHPARK_PERF_REPO_URL`` indicates the destination repository. The dashboard
-redeploy job requires ``PLOTLY_CLOUD_REDEPLOY_WEBHOOK`` to contain the Plotly Cloud
-redeploy webhook URL.
+``BENCHPARK_PERF_REPO_URL`` indicates the destination repository. The dashboard redeploy
+job requires ``PLOTLY_CLOUD_REDEPLOY_WEBHOOK`` to contain the Plotly Cloud redeploy
+webhook URL.
 
 When adding a monitored benchmark, update its test matrix and matching
 ``resource_rules_*`` entry.
