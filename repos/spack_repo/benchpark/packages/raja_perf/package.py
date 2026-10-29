@@ -34,3 +34,9 @@ class RajaPerf(BuiltinRajaPerf):
             )
         )
         return entries
+
+    def cmake_args(self):
+        args = super().cmake_args()
+        if self.spec.satisfies("+rocm"):
+            args.append(f"-DCMAKE_HIP_COMPILER={env['HIPCXX']}")
+        return args
