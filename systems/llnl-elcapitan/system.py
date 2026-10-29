@@ -236,9 +236,10 @@ class LlnlElcapitan(System):
         if self.spec.satisfies("compiler=gcc"):
             self.gcc_version = Version("12.2.0")
             self.mpi_version = Version("9.0.1")
-            self.short_gcc_version = (
-                f"{self.gcc_version.major}.{self.gcc_version.minor}"
-            )
+            # cray-mpich ships one GNU build per release, named for the GCC ABI
+            # HPE built it with (not the gcc used here): ofi/gnu/11.2 for
+            # cray-mpich 8.1.30 through 9.1.0 on the El Capitan systems.
+            self.mpi_gnu_abi = "11.2"
         else:
             if self.rocm_version >= Version("10.0"):
                 self.cce_version = Version("21.0.3")
@@ -302,6 +303,11 @@ class LlnlElcapitan(System):
             self.pals_version = Version("1.2.9")
             self.llvm_version = Version("16.0.0")
         self.short_rocm_version = f"{self.rocm_version.major}.0"
+        # Cray MPICH 9.1.0 only ships an AMD build for ROCm 7 (ofi/amd/7.0),
+        # which ROCm 10 also has to link against
+        self.mpich_amd_version = (
+            "7.0" if self.rocm_version >= Version("7.0.0") else self.short_rocm_version
+        )
         # TODO: Replace this with lookups into the working set
 
         attrs = self.id_to_resources.get(self.spec.variants["cluster"][0])
@@ -542,6 +548,12 @@ class LlnlElcapitan(System):
                     "gcc@12.2.0 languages=c,c++,fortran",
                     "/opt/cray/pe/gcc/12.2.0/",
                     {"c": "gcc", "cxx": "g++", "fortran": "gfortran"},
+                    flags={
+                        "ldflags": (
+                            f"-Wl,-rpath-link,/opt/cray/pe/pmi/{self.pmi_version}/lib "
+                            f"-Wl,-rpath-link,/opt/cray/pe/pals/{self.pals_version}/lib"
+                        )
+                    },
                 )
             ],
         )
@@ -597,7 +609,7 @@ class LlnlElcapitan(System):
         elif self.spec.satisfies("compiler=rocmcc"):
             dont_use_gtl = {
                 "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
-                "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/amd/{self.short_rocm_version}/lib -lmpi "
+                "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/amd/{self.mpich_amd_version}/lib -lmpi "
                 f"-L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib "
                 f"-Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
             }
@@ -607,7 +619,7 @@ class LlnlElcapitan(System):
                 "fi_cxi_ats": "0",
                 "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
                 "gtl_libs": "libmpi_gtl_hsa",
-                "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/amd/{self.short_rocm_version}/lib -lmpi "
+                "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/amd/{self.mpich_amd_version}/lib -lmpi "
                 f"-L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib "
                 f"-Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -lmpi_gtl_hsa",
             }
@@ -625,7 +637,7 @@ class LlnlElcapitan(System):
                         "externals": [
                             {
                                 "spec": f"cray-mpich@{self.mpi_version}{gtl_spec}+wrappers %rocmcc@{self.rocm_version}",
-                                "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/amd/{self.short_rocm_version}",
+                                "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/amd/{self.mpich_amd_version}",
                                 "extra_attributes": gtl_cfg,
                             }
                         ]
@@ -645,10 +657,10 @@ class LlnlElcapitan(System):
                         "externals": [
                             {
                                 "spec": f"cray-mpich@{self.mpi_version}{gtl_spec}+wrappers %gcc@{self.gcc_version}",
-                                "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/{self.short_gcc_version}",
+                                "prefix": f"/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/{self.mpi_gnu_abi}",
                                 "extra_attributes": {
                                     "gtl_lib_path": f"/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
-                                    "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/{self.short_gcc_version}/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
+                                    "ldflags": f"-L/opt/cray/pe/mpich/{self.mpi_version}/ofi/gnu/{self.mpi_gnu_abi}/lib -lmpi -L/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib -Wl,-rpath=/opt/cray/pe/mpich/{self.mpi_version}/gtl/lib",
                                     "gtl_libs": "libmpi_gtl_hsa",
                                 },
                             }

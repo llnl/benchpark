@@ -13,14 +13,13 @@ from ramble.expander import Expander
 class Babelstream(ExecutableApplication):
     """Babelstream benchmark"""
     name = "babelstream"
-   
+
     tags('memorybenchmark', 'microbenchmark', 'memory-benchmark', 'micro-benchmark')
 
-    tags = ['synthetic',
-            'large-scale','multi-node','single-node','sub-node',
-            'high-memory-bandwidth','regular-memory-access',
-            'mpi','c','fortran','openmp']
-
+    tags('synthetic',
+         'large-scale','multi-node','single-node','sub-node',
+         'high-memory-bandwidth','regular-memory-access',
+         'mpi','c','fortran','openmp')
 
     executable('execute', '{execute} -n {n} -s {s}', use_mpi=True)
 

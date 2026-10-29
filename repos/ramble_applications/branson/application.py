@@ -12,9 +12,9 @@ class Branson(ExecutableApplication):
     """Branson benchmark"""
     name = "branson"
 
-    tags = ['asc','montecarlo','particles',
-            'high-branching','irregular-memory-access',
-            'mpi','c++','llnl-nightly','llnl-monthly','llnl-pr','llnl-weekly']
+    tags('asc','ats-6','montecarlo','particles',
+         'high-branching','irregular-memory-access',
+         'mpi','c++','llnl-nightly','llnl-monthly','llnl-pr','llnl-weekly')
 
     executable('setup_experiment',
            template=[
@@ -35,7 +35,7 @@ class Branson(ExecutableApplication):
                 + common_args, use_mpi=True)
 
     workload('branson', executables=['setup_experiment','p'])
-    
+
     workload_variable('input_file', default='3D_hohlraum_multi_node.xml',
     	description='input file name',
       	workloads=['branson'])

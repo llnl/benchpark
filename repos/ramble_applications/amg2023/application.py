@@ -12,12 +12,12 @@ class Amg2023(ExecutableApplication):
     """AMG2023 benchmark"""
     name = "amg2023"
 
-    tags = ['asc','engineering','hypre','solver','sparse-linear-algebra',
-            'large-scale','multi-node','single-node','sub-node',
-            'high-branching','high-memory-bandwidth','large-memory-footprint',
-            'regular-memory-access','irregular-memory-access','mixed-precision',
-            'mpi','network-latency-bound','network-collectives','block-structured-grid',
-            'c','llnl-nightly','llnl-monthly','llnl-pr','llnl-weekly']
+    tags('asc','ats-6','engineering','hypre','solver','sparse-linear-algebra',
+         'large-scale','multi-node','single-node','sub-node',
+         'high-branching','high-memory-bandwidth','large-memory-footprint',
+         'regular-memory-access','irregular-memory-access','mixed-precision',
+         'mpi','network-latency-bound','network-collectives','block-structured-grid',
+         'c','llnl-nightly','llnl-monthly','llnl-pr','llnl-weekly')
 
     executable('p1', 'amg' +
                      ' -P {px} {py} {pz}' +
