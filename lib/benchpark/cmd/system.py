@@ -24,7 +24,7 @@ from benchpark.util.compat import color
 
 def system_init(args):
     system_spec = benchpark.spec.SystemSpec(
-        " ".join(benchpark.spec.quote_kvp(arg) for arg in args.spec)
+        benchpark.spec.quote_kvp_args(args.spec)
     ).concretize()
     system_spec.destdir = args.dest
     system = system_spec.system
@@ -86,7 +86,7 @@ def system_external(args):
         return benchpark.system_external.run(args)
 
     system_spec = benchpark.spec.SystemSpec(
-        " ".join(benchpark.spec.quote_kvp(arg) for arg in args.spec)
+        benchpark.spec.quote_kvp_args(args.spec)
     ).concretize()
     system = system_spec.system
 

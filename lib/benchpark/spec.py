@@ -525,6 +525,28 @@ def quote_kvp(string: str) -> str:
     return f"{key}={quote_if_needed(value)}"
 
 
+def quote_kvp_args(args: Iterable[str]) -> str:
+    """Join CLI spec arguments, preserving quotes supplied literally by a caller."""
+    parts = []
+    literal_quote = None
+    for arg in args:
+        if literal_quote:
+            parts.append(arg)
+            if arg.endswith(literal_quote):
+                literal_quote = None
+            continue
+
+        match = SPLIT_KVP.match(arg)
+        if match and match.group(2).startswith(("'", '"')):
+            value = match.group(2)
+            parts.append(arg)
+            if len(value) == 1 or not value.endswith(value[0]):
+                literal_quote = value[0]
+        else:
+            parts.append(quote_kvp(arg))
+    return " ".join(parts)
+
+
 def strip_quotes_and_unescape(string: str) -> str:
     """Remove surrounding single or double quotes from string, if present."""
     match = STRIP_QUOTES.match(string)

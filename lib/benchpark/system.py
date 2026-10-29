@@ -186,8 +186,9 @@ class System(ExperimentSystemBase):
         for key in ("extra_batch_opts", "extra_cmd_opts"):
             user = [x for x in self.spec.variants[key] if x != "none"]
             if user:
+                existing = (system_specific.get(key) or "").rstrip("\n")
                 system_specific[key] = "\n".join(
-                    filter(None, [system_specific.get(key), ",".join(user)])
+                    filter(None, [existing, ",".join(user)])
                 )
 
         job_configuration_options = {}
