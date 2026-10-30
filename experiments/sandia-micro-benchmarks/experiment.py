@@ -49,7 +49,7 @@ class SandiaMicroBenchmarks(
             self.add_experiment_variable("peers", 1)
             self.add_experiment_variable("message_size", 8, True)
 
-        # msgrate_9pt: 9-point stencil (8 peers)
+        # msgrate_9pt: 9-point stencil (8 peers) - typically used for strong scaling
         elif self.spec.satisfies("workload=msgrate_9pt"):
             if self.spec.satisfies("exec_mode=test"):
                 # CI test mode: single node, 8 cores
@@ -66,11 +66,12 @@ class SandiaMicroBenchmarks(
                 self.add_experiment_variable(
                     "n_ranks", "{n_nodes}*{sys_cores_per_node}", True
                 )
-                self.add_experiment_variable("peers", 8, True)
-                # Start with medium message size
-                self.add_experiment_variable("message_size", 1024, True)
+                # Peers fixed at 8 for 9-point stencil (not scaled)
+                self.add_experiment_variable("peers", 8, False)
+                # Start with small message size for exponential scaling
+                self.add_experiment_variable("message_size", 8, True)
 
-        # msgrate_27pt: 27-point stencil (26 peers)
+        # msgrate_27pt: 27-point stencil (26 peers) - typically used for weak scaling
         elif self.spec.satisfies("workload=msgrate_27pt"):
             if self.spec.satisfies("exec_mode=test"):
                 # CI test mode: single node, 8 cores
@@ -87,9 +88,10 @@ class SandiaMicroBenchmarks(
                 self.add_experiment_variable(
                     "n_ranks", "{n_nodes}*{sys_cores_per_node}", True
                 )
-                self.add_experiment_variable("peers", 26, True)
-                # Start with medium message size
-                self.add_experiment_variable("message_size", 1024, True)
+                # Peers fixed at 26 for 27-point stencil (not scaled)
+                self.add_experiment_variable("peers", 26, False)
+                # Start with small message size for exponential scaling
+                self.add_experiment_variable("message_size", 8, True)
 
         # RMA multi-threaded test
         elif self.spec.satisfies("workload=rma_mt"):
@@ -108,21 +110,35 @@ class SandiaMicroBenchmarks(
         )
 
         # Configure scaling behavior
-        # Strong scaling: increase nodes/ranks with fixed message size
-        # Weak scaling: increase peer count (from 9-point to 27-point pattern)
+        # Both strong and weak scaling scale n_nodes and message_size independently
+        # Strong uses 8 peers (9-point stencil), weak uses 26 peers (27-point stencil)
+        # message_size scales exponentially to 2MiB for both modes
         if self.spec.satisfies("+strong") or self.spec.satisfies("+weak"):
+            # Maximum message size: 2MiB = 2 * 1024 * 1024 = 2097152 bytes
+            max_message_size = 2097152
+
+            def scale_n_nodes_until_saturated(var, _itr, dim, sf):
+                """Scale n_nodes by sf (until system resources are saturated)"""
+                return var.val(dim) * sf
+
+            def scale_message_size_exponentially(var, _itr, dim, sf):
+                """Scale message_size exponentially until reaching 2MiB"""
+                current_size = var.val(dim)
+                new_size = current_size * sf
+                # Cap at 2MiB
+                return min(new_size, max_message_size)
+
             self.register_scaling_config(
                 {
                     ScalingMode.Strong: {
-                        # Strong: scale n_nodes, keep message_size constant
-                        "n_nodes": lambda var, itr, dim, sf: var.val(dim) * sf,
-                        "message_size": lambda var, itr, dim, sf: var.val(dim),
+                        # Strong: 8 peers (9-point), scale n_nodes and message_size
+                        "n_nodes": scale_n_nodes_until_saturated,
+                        "message_size": scale_message_size_exponentially,
                     },
                     ScalingMode.Weak: {
-                        # Weak: scale peers (communication complexity)
-                        # Starts at 8 peers (9-pt), scale factor doubles peer count
-                        "peers": lambda var, itr, dim, sf: var.val(dim) * sf,
-                        "n_nodes": lambda var, itr, dim, sf: var.val(dim) * sf,
+                        # Weak: 26 peers (27-point), scale n_nodes and message_size
+                        "n_nodes": scale_n_nodes_until_saturated,
+                        "message_size": scale_message_size_exponentially,
                     },
                 }
             )
