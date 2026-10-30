@@ -26,7 +26,7 @@ include:
           - phloem
           - raja-perf
           - remhos
-          - smb
+          - sandia-micro-benchmarks
           - sparta-snl
           - stream
       # salmon-tddft doesn't build with oneAPI, use gcc
