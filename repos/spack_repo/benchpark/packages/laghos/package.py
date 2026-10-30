@@ -140,3 +140,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
         mkdirp(prefix.bin)
         install("laghos", prefix.bin)
         install_tree("data", prefix.data)
+
+# This triggers CI
+#
+
