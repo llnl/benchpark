@@ -443,6 +443,11 @@ class Allocation(BasicModifier):
 
         launch_cmd = "flux run" if self._usage_mode == "standard" else self._usage_mode
 
+        if self._usage_mode == "torchrun-hpc":
+            # Otherwise torchrun-hpc picks its own launcher (srun on Slurm
+            # clusters like matrix) and escapes the enclosing flux instance.
+            cmd_opts.append("--scheduler=flux")
+
         # Always run exclusive for mpibind + flux.
         # Otherwise, binding may oversubscribe cores before all cores are allocated.
         cmd_opts.append("--exclusive")
