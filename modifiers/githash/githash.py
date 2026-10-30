@@ -44,8 +44,25 @@ def load_spack_json(raw):
 
 
 def spack_spec_json(name):
+    # Report the spec installed in the active environment. A bare
+    # `spack spec <name>` concretizes the name afresh, so it reports the
+    # package's preferred version and default variants rather than what the
+    # experiment built, e.g. hecbench@2026-09-25 for a hecbench@2026-08-13
+    # install. Fall back to the name when the environment does not hold
+    # exactly one install of it.
+    query = name
+    try:
+        hashes = subprocess.check_output(
+            ["spack", "find", "--format", "{hash}", name],
+            text=True,
+            stderr=subprocess.DEVNULL,
+        ).split()
+        if len(hashes) == 1:
+            query = f"/{hashes[0]}"
+    except subprocess.CalledProcessError:
+        pass
     raw = subprocess.check_output(
-        ["spack", "spec", "--json", name],
+        ["spack", "spec", "--json", query],
         text=True,
     )
     return load_spack_json(raw)["spec"]["nodes"]
