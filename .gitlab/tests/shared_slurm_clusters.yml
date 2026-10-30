@@ -129,7 +129,7 @@ run_tests_slurm_dane:
           - osu-micro-benchmarks
           - raja-perf
           - remhos
-          - smb
+          - sandia-micro-benchmarks
       # Strong scaling runs for "benchpark analyze" test
       - HOST: dane
         ARCHCONFIG: llnl-cluster
