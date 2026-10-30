@@ -59,7 +59,9 @@ variables:
   # Dane
   DANE_SHARED_ALLOC: -N 1 -t 04:00:00 --exclusive --reservation=ci
   # Matrix (NODES ARE SHARED WITHOUT --exclusive)
-  MATRIX_SHARED_ALLOC: -N 1 -t 04:00:00 --exclusive
+  # Request GPUs explicitly: GPUs granted only implicitly by --exclusive are not
+  # given to the "srun ... flux start" step, so flux may not see them.
+  MATRIX_SHARED_ALLOC: -N 1 -t 04:00:00 --exclusive --gpus-per-node=4
   # Tuolumne (max 4hr policy)
   TUOLUMNE_SHARED_ALLOC: -N 1 -t 4h --queue=pci --exclusive --setattr=gpumode=${GPUMODE}
     --conf=resource.rediscover=true
@@ -93,6 +95,7 @@ stages:
   - release-resources
   - summarize
   - publish-performance
+  - deploy-dashboard
   - cleanup-dir
 bootstrap_benchpark:
   tags: [shell, oslic]
@@ -121,9 +124,31 @@ deploy_nightly_performance_metadata:
     - job: generate_test_summary
       artifacts: true
   script: [bash .gitlab/utils/performance/push-to-perf-repo.sh]
+  artifacts:
+    when: always
+    reports:
+      dotenv: artifact-performance-publish/publish.env
+    paths: [artifact-performance-publish/]
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: always
+    - when: never
+redeploy_warden_dashboard:
+  tags: [shell, oslic]
+  stage: deploy-dashboard
+  needs:
+    - job: deploy_nightly_performance_metadata
+      artifacts: true
+  script:
+    - |
+      if [[ "${BENCHPARK_PERF_METADATA_PUSHED:-0}" != "1" ]]; then
+          echo "No new performance metadata was pushed; skipping WARDEN dashboard redeploy."
+          exit 0
+      fi
+    - bash .gitlab/utils/performance/trigger-warden-dashboard-redeploy.sh
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: on_success
     - when: never
 cleanup_pipeline_dir:
   tags: [shell, oslic]
