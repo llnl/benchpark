@@ -23,7 +23,9 @@ from benchpark.util.compat import color
 
 
 def system_init(args):
-    system_spec = benchpark.spec.SystemSpec(" ".join(args.spec)).concretize()
+    system_spec = benchpark.spec.SystemSpec(
+        benchpark.spec.quote_kvp_args(args.spec)
+    ).concretize()
     system_spec.destdir = args.dest
     system = system_spec.system
 
@@ -83,7 +85,9 @@ def system_external(args):
     if hasattr(args, "propose") or hasattr(args, "apply"):
         return benchpark.system_external.run(args)
 
-    system_spec = benchpark.spec.SystemSpec(" ".join(args.spec)).concretize()
+    system_spec = benchpark.spec.SystemSpec(
+        benchpark.spec.quote_kvp_args(args.spec)
+    ).concretize()
     system = system_spec.system
 
     packages = system.compute_packages_section()["packages"]
