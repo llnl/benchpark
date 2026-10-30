@@ -117,7 +117,3 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
         mkdirp(prefix.bin)
         install("remhos", prefix.bin)
         install_tree("data", prefix.data)
-
-# This triggers CI
-#
-

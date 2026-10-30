@@ -102,7 +102,3 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
             cmake_options.append(self.define("AMG_WITH_MPI", True))
 
         return cmake_options
-
-# This triggers CI
-#
-
