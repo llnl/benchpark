@@ -12,11 +12,11 @@ class Phloem(ExecutableApplication):
     """Phloem benchmark"""
     name = "phloem"
 
-    tags = ['synthetic','ats-6',
-            'large-scale','multi-node','single-node',
-            'c','mpi','network-point-to-point',
-            'network-bandwidth-bound','network-latency-bound',
-            'network-collectives','network-nonblocking-collectives']
+    tags('synthetic','ats-6',
+         'large-scale','multi-node','single-node',
+         'c','mpi','network-point-to-point',
+         'network-bandwidth-bound','network-latency-bound',
+         'network-collectives','network-nonblocking-collectives')
 
     # Define executables for each benchmark program
     executable('sqmr', 'sqmr --num_cores={num_cores} --num_nbors={num_nbors}', use_mpi=True)

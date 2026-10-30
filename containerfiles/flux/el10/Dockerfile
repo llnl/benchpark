@@ -68,6 +68,7 @@ COPY --chown=fluxuser:fluxuser . /home/fluxuser/benchpark
 WORKDIR /home/fluxuser/benchpark
 
 RUN pip install -r /home/fluxuser/benchpark/requirements.txt \
+    && pip install -r /home/fluxuser/benchpark/docs/requirements.txt \
     && source /home/fluxuser/benchpark/setup-env.sh \
 	&& benchpark bootstrap \
     && pip install .[analyze] \

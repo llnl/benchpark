@@ -12,9 +12,9 @@ class Smb(ExecutableApplication):
     """Sandia microbenchmarks"""
     name = "Sandia microbenchmarks"
 
-    tags = ['synthetic','ats-6','large-scale','multi-node','mpi',
-            'network-bandwidth-bound','network-bisection-bandwidth-bound',
-            'network-latency-bound','network-point-to-point','c']
+    tags('synthetic','ats-6','large-scale','multi-node','mpi',
+         'network-bandwidth-bound','network-bisection-bandwidth-bound',
+         'network-latency-bound','network-point-to-point','c')
 
     executable('p1', 'mpi_overhead', use_mpi=True)
     executable('p2', 'msgrate -n {ppn}', use_mpi=True)

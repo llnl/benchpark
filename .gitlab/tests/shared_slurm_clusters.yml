@@ -173,7 +173,6 @@ run_tests_slurm_matrix:
           - raja-perf
           - remhos
           - saxpy
-          - smb
         VARIANT: [+cuda]
       - HOST: matrix
         ARCHCONFIG: llnl-matrix

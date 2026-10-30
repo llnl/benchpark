@@ -11,4 +11,4 @@ from ramble.appkit import *
 
 class MdTest(MdTestBase):
 
-    tags = ['synthetic','ats-6','i-o','large-scale','mpi','c']
+    tags('synthetic','ats-6','i-o','large-scale','mpi','c')
