@@ -110,7 +110,6 @@ include:
           - amg2023
           - babelstream
           - branson
-          - gromacs
           - kripke
           - laghos
           - osu-micro-benchmarks
