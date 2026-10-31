@@ -53,6 +53,63 @@ class SandiaMicroBenchmarks(ExecutableApplication):
     workload('msgrate_27pt', executables=['msgrate_27pt_exe'])
     workload('rma_mt', executables=['rma_mt_exe'])
 
+    # Register validators for minimum rank requirements
+    # mpi_overhead requires exactly 2 ranks
+    with when('workload=mpi_overhead'):
+        register_validator(
+            name='two-rank-workload',
+            predicate='{n_ranks} == 2',
+            message='mpi_overhead workload requires exactly 2 ranks.',
+            fail_on_invalid=True,
+        )
+
+    # msgrate_9pt requires minimum 9 ranks (8 peers + self)
+    # Ranks must be in multiples of 9 for proper stencil alignment
+    with when('workload=msgrate_9pt'):
+        register_validator(
+            name='nine-rank-minimum',
+            predicate='{n_ranks} >= 9',
+            message='msgrate_9pt workload requires at least 9 ranks (8 peers + 1).',
+            fail_on_invalid=True,
+        )
+        register_validator(
+            name='stencil-multiple',
+            predicate='{n_ranks} % 9 == 0',
+            message='msgrate_9pt workload requires n_ranks to be a multiple of 9 for proper stencil alignment.',
+            fail_on_invalid=True,
+        )
+
+    # msgrate_27pt requires minimum 27 ranks (26 peers + self)
+    # Ranks must be in multiples of 27 for proper stencil alignment
+    with when('workload=msgrate_27pt'):
+        register_validator(
+            name='twentyseven-rank-minimum',
+            predicate='{n_ranks} >= 27',
+            message='msgrate_27pt workload requires at least 27 ranks (26 peers + 1).',
+            fail_on_invalid=True,
+        )
+        register_validator(
+            name='stencil-multiple',
+            predicate='{n_ranks} % 27 == 0',
+            message='msgrate_27pt workload requires n_ranks to be a multiple of 27 for proper stencil alignment.',
+            fail_on_invalid=True,
+        )
+
+    # rma_mt uses 9-point stencil pattern (8 peers)
+    with when('workload=rma_mt'):
+        register_validator(
+            name='nine-rank-minimum',
+            predicate='{n_ranks} >= 9',
+            message='rma_mt workload requires at least 9 ranks (8 peers + 1).',
+            fail_on_invalid=True,
+        )
+        register_validator(
+            name='stencil-multiple',
+            predicate='{n_ranks} % 9 == 0',
+            message='rma_mt workload requires n_ranks to be a multiple of 9 for proper stencil alignment.',
+            fail_on_invalid=True,
+        )
+
     # Workload variables
     workload_variable(
         'ppn',
