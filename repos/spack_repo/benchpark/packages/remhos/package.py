@@ -26,7 +26,7 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
     license("BSD-2-Clause")
 
     version("develop", branch="master")
-    version("2.0", branch="master")
+    version("ats-6", branch="master")
     version("1.0", sha256="e60464a867fe5b1fd694fbb37bb51773723427f071c0ae26852a2804c08bbb32")
 
     variant("metis", default=True, description="Enable/disable METIS support")
@@ -38,24 +38,22 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
 
     depends_on("mpi")
 
-    depends_on("camp@2026.07.1:", when="@develop")
-    depends_on("umpire@2026.07.1:", when="@develop")
-    depends_on("raja@2026.07.0: ~examples~exercises cxxstd=20", when="@develop")
+    depends_on("umpire@2026.07.2:", when="@develop")
+    depends_on("raja@2026.07.1: ~examples~exercises cxxstd=20", when="@develop")
 
-    depends_on("camp@2026.07.1", when="@2.0")
-    depends_on("umpire@2026.07.1", when="@2.0")
-    depends_on("raja@2026.07.0 ~examples~exercises cxxstd=20", when="@2.0")
+    depends_on("umpire@2026.07.2", when="@ats-6")
+    depends_on("raja@2026.07.1 ~examples~exercises cxxstd=20", when="@ats-6")
 
     depends_on("mfem+mpi+metis", when="+metis")
     depends_on("mfem+mpi~metis", when="~metis")
     depends_on("mfem+raja", when="+raja")
 
     depends_on("mfem@develop", when="@develop")
-    depends_on("mfem@4.10", when="@2.0")
+    depends_on("mfem@4.10", when="@ats-6")
     depends_on("mfem@4.1.0:", when="@1.0")
     depends_on("mfem+caliper", when="+caliper")
     depends_on("mfem cxxstd=20", when="@develop")
-    depends_on("mfem cxxstd=20", when="@2.0")
+    depends_on("mfem cxxstd=20", when="@ats-6")
 
     depends_on("caliper", when="+caliper")
     depends_on("adiak~shared", when="+caliper")

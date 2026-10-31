@@ -22,6 +22,7 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
     license("MIT")
 
     version("develop", branch="develop")
+    version("ats6", branch="develop")
 
     version("1.01", sha256="90208eaec4f6d64a4fd81cd838e30b5e7207246cb7f407e482965f23bbcee848")
     version(
@@ -42,6 +43,9 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
     variant("umpire", default=False, description="Use umpire memory pool")
 
     with when("+umpire"):
+        depends_on("umpire@2026.07.2:", when="@develop")
+        depends_on("umpire@2026.07.2", when="@ats6")
+
         depends_on("umpire+cuda", when="+cuda")
         for sm_ in CudaPackage.cuda_arch_values:
             depends_on("umpire cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))

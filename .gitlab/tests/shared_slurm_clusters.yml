@@ -167,6 +167,7 @@ run_tests_slurm_matrix:
         BENCHMARK:
           - amg2023
           - babelstream
+          - branson
           - kripke
           - laghos
           - osu-micro-benchmarks
