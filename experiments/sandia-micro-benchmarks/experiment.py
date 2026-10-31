@@ -52,7 +52,7 @@ class SandiaMicroBenchmarks(
         # MPI overhead is a 2-rank point-to-point test
         if self.spec.satisfies("workload=mpi_overhead"):
             self.add_experiment_variable("n_ranks", 2, True)
-            self.add_experiment_variable("n_nodes", 1)
+            self.add_experiment_variable("n_nodes", 1, True)
             self.add_experiment_variable("peers", 1)
             self.add_experiment_variable("message_size", 8, True)
 
@@ -65,11 +65,11 @@ class SandiaMicroBenchmarks(
                 # Fill nodes in multiples of stencil_size (9, 18, 27, etc.)
                 # If resources_per_node < stencil_size, use multiple nodes
                 # n_ranks = max(stencil_size, n_nodes * floor(resources_per_node / stencil_size) * stencil_size)
-                self.add_experiment_variable("n_nodes", 1)
+                self.add_experiment_variable("n_nodes", 1, True)
                 self.add_experiment_variable(
                     "n_ranks",
                     f"max({stencil_size}, {{n_nodes}} * (({resources_per_node_expr}) // {stencil_size}) * {stencil_size})",
-                    True
+                    True,
                 )
                 self.add_experiment_variable("peers", 8, True)
                 # Sweep a few message sizes in test mode
@@ -79,11 +79,11 @@ class SandiaMicroBenchmarks(
                 # Fill nodes in multiples of stencil_size
                 # Calculate ranks per node: floor(resources_per_node / 9) * 9
                 # If resources_per_node < 9, spread across multiple nodes
-                self.add_experiment_variable("n_nodes", 1)
+                self.add_experiment_variable("n_nodes", 1, True)
                 self.add_experiment_variable(
                     "n_ranks",
                     f"max({stencil_size}, {{n_nodes}} * (({resources_per_node_expr}) // {stencil_size}) * {stencil_size})",
-                    True
+                    True,
                 )
                 # Peers fixed at 8 for 9-point stencil (not scaled)
                 self.add_experiment_variable("peers", 8, False)
@@ -99,11 +99,11 @@ class SandiaMicroBenchmarks(
                 # Fill nodes in multiples of stencil_size (27, 54, 81, etc.)
                 # If resources_per_node < stencil_size, use multiple nodes
                 # n_ranks = max(stencil_size, n_nodes * floor(resources_per_node / stencil_size) * stencil_size)
-                self.add_experiment_variable("n_nodes", 1)
+                self.add_experiment_variable("n_nodes", 1, True)
                 self.add_experiment_variable(
                     "n_ranks",
                     f"max({stencil_size}, {{n_nodes}} * (({resources_per_node_expr}) // {stencil_size}) * {stencil_size})",
-                    True
+                    True,
                 )
                 self.add_experiment_variable("peers", 26, True)
                 # Sweep a few message sizes in test mode
@@ -113,11 +113,11 @@ class SandiaMicroBenchmarks(
                 # Fill nodes in multiples of stencil_size
                 # Calculate ranks per node: floor(resources_per_node / 27) * 27
                 # If resources_per_node < 27, spread across multiple nodes
-                self.add_experiment_variable("n_nodes", 1)
+                self.add_experiment_variable("n_nodes", 1, True)
                 self.add_experiment_variable(
                     "n_ranks",
                     f"max({stencil_size}, {{n_nodes}} * (({resources_per_node_expr}) // {stencil_size}) * {stencil_size})",
-                    True
+                    True,
                 )
                 # Peers fixed at 26 for 27-point stencil (not scaled)
                 self.add_experiment_variable("peers", 26, False)
@@ -129,11 +129,11 @@ class SandiaMicroBenchmarks(
             stencil_size = 9
             # Fill nodes in multiples of stencil_size
             # If resources_per_node < stencil_size, use multiple nodes
-            self.add_experiment_variable("n_nodes", 1)
+            self.add_experiment_variable("n_nodes", 1, True)
             self.add_experiment_variable(
                 "n_ranks",
                 f"max({stencil_size}, {{n_nodes}} * (({resources_per_node_expr}) // {stencil_size}) * {stencil_size})",
-                True
+                True,
             )
             self.add_experiment_variable("peers", 8, True)
             self.add_experiment_variable("message_size", 8, True)
