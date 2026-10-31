@@ -25,7 +25,7 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     license("Apache-2.0")
 
     version("develop", branch="main")
-    version("20261006", commit="fc4d32089c7c8c72e1dfa48101aaa5a29247effe")
+    version("ats-6", tag="ats-6")
     version("20240511", branch="20240511")
 
     variant("mpi", default=True, description="Enable MPI support")
@@ -45,7 +45,7 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
 
     with when("+umpire"):
         depends_on("umpire@2026.07.2:", when="@develop")
-        depends_on("umpire@2026.07.2", when="@20261006")
+        depends_on("umpire@2026.07.2", when="@ats-6")
 
     depends_on("hypre+mpi", when="+mpi")
     requires("+mpi", when="^hypre+mpi")
@@ -53,7 +53,7 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("adiak", when="+caliper")
     depends_on("hypre+caliper", when="+caliper")
     depends_on("hypre@:2.29.0", when="@20240511")
-    depends_on("hypre@3.2.0", when="@20261006")
+    depends_on("hypre@3.2.0", when="@ats-6")
     depends_on("hypre@3.2.0:", when="@develop")
     depends_on("hypre~fortran")
     depends_on("hypre+mixedint", when="+mixedint")

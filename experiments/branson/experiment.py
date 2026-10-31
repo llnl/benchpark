@@ -29,8 +29,8 @@ class Branson(
 
     variant(
         "version",
-        default="develop",
-        values=("develop",),
+        default="ats6",
+        values=("develop", "ats6"),
         description="app version",
     )
 
