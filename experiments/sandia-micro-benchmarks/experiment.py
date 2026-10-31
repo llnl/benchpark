@@ -42,6 +42,13 @@ class SandiaMicroBenchmarks(
     maintainers("nhanford")
 
     def compute_applications_section(self):
+        # Determine resources per node based on programming model
+        # For GPU-enabled runs, use GPUs per node; otherwise use cores
+        if self.spec.satisfies("+cuda") or self.spec.satisfies("+rocm"):
+            resources_per_node_expr = "{sys_gpus_per_node}"
+        else:
+            resources_per_node_expr = "{sys_cores_per_node}"
+
         # MPI overhead is a 2-rank point-to-point test
         if self.spec.satisfies("workload=mpi_overhead"):
             self.add_experiment_variable("n_ranks", 2, True)
@@ -49,55 +56,84 @@ class SandiaMicroBenchmarks(
             self.add_experiment_variable("peers", 1)
             self.add_experiment_variable("message_size", 8, True)
 
-        # msgrate_9pt: 9-point stencil (8 peers) - typically used for strong scaling
+        # msgrate_9pt: 9-point stencil (8 peers) - requires minimum 9 ranks
         elif self.spec.satisfies("workload=msgrate_9pt"):
+            stencil_size = 9
+
             if self.spec.satisfies("exec_mode=test"):
-                # CI test mode: single node, 8 cores
+                # CI test mode: use minimum configuration
+                # Fill nodes in multiples of stencil_size (9, 18, 27, etc.)
+                # If resources_per_node < stencil_size, use multiple nodes
+                # n_ranks = max(stencil_size, n_nodes * floor(resources_per_node / stencil_size) * stencil_size)
                 self.add_experiment_variable("n_nodes", 1)
                 self.add_experiment_variable(
-                    "n_ranks", "{n_nodes}*{sys_cores_per_node}", True
+                    "n_ranks",
+                    f"max({stencil_size}, {{n_nodes}} * (({resources_per_node_expr}) // {stencil_size}) * {stencil_size})",
+                    True
                 )
                 self.add_experiment_variable("peers", 8, True)
                 # Sweep a few message sizes in test mode
                 self.add_experiment_variable("message_size", [8, 256, 4096], True, True)
             else:
                 # Performance mode: scale as configured
+                # Fill nodes in multiples of stencil_size
+                # Calculate ranks per node: floor(resources_per_node / 9) * 9
+                # If resources_per_node < 9, spread across multiple nodes
                 self.add_experiment_variable("n_nodes", 1)
                 self.add_experiment_variable(
-                    "n_ranks", "{n_nodes}*{sys_cores_per_node}", True
+                    "n_ranks",
+                    f"max({stencil_size}, {{n_nodes}} * (({resources_per_node_expr}) // {stencil_size}) * {stencil_size})",
+                    True
                 )
                 # Peers fixed at 8 for 9-point stencil (not scaled)
                 self.add_experiment_variable("peers", 8, False)
                 # Start with small message size for exponential scaling
                 self.add_experiment_variable("message_size", 8, True)
 
-        # msgrate_27pt: 27-point stencil (26 peers) - typically used for weak scaling
+        # msgrate_27pt: 27-point stencil (26 peers) - requires minimum 27 ranks
         elif self.spec.satisfies("workload=msgrate_27pt"):
+            stencil_size = 27
+
             if self.spec.satisfies("exec_mode=test"):
-                # CI test mode: single node, 8 cores
+                # CI test mode: use minimum configuration
+                # Fill nodes in multiples of stencil_size (27, 54, 81, etc.)
+                # If resources_per_node < stencil_size, use multiple nodes
+                # n_ranks = max(stencil_size, n_nodes * floor(resources_per_node / stencil_size) * stencil_size)
                 self.add_experiment_variable("n_nodes", 1)
                 self.add_experiment_variable(
-                    "n_ranks", "{n_nodes}*{sys_cores_per_node}", True
+                    "n_ranks",
+                    f"max({stencil_size}, {{n_nodes}} * (({resources_per_node_expr}) // {stencil_size}) * {stencil_size})",
+                    True
                 )
                 self.add_experiment_variable("peers", 26, True)
                 # Sweep a few message sizes in test mode
                 self.add_experiment_variable("message_size", [8, 256, 4096], True, True)
             else:
                 # Performance mode: scale as configured
+                # Fill nodes in multiples of stencil_size
+                # Calculate ranks per node: floor(resources_per_node / 27) * 27
+                # If resources_per_node < 27, spread across multiple nodes
                 self.add_experiment_variable("n_nodes", 1)
                 self.add_experiment_variable(
-                    "n_ranks", "{n_nodes}*{sys_cores_per_node}", True
+                    "n_ranks",
+                    f"max({stencil_size}, {{n_nodes}} * (({resources_per_node_expr}) // {stencil_size}) * {stencil_size})",
+                    True
                 )
                 # Peers fixed at 26 for 27-point stencil (not scaled)
                 self.add_experiment_variable("peers", 26, False)
                 # Start with small message size for exponential scaling
                 self.add_experiment_variable("message_size", 8, True)
 
-        # RMA multi-threaded test
+        # RMA multi-threaded test (uses 9-point stencil pattern)
         elif self.spec.satisfies("workload=rma_mt"):
+            stencil_size = 9
+            # Fill nodes in multiples of stencil_size
+            # If resources_per_node < stencil_size, use multiple nodes
             self.add_experiment_variable("n_nodes", 1)
             self.add_experiment_variable(
-                "n_ranks", "{n_nodes}*{sys_cores_per_node}", True
+                "n_ranks",
+                f"max({stencil_size}, {{n_nodes}} * (({resources_per_node_expr}) // {stencil_size}) * {stencil_size})",
+                True
             )
             self.add_experiment_variable("peers", 8, True)
             self.add_experiment_variable("message_size", 8, True)
@@ -117,11 +153,17 @@ class SandiaMicroBenchmarks(
             # Maximum message size: 2MiB = 2 * 1024 * 1024 = 2097152 bytes
             max_message_size = 2097152
 
-            def scale_n_nodes_until_saturated(var, _itr, dim, sf):
-                """Scale n_nodes by sf (until system resources are saturated)"""
+            def scale_n_nodes_until_saturated(var, itr, dim, sf):
+                """Scale n_nodes by sf, always filling nodes with stencil multiples.
+
+                Scaling logic:
+                1. n_ranks is calculated as: n_nodes * floor(resources_per_node / stencil_size) * stencil_size
+                2. This ensures nodes are always filled in multiples of the stencil size
+                3. Nodes scale exponentially until system resources are saturated
+                """
                 return var.val(dim) * sf
 
-            def scale_message_size_exponentially(var, _itr, dim, sf):
+            def scale_message_size_exponentially(var, itr, dim, sf):
                 """Scale message_size exponentially until reaching 2MiB"""
                 current_size = var.val(dim)
                 new_size = current_size * sf
