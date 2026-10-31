@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Copyright 2023 Lawrence Livermore National Security, LLC and other
 # Benchpark Project Developers. See the top-level COPYRIGHT file for details.
 #
@@ -6,9 +7,15 @@
 import argparse
 import os
 import re
+import shutil
 import subprocess
 import sys
+import tarfile
+import tempfile
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from multiprocessing import cpu_count
+from pathlib import Path
 
 DEFAULT_SYSTEM = "llnl-cluster cluster=dane"
 # Skip experiments
@@ -48,6 +55,77 @@ def run_subprocess_cmd(cmd_list, decode=False):
         )
 
 
+def run_single_test(espec, sspec, args, temp_dir=None, original_dir=None):
+    """Run a single test and return the result."""
+    # Adjust IOR tests with mount_point
+    if "ior" in espec and "llnl-cluster" in sspec:
+        sspec += " mount_point=/p/lustre1"
+    elif "ior" in espec:
+        SKIP_EXPR.append(f"{espec} {sspec}")
+
+    expr = f"{espec} {sspec}"
+
+    # Check if test should be skipped
+    if expr in SKIP_EXPR or any([expr.split(" ")[0] == se for se in SKIP_EXPR]):
+        return {"expr": expr, "status": "skipped", "error": None}
+
+    print(f'Running "{expr}"')
+
+    if args.dryrun:
+        return {"expr": expr, "status": "passed", "error": None}
+
+    try:
+        # Run from original directory to preserve paths and configs
+        env = {**os.environ}
+        cwd = original_dir if original_dir else None
+
+        if temp_dir:
+            # Create a unique subdirectory for this test to avoid conflicts
+            import hashlib
+            test_hash = hashlib.md5(expr.encode()).hexdigest()[:8]
+            # Extract benchmark and system names for readable directory names
+            benchmark_name = espec.replace("+", "-").replace(" ", "_")
+            system_name = sspec.split()[0].replace("+", "-")
+            test_dir = os.path.join(temp_dir, f"{benchmark_name}-{system_name}-{test_hash}")
+            os.makedirs(test_dir, exist_ok=True)
+
+            # Create symlinks to necessary directories so relative paths work
+            for item in ["bin", ".github", "benchpark", "lib", "configs", "experiments", "systems"]:
+                src = os.path.join(cwd, item)
+                dst = os.path.join(test_dir, item)
+                if os.path.exists(src) and not os.path.exists(dst):
+                    os.symlink(src, dst)
+
+            # Also check for repo directory
+            repo_src = os.path.join(cwd, "repo")
+            repo_dst = os.path.join(test_dir, "repo")
+            if os.path.exists(repo_src) and not os.path.exists(repo_dst):
+                os.symlink(repo_src, repo_dst)
+
+            # Run from test directory so outputs go there
+            subprocess.run(
+                ["bash", ".github/utils/dryrun.sh", espec, sspec],
+                env=env,
+                cwd=test_dir,
+                capture_output=True,
+                check=True,
+            )
+            # Test passed - clean up the test directory immediately
+            if os.path.exists(test_dir):
+                shutil.rmtree(test_dir, ignore_errors=True)
+        else:
+            subprocess.run(
+                ["bash", ".github/utils/dryrun.sh", espec, sspec],
+                env=env,
+                cwd=cwd,
+                capture_output=True,
+                check=True,
+            )
+        return {"expr": expr, "status": "passed", "error": None}
+    except subprocess.CalledProcessError as e:
+        return {"expr": expr, "status": "failed", "error": e.stderr.decode()}
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -65,10 +143,52 @@ def main():
         help="Only run tests of this type",
     )
     parser.add_argument(
+        "--experiment",
+        type=str,
+        metavar="NAME",
+        help="Only run tests for a specific experiment (e.g., 'amg', 'lammps')",
+    )
+    parser.add_argument(
+        "--system",
+        type=str,
+        metavar="NAME",
+        help="Only run tests for a specific system (e.g., 'llnl-cluster', 'aws-pcluster')",
+    )
+    parser.add_argument(
         "--dryrun", action="store_true", help="Dry runs this script for testing."
+    )
+    parser.add_argument(
+        "-j", "--jobs",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Number of parallel jobs (default: auto-detect CPU count, use 1 for sequential)",
+    )
+    parser.add_argument(
+        "--tmpdir",
+        action="store_true",
+        help="Run tests in a temporary directory that is automatically cleaned up",
+    )
+    parser.add_argument(
+        "--archive",
+        nargs='?',
+        const=True,
+        type=str,
+        metavar="PATH",
+        help="Archive the test workspace to a compressed tar.gz file (implies --tmpdir). If no path given, uses temp directory name.",
     )
     args = parser.parse_args()
 
+    # Determine number of parallel jobs
+    if args.jobs is None:
+        # Auto-detect: use all available CPUs
+        args.jobs = cpu_count()
+        print(f"Auto-detected {args.jobs} CPUs for parallel execution")
+    elif args.jobs < 1:
+        print("Error: -j/--jobs must be at least 1")
+        sys.exit(1)
+
+    # Get experiment and system information first (from original directory)
     expr_str = run_subprocess_cmd(
         ["./bin/benchpark", "list", "experiments", "--no-title"], decode=True
     )
@@ -167,44 +287,132 @@ def main():
     if args.test:
         exprs_to_sys = [tup for tup in exprs_to_sys if tup[0] == args.test]
 
+    # Setup working directory (after collecting test information)
+    temp_dir = None
+    original_dir = os.getcwd()
+
+    if args.archive:
+        # Archive implies tmpdir
+        args.tmpdir = True
+        # Validate archive path if user provided one
+        if args.archive is not True:
+            archive_path = Path(args.archive).resolve()
+            if archive_path.exists():
+                print(f"Error: Archive file already exists: {archive_path}")
+                sys.exit(1)
+            archive_path.parent.mkdir(parents=True, exist_ok=True)
+
+    if args.tmpdir:
+        # Create temporary directory for workspace output
+        temp_dir = tempfile.mkdtemp(prefix="benchpark_dryruns_")
+        print(f"Test workspaces will be created in: {temp_dir}")
+        # Set environment variable to redirect workspace creation
+        os.environ["BENCHPARK_WORKSPACE_DIR"] = temp_dir
+
     total_tests = sum(
         len(expr_spec_list) * len(sys_spec_list)
         for _, expr_spec_list, sys_spec_list in exprs_to_sys
     )
     print(f"Total tests to run: {total_tests}")
+    print(f"Running with {args.jobs} parallel job(s)")
 
     start = time.time()
     errors = {}
     fail_tests = 0
     ran_tests = 0
     skip_tests = 0
+
+    # Build list of all test cases to run
+    test_cases = []
     for _, expr_spec_list, sys_spec_list in exprs_to_sys:
         for espec in expr_spec_list:
             for sspec in sys_spec_list:
-                if "ior" in espec and "llnl-cluster" in sspec:
-                    sspec += " mount_point=/p/lustre1"
-                elif "ior" in espec:
-                    SKIP_EXPR.append(f"{espec} {sspec}")
-                expr = f"{espec} {sspec}"
-                # If (1) entire spec in SKIP_EXPR or (2) just the experiment name is specified, e.g. skip all systems
-                if expr in SKIP_EXPR or any([expr.split(" ")[0] == se for se in SKIP_EXPR]):
-                    skip_tests += 1
-                    print(f'Skipping "{expr}"')
-                    continue
+                test_cases.append((espec, sspec))
+
+    # Filter by experiment name if specified
+    if args.experiment:
+        test_cases = [
+            (espec, sspec)
+            for espec, sspec in test_cases
+            if espec == args.experiment or espec.startswith(args.experiment + "+") or espec.startswith(args.experiment + " ")
+        ]
+        print(f"Filtered to experiment '{args.experiment}': {len(test_cases)} tests")
+
+    # Filter by system name if specified
+    if args.system:
+        test_cases = [
+            (espec, sspec)
+            for espec, sspec in test_cases
+            if sspec == args.system or sspec.startswith(args.system + " ")
+        ]
+        print(f"Filtered to system '{args.system}': {len(test_cases)} tests")
+
+    # Run tests in parallel
+    try:
+        if args.jobs == 1:
+            # Sequential execution
+            results = []
+            for espec, sspec in test_cases:
+                result = run_single_test(espec, sspec, args, temp_dir, original_dir)
+                results.append(result)
+        else:
+            # Parallel execution
+            results = []
+            with ThreadPoolExecutor(max_workers=args.jobs) as executor:
+                # Submit all tasks
+                future_to_test = {
+                    executor.submit(run_single_test, espec, sspec, args, temp_dir, original_dir): (espec, sspec)
+                    for espec, sspec in test_cases
+                }
+
+                # Process results as they complete
+                for future in as_completed(future_to_test):
+                    try:
+                        result = future.result()
+                        results.append(result)
+                    except Exception as e:
+                        espec, sspec = future_to_test[future]
+                        results.append({
+                            "expr": f"{espec} {sspec}",
+                            "status": "failed",
+                            "error": str(e)
+                        })
+
+        # Process results BEFORE cleanup
+        for result in results:
+            if result["status"] == "skipped":
+                skip_tests += 1
+                print(f'Skipped "{result["expr"]}"')
+            elif result["status"] == "passed":
                 ran_tests += 1
-                print(f'Running "{expr}"')
-                if args.dryrun:
-                    continue
+            elif result["status"] == "failed":
+                ran_tests += 1
+                fail_tests += 1
+                errors[result["expr"]] = result["error"]
+
+    finally:
+        # Handle cleanup and archiving
+        if args.tmpdir and temp_dir:
+            if args.archive:
+                # Determine archive path
+                if args.archive is True:
+                    # No path given, use temp directory name
+                    archive_path = f"{os.path.basename(temp_dir)}.tar.gz"
+                else:
+                    archive_path = args.archive
+
+                print(f"\nCreating archive: {archive_path}")
                 try:
-                    subprocess.run(
-                        ["bash", ".github/utils/dryrun.sh", espec, sspec],
-                        env={**os.environ},
-                        capture_output=True,
-                        check=True,
-                    )
-                except subprocess.CalledProcessError as e:
-                    errors[f"{espec} {sspec}"] = e.stderr.decode()
-                    fail_tests += 1
+                    with tarfile.open(archive_path, "w:gz") as tar:
+                        tar.add(temp_dir, arcname=os.path.basename(temp_dir))
+                    print(f"Archive created successfully: {archive_path}")
+                except Exception as e:
+                    print(f"Warning: Failed to create archive: {e}")
+
+            if os.path.exists(temp_dir):
+                print(f"Cleaning up temporary directory: {temp_dir}")
+                shutil.rmtree(temp_dir, ignore_errors=True)
+
     end = time.time()
 
     for i, (key, value) in enumerate(errors.items()):
