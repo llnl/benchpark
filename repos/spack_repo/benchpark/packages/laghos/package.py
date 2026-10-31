@@ -122,7 +122,10 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
             targets.append("LAGHOS_USE_CALIPER=ON")
             targets.append("CALIPER_DIR=%s" % spec["caliper"].prefix)
             targets.append("ADIAK_DIR=%s" % spec["adiak"].prefix)
-        if spec.satisfies("@:2.0"):
+        # Only the legacy releases need CXX overridden.  A range also matches
+        # nonnumeric versions such as ats-6, which must use MFEM's HIP-aware
+        # compiler command for ROCm builds.
+        if spec.satisfies("@1.0,1.1,2.0"):
             targets.append("CXX=%s" % spec["mpi"].mpicxx)
         if self.spec.satisfies("+ofast %gcc"):
             targets.append("CXXFLAGS = -Ofast -finline-functions")
