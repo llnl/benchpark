@@ -43,7 +43,7 @@ class Branson(
 
     variant(
         "decomposition",
-        default="PARTICLE_PASS",
+        default="REPLICATED",
         values=("PARTICLE_PASS", "REPLICATED"),
         description="Domain decomposition type",
     )
