@@ -3,12 +3,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import variant
+from benchpark.directives import DirectiveMeta, variant
 from benchpark.error import BenchparkError
 from benchpark.experiment_helper import ExperimentHelper
 
 
-class CompilerMemtrace:
+class CompilerMemtrace(metaclass=DirectiveMeta):
     variant(
         "compiler_memtrace",
         default="none",
