@@ -14,16 +14,30 @@ from benchpark.paths import paths
 
 SHARED_SLURM_TESTS = paths.benchpark_root / ".gitlab/tests/shared_slurm_clusters.yml"
 
-# Tests that pass under Slurm (nightly.yml) but fail in shared_slurm_clusters.yml,
-# where they run inside a Flux instance started in a Slurm job. Each entry is
-# (HOST, BENCHMARK, regex searched in VARIANT or None for any VARIANT, reason).
+# Tests known to fail in shared_slurm_clusters.yml, where they run inside a Flux
+# instance started in a Slurm job. Each entry is (HOST, BENCHMARK, VARIANT specs,
+# reason). A spec such as "+cuda" also matches a longer VARIANT like
+# "+cuda~gpu-aware-mpi", and None matches a test with no VARIANT.
 EXCLUDED_FROM_SHARED_SLURM_TESTS = [
     (
         "matrix",
         "branson",
-        r"\+cuda($|[\s+~])",
+        ["+cuda"],
         "it fails under Flux (CUDA error synchronizing after the source kernel) "
         "but passes under Slurm, so it is tested in nightly.yml instead",
+    ),
+    (
+        "dane",
+        "phloem",
+        [None],
+        "it fails during MPI_Finalize under Flux, so it is tested under Slurm "
+        "in nightly.yml instead",
+    ),
+    (
+        "matrix",
+        "phloem",
+        [None, "+cuda"],
+        "it fails during MPI_Finalize under Flux",
     ),
 ]
 
@@ -56,15 +70,22 @@ def matrix_combinations(path):
                         yield job, host, benchmark, variant or ""
 
 
+def variant_matches(variant, spec):
+    """Match an empty VARIANT (spec None) or one that contains spec, e.g. +cuda."""
+    if spec is None:
+        return not variant
+    return re.search(re.escape(spec) + r"($|[\s+~])", variant) is not None
+
+
 @pytest.mark.parametrize(
-    "host,benchmark,variant_regex,reason",
+    "host,benchmark,variants,reason",
     EXCLUDED_FROM_SHARED_SLURM_TESTS,
     ids=[
         f"{host}-{benchmark}"
         for host, benchmark, *_ in EXCLUDED_FROM_SHARED_SLURM_TESTS
     ],
 )
-def test_shared_slurm_tests_exclusions(host, benchmark, variant_regex, reason):
+def test_shared_slurm_tests_exclusions(host, benchmark, variants, reason):
     combinations = list(matrix_combinations(SHARED_SLURM_TESTS))
 
     # Make sure the check still sees this host, so it can't pass vacuously
@@ -73,11 +94,11 @@ def test_shared_slurm_tests_exclusions(host, benchmark, variant_regex, reason):
     )
 
     found = [
-        f"{job}: [{h}, {b}, {v}]"
+        f"{job}: [{', '.join(filter(None, (h, b, v)))}]"
         for job, h, b, v in combinations
         if h == host
         and b == benchmark
-        and (variant_regex is None or re.search(variant_regex, v))
+        and any(variant_matches(v, spec) for spec in variants)
     ]
     assert not found, (
         f"Remove {benchmark} on {host} from {SHARED_SLURM_TESTS.name}: {reason}. "
