@@ -127,6 +127,7 @@ run_tests_slurm_dane:
           - laghos
           - lammps
           - osu-micro-benchmarks
+          - phloem
           - raja-perf
           - remhos
           - sandia-micro-benchmarks
@@ -170,6 +171,7 @@ run_tests_slurm_matrix:
           - kripke
           - laghos
           - osu-micro-benchmarks
+          - phloem
           - raja-perf
           - remhos
           - saxpy
