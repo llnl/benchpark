@@ -34,7 +34,9 @@ def root_info(name):
     if spec.satisfies("build_system=cmake"):
         root = str(spack.builder.create(spec.package).root_cmakelists_dir)
         data["cmake_root"] = (
-            os.path.relpath(root, spec.package.stage.source_path) if os.path.isabs(root) else root
+            os.path.relpath(root, spec.package.stage.source_path)
+            if os.path.isabs(root)
+            else root
         )
     if spec.name == "memtrace-llvm":
         data["python"] = spec["python"].command.path

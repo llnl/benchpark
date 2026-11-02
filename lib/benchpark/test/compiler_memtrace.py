@@ -74,11 +74,11 @@ from spack.spec import ArchSpec, Spec
 from spack.variant import SingleValuedVariant
 
 environment = Environment({str(env_path)!r})
-compiler = Spec('builtin.llvm-amdgpu@=7.2.1', external_path={str(tmp_path / 'compiler')!r})
-hip = Spec('builtin.hip@=7.2.1', external_path={str(tmp_path / 'hip')!r})
+compiler = Spec('builtin.llvm-amdgpu@=7.2.1', external_path={str(tmp_path / "compiler")!r})
+hip = Spec('builtin.hip@=7.2.1', external_path={str(tmp_path / "hip")!r})
 python = Spec('builtin.python@=' + '.'.join(map(str, sys.version_info[:3])),
               external_path=sys.prefix)
-numpy = Spec('benchpark.py-numpy@=2.0', external_path={str(tmp_path / 'numpy')!r})
+numpy = Spec('benchpark.py-numpy@=2.0', external_path={str(tmp_path / "numpy")!r})
 for name, spec in (
     ('raja-perf', 'raja-perf@=develop +rocm amdgpu_target=gfx942 build_system=cmake cxxflags="-O3"'),
     ('memtrace-llvm', 'benchpark.memtrace-llvm@=0.1.0 +runtime +python build_system=cmake'),
@@ -967,7 +967,11 @@ def test_reader_import_failure_prevents_benchmark(runner, modifier, tmp_path, ca
     (reader / "memtrace.py").write_text(
         'raise ImportError("test: unresolved BLAS symbol")\n'
     )
-    plugin = {"python": sys.executable, "reader_paths": [str(reader)], "reader_preload": []}
+    plugin = {
+        "python": sys.executable,
+        "reader_paths": [str(reader)],
+        "reader_preload": [],
+    }
     with pytest.raises(SystemExit):
         modifier._check_reader(plugin)
     assert "unresolved BLAS symbol" in capsys.readouterr().err

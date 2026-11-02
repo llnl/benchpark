@@ -166,7 +166,9 @@ class CompilerMemtrace(BasicModifier):
 
     def _use_builtin_numpy(self, env_path):
         helper = Path(self._file_path).resolve().with_name("spack_env.py")
-        output = self._run_spack(["-e", env_path, "python", helper, "use-builtin-numpy"])
+        output = self._run_spack(
+            ["-e", env_path, "python", helper, "use-builtin-numpy"]
+        )
         if output:
             logger.msg(output)
 
