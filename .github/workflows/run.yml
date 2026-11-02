@@ -44,6 +44,7 @@ jobs:
             --executor '{execute_experiment}' \
             --where '{n_nodes} == 1'
       - name: Analyze Saxpy Results
+        id: analyze
         working-directory: ./workspace/generic-x86/saxpy/openmp/workspace/
         run: |
           ramble \
@@ -64,23 +65,8 @@ jobs:
         with:
           name: workspace-archive
           path: ./workspace/generic-x86/saxpy/openmp/workspace/archive/**
-      - name: Upload Binaries to CI Cache
-        if: github.ref == 'refs/heads/develop'
-        env:
-          SPACK_OCI_USER: ${{ github.actor }}
-          SPACK_OCI_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          spack mirror set --push \
-            --oci-username-variable SPACK_OCI_USER \
-            --oci-password-variable SPACK_OCI_TOKEN \
-            ci-buildcache
-          spack buildcache push \
-            -j $(($(nproc) + 1)) \
-            --base-image ubuntu:24.04 \
-            --unsigned \
-            --update-index ci-buildcache \
-            $(spack find --format '/{hash}')
       - name: Test Execution Using Binary
+        id: binary_test
         run: |
           OUTPUT=$(spack find --paths saxpy)
           SAXPY_PATH=$(echo "$OUTPUT" | grep 'saxpy@' | awk '{print $2}')/bin/saxpy
@@ -98,7 +84,7 @@ jobs:
             --executor '{execute_experiment}' \
             --where '{n_nodes} == 1'
       - name: Upload binary coverage to Codecov
-        if: ${{ !contains(github.head_ref, 'dependabot/') && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork) }}
+        if: ${{ !cancelled() && steps.binary_test.outcome != 'skipped' && !contains(github.head_ref, 'dependabot/') && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork) }}
         uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
@@ -111,6 +97,7 @@ jobs:
           echo "Cleaning up binary coverage artifacts"
           rm -rf ./coverage-data-binary
       - name: Test aggregate Command
+        id: aggregate_test
         run: |
           ./bin/benchpark system init --dest=dane llnl-cluster cluster=dane
           ./bin/benchpark experiment init --dest=saxpy-agg dane saxpy n_repeats=5
@@ -118,7 +105,7 @@ jobs:
           ./workspace2/ramble/bin/ramble --workspace-dir /home/runner/work/benchpark/benchpark/workspace2/dane/saxpy-agg/workspace workspace setup --dry-run
           BENCHPARK_RUN_COVERAGE=aggregate ./bin/benchpark aggregate --dest agg workspace2  # Aggregate multi-trial workspace
       - name: Upload aggregate coverage to Codecov
-        if: ${{ !contains(github.head_ref, 'dependabot/') && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork) }}
+        if: ${{ !cancelled() && steps.aggregate_test.outcome != 'skipped' && !contains(github.head_ref, 'dependabot/') && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork) }}
         uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
@@ -130,6 +117,24 @@ jobs:
         run: |
           echo "Cleaning up aggregate coverage artifacts"
           rm -rf ./coverage-data-aggregate
+      # Runs last so a failed cache push can't skip the coverage steps above;
+      # it only depends on the build/run/analyze steps it used to follow.
+      - name: Upload Binaries to CI Cache
+        if: ${{ !cancelled() && github.ref == 'refs/heads/develop' && steps.analyze.outcome == 'success' }}
+        env:
+          SPACK_OCI_USER: ${{ github.actor }}
+          SPACK_OCI_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          spack mirror set --push \
+            --oci-username-variable SPACK_OCI_USER \
+            --oci-password-variable SPACK_OCI_TOKEN \
+            ci-buildcache
+          spack buildcache push \
+            -j $(($(nproc) + 1)) \
+            --base-image ubuntu:24.04 \
+            --unsigned \
+            --update-index ci-buildcache \
+            $(spack find --format '/{hash}')
   dryrunexperiments:
     runs-on: ubuntu-24.04
     strategy:
@@ -152,11 +157,12 @@ jobs:
         run: |
           pip install -r ./requirements.txt
       - name: Run Dryruns
+        id: dryruns
         run: |
           ./bin/benchpark bootstrap
           BENCHPARK_RUN_COVERAGE=${{ matrix.testtype }} ./bin/benchpark-python .github/utils/dryruns.py --test ${{ matrix.testtype }}
       - name: Upload coverage to Codecov
-        if: ${{ !contains(github.head_ref, 'dependabot/') && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork) }}
+        if: ${{ !cancelled() && steps.dryruns.outcome != 'skipped' && !contains(github.head_ref, 'dependabot/') && (github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork) }}
         uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.BENCHPARK_CODECOV_TOKEN }}
