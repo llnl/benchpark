@@ -43,7 +43,7 @@ class Hpl(
             self.add_experiment_variable("N-NBs", 1, False)
             self.add_experiment_variable("NBs", 128, False)
         elif self.spec.satisfies("exec_mode=tutorial-failure"):
-            self.add_experiment_variable("n_ranks", 16, True)
+            self.add_experiment_variable("n_ranks", 1000, True)  # This is an error, more ranks requested than available.
             self.add_experiment_variable("Ns", 1000, True)
             self.add_experiment_variable("N-Grids", 1, False)
             self.add_experiment_variable("Ps", "{n_ranks}", True)
