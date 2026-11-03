@@ -29,8 +29,8 @@ class Branson(
 
     variant(
         "version",
-        default="ats6",
-        values=("develop", "ats6"),
+        default="develop",
+        values=("develop",),
         description="app version",
     )
 
@@ -43,7 +43,7 @@ class Branson(
 
     variant(
         "decomposition",
-        default="REPLICATED",
+        default="PARTICLE_PASS",
         values=("PARTICLE_PASS", "REPLICATED"),
         description="Domain decomposition type",
     )
