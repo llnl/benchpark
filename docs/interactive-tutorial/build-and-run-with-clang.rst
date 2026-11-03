@@ -4,9 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-#########################
+##########################
  Build and Run with Clang
-#########################
+##########################
 
 **Glossary terms:** :ref:`Benchmark <beginner-tutorial-glossary-benchmark>`,
 :ref:`Experiment <beginner-tutorial-glossary-experiment>`, :ref:`System
@@ -73,6 +73,24 @@ Then, run the experiments:
 The generated workspace is separate from the default GCC run because the system
 instance is named ``hpc-tutorial-clang``. That keeps the Clang build, run scripts, and
 results side by side with the original ``hpc-tutorial`` workspace.
+
+************************
+ Analyze Strong Scaling
+************************
+
+The default stacked area chart shows the exclusive average time per rank for each
+instrumented region. The x-axis records the node and MPI-rank counts varied in the
+strong-scaling study.
+
+.. code-block:: console
+
+    ~/benchpark]$ benchpark analyze --workspace-dir wkp/hpl-tutorial-clang/hpl/workspace
+
+.. figure:: /_static/images/hpl_mpi_strong_raw_exc_clang.png
+    :width: 800
+    :align: center
+
+    Strong-scaling area chart.
 
 ***********************
  Choose Your Next Step
