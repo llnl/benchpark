@@ -137,8 +137,8 @@ generated experiment instance failed.
  Inspect the Experiment Log
 ****************************
 
-In the ``experiments/hpl/experiment.py`` file, you should see that it is asking for 1000
-ranks, which exceeds the number of available resources on our AWS system.
+In the ``experiments/hpl/experiment.py`` file, you should see that we are missing
+definitions for n_ranks, which is required by the experiment spec.
 
 **Any other text about ramble logs**
 
@@ -146,8 +146,8 @@ ranks, which exceeds the number of available resources on our AWS system.
  Restore State
 **************
 
-Fix this by setting ``n_ranks`` to 1. The commands above can be re-run and the ``ramble
-on`` commands should succeed.
+Fix this by uncommenting ``self.add_experiment_variable("n_ranks", 1, True)``. The
+commands above can be re-run and the ``ramble on`` commands should succeed.
 
 
 ***********************
