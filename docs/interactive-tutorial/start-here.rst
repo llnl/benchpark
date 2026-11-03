@@ -147,25 +147,25 @@ A Benchpark spec describes a Benchpark object. A system spec selects a definitio
 
 The Benchpark system spec defines the hardware resources and software stack, including
 information that is useful for running benchmarks. This may include the following:
-- Resources (CPU cores, GPUs)
-- Scheduler (Slurm, flux)
-- Process mapping (cores, sockets, GPUs, NICs)
-- On-node parallelism (CUDA, ROCM, OpenMP)
-- Software stack
-- Compilers (which is best?)
-- MPI implementations (best?)
-- Math libraries
+* Resources (CPU cores, GPUs)
+* Scheduler (Slurm, flux)
+* Process mapping (cores, sockets, GPUs, NICs)
+* On-node parallelism (CUDA, ROCM, OpenMP)
+* Software stack
+* Compilers (which is best?)
+* MPI implementations (best?)
+* Math libraries
 
 The Benchpark experiment spec defines any information for reproducible sets of
 experiments that we can map onto specific systems, such as:
-- On-node parallelism (CUDA, ROCM, OpenMP)
-- Problem sizes
-    - Overall problem size, or
-    - Per node or per GPU
-- Scaling studies
-    - How to scale
-    - How to decompose
-- Resources (cores, GPUs)
+* On-node parallelism (CUDA, ROCM, OpenMP)
+* Problem sizes
+  * Overall problem size, or
+  * Per node or per GPU
+* Scaling studies
+  * How to scale
+  * How to decompose
+* Resources (cores, GPUs)
 
 Benchpark's parser is derived from Spack's spec parser and implements the object name
 and `variant portions of its syntax
