@@ -26,24 +26,24 @@ class SandiaMicroBenchmarks(ExecutableApplication):
     executable('mpi_overhead_exe', 'mpi_overhead', use_mpi=True)
 
     # msgrate for 9-point stencil (8 peers)
-    # Use -o for machine-readable output, -n for ppn
+    # Use -n for ppn (no -o flag for human-readable output)
     executable(
         'msgrate_9pt_exe',
-        'msgrate -n {ppn} -p {peers} -s {message_size} -c {cache_size} -o',
+        'msgrate -n {ppn} -p {peers} -s {message_size} -c {cache_size}',
         use_mpi=True
     )
 
     # msgrate for 27-point stencil (26 peers)
     executable(
         'msgrate_27pt_exe',
-        'msgrate -n {ppn} -p {peers} -s {message_size} -c {cache_size} -o',
+        'msgrate -n {ppn} -p {peers} -s {message_size} -c {cache_size}',
         use_mpi=True
     )
 
     # RMA multi-threaded test
     executable(
         'rma_mt_exe',
-        'msgrate -n {ppn} -p {peers} -s {message_size} -c {cache_size} -o',
+        'msgrate -n {ppn} -p {peers} -s {message_size} -c {cache_size}',
         use_mpi=True
     )
 
@@ -52,6 +52,63 @@ class SandiaMicroBenchmarks(ExecutableApplication):
     workload('msgrate_9pt', executables=['msgrate_9pt_exe'])
     workload('msgrate_27pt', executables=['msgrate_27pt_exe'])
     workload('rma_mt', executables=['rma_mt_exe'])
+
+    # Register validators for minimum rank requirements
+    # mpi_overhead requires exactly 2 ranks
+    with when('workload=mpi_overhead'):
+        register_validator(
+            name='two-rank-workload',
+            predicate='{n_ranks} == 2',
+            message='mpi_overhead workload requires exactly 2 ranks.',
+            fail_on_invalid=True,
+        )
+
+    # msgrate_9pt requires minimum 9 ranks (8 peers + self)
+    # Ranks must be in multiples of 9 for proper stencil alignment
+    with when('workload=msgrate_9pt'):
+        register_validator(
+            name='nine-rank-minimum',
+            predicate='{n_ranks} >= 9',
+            message='msgrate_9pt workload requires at least 9 ranks (8 peers + 1).',
+            fail_on_invalid=True,
+        )
+        register_validator(
+            name='stencil-multiple',
+            predicate='{n_ranks} % 9 == 0',
+            message='msgrate_9pt workload requires n_ranks to be a multiple of 9 for proper stencil alignment.',
+            fail_on_invalid=True,
+        )
+
+    # msgrate_27pt requires minimum 27 ranks (26 peers + self)
+    # Ranks must be in multiples of 27 for proper stencil alignment
+    with when('workload=msgrate_27pt'):
+        register_validator(
+            name='twentyseven-rank-minimum',
+            predicate='{n_ranks} >= 27',
+            message='msgrate_27pt workload requires at least 27 ranks (26 peers + 1).',
+            fail_on_invalid=True,
+        )
+        register_validator(
+            name='stencil-multiple',
+            predicate='{n_ranks} % 27 == 0',
+            message='msgrate_27pt workload requires n_ranks to be a multiple of 27 for proper stencil alignment.',
+            fail_on_invalid=True,
+        )
+
+    # rma_mt uses 9-point stencil pattern (8 peers)
+    with when('workload=rma_mt'):
+        register_validator(
+            name='nine-rank-minimum',
+            predicate='{n_ranks} >= 9',
+            message='rma_mt workload requires at least 9 ranks (8 peers + 1).',
+            fail_on_invalid=True,
+        )
+        register_validator(
+            name='stencil-multiple',
+            predicate='{n_ranks} % 9 == 0',
+            message='rma_mt workload requires n_ranks to be a multiple of 9 for proper stencil alignment.',
+            fail_on_invalid=True,
+        )
 
     # Workload variables
     workload_variable(
@@ -93,14 +150,17 @@ class SandiaMicroBenchmarks(ExecutableApplication):
     )
 
     # Figures of merit for msgrate workloads
-    # With -o flag, output format is machine-readable CSV-like
-    # Format: jobsize,npeers,niters,nmsgs,nbytes,cachesz,ppn,single_dir,pair_based,pre_post,all_start
+    # Without -o flag, output format is human-readable with labels:
+    # single direction: <value>
+    # pair-based: <value>
+    # pre-post: <value>
+    # all-start: <value>
 
     figure_of_merit(
         'msgrate_single_direction',
         log_file='{experiment_run_dir}/{experiment_name}.out',
-        fom_regex=r'single direction:\s+(?P<fom>[0-9]+\.?[0-9]*)',
-        group_name='fom',
+        fom_regex=r'single direction:\s+(?P<single_dir>[0-9]+\.?[0-9]*)',
+        group_name='single_dir',
         units='msgs/sec',
         workloads=['msgrate_9pt', 'msgrate_27pt', 'rma_mt']
     )
@@ -108,8 +168,8 @@ class SandiaMicroBenchmarks(ExecutableApplication):
     figure_of_merit(
         'msgrate_pair_based',
         log_file='{experiment_run_dir}/{experiment_name}.out',
-        fom_regex=r'pair-based:\s+(?P<fom>[0-9]+\.?[0-9]*)',
-        group_name='fom',
+        fom_regex=r'pair-based:\s+(?P<pair_based>[0-9]+\.?[0-9]*)',
+        group_name='pair_based',
         units='msgs/sec',
         workloads=['msgrate_9pt', 'msgrate_27pt', 'rma_mt']
     )
@@ -117,8 +177,8 @@ class SandiaMicroBenchmarks(ExecutableApplication):
     figure_of_merit(
         'msgrate_pre_post',
         log_file='{experiment_run_dir}/{experiment_name}.out',
-        fom_regex=r'pre-post:\s+(?P<fom>[0-9]+\.?[0-9]*)',
-        group_name='fom',
+        fom_regex=r'pre-post:\s+(?P<pre_post>[0-9]+\.?[0-9]*)',
+        group_name='pre_post',
         units='msgs/sec',
         workloads=['msgrate_9pt', 'msgrate_27pt', 'rma_mt']
     )
@@ -126,8 +186,8 @@ class SandiaMicroBenchmarks(ExecutableApplication):
     figure_of_merit(
         'msgrate_all_start',
         log_file='{experiment_run_dir}/{experiment_name}.out',
-        fom_regex=r'all-start:\s+(?P<fom>[0-9]+\.?[0-9]*)',
-        group_name='fom',
+        fom_regex=r'all-start:\s+(?P<all_start>[0-9]+\.?[0-9]*)',
+        group_name='all_start',
         units='msgs/sec',
         workloads=['msgrate_9pt', 'msgrate_27pt', 'rma_mt']
     )
