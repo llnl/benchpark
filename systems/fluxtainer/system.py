@@ -5,13 +5,7 @@
 
 from benchpark.directives import maintainers, variant
 from benchpark.openmpsystem import OpenMPCPUOnlySystem
-from benchpark.system import (
-    System,
-    compiler_def,
-    compiler_section_for,
-    hybrid_compiler_requirements,
-    merge_dicts,
-)
+from benchpark.system import System, compiler_def, compiler_section_for
 
 
 class Fluxtainer(System):
@@ -53,7 +47,19 @@ class Fluxtainer(System):
             setattr(self, k, v)
 
     def compute_compilers_section(self):
-        gcc_cfg = compiler_section_for(
+        if self.spec.satisfies("compiler=clang"):
+            return compiler_section_for(
+                "llvm",
+                [
+                    compiler_def(
+                        "llvm@20.1.8 +clang +flang",
+                        "/opt/llvm",
+                        {"c": "clang", "cxx": "clang++", "fortran": "flang"},
+                    )
+                ],
+            )
+
+        return compiler_section_for(
             "gcc",
             [
                 compiler_def(
@@ -63,22 +69,6 @@ class Fluxtainer(System):
                 )
             ],
         )
-
-        if self.spec.satisfies("compiler=clang"):
-            llvm_cfg = compiler_section_for(
-                "llvm",
-                [
-                    compiler_def(
-                        "llvm@20.1.8", "/usr/", {"c": "clang", "cxx": "clang++"}
-                    )
-                ],
-            )
-            # clang for C/C++, gfortran for Fortran (HPL needs one)
-            return merge_dicts(
-                llvm_cfg, gcc_cfg, hybrid_compiler_requirements("llvm", "gcc")
-            )
-
-        return gcc_cfg
 
     def compute_packages_section(self):
         return {

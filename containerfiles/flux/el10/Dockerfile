@@ -28,6 +28,24 @@ RUN dnf clean all \
     && dnf clean all \
     && rm -rf /var/cache/dnf
 
+# EL10 does not package Flang; use matching LLVM C, C++, and Fortran compilers.
+RUN case "${TARGETARCH:-$(uname -m)}" in \
+        arm64|aarch64) llvm_arch=ARM64; llvm_sha256=b855cc17d935fdd83da82206b7a7cfc680095efd1e9e8182c4a05e761958bef8 ;; \
+        amd64|x86_64) llvm_arch=X64; llvm_sha256=1ead36b3dfcb774b57be530df42bec70ab2d239fbce9889447c7a29a4ddc1ae6 ;; \
+        *) echo "Unsupported LLVM architecture: ${TARGETARCH:-$(uname -m)}" >&2; exit 1 ;; \
+    esac \
+    && curl -fL --retry 3 \
+        "https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.8/LLVM-20.1.8-Linux-${llvm_arch}.tar.xz" \
+        -o /tmp/llvm.tar.xz \
+    && echo "${llvm_sha256}  /tmp/llvm.tar.xz" | sha256sum -c - \
+    && mkdir -p /opt/llvm \
+    && tar -xJf /tmp/llvm.tar.xz -C /opt/llvm --strip-components=1 \
+    && rm /tmp/llvm.tar.xz \
+    && /opt/llvm/bin/clang --version \
+    && /opt/llvm/bin/flang --version
+
+ENV PATH=/opt/llvm/bin:${PATH}
+
 USER fluxuser
 
 ENV MPIBIND_INSTALL_PREFIX=/home/fluxuser/mpibind-install \
