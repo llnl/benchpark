@@ -12,49 +12,22 @@
  Start Here
 ############
 
-.. tutorialcontainer:: tutorial-project-links
+Benchpark is an open-source infrastructure-as-code Python project which aims to
+enable reproducibility in HPC benchmarking. It accomplishes this by defining
+each component of HPC benchmarking, and constraining it separately.
+Benchpark builds on the specification provided by Spack, an HPC package
+manager, and Ramble, an HPC testing framework.
 
-    .. tutorialcontainer:: tutorial-project-link
+This tutorial is organized around **what you want to do**, not around how
+Benchpark is implemented. Pick the situation below that sounds like yours.
 
-        .. rubric:: Benchpark Source
+.. seealso::
 
-        .. image:: /_static/images/benchpark-icon.svg
-            :alt: Benchpark on GitHub
-            :target: https://github.com/llnl/benchpark
-
-    .. tutorialcontainer:: tutorial-project-link
-
-        .. rubric:: Benchpark Tutorial Slides
-
-        .. image:: /tutorial/PACT26-Tutorial-Slide-Preview.jpg
-            :alt: Benchpark Tutorial Slides
-            :target: ../_static/slides/PACT26-Tutorial-Slides.pdf
-
-    .. tutorialcontainer:: tutorial-project-link
-
-        .. rubric:: Benchpark on CDash
-
-        .. image:: /_static/images/cdash.svg
-            :alt: Benchpark CDash
-            :target: https://my.cdash.org/index.php?project=Benchpark
-
-    .. tutorialcontainer:: tutorial-project-link
-
-        .. rubric:: Spack
-
-        .. image:: https://spack.readthedocs.io/en/latest/_static/spack-logo-text.svg
-            :alt: Spack
-            :target: https://spack.readthedocs.io/en/latest/
-
-    .. tutorialcontainer:: tutorial-project-link
-
-        .. rubric:: Ramble
-
-        .. image:: https://avatars.githubusercontent.com/u/318055132?s=240&v=4
-            :alt: Ramble
-            :target: https://ramble.readthedocs.io/en/latest/
-
-|
+   `Latest Benchpark Tutorial Slides <../_static/slides/PACT26-Tutorial-Slides.pdf>`_ |
+   `Benchpark Code on GitHub <https://github.com/llnl/benchpark>`_ |
+   `Benchpark Dashboard <https://my.cdash.org/index.php?project=Benchpark>`_ |
+   `Ramble <https://ramble.readthedocs.io/en/latest/>`_ |
+   `Spack <https://spack.readthedocs.io/en/latest/>`_
 
 ********************
  Benchpark Glossary
