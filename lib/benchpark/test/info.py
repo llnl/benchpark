@@ -25,6 +25,20 @@ def _args(subcommand, **kwargs):
     return argparse.Namespace(info_subcommand=subcommand, **defaults)
 
 
+def test_info_system_query_lists_matching_clusters(capsys):
+    info.command(_args("system", query="cpu_arch=sapphirerapids"))
+
+    out = capsys.readouterr().out
+    assert "cpu_arch=sapphirerapids" in out
+    assert "llnl-cluster: dane" in out
+
+
+def test_info_system_query_without_match(capsys):
+    info.command(_args("system", query="cpu_arch=not-a-real-arch"))
+
+    assert "No matching systems found." in capsys.readouterr().out
+
+
 @pytest.mark.parametrize(
     "flag, expected, absent",
     [

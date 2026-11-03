@@ -217,3 +217,31 @@ def test_dry_run_command_prints_instead_of_running(capsys):
     assert "spack install" in out
     assert "('extra',)" in out
     assert "{'key': 'value'}" in out
+
+
+def test_mirror_create_dry_run_only_prints_commands(
+    benchpark_workspace, recorded_commands, tmp_path, capsys
+):
+    _, ramble_workspace = benchpark_workspace
+    dest = tmp_path / "mirror"
+
+    mirror.command(_args(ramble_workspace, dest, dry_run=True))
+
+    out = capsys.readouterr().out
+    assert "pip download -r" in out
+    assert "spack bootstrap mirror" in out
+    assert "workspace mirror -d file://" in out
+    # None of the external commands actually ran
+    assert recorded_commands == []
+    assert not (dest / "pip-cache").exists()
+    assert (dest / "git-commit-info.json").read_text() == ""
+
+
+def test_mirror_create_requires_set_up_ramble_workspace(
+    benchpark_workspace, recorded_commands, tmp_path
+):
+    _, ramble_workspace = benchpark_workspace
+    (ramble_workspace / "software" / "saxpy" / "spack.yaml").unlink()
+
+    with pytest.raises(RuntimeError, match="ramble workspace setup"):
+        mirror.command(_args(ramble_workspace, tmp_path / "mirror"))

@@ -222,7 +222,7 @@ def analyze_archive(analyze_dir, cali_files, output=None):
     with tarfile.open(output, "w:gz") as tar:
         tar.add(
             analyze_dir,
-            arcname=os.path.basename(analyze_dir),
+            arcname=os.path.basename(os.path.normpath(analyze_dir)),
             filter=lambda ti: None if ti.name.endswith(".tar.gz") else ti,
         )
         for f in cali_files:

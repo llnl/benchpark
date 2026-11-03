@@ -5,6 +5,7 @@
 
 import argparse
 import re
+import tarfile
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -205,6 +206,29 @@ def test_analyze_clean(tmp_path):
 
     _analyze(workspace, "clean")
     assert {p.name for p in out.iterdir()} == {".ramble-workspace"}
+
+
+def test_analyze_archive(tmp_path, capsys):
+    workspace = _workspace(tmp_path, "strong")
+    archive = tmp_path / "results.tar.gz"
+
+    _analyze(workspace, "archive", "--archive-output", str(archive))
+
+    assert capsys.readouterr().out.strip() == str(archive)
+    with tarfile.open(archive) as tar:
+        names = tar.getnames()
+    assert "analyze" in names
+    assert sorted(n for n in names if n.endswith(".cali")) == sorted(
+        p.name for p in workspace.rglob("*.cali")
+    )
+
+    # Without --archive-output the archive lands in the analyze dir and
+    # does not include itself
+    _analyze(workspace, "archive")
+    default = capsys.readouterr().out.strip()
+    assert Path(default).parent == workspace / "analyze"
+    with tarfile.open(default) as tar:
+        assert not any(n.endswith(".tar.gz") for n in tar.getnames())
 
 
 def test_get_scaling_type():
