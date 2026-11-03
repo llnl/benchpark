@@ -48,7 +48,7 @@
           - '**/osu[-_]micro[-_]benchmarks/**/*'
           - '**/raja[-_]perf/**/*'
           - '**/remhos/**/*'
-          - '**/smb/**/*'
+          - '**/sandia[-_]micro[-_]benchmarks/**/*'
           - '**/sparta[-_]snl/**/*'
           - systems/llnl-cluster/**/*
           - modifiers/**/*
