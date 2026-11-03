@@ -44,7 +44,7 @@ Initialize the HPL experiment against the Clang system instance:
 
 .. code-block:: console
 
-    ~/benchpark]$ benchpark experiment init --dest=hpl hpc-tutorial-clang hpl +strong caliper=time,mpi
+    ~/benchpark]$ benchpark experiment init hpc-tutorial-clang hpl +strong caliper=time,mpi
 
 Create the experiment workspace:
 
