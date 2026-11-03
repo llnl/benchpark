@@ -57,7 +57,7 @@ Then, initialize the HPL experiment, this time specifying the variant ``exec_mod
 
 .. code-block:: console
 
-    ~/benchpark]$ benchpark experiment init --dest=hpl hpc-tutorial hpl +strong caliper=time,mpi exec_mode=tutorial-failure
+    ~/benchpark]$ benchpark experiment init hpc-tutorial hpl +strong caliper=time,mpi exec_mode=tutorial-failure
 
 .. figure:: /_static/images/fluxtainer-aws-experiment-spec-failure.png
     :alt: Tutorial experiment spec
@@ -137,10 +137,10 @@ generated experiment instance failed.
  Inspect the Experiment Log
 ****************************
 
-In the ``experiments/hpl/experiment.py`` file, you should see that it is asking for 16
+In the ``experiments/hpl/experiment.py`` file, you should see that it is asking for 1000
 ranks, which exceeds the number of available resources on our AWS system.
 
-**More text could be filled in here**
+**Any other text about ramble logs**
 
 **************
  Restore State

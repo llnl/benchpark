@@ -217,6 +217,15 @@ not Spack compiler (``%``) or version (``@``) constraints.
 
             25 min.
 
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-substitute tutorial-with-duration
+
+        :doc:`I want to run the same experiment, but build it with a different compiler
+        or library (e.g., gcc or clang compiler). <build-and-run-with-clang>`
+
+        .. tutorialcontainer:: tutorial-duration
+
+            #2 + 5 min.
+
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-troubleshoot tutorial-with-duration
 
         :doc:`I want to run use case #2, run into an error, and learn how to
@@ -247,7 +256,7 @@ not Spack compiler (``%``) or version (``@``) constraints.
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-update-system
 
         :doc:`I want to rerun my experiment on a system, but the system software stack
-        has changed since I last ran it. <update-system-config>`
+        needs an update since it has changed since I last ran it. <update-system-config>`
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-system
 
