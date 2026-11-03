@@ -31,6 +31,7 @@
     interactive-tutorial/start-here
     interactive-tutorial/search-benchpark
     interactive-tutorial/build-and-run-experiment
+    interactive-tutorial/troubleshoot-a-failed-run
     interactive-tutorial/benchpark-analyze
     interactive-tutorial/add-a-spack-package
     interactive-tutorial/add-a-ramble-application

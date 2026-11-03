@@ -114,6 +114,15 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     --goal-number: "2";
 }
 
+.rst-content .tutorial-goal-troubleshoot {
+    --card-accent: #8b6f3f;
+    --card-background: #f7f1e7;
+    --card-border: #dfcfad;
+    --card-hover: #765d33;
+    --card-text: #574321;
+    --goal-number: "2 error path";
+}
+
 .rst-content .tutorial-goal-system {
     --card-accent: #4d82b5;
     --card-background: #eaf3fb;
@@ -328,6 +337,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
 .rst-content .tutorial-next-step:not(.tutorial-unnumbered):is(
     .tutorial-goal-search,
     .tutorial-goal-run,
+    .tutorial-goal-troubleshoot,
     .tutorial-goal-analyze,
     .tutorial-goal-experiment,
     .tutorial-goal-update-system,

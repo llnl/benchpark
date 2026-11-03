@@ -18,9 +18,6 @@ each component of HPC benchmarking, and constraining it separately.
 Benchpark builds on the specification provided by Spack, an HPC package
 manager, and Ramble, an HPC testing framework.
 
-This tutorial is organized around **what you want to do**, not around how
-Benchpark is implemented. Pick the situation below that sounds like yours.
-
 .. seealso::
 
    `Latest Benchpark Tutorial Slides <../_static/slides/PACT26-Tutorial-Slides.pdf>`_ |
@@ -219,6 +216,15 @@ not Spack compiler (``%``) or version (``@``) constraints.
         .. tutorialcontainer:: tutorial-duration
 
             25 min.
+
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-troubleshoot tutorial-with-duration
+
+        :doc:`I want to run use case #2, run into an error, and learn how to
+        diagnose it. <troubleshoot-a-failed-run>`
+
+        .. tutorialcontainer:: tutorial-duration
+
+            #2 + 15 min.
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-analyze tutorial-with-duration
 
