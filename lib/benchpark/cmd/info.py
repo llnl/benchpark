@@ -72,9 +72,12 @@ def info_system(args):
     def _handle_query(query):
         key, value = query.split("=", 1)
         exclude = {"all_hardware_descriptions", "repo.yaml", "generic-x86"}
+        systems_dir = paths.benchpark_root / "systems"
         all_system_specs = []
-        for d in set(os.listdir(paths.benchpark_root / "systems")) - exclude:
-            all_system_specs.append(benchpark.spec.SystemSpec(d))
+        for d in set(os.listdir(systems_dir)) - exclude:
+            # Skip shared resources such as systems/common
+            if (systems_dir / d / "system.py").is_file():
+                all_system_specs.append(benchpark.spec.SystemSpec(d))
 
         matching_systems = []
         for spec in all_system_specs:
