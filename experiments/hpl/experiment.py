@@ -42,15 +42,6 @@ class Hpl(
             self.add_experiment_variable("N-Ns", 1, False)
             self.add_experiment_variable("N-NBs", 1, False)
             self.add_experiment_variable("NBs", 128, False)
-        elif self.spec.satisfies("exec_mode=tutorial-failure"):
-            #self.add_experiment_variable("n_ranks", 1, True)  # n_ranks must be defined
-            self.add_experiment_variable("Ns", 1000, True)
-            self.add_experiment_variable("N-Grids", 1, False)
-            self.add_experiment_variable("Ps", "{n_ranks}", True)
-            self.add_experiment_variable("Qs", "1", False)
-            self.add_experiment_variable("N-Ns", 1, False)
-            self.add_experiment_variable("N-NBs", 1, False)
-            self.add_experiment_variable("NBs", 128, False)
         # Must be exec_mode=perf if not test mode.
         else:
             self.add_experiment_variable("n_ranks", 32, True)
@@ -89,4 +80,7 @@ class Hpl(
         )
 
     def compute_package_section(self):
-        self.add_package_spec(self.name, [f"hpl{self.determine_version()}"])
+        if self.spec.satisfies("exec_mode=tutorial-failure"):
+            self.add_package_spec(self.name, [f"hpl-err{self.determine_version()}"])
+        else:
+            self.add_package_spec(self.name, [f"hpl{self.determine_version()}"])
