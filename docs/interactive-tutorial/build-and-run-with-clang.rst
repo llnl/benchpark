@@ -96,19 +96,19 @@ We can also use `benchpark query <https://software.llnl.gov/benchpark/benchpark-
 to search one or more directories for particular metadata or performance data in the
 Caliper .cali files. The data of interst is written to a CSV file. Here, we query our
 HPL+clang workspace and our HPL+gcc workspace for the execution time of the ``main``
-region. The resulting query generates the execution time at each task count.
+region. The resulting query generates the execution time at each rank count.
 
 .. figure:: /_static/images/benchpark-query-clang.png
     :width: 800
     :align: center
 
-    Performance of HPL built with clang compiler at different task counts.
+    Performance of HPL built with clang compiler at different rank counts.
 
 .. figure:: /_static/images/benchpark-query-gcc.png
     :width: 800
     :align: center
 
-    Performance of HPL built with gcc compiler at different task counts.
+    Performance of HPL built with gcc compiler at different rank counts.
 
 ***********************
  Choose Your Next Step
