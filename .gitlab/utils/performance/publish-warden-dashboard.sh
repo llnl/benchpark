@@ -13,8 +13,9 @@ plotly_react_version="${PLOTLY_CLOUD_REACT_VERSION:-19.2.4}"
 dash_requirement_pin="${PLOTLY_CLOUD_DASH_REQUIREMENT_PIN:-dash==4.5.0}"
 dmc_requirement_pin="${PLOTLY_CLOUD_DMC_REQUIREMENT_PIN:-dash-mantine-components==3.0.0}"
 warden_repo_url="${WARDEN_REPO_URL:-https://github.com/llnl/warden.git}"
-warden_app_subdir="${PLOTLY_CLOUD_APP_SUBDIR:-.}"
 warden_update_cmd="${WARDEN_INIT_OR_UPDATE_CMD:-warden_init_or_update}"
+warden_build_script="${WARDEN_PLOTLY_CLOUD_BUILD_SCRIPT:-scripts/build_plotly_cloud_files.py}"
+warden_build_output_dir="${WARDEN_PLOTLY_CLOUD_OUTPUT_DIR:-plotly-cloud-files-v3}"
 plotly_venv=""
 warden_checkout_root=""
 warden_worktree_path=""
@@ -33,14 +34,14 @@ cleanup() {
 }
 trap cleanup EXIT
 
-resolve_app_path() {
+resolve_warden_worktree_path() {
     local checkout_parent
     local warden_checkout
-    local source_app_path
 
-    if [[ -n "${PLOTLY_CLOUD_APP_PATH:-}" ]]; then
-        source_app_path="${PLOTLY_CLOUD_APP_PATH}"
-        warden_worktree_path="${source_app_path}"
+    if [[ -n "${WARDEN_CHECKOUT_PATH:-}" ]]; then
+        warden_worktree_path="${WARDEN_CHECKOUT_PATH}"
+    elif [[ -n "${PLOTLY_CLOUD_APP_PATH:-}" ]]; then
+        warden_worktree_path="${PLOTLY_CLOUD_APP_PATH}"
     else
         checkout_parent="$(mktemp -d)"
         warden_checkout_root="${checkout_parent}"
@@ -54,15 +55,12 @@ resolve_app_path() {
         fi
 
         warden_worktree_path="${warden_checkout}"
-        source_app_path="${warden_checkout}/${warden_app_subdir}"
     fi
 
-    if [[ ! -d "${source_app_path}" ]]; then
-        echo "Missing WARDEN Dash app directory: ${source_app_path}" >&2
+    if [[ ! -d "${warden_worktree_path}" ]]; then
+        echo "Missing WARDEN checkout directory: ${warden_worktree_path}" >&2
         exit 1
     fi
-
-    app_path="${source_app_path}"
 }
 
 run_warden_init_or_update() {
@@ -87,6 +85,40 @@ run_warden_init_or_update() {
 
         "${update_exe}"
     )
+}
+
+build_plotly_cloud_files() {
+    local build_script_path
+    local output_path
+
+    build_script_path="${warden_build_script}"
+    if [[ "${build_script_path}" != /* ]]; then
+        build_script_path="${warden_worktree_path}/${build_script_path}"
+    fi
+
+    if [[ ! -f "${build_script_path}" ]]; then
+        echo "Missing WARDEN Plotly Cloud build script: ${build_script_path}" >&2
+        exit 1
+    fi
+
+    echo "Building WARDEN Plotly Cloud upload files with ${build_script_path}."
+    (
+        cd "${warden_worktree_path}"
+        "${python}" "${build_script_path}" --output "${warden_build_output_dir}"
+    )
+
+    if [[ "${warden_build_output_dir}" == /* ]]; then
+        output_path="${warden_build_output_dir}"
+    else
+        output_path="${warden_worktree_path}/${warden_build_output_dir}"
+    fi
+
+    if [[ ! -d "${output_path}" ]]; then
+        echo "WARDEN Plotly Cloud build did not create expected directory: ${output_path}" >&2
+        exit 1
+    fi
+
+    app_path="${output_path}"
 }
 
 stage_app() {
@@ -132,8 +164,9 @@ stage_app() {
     app_path="${staged_app_root}/app"
 }
 
-resolve_app_path
+resolve_warden_worktree_path
 run_warden_init_or_update
+build_plotly_cloud_files
 stage_app "${app_path}"
 
 if ! command -v "${plotly_cli}" >/dev/null 2>&1; then
