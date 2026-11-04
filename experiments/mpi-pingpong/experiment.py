@@ -18,7 +18,6 @@ class MpiPingpong(
     ),
     Caliper,
 ):
-
     variant(
         "workload",
         default="run",
