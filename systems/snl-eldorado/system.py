@@ -18,7 +18,6 @@ from benchpark.system import (
 
 
 class SnlEldorado(System):
-
     maintainers("simongdg", "pearce8", "nhanford", "rfhaque")
 
     id_to_resources = {

@@ -13,7 +13,6 @@ from benchpark.system import System, compiler_def, compiler_section_for, merge_d
 
 
 class JscJuwels(System):
-
     maintainers("pearce8")
 
     id_to_resources = {

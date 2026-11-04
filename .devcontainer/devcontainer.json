@@ -1,0 +1,36 @@
+{
+  "name": "Benchpark Development",
+  // "image": "ghcr.io/llnl/benchpark/benchpark-flux-el10:latest",
+  "build": {
+    "dockerfile": "../containerfiles/flux/el10/Dockerfile",
+    "context": ".."
+  },
+  "remoteUser": "fluxuser",
+  "forwardPorts": [8000,8888],
+  "portsAttributes": {
+    "8000": {
+      "label": "Sphinx Docs",
+      "onAutoForward": "notify"
+    },
+    "8888": {
+      "label": "JupyterLab",
+      "onAutoForward": "openBrowser",
+      "protocol": "http"
+    }
+  },
+  "customizations": {
+      "vscode": {
+          "extensions": [
+              "ms-vscode.python",
+              "ms-python.black-formatter",
+              "ms-python.flake8",
+              "ms-vscode.cmake-tools",
+              "ms-toolsai.jupyter"
+          ],
+          "settings": {
+              "terminal.integrated.defaultProfile.linux": "bash"
+          }
+      }
+  },
+    "postCreateCommand": "/workspaces/benchpark/.devcontainer/init.sh"
+}

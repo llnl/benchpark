@@ -53,7 +53,7 @@ view of Benchpark's directory structure:
 
        modifiers/                <- modifier definitions
 
-       repo/                     <- benchmarks are defined here
+       repos/                    <- benchmarks are defined here
           **/application.py      <- ramble application spec
           **/package.py          <- spack package spec
 

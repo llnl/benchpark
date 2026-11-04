@@ -116,10 +116,11 @@ class Lammps(
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "n_resources": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
-                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
+                    "n_resources": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
+                    "total_problem_size_dict": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim)
                     ),
                 },
             }

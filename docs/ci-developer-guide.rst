@@ -107,7 +107,9 @@ status in ``artifact-test-metadata/test_metadata.json``. The ``summarize`` stage
 pipeline summary and per-host JSON files, then
 ``performance/generate_test_status_table.py`` renders the status table. For scheduled
 pipelines, the ``publish-performance`` stage pushes the per-host files to the
-``benchpark-performance`` repository.
+``benchpark-performance`` repository. When that job pushes new metadata, the
+``deploy-dashboard`` stage triggers the WARDEN Plotly Cloud redeploy so the dashboard
+loads the newly published performance data.
 
 Performance collection currently queries ``Avg time/rank`` for the ``main`` region and
 marks values more than 5 percent above the baseline as regressions. Test jobs use
@@ -118,7 +120,9 @@ the current test metadata from being written.
 
 The publishing job requires ``BENCHPARK_PERF_DEPLOY_TOKEN`` to contain, or point to a
 file containing, the SSH private key for ``benchpark-performance``.
-``BENCHPARK_PERF_REPO_URL`` indicates the destination repository.
+``BENCHPARK_PERF_REPO_URL`` indicates the destination repository. The dashboard redeploy
+job requires ``PLOTLY_CLOUD_REDEPLOY_WEBHOOK`` to contain the Plotly Cloud redeploy
+webhook URL.
 
 When adding a monitored benchmark, update its test matrix and matching
 ``resource_rules_*`` entry.
@@ -193,15 +197,14 @@ style.yml - Lint
 
 The linter step checks:
 
-- Check Python code formatting using ``black``
-      - Fix black linter errors using ``python -m black dir/filename.py`` or
-            ``python -m black .`` (in source code dir).
+- Check Python code formatting using ``ruff format``
+      - Fix formatting errors using ``ruff format dir/filename.py`` or
+            ``ruff format .`` (in source code dir).
 - Check spelling using ``codespell``
       - Fix the spelling errors manually.
-- Sort imports using ``isort``
-      - Fix isort linter errors using ``isort .``
-- ``flake8`` for checking Python style enforcement
-      - Fix flake linter errors manually
+- ``ruff check`` for import sorting and Python style enforcement
+      - Fix supported lint errors using ``ruff check --fix .`` and fix the
+            remaining errors manually.
 - ``yamlfix`` for formatting ``.yaml``/``.yml`` files
       - Fix yaml linter errors using ``yamlfix dir.filename.yaml``
 - ``docstrfmt`` for formatting ``.rst`` files

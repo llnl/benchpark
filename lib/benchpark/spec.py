@@ -251,6 +251,24 @@ class Spec(object):
 
 class ExperimentSpec(Spec):
     @property
+    def variable_overrides(self):
+        """Key-value assignments that are not declared experiment variants.
+
+        Keep these in the spec so serialization, equality, and hashing include
+        the overrides. Boolean flags must still name a declared variant.
+        """
+        declared = {
+            name
+            for variants in self.experiment_class.variants.values()
+            for name in variants
+        }
+        return {
+            name: values
+            for name, values in self.variants.items()
+            if name not in declared and not any(isinstance(v, bool) for v in values)
+        }
+
+    @property
     def experiment_class(self):
         return repo_path.get_obj_class(self.fullname)
 
@@ -318,9 +336,15 @@ class ConcreteSpec(Spec):
                     f"Package {self.name} must define a workload variant"
                 )
 
+        variable_overrides = (
+            self.variable_overrides if isinstance(self, ExperimentSpec) else {}
+        )
+
         # For variants that are set, set whatever they imply
         variants_to_check = set(
-            (name, values) for name, values in self.variants.items()
+            (name, values)
+            for name, values in self.variants.items()
+            if name not in variable_overrides
         )
         checked = set()
         while variants_to_check:
@@ -367,6 +391,8 @@ class ConcreteSpec(Spec):
 
         # Validate all set variant values
         for name, values in self.variants.items():
+            if name in variable_overrides:
+                continue
             try:
                 variant = next(
                     v
@@ -499,6 +525,28 @@ def quote_kvp(string: str) -> str:
     return f"{key}={quote_if_needed(value)}"
 
 
+def quote_kvp_args(args: Iterable[str]) -> str:
+    """Join CLI spec arguments, preserving quotes supplied literally by a caller."""
+    parts = []
+    literal_quote = None
+    for arg in args:
+        if literal_quote:
+            parts.append(arg)
+            if arg.endswith(literal_quote):
+                literal_quote = None
+            continue
+
+        match = SPLIT_KVP.match(arg)
+        if match and match.group(2).startswith(("'", '"')):
+            value = match.group(2)
+            parts.append(arg)
+            if len(value) == 1 or not value.endswith(value[0]):
+                literal_quote = value[0]
+        else:
+            parts.append(quote_kvp(arg))
+    return " ".join(parts)
+
+
 def strip_quotes_and_unescape(string: str) -> str:
     """Remove surrounding single or double quotes from string, if present."""
     match = STRIP_QUOTES.match(string)
@@ -612,8 +660,9 @@ class TokenContext:
 
     def advance(self):
         """Advance one token"""
-        self.current_token, self.next_token = self.next_token, next(
-            self.token_stream, None
+        self.current_token, self.next_token = (
+            self.next_token,
+            next(self.token_stream, None),
         )
 
     def accept(self, kind: TokenType):
@@ -681,9 +730,9 @@ class SpecParser(object):
                 spec.variants[name] = value
             elif self.ctx.accept(TokenType.KEY_VALUE_PAIR):
                 match = SPLIT_KVP.match(self.ctx.current_token.value)
-                assert (
-                    match
-                ), f"SPLIT_KVP cannot split pair {self.ctx.current_token.value}"
+                assert match, (
+                    f"SPLIT_KVP cannot split pair {self.ctx.current_token.value}"
+                )
 
                 name, value = match.groups()
                 spec.variants[name] = strip_quotes_and_unescape(value).split(",")

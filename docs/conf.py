@@ -10,6 +10,10 @@ import os
 import subprocess
 import sys
 
+from docutils import nodes
+from docutils.parsers.rst import Directive
+from docutils.parsers.rst.directives.body import Container
+
 subprocess.call(
     [
         "make",
@@ -44,7 +48,7 @@ sys.path.insert(0, os.path.abspath("../lib"))
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", ".spack-env"]
 
 # sphinx-copybutton configurations to avoid copying shell prompts
-copybutton_prompt_text = r"(?:\[[^\]]*\])?\$ "
+copybutton_prompt_text = r"^\$ |^# |^.*@.*:.*[#$] |^[^\]]*\][#$] "
 copybutton_prompt_is_regexp = True
 
 # -- Options for HTML output -------------------------------------------------
@@ -66,3 +70,22 @@ html_logo = "_static/images/benchpark-dark.svg"
 html_theme = "sphinx_rtd_theme"
 html_theme_options = {"logo_only": True}
 pygments_style = "sphinx"
+
+
+class TutorialTarget(Directive):
+    """Create an explicit target that docstrfmt preserves inside a table."""
+
+    required_arguments = 1
+
+    def run(self):
+        name = nodes.fully_normalize_name(self.arguments[0])
+        target = nodes.target(self.block_text, "", names=[name])
+        target.line = self.lineno
+        self.state.document.note_explicit_target(target, self.state.parent)
+        return [target]
+
+
+def setup(app):
+    """Register project-specific reStructuredText directives."""
+    app.add_directive("tutorialcontainer", Container)
+    app.add_directive("tutorialtarget", TutorialTarget)

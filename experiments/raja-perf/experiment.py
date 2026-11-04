@@ -31,8 +31,8 @@ class RajaPerf(
 
     variant(
         "version",
-        default="2025.12.1",
-        values=("develop", "latest", "2025.12.1", "2025.03.0", "2024.07.0"),
+        default="2026.07.0",
+        values=("develop", "latest", "2026.07.0", "2025.12.1", "2025.03.0"),
         description="app version",
     )
 
@@ -98,26 +98,26 @@ class RajaPerf(
         self.register_scaling_config(
             {
                 ScalingMode.Strong: {
-                    "n_resources": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
-                    "process_problem_size": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    )
-                    // scaling_factor,
+                    "n_resources": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
+                    "process_problem_size": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) // scaling_factor
+                    ),
                 },
                 ScalingMode.Weak: {
-                    "n_resources": lambda var, itr, dim, scaling_factor: var.val(dim)
-                    * scaling_factor,
-                    "process_problem_size": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
+                    "n_resources": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
+                    "process_problem_size": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim)
                     ),
                 },
                 ScalingMode.Throughput: {
                     "n_resources": lambda var, itr, dim, scaling_factor: var.val(dim),
-                    "process_problem_size": lambda var, itr, dim, scaling_factor: var.val(
-                        dim
-                    )
-                    * scaling_factor,
+                    "process_problem_size": lambda var, itr, dim, scaling_factor: (
+                        var.val(dim) * scaling_factor
+                    ),
                 },
             }
         )

@@ -179,6 +179,7 @@ benchpark-tags:
     - thrust
   testing-sites:
     - anl-weekly
+    - ats-6
     - aws-weekly
     - csc-weekly
     - cscs-weekly

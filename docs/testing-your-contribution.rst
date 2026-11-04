@@ -108,7 +108,7 @@ that you did not define in your experiment.
 ::
 
     . workspace/setup.sh
-    ramble --workspace-dir workspace/my-experiment/my-system/workspace workspace setup
+    ramble --workspace-dir workspace/my-system/my-experiment/workspace workspace setup
 
 5. Test Your Benchmark
 ======================
@@ -119,4 +119,4 @@ likely source code issues.
 
 ::
 
-    ramble --workspace-dir workspace/my-experiment/my-system/workspace on
+    ramble --workspace-dir workspace/my-system/my-experiment/workspace on

@@ -13,7 +13,6 @@ from benchpark.system import System, compiler_def, compiler_section_for, merge_d
 
 
 class LanlVenado(System):
-
     maintainers("rfhaque", "gshipman")
 
     id_to_resources = {

@@ -13,9 +13,12 @@ class SpartaSnl(ExecutableApplication):
     """Define SNL Sparta application"""
 
     name = "sparta-snl"
-
+    tags('asc','ats-6','chemistry','particles',
+         'direct-solve','montecarlo','structured-grid',
+         'large-scale','multi-node',
+         'mpi','c++')
     maintainers("rfhaque")
-    
+
     executable('sparta', 'spa_ -in {in} {sparta_flags}', use_mpi=True)
 
     executable(
@@ -76,23 +79,23 @@ class SpartaSnl(ExecutableApplication):
     workload_variable('ppc', default='47',
             description='particles per cell',
             workloads=['cylinder'])
-    
+
     workload_variable('xmin', default='-1.0',
             description='xmin',
             workloads=['cylinder'])
-    
+
     workload_variable('xmax', default='1.1',
             description='xmax',
             workloads=['cylinder'])
-    
+
     workload_variable('ymin', default='-1.1',
             description='ymin',
             workloads=['cylinder'])
-    
+
     workload_variable('ymax', default='1.1',
             description='ymax',
             workloads=['cylinder'])
-    
+
     workload_variable('collide_modify', default='vremax 100 yes vibrate no rotate smooth nearcp yes 10',
             description='collisions config',
             workloads=['cylinder'])

@@ -12,13 +12,13 @@ class Branson(ExecutableApplication):
     """Branson benchmark"""
     name = "branson"
 
-    tags = ['asc','montecarlo','particles',
-            'high-branching','irregular-memory-access',
-            'mpi','c++','llnl-nightly','llnl-monthly','llnl-pr','llnl-weekly']
+    tags('asc','ats-6','montecarlo','particles',
+         'high-branching','irregular-memory-access',
+         'mpi','c++','llnl-nightly','llnl-monthly','llnl-pr','llnl-weekly')
 
     executable('setup_experiment',
            template=[
-               'cp {branson}/inputs/* {experiment_run_dir}/.',
+               'cp -r {branson}/inputs/* {experiment_run_dir}/.',
            ])
 
     common_args = (
@@ -35,7 +35,7 @@ class Branson(ExecutableApplication):
                 + common_args, use_mpi=True)
 
     workload('branson', executables=['setup_experiment','p'])
-    
+
     workload_variable('input_file', default='3D_hohlraum_multi_node.xml',
     	description='input file name',
       	workloads=['branson'])
@@ -70,7 +70,7 @@ class Branson(ExecutableApplication):
 
     figure_of_merit('Photons per Second',
                     log_file='{experiment_run_dir}/{experiment_name}.out',
-                    fom_regex=r'Photons Per Second \(FOM\):\s+(?P<fom>[0-9]+\.[0-9]*([0-9]*)?e\+[0-9]*)',
+                    fom_regex=r'Photons Per Second \(FOM\):\s+(?P<fom>[0-9]+(?:\.[0-9]*)?(?:[eE][+-]?[0-9]+)?)',
                     group_name='fom', units='photons')
 
     success_criteria('pass', mode='string', match=r'.*', file='{experiment_run_dir}/{experiment_name}.out')

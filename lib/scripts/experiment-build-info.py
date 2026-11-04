@@ -1,11 +1,16 @@
 import json
 import sys
 
-import spack.environment as ev
+# Spack >= 1.3.0 moved active_environment to its own module
+try:
+    from spack.active_environment import active_environment
+except ImportError:
+    # Fall back to older Spack versions
+    from spack.environment import active_environment
 
 
 def main():
-    x = ev.active_environment()
+    x = active_environment()
     y = list(x.concrete_roots())
     # There may be multiple roots in the env. Assume that the experiment of
     # interest is the largest dag (every other root should just be an attempt

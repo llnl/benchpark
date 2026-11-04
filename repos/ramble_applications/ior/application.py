@@ -13,7 +13,7 @@ class Ior(ExecutableApplication):
 
     name = "ior"
 
-    tags = ["synthetic", "i-o", "large-scale", "mpi", "c"]
+    tags("synthetic", "i-o", "large-scale", "mpi", "c")
 
     params = " -b {b}" + " -t {t}" + " -i {i}" + " -o {o}"
     common_args = ' -Cge -vv {test_file_mode}'

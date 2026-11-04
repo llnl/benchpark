@@ -1,13 +1,13 @@
 application:
   - changed-files:
-      - any-glob-to-any-file: [repo/**]
+      - any-glob-to-any-file: [repos/**]
 ci:
   - changed-files:
       - any-glob-to-any-file: [.github/**]
 dependencies:
   - changed-files:
       - any-glob-to-any-file:
-          - .github/worklflows/requirements/**
+          - .github/workflows/requirements/**
           - pyproject.toml
           - requirements.txt
 docs:

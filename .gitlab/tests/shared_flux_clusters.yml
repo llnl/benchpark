@@ -120,22 +120,22 @@ run_tests_flux_tuolumne:
           - kripke
           - laghos
           - lammps
+          - osu-micro-benchmarks
+          - phloem
           - raja-perf
           - remhos
           - sparta-snl
         VARIANT: [+rocm]
+        GPUMODE: SPX
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [phloem]
         GPUMODE: SPX
       # Test openmp on tuolumne
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK: [kripke]
         VARIANT: [+openmp]
-        GPUMODE: SPX
-      # Test kripke+rocm+single_memory on tuolumne
-      - HOST: tuolumne
-        ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [kripke]
-        VARIANT: [+rocm+single_memory]
         GPUMODE: SPX
       # Caliper profile.hip
       - HOST: tuolumne
@@ -148,7 +148,7 @@ run_tests_flux_tuolumne:
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK: [py-scaffold]
         GPUMODE: [SPX]
-        SYSTEM_ARGS: [rocm=7.1.1]
+        SYSTEM_ARGS: [rocm=7.2.1]
         VARIANT:
           - +rocm package_manager=spack-pip caliper=time,rocm,rocm-gputime,rccl allocation=torchrun-hpc
       # rocm7
@@ -168,8 +168,9 @@ run_tests_flux_tuolumne:
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK: [stream]
-        VARIANT: [caliper=time, mpi]
+        VARIANT: ['caliper=time,mpi']
         SYSTEM_ARGS: [compiler=gcc]
+        GPUMODE: SPX
 run_tests_flux_tioga:
   extends: .run_tests_flux
   tags: [shell, tioga]
@@ -178,12 +179,22 @@ run_tests_flux_tioga:
     matrix:
       - HOST: tioga
         ARCHCONFIG: llnl-elcapitan
-        BENCHMARK: [amg2023, kripke, laghos, raja-perf, remhos]
+        BENCHMARK:
+          - amg2023
+          - kripke
+          - laghos
+          - osu-micro-benchmarks
+          - phloem
+          - raja-perf
+          - remhos
         VARIANT: ['+rocm caliper=time,mpi']
+      - HOST: tioga
+        ARCHCONFIG: llnl-elcapitan
+        BENCHMARK: [phloem]
       # spack-pip
       - HOST: tioga
         ARCHCONFIG: llnl-elcapitan
         BENCHMARK: [py-scaffold]
-        SYSTEM_ARGS: [rocm=7.1.1]
+        SYSTEM_ARGS: [rocm=7.2.1]
         VARIANT:
           - +rocm package_manager=spack-pip caliper=mpi,time allocation=torchrun-hpc

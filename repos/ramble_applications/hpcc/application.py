@@ -11,12 +11,12 @@ from ramble.appkit import *
 
 class Hpcc(HpccBase):
 
-    tags = ['synthetic',
-            'blas','solver','dense-linear-algebra','fft',
-            'large-scale',
-            'high-fp','high-memory-bandwidth',
-            'regular-memory-access','irregular-memory-access',
-            'mpi','network-collectives','network-point-to-point',
-            'network-bandwidth-bound','network-bisection-bandwidth-bound',
-            'network-latency-bound',
-            'c','fortran']
+    tags('synthetic',
+         'blas','solver','dense-linear-algebra','fft',
+         'large-scale',
+         'high-fp','high-memory-bandwidth',
+         'regular-memory-access','irregular-memory-access',
+         'mpi','network-collectives','network-point-to-point',
+         'network-bandwidth-bound','network-bisection-bandwidth-bound',
+         'network-latency-bound',
+         'c','fortran')

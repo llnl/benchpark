@@ -253,7 +253,12 @@ class RuntimeResources:
         if not self.ramble_location.exists():
             first_time = True
             self._install_ramble()
-        return Command(self.ramble_location / "bin" / "ramble", env={}), first_time
+        # Ramble's launcher runs $RAMBLE_PYTHON, else the first python3 on PATH.
+        # This environment is otherwise empty (no PATH), so without this Ramble
+        # falls back to the system python3, which lacks the dependencies that
+        # Ramble >= 0.7 no longer vendors (archspec, distro, jsonschema).
+        env = {"RAMBLE_PYTHON": sys.executable}
+        return Command(self.ramble_location / "bin" / "ramble", env=env), first_time
 
     def _spack(self):
         if not self.pkgs_location.exists():

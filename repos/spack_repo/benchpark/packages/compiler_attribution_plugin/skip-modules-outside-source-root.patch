@@ -1,0 +1,94 @@
+diff --git a/Strata/compiler_attribution_plugin/src/caliper_association/passes/association.cpp b/Strata/compiler_attribution_plugin/src/caliper_association/passes/association.cpp
+index 992fb69..cdd090c 100644
+--- a/Strata/compiler_attribution_plugin/src/caliper_association/passes/association.cpp
++++ b/Strata/compiler_attribution_plugin/src/caliper_association/passes/association.cpp
+@@ -1,6 +1,7 @@
+ #include "association.hpp"
+ 
+ #include <cstdlib>
++#include <optional>
+ #include <string>
+ #include <vector>
+ 
+@@ -100,7 +101,7 @@ llvm::SmallString<256> makeRealPath(llvm::StringRef path, llvm::StringRef descrip
+     return realPath;
+ }
+ 
+-std::string getRelativeModulePath(llvm::StringRef modulePath)
++std::optional<std::string> getRelativeModulePath(llvm::StringRef modulePath)
+ {
+     const std::string srcPath = getRequiredEnvVar(env_vars::association::SrcPath);
+ 
+@@ -109,10 +110,8 @@ std::string getRelativeModulePath(llvm::StringRef modulePath)
+ 
+     llvm::SmallString<256> relativePath(normalizedModule);
+ 
+-    if (!llvm::sys::path::replace_path_prefix(relativePath, normalizedSrc, "")) {
+-        llvm::report_fatal_error(
+-            "Association Plugin Error: module path is not under ASSOCIATION_SRC_PATH");
+-    }
++    if (!llvm::sys::path::replace_path_prefix(relativePath, normalizedSrc, ""))
++        return std::nullopt;
+ 
+     return std::string(relativePath.str());
+ }
+@@ -275,7 +274,11 @@ llvm::PreservedAnalyses CaliperAssociationPass::run(llvm::Module &M,
+     if (TT.isNVPTX() || TT.isAMDGPU())
+         return llvm::PreservedAnalyses::all();
+ 
+-    const std::string moduleTracePath = getRelativeModulePath(M.getSourceFileName());
++    const std::optional<std::string> moduleTracePath =
++        getRelativeModulePath(M.getSourceFileName());
++    if (!moduleTracePath)
++        return llvm::PreservedAnalyses::all();
++
+     std::vector<InstrumentationTarget> targets;
+ 
+     for (llvm::Function &F : M) {
+@@ -301,8 +304,8 @@ llvm::PreservedAnalyses CaliperAssociationPass::run(llvm::Module &M,
+         }
+     }
+ 
+-    const std::string hostModulePath = moduleTracePath + ".host.json";
+-    const std::string deviceModulePath = moduleTracePath + ".device.json";
++    const std::string hostModulePath = *moduleTracePath + ".host.json";
++    const std::string deviceModulePath = *moduleTracePath + ".device.json";
+ 
+     for (const InstrumentationTarget &Target : targets) {
+         if (Target.Kind == InstrumentationKind::Host)
+diff --git a/Strata/compiler_attribution_plugin/src/extraction/data_manager/data_manager.hpp b/Strata/compiler_attribution_plugin/src/extraction/data_manager/data_manager.hpp
+index d066be7..94daa1a 100644
+--- a/Strata/compiler_attribution_plugin/src/extraction/data_manager/data_manager.hpp
++++ b/Strata/compiler_attribution_plugin/src/extraction/data_manager/data_manager.hpp
+@@ -164,6 +164,17 @@ class DataManager
+         moduleFilePath = path;
+     }
+ 
++    bool isModuleUnderSourceRoot(llvm::StringRef modulePath) const
++    {
++        llvm::SmallString<256> normalizedModule =
++            makeNormalizedAbsolutePath(modulePath);
++        llvm::SmallString<256> normalizedSrc =
++            makeNormalizedAbsolutePath(srcFilePath);
++
++        return llvm::sys::path::replace_path_prefix(
++            normalizedModule, normalizedSrc, "");
++    }
++
+     bool isModuleInitialized() const
+     {
+         return moduleInitialized;
+diff --git a/Strata/compiler_attribution_plugin/src/extraction/passes/function_extraction.cpp b/Strata/compiler_attribution_plugin/src/extraction/passes/function_extraction.cpp
+index 1906f09..24ab474 100644
+--- a/Strata/compiler_attribution_plugin/src/extraction/passes/function_extraction.cpp
++++ b/Strata/compiler_attribution_plugin/src/extraction/passes/function_extraction.cpp
+@@ -138,6 +138,9 @@ json getCalledFuncsList(llvm::Function &F)
+ 
+ void extractModule(DataManager *sharedDataManagerState, llvm::Module &M)
+ {
++    if (!sharedDataManagerState->isModuleUnderSourceRoot(M.getSourceFileName()))
++        return;
++
+     // Idempotent: whichever entry point reaches a module first wins, and later
+     // calls are no-ops. Re-walking would reset the module metadata and undo
+     // records already gathered.

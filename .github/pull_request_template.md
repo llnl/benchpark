@@ -11,12 +11,12 @@
 - [ ] Add/modify `systems/system_name/system.py` file
 - [ ] Add/modify `systems/all_hardware_descriptions/hardware_name/hardware_description.yaml` which will appear in the [docs catalogue](https://software.llnl.gov/benchpark/system-list.html)
 
-## Adding/modifying a benchmark (docs: [Adding a Benchmark](https://software.llnl.gov/benchpark/add-a-benchmark.html))
+## Adding/modifying a benchmark (docs: [Adding an Experiment](https://software.llnl.gov/benchpark/add-an-experiment.html))
 
 - [ ] If modifying the source code of a benchmark: create, self-assign, and link here a follow up issue with a link to the PR in the benchmark repo.
-- [ ] If package.py upstreamed to Spack is insufficient, add/modify `repo/benchmark_name/package.py` plus: create, self-assign, and link here a follow up issue with a link to the PR in the Spack repo.
-- [ ] If application.py upstreamed to Ramble is insufficient, add/modify `repo/benchmark_name/application.py` plus: create, self-assign, and link here a follow up issue with a link to the PR in the Ramble repo.
-- [ ] Tags in Ramble's `application.py` or in `repo/benchmark_name/application.py` will appear in the [docs catalogue](https://software.llnl.gov/benchpark/benchmark-list.html)
+- [ ] If package.py upstreamed to Spack is insufficient, add/modify `repos/spack_repo/benchpark/packages/benchmark_name/package.py` plus: create, self-assign, and link here a follow up issue with a link to the PR in the Spack repo.
+- [ ] If application.py upstreamed to Ramble is insufficient, add/modify `repos/ramble_applications/benchmark_name/application.py` plus: create, self-assign, and link here a follow up issue with a link to the PR in the Ramble repo.
+- [ ] Tags in Ramble's `application.py` or in `repos/ramble_applications/benchmark_name/application.py` will appear in the [docs catalogue](https://software.llnl.gov/benchpark/benchmark-list.html)
 - [ ] Add/modify an `experiments/benchmark_name/experiment.py` to define an experiment
 
 ## Adding/modifying core functionality, CI, or documentation:

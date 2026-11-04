@@ -21,7 +21,6 @@ from benchpark.system import (
 
 
 class OlcfFrontier(System):
-
     maintainers("hagertnl")
 
     id_to_resources = {
@@ -193,7 +192,7 @@ class OlcfFrontier(System):
         if mount_point == "none":
             self.full_io_path = None
         elif mount_point == "/lustre/orion":
-            self.full_io_path = f'{mount_point}/{self.spec.variants["bank"][0]}/scratch/{os.environ["USER"]}'
+            self.full_io_path = f"{mount_point}/{self.spec.variants['bank'][0]}/scratch/{os.environ['USER']}"
 
     def compute_packages_section(self):
         selections = {

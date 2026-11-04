@@ -13,8 +13,9 @@ class Laghos(ExecutableApplication):
 
     name = "laghos"
 
-    tags = [
+    tags(
         "asc",
+        "ats-6",
         "engineering",
         "hypre",
         "solver",
@@ -40,7 +41,7 @@ class Laghos(ExecutableApplication):
         "network-collectives",
         "unstructured-grid",
         'llnl-nightly','llnl-monthly','llnl-pr','llnl-weekly'
-    ]
+    )
 
     common_args = (
         " -m {mesh}"
@@ -190,8 +191,8 @@ class Laghos(ExecutableApplication):
 
     def _make_experiments(self, workspace, app_inst=None):
         """
-        When setting up its mesh, Laghos strictly accepts as input either the 
-        elements per mpi (epm) or the mesh dimensions and refinement factors 
+        When setting up its mesh, Laghos strictly accepts as input either the
+        elements per mpi (epm) or the mesh dimensions and refinement factors
         (nx/ny/nz/rs/rp), but not both
 
         Here we select one of the two strategies based on the value of epm

@@ -3,10 +3,10 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from benchpark.directives import provides
+from benchpark.directives import DirectiveMeta, provides
 
 
-class OpenMPCPUOnlySystem:
+class OpenMPCPUOnlySystem(metaclass=DirectiveMeta):
     provides("openmp")
 
     name = "openmp"

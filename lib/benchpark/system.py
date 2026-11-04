@@ -13,7 +13,7 @@ import yaml
 
 import benchpark.spec
 import benchpark.variant
-from benchpark.directives import ExperimentSystemBase, provides, variant
+from benchpark.directives import DirectiveMeta, ExperimentSystemBase, provides, variant
 
 
 def _hash_id(content_list):
@@ -23,7 +23,7 @@ def _hash_id(content_list):
     return sha256_hash.hexdigest()
 
 
-class MPISystem:
+class MPISystem(metaclass=DirectiveMeta):
     provides("mpi")
 
     name = "mpi"
@@ -57,6 +57,20 @@ class System(ExperimentSystemBase):
         default="120",
         multi=False,
         description="Set job timeout limit (in minutes). Has to be under the limit for selected 'queue'.",
+    )
+
+    variant(
+        "extra_batch_opts",
+        default="none",
+        multi=True,
+        description="Scheduler options added to every allocation, after the system's own",
+    )
+
+    variant(
+        "extra_cmd_opts",
+        default="none",
+        multi=True,
+        description="Launcher options added to every run command, after the system's own",
     )
 
     def __init__(self, spec):
@@ -117,7 +131,11 @@ class System(ExperimentSystemBase):
             pm.verify(self)
 
     def enforce(self, attr):
-        if attr not in self.provides:
+        # Programming model helpers are composed into systems at runtime.
+        # Their directives belong to the helpers, not to the system class.
+        if attr not in self.provides and not any(
+            attr in model.provides for model in self.programming_models
+        ):
             raise AttributeError(f'{self.spec.name} does not provide "{attr}"')
 
     def system_specific_variables(self):
@@ -161,6 +179,17 @@ class System(ExperimentSystemBase):
         system_specific = {}
         for k, v in self.system_specific_variables().items():
             system_specific[k] = v
+
+        # Append user passthrough options to the system's computed ones (never
+        # replace them). The spec parser splits values on commas, so rejoin:
+        # flags like --requires=hosts:a,b or -o mpibind=greedy:0,verbose need them.
+        for key in ("extra_batch_opts", "extra_cmd_opts"):
+            user = [x for x in self.spec.variants[key] if x != "none"]
+            if user:
+                existing = (system_specific.get(key) or "").rstrip("\n")
+                system_specific[key] = "\n".join(
+                    filter(None, [existing, ",".join(user)])
+                )
 
         job_configuration_options = {}
         self.timeout = job_configuration_options["timeout"] = self.spec.variants[

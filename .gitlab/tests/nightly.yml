@@ -16,7 +16,6 @@ include:
         SCHEDULER_PARAMETERS: $DANE_PARAMS
         BENCHMARK:
           - amg2023
-          - gpcnet
           - hpcg
           - hpl
           - kripke
@@ -27,7 +26,7 @@ include:
           - phloem
           - raja-perf
           - remhos
-          - smb
+          - sandia-micro-benchmarks
           - sparta-snl
           - stream
       # salmon-tddft doesn't build with oneAPI, use gcc
@@ -42,6 +41,13 @@ include:
         SCHEDULER_PARAMETERS: $DANE_PARAMS
         SYSTEM_ARGS: [mount_point="/p/lustre1"]
         BENCHMARK: ior
+      # Test openmpi here: nightly launches with srun, and MPI_Init fails under
+      # flux in the PR pipelines
+      - HOST: dane
+        ARCHCONFIG: llnl-cluster
+        SCHEDULER_PARAMETERS: $DANE_PARAMS
+        SYSTEM_ARGS: [mpi=openmpi]
+        BENCHMARK: osu-micro-benchmarks
       # +rocm tests
       - HOST: [tuolumne]
         ARCHCONFIG: llnl-elcapitan
@@ -54,10 +60,27 @@ include:
           - laghos
           - lammps
           - osu-micro-benchmarks
+          - phloem
           - raja-perf
           - remhos
           - sparta-snl
         VARIANT: [+rocm]
+      # New ROCm version coverage
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        SCHEDULER_PARAMETERS: $ELCAP_PARAMS
+        BENCHMARK: saxpy
+        SYSTEM_ARGS: [rocm=7.2.1, rocm=7.14, rocm=10.0 compiler=rocmcc]
+        VARIANT: [+rocm]
+      # spack-pip
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        SCHEDULER_PARAMETERS: $ELCAP_PARAMS
+        BENCHMARK: [py-scaffold]
+        GPUMODE: [SPX]
+        SYSTEM_ARGS: [rocm=7.2.1]
+        VARIANT:
+          - +rocm package_manager=spack-pip caliper=time,rocm,rocm-gputime,rccl allocation=torchrun-hpc
       # +openmp tests
       - HOST: dane
         ARCHCONFIG: llnl-cluster
@@ -87,10 +110,10 @@ include:
           - amg2023
           - babelstream
           - branson
-          - gromacs
           - kripke
           - laghos
           - osu-micro-benchmarks
+          # - phloem  # Uncomment this once gpu-aware MPI available on Matrix system.py (likely in https://github.com/llnl/benchpark/issues/1423)
           - raja-perf
           - remhos
           - saxpy
@@ -101,6 +124,13 @@ include:
         SCHEDULER_PARAMETERS: $MATRIX_PARAMS
         BENCHMARK: [lammps, sparta-snl]
         VARIANT: [+cuda~gpu-aware-mpi]
+      # spack-pip
+      - HOST: matrix
+        ARCHCONFIG: llnl-matrix
+        SCHEDULER_PARAMETERS: $MATRIX_PARAMS
+        BENCHMARK: [py-scaffold]
+        VARIANT:
+          - +cuda package_manager=spack-pip caliper=mpi,time allocation=torchrun-hpc
       #############
       # Other tests
       #############
@@ -112,6 +142,15 @@ include:
         VARIANT: ['+rocm caliper=mpi,time']
         GPUMODE: [TPX, CPX]
         SYSTEM_ARGS: [gpumode=$GPUMODE]
+      #  # Compiler attribution with supported Tuolumne ROCm versions
+      # - HOST: tuolumne
+      #   ARCHCONFIG: llnl-elcapitan
+      #   SCHEDULER_PARAMETERS: $ELCAP_PARAMS
+      #   BENCHMARK: raja-perf
+      #   BENCHMARK_VERSION: develop
+      #   VARIANT: [+rocm compiler_attribution=on caliper=time]
+      #   SYSTEM_ARGS: [rocm=6.4.3, rocm=7.2.1]
+      #   GPUMODE: SPX
       # Test benchmark@develop
       - HOST: dane
         ARCHCONFIG: llnl-cluster
@@ -128,7 +167,7 @@ include:
         ARCHCONFIG: llnl-matrix
         SCHEDULER_PARAMETERS: $MATRIX_PARAMS
         BENCHMARK: [lammps]
-        VARIANT: [+cuda workload=pace]
+        VARIANT: [+cuda~gpu-aware-mpi workload=pace]
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan
         SCHEDULER_PARAMETERS: $ELCAP_PARAMS

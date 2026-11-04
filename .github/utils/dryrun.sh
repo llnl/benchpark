@@ -5,6 +5,8 @@
 
 #!/bin/bash
 
+set -e
+
 benchmark_spec="$1"
 system_spec="$2"
 

@@ -35,7 +35,24 @@ endif()
 
 if(USE_HIP)
     include_directories(${ROCM_PATH}/include)
-    target_compile_options(${PROJECT_NAME} PRIVATE -x hip -DUSE_HIP --offload-arch=${ROCM_ARCH})
+    set(HIP_COMPILE_OPTIONS
+      -x hip
+      -DUSE_HIP
+      --offload-arch=${ROCM_ARCH}
+      --rocm-path=${ROCM_PATH})
+
+    execute_process(
+      COMMAND ${CMAKE_CXX_COMPILER} --print-resource-dir
+      OUTPUT_VARIABLE CXX_RESOURCE_DIR
+      OUTPUT_STRIP_TRAILING_WHITESPACE)
+    set(COMPILER_ROCM_DEVICE_LIB_PATH
+      ${CXX_RESOURCE_DIR}/lib/amdgcn/bitcode)
+    if(EXISTS ${COMPILER_ROCM_DEVICE_LIB_PATH})
+      list(APPEND HIP_COMPILE_OPTIONS
+        --rocm-device-lib-path=${COMPILER_ROCM_DEVICE_LIB_PATH})
+    endif()
+
+    target_compile_options(${PROJECT_NAME} PRIVATE ${HIP_COMPILE_OPTIONS})
     list(APPEND SAXPY_DEPENDENCIES
       "-L${ROCM_PATH}/lib -lamdhip64")
 endif()

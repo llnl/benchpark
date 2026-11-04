@@ -13,12 +13,12 @@ from ramble.appkit import *
 
 class OsuMicroBenchmarks(OsuMicroBenchmarksBase):
 
-    tags = ['synthetic',
-            'large-scale','multi-node','single-node',
-            'atomics','managed-memory',
-            'mpi','openshmem','upc','upc++','nccl','rccl',
-            'network-bandwidth-bound','network-bisection-bandwidth-bound',
-            'network-collectives','network-latency-bound',
-            'network-multi-threaded','network-nonblocking-collectives',
-            'network-onesided','network-point-to-point',
-            'c','java','python','openacc']
+    tags('synthetic','ats-6',
+         'large-scale','multi-node','single-node',
+         'atomics','managed-memory',
+         'mpi','openshmem','upc','upc++','nccl','rccl',
+         'network-bandwidth-bound','network-bisection-bandwidth-bound',
+         'network-collectives','network-latency-bound',
+         'network-multi-threaded','network-nonblocking-collectives',
+         'network-onesided','network-point-to-point',
+         'c','java','python','openacc')

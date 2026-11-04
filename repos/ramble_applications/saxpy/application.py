@@ -12,9 +12,9 @@ class Saxpy(ExecutableApplication):
     """saxpy benchmark"""
     name = "saxpy"
 
-    tags = ['synthetic','single-node','high-memory-bandwidth',
-            'regular-memory-access',
-            'c++']
+    tags('synthetic','single-node','high-memory-bandwidth',
+         'regular-memory-access',
+         'c++')
 
     executable('p', 'saxpy -n {n}', use_mpi=True)
 

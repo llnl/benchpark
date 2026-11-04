@@ -81,7 +81,6 @@ Example usage:
         experiments = args.experiments
 
     for name, tag in bp.items():
-
         if name not in os.listdir(os.getcwd()):
             subprocess.run(
                 ["git", "clone", "https://github.com/LLNL/benchpark.git", name]

@@ -93,3 +93,346 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
 .rst-content div[class^="highlight"] pre {
     max-height: 600px;
 }
+
+.tutorial-next-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+    margin: 1.25rem 0;
+}
+
+.rst-content .tutorial-next-step {
+    --card-accent: #6a984e;
+    --card-background: #eef6e8;
+    --card-border: #c7dbb8;
+    --card-hover: #5f8f45;
+    --card-text: #355e2a;
+    margin: 0;
+}
+
+.rst-content .tutorial-goal-run {
+    --goal-number: "2";
+}
+
+.rst-content .tutorial-goal-system {
+    --card-accent: #4d82b5;
+    --card-background: #eaf3fb;
+    --card-border: #bdd4e8;
+    --card-hover: #477aa9;
+    --card-text: #294f73;
+    --goal-number: "6";
+}
+
+.rst-content .tutorial-goal-benchmark {
+    --card-accent: #c88a16;
+    --card-background: #fff5db;
+    --card-border: #ebd39a;
+    --card-hover: #a96e08;
+    --card-text: #674600;
+}
+
+.rst-content .tutorial-goal-update-system {
+    --card-accent: #8a61a8;
+    --card-background: #f3ecf8;
+    --card-border: #d8c4e6;
+    --card-hover: #795294;
+    --card-text: #513566;
+    --goal-number: "5";
+}
+
+.rst-content .tutorial-goal-scaling {
+    --card-accent: #398b82;
+    --card-background: #e7f6f4;
+    --card-border: #b9ddd8;
+    --card-hover: #337e76;
+    --card-text: #245d57;
+    --goal-number: "7";
+}
+
+.rst-content .tutorial-goal-analyze {
+    --card-accent: #c5654d;
+    --card-background: #fff0ec;
+    --card-border: #efc9bd;
+    --card-hover: #a94e38;
+    --card-text: #6f3528;
+    --goal-number: "3 (requires #2)";
+}
+
+.rst-content .tutorial-goal-query {
+    --card-accent: #626aa5;
+    --card-background: #eef0fb;
+    --card-border: #c9cce8;
+    --card-hover: #565e96;
+    --card-text: #3c426f;
+    --goal-number: "8";
+}
+
+.rst-content .tutorial-goal-spec {
+    --card-accent: #a95574;
+    --card-background: #faedf2;
+    --card-border: #e8c5d2;
+    --card-hover: #934363;
+    --card-text: #653247;
+}
+
+.rst-content .tutorial-goal-setup {
+    --card-accent: #287b8e;
+    --card-background: #e8f5f8;
+    --card-border: #badbe2;
+    --card-hover: #226d7e;
+    --card-text: #204f59;
+}
+
+.rst-content .tutorial-goal-experiment {
+    --card-accent: #b56d2d;
+    --card-background: #fff2e6;
+    --card-border: #e8c9ad;
+    --card-hover: #9f5d25;
+    --card-text: #67401f;
+    --goal-number: "4";
+}
+
+.rst-content .tutorial-goal-search {
+    --card-accent: #5b6b7a;
+    --card-background: #edf1f4;
+    --card-border: #c8d0d7;
+    --card-hover: #4f5f6e;
+    --card-text: #34424f;
+    --goal-number: "1";
+}
+
+.tutorial-project-links {
+    align-items: center;
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+}
+
+.tutorial-project-links a {
+    display: flex;
+    justify-content: flex-start;
+    min-width: 0;
+}
+
+.tutorial-project-link {
+    text-align: left;
+}
+
+.tutorial-project-links img {
+    display: block;
+    height: auto;
+    max-height: 8rem;
+    max-width: 100%;
+    width: auto;
+}
+
+.tutorial-prerequisite-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 0.75rem 0 1.5rem;
+}
+
+.rst-content .tutorial-prerequisite-link {
+    margin: 0;
+}
+
+.rst-content .tutorial-prerequisite-link > p {
+    margin: 0;
+}
+
+.rst-content .tutorial-prerequisite-link a,
+.rst-content .tutorial-prerequisite-link a:visited {
+    align-items: center;
+    background: var(--prerequisite-background);
+    border: 1px solid var(--prerequisite-border);
+    border-radius: 1rem;
+    color: var(--prerequisite-text);
+    display: inline-flex;
+    font-weight: 600;
+    padding: 0.35rem 0.8rem;
+    text-decoration: none;
+}
+
+.rst-content .tutorial-prerequisite-link a:hover {
+    background: var(--prerequisite-accent);
+    color: #ffffff;
+}
+
+.rst-content .tutorial-prerequisite-link a:focus-visible {
+    outline: 3px solid var(--prerequisite-accent);
+    outline-offset: 2px;
+}
+
+.tutorial-prerequisite-spack {
+    --prerequisite-accent: #0f3a80;
+    --prerequisite-background: #edf3fc;
+    --prerequisite-border: #a9bfdf;
+    --prerequisite-text: #0f3a80;
+}
+
+.tutorial-prerequisite-ramble {
+    --prerequisite-accent: #5d3425;
+    --prerequisite-background: #f7f0df;
+    --prerequisite-border: #cfb99b;
+    --prerequisite-text: #5d3425;
+}
+
+.tutorial-prerequisite-experiment {
+    --prerequisite-accent: #356533;
+    --prerequisite-background: #eef7ec;
+    --prerequisite-border: #a8c6a4;
+    --prerequisite-text: #285426;
+}
+
+.rst-content .tutorial-spec-figure {
+    margin: 1.5rem 0 2rem;
+}
+
+.rst-content .tutorial-next-step > p {
+    height: 100%;
+    margin: 0;
+}
+
+.rst-content .tutorial-next-step a,
+.rst-content .tutorial-next-step a:visited {
+    align-items: center;
+    background: var(--card-background);
+    border: 1px solid var(--card-border);
+    border-left: 5px solid var(--card-accent);
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgb(0 0 0 / 12%);
+    color: var(--card-text);
+    display: flex;
+    font-weight: 600;
+    height: 100%;
+    min-height: 7rem;
+    padding: 1.25rem;
+    text-decoration: none;
+    transition: background-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+.rst-content .tutorial-next-step a:hover {
+    background: var(--card-hover);
+    box-shadow: 0 4px 10px rgb(0 0 0 / 18%);
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+.rst-content .tutorial-next-step a:focus-visible {
+    outline: 3px solid var(--card-accent);
+    outline-offset: 3px;
+}
+
+.rst-content .tutorial-next-step:not(.tutorial-unnumbered):is(
+    .tutorial-goal-search,
+    .tutorial-goal-run,
+    .tutorial-goal-analyze,
+    .tutorial-goal-experiment,
+    .tutorial-goal-update-system,
+    .tutorial-goal-system,
+    .tutorial-goal-scaling,
+    .tutorial-goal-query
+) > p > a {
+    align-items: flex-start;
+    flex-direction: column;
+    min-height: 9.5rem;
+}
+
+.rst-content .tutorial-next-step:not(.tutorial-unnumbered) > p > a::before {
+    align-items: center;
+    background: var(--card-accent);
+    border: 1px solid var(--card-accent);
+    border-radius: 1rem;
+    color: #ffffff;
+    content: var(--goal-number);
+    display: inline-flex;
+    flex: 0 0 auto;
+    font-size: 0.9rem;
+    font-variant-numeric: tabular-nums;
+    min-height: 2rem;
+    min-width: 2rem;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+    padding: 0.25rem 0.65rem;
+    transition: background-color 150ms ease, color 150ms ease;
+}
+
+.rst-content .tutorial-next-step:not(.tutorial-unnumbered) > p > a:hover::before {
+    background: #ffffff;
+    color: var(--card-hover);
+}
+
+.rst-content .tutorial-with-duration {
+    position: relative;
+}
+
+.rst-content .tutorial-with-duration a,
+.rst-content .tutorial-with-duration a:visited {
+    padding-bottom: 3rem;
+}
+
+.rst-content .tutorial-with-duration .tutorial-duration {
+    bottom: 1rem;
+    color: var(--card-text);
+    pointer-events: none;
+    position: absolute;
+    right: 1.25rem;
+    text-align: right;
+    transition: color 150ms ease;
+}
+
+.rst-content .tutorial-with-duration .tutorial-duration p {
+    margin: 0;
+}
+
+.rst-content .tutorial-with-duration:hover .tutorial-duration {
+    color: #ffffff;
+}
+
+.rst-content .tutorial-next-step-multiple {
+    align-items: center;
+    background: var(--card-background);
+    border: 1px solid var(--card-border);
+    border-left: 5px solid var(--card-accent);
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgb(0 0 0 / 12%);
+    color: var(--card-text);
+    display: flex;
+    font-weight: 600;
+    min-height: 7rem;
+    padding: 1.25rem;
+}
+
+.rst-content .tutorial-next-step-multiple > p {
+    height: auto;
+}
+
+.rst-content .tutorial-next-step-multiple a,
+.rst-content .tutorial-next-step-multiple a:visited,
+.rst-content .tutorial-next-step-multiple a:hover {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    color: var(--card-text);
+    display: inline;
+    font-weight: 700;
+    height: auto;
+    min-height: 0;
+    padding: 0;
+    text-decoration: underline;
+    transform: none;
+}
+
+@media (max-width: 480px) {
+    .tutorial-next-steps {
+        grid-template-columns: 1fr;
+    }
+
+    .rst-content .tutorial-next-step a,
+    .rst-content .tutorial-next-step a:visited,
+    .rst-content .tutorial-next-step-multiple {
+        min-height: auto;
+    }
+}

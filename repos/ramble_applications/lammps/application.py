@@ -20,7 +20,7 @@ class Lammps(ExecutableApplication):
          'fft','particles','nbody','spatial-discretization',
          'large-scale','multi-node','single-node','sub-node',
          'mpi','network-collectives','network-point-to-point',
-         'c++','python','kokkos','vectorization')
+         'c++','python','kokkos','vectorization','ats-6')
 
     define_compiler("gcc9", pkg_spec="gcc@9.3.0")
 
