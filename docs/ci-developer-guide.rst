@@ -124,13 +124,15 @@ file containing, the SSH private key for ``benchpark-performance``.
 job publishes with the Plotly Cloud CLI. Set ``PLOTLY_API_KEY`` or
 ``PLOTLY_CLOUD_API_KEY`` to a Plotly Cloud API key. The job clones WARDEN from
 ``WARDEN_REPO_URL``, which defaults to ``https://github.com/llnl/warden.git``, and runs
-``warden_init_or_update`` before publishing the updated app files. Override the update
-command with ``WARDEN_INIT_OR_UPDATE_CMD`` only if WARDEN changes the executable name.
-Set ``WARDEN_REF`` to pin a branch, tag, or commit, or set
-``PLOTLY_CLOUD_APP_SUBDIR`` if the Dash app does not live at the WARDEN repository root.
-``PLOTLY_CLOUD_APP_PATH`` can still override cloning and point to an already available
-WARDEN Dash app source directory. A committed ``plotly-cloud.toml`` updates the
-existing app in place. If the app directory does not provide
+``warden_init_or_update``. It then runs
+``scripts/build_plotly_cloud_files.py --output plotly-cloud-files-v3`` and publishes
+that generated upload directory. Override those WARDEN commands with
+``WARDEN_INIT_OR_UPDATE_CMD``, ``WARDEN_PLOTLY_CLOUD_BUILD_SCRIPT``, and
+``WARDEN_PLOTLY_CLOUD_OUTPUT_DIR`` only if WARDEN changes its interface. Set
+``WARDEN_REF`` to pin a branch, tag, or commit. ``WARDEN_CHECKOUT_PATH`` can override
+cloning and point to an already available WARDEN checkout; ``PLOTLY_CLOUD_APP_PATH`` is
+also accepted as a legacy checkout-path override. A committed ``plotly-cloud.toml``
+updates the existing app in place. If the generated app directory does not provide
 ``plotly-cloud.toml`` and ``PLOTLY_CLOUD_APP_CONFIG`` is not set, also set
 ``PLOTLY_CLOUD_APP_NAME``. Optional variables include ``PLOTLY_CLOUD_APP_CONFIG`` and
 ``PLOTLY_CLOUD_TEAM``. The job publishes with ``REACT_VERSION=19.2.4`` by default
