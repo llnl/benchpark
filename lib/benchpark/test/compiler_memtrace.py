@@ -79,6 +79,10 @@ hip = Spec('builtin.hip@=7.2.1', external_path={str(tmp_path / "hip")!r})
 python = Spec('builtin.python@=' + '.'.join(map(str, sys.version_info[:3])),
               external_path=sys.prefix)
 numpy = Spec('benchpark.py-numpy@=2.0', external_path={str(tmp_path / "numpy")!r})
+venv = Spec('builtin.python-venv@=1.0', external_path={str(tmp_path / "venv")!r})
+venv.add_dependency_edge(python, depflag=dt.BUILD | dt.RUN, virtuals=())
+numpy.add_dependency_edge(python, depflag=dt.BUILD | dt.LINK | dt.RUN, virtuals=())
+numpy.add_dependency_edge(venv, depflag=dt.BUILD | dt.RUN, virtuals=())
 for name, spec in (
     ('raja-perf', 'raja-perf@=develop +rocm amdgpu_target=gfx942 build_system=cmake cxxflags="-O3"'),
     ('memtrace-llvm', 'benchpark.memtrace-llvm@=0.1.0 +runtime +python build_system=cmake'),
@@ -100,6 +104,12 @@ for name, spec in (
     environment.add_concrete_spec(Spec(name), root, new=False)
 environment.write(regenerate=False)
 """
+    )
+    # Spack installs extensions with python-venv, which queries its own interpreter,
+    # so the external venv must exist. Its layout differs from a distro Python's.
+    subprocess.run(
+        [sys.executable, "-m", "venv", "--without-pip", str(tmp_path / "venv")],
+        check=True,
     )
     # Use the modifier's real subprocess runner. The wrapper only selects the
     # pinned Spack and package repositories for this test process.

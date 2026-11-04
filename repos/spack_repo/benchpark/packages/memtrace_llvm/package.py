@@ -93,10 +93,15 @@ class MemtraceLlvm(CMakePackage):
         return files
 
     def reader_paths(self):
-        python = self.spec["python"].package
+        numpy = self.spec["py-numpy"]
+        # Spack installs py-numpy with its python-venv interpreter, whose layout can
+        # differ from the base interpreter's default scheme (Debian/Ubuntu system
+        # Pythons report local/lib/pythonX.Y/dist-packages).
+        venvs = numpy.dependencies("python-venv")
+        layout = venvs[0].package if venvs else self.spec["python"].package
         return [join_path(self.prefix.share, "memtrace", "python")] + [
-            join_path(self.spec["py-numpy"].prefix, path)
-            for path in dict.fromkeys((python.purelib, python.platlib))
+            join_path(numpy.prefix, path)
+            for path in dict.fromkeys((layout.purelib, layout.platlib))
         ]
 
     def reader_preload(self):
