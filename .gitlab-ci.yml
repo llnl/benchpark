@@ -52,6 +52,8 @@ variables:
   FF_ENABLE_JOB_CLEANUP: 'true'
   GIT_STRATEGY: fetch
   # Dash Mantine Components 3 requires React 19.
+  WARDEN_REPO_URL: https://github.com/llnl/warden.git
+  WARDEN_INIT_OR_UPDATE_CMD: warden_init_or_update
   PLOTLY_CLOUD_REACT_VERSION: '19.2.4'
   PLOTLY_CLOUD_DASH_REQUIREMENT_PIN: 'dash==4.5.0'
   PLOTLY_CLOUD_DMC_REQUIREMENT_PIN: 'dash-mantine-components==3.0.0'
