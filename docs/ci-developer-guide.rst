@@ -122,11 +122,16 @@ The publishing job requires ``BENCHPARK_PERF_DEPLOY_TOKEN`` to contain, or point
 file containing, the SSH private key for ``benchpark-performance``.
 ``BENCHPARK_PERF_REPO_URL`` indicates the destination repository. The dashboard update
 job publishes with the Plotly Cloud CLI. Set ``PLOTLY_API_KEY`` or
-``PLOTLY_CLOUD_API_KEY`` to a Plotly Cloud API key and set
-``PLOTLY_CLOUD_APP_PATH`` to the WARDEN Dash app source directory available to the CI
-job. The CLI runs ``plotly app publish`` from that app directory, so a committed
-``plotly-cloud.toml`` updates the existing app in place. If the app directory does not
-provide ``plotly-cloud.toml`` and ``PLOTLY_CLOUD_APP_CONFIG`` is not set, also set
+``PLOTLY_CLOUD_API_KEY`` to a Plotly Cloud API key. The job clones WARDEN from
+``WARDEN_REPO_URL``, which defaults to ``https://github.com/llnl/warden.git``, and runs
+``warden_init_or_update`` before publishing the updated app files. Override the update
+command with ``WARDEN_INIT_OR_UPDATE_CMD`` only if WARDEN changes the executable name.
+Set ``WARDEN_REF`` to pin a branch, tag, or commit, or set
+``PLOTLY_CLOUD_APP_SUBDIR`` if the Dash app does not live at the WARDEN repository root.
+``PLOTLY_CLOUD_APP_PATH`` can still override cloning and point to an already available
+WARDEN Dash app source directory. A committed ``plotly-cloud.toml`` updates the
+existing app in place. If the app directory does not provide
+``plotly-cloud.toml`` and ``PLOTLY_CLOUD_APP_CONFIG`` is not set, also set
 ``PLOTLY_CLOUD_APP_NAME``. Optional variables include ``PLOTLY_CLOUD_APP_CONFIG`` and
 ``PLOTLY_CLOUD_TEAM``. The job publishes with ``REACT_VERSION=19.2.4`` by default
 because Dash Mantine Components 3 requires React 19. Override this with
