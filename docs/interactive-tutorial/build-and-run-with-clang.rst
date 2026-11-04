@@ -92,6 +92,28 @@ strong-scaling study.
 
     Strong-scaling area chart.
 
+.. code-block:: console
+
+    ƒ(s=1,d=0) [fluxuser@1b0d0191505c benchpark]$ benchpark query wkp/hpc-tutorial-clang/hpl/workspace/ --metadata-columns n_ranks --metric "Avg time/rank" --query-regions-byname main
+    query-20261104-155408.csv
+    ƒ(s=1,d=0) [fluxuser@1b0d0191505c benchpark]$ cat query-20261104-155408.csv
+    # benchpark query wkp/hpc-tutorial-clang/hpl/workspace/ --metadata-columns n_ranks --metric 'Avg time/rank' --query-regions-byname main
+    cluster,application_name,n_ranks,Avg time/rank
+    bdc,hpl,1,7.703953124999999
+    bdc,hpl,2,4.7093827054999995
+    bdc,hpl,4,3.3855390321000005
+
+.. code-block:: console
+
+    ƒ(s=1,d=0) [fluxuser@1b0d0191505c benchpark]$ benchpark query wkp/hpc-tutorial-gcc/hpl/workspace/ --metadata-columns n_ranks --metric "Avg time/rank" --query-regions-byname main
+    query-20261104-183338.csv
+    ƒ(s=1,d=0) [fluxuser@1b0d0191505c benchpark]$ cat query-20261104-183338.csv
+    # benchpark query wkp/hpc-tutorial-gcc/hpl/workspace/ --metadata-columns n_ranks --metric 'Avg time/rank' --query-regions-byname main
+    cluster,application_name,n_ranks,Avg time/rank
+    bdc,hpl,1,7.997662874
+    bdc,hpl,2,4.9663122085
+    bdc,hpl,4,3.4960456583
+
 ***********************
  Choose Your Next Step
 ***********************
