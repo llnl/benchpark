@@ -37,7 +37,6 @@ When a Benchpark run fails, first identify which phase failed:
 This tutorial focuses on a failure from ``ramble on`` because those failures usually
 mean the benchmark launched but one experiment instance did not finish correctly.
 
-
 *****************************
  Build and Run an Experiment
 *****************************
@@ -143,7 +142,6 @@ job runs, so the next step is to inspect job status and logs.
 **************
 
 Fix this by updating ``hpl-err`` to ``hpl`` to match the correct software spec.
-
 
 ***********************
  Debugging Checklist
