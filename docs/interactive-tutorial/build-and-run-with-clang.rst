@@ -92,27 +92,23 @@ strong-scaling study.
 
     Strong-scaling area chart.
 
-.. code-block:: console
+We can also use `benchpark query <https://software.llnl.gov/benchpark/benchpark-query.html>`_
+to search one or more directories for particular metadata or performance data in the
+Caliper .cali files. The data of interst is written to a CSV file. Here, we query our
+HPL+clang workspace and our HPL+gcc workspace for the execution time of the ``main``
+region. The resulting query generates the execution time at each task count.
 
-    ƒ(s=1,d=0) [fluxuser@1b0d0191505c benchpark]$ benchpark query wkp/hpc-tutorial-clang/hpl/workspace/ --metadata-columns n_ranks --metric "Avg time/rank" --query-regions-byname main
-    query-20261104-155408.csv
-    ƒ(s=1,d=0) [fluxuser@1b0d0191505c benchpark]$ cat query-20261104-155408.csv
-    # benchpark query wkp/hpc-tutorial-clang/hpl/workspace/ --metadata-columns n_ranks --metric 'Avg time/rank' --query-regions-byname main
-    cluster,application_name,n_ranks,Avg time/rank
-    bdc,hpl,1,7.703953124999999
-    bdc,hpl,2,4.7093827054999995
-    bdc,hpl,4,3.3855390321000005
+.. figure:: /_static/images/benchpark-query-clang.png
+    :width: 800
+    :align: center
 
-.. code-block:: console
+    Performance of HPL built with clang compiler at different task counts.
 
-    ƒ(s=1,d=0) [fluxuser@1b0d0191505c benchpark]$ benchpark query wkp/hpc-tutorial-gcc/hpl/workspace/ --metadata-columns n_ranks --metric "Avg time/rank" --query-regions-byname main
-    query-20261104-183338.csv
-    ƒ(s=1,d=0) [fluxuser@1b0d0191505c benchpark]$ cat query-20261104-183338.csv
-    # benchpark query wkp/hpc-tutorial-gcc/hpl/workspace/ --metadata-columns n_ranks --metric 'Avg time/rank' --query-regions-byname main
-    cluster,application_name,n_ranks,Avg time/rank
-    bdc,hpl,1,7.997662874
-    bdc,hpl,2,4.9663122085
-    bdc,hpl,4,3.4960456583
+.. figure:: /_static/images/benchpark-query-gcc.png
+    :width: 800
+    :align: center
+
+    Performance of HPL built with gcc compiler at different task counts.
 
 ***********************
  Choose Your Next Step
