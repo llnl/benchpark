@@ -1,11 +1,17 @@
 #!/bin/bash
 set -euo pipefail
 
-summary_dir="${CI_PROJECT_DIR}/artifact-test-summary"
+ci_project_dir="${CI_PROJECT_DIR:-$(pwd)}"
+summary_dir="${ci_project_dir}/artifact-test-summary"
+publish_state_dir="${ci_project_dir}/artifact-performance-publish"
+publish_state_file="${publish_state_dir}/publish.env"
 perf_repo_url="${BENCHPARK_PERF_REPO_URL:-git@github.com:llnl/benchpark-performance.git}"
 perf_repo_dir="$(mktemp -d)"
 ssh_key_file="${perf_repo_dir}.ssh_key"
 host_dirs=(dane tioga matrix tuolumne)
+
+mkdir -p "${publish_state_dir}"
+printf 'BENCHPARK_PERF_METADATA_PUSHED=0\n' > "${publish_state_file}"
 
 cleanup() {
     rm -rf "${perf_repo_dir}"
@@ -62,3 +68,4 @@ git add "${copied_hosts[@]}"
 git commit -m "Update nightly performance metadata from ${CI_PIPELINE_ID:-unknown}"
 GIT_SSH_COMMAND="${git_ssh_command}" GIT_TERMINAL_PROMPT=0 \
     git push origin HEAD
+printf 'BENCHPARK_PERF_METADATA_PUSHED=1\n' > "${publish_state_file}"
