@@ -108,8 +108,8 @@ pipeline summary and per-host JSON files, then
 ``performance/generate_test_status_table.py`` renders the status table. For scheduled
 pipelines, the ``publish-performance`` stage pushes the per-host files to the
 ``benchpark-performance`` repository. When that job pushes new metadata, the
-``deploy-dashboard`` stage triggers the WARDEN Plotly Cloud redeploy so the dashboard
-loads the newly published performance data.
+``deploy-dashboard`` stage publishes the WARDEN Dash app with the Plotly Cloud CLI so
+the dashboard loads the newly published performance data.
 
 Performance collection currently queries ``Avg time/rank`` for the ``main`` region and
 marks values more than 5 percent above the baseline as regressions. Test jobs use
@@ -120,9 +120,25 @@ the current test metadata from being written.
 
 The publishing job requires ``BENCHPARK_PERF_DEPLOY_TOKEN`` to contain, or point to a
 file containing, the SSH private key for ``benchpark-performance``.
-``BENCHPARK_PERF_REPO_URL`` indicates the destination repository. The dashboard redeploy
-job requires ``PLOTLY_CLOUD_REDEPLOY_WEBHOOK`` to contain the Plotly Cloud redeploy
-webhook URL.
+``BENCHPARK_PERF_REPO_URL`` indicates the destination repository. The dashboard update
+job publishes with the Plotly Cloud CLI. Set ``PLOTLY_API_KEY`` or
+``PLOTLY_CLOUD_API_KEY`` to a Plotly Cloud API key and set
+``PLOTLY_CLOUD_APP_PATH`` to the WARDEN Dash app source directory available to the CI
+job. The CLI runs ``plotly app publish`` from that app directory, so a committed
+``plotly-cloud.toml`` updates the existing app in place. If the app directory does not
+provide ``plotly-cloud.toml`` and ``PLOTLY_CLOUD_APP_CONFIG`` is not set, also set
+``PLOTLY_CLOUD_APP_NAME``. Optional variables include ``PLOTLY_CLOUD_APP_CONFIG`` and
+``PLOTLY_CLOUD_TEAM``. The job publishes with ``REACT_VERSION=19.2.4`` by default
+because Dash Mantine Components 3 requires React 19. Override this with
+``PLOTLY_CLOUD_REACT_VERSION`` only if the WARDEN app dependencies change. Before
+publishing, the job stages a temporary copy of the WARDEN app and pins that staged
+``requirements.txt`` to ``dash==4.5.0`` and
+``dash-mantine-components==3.0.0``. Override those pins with
+``PLOTLY_CLOUD_DASH_REQUIREMENT_PIN`` and ``PLOTLY_CLOUD_DMC_REQUIREMENT_PIN`` only
+when upgrading the dashboard dependency stack. The live Plotly Cloud app must also
+have the runtime environment variable ``REACT_VERSION=19.2.4`` so Dash serves React 19
+in the browser. The job installs ``dash[cloud]`` in a temporary virtual environment if
+the ``plotly`` CLI is not already available.
 
 When adding a monitored benchmark, update its test matrix and matching
 ``resource_rules_*`` entry.
