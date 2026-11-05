@@ -12,19 +12,18 @@
  Start Here
 ############
 
-Benchpark is an open-source infrastructure-as-code Python project which aims to
-enable reproducibility in HPC benchmarking. It accomplishes this by defining
-each component of HPC benchmarking, and constraining it separately.
-Benchpark builds on the specification provided by Spack, an HPC package
-manager, and Ramble, an HPC testing framework.
+Benchpark is an open-source infrastructure-as-code Python project which aims to enable
+reproducibility in HPC benchmarking. It accomplishes this by defining each component of
+HPC benchmarking, and constraining it separately. Benchpark builds on the specification
+provided by Spack, an HPC package manager, and Ramble, an HPC testing framework.
 
 .. seealso::
 
-   `Latest Benchpark Tutorial Slides <../_static/slides/PACT26-Tutorial-Slides.pdf>`_ |
-   `Benchpark Code on GitHub <https://github.com/llnl/benchpark>`_ |
-   `Benchpark Dashboard <https://my.cdash.org/index.php?project=Benchpark>`_ |
-   `Ramble <https://ramble.readthedocs.io/en/latest/>`_ |
-   `Spack <https://spack.readthedocs.io/en/latest/>`_
+    `Latest Benchpark Tutorial Slides <../_static/slides/PACT26-Tutorial-Slides.pdf>`_ |
+    `Benchpark Code on GitHub <https://github.com/llnl/benchpark>`_ | `Benchpark
+    Dashboard <https://my.cdash.org/index.php?project=Benchpark>`_ | `Ramble
+    <https://ramble.readthedocs.io/en/latest/>`_ | `Spack
+    <https://spack.readthedocs.io/en/latest/>`_
 
 ********************
  Benchpark Glossary
@@ -147,25 +146,31 @@ A Benchpark spec describes a Benchpark object. A system spec selects a definitio
 
 The Benchpark system spec defines the hardware resources and software stack, including
 information that is useful for running benchmarks. This may include the following:
-* Resources (CPU cores, GPUs)
-* Scheduler (Slurm, flux)
-* Process mapping (cores, sockets, GPUs, NICs)
-* On-node parallelism (CUDA, ROCM, OpenMP)
-* Software stack
-* Compilers (which is best?)
-* MPI implementations (best?)
-* Math libraries
+
+- Resources (CPU cores, GPUs)
+- Scheduler (Slurm, flux)
+- Process mapping (cores, sockets, GPUs, NICs)
+- On-node parallelism (CUDA, ROCM, OpenMP)
+- Software stack
+- Compilers (which is best?)
+- MPI implementations (best?)
+- Math libraries
 
 The Benchpark experiment spec defines any information for reproducible sets of
 experiments that we can map onto specific systems, such as:
-* On-node parallelism (CUDA, ROCM, OpenMP)
-* Problem sizes
-  * Overall problem size, or
-  * Per node or per GPU
-* Scaling studies
-  * How to scale
-  * How to decompose
-* Resources (cores, GPUs)
+
+- On-node parallelism (CUDA, ROCM, OpenMP)
+- Problem sizes
+
+      - Overall problem size, or
+      - Per node or per GPU
+
+- Scaling studies
+
+  - How to scale
+  - How to decompose
+
+- Resources (cores, GPUs)
 
 Benchpark's parser is derived from Spack's spec parser and implements the object name
 and `variant portions of its syntax

@@ -21,9 +21,9 @@
 This use case follows the same workflow as :doc:`build-and-run-experiment`, but changes
 the tutorial system's compiler from its default ``gcc`` stack to ``clang``.
 
-*************************
+**************************
  What Changes in This Run
-*************************
+**************************
 
 The default ``fluxtainer-aws`` compiler is ``gcc``. To build the same HPL experiment
 with Clang, initialize a second system instance and select the ``compiler=clang``
@@ -36,9 +36,9 @@ variant:
 Here ``compiler=clang`` is a Benchpark system variant provided by ``fluxtainer-aws``. It
 is not a Spack ``%clang`` constraint.
 
-********************
+*******************
  Build and Run HPL
-********************
+*******************
 
 Initialize the HPL experiment against the Clang system instance:
 
@@ -70,9 +70,9 @@ Then, run the experiments:
 
     ~/benchpark]$ ramble --workspace-dir wkp/hpc-tutorial-clang/hpl/workspace on
 
-The generated workspace is separate from the default GCC run because the system
-instance is named ``hpc-tutorial-clang``. That keeps the Clang build, run scripts, and
-results side by side with the original ``hpc-tutorial`` workspace.
+The generated workspace is separate from the default GCC run because the system instance
+is named ``hpc-tutorial-clang``. That keeps the Clang build, run scripts, and results
+side by side with the original ``hpc-tutorial`` workspace.
 
 ************************
  Analyze Strong Scaling
@@ -92,11 +92,12 @@ strong-scaling study.
 
     Strong-scaling area chart.
 
-We can also use `benchpark query <https://software.llnl.gov/benchpark/benchpark-query.html>`_
-to search one or more directories for particular metadata or performance data in the
-Caliper .cali files. The data of interst is written to a CSV file. Here, we query our
-HPL+clang workspace and our HPL+gcc workspace for the execution time of the ``main``
-region. The resulting query generates the execution time at each rank count.
+We can also use `benchpark query
+<https://software.llnl.gov/benchpark/benchpark-query.html>`_ to search one or more
+directories for particular metadata or performance data in the Caliper .cali files. The
+data of interest is written to a CSV file. Here, we query our HPL+clang workspace and our
+HPL+gcc workspace for the execution time of the ``main`` region. The resulting query
+generates the execution time at each rank count.
 
 .. figure:: /_static/images/benchpark-query-clang.png
     :width: 800
