@@ -26,7 +26,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     license("BSD-2-Clause")
 
     version("develop", branch="master")
-    version("ats-6", tag="ats-6")
+    version("3.2", sha256="cd1da85f56a77bab2cf506543cd24155de4dc4de")
     version("3.1", sha256="49b65edcbf9732c7f6c228958620e18980c43ad8381315a8ba9957ecb7534cd5")
     version("3.0", sha256="4db56286e15b42ecdc8d540c4888a7dec698b019df9c7ccb8319b7ea1f92d8b4")
     version("2.0", sha256="dd3632d5558889beec2cd3c49eb60f633f99e6d886ac868731610dd006c44c14")
@@ -46,15 +46,15 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     depends_on("umpire@2026.07.2:", when="@develop")
     depends_on("raja@2026.07.1: ~examples~exercises cxxstd=20", when="@develop")
 
-    depends_on("umpire@2026.07.2", when="@ats-6")
-    depends_on("raja@2026.07.1 ~examples~exercises cxxstd=20", when="@ats-6")
+    depends_on("umpire@2026.07.2", when="@3.2")
+    depends_on("raja@2026.07.1 ~examples~exercises cxxstd=20", when="@3.2")
 
     depends_on("mfem+mpi+metis", when="+metis")
     depends_on("mfem+mpi~metis", when="~metis")
     depends_on("mfem+raja", when="+raja")
 
     depends_on("mfem@develop", when="@develop")
-    depends_on("mfem@4.10", when="@ats-6")
+    depends_on("mfem@4.10", when="@3.2")
     depends_on("mfem@4.2.0:", when="@3.1")
     depends_on("mfem@4.1.0:4.1", when="@3.0")
     # Recommended mfem version for laghos v2.0 is: ^mfem@3.4.1-laghos-v2.0
@@ -63,7 +63,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     depends_on("mfem@3.3.1-laghos-v1.0", when="@1.0,1.1")
     depends_on("mfem+caliper", when="+caliper")
     depends_on("mfem cxxstd=20", when="@develop")
-    depends_on("mfem cxxstd=20", when="@ats-6")
+    depends_on("mfem cxxstd=20", when="@3.2")
 
     depends_on("caliper", when="+caliper")
     depends_on("adiak~shared", when="+caliper")
@@ -122,9 +122,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
             targets.append("LAGHOS_USE_CALIPER=ON")
             targets.append("CALIPER_DIR=%s" % spec["caliper"].prefix)
             targets.append("ADIAK_DIR=%s" % spec["adiak"].prefix)
-        # Only the legacy releases need CXX overridden.  A range also matches
-        # nonnumeric versions such as ats-6, which must use MFEM's HIP-aware
-        # compiler command for ROCm builds.
+        # Only the legacy releases need CXX overridden.
         if spec.satisfies("@1.0,1.1,2.0"):
             targets.append("CXX=%s" % spec["mpi"].mpicxx)
         if self.spec.satisfies("+ofast %gcc"):
