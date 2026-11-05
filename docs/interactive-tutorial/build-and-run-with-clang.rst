@@ -95,8 +95,8 @@ strong-scaling study.
 We can also use `benchpark query
 <https://software.llnl.gov/benchpark/benchpark-query.html>`_ to search one or more
 directories for particular metadata or performance data in the Caliper .cali files. The
-data of interest is written to a CSV file. Here, we query our HPL+clang workspace and our
-HPL+gcc workspace for the execution time of the ``main`` region. The resulting query
+data of interest is written to a CSV file. Here, we query our HPL+clang workspace and
+our HPL+gcc workspace for the execution time of the ``main`` region. The resulting query
 generates the execution time at each rank count.
 
 .. figure:: /_static/images/benchpark-query-clang.png
