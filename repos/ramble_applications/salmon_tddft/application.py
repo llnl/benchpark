@@ -12,14 +12,14 @@ class SalmonTddft(ExecutableApplication):
     """Salmon-tddft benchmark"""
     name = "salmon-tddft"
 
-    tags = ['mpi']
+    tags('mpi')
 
     executable('pre-process', 'cp {input_path}/* .', use_mpi=False)
 
     executable('post-process', 'cp -r ./data_for_restart {input_path}', use_mpi=False)
 
     executable('link-restart', 'ln -s -T {restart_data} restart', use_mpi=False)
-               
+
     executable('execute', 'salmon ' +
                '{input_data}' , use_mpi=True)
 
@@ -29,10 +29,10 @@ class SalmonTddft(ExecutableApplication):
     input_file('salmon-v2_rt', url='http://salmon-tddft.jp/download/SALMON-v.2.2.0.tar.gz',
                md5='d71436df3a1ad507f665abb8453eee15',
                description='')
-               
+
     workload('gs', executables=['pre-process', 'execute'], input='salmon-v2_gs')
     workload('rt', executables=['pre-process', 'link-restart', 'execute'], input='salmon-v2_rt')
-    
+
    # workload_variable('input_path', default='{salmon-v2}/samples/{exercise}',
    #                   description='Input path for sample exercise',
    #                   workloads=['gs','rt'])

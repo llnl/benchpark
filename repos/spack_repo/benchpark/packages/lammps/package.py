@@ -17,6 +17,11 @@ class Lammps(BuiltinLammps):
   depends_on("kokkos@5.0.0:", when="@20251219: +kokkos")
   depends_on("kokkos+openmp", when="+openmp")
   depends_on("kokkos+wrapper", when="+cuda")
+  # Kokkos 5.2.0-5.2.2's nvcc_wrapper mishandles the quoted object paths CMake
+  # writes into response files, so the +cuda link fails with "Argument list
+  # too long". 5.1.1 predates that change. Fixed upstream for 5.3.0
+  # (kokkos/kokkos#9573); relax this once 5.3.0 is available in Spack.
+  depends_on("kokkos@:5.1.1", when="+kokkos +cuda")
   depends_on("kokkos+apu", when="+apu")
 
   def flag_handler(self, name, flags):

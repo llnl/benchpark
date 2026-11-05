@@ -12,13 +12,13 @@ class Remhos(ExecutableApplication):
     """Remhos benchmark"""
     name = "remhos"
 
-    tags = ['asc','ats-6','engineering','mfem','cfd','large-scale',
-            'multi-node','single-node','mpi','c++','high-order','hydrodynamics',
-            'explicit-timestepping','finite-element','time-dependent','ode',
-            'full-assembly','partial-assembly',
-            'lagrangian','spatial-discretization','unstructured-grid',
-            'network-latency-bound','network-collectives','unstructured-grid',
-            'llnl-nightly','llnl-monthly','llnl-pr','llnl-weekly']
+    tags('asc','ats-6','engineering','mfem','cfd','large-scale',
+         'multi-node','single-node','mpi','c++','high-order','hydrodynamics',
+         'explicit-timestepping','finite-element','time-dependent','ode',
+         'full-assembly','partial-assembly',
+         'lagrangian','spatial-discretization','unstructured-grid',
+         'network-latency-bound','network-collectives','unstructured-grid',
+         'llnl-nightly','llnl-monthly','llnl-pr','llnl-weekly')
 
     executable('2d', 'remhos' +
                      ' -dim 2 ' +
@@ -56,7 +56,7 @@ class Remhos(ExecutableApplication):
 
     workload('2d', executables=['2d'])
     workload('3d', executables=['3d'])
-    
+
     #workload_variable('mesh', default='{remhos}/data/periodic-square.mesh',
     #   description='mesh file',
     #  workloads=[''])
@@ -72,7 +72,7 @@ class Remhos(ExecutableApplication):
     workload_variable('p', default='5',
         description='problem number',
         workloads=['remhos'])
-    
+
     workload_variable('dt', default='-1.0',
         description='time step',
         workloads=['2d','3d'])
@@ -80,7 +80,7 @@ class Remhos(ExecutableApplication):
     workload_variable('tf', default='0.5',
         description='time final',
         workloads=['2d','3d'])
-    
+
     workload_variable('ho', default='3',
         description='high order solver',
         workloads=['2d','3d'])

@@ -37,6 +37,21 @@ where:
 - ``<Benchmark>``: amg2023 | saxpy | etc. (predefined choices in :doc:`benchmark-list`)
 - ``<SystemName>``: Cts | Tioga | etc. (predefined systems in :doc:`system-list`)
 
+System specifications accept ``extra_batch_opts`` for scheduler allocation options and
+``extra_cmd_opts`` for launcher options. These options are appended after those defined
+by the system and appear in the generated ``variables.yaml`` for every experiment using
+that system. Quote each assignment when its value contains spaces or commas so the shell
+passes it as one argument. For example:
+
+::
+
+    benchpark system init --dest=tuolumne llnl-elcapitan cluster=tuolumne \
+        'extra_batch_opts=--requires=hosts:a,b' \
+        'extra_cmd_opts=-o mpibind=greedy:0,verbose'
+
+Omit either assignment to use only the system's own options. The default value for each
+variant is ``none``.
+
 Experiment variables can be overridden with ``name=value`` assignments, even when the
 experiment does not declare them as variants. For example:
 

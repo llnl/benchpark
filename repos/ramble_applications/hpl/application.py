@@ -11,8 +11,8 @@ from ramble.appkit import *
 
 class Hpl(HplBase):
 
-    tags = ['synthetic',
-            'blas','solver','dense-linear-algebra',
-            'large-scale',
-            'mpi','network-collectives','network-point-to-point',
-            'c']
+    tags('synthetic',
+         'blas','solver','dense-linear-algebra',
+         'large-scale',
+         'mpi','network-collectives','network-point-to-point',
+         'c')
