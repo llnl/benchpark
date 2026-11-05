@@ -32,7 +32,6 @@
     interactive-tutorial/search-benchpark
     interactive-tutorial/build-and-run-experiment
     interactive-tutorial/build-and-run-with-clang
-    interactive-tutorial/troubleshoot-a-failed-run
     interactive-tutorial/benchpark-analyze
     interactive-tutorial/add-a-spack-package
     interactive-tutorial/add-a-ramble-application

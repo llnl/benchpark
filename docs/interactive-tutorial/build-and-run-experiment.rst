@@ -131,11 +131,6 @@ one allocation, see :doc:`/run-experiment`.
         library.
         <build-and-run-with-clang>`
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-troubleshoot
-
-        :doc:`My experiment did not finish, and I want to diagnose where it failed.
-        <troubleshoot-a-failed-run>`
-
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-query
 
         :doc:`I want to generate raw performance data to make my own figures.

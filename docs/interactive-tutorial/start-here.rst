@@ -253,15 +253,6 @@ not Spack compiler (``%``) or version (``@``) constraints.
 
             #2 + 5 min.
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-troubleshoot tutorial-with-duration
-
-        :doc:`I want to run use case #2, run into an error, and learn how to
-        diagnose it. <troubleshoot-a-failed-run>`
-
-        .. tutorialcontainer:: tutorial-duration
-
-            #2 + 15 min.
-
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-analyze tutorial-with-duration
 
         :doc:`I want to generate preconfigured performance figures for an experiment
