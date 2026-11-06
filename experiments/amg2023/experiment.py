@@ -30,8 +30,8 @@ class Amg2023(
 
     variant(
         "version",
-        default="20261006",
-        values=("develop", "latest", "20261006", "20240511"),
+        default="ats-6",
+        values=("develop", "latest", "ats-6", "20261006", "20240511"),
         description="app version",
     )
 
