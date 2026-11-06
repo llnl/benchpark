@@ -26,7 +26,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     license("BSD-2-Clause")
 
     version("develop", branch="master")
-    version("3.2", sha256="cd1da85f56a77bab2cf506543cd24155de4dc4de")
+    version("3.2", sha256="99db3d331cff3c46ce1afc5cd13902bd69bde5967782de0be5162ac057b13862")
     version("3.1", sha256="49b65edcbf9732c7f6c228958620e18980c43ad8381315a8ba9957ecb7534cd5")
     version("3.0", sha256="4db56286e15b42ecdc8d540c4888a7dec698b019df9c7ccb8319b7ea1f92d8b4")
     version("2.0", sha256="dd3632d5558889beec2cd3c49eb60f633f99e6d886ac868731610dd006c44c14")
