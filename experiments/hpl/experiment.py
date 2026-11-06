@@ -80,4 +80,7 @@ class Hpl(
         )
 
     def compute_package_section(self):
-        self.add_package_spec(self.name, [f"hpl{self.determine_version()}"])
+        if self.spec.satisfies("exec_mode=tutorial-failure"):
+            self.add_package_spec(self.name, [f"hpl-err{self.determine_version()}"])
+        else:
+            self.add_package_spec(self.name, [f"hpl{self.determine_version()}"])

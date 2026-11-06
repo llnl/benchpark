@@ -23,7 +23,7 @@ class ExecMode(metaclass=DirectiveMeta):
     variant(
         "exec_mode",
         default="test",
-        values=("test", "perf"),
+        values=("test", "perf", "tutorial-failure"),
         description="Execution mode",
     )
 

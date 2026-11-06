@@ -114,6 +114,15 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     --goal-number: "2";
 }
 
+.rst-content .tutorial-goal-substitute {
+    --card-accent: #4c7a5c;
+    --card-background: #eaf5ee;
+    --card-border: #bdd9c8;
+    --card-hover: #416d51;
+    --card-text: #294f35;
+    --goal-number: "2 substitute";
+}
+
 .rst-content .tutorial-goal-system {
     --card-accent: #4d82b5;
     --card-background: #eaf3fb;
@@ -328,6 +337,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
 .rst-content .tutorial-next-step:not(.tutorial-unnumbered):is(
     .tutorial-goal-search,
     .tutorial-goal-run,
+    .tutorial-goal-substitute,
     .tutorial-goal-analyze,
     .tutorial-goal-experiment,
     .tutorial-goal-update-system,
