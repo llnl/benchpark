@@ -523,9 +523,6 @@ class Gromacs(CMakePackage, CudaPackage, ROCmPackage):
                 )
 
     def setup_run_environment(self, env):
-        if self.compiler.extra_rpaths:
-            for rpath in self.compiler.extra_rpaths:
-                env.prepend_path("LD_LIBRARY_PATH", rpath)
         if self.spec.satisfies("+cufftmp"):
             env.append_path(
                 "LD_LIBRARY_PATH",
@@ -883,9 +880,6 @@ class CMakeBuilder(CMakeBuilder):
         return options
 
     def setup_build_environment(self, env):
-        if self.pkg.compiler.extra_rpaths:
-            for rpath in self.pkg.compiler.extra_rpaths:
-                env.prepend_path("LD_LIBRARY_PATH", rpath)
         if self.spec.satisfies("+cufftmp"):
             env.append_path(
                 "LD_LIBRARY_PATH",

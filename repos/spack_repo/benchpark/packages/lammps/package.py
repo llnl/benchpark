@@ -34,13 +34,6 @@ class Lammps(BuiltinLammps):
 
     return (wrapper_flags, x, build_system_flags)
 
-  def setup_run_environment(self, env):
-    super().setup_run_environment(env)
-
-    if self.compiler.extra_rpaths:
-      for rpath in self.compiler.extra_rpaths:
-        env.prepend_path("LD_LIBRARY_PATH", rpath)
-
   def cmake_args(self):
     args = super().cmake_args()
 
