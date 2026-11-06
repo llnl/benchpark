@@ -25,6 +25,8 @@ RUN dnf clean all \
     npm \
     blas-devel \
     lapack-devel \
+    emacs \
+    nano \
     && dnf clean all \
     && rm -rf /var/cache/dnf
 
