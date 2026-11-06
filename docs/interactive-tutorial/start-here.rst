@@ -229,7 +229,7 @@ not Spack compiler (``%``) or version (``@``) constraints.
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-search tutorial-with-duration
 
-        :doc:`I want to search what is available in Benchpark. <search-benchpark>`
+        :doc:`I want to search what is available in Benchpark and Ramble. <search-benchpark>`
 
         .. tutorialcontainer:: tutorial-duration
 
