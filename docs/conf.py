@@ -41,6 +41,8 @@ extensions = [
     "sphinxcontrib.programoutput",
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
+    "sphinx_design",
+    "sphinxcontrib.mermaid",
 ]
 
 sys.path.insert(0, os.path.abspath("../lib"))

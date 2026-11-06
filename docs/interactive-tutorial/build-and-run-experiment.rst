@@ -27,7 +27,7 @@ Then, initialize the HPL experiment:
 
 .. code-block:: console
 
-    ~/benchpark]$ benchpark experiment init --dest=hpl hpc-tutorial hpl +strong caliper=time,mpi
+    ~/benchpark]$ benchpark experiment init hpc-tutorial hpl +strong caliper=time,mpi
 
 .. figure:: /_static/images/fluxtainer-aws-experiment-spec.png
     :alt: Tutorial experiment spec
@@ -124,6 +124,12 @@ one allocation, see :doc:`/run-experiment`.
 
         :doc:`I want to analyze the performance of an experiment on my system by
         generating preconfigured performance figures. <benchpark-analyze>`
+
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-substitute
+
+        :doc:`I want to re-run this experiment and substitute a different compiler or
+        library.
+        <build-and-run-with-clang>`
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-query
 

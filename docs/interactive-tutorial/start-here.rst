@@ -12,49 +12,18 @@
  Start Here
 ############
 
-.. tutorialcontainer:: tutorial-project-links
+Benchpark is an open-source infrastructure-as-code Python project which aims to enable
+reproducibility in HPC benchmarking. It accomplishes this by defining each component of
+HPC benchmarking, and constraining it separately. Benchpark builds on the specification
+provided by Spack, an HPC package manager, and Ramble, an HPC testing framework.
 
-    .. tutorialcontainer:: tutorial-project-link
+.. seealso::
 
-        .. rubric:: Benchpark Source
-
-        .. image:: /_static/images/benchpark-icon.svg
-            :alt: Benchpark on GitHub
-            :target: https://github.com/llnl/benchpark
-
-    .. tutorialcontainer:: tutorial-project-link
-
-        .. rubric:: Benchpark Tutorial Slides
-
-        .. image:: /tutorial/PACT26-Tutorial-Slide-Preview.jpg
-            :alt: Benchpark Tutorial Slides
-            :target: ../_static/slides/PACT26-Tutorial-Slides.pdf
-
-    .. tutorialcontainer:: tutorial-project-link
-
-        .. rubric:: Benchpark on CDash
-
-        .. image:: /_static/images/cdash.svg
-            :alt: Benchpark CDash
-            :target: https://my.cdash.org/index.php?project=Benchpark
-
-    .. tutorialcontainer:: tutorial-project-link
-
-        .. rubric:: Spack
-
-        .. image:: https://spack.readthedocs.io/en/latest/_static/spack-logo-text.svg
-            :alt: Spack
-            :target: https://spack.readthedocs.io/en/latest/
-
-    .. tutorialcontainer:: tutorial-project-link
-
-        .. rubric:: Ramble
-
-        .. image:: https://avatars.githubusercontent.com/u/318055132?s=240&v=4
-            :alt: Ramble
-            :target: https://ramble.readthedocs.io/en/latest/
-
-|
+    `Latest Benchpark Tutorial Slides <../_static/slides/PACT26-Tutorial-Slides.pdf>`_ |
+    `Benchpark Code on GitHub <https://github.com/llnl/benchpark>`_ | `Benchpark
+    Dashboard <https://my.cdash.org/index.php?project=Benchpark>`_ | `Ramble
+    <https://ramble.readthedocs.io/en/latest/>`_ | `Spack
+    <https://spack.readthedocs.io/en/latest/>`_
 
 ********************
  Benchpark Glossary
@@ -175,6 +144,34 @@ constraints, and dependencies, in addition to its package name and variants.
 A Benchpark spec describes a Benchpark object. A system spec selects a definition under
 ``systems/``, and an experiment spec selects a definition under ``experiments/``.
 
+The Benchpark system spec defines the hardware resources and software stack, including
+information that is useful for running benchmarks. This may include the following:
+
+- Resources (CPU cores, GPUs)
+- Scheduler (Slurm, flux)
+- Process mapping (cores, sockets, GPUs, NICs)
+- On-node parallelism (CUDA, ROCM, OpenMP)
+- Software stack
+- Compilers (which is best?)
+- MPI implementations (best?)
+- Math libraries
+
+The Benchpark experiment spec defines any information for reproducible sets of
+experiments that we can map onto specific systems, such as:
+
+- On-node parallelism (CUDA, ROCM, OpenMP)
+- Problem sizes
+
+      - Overall problem size, or
+      - Per node or per GPU
+
+- Scaling studies
+
+  - How to scale
+  - How to decompose
+
+- Resources (cores, GPUs)
+
 Benchpark's parser is derived from Spack's spec parser and implements the object name
 and `variant portions of its syntax
 <https://spack.readthedocs.io/en/latest/spec_syntax.html#variants>`_. Every token after
@@ -247,6 +244,15 @@ not Spack compiler (``%``) or version (``@``) constraints.
 
             25 min.
 
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-substitute tutorial-with-duration
+
+        :doc:`I want to run the same experiment, but build it with a different compiler
+        or library (e.g., gcc or clang compiler). <build-and-run-with-clang>`
+
+        .. tutorialcontainer:: tutorial-duration
+
+            #2 + 5 min.
+
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-analyze tutorial-with-duration
 
         :doc:`I want to generate preconfigured performance figures for an experiment
@@ -268,7 +274,7 @@ not Spack compiler (``%``) or version (``@``) constraints.
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-update-system
 
         :doc:`I want to rerun my experiment on a system, but the system software stack
-        has changed since I last ran it. <update-system-config>`
+        needs an update since it has changed since I last ran it. <update-system-config>`
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-system
 

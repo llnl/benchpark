@@ -264,7 +264,7 @@ initial version.
 
         def compute_software_section(self):
             default_compiler = "gcc"
-            if self.spec.satisfies("compiler=llvm"):
+            if self.spec.satisfies("compiler=clang"):
                 default_compiler = "llvm"
             return {
                 "software": {
