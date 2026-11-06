@@ -68,8 +68,7 @@ class Laghos(MakefilePackage, CudaPackage, ROCmPackage):
     depends_on("caliper", when="+caliper")
     depends_on("adiak~shared", when="+caliper")
 
-    depends_on("zlib+optimize+pic~shared")
-    requires("^[virtuals=zlib-api] zlib")
+    depends_on("mfem~zlib")
 
     depends_on("hypre+mpi")
     depends_on("hypre+mixedint~fortran")
