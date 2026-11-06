@@ -33,6 +33,7 @@
     interactive-tutorial/build-and-run-experiment
     interactive-tutorial/build-and-run-with-clang
     interactive-tutorial/benchpark-analyze
+    interactive-tutorial/perform-a-parameter-sweep
     interactive-tutorial/add-a-spack-package
     interactive-tutorial/add-a-ramble-application
     interactive-tutorial/add-an-experiment
