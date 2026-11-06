@@ -12,6 +12,11 @@
 :ref:`Experiment <beginner-tutorial-glossary-experiment>`, :ref:`System
 <beginner-tutorial-glossary-system>`
 
+.. figure:: /_static/images/benchpark-replicate-table.png
+    :alt: Benchpark replicate specification
+    :width: 50%
+    :align: center
+
 .. tutorialcontainer:: tutorial-prerequisite-links
 
     .. tutorialcontainer:: tutorial-prerequisite-link tutorial-prerequisite-experiment

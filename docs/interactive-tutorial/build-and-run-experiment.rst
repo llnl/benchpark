@@ -12,6 +12,11 @@
 :ref:`Experiment <beginner-tutorial-glossary-experiment>`, :ref:`System
 <beginner-tutorial-glossary-system>`
 
+.. figure:: /_static/images/benchpark-repeat-table.png
+    :alt: Benchpark replicate specification
+    :width: 50%
+    :align: center
+
 Initialize the AWS tutorial system:
 
 .. code-block:: console
