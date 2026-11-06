@@ -29,8 +29,8 @@ class Remhos(
 
     variant(
         "version",
-        default="2.0",
-        values=("develop", "latest", "1.0", "2.0"),
+        default="ats-6",
+        values=("develop", "latest", "1.0", "ats-6"),
         description="app version",
     )
 
