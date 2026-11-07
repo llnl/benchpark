@@ -15,8 +15,8 @@
 In this example, we show how to repeat an experiment, that is to run the same
 application experiment on the same system using the same hardware and software stack.
 This use case follows the same steps to create an HPL workspace as in
-:doc:`build-and-run-experiment`, but we will run into build and run errors and
-follow the clues from the Ramble output to understand the reason for the failure.
+:doc:`build-and-run-experiment`, but we will run into build and run errors and follow
+the clues from the Ramble output to understand the reason for the failure.
 
 *********************
  What You Will Learn
@@ -206,9 +206,9 @@ workspace. Opening this file, we see an error close to the bottom that says:
 
     ==> Error: No such variant {'foo'} for spec: 'hpl@2.3-caliper~foo+caliper~openmp'
 
-This error tells us that the ``foo`` variant we added in the spec is not actually define
-in the HPL Spack package. To fix this, we can change the spec back to what it was
-before. This can be done using either the command line:
+This error tells us that the ``foo`` variant we added in the spec is not actually
+defined in the HPL Spack package. To fix this, we can change the spec back to what it
+was before. This can be done using either the command line:
 
 .. code-block:: console
 
