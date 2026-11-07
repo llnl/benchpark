@@ -12,6 +12,21 @@
 :ref:`Experiment <beginner-tutorial-glossary-experiment>`, :ref:`System
 <beginner-tutorial-glossary-system>`
 
+In this example, we show how to repeat an experiment, that is to run the same
+application experiment on the same system using the same hardware and software stack. As
+the task often involves the environment of a specific user, it may be challenging for
+multiple users to repeat each other’s experiments. All components are kept exactly the
+same when repeating an experiment: system hardware, system software, and application.
+The only thing that is different in this case is that a new user is running it, or the
+same user is rerunning at a different time. Performance of the application is expected
+to be the same (or within an expected deviation in the case of an application with
+variable runtime).
+
+.. figure:: /_static/images/benchpark-repeat-table.png
+    :alt: Benchpark replicate specification
+    :width: 50%
+    :align: center
+
 Initialize the AWS tutorial system:
 
 .. code-block:: console
@@ -392,16 +407,16 @@ workspaces into one allocation, see :doc:`/run-experiment`.
         start another workflow by searching what is available in Benchpark.
         <search-benchpark>`
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-analyze
-
-        :doc:`I want to analyze the performance of an experiment on my system by
-        generating preconfigured performance figures. <benchpark-analyze>`
-
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-substitute
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run-substitute
 
         :doc:`I want to re-run this experiment and substitute a different compiler or
         library.
         <build-and-run-with-clang>`
+
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-analyze
+
+        :doc:`I want to analyze the performance of an experiment on my system by
+        generating preconfigured performance figures. <benchpark-analyze>`
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-query
 

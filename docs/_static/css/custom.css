@@ -114,13 +114,12 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     --goal-number: "2";
 }
 
-.rst-content .tutorial-goal-substitute {
-    --card-accent: #4c7a5c;
-    --card-background: #eaf5ee;
-    --card-border: #bdd9c8;
-    --card-hover: #416d51;
-    --card-text: #294f35;
-    --goal-number: "2 substitute";
+.rst-content .tutorial-goal-run-substitute {
+    --card-accent: #8a8f1f;
+    --card-background: #f6f6dc;
+    --card-border: #dcdca0;
+    --card-hover: #6f7418;
+    --goal-number: "3";
 }
 
 .rst-content .tutorial-goal-system {
@@ -164,7 +163,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     --card-border: #efc9bd;
     --card-hover: #a94e38;
     --card-text: #6f3528;
-    --goal-number: "3 (requires #2)";
+    --goal-number: "4 (requires #2)";
 }
 
 .rst-content .tutorial-goal-query {
@@ -198,7 +197,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     --card-border: #e8c9ad;
     --card-hover: #9f5d25;
     --card-text: #67401f;
-    --goal-number: "4";
+    --goal-number: "9";
 }
 
 .rst-content .tutorial-goal-search {
@@ -337,7 +336,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
 .rst-content .tutorial-next-step:not(.tutorial-unnumbered):is(
     .tutorial-goal-search,
     .tutorial-goal-run,
-    .tutorial-goal-substitute,
+    .tutorial-goal-run-substitute,
     .tutorial-goal-analyze,
     .tutorial-goal-experiment,
     .tutorial-goal-update-system,

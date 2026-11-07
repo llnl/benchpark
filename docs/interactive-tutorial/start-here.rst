@@ -229,7 +229,7 @@ not Spack compiler (``%``) or version (``@``) constraints.
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-search tutorial-with-duration
 
-        :doc:`I want to search what is available in Benchpark. <search-benchpark>`
+        :doc:`I want to search what is available in Benchpark and Ramble. <search-benchpark>`
 
         .. tutorialcontainer:: tutorial-duration
 
@@ -244,14 +244,14 @@ not Spack compiler (``%``) or version (``@``) constraints.
 
             25 min.
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-substitute tutorial-with-duration
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run-substitute tutorial-with-duration
 
         :doc:`I want to run the same experiment, but build it with a different compiler
         or library (e.g., gcc or clang compiler). <build-and-run-with-clang>`
 
         .. tutorialcontainer:: tutorial-duration
 
-            #2 + 5 min.
+            #2 + 15 min.
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-analyze tutorial-with-duration
 
@@ -261,15 +261,6 @@ not Spack compiler (``%``) or version (``@``) constraints.
         .. tutorialcontainer:: tutorial-duration
 
             #2 + 25 min.
-
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-experiment tutorial-with-duration
-
-        :doc:`I want to run a new benchmark on the system I have benchmarked before.
-        <add-an-experiment>`
-
-        .. tutorialcontainer:: tutorial-duration
-
-            20 min.
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-update-system
 
@@ -291,3 +282,12 @@ not Spack compiler (``%``) or version (``@``) constraints.
 
         :doc:`I want to generate raw performance data to make my own figures.
         <benchpark-query>`
+
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-experiment tutorial-with-duration
+
+        :doc:`I want to run a new benchmark on the system I have benchmarked before.
+        <add-an-experiment>`
+
+        .. tutorialcontainer:: tutorial-duration
+
+            20 min.

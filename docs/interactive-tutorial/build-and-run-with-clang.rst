@@ -18,6 +18,21 @@
 
         :doc:`Prerequisite: Build and Run an Experiment <build-and-run-experiment>`
 
+In this example, we show how to replicate an experiment, that is to run the same
+application on a potentially different machine that has the same hardware but possibly a
+different software stack (for example, a system with the same hardware specs, but
+software stack is managed by a different organization). We think of a different software
+stack as one containing different compiler or library versions, though the underlying
+hardware remains the same. Replicating an experiment can also encompass re-running on
+the same system (System1) with changes to the software stack, such as a newer library
+version. In this case, the application’s performance is expected to be similar, but not
+necessarily as close as with a repeat run.
+
+.. figure:: /_static/images/benchpark-replicate-table.png
+    :alt: Benchpark replicate specification
+    :width: 50%
+    :align: center
+
 This use case follows the same workflow as :doc:`build-and-run-experiment`, but changes
 the tutorial system's compiler from its default ``gcc`` stack to ``clang``.
 
@@ -33,6 +48,11 @@ variant:
 
     ~/benchpark]$ benchpark system init --dest=hpc-tutorial-clang fluxtainer-aws compiler=clang
 
+.. figure:: /_static/images/fluxtainer-aws-system-spec-clang.png
+    :alt: Tutorial system spec using clang
+    :width: 50%
+    :align: center
+
 Here ``compiler=clang`` is a Benchpark system variant provided by ``fluxtainer-aws``. It
 is not a Spack ``%clang`` constraint.
 
@@ -45,6 +65,11 @@ Initialize the HPL experiment against the Clang system instance:
 .. code-block:: console
 
     ~/benchpark]$ benchpark experiment init hpc-tutorial-clang hpl +strong caliper=time,mpi
+
+.. figure:: /_static/images/fluxtainer-aws-experiment-spec-clang.png
+    :alt: Tutorial experiment spec using clang
+    :width: 50%
+    :align: center
 
 Create the experiment workspace:
 
@@ -86,30 +111,13 @@ strong-scaling study.
 
     ~/benchpark]$ benchpark analyze --workspace-dir wkp/hpl-tutorial-clang/hpl/workspace
 
-.. figure:: /_static/images/hpl_mpi_strong_raw_exc_clang.png
+.. figure:: /_static/images/hpl_strong_gcc_clang_compare.png
     :width: 800
     :align: center
 
-    Strong-scaling area chart.
-
-We can also use `benchpark query
-<https://software.llnl.gov/benchpark/benchpark-query.html>`_ to search one or more
-directories for particular metadata or performance data in the Caliper .cali files. The
-data of interest is written to a CSV file. Here, we query our HPL+clang workspace and
-our HPL+gcc workspace for the execution time of the ``main`` region. The resulting query
-generates the execution time at each rank count.
-
-.. figure:: /_static/images/benchpark-query-clang.png
-    :width: 800
-    :align: center
-
-    Performance of HPL built with clang compiler at different rank counts.
-
-.. figure:: /_static/images/benchpark-query-gcc.png
-    :width: 800
-    :align: center
-
-    Performance of HPL built with gcc compiler at different rank counts.
+    Left figures show the benchpark system specification and strong-scaling area chart
+    for HPL built with gcc in tutorial #2. Right figures show the benchpark system
+    specification and strong-scaling area chart for HPL built with clang.
 
 ***********************
  Choose Your Next Step
