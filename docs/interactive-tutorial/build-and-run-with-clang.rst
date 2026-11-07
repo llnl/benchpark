@@ -20,13 +20,13 @@
 
 In this example, we show how to replicate an experiment, that is to run the same
 application on a potentially different machine that has the same hardware but possibly a
-diferent software stack (for example, a system with the same hardware specs, but software
-stack is managed by a different organization). We think of a different software stack as
-one containing different compiler or library versions, though the underlying hardware
-remains the same. Replicating an experiment can also encompass re-running on the same
-system (System1) with changes to the software stack, such as a newer library version. In
-this case, the application’s performance is expected to be similar, but not necessarily
-as close as with a repeat run.
+different software stack (for example, a system with the same hardware specs, but
+software stack is managed by a different organization). We think of a different software
+stack as one containing different compiler or library versions, though the underlying
+hardware remains the same. Replicating an experiment can also encompass re-running on
+the same system (System1) with changes to the software stack, such as a newer library
+version. In this case, the application’s performance is expected to be similar, but not
+necessarily as close as with a repeat run.
 
 .. figure:: /_static/images/benchpark-replicate-table.png
     :alt: Benchpark replicate specification
@@ -35,7 +35,6 @@ as close as with a repeat run.
 
 This use case follows the same workflow as :doc:`build-and-run-experiment`, but changes
 the tutorial system's compiler from its default ``gcc`` stack to ``clang``.
-
 
 **************************
  What Changes in This Run
@@ -116,10 +115,9 @@ strong-scaling study.
     :width: 800
     :align: center
 
-    Left figures show the benchpark system specification and strong-scaling
-    area chart for HPL built with gcc in tutorial #2. Right figures show the
-    benchpark system specification and strong-scaling area chart for HPL built with
-    clang.
+    Left figures show the benchpark system specification and strong-scaling area chart
+    for HPL built with gcc in tutorial #2. Right figures show the benchpark system
+    specification and strong-scaling area chart for HPL built with clang.
 
 ***********************
  Choose Your Next Step
