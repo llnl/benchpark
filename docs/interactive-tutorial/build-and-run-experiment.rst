@@ -12,6 +12,16 @@
 :ref:`Experiment <beginner-tutorial-glossary-experiment>`, :ref:`System
 <beginner-tutorial-glossary-system>`
 
+In this example, we show how to repeat an experiment, that is to run the same application
+experiment on the same system using the same hardware and software stack. As the task
+often involves the environment of a specific user, it may be challenging for multiple
+users to repeat each other’s experiments. All components are kept exactly the same when
+repeating an experiment: system hardware, system software, and application. The only
+thing that is different in this case is that a new user is running it, or the same user
+is rerunning at a different time. Performance of the application is expected to be the
+same (or within an expected deviation in the case of an application with variable
+runtime).
+
 .. figure:: /_static/images/benchpark-repeat-table.png
     :alt: Benchpark replicate specification
     :width: 50%
