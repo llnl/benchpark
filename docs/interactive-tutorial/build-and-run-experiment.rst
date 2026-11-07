@@ -42,7 +42,7 @@ Then, initialize the HPL experiment:
 
 .. code-block:: console
 
-    benchpark]$ benchpark experiment init hpc-tutorial hpl +strong Ns=-1 caliper=time,mpi
+    benchpark]$ benchpark experiment init hpc-tutorial hpl +strong caliper=time,mpi
 
 .. figure:: /_static/images/fluxtainer-aws-experiment-spec.png
     :alt: Tutorial experiment spec
@@ -97,123 +97,6 @@ This should print the following output:
           Experiment 4: hpl.standard.hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_8_1000_8
 
 We can see from this that this workspace will execute 4 experiments currently.
-
-Before setting up the Ramble workspace, we will explore a few error cases.
-
-To begin, we will explore what happens when you analyze the workspace before any data
-has been created.
-
-.. code-block:: console
-
-    workspace]$ ramble --workspace-dir . workspace analyze
-
-This command should print an error like the following:
-
-.. code-block:: console
-
-    ==> Error: No analyzeable experiment detected. Make sure your workspace is setup with
-        ramble workspace setup
-
-Additionally, we can attempt to run ``benchpark analyze`` using the following:
-
-.. code-block:: console
-
-    workspace] benchpark analyze --workspace-dir .
-
-This will print the following error:
-
-.. code-block:: console
-
-    INFO:benchpark.cmd.analyze: Found 0 .cali files for analysis.
-    Traceback (most recent call last):
-      File "/home/fluxuser/benchpark/bin/benchpark", line 35, in <module>
-        exit_code = main()
-                    ^^^^^^
-      File "/home/fluxuser/benchpark/lib/main.py", line 169, in main
-        exit_code = action(args)
-                    ^^^^^^^^^^^^
-      File "/home/fluxuser/benchpark/lib/benchpark/cmd/analyze.py", line 842, in command
-        prepare_data(**vars(args))
-      File "/home/fluxuser/benchpark/lib/benchpark/cmd/analyze.py", line 382, in prepare_data
-        tk = th.Thicket.from_caliperreader(
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-      File "/home/fluxuser/.local/lib/python3.12/site-packages/thicket/thicket.py", line 459, in from_caliperreader
-        return Thicket.reader_dispatch(
-               ^^^^^^^^^^^^^^^^^^^^^^^^
-      File "/home/fluxuser/.local/lib/python3.12/site-packages/thicket/thicket.py", line 573, in reader_dispatch
-        raise ValueError("Iterable must contain at least one file")
-    ValueError: Iterable must contain at least one file
-
-Next we will manufacture a few errors related to the Spack build, to help show where
-these errors show up. Update the spec used to install HPL as follows:
-
-.. code-block:: console
-
-    workspace]$ ramble --workspace-dir . workspace manage software -o --pkg hpl --spec hpl-err@2.3-caliper~openmp~foo+caliper --prefix spack
-
-Set up the Ramble workspace to build HPL and generate each experiment instance:
-
-.. code-block:: console
-
-    workspace]$ ramble --workspace-dir . workspace setup
-
-This will fail with an error similar to the following:
-
-.. code-block:: console
-
-    ==> Error: Software spec hpl is not defined in environment hpl, but is required by the spack application definition
-
-This error comes from Ramble, in an attempt to make sure the package you need to perform
-the experiment is added into the environment that is going to be built using Spack. In
-this case, we changed the package name from ``hpl`` to ``hpl-err`` which triggers the
-error. Now, change the package name back:
-
-.. code-block:: console
-
-    workspace]$ ramble --workspace-dir . workspace manage software -o --pkg hpl --spec hpl@2.3-caliper~openmp~foo+caliper --prefix spack
-
-Set up the Ramble workspace to build HPL and generate each experiment instance:
-
-.. code-block:: console
-
-    workspace]$ ramble --workspace-dir . workspace setup
-
-This will fail with an error similar to the following:
-
-.. code-block:: console
-
-    ==> Error: Command exited with status 1:
-        '/home/fluxuser/benchpark/tutorial-workspaces/wkp/spack/bin/spack' 'concretize' '-U' '-f'
-    ==> Error: Error running spack command: /home/fluxuser/benchpark/tutorial-workspaces/wkp/spack/bin/spack concretize -U -f
-    ==> Error: For more details, see the log file: /home/fluxuser/benchpark/tutorial-workspaces/wkp/hpc-tutorial/hpl/workspace/logs/setup.<date_stamp>/hpl.standard.hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_1_-1_1.out
-
-The last line of this error message points to a log file that contains additional
-information. Ramble stores high level logs within this ``logs/`` subdirectory of the
-workspace. Opening this file, we see an error close to the bottom that says:
-
-.. code-block:: console
-
-    ==> Error: No such variant {'foo'} for spec: 'hpl@2.3-caliper~foo+caliper~openmp'
-
-This error tells us that the ``foo`` variant we added in the spec is not actually define
-in the HPL Spack package. To fix this, we can change the spec back to what it was
-before. This can be done using either the command line:
-
-.. code-block:: console
-
-    workspace]$ ramble --workspace-dir . workspace manage software -o --pkg hpl --spec hpl@2.3-caliper~openmp+caliper --prefix spack
-
-Or by editing the Ramble workspace configuration file (you can use your favorite
-editor):
-
-.. code-block:: console
-
-    workspace]$ nano config/ramble.yaml
-
-And removing ``~foo`` from the HPL spec in the ``packages:`` configuration section.
-(After editing, save and exit using Ctrl+O <enter> followed by Ctrl+X)
-
-Now, set up the experiments again:
 
 .. code-block:: console
 
@@ -286,96 +169,7 @@ After the jobs have drained out of the queue, we can analyze them using:
 
     workspace]$ ramble --workspace-dir . workspace analyze
 
-This creates a file in the root of the workspace named ``results.latest.txt``. Opening
-this file, we should see the following:
-
-.. code-block:: console
-
-    Experiment hpl.standard.hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_1_-1_1 figures of merit:
-      Status = FAILED
-
-And in fact, all of the experiments have failed. To find out why, we can open one of the
-experiment log files. Ramble creates independent directories for each experiment within
-the ``experiments`` subdirectory of the workspace. Navigate into one of them using:
-
-.. code-block:: console
-
-    workspace]$ cd experiments/hpl/standard/hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_1_-1_1/
-
-Within this directory, you should see the following files:
-
-.. code-block:: console
-
-    execute_experiment - The script that is run for the experiment
-    HPL.dat - The input for HPL
-    hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_1_-1_1.out - The redirected output from the experiment's execution
-
-Along with several other files. If we open the
-``hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_1_-1_1.out`` file, we should see
-the following:
-
-.. code-block:: console
-
-    HPL ERROR from process # 0, on line 343 of function HPL_pdinfo:
-    >>> Value of N less than 0 <<<
-
-    HPL ERROR from process # 0, on line 621 of function HPL_pdinfo:
-    >>> Illegal input in file HPL.dat. Exiting ... <<<
-
-    flux-job: task(s) exited with exit code 1
-
-This means our HPL input was invalid, causing the run to prematurely exit. This all
-stems from our addition of ``Ns=-1`` on the ``benchpark experiment init`` line. If we
-hadn't added this line, benchpark would have set the value to be ``Ns=1000`` by default.
-To fix this, we will navigate back into the workspace root:
-
-.. code-block:: console
-
-    hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_1_-1_1]$ cd ../../../../
-
-Here, open the workspace config file again:
-
-.. code-block:: console
-
-    workspace]$ nano configs/ramble.yaml
-
-In the top portion of the file, you should see a group of variables that are defined.
-Some are scalars, some are variable references, some are even lists (i.e. ``n_ranks``).
-Ramble uses these when generating the individual experiments within this workspace. Find
-the variable definition that looks like:
-
-.. code-block:: console
-
-    Ns:
-    - -1
-    - -1
-    - -1
-    - -1
-
-and change all of the ``-1`` to ``1000``. Then save and exit the file. There are
-multiple lines with ``-1`` to allow each value of ``n_ranks`` below to have a different
-``Ns`` value. Now, delete the old experiment directories to ensure no stale caliper
-files exist:
-
-.. code-block:: console
-
-    workspace]$ rm -rf experiments/
-
-Then set up the workspace again:
-
-.. code-block:: console
-
-    workspace]$ ramble --workspace-dir . workspace setup
-
-And re-submit the jobs:
-
-At this point, set up the workspace again:
-
-.. code-block:: console
-
-    workspace]$ ramble --workspace-dir . on
-
-Once the jobs are all finished, we can re-analyze the workspace:
+Once the jobs are all finished, we can analyze the workspace:
 
 .. code-block:: console
 
@@ -412,6 +206,11 @@ workspaces into one allocation, see :doc:`/run-experiment`.
         :doc:`I want to re-run this experiment and substitute a different compiler or
         library.
         <build-and-run-with-clang>`
+
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-troubleshoot
+
+        :doc:`My experiment did not finish, and I want to diagnose where it failed.
+        <troubleshoot-a-failed-run>`
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-analyze
 

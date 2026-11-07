@@ -122,6 +122,15 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     --goal-number: "3";
 }
 
+.rst-content .tutorial-goal-troubleshoot {
+    --card-accent: #8b6f3f;
+    --card-background: #f7f1e7;
+    --card-border: #dfcfad;
+    --card-hover: #765d33;
+    --card-text: #574321;
+    --goal-number: "4";
+}
+
 .rst-content .tutorial-goal-system {
     --card-accent: #4d82b5;
     --card-background: #eaf3fb;
@@ -145,7 +154,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     --card-border: #d8c4e6;
     --card-hover: #795294;
     --card-text: #513566;
-    --goal-number: "5";
+    --goal-number: "10";
 }
 
 .rst-content .tutorial-goal-scaling {
@@ -163,7 +172,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     --card-border: #efc9bd;
     --card-hover: #a94e38;
     --card-text: #6f3528;
-    --goal-number: "4 (requires #2)";
+    --goal-number: "5 (requires #2)";
 }
 
 .rst-content .tutorial-goal-query {
@@ -337,6 +346,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     .tutorial-goal-search,
     .tutorial-goal-run,
     .tutorial-goal-run-substitute,
+    .tutorial-goal-troubleshoot,
     .tutorial-goal-analyze,
     .tutorial-goal-experiment,
     .tutorial-goal-update-system,

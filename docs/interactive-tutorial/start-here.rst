@@ -253,6 +253,15 @@ not Spack compiler (``%``) or version (``@``) constraints.
 
             #2 + 15 min.
 
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-troubleshoot tutorial-with-duration
+
+        :doc:`I ran into an error while building and running experiment, and
+        want to learn how to diagnose it. <troubleshoot-a-failed-run>`
+
+        .. tutorialcontainer:: tutorial-duration
+
+            25 min.
+
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-analyze tutorial-with-duration
 
         :doc:`I want to generate preconfigured performance figures for an experiment
@@ -261,11 +270,6 @@ not Spack compiler (``%``) or version (``@``) constraints.
         .. tutorialcontainer:: tutorial-duration
 
             #2 + 25 min.
-
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-update-system
-
-        :doc:`I want to rerun my experiment on a system, but the system software stack
-        needs an update since it has changed since I last ran it. <update-system-config>`
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-system
 
@@ -291,3 +295,8 @@ not Spack compiler (``%``) or version (``@``) constraints.
         .. tutorialcontainer:: tutorial-duration
 
             20 min.
+
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-update-system
+
+        :doc:`I want to rerun my experiment on a system, but the system software stack
+        needs an update since it has changed since I last ran it. <update-system-config>`
