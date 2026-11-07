@@ -110,8 +110,10 @@ For example, to list all applications containing the letter ``h``:
 
 which produces:
 
-.. literalinclude:: ../_generated/snippets/ramble_basics_hostname_list_h.out
-    :language: console
+.. figure:: /_static/ramble_snippets/ramble_basics_hostname_list_h.png
+    :alt: List all applications containing the letter h in Ramble
+    :width: 50%
+    :align: center
 
 You can also use shell glob characters such as ``*`` and ``?`` (wrapped in quotes so
 your shell does not expand them before passing them to Ramble). For example, to list
@@ -123,8 +125,10 @@ only applications whose names **start** with ``h``:
 
 which produces:
 
-.. literalinclude:: ../_generated/snippets/ramble_basics_hostname_list_hstar.out
-    :language: console
+.. figure:: /_static/ramble_snippets/ramble_basics_hostname_list_hstar.png
+    :alt: List all applications that start with the letter h in Ramble
+    :width: 50%
+    :align: center
 
 Searching Descriptions
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -150,8 +154,10 @@ what tags are available will be provided later in this tutorial). You can filter
 
 which outputs:
 
-.. literalinclude:: ../_generated/snippets/ramble_basics_hostname_list_tag.out
-    :language: console
+.. figure:: /_static/ramble_snippets/ramble_basics_hostname_list_tag.png
+    :alt: List all applications that have a particular tag
+    :width: 50%
+    :align: center
 
 Listing Other Object Types
 --------------------------
@@ -167,8 +173,10 @@ For example, to list all available **modifiers**:
 
 which produces:
 
-.. literalinclude:: ../_generated/snippets/ramble_basics_hostname_list_modifiers.out
-    :language: console
+.. figure:: /_static/ramble_snippets/ramble_basics_hostname_list_modifiers.png
+    :alt: List all modifiers in Ramble
+    :width: 50%
+    :align: center
 
 To list all available **package managers**:
 
@@ -176,8 +184,10 @@ To list all available **package managers**:
 
     $ ramble list --type package_managers
 
-.. literalinclude:: ../_generated/snippets/ramble_basics_hostname_list_package_managers.out
-    :language: console
+.. figure:: /_static/ramble_snippets/ramble_basics_hostname_list_package_managers.png
+    :alt: List all package managers in Ramble
+    :width: 50%
+    :align: center
 
 And to list all available **workflow managers**:
 
@@ -185,8 +195,10 @@ And to list all available **workflow managers**:
 
     $ ramble list --type workflow_managers
 
-.. literalinclude:: ../_generated/snippets/ramble_basics_hostname_list_workflow_managers.out
-    :language: console
+.. figure:: /_static/ramble_snippets/ramble_basics_hostname_list_workflow_managers.png
+    :alt: List all workflow managers in Ramble
+    :width: 50%
+    :align: center
 
 Inspecting Object Details (``ramble info``)
 ===========================================
@@ -206,8 +218,10 @@ Let's inspect the ``hostname`` application:
 
 This command prints a comprehensive overview of the ``hostname`` application:
 
-.. literalinclude:: ../_generated/snippets/ramble_basics_hostname_info.out
-    :language: console
+.. figure:: /_static/ramble_snippets/ramble_basics_hostname_info.png
+    :alt: Overview of ``hostname`` application
+    :width: 50%
+    :align: center
 
 From this output, you can see:
 
@@ -234,8 +248,10 @@ on an object without printing all of their contents, use ``-o`` (``--overview``)
 
     $ ramble info hostname -o
 
-.. literalinclude:: ../_generated/snippets/ramble_basics_hostname_info_overview.out
-    :language: console
+.. figure:: /_static/ramble_snippets/ramble_basics_hostname_info_overview.png
+    :alt: Quick summary of populated attribute categories
+    :width: 50%
+    :align: center
 
 You can then inspect one or more specific attributes using ``--attrs`` (or
 ``--attributes``) and request verbose details (such as workload variables and defaults)
@@ -247,8 +263,10 @@ using ``-v`` (``--verbose``):
 
 which produces:
 
-.. literalinclude:: ../_generated/snippets/ramble_basics_hostname_filtered_info.out
-    :language: console
+.. figure:: /_static/ramble_snippets/ramble_basics_hostname_filtered_info.png
+    :alt: Inspect one of the specific attributes
+    :width: 50%
+    :align: center
 
 Notice how adding ``-v`` reveals the **Variables** defined on each workload (such as
 ``input_arguments``, ``n_ranks``, and ``n_threads``), along with their default values
@@ -284,8 +302,10 @@ or equivalently:
 
 which produces:
 
-.. literalinclude:: ../_generated/snippets/ramble_basics_hostname_info_modifier_lscpu.out
-    :language: console
+.. figure:: /_static/ramble_snippets/ramble_basics_hostname_info_modifier_lscpu.png
+    :alt: Inspect an object time
+    :width: 50%
+    :align: center
 
 For more information, see `Ramble Basics
 <https://ramble.readthedocs.io/en/latest/tutorials/beginner_ramble_basics.html>`_.
