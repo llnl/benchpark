@@ -191,12 +191,12 @@ For the complete experiment authoring reference, see :doc:`/add-an-experiment`.
 
 .. tutorialcontainer:: tutorial-next-steps
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-scaling
-
-        :doc:`I want to add a scaling configuration to this experiment.
-        <add-a-scaling-configuration>`
-
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-run
 
         :doc:`I want to build and run the new experiment on my existing system.
         <build-and-run-experiment>`
+
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-scaling
+
+        :doc:`I want to add a scaling configuration to this experiment.
+        <add-a-scaling-configuration>`
