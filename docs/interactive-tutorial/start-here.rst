@@ -235,6 +235,15 @@ not Spack compiler (``%``) or version (``@``) constraints.
 
             10 min.
 
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-troubleshoot tutorial-with-duration
+
+        :doc:`I ran into an error while building and running experiment, and
+        want to learn how to diagnose it. <troubleshoot-a-failed-run>`
+
+        .. tutorialcontainer:: tutorial-duration
+
+            25 min.
+
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-run tutorial-with-duration
 
         :doc:`I want to run an experiment someone gave me on the same system.
