@@ -244,7 +244,7 @@ not Spack compiler (``%``) or version (``@``) constraints.
 
             25 min.
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run-with-substitute tutorial-with-duration
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run-substitute tutorial-with-duration
 
         :doc:`I want to run the same experiment, but build it with a different compiler
         or library (e.g., gcc or clang compiler). <build-and-run-with-clang>`

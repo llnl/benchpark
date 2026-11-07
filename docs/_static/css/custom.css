@@ -114,7 +114,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     --goal-number: "2";
 }
 
-.rst-content .tutorial-goal-run-with-substitute {
+.rst-content .tutorial-goal-run-substitute {
     --card-accent: #8a8f1f;
     --card-background: #f6f6dc;
     --card-border: #dcdca0;
@@ -336,7 +336,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
 .rst-content .tutorial-next-step:not(.tutorial-unnumbered):is(
     .tutorial-goal-search,
     .tutorial-goal-run,
-    .tutorial-goal-run-with-substitute,
+    .tutorial-goal-run-substitute,
     .tutorial-goal-analyze,
     .tutorial-goal-experiment,
     .tutorial-goal-update-system,

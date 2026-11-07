@@ -140,7 +140,7 @@ one allocation, see :doc:`/run-experiment`.
         :doc:`I want to analyze the performance of an experiment on my system by
         generating preconfigured performance figures. <benchpark-analyze>`
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run-with-substitute
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run-substitute
 
         :doc:`I want to re-run this experiment and substitute a different compiler or
         library.
