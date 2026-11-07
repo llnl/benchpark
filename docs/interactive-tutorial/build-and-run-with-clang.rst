@@ -12,16 +12,16 @@
 :ref:`Experiment <beginner-tutorial-glossary-experiment>`, :ref:`System
 <beginner-tutorial-glossary-system>`
 
-.. figure:: /_static/images/benchpark-replicate-table.png
-    :alt: Benchpark replicate specification
-    :width: 50%
-    :align: center
-
 .. tutorialcontainer:: tutorial-prerequisite-links
 
     .. tutorialcontainer:: tutorial-prerequisite-link tutorial-prerequisite-experiment
 
         :doc:`Prerequisite: Build and Run an Experiment <build-and-run-experiment>`
+
+.. figure:: /_static/images/benchpark-replicate-table.png
+    :alt: Benchpark replicate specification
+    :width: 50%
+    :align: center
 
 This use case follows the same workflow as :doc:`build-and-run-experiment`, but changes
 the tutorial system's compiler from its default ``gcc`` stack to ``clang``.
@@ -38,6 +38,11 @@ variant:
 
     ~/benchpark]$ benchpark system init --dest=hpc-tutorial-clang fluxtainer-aws compiler=clang
 
+.. figure:: /_static/images/fluxtainer-aws-system-spec-clang.png
+    :alt: Tutorial system spec using clang
+    :width: 50%
+    :align: center
+
 Here ``compiler=clang`` is a Benchpark system variant provided by ``fluxtainer-aws``. It
 is not a Spack ``%clang`` constraint.
 
@@ -50,6 +55,11 @@ Initialize the HPL experiment against the Clang system instance:
 .. code-block:: console
 
     ~/benchpark]$ benchpark experiment init hpc-tutorial-clang hpl +strong caliper=time,mpi
+
+.. figure:: /_static/images/fluxtainer-aws-experiment-spec-clang.png
+    :alt: Tutorial experiment spec using clang
+    :width: 50%
+    :align: center
 
 Create the experiment workspace:
 
@@ -91,11 +101,14 @@ strong-scaling study.
 
     ~/benchpark]$ benchpark analyze --workspace-dir wkp/hpl-tutorial-clang/hpl/workspace
 
-.. figure:: /_static/images/hpl_mpi_strong_raw_exc_clang.png
+.. figure:: /_static/images/hpl_strong_gcc_clang_compare.png
     :width: 800
     :align: center
 
-    Strong-scaling area chart.
+    Left figures show the benchpark system specification and strong-scaling
+    area chart for HPL built with gcc in tutorial #2. Right figures show the
+    benchpark system specification and strong-scaling area chart for HPL built with
+    clang.
 
 ***********************
  Choose Your Next Step
