@@ -1,0 +1,45 @@
+name: Spack Mirror Compatibility Test
+
+on:
+  push:
+    branches: [develop]
+    paths:
+      - 'lib/scripts/env-collect-branch-tips.py'
+      - 'lib/scripts/redirect-git-urls.py'
+      - 'lib/benchpark/cmd/mirror.py'
+      - 'lib/benchpark/test/test_spack_mirror_integration.py'
+  pull_request:
+    branches: [develop]
+    paths:
+      - 'lib/scripts/env-collect-branch-tips.py'
+      - 'lib/scripts/redirect-git-urls.py'
+      - 'lib/benchpark/cmd/mirror.py'
+      - 'lib/benchpark/test/test_spack_mirror_integration.py'
+
+jobs:
+  spack-mirror-compatibility:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Benchpark
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+
+      - name: Add needed Python libs
+        run: |
+          pip install -r ./requirements.txt
+
+      - name: Clone Spack develop
+        run: |
+          git clone --depth 1 https://github.com/spack/spack.git spack-develop
+
+      - name: Make Spack available on PATH
+        run: |
+          echo "SPACK_ROOT=$PWD/spack-develop" >> $GITHUB_ENV
+          echo "$PWD/spack-develop/bin" >> $GITHUB_PATH
+
+      - name: Verify Spack works
+        run: |
+          spack --version
+
+      - name: Run Spack mirror compatibility test
+        run: |
+          ./bin/benchpark unit-test lib/benchpark/test/test_spack_mirror_integration.py
