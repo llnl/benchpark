@@ -4,9 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-#################
- Adding a System
-#################
+##############
+ Add a System
+##############
 
 **Glossary terms:** :ref:`Package <beginner-tutorial-glossary-package>`, :ref:`Spec
 <beginner-tutorial-glossary-spec>`, :ref:`Variant <beginner-tutorial-glossary-variant>`,
