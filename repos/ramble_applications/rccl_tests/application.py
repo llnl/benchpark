@@ -17,17 +17,6 @@ class RcclTests(ExecutableApplication):
 
     name = "rccl-tests"
 
-    register_phase(
-        "configure_net_plugin", pipeline="setup", run_before=["make_experiments"]
-    )
-
-    def _configure_net_plugin(self, workspace, app_inst=None):
-        app_inst.variables["net_plugin_export"] = ":"
-        if "rocm_arch" in app_inst.variables and "rccl_net_plugin" in app_inst.variables:
-            app_inst.variables["net_plugin_export"] = (
-                "export NCCL_NET_PLUGIN={rccl_net_plugin}"
-            )
-
     tags('synthetic','ats-6',
          'single-node','multi-node',
          'rccl','mpi','rocm','hip',
@@ -52,13 +41,11 @@ class RcclTests(ExecutableApplication):
     }
     all_workloads = list(tests.keys())
 
-    executable("set-net-plugin", "{net_plugin_export}")
     for workload_name, binary in tests.items():
         executable(f'{workload_name}-execute',
                    template=[f'{binary} {{additional_args}}'],
                    use_mpi=True)
-        workload(workload_name,
-                 executables=['set-net-plugin', f'{workload_name}-execute'])
+        workload(workload_name, executables=[f'{workload_name}-execute'])
 
     workload_variable('num_gpus_per_task', default='1',
                       description='GPUs per MPI rank (-g)',
