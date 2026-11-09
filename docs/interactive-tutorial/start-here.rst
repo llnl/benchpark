@@ -156,22 +156,6 @@ information that is useful for running benchmarks. This may include the followin
 - MPI implementations (best?)
 - Math libraries
 
-The Benchpark experiment spec defines any information for reproducible sets of
-experiments that we can map onto specific systems, such as:
-
-- On-node parallelism (CUDA, ROCM, OpenMP)
-- Problem sizes
-
-      - Overall problem size, or
-      - Per node or per GPU
-
-- Scaling studies
-
-  - How to scale
-  - How to decompose
-
-- Resources (cores, GPUs)
-
 Benchpark's parser is derived from Spack's spec parser and implements the object name
 and `variant portions of its syntax
 <https://spack.readthedocs.io/en/latest/spec_syntax.html#variants>`_. Every token after
@@ -189,6 +173,22 @@ not Spack compiler (``%``) or version (``@``) constraints.
 ***************************
  Benchpark Experiment Spec
 ***************************
+
+The Benchpark experiment spec defines any information for reproducible sets of
+experiments that we can map onto specific systems, such as:
+
+- On-node parallelism (CUDA, ROCM, OpenMP)
+- Problem sizes
+
+      - Overall problem size, or
+      - Per node or per GPU
+
+- Scaling studies
+
+  - How to scale
+  - How to decompose
+
+- Resources (cores, GPUs)
 
 .. figure:: /_static/images/experiment-spec.png
     :alt: Annotated Benchpark experiment spec
@@ -271,6 +271,18 @@ not Spack compiler (``%``) or version (``@``) constraints.
 
             #2 + 25 min.
 
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-parameter-sweep
+
+        :doc:`I want to perform a parameter sweep for an experiment on my system.
+        <perform-a-parameter-sweep>`
+
+            15 min.
+
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-update-system
+
+        :doc:`I want to rerun my experiment on a system, but the system software stack
+        needs an update since it has changed since I last ran it. <update-system-config>`
+
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-system
 
         :doc:`I want to run an experiment someone gave me, but on my system that has
@@ -295,8 +307,3 @@ not Spack compiler (``%``) or version (``@``) constraints.
         .. tutorialcontainer:: tutorial-duration
 
             20 min.
-
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-update-system
-
-        :doc:`I want to rerun my experiment on a system, but the system software stack
-        needs an update since it has changed since I last ran it. <update-system-config>`
