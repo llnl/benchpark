@@ -271,7 +271,7 @@ experiments that we can map onto specific systems, such as:
 
             #2 + 25 min.
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-parameter-sweep
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-parameter-sweep tutorial-with-duration
 
         :doc:`I want to perform a parameter sweep for an experiment on my system.
         <perform-a-parameter-sweep>`
