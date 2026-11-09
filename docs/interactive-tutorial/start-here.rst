@@ -246,12 +246,12 @@ experiments that we can map onto specific systems, such as:
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-run-substitute tutorial-with-duration
 
-        :doc:`I want to run the same experiment, but build it with a different compiler
+        :doc:`I want to run an experiment, but build it with a different compiler
         or library (e.g., gcc or clang compiler). <build-and-run-with-clang>`
 
         .. tutorialcontainer:: tutorial-duration
 
-            #2 + 15 min.
+            15 min.
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-troubleshoot tutorial-with-duration
 
@@ -269,12 +269,14 @@ experiments that we can map onto specific systems, such as:
 
         .. tutorialcontainer:: tutorial-duration
 
-            #2 + 25 min.
+            #4 + 25 min.
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-parameter-sweep tutorial-with-duration
 
         :doc:`I want to perform a parameter sweep for an experiment on my system.
         <perform-a-parameter-sweep>`
+
+        .. tutorialcontainer:: tutorial-duration
 
             15 min.
 
