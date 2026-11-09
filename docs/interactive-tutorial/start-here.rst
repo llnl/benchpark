@@ -156,22 +156,6 @@ information that is useful for running benchmarks. This may include the followin
 - MPI implementations (best?)
 - Math libraries
 
-The Benchpark experiment spec defines any information for reproducible sets of
-experiments that we can map onto specific systems, such as:
-
-- On-node parallelism (CUDA, ROCM, OpenMP)
-- Problem sizes
-
-      - Overall problem size, or
-      - Per node or per GPU
-
-- Scaling studies
-
-  - How to scale
-  - How to decompose
-
-- Resources (cores, GPUs)
-
 Benchpark's parser is derived from Spack's spec parser and implements the object name
 and `variant portions of its syntax
 <https://spack.readthedocs.io/en/latest/spec_syntax.html#variants>`_. Every token after
@@ -189,6 +173,22 @@ not Spack compiler (``%``) or version (``@``) constraints.
 ***************************
  Benchpark Experiment Spec
 ***************************
+
+The Benchpark experiment spec defines any information for reproducible sets of
+experiments that we can map onto specific systems, such as:
+
+- On-node parallelism (CUDA, ROCM, OpenMP)
+- Problem sizes
+
+      - Overall problem size, or
+      - Per node or per GPU
+
+- Scaling studies
+
+  - How to scale
+  - How to decompose
+
+- Resources (cores, GPUs)
 
 .. figure:: /_static/images/experiment-spec.png
     :alt: Annotated Benchpark experiment spec
