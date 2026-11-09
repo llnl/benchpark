@@ -276,7 +276,7 @@ experiments that we can map onto specific systems, such as:
         :doc:`I want to perform a parameter sweep for an experiment on my system.
         <perform-a-parameter-sweep>`
 
-            XX min.
+            15 min.
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-update-system
 
