@@ -4,9 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-#############################
- Adding a Ramble Application
-#############################
+##########################
+ Add a Ramble Application
+##########################
 
 **Glossary terms:** :ref:`Benchmark <beginner-tutorial-glossary-benchmark>`,
 :ref:`Application <beginner-tutorial-glossary-application>`
