@@ -237,51 +237,6 @@ From this output, you can see:
   (``builtin::env_vars``). These are defined in either the application definition, or
   one of it's ancestors.
 
-Viewing Attribute Overviews and Filtering Attributes
-----------------------------------------------------
-
-Complex applications (such as ``gromacs`` or ``wrf``) define many workloads, variables,
-and software specs. To see a quick summary of which attribute categories are populated
-on an object without printing all of their contents, use ``-o`` (``--overview``):
-
-.. code-block:: console
-
-    $ ramble info hostname -o
-
-.. figure:: /_static/ramble_snippets/ramble_basics_hostname_info_overview.png
-    :alt: Quick summary of populated attribute categories
-    :width: 50%
-    :align: center
-
-You can then inspect one or more specific attributes using ``--attrs`` (or
-``--attributes``) and request verbose details (such as workload variables and defaults)
-using ``-v`` (``--verbose``):
-
-.. code-block:: console
-
-    $ ramble info hostname --attrs workloads -v
-
-which produces:
-
-.. figure:: /_static/ramble_snippets/ramble_basics_hostname_filtered_info.png
-    :alt: Inspect one of the specific attributes
-    :width: 50%
-    :align: center
-
-Notice how adding ``-v`` reveals the **Variables** defined on each workload (such as
-``input_arguments``, ``n_ranks``, and ``n_threads``), along with their default values
-and descriptions.
-
-You can also filter the items shown within an attribute section using ``-p``
-(``--pattern``) with a glob pattern. For example, to view only workload matching
-``water*`` on ``gromacs``:
-
-.. code-block:: console
-
-    $ ramble info gromacs --attrs workloads -p "water*"
-    or;
-    $ ramble info gromacs --attrs workloads -p "water*" -v
-
 Inspecting Modifiers and Other Objects
 --------------------------------------
 
