@@ -27,7 +27,7 @@ Then, initialize the HPL experiment:
 
 .. code-block:: console
 
-    benchpark]$ benchpark experiment init --dest=hpl hpc-tutorial hpl +strong caliper=time,mpi
+    benchpark]$ benchpark experiment init hpc-tutorial hpl +strong caliper=time,mpi
 
 .. figure:: /_static/images/fluxtainer-aws-experiment-spec.png
     :alt: Tutorial experiment spec
@@ -199,7 +199,7 @@ following:
       - n_ranks
       - Ns
 
-This would requiring removing the ``zips: {}`` definition as well. However it is not
+This would require removing the ``zips: {}`` definition as well. However it is not
 necessary in this tutorial. Now, set up the experiments:
 
 .. code-block:: console
@@ -207,19 +207,7 @@ necessary in this tutorial. Now, set up the experiments:
     workspace]$ ramble --workspace-dir . workspace setup
 
 At this point, Ramble has used Spack to install HPL, and configure the experiment
-directories for you. We'll explore the experiment directories later, but to see the
-output from spack you can open the setup log for the first experiment:
-
-.. code-block:: console
-
-    workspace]$ nano logs/setup.latest/hpl.standard.hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_1_-1_1.out
-
-If you explore this file, you should see output related to ``spack concretize`` and
-``spack install``. For more information on what these content mean, please refer to
-Spack's documentation. At the bottom of the file, you can see all of the phases Ramble
-executed to set up these experiments, along with timing data for each of these.
-
-Now, run the experiments:
+directories for you. Now, run the experiments:
 
 .. code-block:: console
 
@@ -273,102 +261,8 @@ After the jobs have drained out of the queue, we can analyze them using:
 
     workspace]$ ramble --workspace-dir . workspace analyze
 
-This creates a file in the root of the workspace named ``results.latest.txt``. Opening
-this file, we should see the following:
-
-.. code-block:: console
-
-    Experiment hpl.standard.hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_1_-1_1 figures of merit:
-      Status = FAILED
-
-And in fact, all of the experiments have failed. To find out why, we can open one of the
-experiment log files. Ramble creates independent directories for each experiment within
-the ``experiments`` subdirectory of the workspace. Navigate into one of them using:
-
-.. code-block:: console
-
-    workspace]$ cd experiments/hpl/standard/hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_1_-1_1/
-
-Within this directory, you should see the following files:
-
-.. code-block:: console
-
-    execute_experiment - The script that is run for the experiment
-    HPL.dat - The input for HPL
-    hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_1_-1_1.out - The redirected output from the experiment's execution
-
-Along with several other files. If we open the
-``hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_1_-1_1.out`` file, we should see
-the following:
-
-.. code-block:: console
-
-    HPL ERROR from process # 0, on line 343 of function HPL_pdinfo:
-    >>> Value of N less than 0 <<<
-
-    HPL ERROR from process # 0, on line 621 of function HPL_pdinfo:
-    >>> Illegal input in file HPL.dat. Exiting ... <<<
-
-    flux-job: task(s) exited with exit code 1
-
-This means our HPL input was invalid, causing the run to prematurely exit. This all
-stems from our addition of ``Ns=-1`` on the ``benchpark experiment init`` line. If we
-hadn't added this line, benchpark would have set the value to be ``Ns=1000`` by default.
-To fix this, we will navigate back into the workspace root:
-
-.. code-block:: console
-
-    hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_1_-1_1]$ cd ../../../../
-
-Here, open the workspace config file again:
-
-.. code-block:: console
-
-    workspace]$ nano configs/ramble.yaml
-
-In the top portion of the file, you should see a group of variables that are defined.
-Some are scalars, some are variable references, some are even lists (i.e. ``n_ranks``).
-Ramble uses these when generating the individual experiments within this workspace. Find
-the variable definition that looks like:
-
-.. code-block:: console
-
-    Ns:
-    - -1
-    - -1
-    - -1
-    - -1
-
-and change all of the ``-1`` to ``1000``. Then save and exit the file. There are
-multiple lines with ``-1`` to allow each value of ``n_ranks`` below to have a different
-``Ns`` value. Now, delete the old experiment directories to ensure no stale caliper
-files exist:
-
-.. code-block:: console
-
-    workspace]$ rm -rf experiments/
-
-Then set up the workspace again:
-
-.. code-block:: console
-
-    workspace]$ ramble --workspace-dir . workspace setup
-
-And re-submit the jobs:
-
-At this point, set up the workspace again:
-
-.. code-block:: console
-
-    workspace]$ ramble --workspace-dir . on
-
-Once the jobs are all finished, we can re-analyze the workspace:
-
-.. code-block:: console
-
-    workspace]$ ramble --workspace-dir . workspace analyze
-
-And we can examine the contents of the ``results.latest.txt`` file:
+This creates a file in the root of the workspace named ``results.latest.txt``. We can
+now open this file to explore the results of our experiments:
 
 .. code-block:: console
 
@@ -399,7 +293,7 @@ workspaces into one allocation, see :doc:`/run-experiment`.
         :doc:`I want to analyze the performance of an experiment on my system by
         generating preconfigured performance figures. <benchpark-analyze>`
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-substitute
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run-substitute
 
         :doc:`I want to re-run this experiment and substitute a different compiler or
         library.

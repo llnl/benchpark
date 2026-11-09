@@ -137,7 +137,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     --card-border: #bdd4e8;
     --card-hover: #477aa9;
     --card-text: #294f73;
-    --goal-number: "6";
+    --goal-number: "8";
 }
 
 .rst-content .tutorial-goal-benchmark {
@@ -154,7 +154,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     --card-border: #d8c4e6;
     --card-hover: #795294;
     --card-text: #513566;
-    --goal-number: "10";
+    --goal-number: "7";
 }
 
 .rst-content .tutorial-goal-scaling {
@@ -163,7 +163,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     --card-border: #b9ddd8;
     --card-hover: #337e76;
     --card-text: #245d57;
-    --goal-number: "7";
+    --goal-number: "9";
 }
 
 .rst-content .tutorial-goal-analyze {
@@ -181,7 +181,16 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     --card-border: #c9cce8;
     --card-hover: #565e96;
     --card-text: #3c426f;
-    --goal-number: "8";
+    --goal-number: "10";
+}
+
+.rst-content .tutorial-goal-parameter-sweep {
+    --card-accent: #2f7f6f;
+    --card-background: #e8f6f2;
+    --card-border: #b9ddd5;
+    --card-hover: #286f62;
+    --card-text: #20554b;
+    --goal-number: "6";
 }
 
 .rst-content .tutorial-goal-spec {
@@ -206,7 +215,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     --card-border: #e8c9ad;
     --card-hover: #9f5d25;
     --card-text: #67401f;
-    --goal-number: "9";
+    --goal-number: "11";
 }
 
 .rst-content .tutorial-goal-search {
@@ -348,6 +357,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     .tutorial-goal-run-substitute,
     .tutorial-goal-troubleshoot,
     .tutorial-goal-analyze,
+    .tutorial-goal-parameter-sweep,
     .tutorial-goal-experiment,
     .tutorial-goal-update-system,
     .tutorial-goal-system,
