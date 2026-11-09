@@ -934,6 +934,12 @@ class LlnlElcapitan(System):
     def system_specific_variables(self):
         opts = super().system_specific_variables()
 
+        if self.rccl_version is not None:
+            opts["rccl_net_plugin"] = (
+                "/collab/usr/global/tools/rccl/toss_4_x86_64_ib_cray/"
+                f"rocm-{self.rccl_version}/install/lib/librccl-net.so"
+            )
+
         extra_batch_opts = []
 
         if not self.spec.variants["spindle"][0]:
