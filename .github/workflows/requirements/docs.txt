@@ -3,7 +3,7 @@ sphinx==9.2.0
 sphinx-rtd-theme==3.1.0
 codespell==2.4.2
 pyyaml==6.0.3
-pandas==3.1.0
+pandas==3.1.1
 sphinxcontrib-programoutput==0.20
 sphinx-copybutton==0.5.2
 sphinx_design
