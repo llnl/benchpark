@@ -95,7 +95,10 @@ def test_system_compute_variables_section(monkeypatch):
             "rocm_arch": "gfx942",
             "rocm_version": "6.4.3",
             "gtl_flag": True,
-            "rccl_net_plugin": "/collab/usr/global/tools/rccl/toss_4_x86_64_ib_cray/rocm-6.4.1/install/lib/librccl-net.so",
+            "rccl_net_plugin": (
+                "/collab/usr/global/tools/rccl/toss_4_x86_64_ib_cray/"
+                "rocm-6.4.1/install/lib/librccl-net.so"
+            ),
             "gpu_factor": 1,
             "extra_batch_opts": "-o spindle.level=off\n--amd-gpumode=SPX\n--conf=resource.rediscover=true",
         }
