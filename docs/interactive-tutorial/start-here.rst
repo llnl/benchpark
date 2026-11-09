@@ -271,6 +271,18 @@ not Spack compiler (``%``) or version (``@``) constraints.
 
             #2 + 25 min.
 
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-parameter-sweep
+
+        :doc:`I want to perform a parameter sweep for an experiment on my system.
+        <perform-a-parameter-sweep>`
+
+            XX min.
+
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-update-system
+
+        :doc:`I want to rerun my experiment on a system, but the system software stack
+        needs an update since it has changed since I last ran it. <update-system-config>`
+
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-system
 
         :doc:`I want to run an experiment someone gave me, but on my system that has
@@ -295,8 +307,3 @@ not Spack compiler (``%``) or version (``@``) constraints.
         .. tutorialcontainer:: tutorial-duration
 
             20 min.
-
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-update-system
-
-        :doc:`I want to rerun my experiment on a system, but the system software stack
-        needs an update since it has changed since I last ran it. <update-system-config>`
