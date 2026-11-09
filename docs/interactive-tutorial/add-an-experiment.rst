@@ -4,9 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-######################
- Adding an Experiment
-######################
+###################
+ Add an Experiment
+###################
 
 **Glossary terms:** :ref:`Benchmark <beginner-tutorial-glossary-benchmark>`,
 :ref:`Package <beginner-tutorial-glossary-package>`, :ref:`Application

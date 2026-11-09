@@ -261,8 +261,8 @@ After the jobs have drained out of the queue, we can analyze them using:
 
     workspace]$ ramble --workspace-dir . workspace analyze
 
-This creates a file in the root of the workspace named ``results.latest.txt``.
-We can now open this file to explore the results of our experiments:
+This creates a file in the root of the workspace named ``results.latest.txt``. We can
+now open this file to explore the results of our experiments:
 
 .. code-block:: console
 
