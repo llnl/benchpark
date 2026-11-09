@@ -14,13 +14,13 @@ jobs:
           cache: pip
           cache-dependency-path: |
             requirements.txt
-            .github/workflows/requirements/docs.txt
+            docs/requirements.txt
       - name: Setup GitHub Pages
         id: pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d
       - name: Install Sphinx and Theme via Pip
         run: |
-          pip install -r requirements.txt -r .github/workflows/requirements/docs.txt
+          pip install -r requirements.txt -r docs/requirements.txt
           # create a dummy workspace to get a working ramble
           bin/benchpark system init --dest=generic-x86 generic-x86
           bin/benchpark experiment init --dest=saxpy generic-x86 saxpy

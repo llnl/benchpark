@@ -216,10 +216,10 @@ jobs:
           cache: pip
           cache-dependency-path: |
             requirements.txt
-            .github/workflows/requirements/docs.txt
+            docs/requirements.txt
       - name: Install deps
         run: |
-          pip install -r requirements.txt -r .github/workflows/requirements/docs.txt
+          pip install -r requirements.txt -r docs/requirements.txt
       - name: Test Docs Scripts
         run: |-
           cd docs/
