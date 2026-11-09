@@ -121,31 +121,16 @@ the current test metadata from being written.
 The publishing job requires ``BENCHPARK_PERF_DEPLOY_TOKEN`` to contain, or point to a
 file containing, the SSH private key for ``benchpark-performance``.
 ``BENCHPARK_PERF_REPO_URL`` indicates the destination repository. The dashboard update
-job publishes with the Plotly Cloud CLI. Set ``PLOTLY_API_KEY`` or
-``PLOTLY_CLOUD_API_KEY`` to a Plotly Cloud API key. The job clones WARDEN from
-``WARDEN_REPO_URL``, which defaults to ``https://github.com/llnl/warden.git``, and runs
-``warden_init_or_update``. It then runs
-``scripts/build_plotly_cloud_files.py --output plotly-cloud-files-v3`` and publishes
-that generated upload directory. Override those WARDEN commands with
-``WARDEN_INIT_OR_UPDATE_CMD``, ``WARDEN_PLOTLY_CLOUD_BUILD_SCRIPT``, and
-``WARDEN_PLOTLY_CLOUD_OUTPUT_DIR`` only if WARDEN changes its interface. Set
-``WARDEN_REF`` to pin a branch, tag, or commit. ``WARDEN_CHECKOUT_PATH`` can override
-cloning and point to an already available WARDEN checkout; ``PLOTLY_CLOUD_APP_PATH`` is
-also accepted as a legacy checkout-path override. A committed ``plotly-cloud.toml``
-updates the existing app in place. If the generated app directory does not provide
-``plotly-cloud.toml`` and ``PLOTLY_CLOUD_APP_CONFIG`` is not set, also set
-``PLOTLY_CLOUD_APP_NAME``. Optional variables include ``PLOTLY_CLOUD_APP_CONFIG`` and
-``PLOTLY_CLOUD_TEAM``. The job publishes with ``REACT_VERSION=19.2.4`` by default
-because Dash Mantine Components 3 requires React 19. Override this with
-``PLOTLY_CLOUD_REACT_VERSION`` only if the WARDEN app dependencies change. Before
-publishing, the job stages a temporary copy of the WARDEN app and pins that staged
-``requirements.txt`` to ``dash==4.5.0`` and
-``dash-mantine-components==3.0.0``. Override those pins with
-``PLOTLY_CLOUD_DASH_REQUIREMENT_PIN`` and ``PLOTLY_CLOUD_DMC_REQUIREMENT_PIN`` only
-when upgrading the dashboard dependency stack. The live Plotly Cloud app must also
-have the runtime environment variable ``REACT_VERSION=19.2.4`` so Dash serves React 19
-in the browser. The job installs ``dash[cloud]`` in a temporary virtual environment if
-the ``plotly`` CLI is not already available.
+job publishes with the Plotly Cloud CLI. Set the CI/CD variables ``PLOTLY_API_KEY`` and
+``PLOTLY_CLOUD_APP_NAME`` for the target Plotly Cloud app. The job clones WARDEN from
+``https://github.com/llnl/warden.git`` and runs ``warden_init_or_update``. It then runs
+``scripts/build_plotly_cloud_files.py --output plotly-cloud-files``. It copies
+WARDEN's pinned ``requirements.txt`` into that generated upload directory before
+publishing. The publish command sets ``REACT_VERSION=19.2.4`` because Dash Mantine
+Components 3 requires React 19. The live Plotly Cloud app must also have the runtime
+environment variable ``REACT_VERSION=19.2.4`` so Dash serves React 19 in the browser.
+The job installs ``dash[cloud]`` in a temporary virtual environment if the ``plotly``
+CLI is not already available.
 
 When adding a monitored benchmark, update its test matrix and matching
 ``resource_rules_*`` entry.
