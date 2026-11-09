@@ -63,12 +63,11 @@ view of Benchpark's directory structure:
  Updating Documentation
 ************************
 
-To build the documentation, requirements can be easily installed from
-``.github/workflows/requirements/docs.txt``, using:
+To build the documentation, install the shared and documentation requirements:
 
 .. code-block:: bash
 
-    pip install -r .github/workflows/requirements/docs.txt
+    pip install -r requirements.txt -r .github/workflows/requirements/docs.txt
 
 This requires ``python>=3.11`` (or try an earlier version of sphinx). After updating the
 documentation, render the pages with the following:
