@@ -51,14 +51,6 @@ variables:
   # clean up the repository after the job finishes
   FF_ENABLE_JOB_CLEANUP: 'true'
   GIT_STRATEGY: fetch
-  # Dash Mantine Components 3 requires React 19.
-  WARDEN_REPO_URL: https://github.com/llnl/warden.git
-  WARDEN_INIT_OR_UPDATE_CMD: warden_init_or_update
-  WARDEN_PLOTLY_CLOUD_BUILD_SCRIPT: scripts/build_plotly_cloud_files.py
-  WARDEN_PLOTLY_CLOUD_OUTPUT_DIR: plotly-cloud-files-v3
-  PLOTLY_CLOUD_REACT_VERSION: '19.2.4'
-  PLOTLY_CLOUD_DASH_REQUIREMENT_PIN: 'dash==4.5.0'
-  PLOTLY_CLOUD_DMC_REQUIREMENT_PIN: 'dash-mantine-components==3.0.0'
   # Debugging logs on gitlab
   # CI_DEBUG_TRACE: 'true'
   # Job variables
