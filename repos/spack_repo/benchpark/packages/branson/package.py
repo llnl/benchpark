@@ -15,6 +15,7 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
     methods for domain decomposition."""
 
     homepage = "https://github.com/lanl/branson"
+    url = "https://github.com/lanl/branson/archive/refs/tags/0.90.tar.gz"
     git = "https://github.com/LANL/branson.git"
 
     tags = ["proxy-app"]
@@ -22,13 +23,15 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
     license("MIT")
 
     version("develop", branch="develop")
-    version("ats6", branch="develop")
 
-    version("1.01", sha256="90208eaec4f6d64a4fd81cd838e30b5e7207246cb7f407e482965f23bbcee848")
+    version(
+        "0.90",
+        sha256="6a710f546b4d954e93db689b63fd5edcf52a57b01f3b72dcc4c90951cc4150dd",
+        preferred=True,
+    )
     version(
         "0.82",
         sha256="7d83d41d0c7ab9c1c906a902165af31182da4604dd0b69aec28d709fe4d7a6ec",
-        preferred=True,
     )
     version("0.81", sha256="493f720904791f06b49ff48c17a681532c6a4d9fa59636522cf3f9700e77efe4")
     version("0.8", sha256="85ffee110f89be00c37798700508b66b0d15de1d98c54328b6d02a9eb2cf1cb8")
@@ -44,7 +47,7 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
 
     with when("+umpire"):
         depends_on("umpire@2026.07.2:", when="@develop")
-        depends_on("umpire@2026.07.2", when="@ats6")
+        depends_on("umpire@2026.07.2", when="@0.90")
 
         depends_on("umpire+cuda", when="+cuda")
         for sm_ in CudaPackage.cuda_arch_values:
