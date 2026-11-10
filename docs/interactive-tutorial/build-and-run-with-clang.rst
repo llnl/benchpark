@@ -30,7 +30,7 @@ necessarily as close as with a repeat run.
 
 .. figure:: /_static/images/benchpark-replicate-table.png
     :alt: Benchpark replicate specification
-    :width: 75%
+    :width: 50%
     :align: center
 
 This use case follows the same workflow as :doc:`build-and-run-experiment`, but changes
