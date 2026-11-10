@@ -271,10 +271,49 @@ now open this file to explore the results of our experiments:
 This file should contain the GFLOPs rating for the HPL experiments that you ran, in
 addition to information about the software stack, and variants used.
 
-Each experiment directory (i.e., subdirectories of ``experiments/hpl/standard``) will
-now contain a Caliper output file (i.e., a ``.cali`` file) containing performance data
-for the job. For individual experiment instances, rerunning experiments, and combining
-workspaces into one allocation, see :doc:`/run-experiment`.
+To make the results easier to compare across configurations, we can add a table
+definition to the Ramble configuration. Open the ``ramble.yaml``:
+
+.. code-block:: console
+
+    workspace]$ nano configs/ramble.yaml
+
+And add the following to the bottom of the configuration file. Make sure it is indented
+a base of two spaces.
+
+.. code-block:: YAML
+
+    tables:
+    - name: parameter_sweep
+      columns:
+      - name: "N Ranks"
+        expression: "{n_ranks}"
+      - name: "Matrix Size"
+        expression: "{Ns}"
+      - name: "Block Size"
+        expression: "{NBs}"
+      - name: GFlops
+        figure_of_merit: "GFlops"
+        figure_of_merit_context: "N-NB-P-Q = {Ns}-{NBs}-{n_ranks}-1"
+
+Now, re-analyze the experiments:
+
+.. code-block:: console
+
+    workspace]$ ramble --workspace-dir . workspace analyze
+
+This time, the last lines of the output should be about creating tables. You can now
+explore the generated table using:
+
+.. code-block:: console
+
+    workspace]$ cat tables/parameter_sweep.latest.csv
+
+Additionally, each experiment directory (i.e., subdirectories of
+``experiments/hpl/standard``) will now contain a Caliper output file (i.e., a ``.cali``
+file) containing performance data for the job. For individual experiment instances,
+rerunning experiments, and combining workspaces into one allocation, see
+:doc:`/run-experiment`.
 
 ***********************
  Choose Your Next Step
