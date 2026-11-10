@@ -41,8 +41,13 @@ initial version.
         maintainers("nhanford")
 
         id_to_resources = {
-            # Step 1 adds the ARM64 resource mapping here.
-            "amd64": {"cpu_arch": "x86_64_v3"},
+            "fluxtainer": {"sys_cores_per_node": 4},
+            "fluxtainer-aws": {"sys_cores_per_node": 32},
+        }
+
+        architecture_to_cpu_arch = {
+            # Step 1 adds the ARM64 architecture here.
+            "amd64": "x86_64_v3",
         }
 
         variant(
@@ -52,7 +57,14 @@ initial version.
                 # Step 1 adds the ARM64 instance type here.
             ),
             default="amd64",
-            description="Target Architecture",
+            description="Target architecture",
+        )
+
+        variant(
+            "instance",
+            values=("fluxtainer", "fluxtainer-aws"),
+            default="fluxtainer",
+            description="Container instance configuration",
         )
 
         variant(
@@ -259,6 +271,14 @@ initial version.
                         "externals": [{"spec": "python@3.12.12", "prefix": "/usr"}],
                         "buildable": False,
                     },
+                    "blas": {"require": "netlib-lapack", "buildable": False},
+                    "lapack": {"require": "netlib-lapack", "buildable": False},
+                    "netlib-lapack": {
+                        "externals": [
+                            {"spec": "netlib-lapack@3.12.0", "prefix": "/usr"}
+                        ],
+                        "buildable": False,
+                    },
                 }
             }
 
@@ -279,15 +299,16 @@ initial version.
 1. Add Another Target Architecture
 ==================================
 
-The starter definition supports the ``amd64`` architecture. Adding ``arm64`` requires a
-resource mapping and a corresponding value in the ``instance_type`` variant.
+The starter definition supports the ``amd64`` architecture and both instance sizes.
+Adding ``arm64`` requires an architecture mapping and a corresponding value in the
+``instance_type`` variant.
 
-Replace the first Step 1 placeholder in ``id_to_resources`` with:
+Replace the first Step 1 placeholder in ``architecture_to_cpu_arch`` with:
 
 .. code-block:: python
 
-    # In id_to_resources:
-            "arm64": {"cpu_arch": "arm64"},
+    # In architecture_to_cpu_arch:
+            "arm64": "arm64",
 
 Replace the second Step 1 placeholder in the ``instance_type`` variant with:
 
@@ -308,10 +329,11 @@ Replace the Step 2 placeholder in ``__init__()`` with:
             self.programming_models = [OpenMPCPUOnlySystem()]
 
             self.scheduler = "flux"
-            setattr(self, "sys_cores_per_node", 4)
             setattr(self, "sys_mem_per_node_GB", 1)
-            setattr(self, "n_nodes", 1)
-            attrs = self.id_to_resources.get(self.spec.variants["instance_type"][0])
+            self.cpu_arch = self.architecture_to_cpu_arch[
+                self.spec.variants["instance_type"][0]
+            ]
+            attrs = self.id_to_resources[self.spec.variants["instance"][0]]
             for k, v in attrs.items():
                 setattr(self, k, v)
 
@@ -335,12 +357,12 @@ executables are available. Replace the second Step 3 placeholder, immediately be
     # In compute_compilers_section():
             if self.spec.satisfies("compiler=clang"):
                 cfg = compiler_section_for(
-                    "clang",
+                    "llvm",
                     [
                         compiler_def(
-                            "llvm@20.1.8",
-                            "/usr/lib64/ccache/",
-                            {"c": "clang", "cxx": "clang++"},
+                            "llvm@20.1.8 +clang +flang",
+                            "/opt/llvm",
+                            {"c": "clang", "cxx": "clang++", "fortran": "flang"},
                         )
                     ],
                 )
@@ -364,6 +386,13 @@ Initialize the system to validate the definition:
 .. code-block:: console
 
     $ benchpark system init --dest=fluxtainer fluxtainer
+
+To initialize the AWS configuration with 32 cores per node, select the
+``fluxtainer-aws`` instance:
+
+.. code-block:: console
+
+    $ benchpark system init --dest=fluxtainer-aws fluxtainer instance=fluxtainer-aws
 
 For the complete system authoring reference, see :doc:`/add-a-system-config`.
 

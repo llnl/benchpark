@@ -48,7 +48,7 @@ After choosing a system or experiment, inspect its variants and configuration de
 
 .. code-block:: console
 
-    ~]$ benchpark info system fluxtainer-aws
+    ~]$ benchpark info system fluxtainer
     ~]$ benchpark info experiment hpl
 
 For a complete command reference, see :doc:`Benchpark Commands </benchpark-commands>`.
