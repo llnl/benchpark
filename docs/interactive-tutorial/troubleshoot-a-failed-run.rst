@@ -418,11 +418,6 @@ workspaces into one allocation, see :doc:`/run-experiment`.
         start another workflow by searching what is available in Benchpark.
         <search-benchpark>`
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-troubleshoot
-
-        :doc:`I ran into errors building and running an experiment, and I want to
-        diagnose where it failed.  <troubleshoot-a-failed-run>`
-
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-analyze
 
         :doc:`I want to analyze the performance of an experiment on my system by
