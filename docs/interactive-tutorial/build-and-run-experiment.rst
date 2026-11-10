@@ -108,7 +108,7 @@ output from spack you can open the setup log for the first experiment:
 
 .. code-block:: console
 
-    workspace]$ nano logs/setup.latest/hpl.standard.hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_1_-1_1.out
+    workspace]$ nano logs/setup.latest/hpl.standard.hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_1_1000_1.out
 
 If you explore this file, you should see output related to ``spack concretize`` and
 ``spack install``. For more information on what these content mean, please refer to
@@ -164,12 +164,6 @@ This command will produce an output like:
     system, expect the jobs to complete faster.
 
 After the jobs have drained out of the queue, we can analyze them using:
-
-.. code-block:: console
-
-    workspace]$ ramble --workspace-dir . workspace analyze
-
-Once the jobs are all finished, we can analyze the workspace:
 
 .. code-block:: console
 
