@@ -195,12 +195,6 @@ workspaces into one allocation, see :doc:`/run-experiment`.
         start another workflow by searching what is available in Benchpark.
         <search-benchpark>`
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run-substitute
-
-        :doc:`I want to re-run this experiment and substitute a different compiler or
-        library.
-        <build-and-run-with-clang>`
-
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-troubleshoot
 
         :doc:`My experiment did not finish, and I want to diagnose where it failed.
@@ -210,6 +204,12 @@ workspaces into one allocation, see :doc:`/run-experiment`.
 
         :doc:`I want to analyze the performance of an experiment on my system by
         generating preconfigured performance figures. <benchpark-analyze>`
+
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run-substitute
+
+        :doc:`I want to re-run this experiment and substitute a different compiler or
+        library.
+        <build-and-run-with-clang>`
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-query
 
