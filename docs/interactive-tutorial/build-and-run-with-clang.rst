@@ -46,9 +46,9 @@ variant:
 
 .. code-block:: console
 
-    ~/benchpark]$ benchpark system init --dest=hpc-tutorial-clang fluxtainer instance=fluxtainer-aws compiler=clang
+    ~/benchpark]$ benchpark system init --dest=hpc-tutorial-clang fluxtainer instance_type=amd64-aws compiler=clang
 
-The ``fluxtainer-aws`` instance retains the tutorial's 32 cores per node.
+The ``amd64-aws`` instance type retains the tutorial's 32 cores per node.
 
 Here ``compiler=clang`` is a Benchpark system variant provided by ``fluxtainer``. It
 is not a Spack ``%clang`` constraint.

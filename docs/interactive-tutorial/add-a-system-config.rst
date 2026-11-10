@@ -41,30 +41,20 @@ initial version.
         maintainers("nhanford")
 
         id_to_resources = {
-            "fluxtainer": {"sys_cores_per_node": 4},
-            "fluxtainer-aws": {"sys_cores_per_node": 32},
-        }
-
-        architecture_to_cpu_arch = {
-            # Step 1 adds the ARM64 architecture here.
-            "amd64": "x86_64_v3",
+            # Step 1 adds the ARM64 resource mappings here.
+            "amd64": {"cpu_arch": "x86_64_v3", "sys_cores_per_node": 4},
+            "amd64-aws": {"cpu_arch": "x86_64_v3", "sys_cores_per_node": 32},
         }
 
         variant(
             "instance_type",
             values=(
                 "amd64",
-                # Step 1 adds the ARM64 instance type here.
+                "amd64-aws",
+                # Step 1 adds the ARM64 instance types here.
             ),
             default="amd64",
-            description="Target architecture",
-        )
-
-        variant(
-            "instance",
-            values=("fluxtainer", "fluxtainer-aws"),
-            default="fluxtainer",
-            description="Container instance configuration",
+            description="Target architecture and instance size",
         )
 
         variant(
@@ -299,16 +289,17 @@ initial version.
 1. Add Another Target Architecture
 ==================================
 
-The starter definition supports the ``amd64`` architecture and both instance sizes.
-Adding ``arm64`` requires an architecture mapping and a corresponding value in the
-``instance_type`` variant.
+The starter definition supports ``amd64`` with 4 or 32 cores per node. Adding the
+matching ``arm64`` configurations requires resource mappings and corresponding
+values in the ``instance_type`` variant.
 
-Replace the first Step 1 placeholder in ``architecture_to_cpu_arch`` with:
+Replace the first Step 1 placeholder in ``id_to_resources`` with:
 
 .. code-block:: python
 
-    # In architecture_to_cpu_arch:
-            "arm64": "arm64",
+    # In id_to_resources:
+            "arm64": {"cpu_arch": "arm64", "sys_cores_per_node": 4},
+            "arm64-aws": {"cpu_arch": "arm64", "sys_cores_per_node": 32},
 
 Replace the second Step 1 placeholder in the ``instance_type`` variant with:
 
@@ -316,6 +307,7 @@ Replace the second Step 1 placeholder in the ``instance_type`` variant with:
 
     # In the instance_type values tuple:
                 "arm64",
+                "arm64-aws",
 
 2. Set Runtime and Resource Attributes
 ======================================
@@ -330,10 +322,7 @@ Replace the Step 2 placeholder in ``__init__()`` with:
 
             self.scheduler = "flux"
             setattr(self, "sys_mem_per_node_GB", 1)
-            self.cpu_arch = self.architecture_to_cpu_arch[
-                self.spec.variants["instance_type"][0]
-            ]
-            attrs = self.id_to_resources[self.spec.variants["instance"][0]]
+            attrs = self.id_to_resources[self.spec.variants["instance_type"][0]]
             for k, v in attrs.items():
                 setattr(self, k, v)
 
@@ -388,11 +377,11 @@ Initialize the system to validate the definition:
     $ benchpark system init --dest=fluxtainer fluxtainer
 
 To initialize the AWS configuration with 32 cores per node, select the
-``fluxtainer-aws`` instance:
+``amd64-aws`` instance type:
 
 .. code-block:: console
 
-    $ benchpark system init --dest=fluxtainer-aws fluxtainer instance=fluxtainer-aws
+    $ benchpark system init --dest=fluxtainer-aws fluxtainer instance_type=amd64-aws
 
 For the complete system authoring reference, see :doc:`/add-a-system-config`.
 

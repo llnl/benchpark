@@ -15,29 +15,18 @@ class Fluxtainer(System):
 
     maintainers("nhanford")
 
-    # Node size and CPU architecture are selected independently.
     id_to_resources = {
-        "fluxtainer": {"sys_cores_per_node": 4},
-        "fluxtainer-aws": {"sys_cores_per_node": 32},
-    }
-
-    architecture_to_cpu_arch = {
-        "arm64": "arm64",
-        "amd64": "x86_64_v3",
+        "arm64": {"cpu_arch": "arm64", "sys_cores_per_node": 4},
+        "amd64": {"cpu_arch": "x86_64_v3", "sys_cores_per_node": 4},
+        "arm64-aws": {"cpu_arch": "arm64", "sys_cores_per_node": 32},
+        "amd64-aws": {"cpu_arch": "x86_64_v3", "sys_cores_per_node": 32},
     }
 
     variant(
         "instance_type",
-        values=("arm64", "amd64"),
+        values=("arm64", "amd64", "arm64-aws", "amd64-aws"),
         default="amd64",
-        description="Target architecture",
-    )
-
-    variant(
-        "instance",
-        values=("fluxtainer", "fluxtainer-aws"),
-        default="fluxtainer",
-        description="Container instance configuration",
+        description="Target architecture and instance size",
     )
 
     variant(
@@ -53,10 +42,7 @@ class Fluxtainer(System):
 
         self.scheduler = "flux"
         setattr(self, "sys_mem_per_node_GB", 1)
-        self.cpu_arch = self.architecture_to_cpu_arch[
-            self.spec.variants["instance_type"][0]
-        ]
-        attrs = self.id_to_resources[self.spec.variants["instance"][0]]
+        attrs = self.id_to_resources[self.spec.variants["instance_type"][0]]
         for k, v in attrs.items():
             setattr(self, k, v)
 
