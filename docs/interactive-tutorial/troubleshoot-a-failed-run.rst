@@ -135,25 +135,8 @@ This will print the following error:
 
 .. code-block:: console
 
-    INFO:benchpark.cmd.analyze: Found 0 .cali files for analysis.
-    Traceback (most recent call last):
-      File "/home/fluxuser/benchpark/bin/benchpark", line 35, in <module>
-        exit_code = main()
-                    ^^^^^^
-      File "/home/fluxuser/benchpark/lib/main.py", line 169, in main
-        exit_code = action(args)
-                    ^^^^^^^^^^^^
-      File "/home/fluxuser/benchpark/lib/benchpark/cmd/analyze.py", line 842, in command
-        prepare_data(**vars(args))
-      File "/home/fluxuser/benchpark/lib/benchpark/cmd/analyze.py", line 382, in prepare_data
-        tk = th.Thicket.from_caliperreader(
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-      File "/home/fluxuser/.local/lib/python3.12/site-packages/thicket/thicket.py", line 459, in from_caliperreader
-        return Thicket.reader_dispatch(
-               ^^^^^^^^^^^^^^^^^^^^^^^^
-      File "/home/fluxuser/.local/lib/python3.12/site-packages/thicket/thicket.py", line 573, in reader_dispatch
-        raise ValueError("Iterable must contain at least one file")
-    ValueError: Iterable must contain at least one file
+    Error: No Caliper (.cali) files found under '/home/fluxuser/benchpark/wkp/hpc-tutorial/hpl/workspace' (searched recursively for '*.cali')
+    You must run your experiment with Caliper and generate Caliper profiles to use benchpark analyze.
 
 Next we will manufacture a few errors related to the Spack build, to help show where
 these errors show up. Update the spec used to install HPL as follows:
