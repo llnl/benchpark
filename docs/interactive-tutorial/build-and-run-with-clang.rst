@@ -30,7 +30,7 @@ necessarily as close as with a repeat run.
 
 .. figure:: /_static/images/benchpark-replicate-table.png
     :alt: Benchpark replicate specification
-    :width: 50%
+    :width: 75%
     :align: center
 
 This use case follows the same workflow as :doc:`build-and-run-experiment`, but changes
@@ -50,7 +50,7 @@ variant:
 
 .. figure:: /_static/images/fluxtainer-aws-system-spec-clang.png
     :alt: Tutorial system spec using clang
-    :width: 50%
+    :width: 90%
     :align: center
 
 Here ``compiler=clang`` is a Benchpark system variant provided by ``fluxtainer-aws``. It
@@ -112,7 +112,7 @@ strong-scaling study.
     ~/benchpark]$ benchpark analyze --workspace-dir wkp/hpl-tutorial-clang/hpl/workspace
 
 .. figure:: /_static/images/hpl_strong_gcc_clang_compare.png
-    :width: 800
+    :width: 90%
     :align: center
 
     Left figures show the benchpark system specification and strong-scaling area chart
