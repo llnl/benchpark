@@ -1,4 +1,11 @@
-Sphinx
+# Sphinx 9.2 requires Python 3.13; use Sphinx 8.2 on Python 3.11 and 3.12.
+sphinx==8.2.3; python_version < "3.13"
+sphinx; python_version >= "3.13"
 sphinx-rtd-theme
+codespell
 sphinxcontrib-programoutput
 sphinx-copybutton
+sphinx_design
+sphinxcontrib.mermaid
+# benchpark analyze -h command
+llnl-thicket

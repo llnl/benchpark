@@ -65,6 +65,13 @@ include:
           - remhos
           - sparta-snl
         VARIANT: [+rocm]
+      # Exercise the RCCL net plugin with ROCm 7.2.1
+      - HOST: tuolumne
+        ARCHCONFIG: llnl-elcapitan
+        SCHEDULER_PARAMETERS: $ELCAP_PARAMS
+        BENCHMARK: [rccl-tests]
+        SYSTEM_ARGS: [rocm=7.2.1]
+        VARIANT: [+rocm]
       # New ROCm version coverage
       - HOST: tuolumne
         ARCHCONFIG: llnl-elcapitan

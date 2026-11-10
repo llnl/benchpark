@@ -32,7 +32,6 @@ class Hpl(
     maintainers("daboehme")
 
     def compute_applications_section(self):
-
         if self.spec.satisfies("exec_mode=test"):
             self.add_experiment_variable("n_ranks", 1, True)
             self.add_experiment_variable("Ns", 1000, True)
@@ -42,6 +41,13 @@ class Hpl(
             self.add_experiment_variable("N-Ns", 1, False)
             self.add_experiment_variable("N-NBs", 1, False)
             self.add_experiment_variable("NBs", 128, False)
+            self.add_experiment_variable("NPFACTs", 1, False)
+            self.add_experiment_variable("PFACTs", 2, False)
+            self.add_experiment_variable("N-NBMINs", 1, False)
+            self.add_experiment_variable("NBMINs", 2, False)
+            self.add_experiment_variable("N-RFACTs", 1, False)
+            self.add_experiment_variable("RFACTs", 2, False)
+
         # Must be exec_mode=perf if not test mode.
         else:
             self.add_experiment_variable("n_ranks", 32, True)
@@ -80,4 +86,7 @@ class Hpl(
         )
 
     def compute_package_section(self):
-        self.add_package_spec(self.name, [f"hpl{self.determine_version()}"])
+        if self.spec.satisfies("exec_mode=tutorial-failure"):
+            self.add_package_spec(self.name, [f"hpl-err{self.determine_version()}"])
+        else:
+            self.add_package_spec(self.name, [f"hpl{self.determine_version()}"])

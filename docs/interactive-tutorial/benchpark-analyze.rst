@@ -39,7 +39,7 @@ strong-scaling study.
 
 .. code-block:: console
 
-    ~/benchpark]$ benchpark analyze --workspace-dir wkp/fluxtainer-aws/hpl/workspace
+    benchpark]$ benchpark analyze --workspace-dir wkp/hpc-tutorial/hpl/workspace
 
 .. figure:: /_static/images/hpl_mpi_strong_raw_exc.png
     :width: 800
@@ -56,7 +56,7 @@ This makes each region's share of total time easier to compare.
 
 .. code-block:: console
 
-    ~/benchpark]$ benchpark analyze --workspace-dir wkp/fluxtainer-aws/hpl/workspace --chart-type percentage
+    benchpark]$ benchpark analyze --workspace-dir wkp/hpc-tutorial/hpl/workspace --chart-type percentage
 
 .. figure:: /_static/images/hpl_mpi_strong_percentage_exc.png
     :width: 800
@@ -72,7 +72,7 @@ The inclusive chart uses ``Avg time/rank`` instead of ``Avg time/rank (exc)``.
 
 .. code-block:: console
 
-    ~/benchpark]$ benchpark analyze --workspace-dir wkp/fluxtainer-aws/hpl/workspace --yaxis-metric "Avg time/rank"
+    benchpark]$ benchpark analyze --workspace-dir wkp/hpc-tutorial/hpl/workspace --yaxis-metric "Avg time/rank"
 
 .. figure:: /_static/images/hpl_mpi_strong_raw.png
     :width: 800
@@ -90,7 +90,7 @@ the measured time.
 
 .. code-block:: console
 
-    ~/benchpark]$ benchpark analyze --workspace-dir wkp/fluxtainer-aws/hpl/workspace --group-regions-name --top-n-regions 10
+    benchpark]$ benchpark analyze --workspace-dir wkp/hpc-tutorial/hpl/workspace --group-regions-name --top-n-regions 10
 
 .. figure:: /_static/images/hpl_mpi_strong_raw_exc_region.png
     :width: 800

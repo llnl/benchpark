@@ -41,6 +41,14 @@ exclude = [
 skip = './docs/_build,./docs/_static,./taxonomy.yaml,./repos/spack_repo/*/*/*/*.patch'
 ignore-words-list = 'fom'
 
+[tool.coverage.run]
+# Also measure Python subprocesses, e.g. unit tests that run bin/benchpark.
+# pytest-cov >= 7 no longer does this on its own (needs coverage >= 7.10).
+patch = ["subprocess"]
+# Measure Benchpark itself, not its unit tests. The leading * keeps the
+# pattern independent of the working directory of each (sub)process.
+omit = ["*/lib/benchpark/test/*"]
+
 [tool.yamlfix]
 line-length = 88
 allow_duplicate_keys = true

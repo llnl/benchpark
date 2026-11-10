@@ -12,49 +12,18 @@
  Start Here
 ############
 
-.. tutorialcontainer:: tutorial-project-links
+Benchpark is an open-source infrastructure-as-code Python project which aims to enable
+reproducibility in HPC benchmarking. It accomplishes this by defining each component of
+HPC benchmarking, and constraining it separately. Benchpark builds on the specification
+provided by Spack, an HPC package manager, and Ramble, an HPC testing framework.
 
-    .. tutorialcontainer:: tutorial-project-link
+.. seealso::
 
-        .. rubric:: Benchpark Source
-
-        .. image:: /_static/images/benchpark-icon.svg
-            :alt: Benchpark on GitHub
-            :target: https://github.com/llnl/benchpark
-
-    .. tutorialcontainer:: tutorial-project-link
-
-        .. rubric:: Benchpark Tutorial Slides
-
-        .. image:: /tutorial/PACT26-Tutorial-Slide-Preview.jpg
-            :alt: Benchpark Tutorial Slides
-            :target: ../_static/slides/PACT26-Tutorial-Slides.pdf
-
-    .. tutorialcontainer:: tutorial-project-link
-
-        .. rubric:: Benchpark on CDash
-
-        .. image:: /_static/images/cdash.svg
-            :alt: Benchpark CDash
-            :target: https://my.cdash.org/index.php?project=Benchpark
-
-    .. tutorialcontainer:: tutorial-project-link
-
-        .. rubric:: Spack
-
-        .. image:: https://spack.readthedocs.io/en/latest/_static/spack-logo-text.svg
-            :alt: Spack
-            :target: https://spack.readthedocs.io/en/latest/
-
-    .. tutorialcontainer:: tutorial-project-link
-
-        .. rubric:: Ramble
-
-        .. image:: https://avatars.githubusercontent.com/u/318055132?s=240&v=4
-            :alt: Ramble
-            :target: https://ramble.readthedocs.io/en/latest/
-
-|
+    `Latest Benchpark Tutorial Slides <../_static/slides/PACT26-Tutorial-Slides.pdf>`_ |
+    `Benchpark Code on GitHub <https://github.com/llnl/benchpark>`_ | `Benchpark
+    Dashboard <https://my.cdash.org/index.php?project=Benchpark>`_ | `Ramble
+    <https://ramble.readthedocs.io/en/latest/>`_ | `Spack
+    <https://spack.readthedocs.io/en/latest/>`_
 
 ********************
  Benchpark Glossary
@@ -175,6 +144,18 @@ constraints, and dependencies, in addition to its package name and variants.
 A Benchpark spec describes a Benchpark object. A system spec selects a definition under
 ``systems/``, and an experiment spec selects a definition under ``experiments/``.
 
+The Benchpark system spec defines the hardware resources and software stack, including
+information that is useful for running benchmarks. This may include the following:
+
+- Resources (CPU cores, GPUs)
+- Scheduler (Slurm, flux)
+- Process mapping (cores, sockets, GPUs, NICs)
+- On-node parallelism (CUDA, ROCM, OpenMP)
+- Software stack
+- Compilers (which is best?)
+- MPI implementations (best?)
+- Math libraries
+
 Benchpark's parser is derived from Spack's spec parser and implements the object name
 and `variant portions of its syntax
 <https://spack.readthedocs.io/en/latest/spec_syntax.html#variants>`_. Every token after
@@ -192,6 +173,22 @@ not Spack compiler (``%``) or version (``@``) constraints.
 ***************************
  Benchpark Experiment Spec
 ***************************
+
+The Benchpark experiment spec defines any information for reproducible sets of
+experiments that we can map onto specific systems, such as:
+
+- On-node parallelism (CUDA, ROCM, OpenMP)
+- Problem sizes
+
+      - Overall problem size, or
+      - Per node or per GPU
+
+- Scaling studies
+
+  - How to scale
+  - How to decompose
+
+- Resources (cores, GPUs)
 
 .. figure:: /_static/images/experiment-spec.png
     :alt: Annotated Benchpark experiment spec
@@ -232,7 +229,7 @@ not Spack compiler (``%``) or version (``@``) constraints.
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-search tutorial-with-duration
 
-        :doc:`I want to search what is available in Benchpark. <search-benchpark>`
+        :doc:`I want to search what is available in Benchpark and Ramble. <search-benchpark>`
 
         .. tutorialcontainer:: tutorial-duration
 
@@ -247,6 +244,24 @@ not Spack compiler (``%``) or version (``@``) constraints.
 
             25 min.
 
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run-substitute tutorial-with-duration
+
+        :doc:`I want to run an experiment, but build it with a different compiler
+        or library (e.g., gcc or clang compiler). <build-and-run-with-clang>`
+
+        .. tutorialcontainer:: tutorial-duration
+
+            15 min.
+
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-troubleshoot tutorial-with-duration
+
+        :doc:`I ran into an error while building and running experiment, and
+        want to learn how to diagnose it. <troubleshoot-a-failed-run>`
+
+        .. tutorialcontainer:: tutorial-duration
+
+            25 min.
+
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-analyze tutorial-with-duration
 
         :doc:`I want to generate preconfigured performance figures for an experiment
@@ -254,21 +269,21 @@ not Spack compiler (``%``) or version (``@``) constraints.
 
         .. tutorialcontainer:: tutorial-duration
 
-            #2 + 25 min.
+            #4 + 25 min.
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-experiment tutorial-with-duration
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-parameter-sweep tutorial-with-duration
 
-        :doc:`I want to run a new benchmark on the system I have benchmarked before.
-        <add-an-experiment>`
+        :doc:`I want to perform a parameter sweep for an experiment on my system.
+        <perform-a-parameter-sweep>`
 
         .. tutorialcontainer:: tutorial-duration
 
-            20 min.
+            15 min.
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-update-system
 
         :doc:`I want to rerun my experiment on a system, but the system software stack
-        has changed since I last ran it. <update-system-config>`
+        needs an update since it has changed since I last ran it. <update-system-config>`
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-system
 
@@ -285,3 +300,12 @@ not Spack compiler (``%``) or version (``@``) constraints.
 
         :doc:`I want to generate raw performance data to make my own figures.
         <benchpark-query>`
+
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-experiment tutorial-with-duration
+
+        :doc:`I want to run a new benchmark on the system I have benchmarked before.
+        <add-an-experiment>`
+
+        .. tutorialcontainer:: tutorial-duration
+
+            20 min.
