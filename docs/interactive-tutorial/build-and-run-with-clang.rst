@@ -12,12 +12,6 @@
 :ref:`Experiment <beginner-tutorial-glossary-experiment>`, :ref:`System
 <beginner-tutorial-glossary-system>`
 
-.. tutorialcontainer:: tutorial-prerequisite-links
-
-    .. tutorialcontainer:: tutorial-prerequisite-link tutorial-prerequisite-experiment
-
-        :doc:`Prerequisite: Build and Run an Experiment <build-and-run-experiment>`
-
 In this example, we show how to replicate an experiment, that is to run the same
 application on a potentially different machine that has the same hardware but possibly a
 different software stack (for example, a system with the same hardware specs, but
@@ -46,7 +40,7 @@ variant:
 
 .. code-block:: console
 
-    ~/benchpark]$ benchpark system init --dest=hpc-tutorial-clang fluxtainer-aws compiler=clang
+    benchpark]$ benchpark system init --dest=hpc-tutorial-clang fluxtainer-aws compiler=clang
 
 .. figure:: /_static/images/fluxtainer-aws-system-spec-clang.png
     :alt: Tutorial system spec using clang
@@ -68,7 +62,7 @@ Initialize the HPL experiment against the Clang system instance:
 
 .. figure:: /_static/images/fluxtainer-aws-experiment-spec-clang.png
     :alt: Tutorial experiment spec using clang
-    :width: 50%
+    :width: 90%
     :align: center
 
 Create the experiment workspace:
