@@ -125,12 +125,19 @@ strong-scaling study.
 
 .. tutorialcontainer:: tutorial-next-steps
 
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-search
+
+        :ref:`I have run an experiment someone gave me on the same system. I want to
+        start another workflow by searching what is available in Benchpark.
+        <search-benchpark>`
+
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-run
 
         :doc:`I want to return to the default GCC build and run workflow.
         <build-and-run-experiment>`
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-analyze
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-troubleshoot
 
-        :doc:`I want to analyze the performance of this experiment by generating
-        preconfigured performance figures. <benchpark-analyze>`
+        :doc:`My experiment did not finish, and I want to diagnose where it failed.
+        <troubleshoot-a-failed-run>`
+

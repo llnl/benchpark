@@ -327,16 +327,10 @@ rerunning experiments, and combining workspaces into one allocation, see
         start another workflow by searching what is available in Benchpark.
         <search-benchpark>`
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-analyze
-
-        :doc:`I want to analyze the performance of an experiment on my system by
-        generating preconfigured performance figures. <benchpark-analyze>`
-
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-run-substitute
 
-        :doc:`I want to re-run this experiment and substitute a different compiler or
-        library.
-        <build-and-run-with-clang>`
+        :doc:`I want to run an experiment someone gave me on the same system, but
+        substitute a different compiler or library.  <build-and-run-with-clang>`
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-query
 
