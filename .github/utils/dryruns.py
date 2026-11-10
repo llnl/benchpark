@@ -9,6 +9,7 @@ import re
 import subprocess
 import sys
 import time
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 
 DEFAULT_SYSTEM = "llnl-cluster cluster=dane"
 # Skip experiments
@@ -48,6 +49,26 @@ def run_subprocess_cmd(cmd_list, decode=False):
         )
 
 
+def run_dryrun(espec, sspec):
+    try:
+        subprocess.run(
+            ["bash", ".github/utils/dryrun.sh", espec, sspec],
+            env={**os.environ},
+            capture_output=True,
+            check=True,
+        )
+    except subprocess.CalledProcessError as e:
+        output = []
+        if e.stdout:
+            output.append(f"stdout:\n{e.stdout.decode(errors='replace')}")
+        if e.stderr:
+            output.append(f"stderr:\n{e.stderr.decode(errors='replace')}")
+        return "\n".join(output) or (
+            f"Command exited with status {e.returncode} without output."
+        )
+    return None
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -66,6 +87,9 @@ def main():
     )
     parser.add_argument(
         "--dryrun", action="store_true", help="Dry runs this script for testing."
+    )
+    parser.add_argument(
+        "--jobs", type=int, default=16, help="Maximum concurrent dry runs (default: 16)."
     )
     args = parser.parse_args()
 
@@ -175,40 +199,48 @@ def main():
     print(f"Total tests to run: {total_tests}")
 
     start = time.time()
-    errors = {}
+    errors = []
     fail_tests = 0
     ran_tests = 0
     skip_tests = 0
-    for _, expr_spec_list, sys_spec_list in exprs_to_sys:
-        for espec in expr_spec_list:
-            for sspec in sys_spec_list:
-                if "ior" in espec and "llnl-cluster" in sspec:
-                    sspec += " mount_point=/p/lustre1"
-                elif "ior" in espec:
-                    SKIP_EXPR.append(f"{espec} {sspec}")
-                expr = f"{espec} {sspec}"
-                # If (1) entire spec in SKIP_EXPR or (2) just the experiment name is specified, e.g. skip all systems
-                if expr in SKIP_EXPR or any([expr.split(" ")[0] == se for se in SKIP_EXPR]):
-                    skip_tests += 1
-                    print(f'Skipping "{expr}"')
-                    continue
-                ran_tests += 1
-                print(f'Running "{expr}"')
-                if args.dryrun:
-                    continue
-                try:
-                    subprocess.run(
-                        ["bash", ".github/utils/dryrun.sh", espec, sspec],
-                        env={**os.environ},
-                        capture_output=True,
-                        check=True,
-                    )
-                except subprocess.CalledProcessError as e:
-                    errors[f"{espec} {sspec}"] = e.stderr.decode()
-                    fail_tests += 1
+    with ThreadPoolExecutor(max_workers=args.jobs) as executor:
+        pending = {}
+        for _, expr_spec_list, sys_spec_list in exprs_to_sys:
+            for espec in expr_spec_list:
+                for sspec in sys_spec_list:
+                    if "ior" in espec and "llnl-cluster" in sspec:
+                        sspec += " mount_point=/p/lustre1"
+                    elif "ior" in espec:
+                        SKIP_EXPR.append(f"{espec} {sspec}")
+                    expr = f"{espec} {sspec}"
+                    # If (1) entire spec in SKIP_EXPR or (2) just the experiment name is specified, e.g. skip all systems
+                    if expr in SKIP_EXPR or any(
+                        expr.split(" ")[0] == se for se in SKIP_EXPR
+                    ):
+                        skip_tests += 1
+                        print(f'Skipping "{expr}"')
+                        continue
+                    ran_tests += 1
+                    print(f'Running "{expr}"')
+                    if args.dryrun:
+                        continue
+                    pending[executor.submit(run_dryrun, espec, sspec)] = expr
+                    if len(pending) == args.jobs:
+                        done, _ = wait(pending, return_when=FIRST_COMPLETED)
+                        for future in done:
+                            error = future.result()
+                            if error is not None:
+                                errors.append((pending[future], error))
+                                fail_tests += 1
+                            del pending[future]
+        for future in pending:
+            error = future.result()
+            if error is not None:
+                errors.append((pending[future], error))
+                fail_tests += 1
     end = time.time()
 
-    for i, (key, value) in enumerate(errors.items()):
+    for i, (key, value) in enumerate(sorted(errors)):
         print("=" * 100)
         print(str(i + 1) + ". " + key)
         print(value)
