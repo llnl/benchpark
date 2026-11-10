@@ -839,6 +839,15 @@ def command(args):
 
     _write_last_cmd(args.out_dir)
 
+    if not args.cali_files:
+        print(
+            f"Error: No Caliper (.cali) files found under "
+            f"'{os.path.abspath(args.workspace_dir)}' "
+            f"(searched recursively for '*{args.file_name_match}.cali')",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
     prepare_data(**vars(args))
 
     return 0
