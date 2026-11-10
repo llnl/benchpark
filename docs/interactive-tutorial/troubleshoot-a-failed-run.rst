@@ -102,10 +102,10 @@ This should print the following output:
     Experiments:
       Application: hpl
         Workload: standard
-          Experiment 1: hpl.standard.hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_1_1000_1
-          Experiment 2: hpl.standard.hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_2_1000_2
-          Experiment 3: hpl.standard.hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_4_1000_4
-          Experiment 4: hpl.standard.hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_8_1000_8
+          Experiment 1: hpl.standard.hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_1_-1_1
+          Experiment 2: hpl.standard.hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_2_-1_2
+          Experiment 3: hpl.standard.hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_4_-1_4
+          Experiment 4: hpl.standard.hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_8_-1_8
 
 We can see from this that this workspace will execute 4 experiments currently.
 
@@ -129,7 +129,7 @@ Additionally, we can attempt to run ``benchpark analyze`` using the following:
 
 .. code-block:: console
 
-    workspace] benchpark analyze --workspace-dir .
+    workspace]$ benchpark analyze --workspace-dir .
 
 This will print the following error:
 
@@ -219,7 +219,7 @@ editor):
 
 .. code-block:: console
 
-    workspace]$ nano config/ramble.yaml
+    workspace]$ nano configs/ramble.yaml
 
 And removing ``~foo`` from the HPL spec in the ``packages:`` configuration section.
 (After editing, save and exit using Ctrl+O <enter> followed by Ctrl+X)
