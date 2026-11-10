@@ -16,15 +16,17 @@ class Fluxtainer(System):
     maintainers("nhanford")
 
     id_to_resources = {
-        "arm64": {"cpu_arch": "arm64"},
-        "amd64": {"cpu_arch": "x86_64_v3"},
+        "arm64": {"cpu_arch": "arm64", "sys_cores_per_node": 4},
+        "amd64": {"cpu_arch": "x86_64_v3", "sys_cores_per_node": 4},
+        "arm64-aws": {"cpu_arch": "arm64", "sys_cores_per_node": 32},
+        "amd64-aws": {"cpu_arch": "x86_64_v3", "sys_cores_per_node": 32},
     }
 
     variant(
         "instance_type",
-        values=("arm64", "amd64"),
+        values=("arm64", "amd64", "arm64-aws", "amd64-aws"),
         default="amd64",
-        description="Target Architecture",
+        description="Target architecture and instance size",
     )
 
     variant(
@@ -39,9 +41,8 @@ class Fluxtainer(System):
         self.programming_models = [OpenMPCPUOnlySystem()]
 
         self.scheduler = "flux"
-        setattr(self, "sys_cores_per_node", 4)
         setattr(self, "sys_mem_per_node_GB", 1)
-        attrs = self.id_to_resources.get(self.spec.variants["instance_type"][0])
+        attrs = self.id_to_resources[self.spec.variants["instance_type"][0]]
         for k, v in attrs.items():
             setattr(self, k, v)
 

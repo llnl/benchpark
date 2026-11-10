@@ -42,23 +42,16 @@ Initialize the AWS tutorial system:
 
 .. code-block:: console
 
-    benchpark]$ benchpark system init --dest=hpc-tutorial fluxtainer-aws
+    benchpark]$ benchpark system init --dest=hpc-tutorial fluxtainer instance_type=amd64-aws
 
-.. figure:: /_static/images/fluxtainer-aws-system-spec.png
-    :alt: Tutorial system spec
-    :width: 50%
-    :align: center
+The ``amd64-aws`` instance type selects 32 cores per node in the generated system
+configuration.
 
 Then, initialize the HPL experiment:
 
 .. code-block:: console
 
     benchpark]$ benchpark experiment init hpc-tutorial hpl +strong Ns=-1 caliper=time,mpi
-
-.. figure:: /_static/images/fluxtainer-aws-experiment-spec.png
-    :alt: Tutorial experiment spec
-    :width: 50%
-    :align: center
 
 Create the experiment workspace:
 

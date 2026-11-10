@@ -85,12 +85,12 @@ This will show you all the systems available. This particular one is called
 .. program-output:: ../bin/benchpark info system fluxtainer
 
 In the output, we can see that there is a ``variant`` called ``instance_type``. Let's
-keep that in mind as we initialize the system. In my case, the architecture is ``arm``,
-but yours might be ``x86``.
+keep that in mind as we initialize the system. Select ``arm64`` or ``amd64`` for
+4 cores per node, or ``arm64-aws`` or ``amd64-aws`` for 32 cores per node.
 
 .. code-block:: bash
 
-    benchpark system init --dest=my-fluxtainer fluxtainer instance_type=arm
+    benchpark system init --dest=my-fluxtainer fluxtainer instance_type=arm64
 
 Okay now let's look at some benchmarks:
 
