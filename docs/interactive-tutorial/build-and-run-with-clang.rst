@@ -116,7 +116,7 @@ strong-scaling study.
     :align: center
 
     Left figures show the benchpark system specification and strong-scaling area chart
-    for HPL built with gcc in tutorial #2. Right figures show the benchpark system
+    for HPL built with gcc in tutorial #4. Right figures show the benchpark system
     specification and strong-scaling area chart for HPL built with clang.
 
 ***********************
