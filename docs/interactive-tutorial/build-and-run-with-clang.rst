@@ -64,7 +64,7 @@ Initialize the HPL experiment against the Clang system instance:
 
 .. code-block:: console
 
-    ~/benchpark]$ benchpark experiment init hpc-tutorial-clang hpl +strong caliper=time,mpi
+    benchpark]$ benchpark experiment init hpc-tutorial-clang hpl +strong caliper=time,mpi
 
 .. figure:: /_static/images/fluxtainer-aws-experiment-spec-clang.png
     :alt: Tutorial experiment spec using clang
@@ -75,25 +75,25 @@ Create the experiment workspace:
 
 .. code-block:: console
 
-    ~/benchpark]$ benchpark setup hpc-tutorial-clang/hpl wkp
+    benchpark]$ benchpark setup hpc-tutorial-clang/hpl wkp
 
 Activate Benchpark's Spack and Ramble environments:
 
 .. code-block:: console
 
-    ~/benchpark]$ . wkp/setup.sh
+    benchpark]$ . wkp/setup.sh
 
 Set up the Ramble workspace to build HPL and generate each experiment instance:
 
 .. code-block:: console
 
-    ~/benchpark]$ ramble --workspace-dir wkp/hpc-tutorial-clang/hpl/workspace workspace setup
+    benchpark]$ ramble --workspace-dir wkp/hpc-tutorial-clang/hpl/workspace workspace setup
 
 Then, run the experiments:
 
 .. code-block:: console
 
-    ~/benchpark]$ ramble --workspace-dir wkp/hpc-tutorial-clang/hpl/workspace on
+    benchpark]$ ramble --workspace-dir wkp/hpc-tutorial-clang/hpl/workspace on
 
 The generated workspace is separate from the default GCC run because the system instance
 is named ``hpc-tutorial-clang``. That keeps the Clang build, run scripts, and results
@@ -109,7 +109,7 @@ strong-scaling study.
 
 .. code-block:: console
 
-    ~/benchpark]$ benchpark analyze --workspace-dir wkp/hpl-tutorial-clang/hpl/workspace
+    benchpark]$ benchpark analyze --workspace-dir wkp/hpl-tutorial-clang/hpl/workspace
 
 .. figure:: /_static/images/hpl_strong_gcc_clang_compare.png
     :width: 90%
