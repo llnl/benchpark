@@ -843,7 +843,9 @@ def command(args):
         print(
             f"Error: No Caliper (.cali) files found under "
             f"'{os.path.abspath(args.workspace_dir)}' "
-            f"(searched recursively for '*{args.file_name_match}.cali')",
+            f"(searched recursively for '*{args.file_name_match}.cali')\n"
+            "You must run your experiment with Caliper and generate Caliper "
+            "profiles to use benchpark analyze.",
             file=sys.stderr,
         )
         sys.exit(1)
