@@ -109,7 +109,7 @@ strong-scaling study.
 
 .. code-block:: console
 
-    benchpark]$ benchpark analyze --workspace-dir wkp/hpl-tutorial-clang/hpl/workspace
+    benchpark]$ benchpark analyze --workspace-dir wkp/hpc-tutorial-clang/hpl/workspace
 
 .. figure:: /_static/images/hpl_strong_gcc_clang_compare.png
     :width: 90%
