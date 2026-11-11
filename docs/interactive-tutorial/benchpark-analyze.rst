@@ -31,8 +31,7 @@ been installed in the container for the hands-on tutorials):
 
 Analyze the completed HPL scaling study from :doc:`build-and-run-experiment`.
 
-First, move back to the Benchpark root directory to continue with the remaining
-steps:
+First, move back to the Benchpark root directory to continue with the remaining steps:
 
 .. code-block:: console
 

@@ -134,4 +134,3 @@ strong-scaling study.
 
         :doc:`My experiment did not finish, and I want to diagnose where it failed.
         <troubleshoot-a-failed-run>`
-
