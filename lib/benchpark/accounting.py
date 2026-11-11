@@ -78,7 +78,13 @@ def benchpark_experiments(exp_dict=EXP_DICT, exclude_variants=[]):
 
 
 def benchpark_modifiers():
-    all_benchmark_modifiers = ["affinity", "allocation", "hwloc"]
+    all_benchmark_modifiers = [
+        "affinity",
+        "allocation",
+        "compiler_attribution",
+        "githash",
+        "hwloc",
+    ]
     source_dir = base_paths.benchpark_root
     experiments_dir = source_dir / "experiments"
     modifiers = []
