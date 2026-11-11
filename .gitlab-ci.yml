@@ -133,7 +133,7 @@ deploy_nightly_performance_metadata:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: always
     - when: never
-redeploy_warden_dashboard:
+publish_warden_dashboard:
   tags: [shell, oslic]
   stage: deploy-dashboard
   needs:
@@ -142,10 +142,10 @@ redeploy_warden_dashboard:
   script:
     - |
       if [[ "${BENCHPARK_PERF_METADATA_PUSHED:-0}" != "1" ]]; then
-          echo "No new performance metadata was pushed; skipping WARDEN dashboard redeploy."
+          echo "No new performance metadata was pushed; skipping WARDEN dashboard publish."
           exit 0
       fi
-    - bash .gitlab/utils/performance/trigger-warden-dashboard-redeploy.sh
+    - bash .gitlab/utils/performance/publish-warden-dashboard.sh
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: on_success
