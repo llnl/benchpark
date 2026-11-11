@@ -20,6 +20,8 @@
 
         :doc:`Prerequisite: Build and Run an Experiment <build-and-run-experiment>`
 
+        :doc:`Prerequisite: Troubleshoot a Failed Experiment <troubleshoot-a-failed-run>`
+
 Install the analysis dependencies once from the Benchpark repository (this has already
 been installed in the container for the hands-on tutorials):
 
@@ -27,7 +29,13 @@ been installed in the container for the hands-on tutorials):
 
     $ pip install .[analyze]
 
-Analyze the completed HPL scaling study from :doc:`build-and-run-experiment`:
+Analyze the completed HPL scaling study from :doc:`build-and-run-experiment`.
+
+First, move back to the Benchpark root directory to continue with the remaining steps:
+
+.. code-block:: console
+
+    benchpark]$ cd benchpark
 
 ****************
  Strong Scaling
