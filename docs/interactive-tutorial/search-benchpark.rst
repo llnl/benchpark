@@ -31,18 +31,60 @@ one of four categories:
 The Benchpark Catalogue shows detailed information on :doc:`Benchpark Systems
 </system-list>` and :doc:`Benchpark Experiments </benchmark-list>` in tabular form.
 
+A Benchpark system spec selects a definition under ``systems/``. It defines the hardware
+resources and software stack, including information that is useful for running
+benchmarks. This may include the following:
+
+- Resources (CPU cores, GPUs)
+- Scheduler (Slurm, flux)
+- Process mapping (cores, sockets, GPUs, NICs)
+- On-node parallelism (CUDA, ROCM, OpenMP)
+- Software stack
+- Compilers (which is best?)
+- MPI implementations (best?)
+- Math libraries
+
+.. figure:: /_static/images/system-spec.png
+    :alt: Annotated Benchpark system spec
+    :figclass: tutorial-spec-figure
+    :width: 100%
+    :align: center
+
+To search for systems in Benchpark:
+
+.. code-block:: console
+
+    ~]$ benchpark list systems
+
+A Benchpark experiment spec selects a definition under ``experiments/``. It defines any
+information for reproducible sets of experiments that we can map onto specific systems,
+such as:
+
+- On-node parallelism (CUDA, ROCM, OpenMP)
+- Problem sizes
+
+      - Overall problem size, or
+      - Per node or per GPU
+
+- Scaling studies
+
+  - How to scale
+  - How to decompose
+
+- Resources (cores, GPUs)
+
+.. figure:: /_static/images/experiment-spec.png
+    :alt: Annotated Benchpark experiment spec
+    :figclass: tutorial-spec-figure
+    :width: 100%
+    :align: center
+
 Use the filter to find experiments with your targeted programming model or specific type
 of scaling. For example, this command will display only the CUDA experiments:
 
 .. code-block:: console
 
     ~]$ benchpark list experiments --experiment cuda
-
-We can also search for systems:
-
-.. code-block:: console
-
-    ~]$ benchpark list systems
 
 After choosing a system or experiment, inspect its variants and configuration details:
 

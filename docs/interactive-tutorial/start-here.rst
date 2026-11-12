@@ -83,7 +83,7 @@ The Beginner Tutorial uses the following terms from Spack, Ramble, and Benchpark
         **Modifier**
 
       - `Ramble
-        <https://ramble.readthedocs.io/en/latest/tutorials/10_using_modifiers.html>`__
+        <https://ramble.readthedocs.io/en/latest/tutorials/intermediate_using_modifiers.html#discovering-modifiers>`__
       - An object that encapsulates reusable experiment configuration. Benchpark
         provides modifier implementations, including Caliper and Allocation, that follow
         Ramble's modifier syntax. These modifiers can inject commands before, after, or
@@ -244,19 +244,10 @@ experiments that we can map onto specific systems, such as:
 
             25 min.
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run-substitute tutorial-with-duration
-
-        :doc:`I want to run an experiment, but build it with a different compiler
-        or library (e.g., gcc or clang compiler). <build-and-run-with-clang>`
-
-        .. tutorialcontainer:: tutorial-duration
-
-            15 min.
-
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-troubleshoot tutorial-with-duration
 
-        :doc:`I ran into an error while building and running experiment, and
-        want to learn how to diagnose it. <troubleshoot-a-failed-run>`
+        :doc:`I ran into an error while running an experiment someone gave me
+        on the same system, and want to learn how to diagnose it. <troubleshoot-a-failed-run>`
 
         .. tutorialcontainer:: tutorial-duration
 
@@ -269,7 +260,16 @@ experiments that we can map onto specific systems, such as:
 
         .. tutorialcontainer:: tutorial-duration
 
-            #4 + 25 min.
+            #3 + 15 min.
+
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run-substitute tutorial-with-duration
+
+        :doc:`I want to run an experiment, but build it with a different compiler
+        or library (e.g., gcc or clang compiler). <build-and-run-with-clang>`
+
+        .. tutorialcontainer:: tutorial-duration
+
+            25 min.
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-parameter-sweep tutorial-with-duration
 

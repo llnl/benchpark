@@ -119,7 +119,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     --card-background: #f6f6dc;
     --card-border: #dcdca0;
     --card-hover: #6f7418;
-    --goal-number: "3";
+    --goal-number: "5";
 }
 
 .rst-content .tutorial-goal-troubleshoot {
@@ -128,7 +128,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     --card-border: #dfcfad;
     --card-hover: #765d33;
     --card-text: #574321;
-    --goal-number: "4";
+    --goal-number: "3";
 }
 
 .rst-content .tutorial-goal-system {
@@ -172,7 +172,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     --card-border: #efc9bd;
     --card-hover: #a94e38;
     --card-text: #6f3528;
-    --goal-number: "5 (requires #4)";
+    --goal-number: "4 (requires #3)";
 }
 
 .rst-content .tutorial-goal-query {

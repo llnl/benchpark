@@ -12,12 +12,6 @@
 :ref:`Experiment <beginner-tutorial-glossary-experiment>`, :ref:`System
 <beginner-tutorial-glossary-system>`
 
-.. tutorialcontainer:: tutorial-prerequisite-links
-
-    .. tutorialcontainer:: tutorial-prerequisite-link tutorial-prerequisite-experiment
-
-        :doc:`Prerequisite: Build and Run an Experiment <build-and-run-experiment>`
-
 In this example, we show how to replicate an experiment, that is to run the same
 application on a potentially different machine that has the same hardware but possibly a
 different software stack (for example, a system with the same hardware specs, but
@@ -30,7 +24,7 @@ necessarily as close as with a repeat run.
 
 .. figure:: /_static/images/benchpark-replicate-table.png
     :alt: Benchpark replicate specification
-    :width: 75%
+    :width: 50%
     :align: center
 
 This use case follows the same workflow as :doc:`build-and-run-experiment`, but changes
@@ -46,7 +40,7 @@ variant:
 
 .. code-block:: console
 
-    ~/benchpark]$ benchpark system init --dest=hpc-tutorial-clang fluxtainer-aws compiler=clang
+    benchpark]$ benchpark system init --dest=hpc-tutorial-clang fluxtainer-aws compiler=clang
 
 .. figure:: /_static/images/fluxtainer-aws-system-spec-clang.png
     :alt: Tutorial system spec using clang
@@ -68,7 +62,7 @@ Initialize the HPL experiment against the Clang system instance:
 
 .. figure:: /_static/images/fluxtainer-aws-experiment-spec-clang.png
     :alt: Tutorial experiment spec using clang
-    :width: 50%
+    :width: 90%
     :align: center
 
 Create the experiment workspace:
@@ -116,7 +110,7 @@ strong-scaling study.
     :align: center
 
     Left figures show the benchpark system specification and strong-scaling area chart
-    for HPL built with gcc in tutorial #2. Right figures show the benchpark system
+    for HPL built with gcc in tutorial #4. Right figures show the benchpark system
     specification and strong-scaling area chart for HPL built with clang.
 
 ***********************
@@ -125,12 +119,18 @@ strong-scaling study.
 
 .. tutorialcontainer:: tutorial-next-steps
 
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-search
+
+        :ref:`I have run an experiment someone gave me on the same system. I want to
+        start another workflow by searching what is available in Benchpark.
+        <search-benchpark>`
+
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-run
 
         :doc:`I want to return to the default GCC build and run workflow.
         <build-and-run-experiment>`
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-analyze
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-troubleshoot
 
-        :doc:`I want to analyze the performance of this experiment by generating
-        preconfigured performance figures. <benchpark-analyze>`
+        :doc:`My experiment did not finish, and I want to diagnose where it failed.
+        <troubleshoot-a-failed-run>`

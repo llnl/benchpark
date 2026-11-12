@@ -35,7 +35,7 @@ Initialize the AWS tutorial system:
 
 .. figure:: /_static/images/fluxtainer-aws-system-spec.png
     :alt: Tutorial system spec
-    :width: 50%
+    :width: 90%
     :align: center
 
 Then, initialize the HPL experiment:
@@ -46,7 +46,7 @@ Then, initialize the HPL experiment:
 
 .. figure:: /_static/images/fluxtainer-aws-experiment-spec.png
     :alt: Tutorial experiment spec
-    :width: 50%
+    :width: 90%
     :align: center
 
 Create the experiment workspace:
@@ -195,21 +195,20 @@ workspaces into one allocation, see :doc:`/run-experiment`.
         start another workflow by searching what is available in Benchpark.
         <search-benchpark>`
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run-substitute
-
-        :doc:`I want to re-run this experiment and substitute a different compiler or
-        library.
-        <build-and-run-with-clang>`
-
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-troubleshoot
 
-        :doc:`My experiment did not finish, and I want to diagnose where it failed.
-        <troubleshoot-a-failed-run>`
+        :doc:`I ran into errors building and running an experiment, and I want to
+        diagnose where it failed.  <troubleshoot-a-failed-run>`
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-analyze
 
         :doc:`I want to analyze the performance of an experiment on my system by
         generating preconfigured performance figures. <benchpark-analyze>`
+
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run-substitute
+
+        :doc:`I want to run an experiment someone gave me on the same system, but
+        substitute a different compiler or library.  <build-and-run-with-clang>`
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-query
 
