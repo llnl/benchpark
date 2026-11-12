@@ -7,4 +7,4 @@ versions:
   ramble: e1389bd51ab82e1a67e100f6c39dba5ea819b157  # Oct 15 2026 (v0.7.0)
   spack: c7c444853df6d525e7823c7cc730225a20bd5650  # Oct 1 2026 after v1.2.2 (2026-07-20)
   # Was Oct 29 2026 after v2026.10.0
-  spack-packages: 552fa350a0100de38c57ac27c2399e56b6ff84ea  # Tip of 4411
+  spack-packages: ee2fca71c4d09390c1a5bcc8ea1132bd28358fdc  # Tip of 4411
