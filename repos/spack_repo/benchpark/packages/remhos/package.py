@@ -26,6 +26,7 @@ class Remhos(CMakePackage, CudaPackage, ROCmPackage):
     license("BSD-2-Clause")
 
     patch("remhos-cmake.patch")
+    patch("remhos-cmake-cuda.patch")
 
     version("develop", branch="master")
     version("2.0", branch="master")
@@ -109,6 +110,11 @@ class Remhos(CMakePackage, CudaPackage, ROCmPackage):
             args.append(f"-DCMAKE_HIP_COMPILER={env['HIPCXX']}")
             amdgpu_target = ";".join(spec.variants["amdgpu_target"].value)
             args.append(self.define("CMAKE_HIP_ARCHITECTURES", amdgpu_target))
+        if self.spec.satisfies("+cuda"):
+            args.append("-DMFEM_USE_CUDA=ON")
+            args.append(self.define("CMAKE_CUDA_ARCHITECTURES", self.spec.variants["cuda_arch"].value))
+            nvcc = self.spec["cuda"].prefix.bin.nvcc
+            args.append(f"-DCMAKE_CUDA_COMPILER={nvcc}")
         if self.spec.satisfies("^mfem cxxstd=20"):
             args.append("-DCMAKE_CXX_STANDARD=20")
         if self.spec.satisfies("+caliper"):

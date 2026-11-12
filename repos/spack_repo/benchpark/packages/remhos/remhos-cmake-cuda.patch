@@ -1,0 +1,63 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c4f00c7..a681d89 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -29,6 +29,25 @@ if (REMHOS_USE_CALIPER)
+     find_package(adiak REQUIRED)
+ endif()
+ 
++# CUDA support ****************************************************************
++# Read MFEM_USE_CUDA from MFEMConfig or from the cache (passed via -DMFEM_USE_CUDA=ON)
++if (NOT DEFINED MFEM_USE_CUDA)
++    set(MFEM_USE_CUDA OFF)
++endif()
++
++if (MFEM_USE_CUDA)
++    if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
++        set(CMAKE_CUDA_ARCHITECTURES 70)
++    endif()
++    enable_language(CUDA)
++    set(CMAKE_CUDA_STANDARD ${CMAKE_CXX_STANDARD} CACHE STRING
++        "CUDA standard to use.")
++    set(CMAKE_CUDA_STANDARD_REQUIRED ON CACHE BOOL
++        "Force the use of the chosen CUDA standard.")
++    set(CMAKE_CUDA_EXTENSIONS OFF CACHE BOOL "Enable CUDA standard extensions.")
++    message(STATUS "Using CUDA architecture: ${CMAKE_CUDA_ARCHITECTURES}")
++endif()
++
+ # HIP support *****************************************************************
+ # Read MFEM_USE_HIP from MFEMConfig or from the cache (passed via -DMFEM_USE_HIP=ON)
+ if (NOT DEFINED MFEM_USE_HIP)
+@@ -70,7 +89,9 @@ set(LIB_SOURCES
+     remhos_tools.cpp
+ )
+ 
+-if (MFEM_USE_HIP)
++if (MFEM_USE_CUDA)
++    set_source_files_properties(${LIB_SOURCES} PROPERTIES LANGUAGE CUDA)
++elseif (MFEM_USE_HIP)
+     set_source_files_properties(${LIB_SOURCES} PROPERTIES LANGUAGE HIP)
+ endif()
+ 
+@@ -96,7 +117,9 @@ if (REMHOS_USE_CALIPER)
+ endif()
+ 
+ # Executables *****************************************************************
+-if (MFEM_USE_HIP)
++if (MFEM_USE_CUDA)
++    set_source_files_properties(remhos_main.cpp PROPERTIES LANGUAGE CUDA)
++elseif (MFEM_USE_HIP)
+     set_source_files_properties(remhos_main.cpp PROPERTIES LANGUAGE HIP)
+ endif()
+ add_executable(remhos_main remhos_main.cpp)
+@@ -114,7 +137,9 @@ function(add_remhos_test name)
+     add_executable(${name} ${name}.cpp)
+     add_dependencies(${name} copy_mesh_files)
+     target_link_libraries(${name} PRIVATE Remhos)
+-    if (MFEM_USE_HIP)
++    if (MFEM_USE_CUDA)
++        set_source_files_properties(${name}.cpp PROPERTIES LANGUAGE CUDA)
++    elseif (MFEM_USE_HIP)
+         set_source_files_properties(${name}.cpp PROPERTIES LANGUAGE HIP)
+     endif()
+     add_test(NAME ${name}_n1
