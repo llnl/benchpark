@@ -126,6 +126,7 @@ run_tests_slurm_dane:
           - branson
           - laghos
           - lammps
+          - mpi-pingpong
           - osu-micro-benchmarks
           - raja-perf
           - remhos

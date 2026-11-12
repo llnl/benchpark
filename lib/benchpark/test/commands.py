@@ -42,6 +42,9 @@ def test_list():
                 "amg2023" in result_with_title.stdout
                 and "amg2023" in result_no_title.stdout
             )
+            for modifier in ("compiler_attribution", "githash"):
+                expected_scope = f"    {modifier}\n    \t(all benchmarks)"
+                assert expected_scope in result_with_title.stdout
         elif subcmd == "experiments":
             for experiment in ["nbody", "softmax", "wmma"]:
                 expected = f"hecbench.{experiment}+[cuda|rocm|mpi]"

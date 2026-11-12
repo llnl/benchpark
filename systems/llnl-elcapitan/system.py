@@ -29,6 +29,7 @@ class LlnlElcapitan(System):
             "sys_cores_per_node": 56,
             "sys_cores_os_reserved_per_node": 8,
             "sys_cores_os_reserved_per_node_list": [0, 8, 16, 24, 32, 40, 48, 56],
+            "sys_sockets_per_node": 2,
             "sys_gpus_per_node": 8,
             "sys_mem_per_node_GB": 512,
             "sys_cpu_mem_per_node_MB": 2048,
@@ -939,6 +940,12 @@ class LlnlElcapitan(System):
 
     def system_specific_variables(self):
         opts = super().system_specific_variables()
+
+        if self.rccl_version is not None:
+            opts["rccl_net_plugin"] = (
+                "/collab/usr/global/tools/rccl/toss_4_x86_64_ib_cray/"
+                f"rocm-{self.rccl_version}/install/lib/librccl-net.so"
+            )
 
         extra_batch_opts = []
 

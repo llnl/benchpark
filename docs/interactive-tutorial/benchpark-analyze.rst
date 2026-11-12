@@ -20,6 +20,8 @@
 
         :doc:`Prerequisite: Build and Run an Experiment <build-and-run-experiment>`
 
+        :doc:`Prerequisite: Troubleshoot a Failed Experiment <troubleshoot-a-failed-run>`
+
 Install the analysis dependencies once from the Benchpark repository (this has already
 been installed in the container for the hands-on tutorials):
 
@@ -27,7 +29,13 @@ been installed in the container for the hands-on tutorials):
 
     $ pip install .[analyze]
 
-Analyze the completed HPL scaling study from :doc:`build-and-run-experiment`:
+Analyze the completed HPL scaling study from :doc:`build-and-run-experiment`.
+
+First, move back to the Benchpark root directory to continue with the remaining steps:
+
+.. code-block:: console
+
+    benchpark]$ cd benchpark
 
 ****************
  Strong Scaling
@@ -39,7 +47,7 @@ strong-scaling study.
 
 .. code-block:: console
 
-    ~/benchpark]$ benchpark analyze --workspace-dir wkp/fluxtainer-aws/hpl/workspace
+    benchpark]$ benchpark analyze --workspace-dir wkp/hpc-tutorial/hpl/workspace
 
 .. figure:: /_static/images/hpl_mpi_strong_raw_exc.png
     :width: 800
@@ -56,7 +64,7 @@ This makes each region's share of total time easier to compare.
 
 .. code-block:: console
 
-    ~/benchpark]$ benchpark analyze --workspace-dir wkp/fluxtainer-aws/hpl/workspace --chart-type percentage
+    benchpark]$ benchpark analyze --workspace-dir wkp/hpc-tutorial/hpl/workspace --chart-type percentage
 
 .. figure:: /_static/images/hpl_mpi_strong_percentage_exc.png
     :width: 800
@@ -72,7 +80,7 @@ The inclusive chart uses ``Avg time/rank`` instead of ``Avg time/rank (exc)``.
 
 .. code-block:: console
 
-    ~/benchpark]$ benchpark analyze --workspace-dir wkp/fluxtainer-aws/hpl/workspace --yaxis-metric "Avg time/rank"
+    benchpark]$ benchpark analyze --workspace-dir wkp/hpc-tutorial/hpl/workspace --yaxis-metric "Avg time/rank"
 
 .. figure:: /_static/images/hpl_mpi_strong_raw.png
     :width: 800
@@ -90,7 +98,7 @@ the measured time.
 
 .. code-block:: console
 
-    ~/benchpark]$ benchpark analyze --workspace-dir wkp/fluxtainer-aws/hpl/workspace --group-regions-name --top-n-regions 10
+    benchpark]$ benchpark analyze --workspace-dir wkp/hpc-tutorial/hpl/workspace --group-regions-name --top-n-regions 10
 
 .. figure:: /_static/images/hpl_mpi_strong_raw_exc_region.png
     :width: 800
