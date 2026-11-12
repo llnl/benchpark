@@ -4,9 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-########################
- Adding a Spack Package
-########################
+#####################
+ Add a Spack Package
+#####################
 
 **Glossary terms:** :ref:`Benchmark <beginner-tutorial-glossary-benchmark>`,
 :ref:`Package <beginner-tutorial-glossary-package>`
