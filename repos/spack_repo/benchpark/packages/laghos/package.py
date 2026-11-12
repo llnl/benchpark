@@ -135,4 +135,9 @@ class Laghos(CMakePackage, CudaPackage, ROCmPackage):
             #    f"--offload-arch={amdgpu_target}",
             #]
             #args.append(self.define("CMAKE_CXX_FLAGS", " ".join(flags)))
+        if self.spec.satisfies("+cuda"):
+            args.append("-DMFEM_USE_CUDA=ON")
+            args.append(self.define("CMAKE_CUDA_ARCHITECTURES", self.spec.variants["cuda_arch"].value))
+            nvcc = self.spec["cuda"].prefix.bin.nvcc
+            args.append(f"-DCMAKE_CUDA_COMPILER={nvcc}")
         return args
