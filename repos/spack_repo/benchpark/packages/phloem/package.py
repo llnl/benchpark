@@ -76,6 +76,8 @@ class Phloem(CachedCMakePackage, CudaPackage, ROCmPackage):
         )
         if self.spec.satisfies("+man"):
             args.append(self.define("CMAKE_INSTALL_MANDIR", self.prefix.man))
+        if self.spec.satisfies("+rocm"):
+            args.append(f"-DCMAKE_HIP_COMPILER={env['HIPCXX']}")
         if self.spec.satisfies("+rocm") and self.spec.satisfies("^cray-mpich"):
             mpi_link_flags = self.spec["mpi"].libs.link_flags
             mpi_link_flags += "-lmpi_gtl_hsa"
