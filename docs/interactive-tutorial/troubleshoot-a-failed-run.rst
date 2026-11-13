@@ -107,7 +107,7 @@ This should print the following output:
           Experiment 3: hpl.standard.hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_4_-1_4
           Experiment 4: hpl.standard.hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_8_-1_8
 
-We can see from this that this workspace will execute 4 experiments currently.
+We can see from this that this workspace will currently execute 4 experiments.
 
 Before setting up the Ramble workspace, we will explore a few error cases.
 
