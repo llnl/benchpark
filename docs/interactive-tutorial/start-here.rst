@@ -161,7 +161,7 @@ to build and a Ramble ``application.py`` to run the benchmark.
 
         .. tutorialcontainer:: tutorial-duration
 
-            #3 + 15 min.
+            (#2 or #3) + 15 min.
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-run-substitute tutorial-with-duration
 
