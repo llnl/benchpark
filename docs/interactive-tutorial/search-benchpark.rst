@@ -33,7 +33,6 @@ The Benchpark Catalogue shows detailed information on :doc:`Benchpark Systems
 
 A Benchpark spec describes a Benchpark object.
 
-================
 Benchpark System
 ================
 
@@ -68,7 +67,6 @@ To search for systems in Benchpark:
 
     ~]$ benchpark list systems
 
-====================
 Benchpark Experiment
 ====================
 
