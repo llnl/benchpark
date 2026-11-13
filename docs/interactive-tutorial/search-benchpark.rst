@@ -22,7 +22,7 @@
 
 All of the systems, benchmarks, experiments, and modifiers that are available in
 Benchpark can be searched on the command line. The ``benchpark list`` command accepts
-one of four categories:
+one of four options:
 
 .. code-block:: console
 
@@ -30,8 +30,6 @@ one of four categories:
 
 The Benchpark Catalogue shows detailed information on :doc:`Benchpark Systems
 </system-list>` and :doc:`Benchpark Experiments </benchmark-list>` in tabular form.
-
-A Benchpark spec describes a Benchpark object.
 
 Benchpark System
 ================
@@ -42,7 +40,7 @@ Benchpark System
     :width: 100%
     :align: center
 
-A Benchpark system is initialized from a spec written in Benchpark's spec syntax. Its
+A Benchpark system is initialized from a specification written in Benchpark's spec syntax. Its
 definition under ``systems/`` describes the hardware resources and software stack used
 to run benchmarks, including:
 
@@ -76,7 +74,7 @@ Benchpark Experiment
     :width: 100%
     :align: center
 
-A Benchpark experiment is initialized from a spec written in Benchpark's spec syntax.
+A Benchpark experiment is initialized from a specification written in Benchpark's spec syntax.
 Its definition under ``experiments/`` describes the information needed for reproducible
 sets of experiments that can be mapped onto specific systems, including:
 

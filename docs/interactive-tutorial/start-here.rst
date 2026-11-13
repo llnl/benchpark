@@ -14,7 +14,7 @@
 
 Benchpark is an open-source infrastructure-as-code Python project which aims to enable
 reproducibility in HPC benchmarking. It accomplishes this by defining each component of
-HPC benchmarking, and constraining it separately. Benchpark builds on the specification
+HPC benchmarking, and constraining it separately. Benchpark builds on the specifications
 provided by Spack, an HPC package manager, and Ramble, an HPC testing framework.
 
 .. seealso::
