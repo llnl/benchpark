@@ -62,7 +62,7 @@ Initialize the HPL experiment against the Clang system instance:
 
 .. figure:: /_static/images/fluxtainer-aws-experiment-spec-clang.png
     :alt: Tutorial experiment spec using clang
-    :width: 90%
+    :width: 80%
     :align: center
 
 Create the experiment workspace:
