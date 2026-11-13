@@ -31,9 +31,21 @@ one of four categories:
 The Benchpark Catalogue shows detailed information on :doc:`Benchpark Systems
 </system-list>` and :doc:`Benchpark Experiments </benchmark-list>` in tabular form.
 
-A Benchpark system spec selects a definition under ``systems/``. It defines the hardware
-resources and software stack, including information that is useful for running
-benchmarks. This may include the following:
+A Benchpark spec describes a Benchpark object.
+
+================
+Benchpark System
+================
+
+.. figure:: /_static/images/system_slide.png
+    :alt: Benchpark system class
+    :figclass: tutorial-system-figure
+    :width: 100%
+    :align: center
+
+A Benchpark system is initialized from a spec written in Benchpark's spec syntax. Its
+definition under ``systems/`` describes the hardware resources and software stack used
+to run benchmarks, including:
 
 - Resources (CPU cores, GPUs)
 - Scheduler (Slurm, flux)
@@ -56,9 +68,19 @@ To search for systems in Benchpark:
 
     ~]$ benchpark list systems
 
-A Benchpark experiment spec selects a definition under ``experiments/``. It defines any
-information for reproducible sets of experiments that we can map onto specific systems,
-such as:
+====================
+Benchpark Experiment
+====================
+
+.. figure:: /_static/images/experiment_slide.png
+    :alt: Benchpark experiment class
+    :figclass: tutorial-experiment-figure
+    :width: 100%
+    :align: center
+
+A Benchpark experiment is initialized from a spec written in Benchpark's spec syntax.
+Its definition under ``experiments/`` describes the information needed for reproducible
+sets of experiments that can be mapped onto specific systems, including:
 
 - On-node parallelism (CUDA, ROCM, OpenMP)
 - Problem sizes

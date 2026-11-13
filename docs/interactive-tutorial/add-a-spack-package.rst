@@ -31,6 +31,19 @@ and test its ``package.py``.
 Before adding the experiment, create its :doc:`Ramble application
 <add-a-ramble-application>` if one is also missing.
 
+*******************
+ Spack Spec Syntax
+*******************
+
+A Spack package spec can include versions, architecture constraints, compiler
+constraints, and dependencies, in addition to its package name and variants.
+
+.. figure:: /_static/images/spack-spec_anatomy.svg
+    :alt: Spack package spec: package name, versions, variants, architecture, compiler, and dependencies.
+    :figclass: tutorial-spec-figure
+    :width: 100%
+    :align: center
+
 ***********
  Next Step
 ***********
