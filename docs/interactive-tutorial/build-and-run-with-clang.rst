@@ -37,7 +37,7 @@
 
     .. figure:: /_static/images/fluxtainer-aws-experiment-spec.png
         :alt: Tutorial experiment spec
-        :width: 90%
+        :width: 71%
         :align: center
 
 In this example, we show how to replicate an experiment, that is to run the same
@@ -90,7 +90,7 @@ Initialize the HPL experiment against the Clang system instance:
 
 .. figure:: /_static/images/fluxtainer-aws-experiment-spec-clang.png
     :alt: Tutorial experiment spec using clang
-    :width: 70%
+    :width: 68%
     :align: center
 
 Create the experiment workspace:

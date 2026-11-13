@@ -46,7 +46,7 @@ Initialize the AWS tutorial system:
 
 .. figure:: /_static/images/fluxtainer-aws-system-spec.png
     :alt: Tutorial system spec
-    :width: 100%
+    :width: 90%
     :align: center
 
 Then, initialize the HPL experiment:
@@ -57,8 +57,8 @@ Then, initialize the HPL experiment:
 
 .. figure:: /_static/images/fluxtainer-aws-experiment-spec.png
     :alt: Tutorial experiment spec
-    :width: 80%
-    :align: left
+    :width: 71%
+    :align: center
 
 Create the experiment workspace:
 

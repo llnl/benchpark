@@ -48,7 +48,7 @@
 
     .. figure:: /_static/images/fluxtainer-aws-experiment-spec.png
         :alt: Tutorial experiment spec
-        :width: 90%
+        :width: 71%
         :align: center
 
 Install the analysis dependencies once from the Benchpark repository (this has already

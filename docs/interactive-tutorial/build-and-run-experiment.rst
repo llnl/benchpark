@@ -46,7 +46,7 @@ Then, initialize the HPL experiment:
 
 .. figure:: /_static/images/fluxtainer-aws-experiment-spec.png
     :alt: Tutorial experiment spec
-    :width: 90%
+    :width: 71%
     :align: center
 
 Create the experiment workspace:
