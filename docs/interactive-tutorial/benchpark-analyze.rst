@@ -22,6 +22,35 @@
 
         :doc:`Prerequisite: Troubleshoot a Failed Experiment <troubleshoot-a-failed-run>`
 
+.. admonition:: Previously completed
+
+    Before starting this page, you should have completed either :doc:`Build and Run an
+    Experiment <build-and-run-experiment>` or :doc:`Troubleshoot a Failed Experiment Run
+    <troubleshoot-a-failed-run>` and have a completed HPL scaling study. These standard
+    initialization commands from the build and run workflow are reminders.
+
+    The AWS tutorial system was initialized with:
+
+    .. code-block:: console
+
+        benchpark]$ benchpark system init --dest=hpc-tutorial fluxtainer-aws
+
+    .. figure:: /_static/images/fluxtainer-aws-system-spec.png
+        :alt: Tutorial system spec
+        :width: 90%
+        :align: center
+
+    The HPL experiment was initialized with:
+
+    .. code-block:: console
+
+        benchpark]$ benchpark experiment init hpc-tutorial hpl +strong caliper=time,mpi
+
+    .. figure:: /_static/images/fluxtainer-aws-experiment-spec.png
+        :alt: Tutorial experiment spec
+        :width: 90%
+        :align: center
+
 Install the analysis dependencies once from the Benchpark repository (this has already
 been installed in the container for the hands-on tutorials):
 
@@ -29,7 +58,7 @@ been installed in the container for the hands-on tutorials):
 
     $ pip install .[analyze]
 
-Analyze the completed HPL scaling study from :doc:`build-and-run-experiment`.
+Analyze the completed HPL scaling study.
 
 First, move back to the Benchpark root directory to continue with the remaining steps:
 

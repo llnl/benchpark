@@ -12,6 +12,34 @@
 :ref:`Experiment <beginner-tutorial-glossary-experiment>`, :ref:`System
 <beginner-tutorial-glossary-system>`
 
+.. admonition:: Previously completed
+
+    Before starting this page, you should have completed the default GCC workflow in
+    :doc:`Build and Run an Experiment <build-and-run-experiment>`. These initialization
+    commands are reminders. This page creates a separate Clang system.
+
+    The AWS tutorial system was initialized with:
+
+    .. code-block:: console
+
+        benchpark]$ benchpark system init --dest=hpc-tutorial fluxtainer-aws
+
+    .. figure:: /_static/images/fluxtainer-aws-system-spec.png
+        :alt: Tutorial system spec
+        :width: 90%
+        :align: center
+
+    The HPL experiment was initialized with:
+
+    .. code-block:: console
+
+        benchpark]$ benchpark experiment init hpc-tutorial hpl +strong caliper=time,mpi
+
+    .. figure:: /_static/images/fluxtainer-aws-experiment-spec.png
+        :alt: Tutorial experiment spec
+        :width: 90%
+        :align: center
+
 In this example, we show how to replicate an experiment, that is to run the same
 application on a potentially different machine that has the same hardware but possibly a
 different software stack (for example, a system with the same hardware specs, but
