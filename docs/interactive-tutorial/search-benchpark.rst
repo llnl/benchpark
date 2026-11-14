@@ -111,6 +111,24 @@ After choosing a system or experiment, inspect its variants and configuration de
     ~]$ benchpark info system fluxtainer-aws
     ~]$ benchpark info experiment hpl
 
+To find systems with a specific CPU architecture, query their system resources:
+
+.. code-block:: console
+
+    $ benchpark info system --query cpu_arch=sapphirerapids
+    cpu_arch=sapphirerapids:
+        aws-tutorial: c7i.48xlarge
+        aws-tutorial: c7i.metal-48xl
+        aws-tutorial: c7i.24xlarge
+        aws-tutorial: c7i.metal-24xl
+        aws-tutorial: c7i.12xlarge
+        llnl-cluster: dane
+        llnl-cluster: poodle-deprecated
+        llnl-matrix: matrix
+        lanl-rocinante: crossroads
+        lanl-rocinante: rocinante
+        lanl-rocinante: tycho
+
 For a complete command reference, see :doc:`Benchpark Commands </benchpark-commands>`.
 
 ********
