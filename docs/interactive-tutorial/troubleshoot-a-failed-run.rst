@@ -12,11 +12,11 @@
 :ref:`System <beginner-tutorial-glossary-system>`, :ref:`Scaling Study
 <beginner-tutorial-glossary-scaling-study>`
 
-In this example, we show how to repeat an experiment, that is to run the same
-experiment on the same system using the same hardware and software stack.
-This use case follows the same steps to create an HPL workspace as in
-:doc:`build-and-run-experiment`, but we will run into various errors and read
-the Ramble output to understand the reason for the failure.
+In this example, we show how to repeat an experiment, that is to run the same experiment
+on the same system using the same hardware and software stack. This use case follows the
+same steps to create an HPL workspace as in :doc:`build-and-run-experiment`, but we will
+run into various errors and read the Ramble output to understand the reason for the
+failure.
 
 *********************
  What You Will Learn
@@ -73,11 +73,12 @@ Ramble environments.
 
     benchpark]$ . wkp/setup.sh
 
-The benchpark workspace ``wkp`` directory contains ``ramble``, ``spack``, ``spack-packages``, and
-``hpc-tutorial/hpl/workspace`` sub-directories. The ``ramble`` and ``spack`` directories
-contain the source for those respective tools. The ``spack-packages`` directory contains
-a Spack packages repository. The ``hpc-tutorial/hpl/workspace`` directory contains the
-Ramble workspace for the experiments in this tutorial.
+The benchpark workspace ``wkp`` directory contains ``ramble``, ``spack``,
+``spack-packages``, and ``hpc-tutorial/hpl/workspace`` sub-directories. The ``ramble``
+and ``spack`` directories contain the source for those respective tools. The
+``spack-packages`` directory contains a Spack packages repository. The
+``hpc-tutorial/hpl/workspace`` directory contains the Ramble workspace for the
+experiments in this tutorial.
 
 At this point, move into the workspace directory to continue with the remaining steps:
 

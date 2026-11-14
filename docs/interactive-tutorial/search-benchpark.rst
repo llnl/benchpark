@@ -40,9 +40,9 @@ Benchpark System
     :width: 100%
     :align: center
 
-A Benchpark system is initialized from a specification written in Benchpark's spec syntax. Its
-definition under ``systems/`` describes the hardware resources and software stack used
-to run benchmarks, including:
+A Benchpark system is initialized from a specification written in Benchpark's spec
+syntax. Its definition under ``systems/`` describes the hardware resources and software
+stack used to run benchmarks, including:
 
 - Resources (CPU cores, GPUs)
 - Scheduler (Slurm, flux)
@@ -74,9 +74,9 @@ Benchpark Experiment
     :width: 100%
     :align: center
 
-A Benchpark experiment is initialized from a specification written in Benchpark's spec syntax.
-Its definition under ``experiments/`` describes the information needed for reproducible
-sets of experiments that can be mapped onto specific systems, including:
+A Benchpark experiment is initialized from a specification written in Benchpark's spec
+syntax. Its definition under ``experiments/`` describes the information needed for
+reproducible sets of experiments that can be mapped onto specific systems, including:
 
 - On-node parallelism (CUDA, ROCM, OpenMP)
 - Problem sizes
