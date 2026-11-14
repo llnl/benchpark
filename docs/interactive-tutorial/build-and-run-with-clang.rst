@@ -12,11 +12,12 @@
 :ref:`Experiment <beginner-tutorial-glossary-experiment>`, :ref:`System
 <beginner-tutorial-glossary-system>`
 
-.. admonition:: Previously completed
+.. admonition:: Earlier GCC run (optional)
 
-    Before starting this page, you should have completed the default GCC workflow in
-    :doc:`Build and Run an Experiment <build-and-run-experiment>`. These initialization
-    commands are reminders. This page creates a separate Clang system.
+    In :doc:`Build and Run an Experiment <build-and-run-experiment>`, we initialized the
+    default GCC system and HPL experiment with the commands below. That earlier run is
+    optional for this page. Here, you will use similar commands to create a separate
+    Clang system and HPL experiment.
 
     The AWS tutorial system was initialized with:
 
