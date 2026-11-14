@@ -7,5 +7,5 @@ sphinxcontrib-programoutput
 sphinx-copybutton
 sphinx_design
 sphinxcontrib.mermaid
-# benchpark analyze -h command
-llnl-thicket
+# Benchpark commands captured by program-output import Thicket's plotting modules.
+llnl-thicket[plotting]

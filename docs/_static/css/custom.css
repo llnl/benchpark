@@ -172,7 +172,7 @@ html.writer-html4 .rst-content dl:not(.docutils) > dt, html.writer-html5 .rst-co
     --card-border: #efc9bd;
     --card-hover: #a94e38;
     --card-text: #6f3528;
-    --goal-number: "4 (requires #3)";
+    --goal-number: "4 (requires #2 or #3)";
 }
 
 .rst-content .tutorial-goal-query {

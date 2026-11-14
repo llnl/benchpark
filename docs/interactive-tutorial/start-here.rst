@@ -14,7 +14,7 @@
 
 Benchpark is an open-source infrastructure-as-code Python project which aims to enable
 reproducibility in HPC benchmarking. It accomplishes this by defining each component of
-HPC benchmarking, and constraining it separately. Benchpark builds on the specification
+HPC benchmarking, and constraining it separately. Benchpark builds on the specifications
 provided by Spack, an HPC package manager, and Ramble, an HPC testing framework.
 
 .. seealso::
@@ -122,105 +122,6 @@ Benchpark provides a ``system.py`` to describe a system, and an ``experiment.py`
 describe how to map a benchmark onto this system. Benchpark uses a Spack ``package.py``
 to build and a Ramble ``application.py`` to run the benchmark.
 
-.. _benchpark-spec-syntax:
-
-*******************
- Spack Spec Syntax
-*******************
-
-A Spack package spec can include versions, architecture constraints, compiler
-constraints, and dependencies, in addition to its package name and variants.
-
-.. figure:: /_static/images/spack-spec_anatomy.svg
-    :alt: Spack package spec: package name, versions, variants, architecture, compiler, and dependencies.
-    :figclass: tutorial-spec-figure
-    :width: 100%
-    :align: center
-
-***********************
- Benchpark System Spec
-***********************
-
-A Benchpark spec describes a Benchpark object. A system spec selects a definition under
-``systems/``, and an experiment spec selects a definition under ``experiments/``.
-
-The Benchpark system spec defines the hardware resources and software stack, including
-information that is useful for running benchmarks. This may include the following:
-
-- Resources (CPU cores, GPUs)
-- Scheduler (Slurm, flux)
-- Process mapping (cores, sockets, GPUs, NICs)
-- On-node parallelism (CUDA, ROCM, OpenMP)
-- Software stack
-- Compilers (which is best?)
-- MPI implementations (best?)
-- Math libraries
-
-Benchpark's parser is derived from Spack's spec parser and implements the object name
-and `variant portions of its syntax
-<https://spack.readthedocs.io/en/latest/spec_syntax.html#variants>`_. Every token after
-the system or experiment name is a Benchpark variant. Tokens beginning with ``+`` are
-Boolean variants, while tokens containing ``=`` are named variants. ``compiler=cce`` and
-``version=2.3-caliper`` are named variants defined by their Benchpark objects. They are
-not Spack compiler (``%``) or version (``@``) constraints.
-
-.. figure:: /_static/images/system-spec.png
-    :alt: Annotated Benchpark system spec
-    :figclass: tutorial-spec-figure
-    :width: 100%
-    :align: center
-
-***************************
- Benchpark Experiment Spec
-***************************
-
-The Benchpark experiment spec defines any information for reproducible sets of
-experiments that we can map onto specific systems, such as:
-
-- On-node parallelism (CUDA, ROCM, OpenMP)
-- Problem sizes
-
-      - Overall problem size, or
-      - Per node or per GPU
-
-- Scaling studies
-
-  - How to scale
-  - How to decompose
-
-- Resources (cores, GPUs)
-
-.. figure:: /_static/images/experiment-spec.png
-    :alt: Annotated Benchpark experiment spec
-    :figclass: tutorial-spec-figure
-    :width: 100%
-    :align: center
-
-.. list-table:: Differences in Benchpark and Spack Specs
-    :header-rows: 1
-    :stub-columns: 1
-    :widths: 27 36 37
-
-    - - Goal
-      - Benchpark
-      - Spack
-    - - Select a version
-      - Use a definition's variant: ``version=<value>``
-      - Use a version constraint: ``@<version>``.
-    - - Select multiple values exactly
-      - Use ``<variant>=<value1>,<value2>``.
-      - Use ``<variant>:=<value1>,<value2>``. In Spack, ``=`` also matches specs
-        containing additional values, while ``:=`` requires an exact match.
-    - - Select a compiler
-      - Not supported.
-      - Use ``%<compiler>``.
-    - - Select a dependency
-      - Not supported.
-      - Use ``^<dependency>``.
-    - - Select an installed spec by hash
-      - Not supported.
-      - Use ``/hash``.
-
 ***********************************************
  Continue with the step that matches your goal
 ***********************************************
@@ -260,7 +161,7 @@ experiments that we can map onto specific systems, such as:
 
         .. tutorialcontainer:: tutorial-duration
 
-            #3 + 15 min.
+            (#2 or #3) + 15 min.
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-run-substitute tutorial-with-duration
 

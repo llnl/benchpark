@@ -22,7 +22,7 @@
 
 All of the systems, benchmarks, experiments, and modifiers that are available in
 Benchpark can be searched on the command line. The ``benchpark list`` command accepts
-one of four categories:
+one of four options:
 
 .. code-block:: console
 
@@ -31,9 +31,18 @@ one of four categories:
 The Benchpark Catalogue shows detailed information on :doc:`Benchpark Systems
 </system-list>` and :doc:`Benchpark Experiments </benchmark-list>` in tabular form.
 
-A Benchpark system spec selects a definition under ``systems/``. It defines the hardware
-resources and software stack, including information that is useful for running
-benchmarks. This may include the following:
+Benchpark System
+================
+
+.. figure:: /_static/images/system_slide.png
+    :alt: Benchpark system class
+    :figclass: tutorial-system-figure
+    :width: 100%
+    :align: center
+
+A Benchpark system is initialized from a specification written in Benchpark's spec
+syntax. Its definition under ``systems/`` describes the hardware resources and software
+stack used to run benchmarks, including:
 
 - Resources (CPU cores, GPUs)
 - Scheduler (Slurm, flux)
@@ -56,9 +65,18 @@ To search for systems in Benchpark:
 
     ~]$ benchpark list systems
 
-A Benchpark experiment spec selects a definition under ``experiments/``. It defines any
-information for reproducible sets of experiments that we can map onto specific systems,
-such as:
+Benchpark Experiment
+====================
+
+.. figure:: /_static/images/experiment_slide.png
+    :alt: Benchpark experiment class
+    :figclass: tutorial-experiment-figure
+    :width: 100%
+    :align: center
+
+A Benchpark experiment is initialized from a specification written in Benchpark's spec
+syntax. Its definition under ``experiments/`` describes the information needed for
+reproducible sets of experiments that can be mapped onto specific systems, including:
 
 - On-node parallelism (CUDA, ROCM, OpenMP)
 - Problem sizes
@@ -92,6 +110,24 @@ After choosing a system or experiment, inspect its variants and configuration de
 
     ~]$ benchpark info system fluxtainer-aws
     ~]$ benchpark info experiment hpl
+
+To find systems with a specific CPU architecture, query their system resources:
+
+.. code-block:: console
+
+    $ benchpark info system --query cpu_arch=sapphirerapids
+    cpu_arch=sapphirerapids:
+        aws-tutorial: c7i.48xlarge
+        aws-tutorial: c7i.metal-48xl
+        aws-tutorial: c7i.24xlarge
+        aws-tutorial: c7i.metal-24xl
+        aws-tutorial: c7i.12xlarge
+        llnl-cluster: dane
+        llnl-cluster: poodle-deprecated
+        llnl-matrix: matrix
+        lanl-rocinante: crossroads
+        lanl-rocinante: rocinante
+        lanl-rocinante: tycho
 
 For a complete command reference, see :doc:`Benchpark Commands </benchpark-commands>`.
 
