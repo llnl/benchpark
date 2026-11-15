@@ -19,7 +19,7 @@ provided by Spack, an HPC package manager, and Ramble, an HPC testing framework.
 
 .. seealso::
 
-    `Latest Benchpark Tutorial Slides <../_static/slides/PACT26-Tutorial-Slides.pdf>`_ |
+    `Latest Benchpark Tutorial Slides <../_static/slides/SC26-Tutorial-Slides.pdf>`_ |
     `Benchpark Code on GitHub <https://github.com/llnl/benchpark>`_ | `Benchpark
     Dashboard <https://my.cdash.org/index.php?project=Benchpark>`_ | `Ramble
     <https://ramble.readthedocs.io/en/latest/>`_ | `Spack
