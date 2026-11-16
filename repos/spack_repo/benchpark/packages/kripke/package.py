@@ -164,8 +164,8 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
 
     def setup_build_environment(self, env):
         spec = self.spec
-        if "+cuda" in spec:
-            if "+mpi" in spec:
+        if spec.satisfies("+cuda"):
+            if spec.satisfies("+mpi"):
                 env.set("CUDAHOSTCXX", self.spec["mpi"].mpicxx)
             else:
                 env.set("CUDAHOSTCXX", self.compiler.cxx)
@@ -197,7 +197,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
         )
 
         args.append(self.define_from_variant("ENABLE_CHAI", "chai"))
-        if "+chai" in spec:
+        if spec.satisfies("+chai"):
             args.extend(
                 [
                     "-Dchai_DIR=%s" % self.spec["chai"].prefix,
@@ -206,18 +206,18 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
             )
 
         args.append(self.define_from_variant("ENABLE_GPU_AWARE_MPI", "gpu-aware-mpi"))
-        if "+gpu-aware-mpi" in spec:
+        if spec.satisfies("+gpu-aware-mpi"):
             args.append(self.define_from_variant("ENABLE_DIRECT_UMPIRE_PLANE_STORAGE", "direct-device-plane"))
         args.append(self.define_from_variant("ENABLE_OPENMP", "openmp"))
         args.append(self.define_from_variant("ENABLE_CALIPER", "caliper"))
 
         args.append(self.define_from_variant("ENABLE_MPI", "mpi"))
-        if "+mpi" in spec:
+        if spec.satisfies("+mpi"):
             args.append(self.define("CMAKE_CXX_COMPILER", self.spec["mpi"].mpicxx))
             args.append("-DMPI_CXX_LINK_FLAGS='%s'" % self.spec["mpi"].libs.ld_flags)
 
         args.append(self.define_from_variant("ENABLE_HIP", "rocm"))
-        if "+rocm" in spec:
+        if spec.satisfies("+rocm"):
             # Set up the hip macros needed by the build
             args.append("-Dumpire_DIR=%s" % self.spec["umpire"].prefix + "/lib64/cmake/umpire")
             args.append("-DHIP_ROOT_DIR={0}".format(spec["hip"].prefix))
@@ -228,9 +228,9 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
                 args.append("-DCMAKE_HIP_ARCHITECTURES={0}".format(arch_str))
 
         args.append(self.define_from_variant("ENABLE_CUDA", "cuda"))
-        if "+cuda" in spec:
+        if spec.satisfies("+cuda"):
             args.append("-Dumpire_DIR=%s" % self.spec["umpire"].prefix + "/lib64/cmake/umpire")
-            if "+mpi" in spec:
+            if spec.satisfies("+mpi"):
                 args.append(self.define("CMAKE_CUDA_HOST_COMPILER", self.spec["mpi"].mpicxx))
             else:
                 args.append(self.define("CMAKE_CUDA_HOST_COMPILER", self.compiler.cxx))
@@ -238,7 +238,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
                 cuda_arch = spec.variants["cuda_arch"].value
                 args.append("-DCUDA_ARCH={0}".format(cuda_arch[0]))
                 args.append("-DCMAKE_CUDA_ARCHITECTURES={0}".format(cuda_arch[0]))
-            if "+mpi" in spec:
+            if spec.satisfies("+mpi"):
                 args.append(
                     "-DCMAKE_CUDA_FLAGS=--extended-lambda -I=%s"
                     % (self.spec["mpi"].prefix.include)
