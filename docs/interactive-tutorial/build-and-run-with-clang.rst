@@ -12,15 +12,43 @@
 :ref:`Experiment <beginner-tutorial-glossary-experiment>`, :ref:`System
 <beginner-tutorial-glossary-system>`
 
+.. admonition:: Earlier GCC run (optional)
+
+    In :doc:`Build and Run an Experiment <build-and-run-experiment>`, we initialized the
+    default GCC system and HPL experiment with the commands below. That earlier run is
+    optional for this page. Here, you will use similar commands to create a separate
+    Clang system and HPL experiment.
+
+    The AWS tutorial system was initialized with:
+
+    .. code-block:: console
+
+        benchpark]$ benchpark system init --dest=hpc-tutorial fluxtainer-aws
+
+    .. figure:: /_static/images/fluxtainer-aws-system-spec.png
+        :alt: Tutorial system spec
+        :width: 90%
+        :align: center
+
+    The HPL experiment was initialized with:
+
+    .. code-block:: console
+
+        benchpark]$ benchpark experiment init hpc-tutorial hpl +strong caliper=time,mpi
+
+    .. figure:: /_static/images/fluxtainer-aws-experiment-spec.png
+        :alt: Tutorial experiment spec
+        :width: 71%
+        :align: center
+
 In this example, we show how to replicate an experiment, that is to run the same
-application on a potentially different machine that has the same hardware but possibly a
-different software stack (for example, a system with the same hardware specs, but
-software stack is managed by a different organization). We think of a different software
-stack as one containing different compiler or library versions, though the underlying
-hardware remains the same. Replicating an experiment can also encompass re-running on
-the same system (System1) with changes to the software stack, such as a newer library
-version. In this case, the application’s performance is expected to be similar, but not
-necessarily as close as with a repeat run.
+application on a different software stack (for example, a system with the same hardware
+specs, but software stack is managed by a different organization). We think of a
+different software stack as one containing different compiler or library versions,
+though the underlying hardware remains the same. Replicating an experiment can also
+encompass re-running on the same system (System1) with changes to the software stack,
+such as a newer library version. In this case, the application’s performance is expected
+to be similar, but not necessarily as close as with a repeat run.
 
 .. figure:: /_static/images/benchpark-replicate-table.png
     :alt: Benchpark replicate specification
@@ -47,8 +75,7 @@ variant:
     :width: 90%
     :align: center
 
-Here ``compiler=clang`` is a Benchpark system variant provided by ``fluxtainer-aws``. It
-is not a Spack ``%clang`` constraint.
+Here ``compiler=clang`` is a Benchpark system variant provided by ``fluxtainer-aws``.
 
 *******************
  Build and Run HPL
@@ -62,7 +89,7 @@ Initialize the HPL experiment against the Clang system instance:
 
 .. figure:: /_static/images/fluxtainer-aws-experiment-spec-clang.png
     :alt: Tutorial experiment spec using clang
-    :width: 90%
+    :width: 68%
     :align: center
 
 Create the experiment workspace:
