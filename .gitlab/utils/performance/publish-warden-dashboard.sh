@@ -2,16 +2,16 @@
 
 set -euo pipefail
 
-# The Plotly Cloud app name and API key are stored as GitLab CI/CD variables.
-if [[ -z "${PLOTLY_API_KEY:-}" ]]; then
-    echo "Set PLOTLY_API_KEY to publish with the Plotly Cloud CLI." >&2
-    exit 1
-fi
-
-if [[ -z "${PLOTLY_CLOUD_APP_NAME:-}" ]]; then
-    echo "Set PLOTLY_CLOUD_APP_NAME to the Plotly Cloud app name." >&2
-    exit 1
-fi
+## The Plotly Cloud app name and API key are stored as GitLab CI/CD variables.
+#if [[ -z "${PLOTLY_API_KEY:-}" ]]; then
+#    echo "Set PLOTLY_API_KEY to publish with the Plotly Cloud CLI." >&2
+#    exit 1
+#fi
+#
+#if [[ -z "${PLOTLY_CLOUD_APP_NAME:-}" ]]; then
+#    echo "Set PLOTLY_CLOUD_APP_NAME to the Plotly Cloud app name." >&2
+#    exit 1
+#fi
 
 # WARDEN currently owns the dashboard app source and the Plotly Cloud bundle
 # builder. These values are fixed here so CI has one predictable publish path.
