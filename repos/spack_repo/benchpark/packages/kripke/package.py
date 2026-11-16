@@ -77,14 +77,14 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("cxx", type="build")  # generated
 
     depends_on("mpi", when="+mpi")
-    depends_on("blt", type="build", when="@:1.2.7")
+    depends_on("blt@:0.6.1", type="build", when="@:1.2.6")
+    depends_on("blt@0.6.2:", type="build", when="@1.2.7:")
 
     depends_on("raja@2026.07.1: cxxstd=20", when="@develop")
     depends_on("raja@2026.07.1 cxxstd=20", when="@1.2.8")
     depends_on("raja@2024.07.0 cxxstd=14", when="@1.2.7.0")
-    depends_on("raja@:2024.02.1", when="@:1.2.7")
+    depends_on("raja@:2024.02.1", when="@:1.2.6,=1.2.7")
     depends_on("raja~exercises~examples")
-
 
     with when("+chai"):
         depends_on("chai+mpi", when="+mpi")
@@ -99,7 +99,6 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
         depends_on("chai+cuda", when="+cuda")
         depends_on("chai~cuda", when="~cuda")
         depends_on("chai~rocm", when="~rocm")
-        depends_on("fmt@9.1", when="^chai@2024.07.0")
 
         depends_on("umpire+openmp", when="+openmp")
         depends_on("umpire~openmp", when="~openmp")
@@ -123,8 +122,6 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("caliper", when="+caliper")
     depends_on("adiak@0.4:", when="+caliper")
     conflicts("^blt@:0.3.6", when="+rocm")
-
-    depends_on("blt@0.6.2:", type="build", when="@1.2.7:")
 
     for c in ["+cuda~chai", "+rocm~chai", "+chai"]:
         with when(c):
@@ -168,7 +165,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
             if spec.satisfies("+mpi"):
                 env.set("CUDAHOSTCXX", self.spec["mpi"].mpicxx)
             else:
-                env.set("CUDAHOSTCXX", self.compiler.cxx)
+                env.set("CUDAHOSTCXX", spack_cxx)
 
     def setup_run_environment(self, env):
       super().setup_run_environment(env)
