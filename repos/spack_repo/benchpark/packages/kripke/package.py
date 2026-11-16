@@ -101,10 +101,6 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
         depends_on("chai~rocm", when="~rocm")
         depends_on("fmt@9.1", when="^chai@2024.07.0")
 
-        depends_on("umpire@2026.07.2:", when="@develop")
-        depends_on("umpire@2026.07.2", when="@1.2.8")
-        depends_on("umpire@2024.07.0", when="@1.2.7.0")
-        depends_on("umpire~examples")
         depends_on("umpire+openmp", when="+openmp")
         depends_on("umpire~openmp", when="~openmp")
         depends_on("umpire+cuda", when="+cuda")
@@ -130,20 +126,19 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
 
     depends_on("blt@0.6.2:", type="build", when="@1.2.7:")
 
+    for c in ["+cuda~chai", "+rocm~chai", "+chai"]:
+        with when(c):
+            depends_on("umpire@2026.07.2:", when="@develop")
+            depends_on("umpire@2026.07.2", when="@1.2.8")
+            depends_on("umpire@2024.07.0", when="@1.2.7.0")
+            depends_on("umpire~examples")
+
     with when("+cuda~chai"):
-        depends_on("umpire@2026.07.2:", when="@develop")
-        depends_on("umpire@2026.07.2", when="@1.2.8")
-        depends_on("umpire@2024.07.0", when="@1.2.7.0")
-        depends_on("umpire~examples")
         depends_on("umpire+cuda")
         for sm_ in CudaPackage.cuda_arch_values:
             depends_on("umpire cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
 
     with when("+rocm~chai"):
-        depends_on("umpire@2026.07.2:", when="@develop")
-        depends_on("umpire@2026.07.2", when="@1.2.8")
-        depends_on("umpire@2024.07.0", when="@1.2.7.0")
-        depends_on("umpire~examples")
         depends_on("umpire+rocm")
         for arch in ROCmPackage.amdgpu_targets:
             depends_on("umpire amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
