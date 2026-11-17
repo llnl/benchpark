@@ -533,16 +533,16 @@ class LlnlElcapitan(System):
         compiler = self.spec.variants["compiler"][0]
 
         if compiler == "cce":
-            prefs = {"one_of": ["%cce", "%gcc"], "when": "%c"}
-            return {"packages": {"all": {"require": [prefs]}}}
+            x = ["cce"]
         elif compiler == "gcc":
-            prefs = {"one_of": ["%gcc"], "when": "%c"}
-            return {"packages": {"all": {"require": [prefs]}}}
+            x = ["gcc"]
         elif compiler == "rocmcc":
-            prefs = {"one_of": ["%rocmcc", "%gcc"], "when": "%c"}
-            return {"packages": {"all": {"require": [prefs]}}}
+            x = ["llvm-amdgpu"]
         else:
             raise ValueError(f"Unexpected value for compiler: {compiler}")
+
+        return {"packages": {"c": {"prefer": x}, "cxx": {"prefer": x}, "fortran": {"prefer": x}}}
+
 
     def compute_compilers_section(self):
         cfg = compiler_section_for(
