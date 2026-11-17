@@ -16,11 +16,13 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
 
     homepage = "https://github.com/lanl/branson"
     url = "https://github.com/lanl/branson/archive/refs/tags/0.90.tar.gz"
-    git = "https://github.com/LANL/branson.git"
+    git = "https://github.com/lanl/branson.git"
+
+    maintainers("alexrlongne")
 
     tags = ["proxy-app"]
 
-    license("MIT")
+    license("BSD-3-Clause")
 
     version("develop", branch="develop")
 
@@ -55,14 +57,15 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
 
         depends_on("umpire+rocm", when="+rocm")
         for arch in ROCmPackage.amdgpu_targets:
-            depends_on("umpire amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
+            depends_on(
+                "umpire amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch)
+            )
 
         conflicts("~cuda~rocm")
 
     depends_on("mpi@2:")
 
     depends_on("metis", when="+metis")
-    depends_on("parmetis", when="@:0.81 +metis")
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
 
@@ -71,9 +74,9 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
     flag_handler = build_system_flags
 
     def setup_run_environment(self, env):
-      if self.compiler.extra_rpaths:
-        for rpath in self.compiler.extra_rpaths:
-          env.prepend_path("LD_LIBRARY_PATH", rpath)
+        if self.compiler.extra_rpaths:
+            for rpath in self.compiler.extra_rpaths:
+                env.prepend_path("LD_LIBRARY_PATH", rpath)
 
     def cmake_args(self):
         spec = self.spec
@@ -82,45 +85,45 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
         args.append(f"-DCMAKE_C_COMPILER={spec['mpi'].mpicc}")
         args.append(f"-DCMAKE_CXX_COMPILER={spec['mpi'].mpicxx}")
         args.append(f"-DCMAKE_Fortran_COMPILER={spec['mpi'].mpifc}")
-        args.append(f"-DCMAKE_CXX_STANDARD=17")
+        args.append("-DCMAKE_CXX_STANDARD=17")
         args.append(f"-DMPI_C_COMPILER={spec['mpi'].mpicc}")
         args.append(f"-DMPI_CXX_COMPILER={spec['mpi'].mpicxx}")
 
-        if '+metis' in spec:
+        if spec.satisfies("+metis"):
             args.append(f"-DMETIS_ROOT_DIR={spec['metis'].prefix}")
 
-        if '+cuda' in spec:
+        if spec.satisfies("+cuda"):
             args.append("-DUSE_CUDA=ON")
             args.append("-DUSE_GPU=ON")
             args.append(f"-DCMAKE_CUDA_COMPILER={spec['cuda'].prefix}/bin/nvcc")
             cuda_arch_vals = spec.variants["cuda_arch"].value
             if cuda_arch_vals:
-              cuda_arch_sorted = list(sorted(cuda_arch_vals, reverse=True))
-              cuda_arch = cuda_arch_sorted[0]
-              args.append(f"-DCUDA_ARCH={cuda_arch}")
+                cuda_arch_sorted = list(sorted(cuda_arch_vals, reverse=True))
+                cuda_arch = cuda_arch_sorted[0]
+                args.append(f"-DCUDA_ARCH={cuda_arch}")
         else:
             args.append("-DUSE_CUDA=OFF")
-            if '+rocm' in spec:
+            if spec.satisfies("+rocm"):
                 args.append("-DUSE_HIP=ON")
                 args.append("-DUSE_GPU=ON")
                 rocm_arch_vals = spec.variants["amdgpu_target"].value
                 args.append(f"-DROCM_PATH={spec['hip'].prefix}")
                 if rocm_arch_vals:
-                  rocm_arch_sorted = list(sorted(rocm_arch_vals, reverse=True))
-                  rocm_arch = rocm_arch_sorted[0]
-                  args.append(f"-DROCM_ARCH={rocm_arch}")
-                  args.append(f"-DHIP_ARCH={rocm_arch}")
+                    rocm_arch_sorted = list(sorted(rocm_arch_vals, reverse=True))
+                    rocm_arch = rocm_arch_sorted[0]
+                    args.append(f"-DROCM_ARCH={rocm_arch}")
+                    args.append(f"-DHIP_ARCH={rocm_arch}")
             else:
                 args.append("-DUSE_HIP=OFF")
                 args.append("-DUSE_GPU=OFF")
 
-        if '+umpire' in spec:
+        if spec.satisfies("+umpire"):
             args.append("-DUSE_UMPIRE=ON")
             args.append(f"-Dumpire_DIR={spec['umpire'].prefix}")
 
         args.append(self.define_from_variant("USE_OPENMP", "openmp"))
 
-        if '+caliper' in spec:
+        if spec.satisfies("+caliper"):
             args.append(self.define_from_variant("USE_CALIPER", "caliper"))
             args.append(f"-Dcaliper_DIR={spec['caliper'].prefix}")
 
