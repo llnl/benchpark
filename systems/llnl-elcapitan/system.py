@@ -549,7 +549,6 @@ class LlnlElcapitan(System):
             }
         }
 
-
     def compute_compilers_section(self):
         cfg = compiler_section_for(
             "gcc",
