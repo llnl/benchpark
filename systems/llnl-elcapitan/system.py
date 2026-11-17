@@ -541,7 +541,13 @@ class LlnlElcapitan(System):
         else:
             raise ValueError(f"Unexpected value for compiler: {compiler}")
 
-        return {"packages": {"c": {"prefer": x}, "cxx": {"prefer": x}, "fortran": {"prefer": x}}}
+        return {
+            "packages": {
+                "c": {"prefer": x},
+                "cxx": {"prefer": x},
+                "fortran": {"prefer": x},
+            }
+        }
 
 
     def compute_compilers_section(self):
