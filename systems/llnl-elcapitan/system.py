@@ -351,6 +351,9 @@ class LlnlElcapitan(System):
         selections = {
             "packages": {
                 "all": {"require": [{"spec": "target=x86_64:"}]},
+                "camp": {"require": "@2025.09.0:"},
+                "blt": {"require": "@0.6.0:"},
+                "umpire": {"require": "@2025.09.0:"},
                 "tar": {"externals": [{"spec": "tar@1.30", "prefix": "/usr"}]},
                 "coreutils": {
                     "externals": [{"spec": "coreutils@8.30", "prefix": "/usr"}]
