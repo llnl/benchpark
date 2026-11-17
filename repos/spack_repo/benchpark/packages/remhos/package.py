@@ -2,10 +2,11 @@
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
-from spack.package import *
 from spack_repo.builtin.build_systems.cuda import CudaPackage
 from spack_repo.builtin.build_systems.makefile import MakefilePackage
 from spack_repo.builtin.build_systems.rocm import ROCmPackage
+
+from spack.package import *
 
 
 class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
@@ -18,7 +19,7 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
     tags = ["proxy-app"]
 
     homepage = "https://github.com/CEED/Remhos"
-    url = "https://github.com/CEED/Remhos/archive/v1.0.tar.gz"
+    url = "https://github.com/CEED/Remhos/archive/refs/tags/v2.0.tar.gz"
     git = "https://github.com/CEED/Remhos.git"
 
     maintainers("v-dobrev", "tzanio", "vladotomov")
@@ -26,7 +27,7 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
     license("BSD-2-Clause")
 
     version("develop", branch="master")
-    version("ats-6", branch="master")
+    version("2.0", sha256="68209a529f7559b6add9e02dadd2bb05012a9080a1eb4d2c1b39a4732d7a1ba5")
     version("1.0", sha256="e60464a867fe5b1fd694fbb37bb51773723427f071c0ae26852a2804c08bbb32")
 
     variant("metis", default=True, description="Enable/disable METIS support")
@@ -41,25 +42,24 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
     depends_on("umpire@2026.07.2:", when="@develop")
     depends_on("raja@2026.07.1: ~examples~exercises cxxstd=20", when="@develop")
 
-    depends_on("umpire@2026.07.2", when="@ats-6")
-    depends_on("raja@2026.07.1 ~examples~exercises cxxstd=20", when="@ats-6")
+    depends_on("umpire@2026.07.2", when="@2.0")
+    depends_on("raja@2026.07.1 ~examples~exercises cxxstd=20", when="@2.0")
 
     depends_on("mfem+mpi+metis", when="+metis")
     depends_on("mfem+mpi~metis", when="~metis")
     depends_on("mfem+raja", when="+raja")
 
     depends_on("mfem@develop", when="@develop")
-    depends_on("mfem@4.10", when="@ats-6")
+    depends_on("mfem@4.10", when="@2.0")
     depends_on("mfem@4.1.0:", when="@1.0")
     depends_on("mfem+caliper", when="+caliper")
     depends_on("mfem cxxstd=20", when="@develop")
-    depends_on("mfem cxxstd=20", when="@ats-6")
+    depends_on("mfem cxxstd=20", when="@2.0")
 
     depends_on("caliper", when="+caliper")
     depends_on("adiak~shared", when="+caliper")
 
-    depends_on("zlib+optimize+pic~shared")
-    requires("^[virtuals=zlib-api] zlib")
+    depends_on("mfem~zlib")
 
     depends_on("hypre+mpi")
     depends_on("hypre+mixedint~fortran")
@@ -78,14 +78,20 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
 
     depends_on("hypre~rocm", when="~rocm")
     depends_on("mfem~rocm", when="~rocm")
-    
+
     with when("+rocm"):
         depends_on("hypre+rocm+umpire")
         depends_on("mfem+rocm+umpire")
         for arch in ROCmPackage.amdgpu_targets:
-            depends_on("hypre amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
-            depends_on("mfem amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
-            depends_on("umpire amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
+            depends_on(
+                "hypre amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch)
+            )
+            depends_on(
+                "mfem amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch)
+            )
+            depends_on(
+                "umpire amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch)
+            )
 
     depends_on("hypre+gpu-aware-mpi", when="+gpu-aware-mpi")
 
