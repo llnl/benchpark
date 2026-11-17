@@ -43,13 +43,24 @@ class FluxtainerAws(System):
         self.scheduler = "flux"
         setattr(self, "sys_cores_per_node", 32)
         setattr(self, "sys_mem_per_node_GB", 1)
-        setattr(self, "n_nodes", 1)
         attrs = self.id_to_resources.get(self.spec.variants["instance_type"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
 
     def compute_compilers_section(self):
-        cfg = compiler_section_for(
+        if self.spec.satisfies("compiler=clang"):
+            return compiler_section_for(
+                "llvm",
+                [
+                    compiler_def(
+                        "llvm@20.1.8 +clang +flang",
+                        "/opt/llvm",
+                        {"c": "clang", "cxx": "clang++", "fortran": "flang"},
+                    )
+                ],
+            )
+
+        return compiler_section_for(
             "gcc",
             [
                 compiler_def(
@@ -59,20 +70,6 @@ class FluxtainerAws(System):
                 )
             ],
         )
-
-        if self.spec.satisfies("compiler=clang"):
-            cfg = compiler_section_for(
-                "clang",
-                [
-                    compiler_def(
-                        "llvm@20.1.8",
-                        "/usr/lib64/ccache/",
-                        {"c": "clang", "cxx": "clang++"},
-                    )
-                ],
-            )
-
-        return cfg
 
     def compute_packages_section(self):
         return {
@@ -251,17 +248,19 @@ class FluxtainerAws(System):
                     "externals": [{"spec": "python@3.12.12", "prefix": "/usr"}],
                     "buildable": False,
                 },
-                "blas": {"buildable": False},
-                "lapack": {"buildable": False},
+                # blas-devel and lapack-devel are installed in the EL10 image.
+                "blas": {"require": "netlib-lapack", "buildable": False},
+                "lapack": {"require": "netlib-lapack", "buildable": False},
                 "netlib-lapack": {
                     "externals": [{"spec": "netlib-lapack@3.12.0", "prefix": "/usr"}],
+                    "buildable": False,
                 },
             }
         }
 
     def compute_software_section(self):
         default_compiler = "gcc"
-        if self.spec.satisfies("compiler=llvm"):
+        if self.spec.satisfies("compiler=clang"):
             default_compiler = "llvm"
         return {
             "software": {

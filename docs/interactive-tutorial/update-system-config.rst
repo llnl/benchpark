@@ -4,9 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-###############################
- Updating Software in a System
-###############################
+#############################
+ Update Software in a System
+#############################
 
 **Glossary terms:** :ref:`Package <beginner-tutorial-glossary-package>`, :ref:`Variant
 <beginner-tutorial-glossary-variant>`, :ref:`System <beginner-tutorial-glossary-system>`

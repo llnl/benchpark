@@ -13,6 +13,7 @@ import yaml  # TODO: some way to ensure yaml available
 import benchpark.spec
 import benchpark.variant
 from benchpark.compiler_attribution import CompilerAttribution
+from benchpark.compiler_memtrace import CompilerMemtrace
 from benchpark.directives import DirectiveMeta, ExperimentSystemBase, variant
 from benchpark.error import BenchparkError
 from benchpark.experiment_helper import ExperimentHelper
@@ -23,7 +24,7 @@ class ExecMode(metaclass=DirectiveMeta):
     variant(
         "exec_mode",
         default="test",
-        values=("test", "perf"),
+        values=("test", "perf", "tutorial-failure"),
         description="Execution mode",
     )
 
@@ -150,6 +151,7 @@ class Experiment(
     Hwloc,
     Githash,
     CompilerAttribution,
+    CompilerMemtrace,
 ):
     """This is the superclass for all benchpark experiments.
 

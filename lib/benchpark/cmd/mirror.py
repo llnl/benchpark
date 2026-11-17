@@ -22,6 +22,8 @@ def _dry_run_command(cmd, *args, **kwargs):
         print(f"\n\t{args}")
     if kwargs:
         print(f"\n\t{kwargs}")
+    # Match run_command's (stdout, stderr) so callers can unpack the result
+    return "", ""
 
 
 def copytree_part_of(basedir, dest, include):
@@ -35,6 +37,9 @@ def copytree_part_of(basedir, dest, include):
 
 
 def delete_configs_in(basedir):
+    if not os.path.isdir(basedir):
+        # e.g. under --dry-run, where the tracked files were never copied
+        return
     collected = []
     for fname in os.listdir(basedir):
         if fname.endswith(".yaml"):
@@ -169,7 +174,13 @@ this_script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 export SPACK_DISABLE_LOCAL_CONFIG=1
 """)
 
-    env_dir = os.path.dirname(find_one(ramble_workspace, "spack.yaml"))
+    spack_yaml = find_one(ramble_workspace, "spack.yaml")
+    if spack_yaml is None:
+        raise RuntimeError(
+            f"No spack.yaml found in {ramble_workspace}: run "
+            "`ramble workspace setup` before creating a mirror"
+        )
+    env_dir = os.path.dirname(spack_yaml)
 
     # Get commit requirements for branch-based git packages
     repo_copy_script = os.path.join(

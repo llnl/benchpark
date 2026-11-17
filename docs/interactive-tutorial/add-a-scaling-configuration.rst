@@ -4,9 +4,9 @@
 
     SPDX-License-Identifier: Apache-2.0
 
-################################
- Adding a Scaling Configuration
-################################
+#############################
+ Add a Scaling Configuration
+#############################
 
 **Glossary terms:** :ref:`Benchmark <beginner-tutorial-glossary-benchmark>`,
 :ref:`Experiment <beginner-tutorial-glossary-experiment>`, :ref:`Scaling Study

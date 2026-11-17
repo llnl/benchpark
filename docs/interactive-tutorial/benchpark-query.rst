@@ -18,7 +18,7 @@ Query the average time for the ``main`` region in the completed HPL workspace:
 
 .. code-block:: console
 
-    $ benchpark query workspace/fluxtainer/hpl/workspace \
+    $ benchpark query wkp/hpc-tutorial/hpl/workspace \
         --metric "Avg time/rank" \
         --query-regions-byname main
 
