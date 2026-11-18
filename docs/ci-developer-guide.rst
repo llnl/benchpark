@@ -161,9 +161,11 @@ executed on every system in benchpark that contains that programming model in
 ``self.programming_models``.
 
 - ``.github/utils/dryruns.py`` contains the main script that enumerates all of the
-  dryruns cases, and executes them in a ``subprocess`` call.
+  dryrun cases, and executes up to 16 at a time. Use ``--jobs N`` to change the limit.
 - ``.github/utils/dryrun.sh`` executes a single dryrun, provided a ``benchmark_spec``
-  and ``system_spec``.
+  and ``system_spec``. Each run has a separate input directory and workspace path.
+  Setup of the shared Ramble and Spack repositories runs once; later case setups
+  can run concurrently.
 - ``.github/workflows/run.yml`` defines the ``dryrunexperiments`` job, that will be
   executed by a GitHub runner. Runs are separated by programming model, scaling type,
   and modifiers, and are executed in parallel.
