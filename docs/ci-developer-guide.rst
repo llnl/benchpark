@@ -108,8 +108,8 @@ pipeline summary and per-host JSON files, then
 ``performance/generate_test_status_table.py`` renders the status table. For scheduled
 pipelines, the ``publish-performance`` stage pushes the per-host files to the
 ``benchpark-performance`` repository. When that job pushes new metadata, the
-``deploy-dashboard`` stage triggers the WARDEN Plotly Cloud redeploy so the dashboard
-loads the newly published performance data.
+``deploy-dashboard`` stage publishes the WARDEN Dash app with the Plotly Cloud CLI so
+the dashboard loads the newly published performance data.
 
 Performance collection currently queries ``Avg time/rank`` for the ``main`` region and
 marks values more than 5 percent above the baseline as regressions. Test jobs use
@@ -120,9 +120,17 @@ the current test metadata from being written.
 
 The publishing job requires ``BENCHPARK_PERF_DEPLOY_TOKEN`` to contain, or point to a
 file containing, the SSH private key for ``benchpark-performance``.
-``BENCHPARK_PERF_REPO_URL`` indicates the destination repository. The dashboard redeploy
-job requires ``PLOTLY_CLOUD_REDEPLOY_WEBHOOK`` to contain the Plotly Cloud redeploy
-webhook URL.
+``BENCHPARK_PERF_REPO_URL`` indicates the destination repository. The dashboard update
+job publishes with the Plotly Cloud CLI. Set the CI/CD variables ``PLOTLY_API_KEY`` and
+``PLOTLY_CLOUD_APP_NAME`` for the target Plotly Cloud app. The job clones WARDEN from
+``https://github.com/llnl/warden.git`` and runs ``warden_init_or_update``. It then runs
+``scripts/build_plotly_cloud_files.py --output plotly-cloud-files``. It copies
+WARDEN's pinned ``requirements.txt`` into that generated upload directory before
+publishing. The publish command sets ``REACT_VERSION=19.2.4`` because Dash Mantine
+Components 3 requires React 19. The live Plotly Cloud app must also have the runtime
+environment variable ``REACT_VERSION=19.2.4`` so Dash serves React 19 in the browser.
+The job installs ``dash[cloud]`` in a temporary virtual environment if the ``plotly``
+CLI is not already available.
 
 When adding a monitored benchmark, update its test matrix and matching
 ``resource_rules_*`` entry.
