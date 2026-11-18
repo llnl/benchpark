@@ -37,13 +37,7 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
 
     depends_on("cxx", type="build")  # generated
 
-    depends_on("mpi")
-
-    depends_on("umpire@2026.07.2:", when="@develop")
-    depends_on("raja@2026.07.1: ~examples~exercises cxxstd=20", when="@develop")
-
-    depends_on("umpire@2026.07.2", when="@2.0")
-    depends_on("raja@2026.07.1 ~examples~exercises cxxstd=20", when="@2.0")
+    depends_on("raja ~examples~exercises", when="+raja")
 
     depends_on("mfem+mpi+metis", when="+metis")
     depends_on("mfem+mpi~metis", when="~metis")
@@ -53,50 +47,32 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
     depends_on("mfem@4.10", when="@2.0")
     depends_on("mfem@4.1.0:", when="@1.0")
     depends_on("mfem+caliper", when="+caliper")
-    depends_on("mfem cxxstd=20", when="@develop")
-    depends_on("mfem cxxstd=20", when="@2.0")
-
-    depends_on("caliper", when="+caliper")
-    depends_on("adiak~shared", when="+caliper")
+    depends_on("mfem cxxstd=20", when="@2.0:")
 
     depends_on("mfem~zlib")
 
-    depends_on("hypre+mpi")
     depends_on("hypre+mixedint~fortran")
-    depends_on("hypre+caliper", when="+caliper")
 
-    depends_on("hypre~cuda", when="~cuda")
     depends_on("mfem~cuda", when="~cuda")
 
     with when("+cuda"):
-        depends_on("hypre+cuda+umpire")
         depends_on("mfem+cuda+umpire")
         for sm_ in CudaPackage.cuda_arch_values:
-            depends_on("hypre cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
             depends_on("mfem cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
-            depends_on("umpire cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
 
-    depends_on("hypre~rocm", when="~rocm")
     depends_on("mfem~rocm", when="~rocm")
 
     with when("+rocm"):
-        depends_on("hypre+rocm+umpire")
         depends_on("mfem+rocm+umpire")
         for arch in ROCmPackage.amdgpu_targets:
             depends_on(
-                "hypre amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch)
-            )
-            depends_on(
                 "mfem amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch)
-            )
-            depends_on(
-                "umpire amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch)
             )
 
     depends_on("hypre+gpu-aware-mpi", when="+gpu-aware-mpi")
 
     def setup_run_environment(self, env):
-        if "+gpu-aware-mpi" in self.spec:
+        if self.spec.satisfies("+gpu-aware-mpi"):
             env.set("MFEM_GPU_AWARE_MPI", "1")
 
     @property
@@ -107,7 +83,7 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
         targets.append("MFEM_DIR=%s" % spec["mfem"].prefix)
         targets.append("CONFIG_MK=%s" % spec["mfem"].package.config_mk)
         targets.append("TEST_MK=%s" % spec["mfem"].package.test_mk)
-        if "+caliper" in self.spec:
+        if spec.satisfies("+caliper"):
             targets.append("CALIPER_DIR=%s" % spec["caliper"].prefix)
             targets.append("ADIAK_DIR=%s" % spec["adiak"].prefix)
         return targets
@@ -115,7 +91,7 @@ class Remhos(MakefilePackage, CudaPackage, ROCmPackage):
     # See lib/spack/spack/build_systems/makefile.py
     def check(self):
         with working_dir(self.build_directory):
-            make("test", *self.build_targets)
+            make("tests", *self.build_targets)
 
     def install(self, spec, prefix):
         mkdirp(prefix.bin)
