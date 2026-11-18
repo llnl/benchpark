@@ -50,7 +50,11 @@ warden_dir="${work_root}/warden"
 echo "Cloning WARDEN dashboard source from ${warden_repo_url}."
 git clone "${warden_repo_url}" "${warden_dir}"
 cd "${warden_dir}"
-pip install .
+local venv_activate="/usr/workspace/benchpark-dev/benchpark-venv/${SYS_TYPE}/bin/activate"
+. /usr/workspace/benchpark-dev/benchpark-venv/${SYS_TYPE}/bin/activate
+. "${venv_activate}" || return 1
+benchpark_pip=$(command -v pip)
+${benchpark_pip} install .
 
 # Update WARDEN dashboard with latest performance data before building the
 # Plotly Cloud upload directory. The command is expected to be available in the
