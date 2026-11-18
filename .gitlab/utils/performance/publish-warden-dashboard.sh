@@ -49,13 +49,14 @@ warden_dir="${work_root}/warden"
 # the current upstream dashboard code and generated app layout.
 echo "Cloning WARDEN dashboard source from ${warden_repo_url}."
 git clone "${warden_repo_url}" "${warden_dir}"
+cd "${warden_dir}"
+pip install .
 
 # Update WARDEN dashboard with latest performance data before building the
 # Plotly Cloud upload directory. The command is expected to be available in the
 # CI environment.
 echo "Updating WARDEN dashboard app files."
 (
-    cd "${warden_dir}"
     warden_init_or_update
 )
 
