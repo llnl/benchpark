@@ -52,9 +52,18 @@ class Laghos(
 
     variant(
         "gpu-aware-mpi",
+        default=True,
+        values=(True, False),
+        description="Use GPU-aware MPI",
+        when="+rocm",
+    )
+
+    variant(
+        "gpu-aware-mpi",
         default=False,
         values=(True, False),
         description="Use GPU-aware MPI",
+        when="~rocm",
     )
 
     variant(
