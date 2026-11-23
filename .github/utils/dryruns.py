@@ -131,6 +131,7 @@ def main():
     nmods = [i for i in mods_str.replace(" " * 4, "").split("\n") if i != ""]
     modifiers_expr = []
     exclude_mods = ["allocation"]
+    modifier_modes = {"caliper": "time", "compiler_attribution": "association"}
     i = 0
     while i < len(nmods):
         if nmods[i] in exclude_mods:
@@ -139,7 +140,7 @@ def main():
             continue
         if not nmods[i].startswith("\t"):
             curmod = nmods[i]
-            end = "=on" if curmod != "caliper" else "=time"
+            end = f"={modifier_modes.get(curmod, 'on')}"
             if "(all benchmarks)" in nmods[i + 1]:
                 for b in mpi_only_expr:
                     modifiers_expr.append(b + " " + curmod + end)
