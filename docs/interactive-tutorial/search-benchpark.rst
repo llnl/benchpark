@@ -22,7 +22,7 @@
 
 All of the systems, benchmarks, experiments, and modifiers that are available in
 Benchpark can be searched on the command line. The ``benchpark list`` command accepts
-one of four categories:
+one of four options:
 
 .. code-block:: console
 
@@ -31,6 +31,72 @@ one of four categories:
 The Benchpark Catalogue shows detailed information on :doc:`Benchpark Systems
 </system-list>` and :doc:`Benchpark Experiments </benchmark-list>` in tabular form.
 
+Benchpark System
+================
+
+.. figure:: /_static/images/system_slide.png
+    :alt: Benchpark system class
+    :figclass: tutorial-system-figure
+    :width: 100%
+    :align: center
+
+A Benchpark system is initialized from a specification written in Benchpark's spec
+syntax. Its definition under ``systems/`` describes the hardware resources and software
+stack used to run benchmarks, including:
+
+- Resources (CPU cores, GPUs)
+- Scheduler (Slurm, flux)
+- Process mapping (cores, sockets, GPUs, NICs)
+- On-node parallelism (CUDA, ROCM, OpenMP)
+- Software stack
+- Compilers (which is best?)
+- MPI implementations (best?)
+- Math libraries
+
+.. figure:: /_static/images/system-spec.png
+    :alt: Annotated Benchpark system spec
+    :figclass: tutorial-spec-figure
+    :width: 100%
+    :align: center
+
+To search for systems in Benchpark:
+
+.. code-block:: console
+
+    ~]$ benchpark list systems
+
+Benchpark Experiment
+====================
+
+.. figure:: /_static/images/experiment_slide.png
+    :alt: Benchpark experiment class
+    :figclass: tutorial-experiment-figure
+    :width: 100%
+    :align: center
+
+A Benchpark experiment is initialized from a specification written in Benchpark's spec
+syntax. Its definition under ``experiments/`` describes the information needed for
+reproducible sets of experiments that can be mapped onto specific systems, including:
+
+- On-node parallelism (CUDA, ROCM, OpenMP)
+- Problem sizes
+
+      - Overall problem size, or
+      - Per node or per GPU
+
+- Scaling studies
+
+  - How to scale
+  - How to decompose
+
+- Resources (cores, GPUs)
+
+.. figure:: /_static/images/experiment-spec.png
+    :alt: Annotated Benchpark experiment spec
+    :figclass: tutorial-spec-figure
+    :width: 100%
+    :align: center
+
 Use the filter to find experiments with your targeted programming model or specific type
 of scaling. For example, this command will display only the CUDA experiments:
 
@@ -38,18 +104,30 @@ of scaling. For example, this command will display only the CUDA experiments:
 
     ~]$ benchpark list experiments --experiment cuda
 
-We can also search for systems:
-
-.. code-block:: console
-
-    ~]$ benchpark list systems
-
 After choosing a system or experiment, inspect its variants and configuration details:
 
 .. code-block:: console
 
     ~]$ benchpark info system fluxtainer
     ~]$ benchpark info experiment hpl
+
+To find systems with a specific CPU architecture, query their system resources:
+
+.. code-block:: console
+
+    $ benchpark info system --query cpu_arch=sapphirerapids
+    cpu_arch=sapphirerapids:
+        aws-tutorial: c7i.48xlarge
+        aws-tutorial: c7i.metal-48xl
+        aws-tutorial: c7i.24xlarge
+        aws-tutorial: c7i.metal-24xl
+        aws-tutorial: c7i.12xlarge
+        llnl-cluster: dane
+        llnl-cluster: poodle-deprecated
+        llnl-matrix: matrix
+        lanl-rocinante: crossroads
+        lanl-rocinante: rocinante
+        lanl-rocinante: tycho
 
 For a complete command reference, see :doc:`Benchpark Commands </benchpark-commands>`.
 

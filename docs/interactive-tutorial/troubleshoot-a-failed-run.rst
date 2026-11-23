@@ -12,11 +12,11 @@
 :ref:`System <beginner-tutorial-glossary-system>`, :ref:`Scaling Study
 <beginner-tutorial-glossary-scaling-study>`
 
-In this example, we show how to repeat an experiment, that is to run the same
-application experiment on the same system using the same hardware and software stack.
-This use case follows the same steps to create an HPL workspace as in
-:doc:`build-and-run-experiment`, but we will run into build and run errors and follow
-the clues from the Ramble output to understand the reason for the failure.
+In this example, we show how to repeat an experiment, that is to run the same experiment
+on the same system using the same hardware and software stack. This use case follows the
+same steps to create an HPL workspace as in :doc:`build-and-run-experiment`, but we will
+run into various errors and read the Ramble output to understand the reason for the
+failure.
 
 *********************
  What You Will Learn
@@ -44,14 +44,21 @@ Initialize the AWS tutorial system:
 
     benchpark]$ benchpark system init --dest=hpc-tutorial fluxtainer instance_type=amd64-aws
 
-The ``amd64-aws`` instance type selects 32 cores per node in the generated system
-configuration.
+.. figure:: /_static/images/fluxtainer-aws-system-spec.png
+    :alt: Tutorial system spec
+    :width: 90%
+    :align: center
 
 Then, initialize the HPL experiment:
 
 .. code-block:: console
 
     benchpark]$ benchpark experiment init hpc-tutorial hpl +strong Ns=-1 caliper=time,mpi
+
+.. figure:: /_static/images/fluxtainer-aws-experiment-spec.png
+    :alt: Tutorial experiment spec
+    :width: 71%
+    :align: center
 
 Create the experiment workspace:
 
@@ -66,11 +73,12 @@ Ramble environments.
 
     benchpark]$ . wkp/setup.sh
 
-The ``wkp`` directory contains ``ramble``, ``spack``, ``spack-packages``, and
-``hpc-tutorial/hpl/workspace`` sub-directories. The ``ramble`` and ``spack`` directories
-contain the source for those respective tools. The ``spack-packages`` directory contains
-a Spack packages repository. The ``hpc-tutorial/hpl/workspace`` directory contains the
-Ramble workspace for the experiments in this tutorial.
+The benchpark workspace ``wkp`` directory contains ``ramble``, ``spack``,
+``spack-packages``, and ``hpc-tutorial/hpl/workspace`` sub-directories. The ``ramble``
+and ``spack`` directories contain the source for those respective tools. The
+``spack-packages`` directory contains a Spack packages repository. The
+``hpc-tutorial/hpl/workspace`` directory contains the Ramble workspace for the
+experiments in this tutorial.
 
 At this point, move into the workspace directory to continue with the remaining steps:
 
@@ -100,7 +108,7 @@ This should print the following output:
           Experiment 3: hpl.standard.hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_4_-1_4
           Experiment 4: hpl.standard.hpl_standard_test_mpi_caliper_time_mpi_strong_scaling_8_-1_8
 
-We can see from this that this workspace will execute 4 experiments currently.
+We can see from this that this workspace will currently execute 4 experiments.
 
 Before setting up the Ramble workspace, we will explore a few error cases.
 
@@ -411,21 +419,15 @@ workspaces into one allocation, see :doc:`/run-experiment`.
         start another workflow by searching what is available in Benchpark.
         <search-benchpark>`
 
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run-substitute
-
-        :doc:`I want to re-run this experiment and substitute a different compiler or
-        library.
-        <build-and-run-with-clang>`
-
-    .. tutorialcontainer:: tutorial-next-step tutorial-goal-troubleshoot
-
-        :doc:`My experiment did not finish, and I want to diagnose where it failed.
-        <troubleshoot-a-failed-run>`
-
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-analyze
 
         :doc:`I want to analyze the performance of an experiment on my system by
         generating preconfigured performance figures. <benchpark-analyze>`
+
+    .. tutorialcontainer:: tutorial-next-step tutorial-goal-run-substitute
+
+        :doc:`I want to run an experiment someone gave me on the same system, but
+        substitute a different compiler or library.  <build-and-run-with-clang>`
 
     .. tutorialcontainer:: tutorial-next-step tutorial-goal-query
 
