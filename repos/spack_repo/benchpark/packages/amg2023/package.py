@@ -26,12 +26,7 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
     license("Apache-2.0")
 
     version("develop", branch="main")
-    version(
-        "20261006",
-        sha256="0ce8fe631cde79932d30f2c8f9ee08d160bc2c2ffba6ece8fa029f30256ecc71",
-        preferred=True,
-    )
-    version("20240511", branch="20240511")
+    version("20261006", sha256="0ce8fe631cde79932d30f2c8f9ee08d160bc2c2ffba6ece8fa029f30256ecc71")
 
     variant("mpi", default=True, description="Enable MPI support")
     variant("openmp", default=False, description="Enable OpenMP support")
@@ -48,18 +43,14 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
 
     depends_on("mpi", when="+mpi")
 
-    with when("+umpire"):
-        depends_on("umpire@2026.07.2:", when="@develop")
-        depends_on("umpire@2026.07.2", when="@20261006")
+    depends_on("umpire@2026.07.2:", when="@20261006: +umpire")
 
     depends_on("hypre+mpi", when="+mpi")
     requires("+mpi", when="^hypre+mpi")
     depends_on("caliper", when="+caliper")
     depends_on("adiak", when="+caliper")
     depends_on("hypre+caliper", when="+caliper")
-    depends_on("hypre@:2.29.0", when="@20240511")
-    depends_on("hypre@3.2.0", when="@20261006")
-    depends_on("hypre@3.2.0:", when="@develop")
+    depends_on("hypre@3.2.0:", when="@20261006:")
     depends_on("hypre~fortran")
     depends_on("hypre+mixedint", when="+mixedint")
 
@@ -84,7 +75,9 @@ class Amg2023(CMakePackage, CudaPackage, ROCmPackage):
         with when("+umpire"):
             depends_on("hypre+umpire")
         for arch in ROCmPackage.amdgpu_targets:
-            depends_on("hypre amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
+            depends_on(
+                "hypre amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch)
+            )
             depends_on(
                 "umpire amdgpu_target={0}".format(arch),
                 when="+umpire amdgpu_target={0}".format(arch),
