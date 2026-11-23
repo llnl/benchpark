@@ -290,8 +290,8 @@ initial version.
 ==================================
 
 The starter definition supports ``amd64`` with 4 or 32 cores per node. Adding the
-matching ``arm64`` configurations requires resource mappings and corresponding
-values in the ``instance_type`` variant.
+matching ``arm64`` configurations requires resource mappings and corresponding values in
+the ``instance_type`` variant.
 
 Replace the first Step 1 placeholder in ``id_to_resources`` with:
 
@@ -376,8 +376,8 @@ Initialize the system to validate the definition:
 
     $ benchpark system init --dest=fluxtainer fluxtainer
 
-To initialize the AWS configuration with 32 cores per node, select the
-``amd64-aws`` instance type:
+To initialize the AWS configuration with 32 cores per node, select the ``amd64-aws``
+instance type:
 
 .. code-block:: console
 

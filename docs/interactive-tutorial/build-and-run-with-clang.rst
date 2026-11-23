@@ -62,9 +62,8 @@ the tutorial system's compiler from its default ``gcc`` stack to ``clang``.
  What Changes in This Run
 **************************
 
-The default ``fluxtainer`` compiler is ``gcc``. To build the same HPL experiment
-with Clang, initialize a second system instance and select the ``compiler=clang``
-variant:
+The default ``fluxtainer`` compiler is ``gcc``. To build the same HPL experiment with
+Clang, initialize a second system instance and select the ``compiler=clang`` variant:
 
 .. code-block:: console
 
