@@ -17,8 +17,8 @@ class SpartaSnl(CMakePackage, CudaPackage, ROCmPackage):
     git = "https://github.com/sparta/sparta.git"
 
     version("master", branch="master")
-    version("20Jan2025", tag="20Jan2025")
-    version("20260102", commit="478143bcc766083a100480a0a6e8a0c42c85e7e4")
+    version("27Aug2026", tag="27Aug2026")
+    version("20260827", commit="95b9abaa8bd548991cc3c3f1c58b34722f7ade74")
 
     variant("mpi", default=True, description="Build with mpi")
     variant("openmp", default=False, description="Enable OpenMP support")
