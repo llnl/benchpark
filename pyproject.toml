@@ -58,5 +58,4 @@ explicit_start = false
 analyze = [
   "llnl-hatchet>=2025.2.0",
   "llnl-thicket[plotting]>=2026.1.0",
-  "matplotlib"
 ]
