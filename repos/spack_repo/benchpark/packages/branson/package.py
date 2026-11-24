@@ -29,7 +29,7 @@ class Branson(CMakePackage, CudaPackage, ROCmPackage):
 
     version(
         "0.90",
-        sha256="6a710f546b4d954e93db689b63fd5edcf52a57b01f3b72dcc4c90951cc4150dd",
+        sha256="e2a3bccc291caf136739f31e4908e41ca46b12561f362030a02d2f06ab1d89c8",
         preferred=True,
     )
     version(
