@@ -3,6 +3,7 @@
 # for the commit in checkout-versions.yaml.
 # Intentional differences from Ramble's list:
 #   - matplotlib is listed in requirements/benchpark.txt
+#   - pandas is omitted; it is provided by llnl-hatchet/llnl-thicket (.[analyze])
 google-cloud-storage # for gcs fetch test
 google-api-core # for gcs fetch error .exceptions
 graphlib-backport;python_version<"3.9"
@@ -13,7 +14,6 @@ pyarrow==3.0.0;python_version<="3.6"
 google-cloud-bigquery
 tqdm
 deprecation
-pandas
 setuptools
 scipy
 # Ramble 0.7 no longer vendors these runtime dependencies.
