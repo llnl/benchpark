@@ -11,10 +11,10 @@ jobs:
         with:
           python-version: '3.13'
           cache: pip
-          cache-dependency-path: .github/workflows/requirements/style.txt
+          cache-dependency-path: requirements/style.txt
       - name: Install Python dependencies
         run: |
-          pip install -r .github/workflows/requirements/style.txt
+          pip install -r requirements/style.txt
       - name: Lint and Format Check
         run: |-
           # Check format. To fix, run "ruff format ."

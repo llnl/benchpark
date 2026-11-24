@@ -5,10 +5,17 @@ updates:
     schedule:
       interval: daily
   - package-ecosystem: pip
-    directory: /.github/workflows/requirements
+    # Dependabot reads every requirements file in requirements/. The root
+    # requirements.txt only includes these files and is not scanned.
+    directory: /requirements
+    # ramble.txt is copied from Ramble; keep it in sync with checkout-versions.yaml.
+    exclude-paths: [requirements/ramble.txt]
     schedule:
       interval: weekly
     ignore:
-      # setuptools releases new versions almost daily
-      - dependency-name: setuptools
+      # Patch releases are too noisy. Security updates are still opened.
+      - dependency-name: '*'
         update-types: [version-update:semver-patch]
+    groups:
+      python:
+        patterns: ['*']
