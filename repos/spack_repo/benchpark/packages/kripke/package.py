@@ -2,10 +2,11 @@
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
-from spack.package import *
 from spack_repo.builtin.build_systems.cmake import CMakePackage
 from spack_repo.builtin.build_systems.cuda import CudaPackage
 from spack_repo.builtin.build_systems.rocm import ROCmPackage
+
+from spack.package import *
 
 
 class Kripke(CMakePackage, CudaPackage, ROCmPackage):
@@ -30,9 +31,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
         tag="v1.2.8",
         commit="46563d6d19afe7fdf65fc564638c7ec13615866f",
     )
-    version(
-        "1.2.7.0", submodules=False, commit="db920c1f5e1dcbb9e949d120e7d86efcdb777635"
-    )
+    version("1.2.7.0", submodules=False, commit="db920c1f5e1dcbb9e949d120e7d86efcdb777635")
     version(
         "1.2.7", submodules=True, tag="v1.2.7", commit="ddcac43cdad999f0346eb682065ef0af1847029d"
     )
@@ -69,7 +68,11 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
 
     variant("mpi", default=True, description="Build with MPI.")
     variant("chai", default=True, description="Build with CHAI/Umpire.")
-    variant("direct-device-plane", default=False, description="Use direct device allocator in Umpire for plane fields")
+    variant(
+        "direct-device-plane",
+        default=False,
+        description="Use direct device allocator in Umpire for plane fields",
+    )
     variant("openmp", default=False, description="Build with OpenMP enabled.")
     variant("caliper", default=False, description="Build with Caliper support enabled.")
     variant("gpu-aware-mpi", default=False, description="Enable GPU-aware MPI")
@@ -107,15 +110,15 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
 
         with when("+cuda"):
             for sm_ in CudaPackage.cuda_arch_values:
-                depends_on("umpire cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
-                depends_on("chai cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
+                depends_on(f"umpire cuda_arch={sm_}", when=f"cuda_arch={sm_}")
+                depends_on(f"chai cuda_arch={sm_}", when=f"cuda_arch={sm_}")
 
         depends_on("umpire+rocm", when="+rocm")
         depends_on("umpire~rocm", when="~rocm")
         with when("+rocm @1.2.5:"):
             for arch in ROCmPackage.amdgpu_targets:
-                depends_on("umpire amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
-                depends_on("chai amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
+                depends_on(f"umpire amdgpu_target={arch}", when=f"amdgpu_target={arch}")
+                depends_on(f"chai amdgpu_target={arch}", when=f"amdgpu_target={arch}")
 
         conflicts("^blt@0.7:", when="^chai@:2024.07.0")
 
@@ -133,12 +136,12 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     with when("+cuda~chai"):
         depends_on("umpire+cuda")
         for sm_ in CudaPackage.cuda_arch_values:
-            depends_on("umpire cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
+            depends_on(f"umpire cuda_arch={sm_}", when=f"cuda_arch={sm_}")
 
     with when("+rocm~chai"):
         depends_on("umpire+rocm")
         for arch in ROCmPackage.amdgpu_targets:
-            depends_on("umpire amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
+            depends_on(f"umpire amdgpu_target={arch}", when=f"amdgpu_target={arch}")
 
     depends_on("raja+openmp", when="+openmp")
     depends_on("raja~openmp", when="~openmp")
@@ -147,13 +150,13 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("raja~cuda", when="~cuda")
     with when("+cuda"):
         for sm_ in CudaPackage.cuda_arch_values:
-            depends_on("raja cuda_arch={0}".format(sm_), when="cuda_arch={0}".format(sm_))
+            depends_on(f"raja cuda_arch={sm_}", when=f"cuda_arch={sm_}")
 
     depends_on("raja+rocm", when="+rocm")
     depends_on("raja~rocm", when="~rocm")
     with when("+rocm"):
         for arch in ROCmPackage.amdgpu_targets:
-            depends_on("raja amdgpu_target={0}".format(arch), when="amdgpu_target={0}".format(arch))
+            depends_on(f"raja amdgpu_target={arch}", when=f"amdgpu_target={arch}")
 
     # googletest folder version hasn't been updated in over 5 years
     # and is commented out in later releases
@@ -177,9 +180,7 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
     def cmake_args(self):
         spec = self.spec
         args = []
-        if spec.satisfies("@develop"):
-            blt_cxx_std = "c++20"
-        elif spec.satisfies("@1.2.8"):
+        if spec.satisfies("@develop") or spec.satisfies("@1.2.8"):
             blt_cxx_std = "c++20"
         elif spec.satisfies("@:1.2.7.0"):
             blt_cxx_std = "c++14"
@@ -204,7 +205,11 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
 
         args.append(self.define_from_variant("ENABLE_GPU_AWARE_MPI", "gpu-aware-mpi"))
         if spec.satisfies("+gpu-aware-mpi"):
-            args.append(self.define_from_variant("ENABLE_DIRECT_UMPIRE_PLANE_STORAGE", "direct-device-plane"))
+            args.append(
+                self.define_from_variant(
+                    "ENABLE_DIRECT_UMPIRE_PLANE_STORAGE", "direct-device-plane"
+                )
+            )
         args.append(self.define_from_variant("ENABLE_OPENMP", "openmp"))
         args.append(self.define_from_variant("ENABLE_CALIPER", "caliper"))
 
@@ -221,8 +226,8 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
             rocm_archs = spec.variants["amdgpu_target"].value
             if "none" not in rocm_archs:
                 arch_str = ",".join(rocm_archs)
-                args.append("-DHIP_HIPCC_FLAGS=--amdgpu-target={0}".format(arch_str))
-                args.append("-DCMAKE_HIP_ARCHITECTURES={0}".format(arch_str))
+                args.append(f"-DHIP_HIPCC_FLAGS=--amdgpu-target={arch_str}")
+                args.append(f"-DCMAKE_HIP_ARCHITECTURES={arch_str}")
 
         args.append(self.define_from_variant("ENABLE_CUDA", "cuda"))
         if spec.satisfies("+cuda"):
@@ -233,8 +238,8 @@ class Kripke(CMakePackage, CudaPackage, ROCmPackage):
                 args.append(self.define("CMAKE_CUDA_HOST_COMPILER", self.compiler.cxx))
             if not spec.satisfies("cuda_arch=none"):
                 cuda_arch = spec.variants["cuda_arch"].value
-                args.append("-DCUDA_ARCH={0}".format(cuda_arch[0]))
-                args.append("-DCMAKE_CUDA_ARCHITECTURES={0}".format(cuda_arch[0]))
+                args.append(f"-DCUDA_ARCH={cuda_arch[0]}")
+                args.append(f"-DCMAKE_CUDA_ARCHITECTURES={cuda_arch[0]}")
             if spec.satisfies("+mpi"):
                 args.append(
                     "-DCMAKE_CUDA_FLAGS=--extended-lambda -I=%s"
