@@ -5,7 +5,8 @@ deepdiff
 pytest
 flake8
 xmltodict
-coverage
+# pyproject.toml enables subprocess coverage, introduced in coverage 7.10.
+coverage>=7.10
 pytest-cov
 pre-commit
 matplotlib

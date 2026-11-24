@@ -53,6 +53,8 @@ jobs:
               - 'README.rst'
               - 'taxonomy.yaml'
               - 'pyproject.toml'
+              - 'requirements.txt'
+              - 'requirements/**'
             style:
               - '.github/**'
               - '.gitlab/**'
@@ -69,6 +71,7 @@ jobs:
               - 'checkout-versions.yaml'
               - '.gitlab-ci.yml'
               - 'docs/**'
+              - 'requirements/**'
             run:
               - '.github/**'
               - 'bin/**'
@@ -78,7 +81,9 @@ jobs:
               - 'lib/**'
               - 'modifiers/**'
               - 'repos/**'
+              - 'pyproject.toml'
               - 'requirements.txt'
+              - 'requirements/**'
               - 'systems/**'
               - 'var/**'
             coverage:
@@ -91,6 +96,8 @@ jobs:
               - 'lib/**'
               - 'modifiers/**'
               - 'repos/**'
+              - 'requirements.txt'
+              - 'requirements/**'
               - 'systems/**'
               - 'var/**'
               - 'pyproject.toml'
@@ -117,6 +124,7 @@ jobs:
               - 'modifiers/**'
               - 'repos/**'
               - 'requirements.txt'
+              - 'requirements/**'
               - 'systems/fluxtainer/**'
               - 'systems/fluxtainer-aws/**'
               - 'var/**'

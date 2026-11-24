@@ -30,6 +30,7 @@ workflow:
           - pyproject.toml
           - remote-urls.yaml
           - requirements.txt
+          - requirements/**/*
 
     # Develop pipelines should diff against the previous develop commit.
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "develop"
