@@ -9,8 +9,8 @@ from spack_repo.builtin.packages.lammps.package import Lammps as BuiltinLammps
 
 class Lammps(BuiltinLammps):
 
-  # commit for FCR
-  version("20251219", commit="a51f9ba0e719be544293987bb3cbd9939f1b01ee")
+  # stable_30Sep2026_update1
+  version("20260930", commit="098ffdefa525cabc82272925de02e9884f58c657", preferred=True)
 
   variant("apu", default=False, description="Enable APU support", when="@4.5: +rocm")
 
