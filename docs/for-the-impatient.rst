@@ -8,7 +8,7 @@
  For the Impatient
 ###################
 
-You need git and Python 3.8+:
+You need git and Python 3.9+:
 
 ::
 

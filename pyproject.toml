@@ -2,7 +2,7 @@
 name="benchpark"
 description="An open collaborative repository for cross site benchmarking environments"
 readme = "README.rst"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 dynamic = ["version"]
 
 [tool.setuptools]
