@@ -14,13 +14,14 @@ jobs:
           cache: pip
           cache-dependency-path: |
             requirements.txt
-            docs/requirements.txt
+            requirements/*.txt
+            pyproject.toml
       - name: Setup GitHub Pages
         id: pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d
       - name: Install Sphinx and Theme via Pip
         run: |
-          pip install -r requirements.txt -r docs/requirements.txt
+          pip install -r requirements.txt -r requirements/docs.txt ".[analyze]"
           # create a dummy workspace to get a working ramble
           bin/benchpark system init --dest=generic-x86 generic-x86
           bin/benchpark experiment init --dest=saxpy generic-x86 saxpy
@@ -31,9 +32,6 @@ jobs:
         run: |
           cd docs
           make html WORKSPACE_PATH=/tmp/workspace
-      - name: Check for Typos using Codespell
-        run: |
-          codespell --ignore-words=.codespellignore
       - name: Upload artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         if: github.ref == 'refs/heads/develop'

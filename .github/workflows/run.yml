@@ -242,10 +242,10 @@ jobs:
           cache: pip
           cache-dependency-path: |
             requirements.txt
-            docs/requirements.txt
+            requirements/*.txt
       - name: Install deps
         run: |
-          pip install -r requirements.txt -r docs/requirements.txt
+          pip install -r requirements.txt -r requirements/docs.txt
       - name: Test Docs Scripts
         run: |-
           cd docs/

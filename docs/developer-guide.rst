@@ -67,11 +67,11 @@ To build the documentation, install the shared and documentation requirements:
 
 .. code-block:: bash
 
-    pip install -r requirements.txt -r docs/requirements.txt
+    pip install -r requirements.txt -r requirements/docs.txt ".[analyze]"
 
 This requires ``python>=3.11``. The documentation requirements select Sphinx 8.2.3 for
-Python 3.11 or 3.12 and the latest compatible Sphinx for Python 3.13 or newer. After
-updating the documentation, render the pages with the following:
+Python 3.11 or 3.12 and Sphinx 9.2.0 for Python 3.13 or newer. After updating the
+documentation, render the pages with the following:
 
 .. code-block:: bash
 
