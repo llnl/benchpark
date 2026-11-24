@@ -16,6 +16,14 @@ updates:
       # Patch releases are too noisy. Security updates are still opened.
       - dependency-name: '*'
         update-types: [version-update:semver-patch]
+      # jupyterhub is pinned intentionally. Security updates are still opened.
+      - dependency-name: jupyterhub
+        update-types: [version-update:semver-major, version-update:semver-minor]
     groups:
       python:
         patterns: ['*']
+  - package-ecosystem: docker
+    # Updates the digest-pinned base image in the Flux container.
+    directory: /containerfiles/flux/el10
+    schedule:
+      interval: weekly

@@ -1,4 +1,4 @@
-FROM fluxrm/flux-core:el10
+FROM fluxrm/flux-core:el10@sha256:7c0a53b719438c15239f075a867e1612f876d7c8017e716d237d8ce0a1921abe
 
 ARG TARGETARCH
 
@@ -54,13 +54,12 @@ ENV MPIBIND_INSTALL_PREFIX=/home/fluxuser/mpibind-install \
     GIT_CLONE_STAGING_DIR=/tmp/build \
     PATH=/home/fluxuser/.local/bin:${PATH:-}
 
+# Pinned Python packages for the container; maintained by Dependabot.
+COPY --chown=fluxuser:fluxuser requirements/container.txt /tmp/container-requirements.txt
+
 RUN pip install --upgrade pip \
-    && pip install pybind11 \
-    jupyterlab \
-    jupyterhub==5.3.0 \
-    ipywidgets \
-    matplotlib \
-    ipykernel \
+    && pip install -r /tmp/container-requirements.txt \
+    && rm /tmp/container-requirements.txt \
     && jupyter lab build --dev-build=False \
     && mkdir -p /home/fluxuser/.jupyter \
     && echo "c.ServerApp.ip = '0.0.0.0'" >> /home/fluxuser/.jupyter/jupyter_lab_config.py \
