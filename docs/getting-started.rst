@@ -12,7 +12,7 @@
  Installation
 **************
 
-Git is needed to clone Benchpark, and Python 3.9+ is needed to run Benchpark:
+Git is needed to clone Benchpark, and Python 3.8+ is needed to run Benchpark:
 
 ::
 

@@ -63,16 +63,21 @@ view of Benchpark's directory structure:
  Updating Python Dependencies
 ******************************
 
-Benchpark requires Python 3.9 or newer. Shared runtime and test dependencies live in
+Benchpark requires Python 3.8 or newer. Shared runtime and test dependencies live in
 ``requirements/benchpark.txt``. Add a lower bound only when Benchpark needs
-functionality from that release, and keep a release compatible with Python 3.9 available
+functionality from that release, and keep a release compatible with Python 3.8 available
 to pip. Otherwise, leave the requirement unpinned so pip can select a compatible
 release.
 
 Documentation, style, and container requirements use exact pins for their respective
 Python environments. Use environment markers when different Python versions need
 different pins, as in ``requirements/docs.txt``. The dependency workflow installs shared
-requirements and the analyze extra on Python 3.9 and 3.13, then runs ``pip check``.
+requirements and the analyze extra on Python 3.8 and 3.13, then runs ``pip check``.
+
+Coverage tools live separately in ``requirements/coverage.txt``. Coverage measures which
+lines and branches execute during tests; ``pytest-cov`` connects it to pytest. Jobs that
+collect coverage use Python 3.13 and install this file explicitly, so these tools do not
+raise the minimum Python version for user installations.
 
 ************************
  Updating Documentation

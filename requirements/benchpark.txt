@@ -1,12 +1,9 @@
-# Shared requirements must allow pip to select releases compatible with Python 3.9+.
+# Shared requirements must allow pip to select releases compatible with Python 3.8+.
 # Add a lower bound only when Benchpark needs functionality from that release.
 pyyaml
 deepdiff
 pytest
 flake8
 xmltodict
-# pyproject.toml enables subprocess coverage, introduced in coverage 7.10.
-coverage>=7.10
-pytest-cov
 pre-commit
 matplotlib

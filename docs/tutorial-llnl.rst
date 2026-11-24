@@ -19,7 +19,7 @@ To run Benchpark, you will need to install its requirements:
 
 1. Clone LLNL/Benchpark official repo
 
-You need git and Python 3.9+:
+You need git and Python 3.8+:
 
 ::
 

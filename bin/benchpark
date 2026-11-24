@@ -11,8 +11,8 @@ import sys
 import uuid
 
 # Must run before importing main: main.py bootstraps at import time.
-if sys.version_info[:2] < (3, 9):
-    sys.exit("ERR: Benchpark requires Python 3.9 or later.")
+if sys.version_info[:2] < (3, 8):
+    sys.exit("ERR: Benchpark requires Python 3.8 or later.")
 
 basedir = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(basedir / "lib"))

@@ -10,9 +10,13 @@ jobs:
     steps:
       - name: Checkout Benchpark
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+      - name: Setup Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: '3.13'
       - name: Add needed Python libs
         run: |
-          pip install -r ./requirements.txt
+          pip install -r ./requirements.txt -r requirements/coverage.txt
       - name: Build Saxpy Workspace
         run: |
           ./bin/benchpark system init --dest=generic-x86 generic-x86
@@ -153,9 +157,13 @@ jobs:
     steps:
       - name: Checkout Benchpark
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+      - name: Setup Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: '3.13'
       - name: Add needed Python libs
         run: |
-          pip install -r ./requirements.txt
+          pip install -r ./requirements.txt -r requirements/coverage.txt
       - name: Run Dryruns
         id: dryruns
         run: |
@@ -175,7 +183,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.9', '3.13']
+        python-version: ['3.8', '3.13']
     steps:
       - name: Checkout Benchpark
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0

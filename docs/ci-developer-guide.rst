@@ -218,6 +218,10 @@ Code Coverage
 "covered" by a given test, i.e. if a line was executed it counts as coverage. Code
 coverage should automatically report on all open pull requests.
 
+Coverage jobs use Python 3.13 and install ``requirements/coverage.txt`` in addition to
+the shared requirements. These tools are separate from user requirements so their Python
+minimum does not affect Benchpark installations.
+
 It is possible to run coverage for any test that uses ``bin/benchpark`` by providing
 ``BENCHPARK_RUN_COVERAGE=[YOUR_DIRNAME]`` and add an upload step which takes the
 following form.:
