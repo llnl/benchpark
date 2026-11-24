@@ -44,6 +44,7 @@ ignore-words-list = 'fom'
 [tool.coverage.run]
 # Also measure Python subprocesses, e.g. unit tests that run bin/benchpark.
 # pytest-cov >= 7 no longer does this on its own (needs coverage >= 7.10).
+# These CI-only tools are installed from requirements/coverage.txt.
 patch = ["subprocess"]
 # Measure Benchpark itself, not its unit tests. The leading * keeps the
 # pattern independent of the working directory of each (sub)process.
@@ -58,5 +59,4 @@ explicit_start = false
 analyze = [
   "llnl-hatchet>=2025.2.0",
   "llnl-thicket[plotting]>=2026.1.0",
-  "matplotlib"
 ]

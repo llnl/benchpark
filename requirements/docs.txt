@@ -1,0 +1,10 @@
+# Sphinx 9.2 requires Python 3.13; use Sphinx 8.2 on Python 3.11 and 3.12.
+sphinx==8.2.3; python_version < "3.13"
+sphinx==9.2.0; python_version >= "3.13"
+sphinx-rtd-theme==3.1.0
+sphinxcontrib-programoutput==0.20
+sphinx-copybutton==0.5.2
+sphinx_design==0.8.0
+sphinxcontrib.mermaid==2.1.1
+# Benchpark commands captured by program-output (e.g. `benchpark analyze -h`) need
+# Thicket's plotting modules; install them with `pip install ".[analyze]"`.

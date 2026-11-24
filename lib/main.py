@@ -126,7 +126,7 @@ except ModuleNotFoundError:
 
 def main():
     if sys.version_info[:2] < (3, 8):
-        raise Exception("Benchpark requires at least python 3.8+.")
+        raise Exception("Benchpark requires Python 3.8 or later.")
 
     parser = argparse.ArgumentParser(description="Benchpark")
     parser.add_argument(

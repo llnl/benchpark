@@ -7,9 +7,9 @@ ci:
 dependencies:
   - changed-files:
       - any-glob-to-any-file:
-          - .github/workflows/requirements/**
           - pyproject.toml
           - requirements.txt
+          - requirements/**
 docs:
   - changed-files:
       - any-glob-to-any-file: [docs/**, README.rst, taxonomy.yaml]

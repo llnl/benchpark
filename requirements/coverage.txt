@@ -1,0 +1,4 @@
+# CI-only coverage tools, installed with Python 3.13.
+# Subprocess coverage in pyproject.toml needs coverage >= 7.10.
+coverage==7.17.5
+pytest-cov==7.1.0

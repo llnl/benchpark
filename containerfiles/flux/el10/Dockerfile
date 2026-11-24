@@ -54,13 +54,12 @@ ENV MPIBIND_INSTALL_PREFIX=/home/fluxuser/mpibind-install \
     GIT_CLONE_STAGING_DIR=/tmp/build \
     PATH=/home/fluxuser/.local/bin:${PATH:-}
 
+# Pinned Python packages for the container; maintained by Dependabot.
+COPY --chown=fluxuser:fluxuser requirements/container.txt /tmp/container-requirements.txt
+
 RUN pip install --upgrade pip \
-    && pip install pybind11 \
-    jupyterlab \
-    jupyterhub==5.3.0 \
-    ipywidgets \
-    matplotlib \
-    ipykernel \
+    && pip install -r /tmp/container-requirements.txt \
+    && rm /tmp/container-requirements.txt \
     && jupyter lab build --dev-build=False \
     && mkdir -p /home/fluxuser/.jupyter \
     && echo "c.ServerApp.ip = '0.0.0.0'" >> /home/fluxuser/.jupyter/jupyter_lab_config.py \
@@ -88,7 +87,7 @@ COPY --chown=fluxuser:fluxuser . /home/fluxuser/benchpark
 WORKDIR /home/fluxuser/benchpark
 
 RUN pip install -r /home/fluxuser/benchpark/requirements.txt \
-    && pip install -r /home/fluxuser/benchpark/docs/requirements.txt \
+    && pip install -r /home/fluxuser/benchpark/requirements/docs.txt \
     && source /home/fluxuser/benchpark/setup-env.sh \
 	&& benchpark bootstrap \
     && pip install .[analyze] \

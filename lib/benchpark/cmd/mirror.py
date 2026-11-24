@@ -9,7 +9,9 @@ import os
 import os.path
 import pathlib
 import re
+import shlex
 import shutil
+import sys
 import tempfile
 
 from benchpark.paths import paths
@@ -120,9 +122,25 @@ def mirror_create(args):
         )
 
     cache_storage = os.path.join(dest, "pip-cache")
-    ramble_pip_reqs = os.path.join(paths.benchpark_root, "requirements.txt")
+    benchpark_pip_reqs = os.path.join(paths.benchpark_root, "requirements.txt")
+    ramble_pip_reqs = os.path.join(ramble_instance, "requirements.txt")
     if not os.path.exists(cache_storage):
-        run_command(f"pip download -r {ramble_pip_reqs} -d {cache_storage}")
+        run_command(
+            shlex.join(
+                [
+                    sys.executable,
+                    "-m",
+                    "pip",
+                    "download",
+                    "-r",
+                    benchpark_pip_reqs,
+                    "-r",
+                    ramble_pip_reqs,
+                    "-d",
+                    cache_storage,
+                ]
+            )
+        )
 
     ramble_workspace_dest = os.path.join(dest, ramble_workspace_relative)
     penultimate = pathlib.Path(*pathlib.Path(ramble_workspace_dest).parts[:-1])

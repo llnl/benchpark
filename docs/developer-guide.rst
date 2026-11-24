@@ -59,6 +59,35 @@ view of Benchpark's directory structure:
 
        systems/                  <- system specs
 
+******************************
+ Updating Python Dependencies
+******************************
+
+Benchpark requires Python 3.8 or newer. Shared runtime and test dependencies live in
+``requirements/benchpark.txt``. Add a lower bound only when Benchpark needs
+functionality from that release, and keep a release compatible with Python 3.8 available
+to pip. Otherwise, leave the requirement unpinned so pip can select a compatible
+release.
+
+Ramble's Python dependencies come from ``requirements.txt`` in its checkout, at the
+commit selected by ``checkout-versions.yaml``. Bootstrap installs them into the Python
+environment running Benchpark before importing Ramble. It checks installed versions on
+each invocation so an existing checkout also works with a new virtual environment. There
+is no separate copy of Ramble's requirements to maintain in Benchpark. ``benchpark
+mirror`` downloads both Benchpark's requirements and the workspace Ramble checkout's
+requirements for offline installation.
+
+Documentation, style, and container requirements use exact pins for their respective
+Python environments. Use environment markers when different Python versions need
+different pins, as in ``requirements/docs.txt``. The dependency workflow installs shared
+requirements, bootstraps Ramble, and installs the analyze extra on Python 3.8 and 3.13,
+then runs ``pip check``.
+
+Coverage tools live separately in ``requirements/coverage.txt``. Coverage measures which
+lines and branches execute during tests; ``pytest-cov`` connects it to pytest. Jobs that
+collect coverage use Python 3.13 and install this file explicitly, so these tools do not
+raise the minimum Python version for user installations.
+
 ************************
  Updating Documentation
 ************************
@@ -67,11 +96,11 @@ To build the documentation, install the shared and documentation requirements:
 
 .. code-block:: bash
 
-    pip install -r requirements.txt -r docs/requirements.txt
+    pip install -r requirements.txt -r requirements/docs.txt ".[analyze]"
 
 This requires ``python>=3.11``. The documentation requirements select Sphinx 8.2.3 for
-Python 3.11 or 3.12 and the latest compatible Sphinx for Python 3.13 or newer. After
-updating the documentation, render the pages with the following:
+Python 3.11 or 3.12 and Sphinx 9.2.0 for Python 3.13 or newer. After updating the
+documentation, render the pages with the following:
 
 .. code-block:: bash
 

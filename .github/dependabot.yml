@@ -5,10 +5,18 @@ updates:
     schedule:
       interval: daily
   - package-ecosystem: pip
-    directory: /.github/workflows/requirements
+    # Dependabot reads every requirements file in requirements/. The root
+    # requirements.txt includes benchpark.txt and is not scanned.
+    directory: /requirements
     schedule:
       interval: weekly
     ignore:
-      # setuptools releases new versions almost daily
-      - dependency-name: setuptools
+      # Patch releases are too noisy. Security updates are still opened.
+      - dependency-name: '*'
         update-types: [version-update:semver-patch]
+      # jupyterhub is pinned intentionally. Security updates are still opened.
+      - dependency-name: jupyterhub
+        update-types: [version-update:semver-major, version-update:semver-minor]
+    groups:
+      python:
+        patterns: ['*']

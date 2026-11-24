@@ -5,7 +5,9 @@
 
 import argparse
 import os
+import shlex
 import subprocess
+import sys
 
 import pytest
 
@@ -44,7 +46,11 @@ def benchpark_workspace(tmp_path):
     )
     _git_repo(
         root / "ramble",
-        {"bin/ramble": "#!/bin/sh\n", "etc/ramble/config.yaml": "config: {}\n"},
+        {
+            "bin/ramble": "#!/bin/sh\n",
+            "etc/ramble/config.yaml": "config: {}\n",
+            "requirements.txt": "pandas\n",
+        },
     )
     _git_repo(
         root / "spack-packages", {"repos/spack_repo/builtin/repo.yaml": "repo: {}\n"}
@@ -77,7 +83,7 @@ def recorded_commands(monkeypatch):
             return '{"saxpy": "0123abc"}', ""
         # pip download, spack bootstrap mirror and ramble workspace mirror
         # all create their destination directory
-        destination = command.split()[-1].replace("file://", "")
+        destination = shlex.split(command)[-1].replace("file://", "")
         os.makedirs(destination, exist_ok=True)
         return "", ""
 
@@ -119,6 +125,7 @@ def test_mirror_create_copies_workspace_for_offline_use(
     assert not (dest / "spack" / "etc" / "spack" / "config.yaml").exists()
     assert (dest / "spack" / "etc" / "spack" / "README").exists()
     assert not (dest / "ramble" / "etc" / "ramble" / "config.yaml").exists()
+    assert (dest / "ramble" / "requirements.txt").read_text() == "pandas\n"
     assert (dest / "spack-packages" / "repos" / "spack_repo" / "builtin").is_dir()
 
     # SVGs known to break the copy are deleted from the source Spack
@@ -137,7 +144,18 @@ def test_mirror_create_copies_workspace_for_offline_use(
 
     env_dir = ramble_workspace / "software" / "saxpy"
     req_file = paths.benchpark_root / "requirements.txt"
-    assert f"pip download -r {req_file} -d {dest / 'pip-cache'}" in recorded_commands
+    assert [
+        sys.executable,
+        "-m",
+        "pip",
+        "download",
+        "-r",
+        str(req_file),
+        "-r",
+        str(root / "ramble" / "requirements.txt"),
+        "-d",
+        str(dest / "pip-cache"),
+    ] in [shlex.split(command) for command in recorded_commands]
     assert any(c.startswith(f"spack -e {env_dir} python ") for c in recorded_commands)
     assert f"spack bootstrap mirror {dest / 'spack-bootstrap-mirror'}" in (
         recorded_commands
@@ -163,7 +181,8 @@ def test_mirror_create_reuses_existing_mirror(
     assert (dest / "setup.sh").read_text() == "edited\n"
     second_pass = recorded_commands[first_pass:]
     assert not any(
-        c.startswith(("pip download", "git ls-files", "spack bootstrap", "ramble "))
+        "pip download" in c
+        or c.startswith(("git ls-files", "spack bootstrap", "ramble "))
         for c in second_pass
     )
 
