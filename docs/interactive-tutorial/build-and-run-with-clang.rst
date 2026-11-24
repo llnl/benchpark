@@ -62,20 +62,16 @@ the tutorial system's compiler from its default ``gcc`` stack to ``clang``.
  What Changes in This Run
 **************************
 
-The default ``fluxtainer-aws`` compiler is ``gcc``. To build the same HPL experiment
-with Clang, initialize a second system instance and select the ``compiler=clang``
-variant:
+The default ``fluxtainer`` compiler is ``gcc``. To build the same HPL experiment with
+Clang, initialize a second system instance and select the ``compiler=clang`` variant:
 
 .. code-block:: console
 
-    benchpark]$ benchpark system init --dest=hpc-tutorial-clang fluxtainer-aws compiler=clang
+    benchpark]$ benchpark system init --dest=hpc-tutorial-clang fluxtainer instance_type=amd64-aws compiler=clang
 
-.. figure:: /_static/images/fluxtainer-aws-system-spec-clang.png
-    :alt: Tutorial system spec using clang
-    :width: 90%
-    :align: center
+The ``amd64-aws`` instance type retains the tutorial's 32 cores per node.
 
-Here ``compiler=clang`` is a Benchpark system variant provided by ``fluxtainer-aws``.
+Here ``compiler=clang`` is a Benchpark system variant provided by ``fluxtainer``.
 
 *******************
  Build and Run HPL

@@ -31,7 +31,7 @@ Initialize the AWS tutorial system:
 
 .. code-block:: console
 
-    benchpark]$ benchpark system init --dest=hpc-tutorial fluxtainer-aws
+    benchpark]$ benchpark system init --dest=hpc-tutorial fluxtainer instance_type=amd64-aws
 
 .. figure:: /_static/images/fluxtainer-aws-system-spec.png
     :alt: Tutorial system spec

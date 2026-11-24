@@ -16,7 +16,7 @@ systemconfigs:
 	./generate-sys-defs-list.py
 
 tags:
-	./generate-benchmark-list.py
+# 	./generate-benchmark-list.py
 
 .PHONY: help systemconfigs tags Makefile
 
