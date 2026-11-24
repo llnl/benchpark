@@ -351,6 +351,9 @@ class LlnlElcapitan(System):
         selections = {
             "packages": {
                 "all": {"require": [{"spec": "target=x86_64:"}]},
+                "camp": {"require": "@2025.09.0:"},
+                "blt": {"require": "@0.6.0:"},
+                "umpire": {"require": "@2025.09.0:"},
                 "tar": {"externals": [{"spec": "tar@1.30", "prefix": "/usr"}]},
                 "coreutils": {
                     "externals": [{"spec": "coreutils@8.30", "prefix": "/usr"}]
@@ -530,16 +533,21 @@ class LlnlElcapitan(System):
         compiler = self.spec.variants["compiler"][0]
 
         if compiler == "cce":
-            prefs = {"one_of": ["%cce", "%gcc"], "when": "%c"}
-            return {"packages": {"all": {"require": [prefs]}}}
+            x = ["cce"]
         elif compiler == "gcc":
-            prefs = {"one_of": ["%gcc"], "when": "%c"}
-            return {"packages": {"all": {"require": [prefs]}}}
+            x = ["gcc"]
         elif compiler == "rocmcc":
-            prefs = {"one_of": ["%rocmcc", "%gcc"], "when": "%c"}
-            return {"packages": {"all": {"require": [prefs]}}}
+            x = ["llvm-amdgpu"]
         else:
             raise ValueError(f"Unexpected value for compiler: {compiler}")
+
+        return {
+            "packages": {
+                "c": {"prefer": x},
+                "cxx": {"prefer": x},
+                "fortran": {"prefer": x},
+            }
+        }
 
     def compute_compilers_section(self):
         cfg = compiler_section_for(
@@ -902,7 +910,12 @@ class LlnlElcapitan(System):
         rocmcc_entry = compiler_def(
             f"llvm-amdgpu@{self.rocm_version}",
             self.rocm_llvm_prefix,
-            {"c": "amdclang", "cxx": "amdclang++", "fortran": "amdflang"},
+            {
+                "c": "amdclang",
+                "cxx": "amdclang++",
+                "fortran": "amdflang",
+                "hip": "amdclang++",
+            },
             modules=[f"rocm/{self.rocm_version}"],
             extra_rpaths=list(rpaths),
             env={
