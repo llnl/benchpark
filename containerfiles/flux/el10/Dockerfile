@@ -1,4 +1,4 @@
-FROM fluxrm/flux-core:el10@sha256:7c0a53b719438c15239f075a867e1612f876d7c8017e716d237d8ce0a1921abe
+FROM fluxrm/flux-core:el10
 
 ARG TARGETARCH
 

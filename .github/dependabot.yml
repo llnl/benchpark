@@ -22,8 +22,3 @@ updates:
     groups:
       python:
         patterns: ['*']
-  - package-ecosystem: docker
-    # Updates the digest-pinned base image in the Flux container.
-    directory: /containerfiles/flux/el10
-    schedule:
-      interval: weekly
