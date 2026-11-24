@@ -108,7 +108,7 @@ After choosing a system or experiment, inspect its variants and configuration de
 
 .. code-block:: console
 
-    ~]$ benchpark info system fluxtainer-aws
+    ~]$ benchpark info system fluxtainer
     ~]$ benchpark info experiment hpl
 
 To find systems with a specific CPU architecture, query their system resources:
