@@ -1,3 +1,2 @@
-# Benchpark's Python requirements. The shared lists live in requirements/.
+# Benchpark's Python requirements. Bootstrap installs Ramble's own requirements.
 -r requirements/benchpark.txt
--r requirements/ramble.txt

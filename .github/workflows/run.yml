@@ -196,9 +196,11 @@ jobs:
             requirements.txt
             requirements/*.txt
             pyproject.toml
+            checkout-versions.yaml
       - name: Add needed Python libs
         run: |
           pip install -r ./requirements.txt
+          ./bin/benchpark bootstrap
           pip install ".[analyze]"
       - name: Check installed dependencies
         run: |-
@@ -251,9 +253,11 @@ jobs:
           cache-dependency-path: |
             requirements.txt
             requirements/*.txt
+            checkout-versions.yaml
       - name: Install deps
         run: |
           pip install -r requirements.txt -r requirements/docs.txt
+          ./bin/benchpark bootstrap
       - name: Test Docs Scripts
         run: |-
           cd docs/

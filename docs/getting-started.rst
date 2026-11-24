@@ -35,14 +35,21 @@ Now, to check the version you can run:
  System Prerequisites
 **********************
 
-Once Benchpark is available on your system, its python dependencies can be installed
+Once Benchpark is available on your system, its Python dependencies can be installed
 using the ``requirements.txt`` file included in the root directory of Benchpark.
 
 To install this, you can use:
 
 ::
 
-    pip install -r requirements.txt
+    python3 -m pip install -r requirements.txt
+    benchpark bootstrap
+
+Bootstrap clones the configured Ramble and Spack versions and installs Ramble's Python
+requirements from its checkout into the Python environment running Benchpark. Use a
+virtual environment if your system Python does not allow package installation. Ordinary
+Benchpark commands also bootstrap automatically, installing requirements only when the
+active environment is missing a required package or compatible version.
 
 Now you are ready to look at the benchmarks and systems available in Benchpark, and
 determine your workflow as described in :doc:`benchpark-commands`.

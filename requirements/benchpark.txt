@@ -1,6 +1,7 @@
 # Shared requirements must allow pip to select releases compatible with Python 3.8+.
 # Add a lower bound only when Benchpark needs functionality from that release.
 pyyaml
+packaging
 deepdiff
 pytest
 flake8

@@ -6,10 +6,8 @@ updates:
       interval: daily
   - package-ecosystem: pip
     # Dependabot reads every requirements file in requirements/. The root
-    # requirements.txt only includes these files and is not scanned.
+    # requirements.txt includes benchpark.txt and is not scanned.
     directory: /requirements
-    # ramble.txt is copied from Ramble; keep it in sync with checkout-versions.yaml.
-    exclude-paths: [requirements/ramble.txt]
     schedule:
       interval: weekly
     ignore:

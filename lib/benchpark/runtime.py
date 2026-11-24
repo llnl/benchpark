@@ -4,9 +4,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import importlib
+import importlib.metadata
 import importlib.util
 import os
 import pathlib
+import re
 import shlex
 import shutil
 import subprocess
@@ -14,6 +16,7 @@ import sys
 from contextlib import contextmanager
 
 import yaml
+from packaging.requirements import InvalidRequirement, Requirement
 
 from benchpark.debug import debug_print
 from benchpark.paths import paths
@@ -151,6 +154,7 @@ class RuntimeResources:
             self._install_ramble()
         else:
             self._check_and_update_bootstrap(self.ramble_commit, self.ramble_location)
+        self._ensure_ramble_requirements()
         ramble_lib_path = self.ramble_location / "lib" / "ramble"
         externals = str(ramble_lib_path / "external")
         if externals not in sys.path:
@@ -221,6 +225,40 @@ class RuntimeResources:
         ):
             importlib.import_module(module_name)
 
+    def _ensure_ramble_requirements(self):
+        """Install the checkout's requirements when the active environment needs them."""
+        requirements = self.ramble_location / "requirements.txt"
+        for line in requirements.read_text().splitlines():
+            line = re.split(r"\s+#", line, maxsplit=1)[0].strip()
+            if not line or line.startswith("#"):
+                continue
+            try:
+                requirement = Requirement(line)
+            except InvalidRequirement:
+                # Let pip handle includes, options, and other requirements syntax.
+                break
+            if requirement.marker and not requirement.marker.evaluate():
+                continue
+            if requirement.extras or requirement.url:
+                # Distribution versions alone cannot verify extras or direct URLs.
+                break
+            try:
+                installed = importlib.metadata.version(requirement.name)
+            except importlib.metadata.PackageNotFoundError:
+                break
+            if not requirement.specifier.contains(installed, prereleases=True):
+                break
+        else:
+            return
+
+        print(
+            f"Installing Ramble requirements from {requirements} with {sys.executable}"
+        )
+        subprocess.check_call(
+            [sys.executable, "-m", "pip", "install", "-r", str(requirements)]
+        )
+        importlib.invalidate_caches()
+
     def _install_ramble(self):
         print(f"Cloning Ramble to {self.ramble_location}")
         git_clone_commit(
@@ -253,6 +291,7 @@ class RuntimeResources:
         if not self.ramble_location.exists():
             first_time = True
             self._install_ramble()
+        self._ensure_ramble_requirements()
         # Ramble's launcher runs $RAMBLE_PYTHON, else the first python3 on PATH.
         # This environment is otherwise empty (no PATH), so without this Ramble
         # falls back to the system python3, which lacks the dependencies that
